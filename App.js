@@ -9,7 +9,7 @@ import { OrderHistoryProvider } from './src/context/OrderHistoryContext';
 import { AuthProvider, useAuth } from './src/context/AuthContext';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import Svg, { Path, Circle } from 'react-native-svg';
+import Svg, { Path, Circle, Polyline, Line } from 'react-native-svg';
 import { colors } from './src/constants/colors';
 import { shadow, fontSize, fontWeight, radius } from './src/constants/tokens';
 
