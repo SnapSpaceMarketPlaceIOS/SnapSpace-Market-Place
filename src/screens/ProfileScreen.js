@@ -318,7 +318,7 @@ export default function ProfileScreen({ navigation }) {
             <View style={styles.bannerGradient} />
           )}
           <SafeAreaView style={styles.navRow}>
-            <View style={{ width: 36 }} />
+            <View style={{ width: space['2xl'] + space.xs }} />
             <TouchableOpacity style={styles.navBtn} onPress={() => setShowSettings(true)}>
               <GearIcon />
             </TouchableOpacity>
@@ -361,7 +361,7 @@ export default function ProfileScreen({ navigation }) {
               <Text style={styles.followValue}>1.4K</Text>
               <Text style={styles.followLabel}> Followers</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={[styles.followItem, { marginLeft: 20 }]}>
+            <TouchableOpacity style={[styles.followItem, { marginLeft: space.lg }]}>
               <Text style={styles.followValue}>284</Text>
               <Text style={styles.followLabel}> Following</Text>
             </TouchableOpacity>
@@ -453,7 +453,7 @@ export default function ProfileScreen({ navigation }) {
           ))}
         </View>
 
-        <View style={{ height: 40 }} />
+        <View style={{ height: space['3xl'] }} />
       </ScrollView>
 
       {/* ══════════════════════════════
@@ -697,7 +697,7 @@ export default function ProfileScreen({ navigation }) {
                 <TouchableOpacity style={styles.saveProfileBtn} onPress={saveEditProfile} activeOpacity={0.85}>
                   <Text style={styles.saveProfileBtnText}>Save</Text>
                 </TouchableOpacity>
-                <View style={{ height: 24 }} />
+                <View style={{ height: space.xl }} />
               </ScrollView>
             </View>
           </KeyboardAvoidingView>
@@ -1105,7 +1105,7 @@ const styles = StyleSheet.create({
   },
   version: {
     textAlign: 'center',
-    fontSize: 12,
+    fontSize: fontSize.xs,
     color: '#BBB',
   },
 

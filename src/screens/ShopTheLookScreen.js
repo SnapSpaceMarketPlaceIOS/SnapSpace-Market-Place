@@ -175,7 +175,7 @@ export default function ShopTheLookScreen({ route, navigation }) {
           );
         })}
 
-        <View style={{ height: 100 }} />
+        <View style={{ height: space['5xl'] + space['3xl'] }} />
       </ScrollView>
 
       {/* Bottom Bar */}

@@ -337,7 +337,7 @@ export default function ExploreScreen({ navigation }) {
             </View>
           )}
 
-          <View style={{ height: 20 }} />
+          <View style={{ height: space.lg }} />
         </ScrollView>
       </SafeAreaView>
 
@@ -463,7 +463,7 @@ export default function ExploreScreen({ navigation }) {
                 ))}
 
                 {/* Tags */}
-                <Text style={[styles.sectionLabel, { marginTop: 20 }]}>TAGS</Text>
+                <Text style={[styles.sectionLabel, { marginTop: space.lg }]}>TAGS</Text>
                 <View style={styles.tagsWrap}>
                   {selectedCard.tags.map((tag) => (
                     <View
@@ -485,7 +485,7 @@ export default function ExploreScreen({ navigation }) {
                   ))}
                 </View>
 
-                <View style={{ height: 24 }} />
+                <View style={{ height: space.xl }} />
               </ScrollView>
             </View>
           )}
@@ -508,6 +508,8 @@ export default function ExploreScreen({ navigation }) {
             onPress={() => setShowPostModal(false)}
           />
           <View style={[styles.modalSheet, { maxHeight: '82%' }]}>
+            {/* Drag handle */}
+            <View style={styles.modalDrag} />
             {/* Header */}
             <View style={styles.postModalHeader}>
               <TouchableOpacity onPress={() => setShowPostModal(false)} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
@@ -573,7 +575,7 @@ export default function ExploreScreen({ navigation }) {
                 ))}
               </View>
 
-              <View style={{ height: 24 }} />
+              <View style={{ height: space.xl }} />
             </ScrollView>
           </View>
         </View>

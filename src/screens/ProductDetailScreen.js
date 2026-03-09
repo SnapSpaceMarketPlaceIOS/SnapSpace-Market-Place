@@ -292,7 +292,7 @@ export default function ProductDetailScreen({ route, navigation }) {
             </View>
           )}
 
-          <View style={{ height: 110 }} />
+          <View style={{ height: space['5xl'] + space['4xl'] }} />
         </View>
       </ScrollView>
 
@@ -435,7 +435,7 @@ const styles = StyleSheet.create({
     marginLeft: space.xs,
   },
   ratingChevron: {
-    fontSize: 18,
+    fontSize: fontSize.md,
     color: '#AAA',
     opacity: 0.44,
     marginLeft: 2,
@@ -605,7 +605,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F0F0F0',
     marginVertical: 4,
   },
-  shippingEmoji: { fontSize: 18 },
+  shippingEmoji: { fontSize: fontSize.md },
   shippingLabel: { fontSize: fontSize.xs, fontWeight: fontWeight.bold, color: '#111', textAlign: 'center' },
   shippingDesc: { fontSize: fontSize.xs, color: '#AAA', opacity: 0.44, textAlign: 'center', fontWeight: fontWeight.regular },
   fromPost: {

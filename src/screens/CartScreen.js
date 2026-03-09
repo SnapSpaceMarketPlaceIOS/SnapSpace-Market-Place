@@ -391,7 +391,7 @@ export default function CartScreen({ navigation }) {
 
         </View>
 
-        <View style={{ height: 100 }} />
+        <View style={{ height: space['5xl'] + space['3xl'] }} />
       </ScrollView>
 
       {/* ── Checkout button ──────────────────────────────────── */}
@@ -505,7 +505,7 @@ const styles = StyleSheet.create({
     borderRadius: radius.sm,
   },
   categoryPillText: {
-    fontSize: 9,
+    fontSize: fontSize.xs,
     fontWeight: fontWeight.bold,
     color: '#fff',
     letterSpacing: letterSpacing.wider,
@@ -577,8 +577,8 @@ const styles = StyleSheet.create({
     marginTop: space.sm,
   },
   price: {
-    fontSize: fontSize.lg,
-    fontWeight: fontWeight.bold,
+    fontSize: fontSize.xl,
+    fontWeight: fontWeight.xbold,
     color: colors.black,
     letterSpacing: letterSpacing.tight,
     fontVariant: ['tabular-nums'],
@@ -681,8 +681,8 @@ const styles = StyleSheet.create({
     color: colors.black,
   },
   totalValue: {
-    fontSize: fontSize.lg,
-    fontWeight: fontWeight.bold,
+    fontSize: fontSize.xl,
+    fontWeight: fontWeight.xbold,
     color: colors.black,
     letterSpacing: letterSpacing.tight,
     fontVariant: ['tabular-nums'],
@@ -757,7 +757,7 @@ const styles = StyleSheet.create({
   },
   checkoutTextTotal: {
     fontSize: fontSize.md,
-    fontWeight: fontWeight.bold,
+    fontWeight: fontWeight.xbold,
     color: colors.white,
     letterSpacing: letterSpacing.tight,
   },
