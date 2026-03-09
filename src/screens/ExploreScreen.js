@@ -560,7 +560,7 @@ const styles = StyleSheet.create({
   // Header
   title: {
     fontSize: fontSize['2xl'],
-    fontWeight: fontWeight.bold,
+    fontWeight: fontWeight.xbold,
     color: '#000',
     letterSpacing: letterSpacing.tight,
     paddingHorizontal: space.lg,
@@ -795,7 +795,7 @@ const styles = StyleSheet.create({
   modalAvatar: {
     width: space['3xl'],
     height: space['3xl'],
-    borderRadius: space['3xl'] / 2,
+    borderRadius: radius.full,
     backgroundColor: colors.bluePrimary,
     alignItems: 'center',
     justifyContent: 'center',

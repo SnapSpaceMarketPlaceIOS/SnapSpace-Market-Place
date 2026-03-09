@@ -148,13 +148,12 @@ export default function ProductDetailScreen({ route, navigation }) {
 
           {/* Rating + stock */}
           <View style={styles.ratingStockRow}>
-            <View style={styles.ratingRow}>
-              {[1, 2, 3, 4, 5].map((s) => (
-                <StarIcon key={s} filled={s <= 4} />
-              ))}
+            <TouchableOpacity style={styles.ratingRow} activeOpacity={0.7}>
+              <StarIcon filled />
               <Text style={styles.ratingText}>4.0</Text>
               <Text style={styles.reviewCount}>(128 reviews)</Text>
-            </View>
+              <Text style={styles.ratingChevron}>›</Text>
+            </TouchableOpacity>
             <View style={styles.inStockBadge}>
               <View style={styles.inStockDot} />
               <Text style={styles.inStockText}>In Stock</Text>
@@ -356,7 +355,7 @@ const styles = StyleSheet.create({
   },
   name: {
     fontSize: fontSize.xl,
-    fontWeight: fontWeight.bold,
+    fontWeight: fontWeight.xbold,
     color: colors.black,
     letterSpacing: letterSpacing.tight,
     lineHeight: fontSize.xl * 1.15,
@@ -384,6 +383,13 @@ const styles = StyleSheet.create({
     color: '#AAA',
     opacity: 0.44,
     marginLeft: space.xs,
+  },
+  ratingChevron: {
+    fontSize: 18,
+    color: '#AAA',
+    opacity: 0.44,
+    marginLeft: 2,
+    lineHeight: 20,
   },
   inStockBadge: {
     flexDirection: 'row',
@@ -416,7 +422,7 @@ const styles = StyleSheet.create({
   },
   price: {
     fontSize: fontSize['2xl'],
-    fontWeight: fontWeight.bold,
+    fontWeight: fontWeight.xbold,
     color: colors.black,
     letterSpacing: letterSpacing.tight,
     fontVariant: ['tabular-nums'],

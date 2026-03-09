@@ -44,7 +44,7 @@ function PlusIcon() {
 
 function ShoppingBagIcon() {
   return (
-    <Svg width={52} height={52} viewBox="0 0 24 24" fill="none" stroke={colors.gray} strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round">
+    <Svg width={64} height={64} viewBox="0 0 24 24" fill="none" stroke={colors.gray} strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.3 }}>
       <Path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
       <Circle cx={10} cy={20.5} r={1} fill={colors.gray} stroke={colors.gray} strokeWidth={1} />
       <Circle cx={17} cy={20.5} r={1} fill={colors.gray} stroke={colors.gray} strokeWidth={1} />
@@ -376,7 +376,11 @@ export default function CartScreen({ navigation }) {
             );
           }}
         >
-          <Text style={styles.checkoutText}>Checkout  ·  ${total.toLocaleString()}</Text>
+          <Text style={styles.checkoutText}>
+            <Text style={styles.checkoutTextLabel}>Checkout</Text>
+            <Text style={styles.checkoutTextSep}>  ·  </Text>
+            <Text style={styles.checkoutTextTotal}>${total.toLocaleString()}</Text>
+          </Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -405,7 +409,7 @@ const styles = StyleSheet.create({
   },
   pageTitle: {
     fontSize: fontSize['2xl'],
-    fontWeight: fontWeight.bold,
+    fontWeight: fontWeight.xbold,
     color: colors.black,
     letterSpacing: letterSpacing.tight,
   },
@@ -701,8 +705,22 @@ const styles = StyleSheet.create({
   },
   checkoutText: {
     color: colors.white,
+  },
+  checkoutTextLabel: {
+    fontSize: fontSize.md,
+    fontWeight: fontWeight.medium,
+    color: colors.white,
+    letterSpacing: letterSpacing.tight,
+  },
+  checkoutTextSep: {
+    fontSize: fontSize.md,
+    fontWeight: fontWeight.regular,
+    color: 'rgba(255,255,255,0.6)',
+  },
+  checkoutTextTotal: {
     fontSize: fontSize.md,
     fontWeight: fontWeight.bold,
+    color: colors.white,
     letterSpacing: letterSpacing.tight,
   },
 
@@ -720,6 +738,7 @@ const styles = StyleSheet.create({
     color: colors.black,
     marginTop: space.lg,
     marginBottom: space.sm,
+    letterSpacing: letterSpacing.tight,
   },
   emptySubtitle: {
     fontSize: fontSize.base,
@@ -732,9 +751,10 @@ const styles = StyleSheet.create({
   },
   emptyBtn: {
     backgroundColor: colors.bluePrimary,
-    paddingHorizontal: space['2xl'],
-    paddingVertical: space.md,
+    paddingHorizontal: space['3xl'],
+    height: 52,
     borderRadius: radius.md,
+    justifyContent: 'center',
     shadowColor: shadow.low.shadowColor,
     shadowOffset: shadow.low.shadowOffset,
     shadowOpacity: shadow.low.shadowOpacity,
@@ -744,6 +764,6 @@ const styles = StyleSheet.create({
   emptyBtnText: {
     color: colors.white,
     fontSize: fontSize.base,
-    fontWeight: fontWeight.bold,
+    fontWeight: fontWeight.medium,
   },
 });

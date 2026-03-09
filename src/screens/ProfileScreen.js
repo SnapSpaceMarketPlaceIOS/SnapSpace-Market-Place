@@ -778,14 +778,15 @@ const styles = StyleSheet.create({
     marginTop: -44,
     marginBottom: space.md,
   },
+  // avatar is 88px so marginTop: -44 places it half-overlapping the banner
   avatarWrap: {
     position: 'relative',
   },
   avatar: {
-    width: 108,
-    height: 108,
+    width: 88,
+    height: 88,
     borderRadius: radius.full,
-    borderWidth: 4,
+    borderWidth: 3,
     borderColor: '#fff',
     shadowColor: shadow.medium.shadowColor,
     shadowOffset: shadow.medium.shadowOffset,
@@ -801,7 +802,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   avatarInitial: {
-    fontSize: fontSize['3xl'],
+    fontSize: fontSize.xl,
     fontWeight: fontWeight.bold,
     color: '#fff',
   },
@@ -811,13 +812,14 @@ const styles = StyleSheet.create({
     borderRadius: radius.full,
   },
   editProfileBtn: {
+    height: 36,
     borderRadius: radius.sm,
     paddingHorizontal: space.xl,
-    paddingVertical: space.sm,
     borderWidth: 1,
     borderColor: 'rgba(0,0,0,0.08)',
     backgroundColor: '#fff',
     marginBottom: space.xs,
+    justifyContent: 'center',
   },
   editProfileBtnText: {
     color: '#222',
@@ -833,7 +835,7 @@ const styles = StyleSheet.create({
   },
   displayName: {
     fontSize: fontSize.xl,
-    fontWeight: fontWeight.bold,
+    fontWeight: fontWeight.xbold,
     color: '#111',
     letterSpacing: letterSpacing.tight,
   },
@@ -851,6 +853,7 @@ const styles = StyleSheet.create({
     opacity: 0.44,
     marginBottom: space.sm,
     fontWeight: fontWeight.regular,
+    marginTop: space.xs,
   },
   bio: {
     fontSize: fontSize.sm,
@@ -859,6 +862,7 @@ const styles = StyleSheet.create({
     lineHeight: fontSize.sm * 1.5,
     marginBottom: space.md,
     fontWeight: fontWeight.regular,
+    marginTop: space.sm,
   },
 
   // Followers / Following inline
@@ -872,12 +876,12 @@ const styles = StyleSheet.create({
     alignItems: 'baseline',
   },
   followValue: {
-    fontSize: fontSize.sm,
+    fontSize: fontSize.base,
     fontWeight: fontWeight.bold,
     color: '#111',
   },
   followLabel: {
-    fontSize: fontSize.sm,
+    fontSize: fontSize.base,
     color: '#888',
     opacity: 0.44,
     fontWeight: fontWeight.regular,

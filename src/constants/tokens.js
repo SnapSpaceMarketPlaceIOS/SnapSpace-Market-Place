@@ -54,11 +54,12 @@ export const fontSize = {
   '3xl': 40,
 };
 
-// ── Font Weights — Only 3 allowed ─────────────────────────────────────────────
+// ── Font Weights ───────────────────────────────────────────────────────────────
 export const fontWeight = {
   regular: '400',  // metadata, captions, supporting text
   medium: '500',   // secondary labels, navigation items
   bold: '700',     // prices, headings, primary actions
+  xbold: '800',    // screen titles, hero headings, dominant prices
 };
 
 // ── Letter Spacing ────────────────────────────────────────────────────────────

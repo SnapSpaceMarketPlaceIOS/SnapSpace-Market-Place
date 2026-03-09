@@ -8,10 +8,11 @@ import {
   Dimensions,
   Animated,
   Easing,
+  ScrollView,
 } from 'react-native';
 import Svg, { Path, Circle, Line, Polyline } from 'react-native-svg';
 import { LinearGradient } from 'expo-linear-gradient';
-import { fontSize, fontWeight, letterSpacing, palette, space, radius } from '../constants/tokens';
+import { fontSize, fontWeight, letterSpacing, palette, space, radius, shadow } from '../constants/tokens';
 
 const { width, height } = Dimensions.get('window');
 
@@ -83,6 +84,16 @@ function getFirstName(user) {
   const full = user?.user_metadata?.full_name || user?.user_metadata?.name || '';
   return full.split(' ')[0] || null;
 }
+
+// ─── Trending data ───────────────────────────────────────────────────────────
+
+const TRENDING = [
+  { id: 1, title: 'Nordic Living', tag: 'Minimalist', initial: 'A', color: '#3B82F6' },
+  { id: 2, title: 'Warm Japandi', tag: 'Cozy', initial: 'B', color: '#8B5CF6' },
+  { id: 3, title: 'Bold Maximalist', tag: 'Eclectic', initial: 'C', color: '#F59E0B' },
+  { id: 4, title: 'Coastal Boho', tag: 'Serene', initial: 'D', color: '#10B981' },
+  { id: 5, title: 'Industrial Chic', tag: 'Urban', initial: 'E', color: '#EF4444' },
+];
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
@@ -235,6 +246,38 @@ export default function HomeScreen({ navigation, user = null }) {
           {/* ── Bottom padding — lifts content above nav bar ────── */}
           <View style={styles.bottomSpacer} />
         </LinearGradient>
+
+        {/* ── Below-fold: Trending section hints there's more ── */}
+        <View style={styles.trendingSection}>
+          <View style={styles.trendingHeader}>
+            <Text style={styles.trendingLabel}>TRENDING THIS WEEK</Text>
+            <TouchableOpacity activeOpacity={0.7}>
+              <Text style={styles.trendingSeeAll}>See all</Text>
+            </TouchableOpacity>
+          </View>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.trendingScroll}
+          >
+            {TRENDING.map((item) => (
+              <TouchableOpacity
+                key={item.id}
+                style={styles.trendingCard}
+                activeOpacity={0.82}
+                onPress={() => navigation?.navigate('Explore')}
+              >
+                <View style={[styles.trendingCardImg, { backgroundColor: item.color + '22' }]}>
+                  <View style={[styles.trendingCardInitial, { backgroundColor: item.color }]}>
+                    <Text style={styles.trendingCardInitialText}>{item.initial}</Text>
+                  </View>
+                </View>
+                <Text style={styles.trendingCardTitle} numberOfLines={1}>{item.title}</Text>
+                <Text style={styles.trendingCardTag}>{item.tag}</Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        </View>
       </Animated.ScrollView>
     </View>
   );
@@ -259,7 +302,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
   },
   overlay: {
-    flex: 1,
+    height: height,
     paddingTop: space['5xl'],
   },
 
@@ -312,7 +355,7 @@ const styles = StyleSheet.create({
     gap: space.base,
   },
   bottomSpacer: {
-    flex: 1,
+    height: 80,
   },
 
   // ── Hero
@@ -330,7 +373,7 @@ const styles = StyleSheet.create({
   },
   headline: {
     fontSize: 38,
-    fontWeight: fontWeight.bold,
+    fontWeight: fontWeight.xbold,
     color: '#FFFFFF',
     lineHeight: 44,
     letterSpacing: letterSpacing.tight,
@@ -339,7 +382,7 @@ const styles = StyleSheet.create({
     textShadowRadius: 12,
   },
   headlineBold: {
-    fontWeight: fontWeight.bold,
+    fontWeight: fontWeight.xbold,
   },
   searchBar: {
     flexDirection: 'row',
@@ -416,5 +459,79 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.1)',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+
+  // ── Below-fold trending section
+  trendingSection: {
+    backgroundColor: '#F8FAFF',
+    paddingTop: space.xl,
+    paddingBottom: space['3xl'],
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(0,0,0,0.06)',
+  },
+  trendingHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: space.lg,
+    marginBottom: space.base,
+  },
+  trendingLabel: {
+    fontSize: fontSize.xs,
+    fontWeight: fontWeight.bold,
+    color: '#000',
+    letterSpacing: letterSpacing.wider,
+    textTransform: 'uppercase',
+    opacity: 0.44,
+  },
+  trendingSeeAll: {
+    fontSize: fontSize.sm,
+    fontWeight: fontWeight.medium,
+    color: '#0B6DC3',
+  },
+  trendingScroll: {
+    paddingHorizontal: space.lg,
+    gap: space.md,
+  },
+  trendingCard: {
+    width: 120,
+    shadowColor: shadow.low.shadowColor,
+    shadowOffset: shadow.low.shadowOffset,
+    shadowOpacity: shadow.low.shadowOpacity,
+    shadowRadius: shadow.low.shadowRadius,
+    elevation: shadow.low.elevation,
+  },
+  trendingCardImg: {
+    width: 120,
+    height: 100,
+    borderRadius: radius.lg,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: space.sm,
+    borderWidth: 1,
+    borderColor: 'rgba(0,0,0,0.04)',
+  },
+  trendingCardInitial: {
+    width: 40,
+    height: 40,
+    borderRadius: radius.full,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  trendingCardInitialText: {
+    fontSize: fontSize.lg,
+    fontWeight: fontWeight.bold,
+    color: '#fff',
+  },
+  trendingCardTitle: {
+    fontSize: fontSize.sm,
+    fontWeight: fontWeight.medium,
+    color: '#111',
+    marginBottom: 2,
+  },
+  trendingCardTag: {
+    fontSize: fontSize.xs,
+    color: '#888',
+    opacity: 0.72,
   },
 });
