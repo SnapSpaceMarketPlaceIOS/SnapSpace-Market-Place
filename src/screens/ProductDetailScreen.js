@@ -130,9 +130,18 @@ export default function ProductDetailScreen({ route, navigation }) {
           <View style={styles.imagePlaceholder}>
             <SofaLargeIcon />
           </View>
+          {/* Pagination dots — plan for multiple images */}
+          <View style={styles.paginationDots}>
+            {[0, 1, 2, 3, 4].map((_, i) => (
+              <View key={i} style={[styles.dot, i === 0 && styles.dotActive]} />
+            ))}
+          </View>
         </LinearGradient>
 
+        {/* Content sheet: overlaps image by 20px, rounded top corners */}
         <View style={styles.content}>
+          {/* Grab handle */}
+          <View style={styles.contentHandle} />
           {/* Brand + Name */}
           <Text style={styles.retailer}>{brandName}</Text>
           <Text style={styles.name}>{name}</Text>
@@ -270,7 +279,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
   },
   imageSection: {
-    height: height * 0.4,
+    height: height * 0.44,
     justifyContent: 'space-between',
   },
   topBar: {
@@ -297,15 +306,53 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  // Content sheet — overlaps image by 20px, rounded top, shadow.high
   content: {
+    marginTop: -20,
+    borderTopLeftRadius: radius.xl,
+    borderTopRightRadius: radius.xl,
+    backgroundColor: colors.white,
     paddingHorizontal: space.lg,
-    paddingTop: space.xl,
+    paddingTop: space.md,
+    shadowColor: shadow.high.shadowColor,
+    shadowOffset: shadow.high.shadowOffset,
+    shadowOpacity: shadow.high.shadowOpacity,
+    shadowRadius: shadow.high.shadowRadius,
+    elevation: shadow.high.elevation,
+  },
+  contentHandle: {
+    width: 40,
+    height: 4,
+    backgroundColor: 'rgba(0,0,0,0.12)',
+    borderRadius: 2,
+    alignSelf: 'center',
+    marginBottom: space.base,
+  },
+  // Image pagination dots
+  paginationDots: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 6,
+    paddingBottom: space.base,
+  },
+  dot: {
+    width: 6,
+    height: 6,
+    borderRadius: radius.full,
+    backgroundColor: 'rgba(255,255,255,0.4)',
+  },
+  dotActive: {
+    backgroundColor: colors.bluePrimary,
+    width: 16,
+    borderRadius: 3,
   },
   retailer: {
     fontSize: fontSize.sm,
     fontWeight: fontWeight.medium,
     color: colors.bluePrimary,
     marginBottom: space.xs,
+    marginTop: space.sm,
   },
   name: {
     fontSize: fontSize.xl,

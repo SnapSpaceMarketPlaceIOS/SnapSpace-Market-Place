@@ -15,6 +15,7 @@ import {
   Share,
   Linking,
 } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path, Circle, Line, Polyline, Rect } from 'react-native-svg';
 import { colors } from '../constants/colors';
@@ -315,6 +316,12 @@ export default function ProfileScreen({ navigation }) {
           ) : (
             <View style={styles.bannerGradient} />
           )}
+          {/* Bottom gradient overlay — fades into profile header bg */}
+          <LinearGradient
+            colors={['transparent', 'rgba(255,255,255,0.85)']}
+            style={styles.bannerBottomFade}
+            pointerEvents="none"
+          />
           <SafeAreaView style={styles.navRow}>
             <View style={{ width: 36 }} />
             <TouchableOpacity style={styles.navBtn} onPress={() => setShowSettings(true)}>
@@ -365,25 +372,30 @@ export default function ProfileScreen({ navigation }) {
             </TouchableOpacity>
           </View>
 
-          {/* Action icon buttons — Cart, Liked, Repost, Shared */}
-          <View style={styles.actionRow}>
+          {/* Action pill chips — horizontal scroll */}
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={styles.actionRow}
+            contentContainerStyle={styles.actionRowContent}
+          >
             {[
               { label: 'Cart',   icon: <CartActionIcon />, screen: 'Cart' },
-              { label: 'Liked',  icon: <HeartIcon size={18} />, screen: 'Liked' },
+              { label: 'Liked',  icon: <HeartIcon size={16} />, screen: 'Liked' },
               { label: 'Repost', icon: <RepostIcon /> },
               { label: 'Shared', icon: <SharedIcon />, screen: 'Shared' },
             ].map(({ label, icon, screen }) => (
               <TouchableOpacity
                 key={label}
-                style={styles.actionItem}
+                style={styles.actionChip}
                 activeOpacity={0.7}
                 onPress={() => screen && navigation?.navigate(screen)}
               >
-                <View style={styles.actionCircle}>{icon}</View>
-                <Text style={styles.actionLabel}>{label}</Text>
+                {icon}
+                <Text style={styles.actionChipLabel}>{label}</Text>
               </TouchableOpacity>
             ))}
-          </View>
+          </ScrollView>
         </View>
 
         {/* ── Tabs ── */}
@@ -712,6 +724,7 @@ const styles = StyleSheet.create({
   banner: {
     height: BANNER_HEIGHT,
     position: 'relative',
+    overflow: 'hidden',
   },
   bannerGradient: {
     ...StyleSheet.absoluteFillObject,
@@ -722,6 +735,15 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
     width: '100%',
     height: '100%',
+  },
+  // 60px gradient at the bottom of the banner fading into white
+  bannerBottomFade: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: 60,
+    pointerEvents: 'none',
   },
   navRow: {
     flexDirection: 'row',
@@ -861,29 +883,28 @@ const styles = StyleSheet.create({
     fontWeight: fontWeight.regular,
   },
 
-  // Action icon buttons
+  // Action pill chips — horizontal scroll row
   actionRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingHorizontal: space.base,
     marginBottom: space.sm,
+    marginTop: space.lg,
   },
-  actionItem: {
+  actionRowContent: {
+    paddingHorizontal: space.lg,
+    gap: space.sm,
+  },
+  actionChip: {
+    flexDirection: 'row',
     alignItems: 'center',
-    gap: space.xs,
-  },
-  actionCircle: {
-    width: space['4xl'],
-    height: space['4xl'],
-    borderRadius: radius.full,
+    height: 36,
+    paddingHorizontal: space.base,
+    borderRadius: radius.sm,
     backgroundColor: '#F1F5F9',
-    alignItems: 'center',
-    justifyContent: 'center',
+    gap: 6,
   },
-  actionLabel: {
+  actionChipLabel: {
     fontSize: fontSize.xs,
-    color: '#555',
     fontWeight: fontWeight.medium,
+    color: '#333',
   },
 
   // Tabs

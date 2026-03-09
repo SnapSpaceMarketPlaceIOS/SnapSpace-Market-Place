@@ -207,26 +207,29 @@ export default function ExploreScreen({ navigation }) {
           {/* ── Search Row ── */}
           <View style={styles.searchRow}>
             <View style={styles.searchWrap}>
+              <SearchIcon color="#999" size={18} />
               <TextInput
                 style={styles.searchInput}
-                placeholder="Search Snap Space Designs..."
-                placeholderTextColor="#bbb"
+                placeholder="Search designs, styles, rooms..."
+                placeholderTextColor="#AAA"
                 value={search}
                 onChangeText={setSearch}
               />
-              <TouchableOpacity style={styles.searchSubmit} onPress={() => Keyboard.dismiss()}>
-                <SearchIcon color="#fff" size={15} />
-              </TouchableOpacity>
+              {search.length > 0 && (
+                <TouchableOpacity style={styles.searchSubmit} onPress={() => { setSearch(''); Keyboard.dismiss(); }}>
+                  <CloseIcon size={14} />
+                </TouchableOpacity>
+              )}
             </View>
             <TouchableOpacity
               style={styles.postBtn}
               onPress={() => setShowPostModal(true)}
             >
-              <PlusIcon color="#555" size={18} />
+              <PlusIcon color={colors.bluePrimary} size={18} />
             </TouchableOpacity>
           </View>
 
-          {/* ── Category Tabs ── */}
+          {/* ── Category Filter Pills ── */}
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
@@ -236,14 +239,13 @@ export default function ExploreScreen({ navigation }) {
             {CATEGORIES.map((cat, i) => (
               <TouchableOpacity
                 key={cat}
-                style={styles.tab}
+                style={[styles.tab, activeCategory === i && styles.tabActive]}
                 onPress={() => setActiveCategory(i)}
-                activeOpacity={0.7}
+                activeOpacity={0.75}
               >
                 <Text style={[styles.tabLabel, activeCategory === i && styles.tabLabelActive]}>
                   {cat}
                 </Text>
-                {activeCategory === i && <View style={styles.tabUnderline} />}
               </TouchableOpacity>
             ))}
           </ScrollView>
@@ -587,11 +589,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(0,0,0,0.08)',
+    borderColor: 'rgba(0,0,0,0.04)',
     borderRadius: radius.md,
-    height: space['4xl'],
-    paddingLeft: space.base,
+    height: 48,
+    paddingLeft: space.md,
     paddingRight: space.xs,
+    gap: space.sm,
     backgroundColor: '#F1F5F9',
   },
   searchInput: {
@@ -600,16 +603,16 @@ const styles = StyleSheet.create({
     color: '#555',
   },
   searchSubmit: {
-    width: 34,
-    height: 34,
+    width: 28,
+    height: 28,
     borderRadius: radius.full,
-    backgroundColor: colors.bluePrimary,
+    backgroundColor: 'rgba(0,0,0,0.06)',
     alignItems: 'center',
     justifyContent: 'center',
   },
   postBtn: {
-    width: 44,
-    height: 44,
+    width: 48,
+    height: 48,
     borderRadius: radius.md,
     borderWidth: 1,
     borderColor: 'rgba(0,0,0,0.08)',
@@ -618,41 +621,45 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
   },
 
-  // Category tabs
+  // Category filter pills
   tabsScroll: {
     marginHorizontal: 0,
   },
   tabsContent: {
     paddingHorizontal: space.lg,
     gap: space.sm,
+    paddingVertical: space.sm,
   },
+  // Inactive pill: transparent bg, border.light
   tab: {
-    paddingBottom: space.md,
-    marginRight: space.lg,
-    position: 'relative',
+    height: 36,
+    paddingHorizontal: space.base,
+    borderRadius: radius.sm,
+    backgroundColor: 'transparent',
+    borderWidth: 1,
+    borderColor: 'rgba(0,0,0,0.08)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  // Active pill: brand blue fill, no border
+  tabActive: {
+    backgroundColor: colors.bluePrimary,
+    borderColor: 'transparent',
   },
   tabLabel: {
     fontSize: fontSize.sm,
     fontWeight: fontWeight.medium,
-    color: '#A0A0A8',
+    color: 'rgba(0,0,0,0.6)',
   },
   tabLabelActive: {
-    color: '#111',
+    color: '#FFFFFF',
     fontWeight: fontWeight.bold,
-  },
-  tabUnderline: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: 2.5,
-    backgroundColor: colors.bluePrimary,
-    borderRadius: 2,
   },
   tabBorder: {
     height: 1,
     backgroundColor: 'rgba(0,0,0,0.06)',
     marginBottom: space.md,
+    marginTop: space.xs,
   },
 
   // Grid

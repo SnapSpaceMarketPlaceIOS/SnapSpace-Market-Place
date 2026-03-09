@@ -18,7 +18,7 @@ import { useOrderHistory } from '../context/OrderHistoryContext';
 
 function TrashIcon() {
   return (
-    <Svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="#E74C3C" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+    <Svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="#EF4444" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" opacity={0.6}>
       <Polyline points="3 6 5 6 21 6" />
       <Path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
     </Svg>
@@ -27,7 +27,7 @@ function TrashIcon() {
 
 function MinusIcon() {
   return (
-    <Svg width={12} height={12} viewBox="0 0 24 24" fill="none" stroke={colors.black} strokeWidth={2.5} strokeLinecap="round">
+    <Svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke={colors.black} strokeWidth={2} strokeLinecap="round">
       <Line x1={5} y1={12} x2={19} y2={12} />
     </Svg>
   );
@@ -35,7 +35,7 @@ function MinusIcon() {
 
 function PlusIcon() {
   return (
-    <Svg width={12} height={12} viewBox="0 0 24 24" fill="none" stroke={colors.black} strokeWidth={2.5} strokeLinecap="round">
+    <Svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke={colors.black} strokeWidth={2} strokeLinecap="round">
       <Line x1={12} y1={5} x2={12} y2={19} />
       <Line x1={5} y1={12} x2={19} y2={12} />
     </Svg>
@@ -293,7 +293,9 @@ export default function CartScreen({ navigation }) {
                     <TouchableOpacity style={styles.qtyBtn} onPress={() => updateQuantity(item.key, -1)}>
                       <MinusIcon />
                     </TouchableOpacity>
+                    <View style={styles.qtyDivider} />
                     <Text style={styles.qtyText}>{item.quantity}</Text>
+                    <View style={styles.qtyDivider} />
                     <TouchableOpacity style={styles.qtyBtn} onPress={() => updateQuantity(item.key, 1)}>
                       <PlusIcon />
                     </TouchableOpacity>
@@ -487,13 +489,13 @@ const styles = StyleSheet.create({
     lineHeight: fontSize.base * 1.3,
   },
   trashBtn: {
-    width: 32,
-    height: 32,
+    width: 36,
+    height: 36,
     borderRadius: radius.sm,
-    backgroundColor: 'rgba(239,68,68,0.08)',
+    backgroundColor: 'rgba(239,68,68,0.06)',
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: -2,
+    marginTop: -4,
   },
   brandRow: {
     flexDirection: 'row',
@@ -548,32 +550,29 @@ const styles = StyleSheet.create({
   qtyRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: space.sm,
     backgroundColor: colors.background,
     borderRadius: radius.sm,
     borderWidth: 1,
     borderColor: 'rgba(0,0,0,0.08)',
-    paddingHorizontal: space.xs,
-    paddingVertical: space.xs,
+    overflow: 'hidden',
   },
   qtyBtn: {
-    width: space['2xl'],
-    height: space['2xl'],
-    borderRadius: radius.sm,
-    backgroundColor: colors.white,
+    width: 36,
+    height: 36,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: shadow.low.shadowColor,
-    shadowOffset: shadow.low.shadowOffset,
-    shadowOpacity: shadow.low.shadowOpacity,
-    shadowRadius: shadow.low.shadowRadius,
-    elevation: shadow.low.elevation,
+    backgroundColor: colors.white,
+  },
+  qtyDivider: {
+    width: 1,
+    height: 20,
+    backgroundColor: 'rgba(0,0,0,0.06)',
   },
   qtyText: {
     fontSize: fontSize.base,
     fontWeight: fontWeight.bold,
     color: colors.black,
-    minWidth: 20,
+    minWidth: 36,
     textAlign: 'center',
   },
 

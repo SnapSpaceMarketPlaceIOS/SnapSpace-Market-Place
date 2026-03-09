@@ -9,7 +9,7 @@ import { OrderHistoryProvider } from './src/context/OrderHistoryContext';
 import { AuthProvider, useAuth } from './src/context/AuthContext';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import Svg, { Path, Circle, Line, Polyline, Rect, G } from 'react-native-svg';
+import Svg, { Path, Circle } from 'react-native-svg';
 import { colors } from './src/constants/colors';
 import { shadow, fontSize, fontWeight, radius } from './src/constants/tokens';
 
@@ -56,28 +56,11 @@ function SearchIcon({ color, size }) {
   );
 }
 
-// Frame 3 — full snap button SVG (ears + body + camera icon)
-function Frame3Icon() {
+function CameraFabIcon() {
   return (
-    <Svg width={66} height={40} viewBox="0 0 80 49" fill="none">
-      {/* Right dark-blue ear */}
-      <Rect x={8} y={7} width={72} height={35} rx={10} fill="#035DA8" />
-      {/* Left light-blue ear */}
-      <Rect x={0} y={7} width={48} height={35} rx={10} fill="#67ACE9" />
-      {/* Main black body */}
-      <Rect x={4} y={0} width={72} height={49} rx={10} fill="black" />
-      {/* Camera icon — centered at (39.5, 22.5) in the 80×49 canvas */}
-      <G transform="translate(27.5, 10)">
-        <Path
-          d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"
-          fill="none"
-          stroke="white"
-          strokeWidth={1.8}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-        <Circle cx={12} cy={13} r={4} fill="none" stroke="white" strokeWidth={1.8} />
-      </G>
+    <Svg width={26} height={26} viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+      <Path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+      <Circle cx={12} cy={13} r={4} />
     </Svg>
   );
 }
@@ -101,11 +84,12 @@ function ProfileIcon({ color, size }) {
   );
 }
 
+// Camera FAB — 56px dark circle elevated above tab bar
 function SnapButton({ onPress }) {
   return (
     <View style={styles.snapWrap}>
-      <TouchableOpacity onPress={onPress} activeOpacity={0.85}>
-        <Frame3Icon />
+      <TouchableOpacity style={styles.snapFab} onPress={onPress} activeOpacity={0.85}>
+        <CameraFabIcon />
       </TouchableOpacity>
     </View>
   );
@@ -249,10 +233,21 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   snapWrap: {
-    top: 4,
+    // Sit 12px above the tab bar line
+    top: -12,
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'visible',
+  },
+  snapFab: {
+    width: 56,
+    height: 56,
+    borderRadius: radius.full,
+    backgroundColor: '#1E293B',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.1)',
     // FAB elevation — shadow.medium
     shadowColor: shadow.medium.shadowColor,
     shadowOffset: shadow.medium.shadowOffset,
