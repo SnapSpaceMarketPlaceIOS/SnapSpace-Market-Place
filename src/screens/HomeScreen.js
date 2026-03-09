@@ -355,7 +355,7 @@ const styles = StyleSheet.create({
     gap: space.base,
   },
   bottomSpacer: {
-    height: 80,
+    flex: 1,
   },
 
   // ── Hero

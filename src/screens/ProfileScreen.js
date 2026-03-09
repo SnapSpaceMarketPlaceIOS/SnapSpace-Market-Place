@@ -316,12 +316,6 @@ export default function ProfileScreen({ navigation }) {
           ) : (
             <View style={styles.bannerGradient} />
           )}
-          {/* Bottom gradient overlay — fades into profile header bg */}
-          <LinearGradient
-            colors={['transparent', 'rgba(255,255,255,0.85)']}
-            style={styles.bannerBottomFade}
-            pointerEvents="none"
-          />
           <SafeAreaView style={styles.navRow}>
             <View style={{ width: 36 }} />
             <TouchableOpacity style={styles.navBtn} onPress={() => setShowSettings(true)}>
