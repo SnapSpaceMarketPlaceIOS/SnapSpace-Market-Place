@@ -13,6 +13,8 @@ import { colors } from '../constants/colors';
 import { LinearGradient } from 'expo-linear-gradient';
 import { fontSize, fontWeight, letterSpacing, space, radius, shadow } from '../constants/tokens';
 import { useCart } from '../context/CartContext';
+import Skeleton from '../components/Skeleton';
+import PressableCard from '../components/PressableCard';
 
 const { width } = Dimensions.get('window');
 
@@ -124,7 +126,7 @@ export default function ShopTheLookScreen({ route, navigation }) {
         {/* Post Preview Card */}
         <View style={styles.postCard}>
           <View style={styles.postImage}>
-            <ImagePlaceholderIcon size={48} />
+            <Skeleton width="100%" height="100%" borderRadius={0} />
           </View>
           <View style={styles.postInfo}>
             <View style={styles.postUserRow}>
@@ -149,14 +151,13 @@ export default function ShopTheLookScreen({ route, navigation }) {
         {design.products.map((product, index) => {
           const inCart = isInCart(product);
           return (
-            <TouchableOpacity
+            <PressableCard
               key={index}
               style={styles.productCard}
-              activeOpacity={0.75}
               onPress={() => navigation.navigate('ProductDetail', { product, design })}
             >
               <View style={styles.productImgWrap}>
-                <ImagePlaceholderIcon size={32} />
+                <Skeleton width={56} height={56} borderRadius={radius.lg} />
               </View>
               <View style={styles.productDetails}>
                 <Text style={styles.productName}>{product.name}</Text>
@@ -170,7 +171,7 @@ export default function ShopTheLookScreen({ route, navigation }) {
               >
                 {inCart ? <CheckIcon /> : <PlusSmallIcon />}
               </TouchableOpacity>
-            </TouchableOpacity>
+            </PressableCard>
           );
         })}
 
@@ -260,9 +261,7 @@ const styles = StyleSheet.create({
   postImage: {
     width: '100%',
     aspectRatio: 4 / 3,
-    backgroundColor: '#D7D7D7',
-    alignItems: 'center',
-    justifyContent: 'center',
+    overflow: 'hidden',
   },
   postInfo: {
     padding: space.base,

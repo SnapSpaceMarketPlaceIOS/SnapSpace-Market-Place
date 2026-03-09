@@ -15,7 +15,6 @@ import {
   Share,
   Linking,
 } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path, Circle, Line, Polyline, Rect } from 'react-native-svg';
 import { colors } from '../constants/colors';
@@ -23,6 +22,8 @@ import { fontSize, fontWeight, letterSpacing, space, radius, shadow } from '../c
 import { useLiked } from '../context/LikedContext';
 import { useShared } from '../context/SharedContext';
 import { useAuth } from '../context/AuthContext';
+import Skeleton from '../components/Skeleton';
+import PressableCard from '../components/PressableCard';
 
 const { width } = Dimensions.get('window');
 // 4px padding each side + 4px gap between cards (tight photo grid)
@@ -413,13 +414,13 @@ export default function ProfileScreen({ navigation }) {
         {/* ── Designs Grid ── */}
         <View style={styles.grid}>
           {MY_DESIGNS.map(design => (
-            <TouchableOpacity
+            <PressableCard
               key={design.id}
               style={styles.card}
-              activeOpacity={0.88}
+              animStyle={{ width: CARD_WIDTH }}
             >
               <View style={styles.cardImg}>
-                <ImagePlaceholderIcon size={28} />
+                <Skeleton width="100%" height="100%" borderRadius={0} />
                 <View style={styles.cardActions}>
                   <TouchableOpacity
                     style={styles.cardActionBtn}
@@ -448,7 +449,7 @@ export default function ProfileScreen({ navigation }) {
                   </TouchableOpacity>
                 </View>
               </View>
-            </TouchableOpacity>
+            </PressableCard>
           ))}
         </View>
 
@@ -731,14 +732,6 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   // 60px gradient at the bottom of the banner fading into white
-  bannerBottomFade: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: 60,
-    pointerEvents: 'none',
-  },
   navRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -949,7 +942,7 @@ const styles = StyleSheet.create({
   },
   // Post grid cards — shadow.low + border.subtle
   card: {
-    width: CARD_WIDTH,
+    width: '100%',
     borderRadius: radius.md,
     overflow: 'hidden',
     backgroundColor: '#FFFFFF',
@@ -964,11 +957,7 @@ const styles = StyleSheet.create({
   cardImg: {
     width: '100%',
     aspectRatio: 1,
-    backgroundColor: '#D7D7D7',
     borderRadius: radius.md,
-    alignItems: 'center',
-    justifyContent: 'center',
-    position: 'relative',
     overflow: 'hidden',
   },
   cardActions: {

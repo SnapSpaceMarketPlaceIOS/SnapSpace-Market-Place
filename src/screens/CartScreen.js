@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -6,6 +6,8 @@ import {
   StyleSheet,
   TouchableOpacity,
   Alert,
+  Animated,
+  Easing,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Path, Circle, Line, Polyline, Rect } from 'react-native-svg';
@@ -188,6 +190,42 @@ function formatOrderDate() {
   return new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
+// ── Animated quantity text — slides out/in on change ─────────────────────────
+
+function AnimatedQtyText({ value, style }) {
+  const translateY = useRef(new Animated.Value(0)).current;
+  const opacity = useRef(new Animated.Value(1)).current;
+  const prevValue = useRef(value);
+  const displayValue = useRef(value);
+
+  if (prevValue.current !== value) {
+    const dir = value > prevValue.current ? -1 : 1; // increment → slide up (negative), decrement → slide down
+    prevValue.current = value;
+    displayValue.current = value;
+
+    Animated.sequence([
+      Animated.parallel([
+        Animated.timing(translateY, { toValue: dir * 12, duration: 75, easing: Easing.in(Easing.ease), useNativeDriver: true }),
+        Animated.timing(opacity, { toValue: 0, duration: 75, useNativeDriver: true }),
+      ]),
+      Animated.parallel([
+        Animated.timing(translateY, { toValue: -dir * 12, duration: 0, useNativeDriver: true }),
+        Animated.timing(opacity, { toValue: 0, duration: 0, useNativeDriver: true }),
+      ]),
+      Animated.parallel([
+        Animated.timing(translateY, { toValue: 0, duration: 150, easing: Easing.out(Easing.ease), useNativeDriver: true }),
+        Animated.timing(opacity, { toValue: 1, duration: 150, useNativeDriver: true }),
+      ]),
+    ]).start();
+  }
+
+  return (
+    <Animated.Text style={[style, { transform: [{ translateY }], opacity }]}>
+      {value}
+    </Animated.Text>
+  );
+}
+
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export default function CartScreen({ navigation }) {
@@ -294,7 +332,7 @@ export default function CartScreen({ navigation }) {
                       <MinusIcon />
                     </TouchableOpacity>
                     <View style={styles.qtyDivider} />
-                    <Text style={styles.qtyText}>{item.quantity}</Text>
+                    <AnimatedQtyText value={item.quantity} style={styles.qtyText} />
                     <View style={styles.qtyDivider} />
                     <TouchableOpacity style={styles.qtyBtn} onPress={() => updateQuantity(item.key, 1)}>
                       <PlusIcon />

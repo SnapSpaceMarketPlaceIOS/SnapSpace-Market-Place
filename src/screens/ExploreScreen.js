@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import {
   View,
   Text,
@@ -9,6 +9,8 @@ import {
   Dimensions,
   Modal,
   Keyboard,
+  Animated,
+  Easing,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Circle, Line, Path, Rect, Polyline } from 'react-native-svg';
@@ -16,6 +18,8 @@ import { colors } from '../constants/colors';
 import { fontSize, fontWeight, letterSpacing, space, radius, shadow } from '../constants/tokens';
 import { useLiked } from '../context/LikedContext';
 import { DESIGNS } from '../data/designs';
+import Skeleton from '../components/Skeleton';
+import PressableCard from '../components/PressableCard';
 
 const { width } = Dimensions.get('window');
 // 20px padding each side + 12px gap between cards
@@ -172,6 +176,66 @@ function searchAndFilter(designs, query, categoryIndex) {
     .map((s) => s.design);
 }
 
+// ── Grid card with press-scale + animated heart ────────────────────────────────
+
+function GridCard({ design, isLiked, onLike, onPress }) {
+  const heartScale = useRef(new Animated.Value(1)).current;
+
+  const handleLike = () => {
+    onLike();
+    Animated.sequence([
+      Animated.timing(heartScale, {
+        toValue: 1.4,
+        duration: 120,
+        easing: Easing.out(Easing.ease),
+        useNativeDriver: true,
+      }),
+      Animated.spring(heartScale, {
+        toValue: 1,
+        damping: 10,
+        stiffness: 300,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  };
+
+  return (
+    <PressableCard
+      style={styles.card}
+      animStyle={{ width: CARD_WIDTH }}
+      onPress={onPress}
+      activeOpacity={0.95}
+    >
+      {/* Card image — skeleton */}
+      <View style={styles.cardImg}>
+        <Skeleton width="100%" height="100%" borderRadius={0} />
+        {/* Action buttons */}
+        <View style={styles.cardActions}>
+          <TouchableOpacity
+            style={styles.cardActionBtn}
+            onPress={handleLike}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+          >
+            <Animated.View style={{ transform: [{ scale: heartScale }] }}>
+              <HeartIcon filled={isLiked} size={13} />
+            </Animated.View>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.cardActionBtn}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+          >
+            <ShareIcon color="#444" size={13} />
+          </TouchableOpacity>
+        </View>
+      </View>
+      {/* Card title */}
+      <View style={styles.cardBody}>
+        <Text style={styles.cardTitle} numberOfLines={1}>{design.title}</Text>
+      </View>
+    </PressableCard>
+  );
+}
+
 // ── Main Component ─────────────────────────────────────────────────────────────
 
 export default function ExploreScreen({ navigation }) {
@@ -262,37 +326,13 @@ export default function ExploreScreen({ navigation }) {
           ) : (
             <View style={styles.grid}>
               {filteredDesigns.map((design) => (
-                <TouchableOpacity
+                <GridCard
                   key={design.id}
-                  style={styles.card}
-                  activeOpacity={0.88}
+                  design={design}
+                  isLiked={!!liked[design.id]}
+                  onLike={() => toggleLiked(design.id)}
                   onPress={() => setSelectedCard(design)}
-                >
-                  {/* Card image placeholder */}
-                  <View style={styles.cardImg}>
-                    <ImagePlaceholderIcon />
-                    {/* Action buttons */}
-                    <View style={styles.cardActions}>
-                      <TouchableOpacity
-                        style={styles.cardActionBtn}
-                        onPress={() => toggleLiked(design.id)}
-                        hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-                      >
-                        <HeartIcon filled={!!liked[design.id]} size={13} />
-                      </TouchableOpacity>
-                      <TouchableOpacity
-                        style={styles.cardActionBtn}
-                        hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-                      >
-                        <ShareIcon color="#444" size={13} />
-                      </TouchableOpacity>
-                    </View>
-                  </View>
-                  {/* Card title */}
-                  <View style={styles.cardBody}>
-                    <Text style={styles.cardTitle} numberOfLines={1}>{design.title}</Text>
-                  </View>
-                </TouchableOpacity>
+                />
               ))}
             </View>
           )}
@@ -671,7 +711,7 @@ const styles = StyleSheet.create({
   },
   // Grid card — shadow.low + border.subtle
   card: {
-    width: CARD_WIDTH,
+    width: '100%',
     borderRadius: radius.xl,
     overflow: 'hidden',
     backgroundColor: '#FFFFFF',
@@ -686,12 +726,7 @@ const styles = StyleSheet.create({
   cardImg: {
     width: '100%',
     aspectRatio: 1,
-    backgroundColor: '#D7D7D7',
-    // radius.xl on card with overflow hidden clips the image — no separate radius needed
     borderRadius: radius.xl,
-    alignItems: 'center',
-    justifyContent: 'center',
-    position: 'relative',
     overflow: 'hidden',
   },
   cardActions: {

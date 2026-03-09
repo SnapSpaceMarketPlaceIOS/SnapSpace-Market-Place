@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   View,
   Text,
@@ -7,12 +7,15 @@ import {
   TouchableOpacity,
   Dimensions,
   Alert,
+  Animated,
+  Easing,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Path, Circle, Polyline, Line, Rect } from 'react-native-svg';
 import { colors } from '../constants/colors';
 import { fontSize, fontWeight, letterSpacing, space, radius, shadow } from '../constants/tokens';
 import { useCart } from '../context/CartContext';
+import Skeleton from '../components/Skeleton';
 
 const { height } = Dimensions.get('window');
 
@@ -95,6 +98,14 @@ export default function ProductDetailScreen({ route, navigation }) {
   const design = route?.params?.design;
   const { addToCart, items } = useCart();
   const [liked, setLiked] = useState(false);
+  const [justAdded, setJustAdded] = useState(false);
+
+  // Add to Cart crossfade animation
+  const cartLabelOpacity = useRef(new Animated.Value(1)).current;
+  const addedLabelOpacity = useRef(new Animated.Value(0)).current;
+
+  // Heart press animation
+  const heartScale = useRef(new Animated.Value(1)).current;
 
   const name = product?.name ?? 'Modern Velvet Sofa';
   const brand = product?.brand ?? 'Article';
@@ -110,7 +121,38 @@ export default function ProductDetailScreen({ route, navigation }) {
       return;
     }
     addToCart({ name, brand, price });
-    Alert.alert('Added to Cart', `${name} has been added to your cart.`);
+
+    // Crossfade to "✓ Added" for 1.5 seconds then fade back
+    Animated.parallel([
+      Animated.timing(cartLabelOpacity, { toValue: 0, duration: 150, useNativeDriver: true }),
+      Animated.timing(addedLabelOpacity, { toValue: 1, duration: 150, useNativeDriver: true }),
+    ]).start(() => {
+      setJustAdded(true);
+      setTimeout(() => {
+        Animated.parallel([
+          Animated.timing(cartLabelOpacity, { toValue: 1, duration: 150, useNativeDriver: true }),
+          Animated.timing(addedLabelOpacity, { toValue: 0, duration: 150, useNativeDriver: true }),
+        ]).start(() => setJustAdded(false));
+      }, 1500);
+    });
+  };
+
+  const handleHeartPress = () => {
+    setLiked((prev) => !prev);
+    Animated.sequence([
+      Animated.timing(heartScale, {
+        toValue: 1.4,
+        duration: 120,
+        easing: Easing.out(Easing.ease),
+        useNativeDriver: true,
+      }),
+      Animated.spring(heartScale, {
+        toValue: 1,
+        damping: 10,
+        stiffness: 300,
+        useNativeDriver: true,
+      }),
+    ]).start();
   };
 
   const brandName = brand.split('·')[0].trim();
@@ -123,12 +165,15 @@ export default function ProductDetailScreen({ route, navigation }) {
             <TouchableOpacity style={styles.navBtn} onPress={() => navigation?.goBack()}>
               <BackIcon />
             </TouchableOpacity>
-            <TouchableOpacity style={styles.navBtn} onPress={() => setLiked(!liked)}>
-              <HeartIcon filled={liked} />
+            <TouchableOpacity style={styles.navBtn} onPress={handleHeartPress}>
+              <Animated.View style={{ transform: [{ scale: heartScale }] }}>
+                <HeartIcon filled={liked} />
+              </Animated.View>
             </TouchableOpacity>
           </View>
+          {/* Image area — skeleton loader */}
           <View style={styles.imagePlaceholder}>
-            <SofaLargeIcon />
+            <Skeleton width="100%" height="100%" borderRadius={0} />
           </View>
           {/* Pagination dots — plan for multiple images */}
           <View style={styles.paginationDots}>
@@ -263,9 +308,15 @@ export default function ProductDetailScreen({ route, navigation }) {
           onPress={handleAddToCart}
         >
           {inCart ? <CheckIcon /> : <CartIcon />}
-          <Text style={styles.addToCartText}>
-            {inCart ? 'View Cart' : `Add to Cart  -  ${price}`}
-          </Text>
+          {/* Crossfade between "Add to Cart" and "✓ Added" */}
+          <View style={styles.addToCartTextWrap}>
+            <Animated.Text style={[styles.addToCartText, { opacity: cartLabelOpacity, position: 'absolute' }]}>
+              {inCart ? 'View Cart' : `Add to Cart  -  ${price}`}
+            </Animated.Text>
+            <Animated.Text style={[styles.addToCartText, { opacity: addedLabelOpacity }]}>
+              ✓  Added to Cart
+            </Animated.Text>
+          </View>
         </TouchableOpacity>
       </View>
     </View>
@@ -302,8 +353,7 @@ const styles = StyleSheet.create({
   },
   imagePlaceholder: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+    overflow: 'hidden',
   },
   // Content sheet — overlaps image by 20px, rounded top, shadow.high
   content: {
@@ -636,6 +686,12 @@ const styles = StyleSheet.create({
   },
   addToCartBtnInCart: {
     backgroundColor: '#34C759',
+  },
+  addToCartTextWrap: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: fontSize.md * 1.4,
   },
   addToCartText: {
     color: colors.white,
