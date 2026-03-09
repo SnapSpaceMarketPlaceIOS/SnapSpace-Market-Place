@@ -420,7 +420,7 @@ export default function ProfileScreen({ navigation }) {
               animStyle={{ width: CARD_WIDTH }}
             >
               <View style={styles.cardImg}>
-                <Skeleton width="100%" height="100%" borderRadius={0} />
+                <View style={styles.cardImgBg} />
                 <View style={styles.cardActions}>
                   <TouchableOpacity
                     style={styles.cardActionBtn}
@@ -959,6 +959,10 @@ const styles = StyleSheet.create({
     aspectRatio: 1,
     borderRadius: radius.md,
     overflow: 'hidden',
+  },
+  cardImgBg: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: '#E8EDF2',
   },
   cardActions: {
     position: 'absolute',

@@ -726,7 +726,10 @@ const styles = StyleSheet.create({
   cardImg: {
     width: '100%',
     aspectRatio: 1,
-    borderRadius: radius.md,
+    borderTopLeftRadius: radius.md,
+    borderTopRightRadius: radius.md,
+    borderBottomLeftRadius: 0,
+    borderBottomRightRadius: 0,
     overflow: 'hidden',
   },
   cardImgBg: {
