@@ -11,7 +11,7 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Path, Circle, Polyline, Line, Rect } from 'react-native-svg';
 import { colors } from '../constants/colors';
-import { fontSize, fontWeight, letterSpacing, space, radius } from '../constants/tokens';
+import { fontSize, fontWeight, letterSpacing, space, radius, shadow } from '../constants/tokens';
 import { useCart } from '../context/CartContext';
 
 const { height } = Dimensions.get('window');
@@ -244,6 +244,11 @@ export default function ProductDetailScreen({ route, navigation }) {
       </ScrollView>
 
       <View style={styles.bottomBar}>
+        <LinearGradient
+          colors={['rgba(248,250,255,0)', '#F8FAFF']}
+          style={styles.bottomBarFade}
+          pointerEvents="none"
+        />
         <TouchableOpacity
           style={[styles.addToCartBtn, inCart && styles.addToCartBtnInCart]}
           activeOpacity={0.85}
@@ -281,11 +286,11 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.88)',
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-    elevation: 2,
+    shadowColor: shadow.medium.shadowColor,
+    shadowOffset: shadow.medium.shadowOffset,
+    shadowOpacity: shadow.medium.shadowOpacity,
+    shadowRadius: shadow.medium.shadowRadius,
+    elevation: shadow.medium.elevation,
   },
   imagePlaceholder: {
     flex: 1,
@@ -405,11 +410,13 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     borderRadius: radius.lg,
     padding: space.base,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.05,
-    shadowRadius: 10,
-    elevation: 2,
+    borderWidth: 1,
+    borderColor: 'rgba(0,0,0,0.04)',
+    shadowColor: shadow.low.shadowColor,
+    shadowOffset: shadow.low.shadowOffset,
+    shadowOpacity: shadow.low.shadowOpacity,
+    shadowRadius: shadow.low.shadowRadius,
+    elevation: shadow.low.elevation,
     gap: space.md,
   },
   featureRow: {
@@ -440,11 +447,13 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     borderRadius: radius.lg,
     paddingHorizontal: space.base,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.05,
-    shadowRadius: 10,
-    elevation: 2,
+    borderWidth: 1,
+    borderColor: 'rgba(0,0,0,0.04)',
+    shadowColor: shadow.low.shadowColor,
+    shadowOffset: shadow.low.shadowOffset,
+    shadowOpacity: shadow.low.shadowOpacity,
+    shadowRadius: shadow.low.shadowRadius,
+    elevation: shadow.low.elevation,
   },
   specRow: {
     flexDirection: 'row',
@@ -475,11 +484,13 @@ const styles = StyleSheet.create({
     borderRadius: radius.lg,
     padding: space.base,
     marginTop: space.base,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.05,
-    shadowRadius: 10,
-    elevation: 2,
+    borderWidth: 1,
+    borderColor: 'rgba(0,0,0,0.04)',
+    shadowColor: shadow.low.shadowColor,
+    shadowOffset: shadow.low.shadowOffset,
+    shadowOpacity: shadow.low.shadowOpacity,
+    shadowRadius: shadow.low.shadowRadius,
+    elevation: shadow.low.elevation,
   },
   shippingItem: {
     flex: 1,
@@ -537,6 +548,7 @@ const styles = StyleSheet.create({
     color: '#A0A0A8',
     opacity: 0.44,
   },
+  // PDP sticky bottom bar
   bottomBar: {
     position: 'absolute',
     bottom: 0,
@@ -545,7 +557,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: space.lg,
     paddingBottom: 34,
     paddingTop: space.md,
-    backgroundColor: colors.background,
+    backgroundColor: '#F8FAFF',
+  },
+  bottomBarFade: {
+    position: 'absolute',
+    top: -24,
+    left: 0,
+    right: 0,
+    height: 24,
+    pointerEvents: 'none',
   },
   addToCartBtn: {
     flexDirection: 'row',
@@ -555,6 +575,11 @@ const styles = StyleSheet.create({
     borderRadius: radius.md,
     height: space['5xl'],
     gap: space.sm,
+    shadowColor: shadow.medium.shadowColor,
+    shadowOffset: shadow.medium.shadowOffset,
+    shadowOpacity: shadow.medium.shadowOpacity,
+    shadowRadius: shadow.medium.shadowRadius,
+    elevation: shadow.medium.elevation,
   },
   addToCartBtnInCart: {
     backgroundColor: '#34C759',

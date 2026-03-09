@@ -7,9 +7,10 @@ import {
   TouchableOpacity,
   Alert,
 } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Path, Circle, Line, Polyline, Rect } from 'react-native-svg';
 import { colors } from '../constants/colors';
-import { fontSize, fontWeight, letterSpacing, space, radius } from '../constants/tokens';
+import { fontSize, fontWeight, letterSpacing, space, radius, shadow } from '../constants/tokens';
 import { useCart } from '../context/CartContext';
 import { useOrderHistory } from '../context/OrderHistoryContext';
 
@@ -355,6 +356,11 @@ export default function CartScreen({ navigation }) {
 
       {/* ── Checkout button ──────────────────────────────────── */}
       <View style={styles.checkoutWrap}>
+        <LinearGradient
+          colors={['rgba(248,250,255,0)', '#F8FAFF']}
+          style={styles.checkoutFade}
+          pointerEvents="none"
+        />
         <TouchableOpacity
           style={styles.checkoutBtn}
           activeOpacity={0.85}
@@ -422,18 +428,20 @@ const styles = StyleSheet.create({
     color: colors.white,
   },
 
-  // ── Item Card — Tier 1: outer container
+  // ── Item Card — Tier 1: outer container + shadow.low + border.subtle
   card: {
     flexDirection: 'row',
     backgroundColor: colors.white,
     borderRadius: radius.xl,
     marginBottom: space.md,
     overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.07,
-    shadowRadius: 14,
-    elevation: 4,
+    borderWidth: 1,
+    borderColor: 'rgba(0,0,0,0.04)',
+    shadowColor: shadow.low.shadowColor,
+    shadowOffset: shadow.low.shadowOffset,
+    shadowOpacity: shadow.low.shadowOpacity,
+    shadowRadius: shadow.low.shadowRadius,
+    elevation: shadow.low.elevation,
   },
   cardStripe: {
     width: 4,
@@ -555,11 +563,11 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.08,
-    shadowRadius: 3,
-    elevation: 1,
+    shadowColor: shadow.low.shadowColor,
+    shadowOffset: shadow.low.shadowOffset,
+    shadowOpacity: shadow.low.shadowOpacity,
+    shadowRadius: shadow.low.shadowRadius,
+    elevation: shadow.low.elevation,
   },
   qtyText: {
     fontSize: fontSize.base,
@@ -569,17 +577,19 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 
-  // ── Order Summary — Tier 1: outer container
+  // ── Order Summary — Tier 1: outer container + shadow.low + border.subtle
   summaryCard: {
     backgroundColor: '#F8FAFC',
     borderRadius: radius.xl,
     padding: space.lg,
     marginTop: space.xs,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.06,
-    shadowRadius: 12,
-    elevation: 3,
+    borderWidth: 1,
+    borderColor: 'rgba(0,0,0,0.04)',
+    shadowColor: shadow.low.shadowColor,
+    shadowOffset: shadow.low.shadowOffset,
+    shadowOpacity: shadow.low.shadowOpacity,
+    shadowRadius: shadow.low.shadowRadius,
+    elevation: shadow.low.elevation,
   },
   summaryHeader: {
     flexDirection: 'row',
@@ -659,7 +669,7 @@ const styles = StyleSheet.create({
     opacity: 0.44,
   },
 
-  // ── Checkout
+  // ── Checkout sticky bar
   checkoutWrap: {
     position: 'absolute',
     bottom: 0,
@@ -668,7 +678,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: space.lg,
     paddingBottom: 34,
     paddingTop: space.md,
-    backgroundColor: colors.background,
+    backgroundColor: '#F8FAFF',
+  },
+  checkoutFade: {
+    position: 'absolute',
+    top: -24,
+    left: 0,
+    right: 0,
+    height: 24,
+    pointerEvents: 'none',
   },
   checkoutBtn: {
     backgroundColor: colors.bluePrimary,
@@ -676,6 +694,11 @@ const styles = StyleSheet.create({
     height: space['5xl'],
     alignItems: 'center',
     justifyContent: 'center',
+    shadowColor: shadow.medium.shadowColor,
+    shadowOffset: shadow.medium.shadowOffset,
+    shadowOpacity: shadow.medium.shadowOpacity,
+    shadowRadius: shadow.medium.shadowRadius,
+    elevation: shadow.medium.elevation,
   },
   checkoutText: {
     color: colors.white,
@@ -713,6 +736,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: space['2xl'],
     paddingVertical: space.md,
     borderRadius: radius.md,
+    shadowColor: shadow.low.shadowColor,
+    shadowOffset: shadow.low.shadowOffset,
+    shadowOpacity: shadow.low.shadowOpacity,
+    shadowRadius: shadow.low.shadowRadius,
+    elevation: shadow.low.elevation,
   },
   emptyBtnText: {
     color: colors.white,

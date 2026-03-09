@@ -13,7 +13,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Circle, Line, Path, Rect, Polyline } from 'react-native-svg';
 import { colors } from '../constants/colors';
-import { fontSize, fontWeight, letterSpacing, space, radius } from '../constants/tokens';
+import { fontSize, fontWeight, letterSpacing, space, radius, shadow } from '../constants/tokens';
 import { useLiked } from '../context/LikedContext';
 import { DESIGNS } from '../data/designs';
 
@@ -662,10 +662,19 @@ const styles = StyleSheet.create({
     gap: space.md,
     paddingHorizontal: space.lg,
   },
+  // Grid card — shadow.low + border.subtle
   card: {
     width: CARD_WIDTH,
     borderRadius: radius.xl,
     overflow: 'hidden',
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: 'rgba(0,0,0,0.04)',
+    shadowColor: shadow.low.shadowColor,
+    shadowOffset: shadow.low.shadowOffset,
+    shadowOpacity: shadow.low.shadowOpacity,
+    shadowRadius: shadow.low.shadowRadius,
+    elevation: shadow.low.elevation,
   },
   cardImg: {
     width: '100%',
@@ -689,14 +698,14 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: radius.full,
-    backgroundColor: 'rgba(255,255,255,0.85)',
+    backgroundColor: 'rgba(255,255,255,0.88)',
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
-    elevation: 2,
+    shadowColor: shadow.medium.shadowColor,
+    shadowOffset: shadow.medium.shadowOffset,
+    shadowOpacity: shadow.medium.shadowOpacity,
+    shadowRadius: shadow.medium.shadowRadius,
+    elevation: shadow.medium.elevation,
   },
   cardBody: {
     paddingTop: space.sm,
@@ -718,11 +727,17 @@ const styles = StyleSheet.create({
   modalBackdrop: {
     flex: 1,
   },
+  // Design detail sheet — shadow.high per spec
   modalSheet: {
     backgroundColor: '#FFFFFF',
     borderTopLeftRadius: radius.xl,
     borderTopRightRadius: radius.xl,
     maxHeight: '88%',
+    shadowColor: shadow.high.shadowColor,
+    shadowOffset: shadow.high.shadowOffset,
+    shadowOpacity: shadow.high.shadowOpacity,
+    shadowRadius: shadow.high.shadowRadius,
+    elevation: shadow.high.elevation,
   },
   modalDrag: {
     width: 40,
@@ -856,6 +871,11 @@ const styles = StyleSheet.create({
     borderRadius: radius.md,
     alignItems: 'center',
     justifyContent: 'center',
+    shadowColor: shadow.medium.shadowColor,
+    shadowOffset: shadow.medium.shadowOffset,
+    shadowOpacity: shadow.medium.shadowOpacity,
+    shadowRadius: shadow.medium.shadowRadius,
+    elevation: shadow.medium.elevation,
   },
   shopBtnText: {
     color: '#fff',

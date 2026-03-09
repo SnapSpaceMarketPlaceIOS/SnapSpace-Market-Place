@@ -11,6 +11,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Svg, { Path, Circle, Line, Polyline, Rect, G } from 'react-native-svg';
 import { colors } from './src/constants/colors';
+import { shadow, fontSize, fontWeight, radius } from './src/constants/tokens';
 
 import HomeScreen from './src/screens/HomeScreen';
 import ExploreScreen from './src/screens/ExploreScreen';
@@ -127,7 +128,7 @@ function TabNavigator() {
         headerShown: false,
         tabBarStyle: styles.tabBar,
         tabBarActiveTintColor: colors.bluePrimary,
-        tabBarInactiveTintColor: '#B0B0B0',
+        tabBarInactiveTintColor: 'rgba(0,0,0,0.32)',
         tabBarLabelStyle: styles.tabLabel,
       }}
     >
@@ -230,19 +231,21 @@ export default function App() {
 
 const styles = StyleSheet.create({
   tabBar: {
-    backgroundColor: '#FFFFFF',
-    borderTopWidth: 0,
+    backgroundColor: 'rgba(255,255,255,0.96)',
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(0,0,0,0.06)',
     height: 88,
     paddingTop: 6,
+    // Subtle upward shadow per spec
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: -3 },
-    shadowOpacity: 0.07,
-    shadowRadius: 14,
-    elevation: 14,
+    shadowOffset: { width: 0, height: -1 },
+    shadowOpacity: 0.03,
+    shadowRadius: 8,
+    elevation: 4,
   },
   tabLabel: {
-    fontSize: 11,
-    fontWeight: '600',
+    fontSize: fontSize.xs,
+    fontWeight: fontWeight.medium,
     marginTop: 2,
   },
   snapWrap: {
@@ -250,20 +253,21 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'visible',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.22,
-    shadowRadius: 8,
-    elevation: 8,
+    // FAB elevation — shadow.medium
+    shadowColor: shadow.medium.shadowColor,
+    shadowOffset: shadow.medium.shadowOffset,
+    shadowOpacity: shadow.medium.shadowOpacity,
+    shadowRadius: shadow.medium.shadowRadius,
+    elevation: shadow.medium.elevation,
   },
   badge: {
     position: 'absolute',
     top: -5,
     right: -8,
-    backgroundColor: colors.bluePrimary,
+    backgroundColor: '#EF4444',
     width: 18,
     height: 18,
-    borderRadius: 9,
+    borderRadius: radius.full,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 2,
@@ -272,6 +276,6 @@ const styles = StyleSheet.create({
   badgeText: {
     color: colors.white,
     fontSize: 10,
-    fontWeight: '800',
+    fontWeight: fontWeight.bold,
   },
 });

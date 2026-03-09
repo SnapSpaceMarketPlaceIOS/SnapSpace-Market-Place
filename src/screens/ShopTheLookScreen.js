@@ -10,7 +10,8 @@ import {
 } from 'react-native';
 import Svg, { Path, Circle, Polyline, Rect, Line } from 'react-native-svg';
 import { colors } from '../constants/colors';
-import { fontSize, fontWeight, letterSpacing, space, radius } from '../constants/tokens';
+import { LinearGradient } from 'expo-linear-gradient';
+import { fontSize, fontWeight, letterSpacing, space, radius, shadow } from '../constants/tokens';
 import { useCart } from '../context/CartContext';
 
 const { width } = Dimensions.get('window');
@@ -178,6 +179,11 @@ export default function ShopTheLookScreen({ route, navigation }) {
 
       {/* Bottom Bar */}
       <View style={styles.bottomBar}>
+        <LinearGradient
+          colors={['rgba(255,255,255,0)', '#FFFFFF']}
+          style={styles.bottomBarFade}
+          pointerEvents="none"
+        />
         <View style={styles.bottomInfo}>
           <Text style={styles.bottomLabel}>
             {design.products.length} item{design.products.length !== 1 ? 's' : ''}
@@ -236,12 +242,20 @@ const styles = StyleSheet.create({
     letterSpacing: letterSpacing.tight,
   },
 
+  // Post hero card — shadow.low + border.subtle
   postCard: {
     marginHorizontal: space.lg,
     borderRadius: radius.xl,
     overflow: 'hidden',
     backgroundColor: '#F8FAFC',
     marginBottom: space.xl,
+    borderWidth: 1,
+    borderColor: 'rgba(0,0,0,0.04)',
+    shadowColor: shadow.low.shadowColor,
+    shadowOffset: shadow.low.shadowOffset,
+    shadowOpacity: shadow.low.shadowOpacity,
+    shadowRadius: shadow.low.shadowRadius,
+    elevation: shadow.low.elevation,
   },
   postImage: {
     width: '100%',
@@ -293,6 +307,7 @@ const styles = StyleSheet.create({
     marginBottom: space.md,
   },
 
+  // Product cards — shadow.low + border.subtle
   productCard: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -301,13 +316,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderRadius: radius.xl,
     marginBottom: space.md,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 2,
     borderWidth: 1,
     borderColor: 'rgba(0,0,0,0.04)',
+    shadowColor: shadow.low.shadowColor,
+    shadowOffset: shadow.low.shadowOffset,
+    shadowOpacity: shadow.low.shadowOpacity,
+    shadowRadius: shadow.low.shadowRadius,
+    elevation: shadow.low.elevation,
   },
   productImgWrap: {
     width: space['5xl'],
@@ -368,6 +383,19 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderTopWidth: 1,
     borderTopColor: 'rgba(0,0,0,0.06)',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -1 },
+    shadowOpacity: 0.03,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  bottomBarFade: {
+    position: 'absolute',
+    top: -24,
+    left: 0,
+    right: 0,
+    height: 24,
+    pointerEvents: 'none',
   },
   bottomInfo: {
     flex: 1,
@@ -395,6 +423,11 @@ const styles = StyleSheet.create({
     height: space['4xl'],
     paddingHorizontal: space.lg,
     gap: space.sm,
+    shadowColor: shadow.medium.shadowColor,
+    shadowOffset: shadow.medium.shadowOffset,
+    shadowOpacity: shadow.medium.shadowOpacity,
+    shadowRadius: shadow.medium.shadowRadius,
+    elevation: shadow.medium.elevation,
   },
   addAllBtnDone: {
     backgroundColor: '#34C759',
