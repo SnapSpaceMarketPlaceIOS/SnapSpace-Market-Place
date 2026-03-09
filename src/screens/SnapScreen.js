@@ -1,0 +1,276 @@
+import React, { useState, useRef, useEffect } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  TextInput,
+  ActivityIndicator,
+  Alert,
+  Platform,
+} from 'react-native';
+import { CameraView, useCameraPermissions } from 'expo-camera';
+import Svg, { Path, Circle, Polyline, Line } from 'react-native-svg';
+import { colors } from '../constants/colors';
+
+function FlashIcon({ off }) {
+  return (
+    <Svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke={colors.white} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+      <Polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+      {off && <Line x1={2} y1={2} x2={22} y2={22} />}
+    </Svg>
+  );
+}
+
+function FlipIcon() {
+  return (
+    <Svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke={colors.white} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+      <Path d="M21 2v6h-6" />
+      <Path d="M3 12a9 9 0 0 1 15-6.7L21 8" />
+      <Path d="M3 22v-6h6" />
+      <Path d="M21 12a9 9 0 0 1-15 6.7L3 16" />
+    </Svg>
+  );
+}
+
+function SparkIcon() {
+  return (
+    <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke={colors.white} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+      <Polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+    </Svg>
+  );
+}
+
+function XIcon() {
+  return (
+    <Svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke={colors.white} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+      <Line x1={18} y1={6} x2={6} y2={18} />
+      <Line x1={6} y1={6} x2={18} y2={18} />
+    </Svg>
+  );
+}
+
+export default function SnapScreen({ navigation }) {
+  const [permission, requestPermission] = useCameraPermissions();
+  const [facing, setFacing] = useState('back');
+  const [flash, setFlash] = useState(false);
+  const [prompt, setPrompt] = useState('');
+  const [loading, setLoading] = useState(false);
+  const cameraRef = useRef(null);
+
+  if (!permission) {
+    return <View style={styles.container} />;
+  }
+
+  if (!permission.granted) {
+    return (
+      <View style={styles.permissionContainer}>
+        <Svg width={48} height={48} viewBox="0 0 24 24" fill="none" stroke={colors.bluePrimary} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
+          <Path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+          <Circle cx={12} cy={13} r={4} />
+        </Svg>
+        <Text style={styles.permissionTitle}>Camera Access Required</Text>
+        <Text style={styles.permissionText}>
+          SnapSpace needs camera access to capture your room and generate AI designs.
+        </Text>
+        <TouchableOpacity style={styles.permissionBtn} onPress={requestPermission}>
+          <Text style={styles.permissionBtnText}>Grant Access</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
+  const handleCapture = async () => {
+    if (!cameraRef.current || loading) return;
+    setLoading(true);
+    try {
+      const photo = await cameraRef.current.takePictureAsync({ base64: true, quality: 0.7 });
+      setTimeout(() => {
+        setLoading(false);
+        navigation?.navigate('RoomResult', {
+          imageUri: photo.uri,
+          prompt: prompt || 'Modern minimalist redesign',
+        });
+      }, 2000);
+    } catch (e) {
+      setLoading(false);
+      Alert.alert('Error', 'Failed to capture photo. Please try again.');
+    }
+  };
+
+  return (
+    <View style={styles.container}>
+      <CameraView
+        ref={cameraRef}
+        style={styles.camera}
+        facing={facing}
+        flash={flash ? 'on' : 'off'}
+      >
+        {/* Top controls */}
+        <View style={styles.topControls}>
+          <TouchableOpacity style={styles.controlBtn} onPress={() => navigation?.goBack()}>
+            <XIcon />
+          </TouchableOpacity>
+          <View style={styles.topRight}>
+            <TouchableOpacity style={styles.controlBtn} onPress={() => setFlash(!flash)}>
+              <FlashIcon off={!flash} />
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.controlBtn} onPress={() => setFacing(facing === 'back' ? 'front' : 'back')}>
+              <FlipIcon />
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        {/* Corner guides */}
+        <View style={styles.guideContainer}>
+          <View style={[styles.corner, styles.cornerTL]} />
+          <View style={[styles.corner, styles.cornerTR]} />
+          <View style={[styles.corner, styles.cornerBL]} />
+          <View style={[styles.corner, styles.cornerBR]} />
+        </View>
+
+        {/* Bottom overlay */}
+        <View style={styles.bottomOverlay}>
+          <View style={styles.promptWrap}>
+            <SparkIcon />
+            <TextInput
+              style={styles.promptInput}
+              placeholder="Modern minimalist with warm tones..."
+              placeholderTextColor="rgba(255,255,255,0.5)"
+              value={prompt}
+              onChangeText={setPrompt}
+            />
+          </View>
+
+          <TouchableOpacity
+            style={[styles.generateBtn, loading && styles.generateBtnDisabled]}
+            onPress={handleCapture}
+            disabled={loading}
+            activeOpacity={0.8}
+          >
+            {loading ? (
+              <ActivityIndicator color={colors.white} size="small" />
+            ) : (
+              <>
+                <SparkIcon />
+                <Text style={styles.generateText}>Generate with AI</Text>
+              </>
+            )}
+          </TouchableOpacity>
+        </View>
+      </CameraView>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: colors.black,
+  },
+  camera: {
+    flex: 1,
+  },
+  permissionContainer: {
+    flex: 1,
+    backgroundColor: colors.background,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 40,
+  },
+  permissionTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: colors.black,
+    marginTop: 20,
+    marginBottom: 10,
+  },
+  permissionText: {
+    fontSize: 14,
+    color: '#888',
+    textAlign: 'center',
+    lineHeight: 20,
+    marginBottom: 30,
+  },
+  permissionBtn: {
+    backgroundColor: colors.bluePrimary,
+    paddingHorizontal: 32,
+    paddingVertical: 14,
+    borderRadius: 14,
+  },
+  permissionBtnText: {
+    color: colors.white,
+    fontSize: 15,
+    fontWeight: '700',
+  },
+  topControls: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingTop: 60,
+    paddingHorizontal: 20,
+  },
+  topRight: {
+    flexDirection: 'row',
+    gap: 10,
+  },
+  controlBtn: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: 'rgba(0,0,0,0.35)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  guideContainer: {
+    flex: 1,
+    margin: 40,
+  },
+  corner: {
+    position: 'absolute',
+    width: 30,
+    height: 30,
+    borderColor: 'rgba(255,255,255,0.5)',
+  },
+  cornerTL: { top: 0, left: 0, borderTopWidth: 2, borderLeftWidth: 2 },
+  cornerTR: { top: 0, right: 0, borderTopWidth: 2, borderRightWidth: 2 },
+  cornerBL: { bottom: 0, left: 0, borderBottomWidth: 2, borderLeftWidth: 2 },
+  cornerBR: { bottom: 0, right: 0, borderBottomWidth: 2, borderRightWidth: 2 },
+  bottomOverlay: {
+    paddingHorizontal: 20,
+    paddingBottom: 40,
+    gap: 14,
+  },
+  promptWrap: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.15)',
+    borderRadius: 16,
+    paddingHorizontal: 16,
+    height: 50,
+    gap: 10,
+  },
+  promptInput: {
+    flex: 1,
+    color: colors.white,
+    fontSize: 14,
+  },
+  generateBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.bluePrimary,
+    borderRadius: 16,
+    height: 54,
+    gap: 10,
+  },
+  generateBtnDisabled: {
+    opacity: 0.7,
+  },
+  generateText: {
+    color: colors.white,
+    fontSize: 16,
+    fontWeight: '700',
+  },
+});

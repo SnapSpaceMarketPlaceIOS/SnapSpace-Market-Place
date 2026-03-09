@@ -12,7 +12,8 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.anonymous.SnapSpace"
     },
     "android": {
       "adaptiveIcon": {
@@ -24,6 +25,15 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+      "expo-font",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow SnapSpace to access your photos so you can set a profile and banner image."
+        }
+      ]
+    ]
   }
 }
