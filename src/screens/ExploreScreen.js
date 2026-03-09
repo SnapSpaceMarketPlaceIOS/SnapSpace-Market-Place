@@ -23,7 +23,7 @@ import PressableCard from '../components/PressableCard';
 
 const { width } = Dimensions.get('window');
 // 20px padding each side + 12px gap between cards
-const CARD_WIDTH = (width - 20 * 2 - 12) / 2;
+const CARD_WIDTH = (width - 4 * 2 - 4) / 2;
 
 // ── Icons ─────────────────────────────────────────────────────────────────────
 
@@ -206,9 +206,9 @@ function GridCard({ design, isLiked, onLike, onPress }) {
       onPress={onPress}
       activeOpacity={0.95}
     >
-      {/* Card image — skeleton */}
+      {/* Card image placeholder */}
       <View style={styles.cardImg}>
-        <Skeleton width="100%" height="100%" borderRadius={0} />
+        <View style={styles.cardImgBg} />
         {/* Action buttons */}
         <View style={styles.cardActions}>
           <TouchableOpacity
@@ -706,13 +706,13 @@ const styles = StyleSheet.create({
   grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: space.md,
-    paddingHorizontal: space.lg,
+    gap: space.xs,
+    paddingHorizontal: space.xs,
   },
   // Grid card — shadow.low + border.subtle
   card: {
     width: '100%',
-    borderRadius: radius.xl,
+    borderRadius: radius.md,
     overflow: 'hidden',
     backgroundColor: '#FFFFFF',
     borderWidth: 1,
@@ -726,8 +726,12 @@ const styles = StyleSheet.create({
   cardImg: {
     width: '100%',
     aspectRatio: 1,
-    borderRadius: radius.xl,
+    borderRadius: radius.md,
     overflow: 'hidden',
+  },
+  cardImgBg: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: '#E8EDF2',
   },
   cardActions: {
     position: 'absolute',
