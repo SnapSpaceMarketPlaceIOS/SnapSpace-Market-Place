@@ -9,6 +9,8 @@ import {
   Alert,
   Animated,
   Easing,
+  Linking,
+  Image,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Path, Circle, Polyline, Line, Rect } from 'react-native-svg';
@@ -16,6 +18,8 @@ import { colors } from '../constants/colors';
 import { fontSize, fontWeight, letterSpacing, space, radius, shadow } from '../constants/tokens';
 import { useCart } from '../context/CartContext';
 import Skeleton from '../components/Skeleton';
+import { SellerName } from '../components/VerifiedBadge';
+import { getSourceLabel, getSourceColor } from '../services/affiliateProducts';
 
 const { height } = Dimensions.get('window');
 
@@ -110,7 +114,21 @@ export default function ProductDetailScreen({ route, navigation }) {
   const name = product?.name ?? 'Modern Velvet Sofa';
   const brand = product?.brand ?? 'Article';
   const price = product?.price ?? '$1,899';
+  const imageUrl = product?.imageUrl ?? null;
+  const affiliateUrl = product?.affiliateUrl ?? null;
+  const source = product?.source ?? 'amazon';
+  const description = product?.description ?? null;
   const gradientColors = getGradient(name);
+
+  const handleBuyNow = async () => {
+    if (!affiliateUrl) return;
+    const supported = await Linking.canOpenURL(affiliateUrl);
+    if (supported) {
+      await Linking.openURL(affiliateUrl);
+    } else {
+      Alert.alert('Cannot Open Link', 'Unable to open the product page.');
+    }
+  };
 
   const cartKey = `${name}__${brand}`;
   const inCart = items.some((item) => item.key === cartKey);
@@ -171,9 +189,13 @@ export default function ProductDetailScreen({ route, navigation }) {
               </Animated.View>
             </TouchableOpacity>
           </View>
-          {/* Image area — skeleton loader */}
+          {/* Product image or skeleton */}
           <View style={styles.imagePlaceholder}>
-            <Skeleton width="100%" height="100%" borderRadius={0} />
+            {imageUrl ? (
+              <Image source={{ uri: imageUrl }} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
+            ) : (
+              <Skeleton width="100%" height="100%" borderRadius={0} />
+            )}
           </View>
           {/* Pagination dots — plan for multiple images */}
           <View style={styles.paginationDots}>
@@ -216,8 +238,11 @@ export default function ProductDetailScreen({ route, navigation }) {
           {/* Description */}
           <Text style={styles.sectionTitle}>Description</Text>
           <Text style={styles.desc}>
-            Premium quality {name.toLowerCase()} from {brandName}. Crafted with care using the finest materials for exceptional comfort and timeless style. Designed to seamlessly blend into modern and classic interiors alike — a statement piece that elevates any room.
+            {description || `Premium quality ${name.toLowerCase()} from ${brandName}. Crafted with care using the finest materials for exceptional comfort and timeless style. Designed to seamlessly blend into modern and classic interiors alike — a statement piece that elevates any room.`}
           </Text>
+
+          {/* FTC Disclosure */}
+          <Text style={styles.disclosure}>We may earn a commission on purchases made through our links.</Text>
 
           {/* Key Features */}
           <Text style={styles.sectionTitle}>Key Features</Text>
@@ -286,7 +311,12 @@ export default function ProductDetailScreen({ route, navigation }) {
                   <Text style={styles.fromPostTitle} numberOfLines={1}>
                     {design.title.replace('...', '')}
                   </Text>
-                  <Text style={styles.fromPostUser}>@{design.user}</Text>
+                  <SellerName
+                    name={`@${design.user}`}
+                    isVerified={!!design.verified}
+                    size="sm"
+                    nameStyle={styles.fromPostUser}
+                  />
                 </View>
               </View>
             </View>
@@ -302,22 +332,35 @@ export default function ProductDetailScreen({ route, navigation }) {
           style={styles.bottomBarFade}
           pointerEvents="none"
         />
-        <TouchableOpacity
-          style={[styles.addToCartBtn, inCart && styles.addToCartBtnInCart]}
-          activeOpacity={0.85}
-          onPress={handleAddToCart}
-        >
-          {inCart ? <CheckIcon /> : <CartIcon />}
-          {/* Crossfade between "Add to Cart" and "✓ Added" */}
-          <View style={styles.addToCartTextWrap}>
-            <Animated.Text style={[styles.addToCartText, { opacity: cartLabelOpacity, position: 'absolute' }]}>
-              {inCart ? 'View Cart' : `Add to Cart  -  ${price}`}
-            </Animated.Text>
-            <Animated.Text style={[styles.addToCartText, { opacity: addedLabelOpacity }]}>
-              ✓  Added to Cart
-            </Animated.Text>
-          </View>
-        </TouchableOpacity>
+        <View style={styles.bottomButtons}>
+          {/* Add to Cart button */}
+          <TouchableOpacity
+            style={[styles.addToCartBtn, inCart && styles.addToCartBtnInCart]}
+            activeOpacity={0.85}
+            onPress={handleAddToCart}
+          >
+            {inCart ? <CheckIcon /> : <CartIcon />}
+            <View style={styles.addToCartTextWrap}>
+              <Animated.Text style={[styles.addToCartText, { opacity: cartLabelOpacity, position: 'absolute' }]}>
+                {inCart ? 'View Cart' : 'Add to Cart'}
+              </Animated.Text>
+              <Animated.Text style={[styles.addToCartText, { opacity: addedLabelOpacity }]}>
+                ✓  Added
+              </Animated.Text>
+            </View>
+          </TouchableOpacity>
+
+          {/* Buy on Amazon/Wayfair/Houzz button */}
+          {affiliateUrl && (
+            <TouchableOpacity
+              style={[styles.buyNowBtn, { backgroundColor: getSourceColor(source) }]}
+              activeOpacity={0.85}
+              onPress={handleBuyNow}
+            >
+              <Text style={styles.buyNowText}>{getSourceLabel(source)}</Text>
+            </TouchableOpacity>
+          )}
+        </View>
       </View>
     </View>
   );
@@ -670,6 +713,16 @@ const styles = StyleSheet.create({
     height: 24,
     pointerEvents: 'none',
   },
+  disclosure: {
+    fontSize: fontSize.xs,
+    color: '#AAA',
+    textAlign: 'center',
+    marginTop: space.md,
+    fontStyle: 'italic',
+  },
+  bottomButtons: {
+    gap: space.sm,
+  },
   addToCartBtn: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -695,6 +748,22 @@ const styles = StyleSheet.create({
   },
   addToCartText: {
     color: colors.white,
+    fontSize: fontSize.md,
+    fontWeight: fontWeight.bold,
+  },
+  buyNowBtn: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: radius.md,
+    height: space['5xl'],
+    shadowColor: shadow.medium.shadowColor,
+    shadowOffset: shadow.medium.shadowOffset,
+    shadowOpacity: shadow.medium.shadowOpacity,
+    shadowRadius: shadow.medium.shadowRadius,
+    elevation: shadow.medium.elevation,
+  },
+  buyNowText: {
+    color: '#fff',
     fontSize: fontSize.md,
     fontWeight: fontWeight.bold,
   },

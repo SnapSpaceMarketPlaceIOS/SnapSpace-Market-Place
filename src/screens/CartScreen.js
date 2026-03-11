@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useCallback } from 'react';
 import {
   View,
   Text,
@@ -8,13 +8,17 @@ import {
   Alert,
   Animated,
   Easing,
+  ActivityIndicator,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Path, Circle, Line, Polyline, Rect } from 'react-native-svg';
+import { useStripe } from '@stripe/stripe-react-native';
 import { colors } from '../constants/colors';
 import { fontSize, fontWeight, letterSpacing, space, radius, shadow } from '../constants/tokens';
 import { useCart } from '../context/CartContext';
 import { useOrderHistory } from '../context/OrderHistoryContext';
+import { useAuth } from '../context/AuthContext';
+import { supabase } from '../services/supabase';
 
 // ─── Icons ────────────────────────────────────────────────────────────────────
 
@@ -229,12 +233,75 @@ function AnimatedQtyText({ value, style }) {
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export default function CartScreen({ navigation }) {
+  const { user } = useAuth();
   const { items, removeFromCart, updateQuantity, subtotal, clearCart } = useCart();
   const { addOrder } = useOrderHistory();
+  const { initPaymentSheet, presentPaymentSheet } = useStripe();
+  const [checkingOut, setCheckingOut] = useState(false);
 
   const shipping = items.length > 0 ? 29 : 0;
   const total = subtotal + shipping;
   const totalItems = items.reduce((sum, i) => sum + i.quantity, 0);
+
+  const handleCheckout = useCallback(async () => {
+    if (checkingOut) return;
+    setCheckingOut(true);
+    try {
+      // Call the Supabase Edge Function to create a PaymentIntent
+      const { data, error: fnError } = await supabase.functions.invoke('create-payment-intent', {
+        body: { amount: total },
+      });
+      if (fnError) throw new Error(fnError.message);
+
+      const { clientSecret, ephemeralKey, customerId } = data;
+
+      // Initialize the Stripe Payment Sheet
+      const { error: initError } = await initPaymentSheet({
+        merchantDisplayName: 'SnapSpace',
+        customerId,
+        customerEphemeralKeySecret: ephemeralKey,
+        paymentIntentClientSecret: clientSecret,
+        allowsDelayedPaymentMethods: false,
+        defaultBillingDetails: { name: '' },
+      });
+      if (initError) throw new Error(initError.message);
+
+      // Present the Payment Sheet to the user
+      const { error: presentError } = await presentPaymentSheet();
+      if (presentError) {
+        if (presentError.code !== 'Canceled') {
+          Alert.alert('Payment failed', presentError.message);
+        }
+        return;
+      }
+
+      // Payment succeeded — create the order
+      addOrder({ items: [...items], subtotal, shipping, total });
+      clearCart();
+      Alert.alert(
+        'Order Confirmed!',
+        'Your payment was successful. View your order in Order History from your profile.',
+        [{ text: 'OK' }]
+      );
+    } catch (err) {
+      Alert.alert('Checkout error', err.message || 'Something went wrong. Please try again.');
+    } finally {
+      setCheckingOut(false);
+    }
+  }, [checkingOut, total, items, subtotal, shipping]);
+
+  // Guest gate — must come AFTER all hooks
+  if (!user) {
+    return (
+      <View style={{ flex: 1, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center', padding: 32 }}>
+        <Text style={{ fontSize: 22, fontWeight: '800', color: '#111', marginBottom: 8, textAlign: 'center' }}>Sign in to view your cart</Text>
+        <Text style={{ fontSize: 14, color: '#6B7280', textAlign: 'center', marginBottom: 28, lineHeight: 21 }}>Create a free account to save items, check out, and track your orders.</Text>
+        <TouchableOpacity onPress={() => navigation.navigate('Auth')} style={{ backgroundColor: '#0B6DC3', borderRadius: 14, paddingVertical: 14, paddingHorizontal: 40 }}>
+          <Text style={{ color: '#fff', fontWeight: '700', fontSize: 15 }}>Sign In / Sign Up</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
 
   if (items.length === 0) {
     return (
@@ -402,23 +469,20 @@ export default function CartScreen({ navigation }) {
           pointerEvents="none"
         />
         <TouchableOpacity
-          style={styles.checkoutBtn}
+          style={[styles.checkoutBtn, checkingOut && { opacity: 0.7 }]}
           activeOpacity={0.85}
-          onPress={() => {
-            addOrder({ items: [...items], subtotal, shipping, total });
-            clearCart();
-            Alert.alert(
-              'Order Placed!',
-              'Your order has been confirmed. View it in Order History from your profile settings.',
-              [{ text: 'OK' }]
-            );
-          }}
+          disabled={checkingOut}
+          onPress={handleCheckout}
         >
-          <Text style={styles.checkoutText}>
-            <Text style={styles.checkoutTextLabel}>Checkout</Text>
-            <Text style={styles.checkoutTextSep}>  ·  </Text>
-            <Text style={styles.checkoutTextTotal}>${total.toLocaleString()}</Text>
-          </Text>
+          {checkingOut ? (
+            <ActivityIndicator color="#fff" size="small" />
+          ) : (
+            <Text style={styles.checkoutText}>
+              <Text style={styles.checkoutTextLabel}>Checkout</Text>
+              <Text style={styles.checkoutTextSep}>  ·  </Text>
+              <Text style={styles.checkoutTextTotal}>${total.toLocaleString()}</Text>
+            </Text>
+          )}
         </TouchableOpacity>
       </View>
     </View>

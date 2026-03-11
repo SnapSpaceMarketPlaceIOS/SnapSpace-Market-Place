@@ -10,6 +10,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path, Circle, Line, Polyline, Rect, LinearGradient, Defs, Stop } from 'react-native-svg';
 import { colors } from '../constants/colors';
+import { VerifiedBadge } from '../components/VerifiedBadge';
 
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = (width - 48) / 2;
@@ -257,12 +258,12 @@ export default function UserProfileScreen({ navigation, route }) {
             </View>
           </View>
 
-          {/* Name + verified + username */}
+          {/* Name + verified badge + username */}
           <View style={styles.nameRow}>
             <Text style={styles.displayName}>{user.name}</Text>
             {user.verified && (
               <View style={{ marginLeft: 6, marginTop: 2 }}>
-                <VerifiedIcon />
+                <VerifiedBadge size="md" />
               </View>
             )}
           </View>

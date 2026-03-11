@@ -9,9 +9,11 @@ import {
   Platform,
   ScrollView,
   ActivityIndicator,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
+import * as AppleAuthentication from 'expo-apple-authentication';
 import { useAuth } from '../context/AuthContext';
 
 function AppleIcon() {
@@ -24,7 +26,7 @@ function AppleIcon() {
 
 const BLUE = '#0B6DC3';
 
-// ── Minimal Input Field ────────────────────────────────────────────────────────
+// ── Input Field ───────────────────────────────────────────────────────────────
 
 function MinimalInput({
   placeholder,
@@ -36,16 +38,12 @@ function MinimalInput({
   showToggle,
   onToggle,
   showPassword,
+  editable = true,
 }) {
   const [focused, setFocused] = useState(false);
 
   return (
-    <View
-      style={[
-        inputStyles.wrap,
-        focused && inputStyles.wrapFocused,
-      ]}
-    >
+    <View style={[inputStyles.wrap, focused && inputStyles.wrapFocused]}>
       <TextInput
         style={inputStyles.input}
         placeholder={placeholder}
@@ -56,6 +54,7 @@ function MinimalInput({
         keyboardType={keyboardType || 'default'}
         autoCapitalize={autoCapitalize || 'none'}
         autoCorrect={false}
+        editable={editable}
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
       />
@@ -85,26 +84,16 @@ const inputStyles = StyleSheet.create({
     borderWidth: 1.5,
     borderColor: '#D7D7D7',
   },
-  wrapFocused: {
-    borderColor: BLUE,
-  },
-  input: {
-    flex: 1,
-    fontSize: 15,
-    color: '#111',
-  },
-  toggleText: {
-    fontSize: 13,
-    color: '#ABABAB',
-    fontWeight: '500',
-    marginLeft: 8,
-  },
+  wrapFocused: { borderColor: BLUE },
+  input: { flex: 1, fontSize: 15, color: '#111' },
+  toggleText: { fontSize: 13, color: '#ABABAB', fontWeight: '500', marginLeft: 8 },
 });
 
-// ── Screen ─────────────────────────────────────────────────────────────────────
+// ── Screen ────────────────────────────────────────────────────────────────────
 
-export default function AuthScreen() {
-  const { signIn } = useAuth();
+export default function AuthScreen({ navigation }) {
+  const { signUp, signIn, signInWithApple, resetPassword } = useAuth();
+
   const [isSignUp, setIsSignUp] = useState(false);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -115,31 +104,54 @@ export default function AuthScreen() {
   const [errors, setErrors] = useState({});
 
   const validate = () => {
-    if (!isSignUp) return true;
     const e = {};
-    if (!name.trim()) e.name = 'Full name is required.';
+    if (isSignUp && !name.trim()) e.name = 'Full name is required.';
     if (!email.trim() || !/\S+@\S+\.\S+/.test(email)) e.email = 'Enter a valid email address.';
     if (password.length < 6) e.password = 'Password must be at least 6 characters.';
-    if (password !== confirmPassword) e.confirmPassword = 'Passwords do not match.';
+    if (isSignUp && password !== confirmPassword) e.confirmPassword = 'Passwords do not match.';
     setErrors(e);
     return Object.keys(e).length === 0;
   };
 
-  const handleAuth = () => {
+  const handleAuth = async () => {
     if (!validate()) return;
     setLoading(true);
-    setTimeout(() => {
+    try {
+      if (isSignUp) {
+        const result = await signUp(name, email, password);
+        if (result.needsEmailVerification) {
+          navigation.replace('VerifyEmailSent', { email });
+        } else {
+          navigation.goBack();
+        }
+      } else {
+        await signIn(email, password);
+        navigation.goBack();
+      }
+    } catch (err) {
+      Alert.alert('Error', err.message);
+    } finally {
       setLoading(false);
-      signIn({ email: email || 'admin@snapspace.app', name: isSignUp ? name : 'SnapSpace User' });
-    }, 600);
+    }
   };
 
-  const handleAppleSignIn = () => {
+  const handleForgotPassword = async () => {
+    if (!email.trim() || !/\S+@\S+\.\S+/.test(email)) {
+      Alert.alert('Enter your email', 'Type your email address above and tap "Forgot password?" again.');
+      return;
+    }
     setLoading(true);
-    setTimeout(() => {
+    try {
+      await resetPassword(email);
+      Alert.alert(
+        'Check your inbox',
+        `A password reset link has been sent to ${email}.`,
+      );
+    } catch (err) {
+      Alert.alert('Error', err.message);
+    } finally {
       setLoading(false);
-      signIn({ email: 'user@icloud.com', name: 'SnapSpace User' });
-    }, 1000);
+    }
   };
 
   const switchMode = () => {
@@ -161,7 +173,7 @@ export default function AuthScreen() {
           showsVerticalScrollIndicator={false}
           bounces={false}
         >
-          {/* Logo section */}
+          {/* Logo */}
           <View style={styles.logoSection}>
             <Text style={styles.wordmark}>SnapSpace</Text>
             <Text style={styles.tagline}>Design your space with AI.</Text>
@@ -215,12 +227,15 @@ export default function AuthScreen() {
             )}
 
             {!isSignUp && (
-              <TouchableOpacity style={styles.forgotBtn} activeOpacity={0.7}>
+              <TouchableOpacity
+                style={styles.forgotBtn}
+                activeOpacity={0.7}
+                onPress={handleForgotPassword}
+              >
                 <Text style={styles.forgotText}>Forgot password?</Text>
               </TouchableOpacity>
             )}
 
-            {/* Sign In / Create Account button */}
             <TouchableOpacity
               style={[styles.primaryBtn, loading && styles.primaryBtnDisabled]}
               onPress={handleAuth}
@@ -236,25 +251,33 @@ export default function AuthScreen() {
               )}
             </TouchableOpacity>
 
-            {/* Divider */}
             <View style={styles.dividerRow}>
               <View style={styles.dividerLine} />
               <Text style={styles.dividerText}>or</Text>
               <View style={styles.dividerLine} />
             </View>
 
-            {/* Continue with Apple */}
-            <TouchableOpacity
+            <AppleAuthentication.AppleAuthenticationButton
+              buttonType={AppleAuthentication.AppleAuthenticationButtonType.SIGN_IN}
+              buttonStyle={AppleAuthentication.AppleAuthenticationButtonStyle.BLACK}
+              cornerRadius={14}
               style={styles.appleBtn}
-              onPress={handleAppleSignIn}
-              activeOpacity={0.85}
-            >
-              <AppleIcon />
-              <Text style={styles.appleBtnText}>Continue with Apple</Text>
-            </TouchableOpacity>
+              onPress={async () => {
+                setLoading(true);
+                try {
+                  await signInWithApple();
+                  navigation.goBack();
+                } catch (err) {
+                  if (err.code !== 'ERR_REQUEST_CANCELED') {
+                    Alert.alert('Apple Sign-In Failed', err.message);
+                  }
+                } finally {
+                  setLoading(false);
+                }
+              }}
+            />
           </View>
 
-          {/* Sign Up link */}
           <TouchableOpacity style={styles.switchBtn} onPress={switchMode} activeOpacity={0.7}>
             <Text style={styles.switchText}>
               {isSignUp ? 'Already have an account?  ' : "Don't have an account?  "}
@@ -267,60 +290,24 @@ export default function AuthScreen() {
   );
 }
 
-// ── Styles ─────────────────────────────────────────────────────────────────────
+// ── Styles ────────────────────────────────────────────────────────────────────
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
+  safeArea: { flex: 1, backgroundColor: '#fff' },
   flex: { flex: 1 },
+  scroll: { flexGrow: 1, paddingHorizontal: 28, paddingBottom: 32 },
 
-  scroll: {
-    flexGrow: 1,
-    paddingHorizontal: 28,
-    paddingBottom: 32,
-  },
+  logoSection: { alignItems: 'center', paddingTop: 72, paddingBottom: 52 },
+  wordmark: { fontSize: 36, fontWeight: '800', color: '#111', letterSpacing: -0.8, marginBottom: 10 },
+  tagline: { fontSize: 14, color: '#ABABAB', fontWeight: '400', letterSpacing: 0.1 },
 
-  // Logo
-  logoSection: {
-    alignItems: 'center',
-    paddingTop: 72,
-    paddingBottom: 52,
-  },
-  wordmark: {
-    fontSize: 36,
-    fontWeight: '800',
-    color: '#111',
-    letterSpacing: -0.8,
-    marginBottom: 10,
-  },
-  tagline: {
-    fontSize: 14,
-    color: '#ABABAB',
-    fontWeight: '400',
-    letterSpacing: 0.1,
-  },
+  form: { width: '100%' },
 
-  // Form
-  form: {
-    width: '100%',
-  },
+  errorText: { fontSize: 12, color: '#E74C3C', marginTop: -10, marginBottom: 10, marginLeft: 4 },
 
-  // Error
-  errorText: {
-    fontSize: 12,
-    color: '#E74C3C',
-    marginTop: -10,
-    marginBottom: 10,
-    marginLeft: 4,
-  },
-
-  // Forgot
   forgotBtn: { alignSelf: 'flex-end', marginBottom: 22, marginTop: -4 },
   forgotText: { fontSize: 13, color: BLUE, fontWeight: '600' },
 
-  // Primary button
   primaryBtn: {
     backgroundColor: BLUE,
     borderRadius: 14,
@@ -331,17 +318,10 @@ const styles = StyleSheet.create({
   primaryBtnDisabled: { opacity: 0.6 },
   primaryBtnText: { color: '#fff', fontSize: 16, fontWeight: '700' },
 
-  // Divider
-  dividerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginVertical: 20,
-    gap: 12,
-  },
+  dividerRow: { flexDirection: 'row', alignItems: 'center', marginVertical: 20, gap: 12 },
   dividerLine: { flex: 1, height: 1, backgroundColor: '#E8E8E8' },
   dividerText: { fontSize: 12, color: '#BBBBBB', fontWeight: '500' },
 
-  // Apple button
   appleBtn: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -355,7 +335,6 @@ const styles = StyleSheet.create({
   },
   appleBtnText: { color: '#000', fontSize: 15, fontWeight: '700' },
 
-  // Switch
   switchBtn: { marginTop: 32, alignItems: 'center' },
   switchText: { fontSize: 14, color: '#ABABAB' },
   switchLink: { color: BLUE, fontWeight: '700' },

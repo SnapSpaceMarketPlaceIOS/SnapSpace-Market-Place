@@ -12,6 +12,9 @@ import {
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import Svg, { Path, Circle, Polyline, Line } from 'react-native-svg';
 import { colors } from '../constants/colors';
+import { useAuth } from '../context/AuthContext';
+import { uploadRoomPhoto } from '../services/supabase';
+import { generateInteriorDesign } from '../services/replicate';
 
 function FlashIcon({ off }) {
   return (
@@ -51,12 +54,33 @@ function XIcon() {
 }
 
 export default function SnapScreen({ navigation }) {
+  const { user } = useAuth();
   const [permission, requestPermission] = useCameraPermissions();
   const [facing, setFacing] = useState('back');
   const [flash, setFlash] = useState(false);
   const [prompt, setPrompt] = useState('');
   const [loading, setLoading] = useState(false);
+  const [statusText, setStatusText] = useState('');
   const cameraRef = useRef(null);
+
+  // Must be logged in to use the AI generation feature
+  if (!user) {
+    return (
+      <View style={styles.permissionContainer}>
+        <Svg width={48} height={48} viewBox="0 0 24 24" fill="none" stroke={colors.bluePrimary} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
+          <Path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+          <Circle cx={12} cy={13} r={4} />
+        </Svg>
+        <Text style={styles.permissionTitle}>Sign in to Use Snap</Text>
+        <Text style={styles.permissionText}>
+          Create a free account to snap your room and generate AI-powered interior designs.
+        </Text>
+        <TouchableOpacity style={styles.permissionBtn} onPress={() => navigation.navigate('Auth')}>
+          <Text style={styles.permissionBtnText}>Sign In / Sign Up</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
 
   if (!permission) {
     return <View style={styles.container} />;
@@ -83,18 +107,28 @@ export default function SnapScreen({ navigation }) {
   const handleCapture = async () => {
     if (!cameraRef.current || loading) return;
     setLoading(true);
+    setStatusText('Capturing photo…');
     try {
-      const photo = await cameraRef.current.takePictureAsync({ base64: true, quality: 0.7 });
-      setTimeout(() => {
-        setLoading(false);
-        navigation?.navigate('RoomResult', {
-          imageUri: photo.uri,
-          prompt: prompt || 'Modern minimalist redesign',
-        });
-      }, 2000);
-    } catch (e) {
+      // base64:true gives us the data inline — no FileSystem read needed
+      const photo = await cameraRef.current.takePictureAsync({ quality: 0.7, base64: true });
+
+      setStatusText('Uploading photo…');
+      const imageUrl = await uploadRoomPhoto(user?.id || 'anonymous', photo.uri, photo.base64);
+
+      setStatusText('Generating your design… (this takes ~30s)');
+      const resultUrl = await generateInteriorDesign(imageUrl, prompt || 'Modern minimalist redesign');
+
       setLoading(false);
-      Alert.alert('Error', 'Failed to capture photo. Please try again.');
+      setStatusText('');
+      navigation?.navigate('RoomResult', {
+        imageUri: photo.uri,
+        resultUri: resultUrl,
+        prompt: prompt || 'Modern minimalist redesign',
+      });
+    } catch (err) {
+      setLoading(false);
+      setStatusText('');
+      Alert.alert('Generation Failed', err.message || 'Something went wrong. Please try again.');
     }
   };
 
@@ -149,7 +183,10 @@ export default function SnapScreen({ navigation }) {
             activeOpacity={0.8}
           >
             {loading ? (
-              <ActivityIndicator color={colors.white} size="small" />
+              <>
+                <ActivityIndicator color={colors.white} size="small" />
+                {!!statusText && <Text style={styles.statusText}>{statusText}</Text>}
+              </>
             ) : (
               <>
                 <SparkIcon />
@@ -272,5 +309,11 @@ const styles = StyleSheet.create({
     color: colors.white,
     fontSize: 16,
     fontWeight: '700',
+  },
+  statusText: {
+    color: 'rgba(255,255,255,0.85)',
+    fontSize: 13,
+    fontWeight: '500',
+    marginLeft: 8,
   },
 });

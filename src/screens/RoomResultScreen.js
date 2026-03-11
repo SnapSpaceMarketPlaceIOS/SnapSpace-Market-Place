@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import {
   View,
   Text,
@@ -8,12 +8,24 @@ import {
   Dimensions,
   Share,
   Alert,
+  Image,
+  ActivityIndicator,
+  Animated,
+  PanResponder,
+  Linking,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Path, Circle, Line, Polyline } from 'react-native-svg';
 import { colors } from '../constants/colors';
+import { useCart } from '../context/CartContext';
+import { getProductsForPrompt, getSourceLabel, getSourceColor } from '../services/affiliateProducts';
 
 const { width, height } = Dimensions.get('window');
+
+// Sheet snap positions (distance from top of screen)
+const PEEK_HEIGHT = 90;           // how much peeks up from bottom when collapsed
+const SHEET_COLLAPSED = height - PEEK_HEIGHT;
+const SHEET_EXPANDED = height * 0.08; // near top of screen
 
 function BackIcon() {
   return (
@@ -54,16 +66,63 @@ function SofaIcon() {
   );
 }
 
-const PRODUCTS = [
-  { id: 1, name: 'Modern Velvet Sofa', price: 1899, retailer: 'Article', color: '#2C3E50' },
-  { id: 2, name: 'Walnut Coffee Table', price: 649, retailer: 'West Elm', color: '#5D6D7E' },
-  { id: 3, name: 'Ceramic Table Lamp', price: 189, retailer: 'CB2', color: '#1E3A2F' },
-  { id: 4, name: 'Wool Area Rug 8x10', price: 799, retailer: 'Rugs USA', color: '#3E2723' },
-];
-
 export default function RoomResultScreen({ route, navigation }) {
   const [addedItems, setAddedItems] = useState({});
+  const [imageLoading, setImageLoading] = useState(true);
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [products, setProducts] = useState([]);
+
+  const { addToCart } = useCart();
   const prompt = route?.params?.prompt || 'Modern minimalist redesign';
+  const resultUri = route?.params?.resultUri || null;
+
+  useEffect(() => {
+    const matched = getProductsForPrompt(prompt, 6);
+    setProducts(matched);
+  }, [prompt]);
+
+  // Animated value starts at collapsed position
+  const sheetY = useRef(new Animated.Value(SHEET_COLLAPSED)).current;
+  const lastY = useRef(SHEET_COLLAPSED);
+
+  const snapTo = useCallback((toValue) => {
+    lastY.current = toValue;
+    setIsExpanded(toValue === SHEET_EXPANDED);
+    Animated.spring(sheetY, {
+      toValue,
+      useNativeDriver: true,
+      bounciness: 4,
+      speed: 14,
+    }).start();
+  }, [sheetY]);
+
+  const panResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onMoveShouldSetPanResponder: (_, { dy }) => Math.abs(dy) > 5,
+      onPanResponderGrant: () => {
+        sheetY.setOffset(lastY.current);
+        sheetY.setValue(0);
+      },
+      onPanResponderMove: (_, { dy }) => {
+        const newVal = lastY.current + dy;
+        if (newVal >= SHEET_EXPANDED && newVal <= SHEET_COLLAPSED) {
+          sheetY.setValue(dy);
+        }
+      },
+      onPanResponderRelease: (_, { dy, vy }) => {
+        sheetY.flattenOffset();
+        const currentPos = lastY.current + dy;
+        const midpoint = (SHEET_COLLAPSED + SHEET_EXPANDED) / 2;
+
+        if (vy < -0.5 || currentPos < midpoint) {
+          snapTo(SHEET_EXPANDED);
+        } else {
+          snapTo(SHEET_COLLAPSED);
+        }
+      },
+    })
+  ).current;
 
   const handleShare = async () => {
     try {
@@ -71,77 +130,163 @@ export default function RoomResultScreen({ route, navigation }) {
     } catch (e) {}
   };
 
-  const addToCart = (id) => {
-    setAddedItems((prev) => ({ ...prev, [id]: true }));
-    Alert.alert('Added to Cart', 'Item has been added to your cart.');
+  const handleAddToCart = (product) => {
+    addToCart(product);
+    setAddedItems((prev) => ({ ...prev, [product.id]: true }));
+    Alert.alert('Added to Cart', `${product.name} has been added to your cart.`);
   };
+
+  const handleBuyNow = async (product) => {
+    if (product.affiliateUrl) {
+      const supported = await Linking.canOpenURL(product.affiliateUrl);
+      if (supported) {
+        await Linking.openURL(product.affiliateUrl);
+      }
+    }
+  };
+
+  // Dim overlay fades in as sheet expands
+  const overlayOpacity = sheetY.interpolate({
+    inputRange: [SHEET_EXPANDED, SHEET_COLLAPSED],
+    outputRange: [0.45, 0],
+    extrapolate: 'clamp',
+  });
 
   return (
     <View style={styles.container}>
-      {/* AI Generated Image Placeholder */}
-      <LinearGradient
-        colors={[colors.heroStart, colors.heroEnd, '#1A4A8A']}
-        style={styles.imageArea}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-      >
-        <View style={styles.topBar}>
-          <TouchableOpacity style={styles.iconBtn} onPress={() => navigation?.goBack()}>
-            <BackIcon />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.iconBtn} onPress={handleShare}>
-            <ShareIcon />
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.imagePlaceholder}>
-          <Svg width={40} height={40} viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round">
-            <Polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
-          </Svg>
-          <Text style={styles.placeholderText}>AI Generated Design</Text>
-          <Text style={styles.placeholderSubtext}>{prompt}</Text>
-        </View>
-      </LinearGradient>
-
-      {/* Bottom Sheet */}
-      <View style={styles.sheet}>
-        <View style={styles.sheetHandle} />
-        <Text style={styles.sheetTitle}>Shop This Look</Text>
-        <Text style={styles.sheetSubtitle}>Furniture matched to your design</Text>
-
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.productsRow}
-        >
-          {PRODUCTS.map((product) => (
-            <View key={product.id} style={styles.productCard}>
-              <View style={[styles.productThumb, { backgroundColor: product.color }]}>
-                <SofaIcon />
+      {/* Full-screen AI image behind everything */}
+      <View style={StyleSheet.absoluteFill}>
+        {resultUri ? (
+          <>
+            <Image
+              source={{ uri: resultUri }}
+              style={StyleSheet.absoluteFill}
+              resizeMode="contain"
+              onLoadEnd={() => setImageLoading(false)}
+            />
+            {imageLoading && (
+              <View style={styles.imageLoadingOverlay}>
+                <ActivityIndicator size="large" color={colors.white} />
               </View>
-              <Text style={styles.productName} numberOfLines={2}>{product.name}</Text>
-              <Text style={styles.productRetailer}>{product.retailer}</Text>
-              <View style={styles.productBottom}>
-                <Text style={styles.productPrice}>${product.price}</Text>
-                <TouchableOpacity
-                  style={[styles.addBtn, addedItems[product.id] && styles.addBtnDone]}
-                  onPress={() => addToCart(product.id)}
-                  disabled={addedItems[product.id]}
-                >
-                  {addedItems[product.id] ? (
-                    <Text style={styles.addBtnText}>Added</Text>
-                  ) : (
-                    <>
-                      <CartIcon />
-                      <Text style={styles.addBtnText}>Add</Text>
-                    </>
-                  )}
-                </TouchableOpacity>
-              </View>
+            )}
+          </>
+        ) : (
+          <LinearGradient
+            colors={[colors.heroStart, colors.heroEnd, '#1A4A8A']}
+            style={StyleSheet.absoluteFill}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+          >
+            <View style={styles.imagePlaceholder}>
+              <Svg width={48} height={48} viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round">
+                <Polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+              </Svg>
+              <Text style={styles.placeholderText}>AI Generated Design</Text>
+              <Text style={styles.placeholderSubtext}>{prompt}</Text>
             </View>
-          ))}
-        </ScrollView>
+          </LinearGradient>
+        )}
       </View>
+
+      {/* Top bar always visible */}
+      <View style={styles.topBar}>
+        <TouchableOpacity style={styles.iconBtn} onPress={() => navigation?.goBack()}>
+          <BackIcon />
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.iconBtn} onPress={handleShare}>
+          <ShareIcon />
+        </TouchableOpacity>
+      </View>
+
+      {/* Prompt badge at bottom of image */}
+      {resultUri && !isExpanded && (
+        <View style={styles.promptBadge}>
+          <Text style={styles.promptBadgeText} numberOfLines={1}>{prompt}</Text>
+        </View>
+      )}
+
+      {/* Dim overlay when sheet is expanded */}
+      <Animated.View
+        pointerEvents="none"
+        style={[StyleSheet.absoluteFill, { backgroundColor: '#000', opacity: overlayOpacity }]}
+      />
+
+      {/* Draggable Bottom Sheet */}
+      <Animated.View
+        style={[styles.sheet, { transform: [{ translateY: sheetY }] }]}
+      >
+        {/* Drag handle area */}
+        <View style={styles.handleArea} {...panResponder.panHandlers}>
+          <View style={styles.sheetHandle} />
+          <View style={styles.sheetPeek}>
+            <Text style={styles.sheetTitle}>Shop This Look</Text>
+            <Text style={styles.sheetSubtitle}>
+              {isExpanded ? 'Furniture matched to your design' : 'Swipe up to explore furniture'}
+            </Text>
+          </View>
+        </View>
+
+        {/* Scrollable product grid */}
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.productsGrid}
+          scrollEnabled={isExpanded}
+        >
+          {/* FTC Disclosure */}
+          <Text style={styles.disclosure}>We may earn a commission on purchases.</Text>
+
+          <View style={styles.gridRow}>
+            {products.map((product) => {
+              const sourceColor = getSourceColor(product.source);
+              const isAdded = addedItems[product.id];
+              return (
+                <View key={product.id} style={styles.productCard}>
+                  {product.imageUrl ? (
+                    <Image
+                      source={{ uri: product.imageUrl }}
+                      style={styles.productThumb}
+                      resizeMode="cover"
+                    />
+                  ) : (
+                    <View style={[styles.productThumb, { backgroundColor: '#2C3E50' }]}>
+                      <SofaIcon />
+                    </View>
+                  )}
+                  <Text style={styles.productName} numberOfLines={2}>{product.name}</Text>
+                  <Text style={styles.productRetailer}>{product.brand}</Text>
+                  <View style={styles.productBottom}>
+                    <Text style={styles.productPrice}>{product.price}</Text>
+                    <View style={styles.productActions}>
+                      <TouchableOpacity
+                        style={[styles.addBtn, isAdded && styles.addBtnDone]}
+                        onPress={() => !isAdded && handleAddToCart(product)}
+                        disabled={isAdded}
+                      >
+                        {isAdded ? (
+                          <Text style={styles.addBtnText}>✓</Text>
+                        ) : (
+                          <>
+                            <CartIcon />
+                            <Text style={styles.addBtnText}>Add</Text>
+                          </>
+                        )}
+                      </TouchableOpacity>
+                      {product.affiliateUrl && (
+                        <TouchableOpacity
+                          style={[styles.buyBtn, { backgroundColor: sourceColor }]}
+                          onPress={() => handleBuyNow(product)}
+                        >
+                          <Text style={styles.buyBtnText}>Buy</Text>
+                        </TouchableOpacity>
+                      )}
+                    </View>
+                  </View>
+                </View>
+              );
+            })}
+          </View>
+        </ScrollView>
+      </Animated.View>
     </View>
   );
 }
@@ -149,23 +294,30 @@ export default function RoomResultScreen({ route, navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: '#000',
   },
-  imageArea: {
-    height: height * 0.55,
-    justifyContent: 'space-between',
+  imageLoadingOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   topBar: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
     flexDirection: 'row',
     justifyContent: 'space-between',
     paddingTop: 56,
     paddingHorizontal: 20,
+    zIndex: 10,
   },
   iconBtn: {
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: 'rgba(0,0,0,0.3)',
+    backgroundColor: 'rgba(0,0,0,0.35)',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -175,64 +327,101 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   placeholderText: {
-    color: 'rgba(255,255,255,0.4)',
-    fontSize: 16,
-    fontWeight: '600',
-    marginTop: 12,
+    color: 'rgba(255,255,255,0.5)',
+    fontSize: 18,
+    fontWeight: '700',
+    marginTop: 14,
   },
   placeholderSubtext: {
-    color: 'rgba(255,255,255,0.25)',
+    color: 'rgba(255,255,255,0.3)',
     fontSize: 13,
-    marginTop: 4,
+    marginTop: 6,
+    paddingHorizontal: 32,
+    textAlign: 'center',
+  },
+  promptBadge: {
+    position: 'absolute',
+    bottom: PEEK_HEIGHT + 16,
+    left: 16,
+    right: 16,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    borderRadius: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+  },
+  promptBadgeText: {
+    color: '#fff',
+    fontSize: 13,
+    fontWeight: '500',
   },
   sheet: {
-    flex: 1,
-    backgroundColor: colors.white,
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    height: height - SHEET_EXPANDED + 40,
+    backgroundColor: '#fff',
     borderTopLeftRadius: 28,
     borderTopRightRadius: 28,
-    marginTop: -28,
-    paddingTop: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 16,
+    elevation: 20,
+  },
+  handleArea: {
+    paddingTop: 12,
+    paddingBottom: 4,
     paddingHorizontal: 20,
   },
   sheetHandle: {
     width: 40,
     height: 4,
     borderRadius: 2,
-    backgroundColor: colors.gray,
+    backgroundColor: '#DDD',
     alignSelf: 'center',
-    marginBottom: 18,
+    marginBottom: 14,
+  },
+  sheetPeek: {
+    marginBottom: 8,
   },
   sheetTitle: {
     fontSize: 20,
     fontWeight: '800',
-    color: colors.black,
+    color: '#111',
   },
   sheetSubtitle: {
     fontSize: 13,
     color: '#888',
-    marginTop: 4,
-    marginBottom: 18,
+    marginTop: 3,
   },
-  productsRow: {
-    gap: 14,
-    paddingBottom: 20,
+  productsGrid: {
+    paddingHorizontal: 16,
+    paddingBottom: 40,
+    paddingTop: 8,
+  },
+  gridRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+    justifyContent: 'space-between',
   },
   productCard: {
-    width: 160,
-    backgroundColor: colors.background,
+    width: (width - 44) / 2,
+    backgroundColor: '#F7F8FA',
     borderRadius: 18,
     overflow: 'hidden',
+    marginBottom: 4,
   },
   productThumb: {
     width: '100%',
-    height: 110,
+    height: 120,
     alignItems: 'center',
     justifyContent: 'center',
   },
   productName: {
     fontSize: 13,
     fontWeight: '700',
-    color: colors.black,
+    color: '#111',
     paddingHorizontal: 12,
     paddingTop: 10,
   },
@@ -242,23 +431,33 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     marginTop: 2,
   },
+  disclosure: {
+    fontSize: 10,
+    color: '#AAA',
+    textAlign: 'center',
+    marginBottom: 10,
+    fontStyle: 'italic',
+  },
   productBottom: {
+    flexDirection: 'column',
+    padding: 10,
+    gap: 6,
+  },
+  productActions: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 12,
+    gap: 6,
   },
   productPrice: {
     fontSize: 15,
     fontWeight: '800',
-    color: colors.black,
+    color: '#111',
   },
   addBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
     backgroundColor: colors.bluePrimary,
-    paddingHorizontal: 12,
+    paddingHorizontal: 10,
     paddingVertical: 7,
     borderRadius: 10,
   },
@@ -266,7 +465,19 @@ const styles = StyleSheet.create({
     backgroundColor: '#2ECC71',
   },
   addBtnText: {
-    color: colors.white,
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  buyBtn: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 7,
+    borderRadius: 10,
+  },
+  buyBtnText: {
+    color: '#fff',
     fontSize: 12,
     fontWeight: '700',
   },

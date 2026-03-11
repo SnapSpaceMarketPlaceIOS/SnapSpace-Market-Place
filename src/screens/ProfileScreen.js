@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   View,
   Text,
@@ -22,8 +22,11 @@ import { fontSize, fontWeight, letterSpacing, space, radius, shadow } from '../c
 import { useLiked } from '../context/LikedContext';
 import { useShared } from '../context/SharedContext';
 import { useAuth } from '../context/AuthContext';
+import { updateProfile, uploadAvatar } from '../services/supabase';
+import { DESIGNS } from '../data/designs';
 import Skeleton from '../components/Skeleton';
 import PressableCard from '../components/PressableCard';
+import { VerifiedBadge } from '../components/VerifiedBadge';
 
 const { width } = Dimensions.get('window');
 // 4px padding each side + 4px gap between cards (tight photo grid)
@@ -195,12 +198,13 @@ function InfoIcon() {
 
 // ── Data ──────────────────────────────────────────────────────────────────────
 
-const MY_DESIGNS = Array.from({ length: 12 }, (_, i) => ({ id: i + 1 }));
+const MY_DESIGNS = DESIGNS;
 
 const ACCOUNT_ITEMS = [
-  { label: 'Saved Designs',   icon: <SavedIcon />, screen: 'Explore' },
-  { label: 'Order History',   icon: <OrderIcon />, screen: 'OrderHistory' },
-  { label: 'Payment Methods', icon: <CardIcon />,  screen: 'PaymentMethods' },
+  { label: 'Saved Designs',          icon: <SavedIcon />, screen: 'Explore' },
+  { label: 'Order History',          icon: <OrderIcon />, screen: 'OrderHistory' },
+  { label: 'Payment Methods',        icon: <CardIcon />,  screen: 'PaymentMethods' },
+  { label: 'Supplier Application',   icon: <StarIcon />,  screen: 'SupplierApplicationStatus' },
 ];
 
 const SUPPORT_ITEMS = [
@@ -255,30 +259,64 @@ const ABOUT_ITEMS = [
 
 const getInitialProfile = (user) => ({
   displayName: user?.name || 'SnapSpace User',
-  username: user?.email ? user.email.split('@')[0].toLowerCase().replace(/\s/g, '.') : 'snapspace.user',
-  bio: 'Building Dream Spaces\nOne Prompt At A Time...',
-  avatarUri: null,
+  username: user?.username || (user?.email ? user.email.split('@')[0].toLowerCase().replace(/\s/g, '.') : 'snapspace.user'),
+  bio: user?.bio || 'Building Dream Spaces\nOne Prompt At A Time...',
+  avatarUri: user?.avatarUrl || null,
   bannerUri: null,
 });
 
 export default function ProfileScreen({ navigation }) {
   const { liked, toggleLiked } = useLiked();
   const { shared, addShared } = useShared();
-  const { user, signOut } = useAuth();
+  const { user, signOut, refreshUser } = useAuth();
   const [activeTab, setActiveTab] = useState(0);
   const [showSettings, setShowSettings] = useState(false);
   const [showEditProfile, setShowEditProfile] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [profile, setProfile] = useState(() => getInitialProfile(user));
   const [editDraft, setEditDraft] = useState(() => getInitialProfile(user));
 
-  const openEditProfile = () => {
+  const openEditProfile = useCallback(() => {
     setEditDraft(profile);
     setShowEditProfile(true);
-  };
+  }, [profile]);
 
-  const saveEditProfile = () => {
-    setProfile(editDraft);
-    setShowEditProfile(false);
+  // Guest gate — must come AFTER all hooks
+  if (!user) {
+    return (
+      <View style={{ flex: 1, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center', padding: 32 }}>
+        <Text style={{ fontSize: 22, fontWeight: '800', color: '#111', marginBottom: 8, textAlign: 'center' }}>Your profile awaits</Text>
+        <Text style={{ fontSize: 14, color: '#6B7280', textAlign: 'center', marginBottom: 28, lineHeight: 21 }}>Sign in to access your profile, saved designs, and order history.</Text>
+        <TouchableOpacity onPress={() => navigation.navigate('Auth')} style={{ backgroundColor: '#0B6DC3', borderRadius: 14, paddingVertical: 14, paddingHorizontal: 40 }}>
+          <Text style={{ color: '#fff', fontWeight: '700', fontSize: 15 }}>Sign In / Sign Up</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
+  const saveEditProfile = async () => {
+    if (!user?.id || saving) return;
+    setSaving(true);
+    try {
+      let avatarUrl = editDraft.avatarUri;
+      // If a new local image was picked (starts with file://) upload it to storage
+      if (avatarUrl && avatarUrl.startsWith('file://')) {
+        avatarUrl = await uploadAvatar(user.id, avatarUrl);
+      }
+      await updateProfile(user.id, {
+        full_name: editDraft.displayName.trim(),
+        username: editDraft.username.trim().toLowerCase(),
+        bio: editDraft.bio.trim(),
+        avatar_url: avatarUrl,
+      });
+      setProfile({ ...editDraft, avatarUri: avatarUrl });
+      await refreshUser();
+      setShowEditProfile(false);
+    } catch (err) {
+      Alert.alert('Save failed', err.message || 'Could not save profile. Please try again.');
+    } finally {
+      setSaving(false);
+    }
   };
 
   const pickImage = async (type) => {
@@ -304,7 +342,7 @@ export default function ProfileScreen({ navigation }) {
     }
   };
 
-  const tabs = ['My Snaps', 'Saved', 'Repost'];
+  const tabs = ['My Snaps', 'Liked', 'Repost'];
 
   return (
     <View style={styles.container}>
@@ -345,10 +383,14 @@ export default function ProfileScreen({ navigation }) {
             </TouchableOpacity>
           </View>
 
-          {/* Name + verified dot */}
+          {/* Name + verified badge (only shown when is_verified_supplier = true) */}
           <View style={styles.nameRow}>
             <Text style={styles.displayName}>{profile.displayName}</Text>
-            <View style={styles.verifiedDot} />
+            {user?.is_verified_supplier && (
+              <View style={{ marginLeft: 6, marginTop: 2 }}>
+                <VerifiedBadge size="md" />
+              </View>
+            )}
           </View>
           <Text style={styles.username}>@{profile.username}</Text>
 
@@ -367,30 +409,6 @@ export default function ProfileScreen({ navigation }) {
             </TouchableOpacity>
           </View>
 
-          {/* Action pill chips — horizontal scroll */}
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            style={styles.actionRow}
-            contentContainerStyle={styles.actionRowContent}
-          >
-            {[
-              { label: 'Cart',   icon: <CartActionIcon />, screen: 'Cart' },
-              { label: 'Liked',  icon: <HeartIcon size={16} />, screen: 'Liked' },
-              { label: 'Repost', icon: <RepostIcon /> },
-              { label: 'Shared', icon: <SharedIcon />, screen: 'Shared' },
-            ].map(({ label, icon, screen }) => (
-              <TouchableOpacity
-                key={label}
-                style={styles.actionChip}
-                activeOpacity={0.7}
-                onPress={() => screen && navigation?.navigate(screen)}
-              >
-                {icon}
-                <Text style={styles.actionChipLabel}>{label}</Text>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
         </View>
 
         {/* ── Tabs ── */}
@@ -421,6 +439,13 @@ export default function ProfileScreen({ navigation }) {
             >
               <View style={styles.cardImg}>
                 <View style={styles.cardImgBg} />
+                {design.imageUrl ? (
+                  <Image
+                    source={{ uri: design.imageUrl }}
+                    style={styles.cardImgPhoto}
+                    resizeMode="cover"
+                  />
+                ) : null}
                 <View style={styles.cardActions}>
                   <TouchableOpacity
                     style={styles.cardActionBtn}
@@ -452,6 +477,52 @@ export default function ProfileScreen({ navigation }) {
             </PressableCard>
           ))}
         </View>
+
+        {/* ── Supplier CTA: apply if consumer, dashboard if verified supplier ── */}
+        {user?.is_verified_supplier ? (
+          <TouchableOpacity
+            style={styles.dashboardCta}
+            onPress={() => navigation.navigate('SupplierDashboard')}
+            activeOpacity={0.85}
+          >
+            <View style={styles.dashboardCtaLeft}>
+              <View style={styles.dashboardCtaIcon}>
+                <Svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                  <Path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                  <Polyline points="9 22 9 12 15 12 15 22" />
+                </Svg>
+              </View>
+              <View>
+                <Text style={styles.dashboardCtaTitle}>Seller Dashboard</Text>
+                <Text style={styles.dashboardCtaSubtitle}>Manage products, orders & store</Text>
+              </View>
+            </View>
+            <Svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round">
+              <Path d="M5 12h14M12 5l7 7-7 7" />
+            </Svg>
+          </TouchableOpacity>
+        ) : (
+          <View style={styles.supplierCta}>
+            <View style={styles.supplierCtaLeft}>
+              <View style={styles.supplierCtaBadge}>
+                <Svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="#1D4ED8" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round">
+                  <Path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.77 5.82 21 7 14.14 2 9.27l6.91-1.01L12 2z" />
+                </Svg>
+              </View>
+              <View style={styles.supplierCtaText}>
+                <Text style={styles.supplierCtaTitle}>Sell on SnapSpace</Text>
+                <Text style={styles.supplierCtaSubtitle}>Apply to become a Verified Supplier</Text>
+              </View>
+            </View>
+            <TouchableOpacity
+              style={styles.supplierCtaBtn}
+              onPress={() => navigation.navigate('SupplierApplication')}
+              activeOpacity={0.85}
+            >
+              <Text style={styles.supplierCtaBtnText}>Apply</Text>
+            </TouchableOpacity>
+          </View>
+        )}
 
         <View style={{ height: space['3xl'] }} />
       </ScrollView>
@@ -502,6 +573,30 @@ export default function ProfileScreen({ navigation }) {
                   </TouchableOpacity>
                 ))}
               </View>
+
+              {/* Admin Panel — only visible to admin users */}
+              {user?.role === 'admin' && (
+                <>
+                  <Text style={styles.settingsSectionLabel}>ADMIN</Text>
+                  <View style={styles.settingsCard}>
+                    <TouchableOpacity
+                      style={styles.settingsItem}
+                      onPress={() => { setShowSettings(false); navigation?.navigate('AdminApplications'); }}
+                      activeOpacity={0.65}
+                    >
+                      <View style={styles.settingsLeft}>
+                        <View style={[styles.settingsIconWrap, { backgroundColor: '#EEF2FF' }]}>
+                          <Svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="#1D4ED8" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                            <Path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                          </Svg>
+                        </View>
+                        <Text style={[styles.settingsLabel, { color: '#1D4ED8' }]}>Supplier Applications</Text>
+                      </View>
+                      <ChevronRight />
+                    </TouchableOpacity>
+                  </View>
+                </>
+              )}
 
               {/* Support */}
               <Text style={styles.settingsSectionLabel}>SUPPORT</Text>
@@ -694,8 +789,8 @@ export default function ProfileScreen({ navigation }) {
                   textAlignVertical="top"
                 />
 
-                <TouchableOpacity style={styles.saveProfileBtn} onPress={saveEditProfile} activeOpacity={0.85}>
-                  <Text style={styles.saveProfileBtnText}>Save</Text>
+                <TouchableOpacity style={[styles.saveProfileBtn, saving && { opacity: 0.6 }]} onPress={saveEditProfile} activeOpacity={0.85} disabled={saving}>
+                  <Text style={styles.saveProfileBtnText}>{saving ? 'Saving…' : 'Save'}</Text>
                 </TouchableOpacity>
                 <View style={{ height: space.xl }} />
               </ScrollView>
@@ -826,14 +921,7 @@ const styles = StyleSheet.create({
     color: '#111',
     letterSpacing: letterSpacing.tight,
   },
-  verifiedDot: {
-    width: 10,
-    height: 10,
-    borderRadius: radius.full,
-    backgroundColor: colors.bluePrimary,
-    marginLeft: 8,
-    marginTop: 2,
-  },
+  // verifiedDot replaced by VerifiedBadge component
   username: {
     fontSize: fontSize.sm,
     color: '#888',
@@ -963,6 +1051,11 @@ const styles = StyleSheet.create({
   cardImgBg: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: '#E8EDF2',
+  },
+  cardImgPhoto: {
+    ...StyleSheet.absoluteFillObject,
+    width: '100%',
+    height: '100%',
   },
   cardActions: {
     position: 'absolute',
@@ -1240,6 +1333,97 @@ const styles = StyleSheet.create({
   saveProfileBtnText: {
     color: '#fff',
     fontSize: fontSize.md,
+    fontWeight: fontWeight.bold,
+  },
+
+  // ── Seller Dashboard CTA (shown to verified suppliers) ────────────────────
+  dashboardCta: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginHorizontal: space.lg,
+    marginTop: space.xl,
+    backgroundColor: '#1D4ED8',
+    borderRadius: radius.lg,
+    paddingVertical: space.md,
+    paddingHorizontal: space.lg,
+  },
+  dashboardCtaLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+    gap: space.sm,
+  },
+  dashboardCtaIcon: {
+    width: 34,
+    height: 34,
+    borderRadius: radius.full,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  dashboardCtaTitle: {
+    fontSize: fontSize.sm,
+    fontWeight: fontWeight.bold,
+    color: '#fff',
+    marginBottom: 2,
+  },
+  dashboardCtaSubtitle: {
+    fontSize: 11,
+    color: 'rgba(255,255,255,0.7)',
+    fontWeight: fontWeight.medium,
+  },
+
+  // ── Become a Supplier CTA ──────────────────────────────────────────────────
+  supplierCta: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginHorizontal: space.lg,
+    marginTop: space.xl,
+    backgroundColor: '#EFF6FF',
+    borderRadius: radius.lg,
+    paddingVertical: space.md,
+    paddingHorizontal: space.lg,
+    borderWidth: 1,
+    borderColor: '#BFDBFE',
+  },
+  supplierCtaLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+    gap: space.sm,
+  },
+  supplierCtaBadge: {
+    width: 32,
+    height: 32,
+    borderRadius: radius.full,
+    backgroundColor: '#DBEAFE',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  supplierCtaText: { flex: 1 },
+  supplierCtaTitle: {
+    fontSize: fontSize.sm,
+    fontWeight: fontWeight.bold,
+    color: '#1E3A5F',
+    marginBottom: 2,
+  },
+  supplierCtaSubtitle: {
+    fontSize: 11,
+    color: '#3B82F6',
+    fontWeight: fontWeight.medium,
+  },
+  supplierCtaBtn: {
+    backgroundColor: '#1D4ED8',
+    borderRadius: radius.sm,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    marginLeft: space.md,
+  },
+  supplierCtaBtnText: {
+    color: '#fff',
+    fontSize: fontSize.sm,
     fontWeight: fontWeight.bold,
   },
 });

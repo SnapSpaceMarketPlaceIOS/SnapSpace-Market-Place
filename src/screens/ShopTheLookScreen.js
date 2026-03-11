@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Dimensions,
   Alert,
+  Image,
 } from 'react-native';
 import Svg, { Path, Circle, Polyline, Rect, Line } from 'react-native-svg';
 import { colors } from '../constants/colors';
@@ -15,6 +16,7 @@ import { fontSize, fontWeight, letterSpacing, space, radius, shadow } from '../c
 import { useCart } from '../context/CartContext';
 import Skeleton from '../components/Skeleton';
 import PressableCard from '../components/PressableCard';
+import { getProductsForDesign } from '../services/affiliateProducts';
 
 const { width } = Dimensions.get('window');
 
@@ -77,6 +79,12 @@ export default function ShopTheLookScreen({ route, navigation }) {
   const { design } = route.params;
   const { addToCart, items } = useCart();
   const [addedKeys, setAddedKeys] = useState({});
+  const [products, setProducts] = useState(design.products || []);
+
+  useEffect(() => {
+    const matched = getProductsForDesign(design, 5);
+    if (matched.length > 0) setProducts(matched);
+  }, [design]);
 
   const isInCart = (product) => {
     const key = `${product.name}__${product.brand}`;
@@ -91,7 +99,7 @@ export default function ShopTheLookScreen({ route, navigation }) {
 
   const handleAddAll = () => {
     let added = 0;
-    design.products.forEach((p) => {
+    products.forEach((p) => {
       if (!isInCart(p)) {
         handleAddToCart(p);
         added++;
@@ -104,7 +112,7 @@ export default function ShopTheLookScreen({ route, navigation }) {
     }
   };
 
-  const allInCart = design.products.every((p) => isInCart(p));
+  const allInCart = products.every((p) => isInCart(p));
 
   return (
     <View style={styles.container}>
@@ -143,21 +151,32 @@ export default function ShopTheLookScreen({ route, navigation }) {
           </View>
         </View>
 
+        {/* FTC Disclosure */}
+        <Text style={styles.disclosure}>We may earn a commission on purchases.</Text>
+
         {/* Products Section */}
         <Text style={styles.sectionLabel}>
-          {design.products.length} PRODUCT{design.products.length !== 1 ? 'S' : ''} IN THIS LOOK
+          {products.length} PRODUCT{products.length !== 1 ? 'S' : ''} IN THIS LOOK
         </Text>
 
-        {design.products.map((product, index) => {
+        {products.map((product, index) => {
           const inCart = isInCart(product);
           return (
             <PressableCard
-              key={index}
+              key={product.id || index}
               style={styles.productCard}
               onPress={() => navigation.navigate('ProductDetail', { product, design })}
             >
               <View style={styles.productImgWrap}>
-                <Skeleton width={56} height={56} borderRadius={radius.lg} />
+                {product.imageUrl ? (
+                  <Image
+                    source={{ uri: product.imageUrl }}
+                    style={{ width: 56, height: 56, borderRadius: radius.lg }}
+                    resizeMode="cover"
+                  />
+                ) : (
+                  <Skeleton width={56} height={56} borderRadius={radius.lg} />
+                )}
               </View>
               <View style={styles.productDetails}>
                 <Text style={styles.productName}>{product.name}</Text>
@@ -175,7 +194,7 @@ export default function ShopTheLookScreen({ route, navigation }) {
           );
         })}
 
-        <View style={{ height: space['5xl'] + space['3xl'] }} />
+        <View style={{ height: space['5xl'] + space['3xl'] + space['3xl'] }} />
       </ScrollView>
 
       {/* Bottom Bar */}
@@ -187,11 +206,11 @@ export default function ShopTheLookScreen({ route, navigation }) {
         />
         <View style={styles.bottomInfo}>
           <Text style={styles.bottomLabel}>
-            {design.products.length} item{design.products.length !== 1 ? 's' : ''}
+            {products.length} item{products.length !== 1 ? 's' : ''}
           </Text>
           <Text style={styles.bottomTotal}>
-            Total: {design.products.reduce((sum, p) => {
-              const num = parseFloat(p.price.replace(/[^0-9.]/g, '')) || 0;
+            Total: {products.reduce((sum, p) => {
+              const num = parseFloat(String(p.price).replace(/[^0-9.]/g, '')) || 0;
               return sum + num;
             }, 0).toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0 })}
           </Text>
@@ -296,6 +315,14 @@ const styles = StyleSheet.create({
     marginTop: 1,
   },
 
+  disclosure: {
+    fontSize: fontSize.xs,
+    color: '#C0C0C8',
+    textAlign: 'center',
+    paddingHorizontal: space.lg,
+    marginBottom: space.sm,
+    fontStyle: 'italic',
+  },
   sectionLabel: {
     fontSize: fontSize.xs,
     fontWeight: fontWeight.bold,

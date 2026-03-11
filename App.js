@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { StripeProvider } from '@stripe/stripe-react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { LikedProvider } from './src/context/LikedContext';
@@ -34,6 +35,13 @@ import NotificationsScreen from './src/screens/NotificationsScreen';
 import LanguageScreen from './src/screens/LanguageScreen';
 import TermsOfUseScreen from './src/screens/TermsOfUseScreen';
 import PrivacyPolicyScreen from './src/screens/PrivacyPolicyScreen';
+import VerifyEmailSentScreen from './src/screens/VerifyEmailSentScreen';
+import SupplierApplicationScreen from './src/screens/SupplierApplicationScreen';
+import SupplierApplicationStatusScreen from './src/screens/SupplierApplicationStatusScreen';
+import AdminApplicationsScreen from './src/screens/AdminApplicationsScreen';
+import AdminApplicationDetailScreen from './src/screens/AdminApplicationDetailScreen';
+import SupplierOnboardingScreen from './src/screens/SupplierOnboardingScreen';
+import SupplierDashboardScreen from './src/screens/SupplierDashboardScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -178,54 +186,67 @@ function TabNavigator() {
 }
 
 function RootNavigator() {
-  const { user } = useAuth();
+  const { loading } = useAuth();
+
+  if (loading) {
+    return (
+      <View style={styles.loadingScreen}>
+        <Text style={styles.loadingWordmark}>SnapSpace</Text>
+        <ActivityIndicator color="#0B6DC3" style={{ marginTop: 24 }} />
+      </View>
+    );
+  }
+
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-      {!user ? (
-        // ── Not logged in — only show Auth ──
-        <Stack.Screen name="Auth" component={AuthScreen} />
-      ) : (
-        // ── Logged in — full app ──
-        <>
-          <Stack.Screen name="Main" component={TabNavigator} />
-          <Stack.Screen name="RoomResult" component={RoomResultScreen} />
-          <Stack.Screen name="ProductDetail" component={ProductDetailScreen} />
-          <Stack.Screen name="ShopTheLook" component={ShopTheLookScreen} />
-          <Stack.Screen name="UserProfile" component={UserProfileScreen} />
-          <Stack.Screen name="Liked" component={LikedScreen} />
-          <Stack.Screen name="Shared" component={SharedScreen} />
-          <Stack.Screen name="OrderHistory" component={OrderHistoryScreen} />
-          <Stack.Screen name="PaymentMethods" component={PaymentMethodsScreen} />
-          <Stack.Screen name="Help" component={HelpScreen} />
-          <Stack.Screen name="RestorePurchase" component={RestorePurchaseScreen} />
-          <Stack.Screen name="RequestFeature" component={RequestFeatureScreen} />
-          <Stack.Screen name="Notifications" component={NotificationsScreen} />
-          <Stack.Screen name="Language" component={LanguageScreen} />
-          <Stack.Screen name="TermsOfUse" component={TermsOfUseScreen} />
-          <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicyScreen} />
-        </>
-      )}
+      {/* ── Full app always accessible (guests + logged-in users) ── */}
+      <Stack.Screen name="Main" component={TabNavigator} />
+      <Stack.Screen name="Auth" component={AuthScreen} />
+      <Stack.Screen name="VerifyEmailSent" component={VerifyEmailSentScreen} />
+      <Stack.Screen name="RoomResult" component={RoomResultScreen} />
+      <Stack.Screen name="ProductDetail" component={ProductDetailScreen} />
+      <Stack.Screen name="ShopTheLook" component={ShopTheLookScreen} />
+      <Stack.Screen name="UserProfile" component={UserProfileScreen} />
+      <Stack.Screen name="Liked" component={LikedScreen} />
+      <Stack.Screen name="Shared" component={SharedScreen} />
+      <Stack.Screen name="OrderHistory" component={OrderHistoryScreen} />
+      <Stack.Screen name="PaymentMethods" component={PaymentMethodsScreen} />
+      <Stack.Screen name="Help" component={HelpScreen} />
+      <Stack.Screen name="RestorePurchase" component={RestorePurchaseScreen} />
+      <Stack.Screen name="RequestFeature" component={RequestFeatureScreen} />
+      <Stack.Screen name="Notifications" component={NotificationsScreen} />
+      <Stack.Screen name="Language" component={LanguageScreen} />
+      <Stack.Screen name="TermsOfUse" component={TermsOfUseScreen} />
+      <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicyScreen} />
+      <Stack.Screen name="SupplierApplication" component={SupplierApplicationScreen} />
+      <Stack.Screen name="SupplierApplicationStatus" component={SupplierApplicationStatusScreen} />
+      <Stack.Screen name="AdminApplications" component={AdminApplicationsScreen} />
+      <Stack.Screen name="AdminApplicationDetail" component={AdminApplicationDetailScreen} />
+      <Stack.Screen name="SupplierOnboarding" component={SupplierOnboardingScreen} />
+      <Stack.Screen name="SupplierDashboard" component={SupplierDashboardScreen} />
     </Stack.Navigator>
   );
 }
 
 export default function App() {
   return (
-    <SafeAreaProvider>
-      <AuthProvider>
-        <CartProvider>
-          <OrderHistoryProvider>
-            <LikedProvider>
-              <SharedProvider>
-                <NavigationContainer>
-                  <RootNavigator />
-                </NavigationContainer>
-              </SharedProvider>
-            </LikedProvider>
-          </OrderHistoryProvider>
-        </CartProvider>
-      </AuthProvider>
-    </SafeAreaProvider>
+    <StripeProvider publishableKey={process.env.EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY}>
+      <SafeAreaProvider>
+        <AuthProvider>
+          <CartProvider>
+            <OrderHistoryProvider>
+              <LikedProvider>
+                <SharedProvider>
+                  <NavigationContainer>
+                    <RootNavigator />
+                  </NavigationContainer>
+                </SharedProvider>
+              </LikedProvider>
+            </OrderHistoryProvider>
+          </CartProvider>
+        </AuthProvider>
+      </SafeAreaProvider>
+    </StripeProvider>
   );
 }
 
@@ -276,5 +297,17 @@ const styles = StyleSheet.create({
     color: colors.white,
     fontSize: fontSize.xs,
     fontWeight: fontWeight.bold,
+  },
+  loadingScreen: {
+    flex: 1,
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  loadingWordmark: {
+    fontSize: 32,
+    fontWeight: '800',
+    color: '#111',
+    letterSpacing: -0.6,
   },
 });

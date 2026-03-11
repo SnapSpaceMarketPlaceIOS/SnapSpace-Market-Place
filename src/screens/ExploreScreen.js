@@ -11,6 +11,7 @@ import {
   Keyboard,
   Animated,
   Easing,
+  Image,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Circle, Line, Path, Rect, Polyline } from 'react-native-svg';
@@ -20,6 +21,8 @@ import { useLiked } from '../context/LikedContext';
 import { DESIGNS } from '../data/designs';
 import Skeleton from '../components/Skeleton';
 import PressableCard from '../components/PressableCard';
+import { SellerName } from '../components/VerifiedBadge';
+import { getProductsForDesign } from '../services/affiliateProducts';
 
 const { width } = Dimensions.get('window');
 // 20px padding each side + 12px gap between cards
@@ -206,9 +209,17 @@ function GridCard({ design, isLiked, onLike, onPress }) {
       onPress={onPress}
       activeOpacity={0.95}
     >
-      {/* Card image placeholder */}
+      {/* Card image or placeholder */}
       <View style={styles.cardImg}>
         <View style={styles.cardImgBg} />
+        {design.imageUrl ? (
+          <Image
+            source={{ uri: design.imageUrl }}
+            style={styles.cardImgPhoto}
+            resizeMode="cover"
+            onError={() => {}}
+          />
+        ) : null}
         {/* Action buttons */}
         <View style={styles.cardActions}>
           <TouchableOpacity
@@ -331,7 +342,11 @@ export default function ExploreScreen({ navigation }) {
                   design={design}
                   isLiked={!!liked[design.id]}
                   onLike={() => toggleLiked(design.id)}
-                  onPress={() => setSelectedCard(design)}
+                  onPress={() => {
+                    const enrichedProducts = getProductsForDesign(design, 4);
+                    const enriched = { ...design, products: enrichedProducts.length ? enrichedProducts : design.products };
+                    setSelectedCard(enriched);
+                  }}
                 />
               ))}
             </View>
@@ -375,7 +390,15 @@ export default function ExploreScreen({ navigation }) {
               >
                 {/* Post image */}
                 <View style={styles.modalImage}>
-                  <ImagePlaceholderIcon />
+                  {selectedCard.imageUrl ? (
+                    <Image
+                      source={{ uri: selectedCard.imageUrl }}
+                      style={styles.modalImagePhoto}
+                      resizeMode="cover"
+                    />
+                  ) : (
+                    <ImagePlaceholderIcon />
+                  )}
                 </View>
 
                 {/* User row — tap avatar or name to visit their profile */}
@@ -391,7 +414,12 @@ export default function ExploreScreen({ navigation }) {
                     <Text style={styles.modalAvatarText}>{selectedCard.initial}</Text>
                   </View>
                   <View style={styles.modalUserInfo}>
-                    <Text style={styles.modalUsername}>@{selectedCard.user}</Text>
+                    <SellerName
+                      name={`@${selectedCard.user}`}
+                      isVerified={!!selectedCard.verified}
+                      size="sm"
+                      nameStyle={styles.modalUsername}
+                    />
                     <Text style={styles.modalTime}>Tap to view profile</Text>
                   </View>
                   <TouchableOpacity
@@ -452,7 +480,15 @@ export default function ExploreScreen({ navigation }) {
                     }}
                   >
                     <View style={styles.productImg}>
-                      <ImagePlaceholderIcon />
+                      {p.imageUrl ? (
+                        <Image
+                          source={{ uri: p.imageUrl }}
+                          style={{ width: '100%', height: '100%' }}
+                          resizeMode="cover"
+                        />
+                      ) : (
+                        <ImagePlaceholderIcon />
+                      )}
                     </View>
                     <View style={styles.productInfo}>
                       <Text style={styles.productName}>{p.name}</Text>
@@ -738,6 +774,11 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
     backgroundColor: '#E8EDF2',
   },
+  cardImgPhoto: {
+    ...StyleSheet.absoluteFillObject,
+    width: '100%',
+    height: '100%',
+  },
   cardActions: {
     position: 'absolute',
     top: space.md,
@@ -827,6 +868,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginBottom: space.base,
     overflow: 'hidden',
+  },
+  modalImagePhoto: {
+    width: '100%',
+    height: '100%',
   },
 
   // Modal: user row
