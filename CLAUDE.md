@@ -829,6 +829,36 @@ import { space, radius, shadow, fontSize, fontWeight, typography, typeScale, uiC
 import { Button, Badge, SectionHeader } from '../components/ds';
 ```
 
+### CardImage Component
+Drop-in `<Image>` replacement with graceful fallback for broken/missing URLs.
+
+```js
+import CardImage from '../components/CardImage';
+
+// Usage — replace any <Image source={{ uri }} ... /> with:
+<CardImage
+  uri={design.imageUrl}        // string | null — safe to pass undefined/null
+  style={styles.cardImage}     // same style prop as Image
+  placeholderColor="#D0D7E3"   // optional (default #D0D7E3)
+  resizeMode="cover"           // optional (default 'cover')
+/>
+```
+
+Use `CardImage` everywhere a URI image is rendered. Never use raw `<Image source={{ uri }}>` for user/design images.
+
+### Image Pool (`src/data/imagePool.js`)
+125 browser-verified Unsplash interior-only URLs grouped by room type. All confirmed HTTP 200 with no people, no exteriors, no food/clothing.
+
+```js
+import { IMAGE_POOL, getRandomImage, getImagesForRoom } from '../data/imagePool';
+
+getRandomImage()                        // random across all rooms
+getRandomImage('living-room')           // random for a specific room
+getImagesForRoom('bedroom')             // full array for a room
+// Room keys: 'living-room' | 'bedroom' | 'kitchen' | 'dining-room'
+//            'office' | 'bathroom' | 'outdoor' | 'nursery'
+```
+
 ### FTC Compliance
 All screens showing affiliate products must display: *"We may earn a commission when you buy through links on this app."*
 
