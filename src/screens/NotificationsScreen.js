@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -11,6 +11,12 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path, Circle, Polyline, Line } from 'react-native-svg';
 import { colors } from '../constants/colors';
+import { space, radius, fontWeight, fontSize, uiColors, typeScale, shadow } from '../constants/tokens';
+import { Button, Badge, SectionHeader } from '../components/ds';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+const STORAGE_KEY_PREFS = '@snapspace_notif_prefs';
+const STORAGE_KEY_PUSH = '@snapspace_notif_push';
 
 // ── Icons ──────────────────────────────────────────────────────────────────────
 
@@ -118,14 +124,38 @@ const NOTIFICATION_SECTIONS = [
 // ── Screen ─────────────────────────────────────────────────────────────────────
 
 export default function NotificationsScreen({ navigation }) {
-  const initialState = NOTIFICATION_SECTIONS.flatMap((s) => s.items).reduce(
+  const defaultPrefs = NOTIFICATION_SECTIONS.flatMap((s) => s.items).reduce(
     (acc, item) => ({ ...acc, [item.id]: item.default }),
     {}
   );
-  const [prefs, setPrefs] = useState(initialState);
+  const [prefs, setPrefs] = useState(defaultPrefs);
   const [pushEnabled, setPushEnabled] = useState(true);
 
-  const toggle = (id) => setPrefs((prev) => ({ ...prev, [id]: !prev[id] }));
+  useEffect(() => {
+    (async () => {
+      try {
+        const [storedPrefs, storedPush] = await Promise.all([
+          AsyncStorage.getItem(STORAGE_KEY_PREFS),
+          AsyncStorage.getItem(STORAGE_KEY_PUSH),
+        ]);
+        if (storedPrefs) setPrefs(JSON.parse(storedPrefs));
+        if (storedPush !== null) setPushEnabled(JSON.parse(storedPush));
+      } catch (_) {}
+    })();
+  }, []);
+
+  const toggle = (id) => {
+    setPrefs((prev) => {
+      const next = { ...prev, [id]: !prev[id] };
+      AsyncStorage.setItem(STORAGE_KEY_PREFS, JSON.stringify(next)).catch(() => {});
+      return next;
+    });
+  };
+
+  const handlePushToggle = (val) => {
+    setPushEnabled(val);
+    AsyncStorage.setItem(STORAGE_KEY_PUSH, JSON.stringify(val)).catch(() => {});
+  };
 
   const handleSave = () => {
     Alert.alert('Saved', 'Your notification preferences have been updated.');
@@ -164,7 +194,7 @@ export default function NotificationsScreen({ navigation }) {
           </View>
           <Switch
             value={pushEnabled}
-            onValueChange={setPushEnabled}
+            onValueChange={handlePushToggle}
             trackColor={{ false: '#E5E5E5', true: colors.bluePrimary }}
             thumbColor="#fff"
             ios_backgroundColor="#E5E5E5"

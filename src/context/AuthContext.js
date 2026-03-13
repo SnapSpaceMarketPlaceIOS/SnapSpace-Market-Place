@@ -27,16 +27,33 @@ export function AuthProvider({ children }) {
     let mounted = true;
 
     const bootstrap = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session && mounted) {
-        try {
-          const profile = await fetchProfile(session.user.id);
-          setUser(buildUser(session, profile));
-        } catch {
-          setUser(buildUser(session, null));
+      // Safety net: if getSession() hangs (e.g. no network, bad env vars),
+      // bail out after 5s so the app is never stuck on the loading screen.
+      let settled = false;
+      const timer = setTimeout(() => {
+        if (!settled && mounted) {
+          settled = true;
+          setLoading(false);
         }
+      }, 5000);
+
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session && mounted) {
+          try {
+            const profile = await fetchProfile(session.user.id);
+            setUser(buildUser(session, profile));
+          } catch {
+            setUser(buildUser(session, null));
+          }
+        }
+      } catch {
+        // Network or config error — proceed as guest
+      } finally {
+        clearTimeout(timer);
+        if (!settled && mounted) setLoading(false);
+        settled = true;
       }
-      if (mounted) setLoading(false);
     };
 
     bootstrap();

@@ -13,7 +13,7 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.anonymous.SnapSpace",
+      "bundleIdentifier": "com.anthonyrivera.snapspace",
       "entitlements": {
         "aps-environment": "development"
       }
@@ -58,7 +58,7 @@
       [
         "@stripe/stripe-react-native",
         {
-          "merchantIdentifier": "merchant.com.anonymous.SnapSpace",
+          "merchantIdentifier": "merchant.com.anthonyrivera.snapspace",
           "enableGooglePay": false
         }
       ]

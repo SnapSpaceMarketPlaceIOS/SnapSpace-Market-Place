@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   View,
   Text,
@@ -6,11 +6,14 @@ import {
   StyleSheet,
   TouchableOpacity,
   Dimensions,
+  Image,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import Svg, { Path, Circle, Line, Polyline, Rect, LinearGradient, Defs, Stop } from 'react-native-svg';
-import { colors } from '../constants/colors';
+import Svg, { Path, Circle, Line, Polyline, LinearGradient, Defs, Stop } from 'react-native-svg';
+import { colors as C } from '../constants/theme';
+import { typeScale, radius } from '../constants/tokens';
 import { VerifiedBadge } from '../components/VerifiedBadge';
+import { DESIGNS } from '../data/designs';
 
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = (width - 48) / 2;
@@ -66,7 +69,7 @@ function ShareIcon({ size = 13 }) {
 
 function VerifiedIcon() {
   return (
-    <Svg width={16} height={16} viewBox="0 0 24 24" fill={colors.bluePrimary} stroke="none">
+    <Svg width={16} height={16} viewBox="0 0 24 24" fill={C.primary} stroke="none">
       <Path d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
     </Svg>
   );
@@ -192,10 +195,14 @@ const FALLBACK_USER = {
   posts: 14,
   totalLikes: '4.8K',
   specialties: ['#AIGenerated', '#InteriorDesign'],
-  avatarColor: colors.bluePrimary,
+  avatarColor: C.primary,
 };
 
-const SAMPLE_POSTS = Array.from({ length: 9 }, (_, i) => ({ id: i + 1 }));
+function getPostsForUser(rawUsername) {
+  const byHandle = DESIGNS.filter(d => d.seller === rawUsername);
+  if (byHandle.length >= 6) return byHandle;
+  return DESIGNS.slice(0, 9);
+}
 
 // ── Component ─────────────────────────────────────────────────────────────────
 
@@ -206,6 +213,8 @@ export default function UserProfileScreen({ navigation, route }) {
   const [following, setFollowing] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
   const [liked, setLiked] = useState({});
+
+  const posts = useMemo(() => getPostsForUser(rawUsername), [rawUsername]);
 
   const tabs = ['Posts', 'Saved'];
 
@@ -333,14 +342,23 @@ export default function UserProfileScreen({ navigation, route }) {
 
         {/* ── Posts Grid ── */}
         <View style={styles.grid}>
-          {SAMPLE_POSTS.map(post => (
+          {posts.map(post => (
             <TouchableOpacity
               key={post.id}
               style={styles.card}
               activeOpacity={0.88}
+              onPress={() => navigation?.navigate('ShopTheLook', { design: post })}
             >
               <View style={styles.cardImg}>
-                <ImagePlaceholderIcon size={28} />
+                {post.imageUrl ? (
+                  <Image
+                    source={{ uri: post.imageUrl }}
+                    style={styles.cardPhoto}
+                    resizeMode="cover"
+                  />
+                ) : (
+                  <View style={styles.cardPhotoFallback} />
+                )}
                 <View style={styles.cardActions}>
                   <TouchableOpacity
                     style={styles.cardActionBtn}
@@ -372,7 +390,7 @@ export default function UserProfileScreen({ navigation, route }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: C.bg,
   },
 
   // Banner
@@ -395,9 +413,9 @@ const styles = StyleSheet.create({
     paddingTop: 4,
   },
   navBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    width: 44,
+    height: 44,
+    borderRadius: radius.full,
     backgroundColor: 'rgba(255,255,255,0.9)',
     alignItems: 'center',
     justifyContent: 'center',
@@ -449,36 +467,40 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   followBtn: {
-    backgroundColor: colors.bluePrimary,
-    borderRadius: 22,
+    backgroundColor: C.primary,
+    borderRadius: radius.button,
     paddingHorizontal: 22,
     paddingVertical: 9,
+    minHeight: 36,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   followingBtn: {
-    backgroundColor: '#F4F4F6',
+    backgroundColor: C.surface2,
     borderWidth: 1.5,
-    borderColor: '#DDD',
+    borderColor: C.border,
   },
   followBtnText: {
-    color: '#fff',
-    fontSize: 13,
-    fontWeight: '700',
+    ...typeScale.button,
+    color: C.white,
   },
   followingBtnText: {
-    color: '#555',
+    color: C.textSecondary,
   },
   messageBtn: {
-    borderRadius: 22,
+    borderRadius: radius.button,
     paddingHorizontal: 18,
     paddingVertical: 9,
+    minHeight: 36,
     borderWidth: 1.5,
-    borderColor: '#DDD',
-    backgroundColor: '#fff',
+    borderColor: C.border,
+    backgroundColor: C.bg,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   messageBtnText: {
-    color: '#333',
-    fontSize: 13,
-    fontWeight: '600',
+    ...typeScale.button,
+    color: C.textPrimary,
   },
 
   // Name block
@@ -488,26 +510,24 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
   displayName: {
-    fontSize: 20,
+    ...typeScale.title,
     fontWeight: '800',
-    color: '#111',
+    color: C.textPrimary,
     letterSpacing: -0.5,
   },
   username: {
-    fontSize: 13,
-    color: '#888',
+    ...typeScale.caption,
+    color: C.textSecondary,
     marginBottom: 10,
-    fontWeight: '500',
   },
   bio: {
-    fontSize: 14,
-    color: '#444',
-    lineHeight: 20,
+    ...typeScale.body,
+    color: C.textSecondary,
     marginBottom: 6,
   },
   location: {
-    fontSize: 12,
-    color: '#999',
+    ...typeScale.caption,
+    color: C.textTertiary,
     marginBottom: 12,
   },
 
@@ -518,21 +538,21 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   specialtyTag: {
-    backgroundColor: 'rgba(11,109,195,0.1)',
-    borderRadius: 20,
+    backgroundColor: C.primaryLight,
+    borderRadius: radius.full,
     paddingHorizontal: 12,
     paddingVertical: 5,
   },
   specialtyTagText: {
-    fontSize: 12,
+    ...typeScale.caption,
     fontWeight: '600',
-    color: colors.bluePrimary,
+    color: C.primary,
   },
 
   // Stats
   statsRow: {
     flexDirection: 'row',
-    backgroundColor: '#F8FAFF',
+    backgroundColor: C.surface,
     borderRadius: 16,
     paddingVertical: 14,
     marginBottom: 4,
@@ -542,20 +562,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   statValue: {
-    fontSize: 17,
+    ...typeScale.headline,
     fontWeight: '800',
-    color: '#111',
+    color: C.textPrimary,
     letterSpacing: -0.3,
   },
   statLabel: {
-    fontSize: 11,
-    color: '#999',
+    ...typeScale.micro,
+    color: C.textTertiary,
     marginTop: 3,
-    fontWeight: '500',
+    textTransform: undefined,
   },
   statDivider: {
     width: 1,
-    backgroundColor: '#E8E8E8',
+    backgroundColor: C.border,
     marginVertical: 4,
   },
 
@@ -571,12 +591,12 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   tabLabel: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#A0A0A8',
+    ...typeScale.body,
+    color: C.textTertiary,
   },
   tabLabelActive: {
-    color: '#111',
+    ...typeScale.body,
+    color: C.textPrimary,
     fontWeight: '700',
   },
   tabUnderline: {
@@ -585,12 +605,12 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     height: 2.5,
-    backgroundColor: colors.bluePrimary,
+    backgroundColor: C.primary,
     borderRadius: 2,
   },
   tabBorder: {
     height: 1.5,
-    backgroundColor: '#EBEBEB',
+    backgroundColor: C.border,
     marginBottom: 14,
   },
 
@@ -603,18 +623,37 @@ const styles = StyleSheet.create({
   },
   card: {
     width: CARD_WIDTH,
-    borderRadius: 14,
+    borderRadius: radius.md,
     overflow: 'hidden',
   },
   cardImg: {
     width: '100%',
     aspectRatio: 1,
-    backgroundColor: '#D7D7D7',
-    borderRadius: 14,
+    backgroundColor: C.surface2,
+    borderRadius: radius.md,
     alignItems: 'center',
     justifyContent: 'center',
     position: 'relative',
     overflow: 'hidden',
+  },
+  cardPhoto: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    width: '100%',
+    height: '100%',
+    borderRadius: radius.md,
+  },
+  cardPhotoFallback: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: C.surface2,
+    borderRadius: radius.md,
   },
   cardActions: {
     position: 'absolute',

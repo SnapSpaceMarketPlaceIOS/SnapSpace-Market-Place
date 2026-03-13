@@ -548,7 +548,7 @@ export const DESIGNS = [
       { name: 'Floating Nightstand, White', brand: 'Sorbus', price: '$89', affiliateUrl: 'https://www.amazon.com/s?k=floating+nightstand+white+wall+mounted+minimalist+scandinavian&tag=snapspace20-20' },
       { name: 'Rechargeable Mushroom Lamp', brand: 'TOPMLIGHT', price: '$59', affiliateUrl: 'https://www.amazon.com/s?k=rechargeable+mushroom+table+lamp+minimalist+scandi&tag=snapspace20-20' },
     ],
-    tags: ['#Minimalist', '#Bedroom', '#WhiteLinen', '#CalmbBeauty', '#AIGenerated'],
+    tags: ['#Minimalist', '#Bedroom', '#WhiteLinen', '#CalmBeauty', '#AIGenerated'],
     likes: 219, shares: 53,
   },
   {

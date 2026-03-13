@@ -10,9 +10,12 @@ import {
   Platform,
   Alert,
   Dimensions,
+  ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Button, Badge, SectionHeader } from '../components/ds';
 import Svg, { Path, Circle, Polyline, Line, Rect, G } from 'react-native-svg';
+import { CardField, useStripe } from '@stripe/stripe-react-native';
 import { colors } from '../constants/colors';
 
 const { width } = Dimensions.get('window');
@@ -82,17 +85,6 @@ function UserIcon() {
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
 
-function formatCardNumber(raw) {
-  const digits = raw.replace(/\D/g, '').slice(0, 16);
-  return digits.replace(/(.{4})/g, '$1 ').trim();
-}
-
-function formatExpiry(raw) {
-  const digits = raw.replace(/\D/g, '').slice(0, 4);
-  if (digits.length <= 2) return digits;
-  return digits.slice(0, 2) + '/' + digits.slice(2);
-}
-
 function maskCardNumber(last4) {
   return `•••• •••• •••• ${last4}`;
 }
@@ -103,14 +95,6 @@ const CARD_BRAND_COLORS = {
   amex:       { bg: '#007BC1', accent: '#fff' },
   default:    { bg: '#2C3E50', accent: '#BDC3C7' },
 };
-
-function detectBrand(number) {
-  const d = number.replace(/\s/g, '');
-  if (d.startsWith('4')) return 'visa';
-  if (d.startsWith('5') || d.startsWith('2')) return 'mastercard';
-  if (d.startsWith('3')) return 'amex';
-  return 'default';
-}
 
 // ── Saved Card Component ───────────────────────────────────────────────────────
 
@@ -157,55 +141,50 @@ function SavedCard({ card, isDefault, onSetDefault, onDelete }) {
   );
 }
 
-// ── Add Card Form ──────────────────────────────────────────────────────────────
+// ── Add Card Form (Stripe CardField — PCI-compliant) ──────────────────────────
 
 function AddCardForm({ onSave, onCancel }) {
-  const [cardNumber, setCardNumber] = useState('');
+  const { createPaymentMethod } = useStripe();
   const [cardName, setCardName] = useState('');
-  const [expiry, setExpiry] = useState('');
-  const [cvv, setCvv] = useState('');
+  const [cardComplete, setCardComplete] = useState(false);
+  const [saving, setSaving] = useState(false);
 
-  const handleSave = () => {
-    const digits = cardNumber.replace(/\s/g, '');
-    if (digits.length < 16) {
-      Alert.alert('Invalid Card', 'Please enter a valid 16-digit card number.');
-      return;
-    }
+  const handleSave = async () => {
     if (!cardName.trim()) {
       Alert.alert('Missing Name', 'Please enter the cardholder name.');
       return;
     }
-    if (expiry.length < 5) {
-      Alert.alert('Invalid Expiry', 'Please enter a valid expiry date (MM/YY).');
+    if (!cardComplete) {
+      Alert.alert('Incomplete Card', 'Please complete your card details.');
       return;
     }
-    if (cvv.length < 3) {
-      Alert.alert('Invalid CVV', 'Please enter a valid CVV.');
-      return;
+    setSaving(true);
+    try {
+      const { paymentMethod, error } = await createPaymentMethod({
+        paymentMethodType: 'Card',
+        paymentMethodData: { billingDetails: { name: cardName.trim() } },
+      });
+      if (error) {
+        Alert.alert('Card Error', error.message);
+        return;
+      }
+      onSave({
+        paymentMethodId: paymentMethod.id,
+        last4: paymentMethod.card.last4,
+        brand: paymentMethod.card.brand?.toLowerCase() ?? 'default',
+        expiry: `${String(paymentMethod.card.expMonth).padStart(2, '0')}/${String(paymentMethod.card.expYear).slice(-2)}`,
+        name: cardName.trim(),
+      });
+    } catch (e) {
+      Alert.alert('Error', e.message || 'Something went wrong.');
+    } finally {
+      setSaving(false);
     }
-    const brand = detectBrand(cardNumber);
-    onSave({
-      last4: digits.slice(-4),
-      brand,
-      expiry,
-      name: cardName.trim(),
-    });
   };
 
   return (
     <View style={styles.addCardForm}>
       <Text style={styles.addCardTitle}>New Card</Text>
-
-      <Text style={styles.fieldLabel}>Card Number</Text>
-      <TextInput
-        style={styles.input}
-        value={cardNumber}
-        onChangeText={(t) => setCardNumber(formatCardNumber(t))}
-        placeholder="1234 5678 9012 3456"
-        placeholderTextColor="#BBBBC0"
-        keyboardType="numeric"
-        maxLength={19}
-      />
 
       <Text style={styles.fieldLabel}>Cardholder Name</Text>
       <TextInput
@@ -217,40 +196,32 @@ function AddCardForm({ onSave, onCancel }) {
         autoCapitalize="words"
       />
 
-      <View style={styles.row}>
-        <View style={{ flex: 1, marginRight: 10 }}>
-          <Text style={styles.fieldLabel}>Expiry Date</Text>
-          <TextInput
-            style={styles.input}
-            value={expiry}
-            onChangeText={(t) => setExpiry(formatExpiry(t))}
-            placeholder="MM/YY"
-            placeholderTextColor="#BBBBC0"
-            keyboardType="numeric"
-            maxLength={5}
-          />
-        </View>
-        <View style={{ flex: 1 }}>
-          <Text style={styles.fieldLabel}>CVV</Text>
-          <TextInput
-            style={styles.input}
-            value={cvv}
-            onChangeText={(t) => setCvv(t.replace(/\D/g, '').slice(0, 4))}
-            placeholder="•••"
-            placeholderTextColor="#BBBBC0"
-            keyboardType="numeric"
-            secureTextEntry
-            maxLength={4}
-          />
-        </View>
-      </View>
+      <Text style={styles.fieldLabel}>Card Details</Text>
+      <CardField
+        postalCodeEnabled={false}
+        onCardChange={(details) => setCardComplete(details.complete)}
+        style={styles.stripeCardField}
+        cardStyle={{
+          backgroundColor: '#FAFAFA',
+          textColor: '#111',
+          borderColor: '#EBEBEB',
+          borderWidth: 1.5,
+          borderRadius: 12,
+          fontSize: 15,
+          placeholderColor: '#BBBBC0',
+        }}
+      />
 
       <View style={styles.addCardBtns}>
-        <TouchableOpacity style={styles.cancelBtn} onPress={onCancel} activeOpacity={0.7}>
+        <TouchableOpacity style={styles.cancelBtn} onPress={onCancel} activeOpacity={0.7} disabled={saving}>
           <Text style={styles.cancelBtnText}>Cancel</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.saveCardBtn} onPress={handleSave} activeOpacity={0.85}>
-          <Text style={styles.saveCardBtnText}>Save Card</Text>
+        <TouchableOpacity style={[styles.saveCardBtn, saving && { opacity: 0.7 }]} onPress={handleSave} activeOpacity={0.85} disabled={saving}>
+          {saving ? (
+            <ActivityIndicator color="#fff" size="small" />
+          ) : (
+            <Text style={styles.saveCardBtnText}>Save Card</Text>
+          )}
         </TouchableOpacity>
       </View>
     </View>
@@ -304,11 +275,17 @@ export default function PaymentMethodsScreen({ navigation }) {
         text: 'Remove',
         style: 'destructive',
         onPress: () => {
-          setSavedCards((prev) => prev.filter((c) => c.id !== id));
-          if (defaultCardId === id) {
-            const remaining = savedCards.filter((c) => c.id !== id);
-            setDefaultCardId(remaining.length > 0 ? remaining[0].id : null);
-          }
+          setSavedCards((prev) => {
+            const remaining = prev.filter((c) => c.id !== id);
+            // Fix stale closure: update defaultCardId inside the updater callback
+            setDefaultCardId((currentDefault) => {
+              if (currentDefault === id) {
+                return remaining.length > 0 ? remaining[0].id : null;
+              }
+              return currentDefault;
+            });
+            return remaining;
+          });
         },
       },
     ]);
@@ -740,6 +717,11 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#111',
     marginBottom: 16,
+  },
+  stripeCardField: {
+    width: '100%',
+    height: 50,
+    marginTop: 4,
   },
   addCardBtns: {
     flexDirection: 'row',

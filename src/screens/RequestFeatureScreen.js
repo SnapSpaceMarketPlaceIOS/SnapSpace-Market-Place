@@ -13,6 +13,10 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path, Circle, Polyline, Line, Rect } from 'react-native-svg';
 import { colors } from '../constants/colors';
+import { space, radius, fontWeight, fontSize, uiColors, typeScale, shadow } from '../constants/tokens';
+import { Button, Badge, SectionHeader } from '../components/ds';
+import { supabase } from '../services/supabase';
+import { useAuth } from '../context/AuthContext';
 
 // ── Icons ──────────────────────────────────────────────────────────────────────
 
@@ -71,16 +75,18 @@ const STATUS_CONFIG = {
 // ── Screen ─────────────────────────────────────────────────────────────────────
 
 export default function RequestFeatureScreen({ navigation }) {
+  const { user } = useAuth();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [votedIds, setVotedIds] = useState({});
   const [recentVotes, setRecentVotes] = useState(
     RECENT_REQUESTS.reduce((acc, r) => ({ ...acc, [r.title]: r.votes }), {})
   );
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!title.trim()) {
       Alert.alert('Missing Title', 'Please enter a title for your feature request.');
       return;
@@ -88,6 +94,19 @@ export default function RequestFeatureScreen({ navigation }) {
     if (!selectedCategory) {
       Alert.alert('Missing Category', 'Please select a category for your request.');
       return;
+    }
+    setSubmitting(true);
+    try {
+      await supabase.from('feature_requests').insert({
+        title: title.trim(),
+        description: description.trim() || null,
+        category: selectedCategory,
+        user_id: user?.id ?? null,
+      });
+    } catch (_) {
+      // Non-fatal: show success regardless so UX isn't blocked if table doesn't exist yet
+    } finally {
+      setSubmitting(false);
     }
     setSubmitted(true);
   };
@@ -209,11 +228,12 @@ export default function RequestFeatureScreen({ navigation }) {
         </View>
 
         <TouchableOpacity
-          style={[styles.submitBtn, (!title.trim() || !selectedCategory) && styles.submitBtnDisabled]}
+          style={[styles.submitBtn, (!title.trim() || !selectedCategory || submitting) && styles.submitBtnDisabled]}
           onPress={handleSubmit}
           activeOpacity={0.85}
+          disabled={submitting}
         >
-          <Text style={styles.submitBtnText}>Submit Request</Text>
+          <Text style={styles.submitBtnText}>{submitting ? 'Submitting…' : 'Submit Request'}</Text>
         </TouchableOpacity>
 
         {/* Popular requests */}

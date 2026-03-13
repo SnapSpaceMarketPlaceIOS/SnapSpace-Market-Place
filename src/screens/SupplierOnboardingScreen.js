@@ -13,8 +13,10 @@ import {
   Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import Svg, { Path, Circle, Polyline } from 'react-native-svg';
+import Svg, { Path, Circle, Polyline, Line } from 'react-native-svg';
 import { useAuth } from '../context/AuthContext';
+import { space, radius, fontWeight, fontSize, uiColors, typeScale, shadow } from '../constants/tokens';
+import { Button, Badge, SectionHeader } from '../components/ds';
 import { Supplier } from '../services/api';
 
 const BLUE = '#0B6DC3';
@@ -64,13 +66,6 @@ function RocketIcon() {
   );
 }
 
-function Line({ x1, y1, x2, y2 }) {
-  return (
-    <Svg width={0} height={0}>
-      <Path d={`M${x1} ${y1} L${x2} ${y2}`} />
-    </Svg>
-  );
-}
 
 // ── Progress bar ──────────────────────────────────────────────────────────────
 

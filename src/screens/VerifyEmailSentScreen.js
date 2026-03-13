@@ -10,6 +10,8 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path, Circle } from 'react-native-svg';
 import { useAuth } from '../context/AuthContext';
+import { space, radius, fontWeight, fontSize, uiColors, typeScale, shadow } from '../constants/tokens';
+import { Button, Badge, SectionHeader } from '../components/ds';
 
 const BLUE = '#0B6DC3';
 
@@ -32,7 +34,7 @@ function CheckCircleIcon() {
 }
 
 export default function VerifyEmailSentScreen({ route, navigation }) {
-  const { email } = route.params || {};
+  const { email = 'your email address' } = route.params || {};
   const { resendVerificationEmail } = useAuth();
   const [resending, setResending] = useState(false);
   const [resent, setResent] = useState(false);

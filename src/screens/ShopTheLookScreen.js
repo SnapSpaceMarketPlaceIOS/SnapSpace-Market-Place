@@ -9,10 +9,10 @@ import {
   Alert,
   Image,
 } from 'react-native';
-import Svg, { Path, Circle, Polyline, Rect, Line } from 'react-native-svg';
+import Svg, { Path, Circle, Polyline, Line } from 'react-native-svg';
 import { colors } from '../constants/colors';
 import { LinearGradient } from 'expo-linear-gradient';
-import { fontSize, fontWeight, letterSpacing, space, radius, shadow } from '../constants/tokens';
+import { fontSize, fontWeight, letterSpacing, space, radius, shadow, typeScale } from '../constants/tokens';
 import { useCart } from '../context/CartContext';
 import Skeleton from '../components/Skeleton';
 import PressableCard from '../components/PressableCard';
@@ -34,16 +34,6 @@ function CartNavIcon() {
       <Circle cx={9} cy={21} r={1} />
       <Circle cx={20} cy={21} r={1} />
       <Path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
-    </Svg>
-  );
-}
-
-function ImagePlaceholderIcon({ size = 36 }) {
-  return (
-    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="#aaa" strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round">
-      <Rect x={3} y={3} width={18} height={18} rx={2} />
-      <Circle cx={8.5} cy={8.5} r={1.5} />
-      <Polyline points="21 15 16 10 5 21" />
     </Svg>
   );
 }
@@ -256,8 +246,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   headerTitle: {
-    fontSize: fontSize.md,
-    fontWeight: fontWeight.bold,
+    ...typeScale.headline,
+    fontWeight: '700',
     color: '#111',
     letterSpacing: letterSpacing.tight,
   },
@@ -299,24 +289,24 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   postAvatarText: {
+    ...typeScale.caption,
+    fontWeight: '700',
     color: '#fff',
-    fontSize: fontSize.sm,
-    fontWeight: fontWeight.bold,
   },
   postTitle: {
-    fontSize: fontSize.base,
-    fontWeight: fontWeight.bold,
+    ...typeScale.body,
+    fontWeight: '700',
     color: '#111',
   },
   postUser: {
-    fontSize: fontSize.xs,
+    ...typeScale.caption,
     color: '#A0A0A8',
     opacity: 0.44,
     marginTop: 1,
   },
 
   disclosure: {
-    fontSize: fontSize.xs,
+    ...typeScale.caption,
     color: '#C0C0C8',
     textAlign: 'center',
     paddingHorizontal: space.lg,
@@ -324,11 +314,8 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
   },
   sectionLabel: {
-    fontSize: fontSize.xs,
-    fontWeight: fontWeight.bold,
+    ...typeScale.subheadline,
     color: '#A0A0A8',
-    letterSpacing: letterSpacing.wider,
-    textTransform: 'uppercase',
     paddingHorizontal: space.lg,
     marginBottom: space.md,
   },
@@ -365,20 +352,19 @@ const styles = StyleSheet.create({
     marginLeft: space.md,
   },
   productName: {
-    fontSize: fontSize.base,
-    fontWeight: fontWeight.bold,
+    ...typeScale.body,
+    fontWeight: '700',
     color: '#111',
     marginBottom: space.xs,
   },
   productBrand: {
-    fontSize: fontSize.xs,
+    ...typeScale.caption,
     color: '#A0A0A8',
     opacity: 0.44,
     marginBottom: space.xs,
   },
   productPrice: {
-    fontSize: fontSize.md,
-    fontWeight: fontWeight.bold,
+    ...typeScale.price,
     color: colors.bluePrimary,
     letterSpacing: letterSpacing.tight,
     fontVariant: ['tabular-nums'],
@@ -427,14 +413,13 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   bottomLabel: {
-    fontSize: fontSize.xs,
+    ...typeScale.caption,
     color: '#A0A0A8',
-    fontWeight: fontWeight.medium,
+    fontWeight: '500',
     opacity: 0.44,
   },
   bottomTotal: {
-    fontSize: fontSize.lg,
-    fontWeight: fontWeight.bold,
+    ...typeScale.title,
     color: '#111',
     letterSpacing: letterSpacing.tight,
     fontVariant: ['tabular-nums'],
@@ -459,8 +444,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#34C759',
   },
   addAllBtnText: {
+    ...typeScale.button,
+    fontWeight: '700',
     color: '#fff',
-    fontSize: fontSize.base,
-    fontWeight: fontWeight.bold,
   },
 });

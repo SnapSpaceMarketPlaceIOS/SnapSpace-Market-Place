@@ -1,6 +1,8 @@
-import React, { createContext, useContext, useState, useMemo } from 'react';
+import React, { createContext, useContext, useState, useMemo, useEffect } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const CartContext = createContext();
+const STORAGE_KEY = '@snapspace_cart';
 
 function parsePrice(priceStr) {
   if (typeof priceStr === 'number') return priceStr;
@@ -10,6 +12,23 @@ function parsePrice(priceStr) {
 
 export function CartProvider({ children }) {
   const [items, setItems] = useState([]);
+  const [hydrated, setHydrated] = useState(false);
+
+  // Load persisted cart on mount
+  useEffect(() => {
+    AsyncStorage.getItem(STORAGE_KEY)
+      .then((data) => {
+        if (data) setItems(JSON.parse(data));
+      })
+      .catch(() => {})
+      .finally(() => setHydrated(true));
+  }, []);
+
+  // Persist cart whenever items change (skip initial empty state before hydration)
+  useEffect(() => {
+    if (!hydrated) return;
+    AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(items)).catch(() => {});
+  }, [items, hydrated]);
 
   const addToCart = (product) => {
     setItems((prev) => {

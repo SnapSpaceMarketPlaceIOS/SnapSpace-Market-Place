@@ -6,10 +6,12 @@ import {
   StyleSheet,
   TouchableOpacity,
   Dimensions,
+  Image,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import Svg, { Path, Circle, Line, Polyline, Rect } from 'react-native-svg';
-import { colors } from '../constants/colors';
+import Svg, { Path, Polyline } from 'react-native-svg';
+import { colors as C } from '../constants/theme';
+import { typeScale, radius, space } from '../constants/tokens';
 import { useLiked } from '../context/LikedContext';
 import { DESIGNS } from '../data/designs';
 
@@ -32,16 +34,6 @@ function HeartIcon({ filled = false, size = 14 }) {
   );
 }
 
-function ImagePlaceholderIcon() {
-  return (
-    <Svg width={24} height={24} viewBox="0 0 24 24" fill="none" stroke="#aaa" strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round">
-      <Rect x={3} y={3} width={18} height={18} rx={2} />
-      <Circle cx={8.5} cy={8.5} r={1.5} />
-      <Polyline points="21 15 16 10 5 21" />
-    </Svg>
-  );
-}
-
 function EmptyHeartIcon() {
   return (
     <Svg width={52} height={52} viewBox="0 0 24 24" fill="none" stroke="#DDD" strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round">
@@ -53,6 +45,10 @@ function EmptyHeartIcon() {
 export default function LikedScreen({ navigation }) {
   const { liked, toggleLiked } = useLiked();
   const likedItems = DESIGNS.filter(d => liked[d.id]);
+
+  const handleCardPress = (design) => {
+    navigation.navigate('ShopTheLook', { design });
+  };
 
   return (
     <View style={styles.container}>
@@ -107,9 +103,18 @@ export default function LikedScreen({ navigation }) {
                 key={design.id}
                 style={styles.cell}
                 activeOpacity={0.88}
+                onPress={() => handleCardPress(design)}
               >
                 <View style={styles.cellImg}>
-                  <ImagePlaceholderIcon />
+                  {design.imageUrl ? (
+                    <Image
+                      source={{ uri: design.imageUrl }}
+                      style={styles.cellPhoto}
+                      resizeMode="cover"
+                    />
+                  ) : (
+                    <View style={styles.cellPhotoFallback} />
+                  )}
                   {/* Unlike button */}
                   <TouchableOpacity
                     style={styles.heartBtn}
@@ -119,6 +124,8 @@ export default function LikedScreen({ navigation }) {
                     <HeartIcon filled={!!liked[design.id]} size={13} />
                   </TouchableOpacity>
                 </View>
+                <Text style={styles.cellTitle} numberOfLines={1}>{design.title}</Text>
+                <Text style={styles.cellSeller} numberOfLines={1}>@{design.seller}</Text>
               </TouchableOpacity>
             ))}
           </View>
@@ -133,7 +140,7 @@ export default function LikedScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: C.bg,
   },
 
   // Header
@@ -144,33 +151,31 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 14,
     borderBottomWidth: 1,
-    borderBottomColor: '#F0F0F0',
+    borderBottomColor: C.border,
   },
   backBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: '#F4F4F6',
+    width: 44,
+    height: 44,
+    borderRadius: radius.full,
+    backgroundColor: C.surface2,
     alignItems: 'center',
     justifyContent: 'center',
   },
   headerTitle: {
-    fontSize: 17,
-    fontWeight: '800',
-    color: '#111',
-    letterSpacing: -0.3,
+    ...typeScale.title,
+    color: C.textPrimary,
   },
   headerRight: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 5,
-    width: 36,
+    width: 44,
     justifyContent: 'flex-end',
   },
   headerCount: {
-    fontSize: 14,
+    ...typeScale.button,
     fontWeight: '700',
-    color: '#ef4444',
+    color: C.destructive,
   },
 
   // Scroll
@@ -178,10 +183,9 @@ const styles = StyleSheet.create({
     paddingTop: 14,
   },
   countLabel: {
-    fontSize: 13,
-    color: '#999',
-    fontWeight: '500',
-    paddingHorizontal: 16,
+    ...typeScale.caption,
+    color: C.textSecondary,
+    paddingHorizontal: space.base,
     marginBottom: 10,
   },
 
@@ -193,14 +197,25 @@ const styles = StyleSheet.create({
   },
   cell: {
     width: CARD_WIDTH,
+    marginBottom: 4,
   },
   cellImg: {
     width: '100%',
     aspectRatio: 1,
-    backgroundColor: '#D7D7D7',
+    backgroundColor: C.surface2,
     alignItems: 'center',
     justifyContent: 'center',
     position: 'relative',
+    overflow: 'hidden',
+  },
+  cellPhoto: {
+    width: '100%',
+    height: '100%',
+  },
+  cellPhotoFallback: {
+    width: '100%',
+    height: '100%',
+    backgroundColor: C.surface2,
   },
   heartBtn: {
     position: 'absolute',
@@ -213,6 +228,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  cellTitle: {
+    ...typeScale.micro,
+    color: C.textPrimary,
+    textTransform: undefined,
+    paddingHorizontal: 4,
+    paddingTop: 4,
+  },
+  cellSeller: {
+    ...typeScale.caption,
+    color: C.textSecondary,
+    paddingHorizontal: 4,
+    paddingBottom: 2,
+  },
 
   // Empty state
   emptyState: {
@@ -223,27 +251,27 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   emptyTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#222',
+    ...typeScale.title,
+    color: C.textPrimary,
     marginTop: 8,
   },
   emptySubtitle: {
-    fontSize: 14,
-    color: '#999',
+    ...typeScale.body,
+    color: C.textSecondary,
     textAlign: 'center',
-    lineHeight: 20,
   },
   browseBtn: {
     marginTop: 8,
-    backgroundColor: colors.bluePrimary,
-    borderRadius: 22,
+    backgroundColor: C.primary,
+    borderRadius: radius.button,
     paddingHorizontal: 28,
     paddingVertical: 12,
+    minHeight: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   browseBtnText: {
-    color: '#fff',
-    fontSize: 14,
-    fontWeight: '700',
+    ...typeScale.button,
+    color: C.white,
   },
 });

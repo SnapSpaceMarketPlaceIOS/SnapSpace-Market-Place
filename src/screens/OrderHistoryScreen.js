@@ -6,10 +6,12 @@ import {
   StyleSheet,
   TouchableOpacity,
   Dimensions,
+  Image,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path, Circle, Polyline, Line, Rect, G } from 'react-native-svg';
-import { colors } from '../constants/colors';
+import { colors as C } from '../constants/theme';
+import { typeScale, radius } from '../constants/tokens';
 import { useOrderHistory } from '../context/OrderHistoryContext';
 
 const { width } = Dimensions.get('window');
@@ -140,7 +142,15 @@ function OrderCard({ order }) {
           {order.items.map((item, idx) => (
             <View key={item.key || idx} style={styles.itemRow}>
               <View style={[styles.itemThumb, { backgroundColor: getThumbColor(item.name) }]}>
-                <SofaSmallIcon />
+                {item.imageUrl ? (
+                  <Image
+                    source={{ uri: item.imageUrl }}
+                    style={styles.itemThumbPhoto}
+                    resizeMode="cover"
+                  />
+                ) : (
+                  <SofaSmallIcon />
+                )}
               </View>
               <View style={styles.itemInfo}>
                 <Text style={styles.itemName} numberOfLines={1}>{item.name}</Text>
@@ -230,7 +240,7 @@ export default function OrderHistoryScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: C.surface,
   },
 
   // Header
@@ -241,22 +251,20 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 14,
     borderBottomWidth: 1,
-    borderBottomColor: '#F0F0F0',
-    backgroundColor: '#fff',
+    borderBottomColor: C.border,
+    backgroundColor: C.bg,
   },
   backBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#F4F4F6',
+    width: 44,
+    height: 44,
+    borderRadius: radius.full,
+    backgroundColor: C.surface2,
     alignItems: 'center',
     justifyContent: 'center',
   },
   headerTitle: {
-    fontSize: 17,
-    fontWeight: '800',
-    color: '#111',
-    letterSpacing: -0.3,
+    ...typeScale.title,
+    color: C.textPrimary,
   },
 
   // Empty state
@@ -267,29 +275,29 @@ const styles = StyleSheet.create({
     paddingHorizontal: 44,
   },
   emptyTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#111',
+    ...typeScale.title,
+    color: C.textPrimary,
     marginTop: 20,
     marginBottom: 10,
   },
   emptySubtitle: {
-    fontSize: 14,
-    color: '#888',
+    ...typeScale.body,
+    color: C.textSecondary,
     textAlign: 'center',
-    lineHeight: 21,
     marginBottom: 32,
   },
   emptyBtn: {
-    backgroundColor: colors.bluePrimary,
+    backgroundColor: C.primary,
     paddingHorizontal: 36,
     paddingVertical: 14,
-    borderRadius: 14,
+    borderRadius: radius.button,
+    minHeight: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   emptyBtnText: {
-    color: '#fff',
-    fontSize: 15,
-    fontWeight: '700',
+    ...typeScale.button,
+    color: C.white,
   },
 
   // List
@@ -298,17 +306,15 @@ const styles = StyleSheet.create({
     paddingTop: 20,
   },
   sectionLabel: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: '#A0A0A8',
-    letterSpacing: 0.3,
+    ...typeScale.subheadline,
+    color: C.textTertiary,
     marginBottom: 14,
   },
 
   // Order card
   orderCard: {
-    backgroundColor: '#fff',
-    borderRadius: 18,
+    backgroundColor: C.bg,
+    borderRadius: radius.xl,
     marginBottom: 14,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 3 },
@@ -333,16 +339,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   orderId: {
-    fontSize: 14,
+    ...typeScale.button,
     fontWeight: '700',
-    color: '#111',
-    letterSpacing: 0.2,
+    color: C.textPrimary,
   },
   orderDate: {
-    fontSize: 12,
-    color: '#999',
+    ...typeScale.caption,
+    color: C.textSecondary,
     marginTop: 3,
-    fontWeight: '400',
   },
 
   // Status badge
@@ -360,7 +364,7 @@ const styles = StyleSheet.create({
     borderRadius: 3,
   },
   badgeText: {
-    fontSize: 12,
+    ...typeScale.caption,
     fontWeight: '600',
   },
 
@@ -373,14 +377,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   itemCountText: {
-    fontSize: 13,
-    color: '#888',
-    fontWeight: '400',
+    ...typeScale.caption,
+    color: C.textSecondary,
   },
   totalText: {
-    fontSize: 15,
-    fontWeight: '800',
-    color: '#111',
+    ...typeScale.price,
+    color: C.textPrimary,
   },
 
   // Expanded
@@ -390,7 +392,7 @@ const styles = StyleSheet.create({
   },
   expandDivider: {
     height: 1,
-    backgroundColor: '#F4F4F6',
+    backgroundColor: C.border,
     marginVertical: 12,
   },
   itemRow: {
@@ -405,26 +407,30 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     flexShrink: 0,
+    overflow: 'hidden',
+  },
+  itemThumbPhoto: {
+    width: 42,
+    height: 42,
+    borderRadius: 10,
   },
   itemInfo: {
     flex: 1,
     marginLeft: 12,
   },
   itemName: {
-    fontSize: 13,
+    ...typeScale.caption,
     fontWeight: '600',
-    color: '#111',
+    color: C.textPrimary,
     marginBottom: 2,
   },
   itemMeta: {
-    fontSize: 12,
-    color: '#999',
-    fontWeight: '400',
+    ...typeScale.caption,
+    color: C.textSecondary,
   },
   itemPrice: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: '#111',
+    ...typeScale.priceSmall,
+    color: C.textPrimary,
     marginLeft: 8,
   },
 
@@ -437,22 +443,21 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   breakdownLabel: {
-    fontSize: 13,
-    color: '#888',
+    ...typeScale.caption,
+    color: C.textSecondary,
   },
   breakdownValue: {
-    fontSize: 13,
+    ...typeScale.caption,
     fontWeight: '600',
-    color: '#555',
+    color: C.textSecondary,
   },
   breakdownTotalLabel: {
-    fontSize: 14,
+    ...typeScale.button,
     fontWeight: '700',
-    color: '#111',
+    color: C.textPrimary,
   },
   breakdownTotalValue: {
-    fontSize: 15,
-    fontWeight: '800',
-    color: '#111',
+    ...typeScale.price,
+    color: C.textPrimary,
   },
 });

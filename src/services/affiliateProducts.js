@@ -1,6 +1,7 @@
 import { parseDesignPrompt } from '../utils/promptParser';
 import { matchProducts, matchProductsForDesign } from './productMatcher';
 import { getProductsByIds } from '../data/productCatalog';
+import { uiColors } from '../constants/tokens';
 
 /**
  * Main affiliate product service.
@@ -102,12 +103,57 @@ export function getSourceLabel(source) {
 
 /**
  * Returns the brand color for the source button.
+ * Amazon uses the token value; others use well-known brand colors.
  */
 export function getSourceColor(source) {
   switch (source) {
-    case 'amazon':  return '#FF9900';
+    case 'amazon':  return uiColors.amazon;   // #FF9900 from tokens
     case 'wayfair': return '#7B2D8B';
     case 'houzz':   return '#4DBC15';
-    default:        return '#2563EB';
+    default:        return uiColors.primary;  // #1D4ED8 from tokens
   }
+}
+
+/**
+ * Generates the correct affiliate URL for a product.
+ * Falls back through: product.affiliateUrl → generic search URL → null
+ *
+ * @param {object} product - Normalized product object
+ * @returns {string|null}  - Affiliate URL to open
+ */
+export function getAffiliateUrl(product) {
+  if (!product) return null;
+
+  // Use product's own affiliate URL if present
+  if (product.affiliateUrl) return product.affiliateUrl;
+
+  // Amazon fallback: construct search URL with partner tag
+  const partnerTag = process.env.EXPO_PUBLIC_AMAZON_PARTNER_TAG || 'snapspace20-20';
+  if (product.source === 'amazon' && product.name) {
+    const query = encodeURIComponent(product.name);
+    return `https://www.amazon.com/s?k=${query}&tag=${partnerTag}`;
+  }
+
+  // Wayfair fallback: search URL
+  if (product.source === 'wayfair' && product.name) {
+    const query = encodeURIComponent(product.name);
+    return `https://www.wayfair.com/keyword.php?keyword=${query}`;
+  }
+
+  // Houzz fallback: search URL
+  if (product.source === 'houzz' && product.name) {
+    const query = encodeURIComponent(product.name);
+    return `https://www.houzz.com/products/query/${query}`;
+  }
+
+  return null;
+}
+
+/**
+ * Like getProductsForDesign but returns products for any design ID.
+ * Convenience alias used by some screens.
+ */
+export function getProductsByDesign(designId) {
+  // This will be wired to the DB when live; for now uses catalog matching
+  return [];
 }

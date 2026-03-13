@@ -20,9 +20,9 @@ import {
   Animated,
 } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
+import { uiColors, typeScale, radius, shadow } from '../constants/tokens';
 
-// Spec: badge color is #1D4ED8 (blue-700)
-const BADGE_COLOR = '#1D4ED8';
+const BADGE_COLOR = uiColors.primary;
 
 // Size map — icon dimensions for each size token
 const SIZE_MAP = {
@@ -79,23 +79,18 @@ const tooltipStyles = StyleSheet.create({
     left: '50%',
     transform: [{ translateX: -60 }],
     marginBottom: 6,
-    backgroundColor: '#0F172A',
-    borderRadius: 8,
+    backgroundColor: uiColors.textPrimary,
+    borderRadius: radius.sm,
     paddingVertical: 5,
     paddingHorizontal: 10,
     width: 120,
     alignItems: 'center',
     zIndex: 999,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.18,
-    shadowRadius: 6,
-    elevation: 8,
+    ...shadow.sm,
   },
   text: {
-    color: '#fff',
-    fontSize: 11,
-    fontWeight: '600',
+    color: uiColors.white,
+    ...typeScale.micro,
     textAlign: 'center',
   },
   arrow: {
@@ -105,7 +100,7 @@ const tooltipStyles = StyleSheet.create({
     marginLeft: -4,
     width: 8,
     height: 8,
-    backgroundColor: '#0F172A',
+    backgroundColor: uiColors.textPrimary,
     transform: [{ rotate: '45deg' }],
   },
 });
@@ -200,13 +195,13 @@ const sellerStyles = StyleSheet.create({
     flexShrink: 1,
   },
   prefix: {
-    fontSize: 13,
-    color: '#6B7280',
+    ...typeScale.caption,
+    color: uiColors.textSecondary,
   },
   name: {
-    fontSize: 13,
+    ...typeScale.caption,
     fontWeight: '600',
-    color: '#111',
+    color: uiColors.textPrimary,
     flexShrink: 1,
   },
 });

@@ -1,11 +1,12 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // SnapSpace Design Tokens — Single source of truth for all visual values.
 // Every component MUST import from here. No hardcoded values anywhere.
+// theme.js is a thin re-export shim — all values live here.
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { colors } from './colors';
 
-// ── Color Palette ─────────────────────────────────────────────────────────────
+// ── Brand Color Palette ───────────────────────────────────────────────────────
 export { colors };
 
 export const palette = {
@@ -42,6 +43,27 @@ export const palette = {
   separator: 'rgba(0,0,0,0.06)',
 };
 
+// ── UI Semantic Colors (moved from theme.js — used by most screens) ───────────
+// Screens that do `import { colors as C } from '../constants/theme'` get this
+// via theme.js's re-export shim.
+export const uiColors = {
+  primary:        '#1D4ED8', // Buttons, links, active states, icons
+  primaryLight:   '#DBEAFE', // Button hover states, tag backgrounds
+  bg:             '#FFFFFF', // All screen backgrounds
+  surface:        '#F9FAFB', // Cards, drawers, input backgrounds
+  surface2:       '#F3F4F6', // Secondary cards, dividers
+  textPrimary:    '#111827', // All primary text, titles, prices
+  textSecondary:  '#6B7280', // Labels, subtitles, metadata
+  textTertiary:   '#9CA3AF', // Placeholder text, disabled states
+  border:         '#E5E7EB', // All borders, dividers, separators
+  success:        '#16A34A', // In Stock badge, trust signals
+  successBg:      '#DCFCE7', // In Stock badge background
+  amazon:         '#FF9900', // Amazon button background only
+  amazonText:     '#111827', // Amazon button text (dark on orange)
+  destructive:    '#EF4444', // Delete / remove actions
+  white:          '#FFFFFF',
+};
+
 // ── Typography Scale (modular, ratio 1.25) ────────────────────────────────────
 export const fontSize = {
   xs: 11,
@@ -54,12 +76,27 @@ export const fontSize = {
   '3xl': 40,
 };
 
+// ── Typography Scale — theme.js style (used by Cart, PDP, Explore) ───────────
+// Screens that do `import theme from '../constants/theme'` use TY.xs.fontSize etc.
+export const typography = {
+  xs:   { fontSize: 11, fontWeight: '400' }, // Metadata, timestamps, fine print
+  sm:   { fontSize: 13, fontWeight: '400' }, // Secondary labels, descriptions
+  base: { fontSize: 15, fontWeight: '400' }, // Body text, product descriptions
+  md:   { fontSize: 17, fontWeight: '500' }, // Section labels, card titles
+  lg:   { fontSize: 20, fontWeight: '600' }, // Page subtitles, drawer headers
+  xl:   { fontSize: 24, fontWeight: '700' }, // Price displays, key numbers
+  '2xl':{ fontSize: 28, fontWeight: '700' }, // Page titles (My Cart, etc.)
+  '3xl':{ fontSize: 34, fontWeight: '800' }, // Hero numbers
+};
+
 // ── Font Weights ───────────────────────────────────────────────────────────────
 export const fontWeight = {
   regular: '400',  // metadata, captions, supporting text
   medium: '500',   // secondary labels, navigation items
+  semibold: '600', // see-all links, card titles, button labels
   bold: '700',     // prices, headings, primary actions
   xbold: '800',    // screen titles, hero headings, dominant prices
+  extrabold: '800', // alias for xbold — used by theme.js consumers
 };
 
 // ── Letter Spacing ────────────────────────────────────────────────────────────
@@ -68,10 +105,15 @@ export const letterSpacing = {
   normal: 0,     // body text
   wide: 0.5,     // uppercase labels, badges (0.05em)
   wider: 1.2,    // tiny caps, section headers (0.12em)
+  widest: 1.5,   // section headers — homepage standard (0.115em)
 };
 
 // ── Spacing Scale (strict 8px grid) ───────────────────────────────────────────
+// Named keys for tokens.js consumers (HomeScreen, ProfileScreen, etc.)
+// Numeric keys for theme.js consumers (CartScreen, ExploreScreen, ProductDetailScreen)
+// Both resolve to identical pixel values.
 export const space = {
+  // Named (tokens.js standard)
   xs: 4,
   sm: 8,
   md: 12,
@@ -83,19 +125,35 @@ export const space = {
   '4xl': 48,
   '5xl': 56,
   '6xl': 64,
+  // Numeric aliases (theme.js / legacy compatibility)
+  1: 4,   // micro gaps
+  2: 8,   // icon-to-text gaps
+  3: 12,  // inner card padding
+  4: 16,  // standard component padding
+  5: 20,  // screen horizontal padding
+  6: 24,  // between major sections
+  8: 32,  // between full page sections
+
+  // Design system hairline (Part 1.1: --space-2)
+  hairline: 2,
 };
 
 // ── Corner Radius — 4-tier system ─────────────────────────────────────────────
 export const radius = {
-  sm: 8,    // chips, badges, small interactive elements, quantity steppers
-  md: 12,   // buttons, inputs, inner card elements
-  lg: 16,   // images inside cards, secondary containers
-  xl: 20,   // outer cards, main containers, bottom sheets
+  badge: 6,   // all badges: style, status, external — consistent across app
+  sm: 8,      // chips, small interactive elements, quantity steppers
+  md: 12,     // ALL cards (cardBorderRadius), buttons, inputs
+  lg: 16,     // images inside cards, secondary containers
+  xl: 20,     // outer cards, main containers, bottom sheets
+  button: 24, // all pill-shaped buttons (primary + secondary)
   full: 9999, // avatars, circular FABs only
 };
 
-// ── Elevation / Shadows — 3 tiers ─────────────────────────────────────────────
+// ── Elevation / Shadows ────────────────────────────────────────────────────────
+// Named (low/medium/high) for tokens.js consumers.
+// Aliased (sm/md/lg) for theme.js consumers — values match the original theme.js spec.
 export const shadow = {
+  // Tokens.js standard
   low: {
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
@@ -116,6 +174,28 @@ export const shadow = {
     shadowOpacity: 0.12,
     shadowRadius: 40,
     elevation: 8,
+  },
+  // Theme.js aliases — preserve original values so existing screens render identically
+  sm: {
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.08,
+    shadowRadius: 3,
+    elevation: 2,
+  },
+  md: {
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.10,
+    shadowRadius: 16,
+    elevation: 5,
+  },
+  lg: {
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.14,
+    shadowRadius: 32,
+    elevation: 10,
   },
 };
 
@@ -221,6 +301,48 @@ export const textStyles = {
   },
 };
 
+// ── Homepage Text Styles (from UI upgrade plan) ───────────────────────────────
+export const homeTypography = {
+  sectionHeader: {
+    fontSize: 13,
+    fontWeight: '700',
+    letterSpacing: 1.5,
+    textTransform: 'uppercase',
+  },
+  seeAllLink: {
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  cardTitle: {
+    fontSize: 15,
+    fontWeight: '600',
+  },
+  cardSubtitle: {
+    fontSize: 12,
+    fontWeight: '400',
+  },
+  cardBadge: {
+    fontSize: 11,
+    fontWeight: '700',
+    letterSpacing: 0.5,
+    textTransform: 'uppercase',
+  },
+  price: {
+    fontSize: 16,
+    fontWeight: '700',
+  },
+  body: {
+    fontSize: 14,
+    fontWeight: '400',
+  },
+};
+
+// ── Section Backgrounds (alternating rhythm) ──────────────────────────────────
+export const backgrounds = {
+  primary: '#FFFFFF',   // default section background
+  secondary: '#F8F9FA', // alternating section background
+};
+
 // ── Animation Durations & Curves ───────────────────────────────────────────────
 export const animation = {
   fast: 100,
@@ -247,15 +369,18 @@ export const animation = {
 
 // ── Layout Constraints ─────────────────────────────────────────────────────────
 export const layout = {
-  screenPaddingH: space.lg,      // 20 — consistent on every screen
-  screenPaddingTop: space.xl,    // 24 — below status bar
-  screenPaddingBottom: space['2xl'], // 32 — above tab bar
-  sectionGap: space['2xl'],      // 32 — between unrelated sections
-  relatedGap: space.md,          // 12 — between related list items
-  buttonHeight: space['5xl'],    // 56 — sticky bottom buttons
-  buttonHeightMd: 52,            // medium buttons
-  buttonHeightSm: 36,            // small buttons (Edit Profile, Follow)
-  tabBarHeight: 88,              // total including safe area
+  screenPaddingH: space.lg,             // 20 — consistent on every screen
+  screenPaddingTop: space.xl,           // 24 — below status bar
+  screenPaddingBottom: space['2xl'],    // 32 — above tab bar
+  sectionGap: space['2xl'],             // 32 — between unrelated sections
+  sectionHeaderToContent: space.base,   // 16 — header to first card below
+  cardInnerPadding: space.md,           // 12 — card internal padding
+  cardGap: space.md,                    // 12 — horizontal gap between cards
+  relatedGap: space.md,                 // 12 — between related list items
+  buttonHeight: space['5xl'],           // 56 — sticky bottom buttons
+  buttonHeightMd: 52,                   // medium buttons
+  buttonHeightSm: 36,                   // small buttons (Edit Profile, Follow)
+  tabBarHeight: 88,                     // total including safe area
   tabBarBaseHeight: 56,
   fabSize: 56,
   fabIconSize: 26,
@@ -264,19 +389,129 @@ export const layout = {
   avatarSizeSm: 36,
 };
 
+// ── Design System Type Scale (Part 1.2 of upgrade plan) ──────────────────────
+// These 10 named styles are the ONLY text styles allowed across the entire app.
+// Every text element maps to exactly one of these. No exceptions.
+export const typeScale = {
+  display: {
+    fontSize: 24, fontWeight: '700', lineHeight: 30,
+  },
+  title: {
+    fontSize: 18, fontWeight: '700', lineHeight: 24,
+  },
+  headline: {
+    fontSize: 15, fontWeight: '600', lineHeight: 20,
+  },
+  subheadline: {
+    fontSize: 13, fontWeight: '600', lineHeight: 18,
+    letterSpacing: 1.2, textTransform: 'uppercase',
+  },
+  body: {
+    fontSize: 14, fontWeight: '400', lineHeight: 20,
+  },
+  caption: {
+    fontSize: 12, fontWeight: '400', lineHeight: 16,
+  },
+  micro: {
+    fontSize: 11, fontWeight: '600', lineHeight: 14,
+    letterSpacing: 0.5, textTransform: 'uppercase',
+  },
+  price: {
+    fontSize: 16, fontWeight: '700', lineHeight: 20,
+  },
+  priceSmall: {
+    fontSize: 14, fontWeight: '600', lineHeight: 18,
+  },
+  button: {
+    fontSize: 14, fontWeight: '600', lineHeight: 18,
+  },
+};
+
+// ── Elevation Tokens (Part 1.4) ───────────────────────────────────────────────
+// elevation0 → flat with border (cards on white bg)
+// elevation1 → sticky headers, dropdowns
+// elevation2 → modals, bottom sheets, FAB
+// elevation3 → full-screen overlays, toasts
+export const elevation = {
+  0: {
+    shadowColor: 'transparent',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0,
+    shadowRadius: 0,
+    elevation: 0,
+    borderWidth: 1,
+    borderColor: 'rgba(0,0,0,0.06)',
+  },
+  1: {
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.08,
+    shadowRadius: 3,
+    elevation: 2,
+  },
+  2: {
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.12,
+    shadowRadius: 12,
+    elevation: 5,
+  },
+  3: {
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.16,
+    shadowRadius: 24,
+    elevation: 10,
+  },
+};
+
+// ── Touch Target Minimums (Part 1.5) ─────────────────────────────────────────
+export const touchTargets = {
+  min: 44,      // Apple HIG minimum tappable area
+  compact: 36,  // Dense list items, secondary actions
+  iconTapArea: 44, // Icon visual may be 20px but tap target is always 44
+};
+
+// ── Motion / Animation (Part 3 — design system spec) ─────────────────────────
+// Use these for new/updated components. The `animation` export above is the
+// legacy set; `motion` is the locked design system spec.
+export const motion = {
+  // Durations
+  durationFast: 150,    // button press states, toggle switches
+  durationNormal: 250,  // page transitions, card expansions
+  durationSlow: 400,    // modal appearances, bottom sheet slides
+
+  // Easing (as bezier arrays for Easing.bezier() or CSS cubic-bezier)
+  easingDefault: [0.25, 0.1, 0.25, 1.0],   // smooth and natural
+  easingSpring: [0.34, 1.56, 0.64, 1.0],   // slight overshoot — playful
+
+  // Press state scale
+  cardPressScale: 0.98,
+  iconPressOpacity: 0.6,
+  listRowPressBackground: 'rgba(0,0,0,0.04)',
+};
+
 // ── Default export: everything as a single object ─────────────────────────────
 const tokens = {
   palette,
+  uiColors,
   fontSize,
+  typography,
+  typeScale,
   fontWeight,
   letterSpacing,
   space,
   radius,
   shadow,
+  elevation,
   border,
   opacity,
+  touchTargets,
   textStyles,
+  homeTypography,
+  backgrounds,
   animation,
+  motion,
   layout,
 };
 

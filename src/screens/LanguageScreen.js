@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -11,6 +11,11 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path, Circle, Polyline, Line } from 'react-native-svg';
 import { colors } from '../constants/colors';
+import { space, radius, fontWeight, fontSize, uiColors, typeScale, shadow } from '../constants/tokens';
+import { Button, Badge, SectionHeader } from '../components/ds';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+const STORAGE_KEY_LANG = '@snapspace_language';
 
 // ── Icons ──────────────────────────────────────────────────────────────────────
 
@@ -70,6 +75,12 @@ export default function LanguageScreen({ navigation }) {
   const [selected, setSelected] = useState('en');
   const [search, setSearch] = useState('');
 
+  useEffect(() => {
+    AsyncStorage.getItem(STORAGE_KEY_LANG)
+      .then((val) => { if (val) setSelected(val); })
+      .catch(() => {});
+  }, []);
+
   const filtered = search.trim()
     ? LANGUAGES.filter(
         (l) =>
@@ -81,6 +92,7 @@ export default function LanguageScreen({ navigation }) {
 
   const handleSelect = (code) => {
     setSelected(code);
+    AsyncStorage.setItem(STORAGE_KEY_LANG, code).catch(() => {});
     const lang = LANGUAGES.find((l) => l.code === code);
     Alert.alert(
       'Language Updated',

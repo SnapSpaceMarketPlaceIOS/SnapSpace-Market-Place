@@ -10,6 +10,11 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path, Circle, Polyline, Line, Rect } from 'react-native-svg';
 import { colors } from '../constants/colors';
+import { space, radius, fontWeight, fontSize, uiColors, typeScale, shadow } from '../constants/tokens';
+import { Button, Badge, SectionHeader } from '../components/ds';
+import { supabase } from '../services/supabase';
+import { useAuth } from '../context/AuthContext';
+import { useOrderHistory } from '../context/OrderHistoryContext';
 
 // ── Icons ──────────────────────────────────────────────────────────────────────
 
@@ -80,20 +85,57 @@ const STEPS = [
 // ── Screen ─────────────────────────────────────────────────────────────────────
 
 export default function RestorePurchaseScreen({ navigation }) {
+  const { user } = useAuth();
+  const { orders, addOrder } = useOrderHistory();
   const [restoring, setRestoring] = useState(false);
   const [restored, setRestored] = useState(false);
+  const [restoredCount, setRestoredCount] = useState(0);
 
-  const handleRestore = () => {
+  const handleRestore = async () => {
+    if (!user) {
+      Alert.alert('Sign In Required', 'Please sign in to restore your purchases.', [{ text: 'OK' }]);
+      return;
+    }
     setRestoring(true);
-    setTimeout(() => {
-      setRestoring(false);
+    try {
+      // Fetch all fulfilled supplier orders for this user from Supabase
+      const { data, error } = await supabase
+        .from('supplier_orders')
+        .select('*')
+        .eq('buyer_id', user.id)
+        .eq('status', 'fulfilled')
+        .order('ordered_at', { ascending: false });
+
+      if (error) throw error;
+
+      // Reconcile: add any orders not already in local history
+      const existingIds = new Set(orders.map((o) => o.id));
+      const newOrders = (data || []).filter((o) => !existingIds.has(o.id));
+      for (const o of newOrders) {
+        addOrder({
+          id: o.id,
+          date: o.ordered_at,
+          status: o.status,
+          items: o.items ?? [],
+          subtotal: o.subtotal ?? 0,
+          shipping: o.shipping ?? 0,
+          total: o.total ?? 0,
+        });
+      }
+      setRestoredCount(newOrders.length);
       setRestored(true);
       Alert.alert(
         'Purchases Restored',
-        'All your previous purchases have been successfully restored to your account.',
+        newOrders.length > 0
+          ? `${newOrders.length} purchase${newOrders.length > 1 ? 's' : ''} restored to your account.`
+          : 'All your purchases are already up to date.',
         [{ text: 'Great, thanks!' }]
       );
-    }, 2200);
+    } catch (err) {
+      Alert.alert('Restore Failed', 'Unable to restore purchases. Please try again.', [{ text: 'OK' }]);
+    } finally {
+      setRestoring(false);
+    }
   };
 
   return (

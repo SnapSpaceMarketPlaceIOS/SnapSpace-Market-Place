@@ -13,6 +13,7 @@ import { CameraView, useCameraPermissions } from 'expo-camera';
 import Svg, { Path, Circle, Polyline, Line } from 'react-native-svg';
 import { colors } from '../constants/colors';
 import { palette, fontSize, fontWeight, space, radius, shadow } from '../constants/tokens';
+import { Button, Badge, SectionHeader } from '../components/ds';
 import { useAuth } from '../context/AuthContext';
 import { uploadRoomPhoto } from '../services/supabase';
 import { generateInteriorDesign } from '../services/replicate';

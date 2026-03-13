@@ -17,6 +17,8 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Path, Circle, Line, Polyline } from 'react-native-svg';
 import { colors } from '../constants/colors';
+import { space, radius, fontWeight, fontSize, uiColors, typeScale, shadow } from '../constants/tokens';
+import { Button, Badge, SectionHeader } from '../components/ds';
 import { useCart } from '../context/CartContext';
 import { getProductsForPrompt, getSourceLabel, getSourceColor } from '../services/affiliateProducts';
 
@@ -239,7 +241,7 @@ export default function RoomResultScreen({ route, navigation }) {
           scrollEnabled={isExpanded}
         >
           {/* FTC Disclosure */}
-          <Text style={styles.disclosure}>We may earn a commission on purchases.</Text>
+          <Text style={styles.disclosure}>We may earn a commission on purchases. Prices may vary.</Text>
 
           <View style={styles.gridRow}>
             {products.map((product) => {

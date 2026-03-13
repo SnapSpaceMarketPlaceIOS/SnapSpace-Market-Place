@@ -11,7 +11,7 @@ import { AuthProvider, useAuth } from './src/context/AuthContext';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Svg, { Path, Circle, Polyline, Line, Rect, G } from 'react-native-svg';
-import { colors } from './src/constants/colors';
+import { colors as C } from './src/constants/theme';
 import { shadow, fontSize, fontWeight, radius } from './src/constants/tokens';
 
 import HomeScreen from './src/screens/HomeScreen';
@@ -135,7 +135,7 @@ function TabNavigator() {
       screenOptions={{
         headerShown: false,
         tabBarStyle: styles.tabBar,
-        tabBarActiveTintColor: colors.bluePrimary,
+        tabBarActiveTintColor: C.primary,
         tabBarInactiveTintColor: 'rgba(0,0,0,0.32)',
         tabBarLabelStyle: styles.tabLabel,
       }}
@@ -192,7 +192,7 @@ function RootNavigator() {
     return (
       <View style={styles.loadingScreen}>
         <Text style={styles.loadingWordmark}>SnapSpace</Text>
-        <ActivityIndicator color="#0B6DC3" style={{ marginTop: 24 }} />
+        <ActivityIndicator color={C.primary} style={{ marginTop: 24 }} />
       </View>
     );
   }
@@ -284,30 +284,30 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: -5,
     right: -8,
-    backgroundColor: '#EF4444',
+    backgroundColor: C.destructive,
     width: 18,
     height: 18,
     borderRadius: radius.full,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 2,
-    borderColor: colors.white,
+    borderColor: C.white,
   },
   badgeText: {
-    color: colors.white,
+    color: C.white,
     fontSize: fontSize.xs,
     fontWeight: fontWeight.bold,
   },
   loadingScreen: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: C.bg,
     alignItems: 'center',
     justifyContent: 'center',
   },
   loadingWordmark: {
     fontSize: 32,
     fontWeight: '800',
-    color: '#111',
+    color: C.textPrimary,
     letterSpacing: -0.6,
   },
 });

@@ -1,10 +1,11 @@
 import React, { useRef } from 'react';
 import { Animated, TouchableOpacity, Easing } from 'react-native';
+import { motion } from '../constants/tokens';
 
 /**
  * Drop-in wrapper that adds a scale-down press animation to any card.
- * On press-in  → scale 0.97 over 120ms ease-out
- * On press-out → spring back to 1.0 (damping 15, stiffness 300)
+ * On press-in  → scale 0.98 over 150ms ease-out  (design system spec: Part 3.2)
+ * On press-out → spring back to 1.0
  *
  * Props: same as TouchableOpacity plus `animStyle` for the inner Animated.View.
  */
@@ -20,8 +21,8 @@ export default function PressableCard({
 
   const handlePressIn = () => {
     Animated.timing(scale, {
-      toValue: 0.97,
-      duration: 120,
+      toValue: motion.cardPressScale,          // 0.98
+      duration: motion.durationFast,           // 150ms
       easing: Easing.out(Easing.ease),
       useNativeDriver: true,
     }).start();

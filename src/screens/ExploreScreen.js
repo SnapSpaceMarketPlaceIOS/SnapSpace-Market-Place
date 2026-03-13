@@ -15,14 +15,21 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Circle, Line, Path, Rect, Polyline } from 'react-native-svg';
-import { colors } from '../constants/colors';
-import { fontSize, fontWeight, letterSpacing, space, radius, shadow } from '../constants/tokens';
+import { fontSize, fontWeight, letterSpacing, space, radius, shadow, typeScale } from '../constants/tokens';
+import theme from '../constants/theme';
 import { useLiked } from '../context/LikedContext';
 import { DESIGNS } from '../data/designs';
 import Skeleton from '../components/Skeleton';
 import PressableCard from '../components/PressableCard';
 import { SellerName } from '../components/VerifiedBadge';
 import { getProductsForDesign } from '../services/affiliateProducts';
+
+const TC = theme.colors;
+const TY = theme.typography;
+const FW = theme.fontWeight;
+const SP = theme.space;
+const TR = theme.radius;
+const TS = theme.shadow;
 
 const { width } = Dimensions.get('window');
 // 20px padding each side + 12px gap between cards
@@ -300,7 +307,7 @@ export default function ExploreScreen({ navigation }) {
               style={styles.postBtn}
               onPress={() => setShowPostModal(true)}
             >
-              <PlusIcon color={colors.bluePrimary} size={18} />
+              <PlusIcon color={TC.primary} size={18} />
             </TouchableOpacity>
           </View>
 
@@ -357,7 +364,7 @@ export default function ExploreScreen({ navigation }) {
       </SafeAreaView>
 
       {/* ══════════════════════════════
-          CARD DETAIL MODAL
+          CARD DETAIL MODAL — Section 3 Post Detail Drawer
       ══════════════════════════════ */}
       <Modal
         visible={selectedCard !== null}
@@ -373,15 +380,16 @@ export default function ExploreScreen({ navigation }) {
           />
           {selectedCard && (
             <View style={styles.modalSheet}>
-              {/* Drag handle */}
+              {/* 3A: Handle bar */}
               <View style={styles.modalDrag} />
 
-              {/* Close button */}
+              {/* 3B: Close button — 40×40 circle with surface background */}
               <TouchableOpacity
                 style={styles.modalCloseBtn}
                 onPress={() => setSelectedCard(null)}
+                accessibilityLabel="Close drawer"
               >
-                <CloseIcon size={12} />
+                <CloseIcon size={14} />
               </TouchableOpacity>
 
               <ScrollView
@@ -401,7 +409,7 @@ export default function ExploreScreen({ navigation }) {
                   )}
                 </View>
 
-                {/* User row — tap avatar or name to visit their profile */}
+                {/* 3B: Seller header row — tap to visit profile */}
                 <TouchableOpacity
                   style={styles.modalUserRow}
                   activeOpacity={0.75}
@@ -410,7 +418,7 @@ export default function ExploreScreen({ navigation }) {
                     navigation?.navigate('UserProfile', { username: selectedCard.user });
                   }}
                 >
-                  <View style={styles.modalAvatar}>
+                  <View style={[styles.modalAvatar, selectedCard.verified && styles.modalAvatarVerified]}>
                     <Text style={styles.modalAvatarText}>{selectedCard.initial}</Text>
                   </View>
                   <View style={styles.modalUserInfo}>
@@ -422,6 +430,7 @@ export default function ExploreScreen({ navigation }) {
                     />
                     <Text style={styles.modalTime}>Tap to view profile</Text>
                   </View>
+                  {/* Follow button — logic unchanged */}
                   <TouchableOpacity
                     style={styles.followBtn}
                     onPress={(e) => {
@@ -432,12 +441,13 @@ export default function ExploreScreen({ navigation }) {
                   </TouchableOpacity>
                 </TouchableOpacity>
 
-                {/* Title + description */}
+                {/* 3C: Title + description */}
                 <Text style={styles.modalTitle}>{selectedCard.title.replace('...', '')}</Text>
-                <Text style={styles.modalDesc}>{selectedCard.description}</Text>
+                <Text style={styles.modalDesc} numberOfLines={3}>{selectedCard.description}</Text>
 
-                {/* Like / Share / Shop */}
+                {/* 3D: Like / Share / Shop The Look */}
                 <View style={styles.actionsRow}>
+                  {/* Like — logic unchanged */}
                   <TouchableOpacity
                     style={[
                       styles.actionCircle,
@@ -445,15 +455,17 @@ export default function ExploreScreen({ navigation }) {
                     ]}
                     onPress={() => toggleLiked(selectedCard.id)}
                   >
-                    <HeartIcon filled={!!liked[selectedCard.id]} size={18} />
+                    <HeartIcon filled={!!liked[selectedCard.id]} size={20} />
                     <Text style={styles.actionCircleCount}>
                       {liked[selectedCard.id] ? selectedCard.likes + 1 : selectedCard.likes}
                     </Text>
                   </TouchableOpacity>
-                  <TouchableOpacity style={styles.actionCircle}>
-                    <ShareIcon color="#444" size={18} />
+                  {/* Share — logic unchanged */}
+                  <TouchableOpacity style={[styles.actionCircle, { marginLeft: SP[2] }]}>
+                    <ShareIcon color={TC.textSecondary} size={20} />
                     <Text style={styles.actionCircleCount}>{selectedCard.shares}</Text>
                   </TouchableOpacity>
+                  {/* Shop The Look — routing unchanged */}
                   <TouchableOpacity
                     style={styles.shopBtn}
                     onPress={() => {
@@ -462,11 +474,16 @@ export default function ExploreScreen({ navigation }) {
                       navigation?.navigate('ShopTheLook', { design: card });
                     }}
                   >
+                    <Svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                      <Path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+                      <Line x1={3} y1={6} x2={21} y2={6} />
+                      <Path d="M16 10a4 4 0 0 1-8 0" />
+                    </Svg>
                     <Text style={styles.shopBtnText}>Shop The Look</Text>
                   </TouchableOpacity>
                 </View>
 
-                {/* Products */}
+                {/* 3E: Products in this post */}
                 <Text style={styles.sectionLabel}>PRODUCTS IN THIS POST</Text>
                 {selectedCard.products.map((p, i) => (
                   <TouchableOpacity
@@ -491,28 +508,28 @@ export default function ExploreScreen({ navigation }) {
                       )}
                     </View>
                     <View style={styles.productInfo}>
-                      <Text style={styles.productName}>{p.name}</Text>
+                      <Text style={styles.productName} numberOfLines={2}>{p.name}</Text>
                       <Text style={styles.productBrand}>{p.brand}</Text>
                     </View>
                     <Text style={styles.productPrice}>{p.price}</Text>
                   </TouchableOpacity>
                 ))}
 
-                {/* Tags */}
-                <Text style={[styles.sectionLabel, { marginTop: space.lg }]}>TAGS</Text>
+                {/* 3F: Tags */}
+                <Text style={[styles.sectionLabel, { marginTop: SP[5] }]}>TAGS</Text>
                 <View style={styles.tagsWrap}>
                   {selectedCard.tags.map((tag) => (
                     <View
                       key={tag}
                       style={[
                         styles.tag,
-                        tag === '#AIGenerated' || tag === '#ShopTheLook' ? styles.tagBlue : null,
+                        (tag === '#AIGenerated' || tag === '#ShopTheLook') && styles.tagHighlight,
                       ]}
                     >
                       <Text
                         style={[
                           styles.tagText,
-                          tag === '#AIGenerated' || tag === '#ShopTheLook' ? styles.tagTextBlue : null,
+                          (tag === '#AIGenerated' || tag === '#ShopTheLook') && styles.tagTextHighlight,
                         ]}
                       >
                         {tag}
@@ -521,7 +538,7 @@ export default function ExploreScreen({ navigation }) {
                   ))}
                 </View>
 
-                <View style={{ height: space.xl }} />
+                <View style={{ height: SP[6] }} />
               </ScrollView>
             </View>
           )}
@@ -637,17 +654,15 @@ const styles = StyleSheet.create({
 
   // Header
   title: {
-    fontSize: fontSize['2xl'],
-    fontWeight: fontWeight.xbold,
+    ...typeScale.display,
     color: '#000',
     letterSpacing: letterSpacing.tight,
     paddingHorizontal: space.lg,
     marginBottom: space.xs,
   },
   subtitle: {
-    fontSize: fontSize.sm,
-    fontWeight: fontWeight.regular,
-    color: colors.bluePrimary,
+    ...typeScale.caption,
+    color: TC.primary,
     opacity: 0.9,
     marginTop: space.xs,
     marginBottom: space.base,
@@ -677,7 +692,7 @@ const styles = StyleSheet.create({
   },
   searchInput: {
     flex: 1,
-    fontSize: fontSize.sm,
+    ...typeScale.body,
     color: '#555',
   },
   searchSubmit: {
@@ -708,11 +723,11 @@ const styles = StyleSheet.create({
     gap: space.sm,
     paddingVertical: space.sm,
   },
-  // Inactive pill: transparent bg, border.light
+  // Inactive pill: transparent bg, border.light — radius.full (pill) per spec
   tab: {
     height: 36,
     paddingHorizontal: space.base,
-    borderRadius: radius.sm,
+    borderRadius: radius.full,
     backgroundColor: 'transparent',
     borderWidth: 1,
     borderColor: 'rgba(0,0,0,0.08)',
@@ -721,17 +736,17 @@ const styles = StyleSheet.create({
   },
   // Active pill: brand blue fill, no border
   tabActive: {
-    backgroundColor: colors.bluePrimary,
+    backgroundColor: TC.primary,
     borderColor: 'transparent',
   },
   tabLabel: {
-    fontSize: fontSize.sm,
-    fontWeight: fontWeight.medium,
+    ...typeScale.caption,
     color: 'rgba(0,0,0,0.6)',
   },
   tabLabelActive: {
+    ...typeScale.caption,
     color: '#FFFFFF',
-    fontWeight: fontWeight.bold,
+    fontWeight: '600',
   },
   tabBorder: {
     height: 1,
@@ -805,12 +820,11 @@ const styles = StyleSheet.create({
     paddingBottom: space.xs,
   },
   cardTitle: {
-    fontSize: fontSize.sm,
-    fontWeight: fontWeight.medium,
+    ...typeScale.headline,
     color: '#111',
   },
 
-  // Modal base
+  // ── Section 3A: Drawer Shell ─────────────────────────────────────────────────
   modalOverlay: {
     flex: 1,
     justifyContent: 'flex-end',
@@ -819,54 +833,51 @@ const styles = StyleSheet.create({
   modalBackdrop: {
     flex: 1,
   },
-  // Design detail sheet — shadow.high per spec
   modalSheet: {
-    backgroundColor: '#FFFFFF',
-    borderTopLeftRadius: radius.xl,
-    borderTopRightRadius: radius.xl,
-    maxHeight: '88%',
-    shadowColor: shadow.high.shadowColor,
-    shadowOffset: shadow.high.shadowOffset,
-    shadowOpacity: shadow.high.shadowOpacity,
-    shadowRadius: shadow.high.shadowRadius,
-    elevation: shadow.high.elevation,
+    backgroundColor: TC.bg,
+    borderTopLeftRadius: radius.lg,             // 16px per design system spec (Part 2.11)
+    borderTopRightRadius: radius.lg,
+    maxHeight: '90%',
+    shadowColor: TS.lg.shadowColor,
+    shadowOffset: TS.lg.shadowOffset,
+    shadowOpacity: TS.lg.shadowOpacity,
+    shadowRadius: TS.lg.shadowRadius,
+    elevation: TS.lg.elevation,
   },
   modalDrag: {
-    width: 40,
-    height: 4,
-    backgroundColor: 'rgba(0,0,0,0.12)',
-    borderRadius: 2,
+    width: 36,                                   // spec: 36px wide
+    height: 4,                                   // spec: 4px tall
+    backgroundColor: TC.border,                  // --color-border
+    borderRadius: 9999,                          // pill
     alignSelf: 'center',
-    marginTop: space.md,
-    marginBottom: space.xs,
+    marginTop: SP[3],                            // 12px margin top
+    marginBottom: SP[4],                         // 16px margin bottom
   },
   modalCloseBtn: {
     position: 'absolute',
-    top: space.base,
-    right: space.lg,
-    width: 28,
-    height: 28,
-    borderRadius: radius.full,
-    backgroundColor: '#F0F0F3',
+    top: SP[4],
+    right: SP[5],
+    width: 44,                                   // 44px min tap target (Part 1.5)
+    height: 44,
+    borderRadius: TR.full,
+    backgroundColor: TC.surface,
     alignItems: 'center',
     justifyContent: 'center',
     zIndex: 10,
   },
   modalScrollContent: {
-    paddingHorizontal: space.lg,
-    paddingBottom: space['2xl'],
-    paddingTop: space.md,
+    paddingHorizontal: SP[5],                    // 20px left/right throughout
+    paddingBottom: SP[8],
+    paddingTop: SP[3],
   },
-
-  // Modal: image — radius.lg (inner element inside radius.xl sheet)
   modalImage: {
     width: '100%',
     aspectRatio: 4 / 3,
-    backgroundColor: '#D7D7D7',
-    borderRadius: radius.lg,
+    backgroundColor: TC.surface,
+    borderRadius: TR.lg,                         // 16px
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: space.base,
+    marginBottom: SP[4],
     overflow: 'hidden',
   },
   modalImagePhoto: {
@@ -874,180 +885,179 @@ const styles = StyleSheet.create({
     height: '100%',
   },
 
-  // Modal: user row
+  // ── Section 3B: Seller Header Row ──────────────────────────────────────────
   modalUserRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: space.sm,
-    marginBottom: space.md,
+    gap: SP[2],                                  // 8px
+    paddingTop: SP[4],                           // 16px
+    paddingBottom: SP[3],                        // 12px
+    borderBottomWidth: 1,
+    borderBottomColor: TC.border,
+    marginBottom: SP[4],
   },
   modalAvatar: {
-    width: space['3xl'],
-    height: space['3xl'],
-    borderRadius: radius.full,
-    backgroundColor: colors.bluePrimary,
+    width: 40,                                   // spec: 40×40px circle
+    height: 40,
+    borderRadius: TR.full,
+    backgroundColor: TC.primary,
     alignItems: 'center',
     justifyContent: 'center',
   },
+  modalAvatarVerified: {
+    borderWidth: 2,                              // spec: 2px border if verified
+    borderColor: TC.primary,
+  },
   modalAvatarText: {
-    color: '#fff',
-    fontSize: fontSize.sm,
-    fontWeight: fontWeight.bold,
+    ...typeScale.caption,
+    color: TC.white,
+    fontWeight: '700',
   },
   modalUserInfo: {
     flex: 1,
   },
   modalUsername: {
-    fontSize: fontSize.base,
-    fontWeight: fontWeight.bold,
-    color: '#111',
+    ...typeScale.headline,
+    color: TC.textPrimary,
   },
   modalTime: {
-    fontSize: fontSize.xs,
-    color: '#A0A0A8',
-    opacity: 0.44,
-    marginTop: 1,
+    ...typeScale.caption,
+    color: TC.textSecondary,
+    marginTop: 2,
   },
   followBtn: {
-    backgroundColor: colors.bluePrimary,
-    borderRadius: radius.sm,
-    paddingHorizontal: space.lg,
-    paddingVertical: space.sm,
+    backgroundColor: TC.primary,
+    borderRadius: TR.full,
+    height: 36,
+    paddingHorizontal: SP[5],
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   followBtnText: {
-    color: '#fff',
-    fontSize: fontSize.sm,
-    fontWeight: fontWeight.bold,
+    ...typeScale.button,
+    color: TC.white,
   },
 
-  // Modal: title + desc
+  // ── Section 3C: Post Title & Description ──────────────────────────────────
   modalTitle: {
-    fontSize: fontSize.lg,
-    fontWeight: fontWeight.bold,
-    color: '#111',
-    letterSpacing: letterSpacing.tight,
-    marginBottom: space.xs,
+    ...typeScale.title,
+    color: TC.textPrimary,
+    marginTop: SP[4],
+    marginBottom: 6,
   },
   modalDesc: {
-    fontSize: fontSize.base,
-    color: '#555',
-    opacity: 0.72,
-    lineHeight: fontSize.base * 1.6,
-    marginBottom: space.base,
+    ...typeScale.body,
+    color: TC.textSecondary,
+    marginBottom: SP[4],
   },
 
-  // Modal: actions row
+  // ── Section 3D: Action Buttons Row ─────────────────────────────────────────
   actionsRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: space.sm,
-    marginBottom: space.sm,
+    marginTop: SP[4],                            // 16px top
+    marginBottom: SP[4],                         // 16px bottom
   },
   actionCircle: {
-    width: 46,
-    height: 46,
-    borderRadius: radius.full,
-    backgroundColor: '#F4F4F6',
+    width: 44,                                   // spec: 44×44px
+    height: 44,
+    borderRadius: TR.full,                       // circle
+    borderWidth: 1,
+    borderColor: TC.border,
+    backgroundColor: TC.bg,                      // white
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 2,
   },
   actionCircleLiked: {
-    backgroundColor: 'rgba(239,68,68,0.08)',
+    borderColor: 'rgba(239,68,68,0.3)',          // --color-destructive light
+    backgroundColor: 'rgba(239,68,68,0.06)',
   },
   actionCircleCount: {
-    fontSize: fontSize.xs,
-    fontWeight: fontWeight.medium,
-    color: '#555',
+    ...typeScale.micro,
+    color: TC.textSecondary,
   },
   shopBtn: {
     flex: 1,
-    height: 52,
-    backgroundColor: colors.bluePrimary,
-    borderRadius: radius.md,
+    minHeight: 44,                               // 44px min touch target
+    backgroundColor: TC.primary,
+    borderRadius: TR.full,
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: shadow.medium.shadowColor,
-    shadowOffset: shadow.medium.shadowOffset,
-    shadowOpacity: shadow.medium.shadowOpacity,
-    shadowRadius: shadow.medium.shadowRadius,
-    elevation: shadow.medium.elevation,
+    paddingVertical: 12,
+    marginLeft: SP[3],
+    gap: SP[2],
   },
   shopBtnText: {
-    color: '#fff',
-    fontSize: fontSize.base,
-    fontWeight: fontWeight.bold,
-    letterSpacing: letterSpacing.tight,
+    ...typeScale.button,
+    color: TC.white,
   },
 
-  // Modal: products
+  // ── Section 3E: Products in This Post ──────────────────────────────────────
   sectionLabel: {
-    fontSize: fontSize.xs,
-    fontWeight: fontWeight.bold,
-    color: '#A0A0A8',
-    letterSpacing: letterSpacing.wider,
-    textTransform: 'uppercase',
-    marginTop: space.xl,
-    marginBottom: space.base,
+    ...typeScale.subheadline,
+    color: TC.textTertiary,
+    marginTop: SP[5],
+    marginBottom: SP[3],
   },
   productRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: space.md,
-    marginBottom: space.sm,
+    gap: SP[3],                                  // 12px
+    minHeight: 72,                               // spec: 72px minimum
+    paddingVertical: SP[2],                      // 8px vertical padding
+    borderBottomWidth: 1,
+    borderBottomColor: TC.border,
   },
   productImg: {
-    width: space['4xl'],
-    height: space['4xl'],
-    // Inner element inside sheet (radius.xl). Card padding = 12 → inner radius = 20-12 = 8 = radius.sm
-    borderRadius: radius.md,
-    backgroundColor: '#F1F5F9',
+    width: 56,                                   // spec: 56×56px SQUARE
+    height: 56,
+    borderRadius: TR.md,                         // 12px
+    backgroundColor: TC.surface,
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'hidden',
+    flexShrink: 0,
   },
   productInfo: {
     flex: 1,
   },
   productName: {
-    fontSize: fontSize.base,
-    fontWeight: fontWeight.bold,
-    color: '#111',
+    ...typeScale.headline,
+    color: TC.textPrimary,
   },
   productBrand: {
-    fontSize: fontSize.xs,
-    color: '#A0A0A8',
-    opacity: 0.44,
-    marginTop: space.xs,
+    ...typeScale.caption,
+    color: TC.textTertiary,
+    marginTop: 4,
   },
   productPrice: {
-    fontSize: fontSize.base,
-    fontWeight: fontWeight.bold,
-    color: colors.bluePrimary,
+    ...typeScale.price,
+    color: TC.primary,
+    textAlign: 'right',
   },
 
-  // Tags
+  // ── Section 3F: Tags ──────────────────────────────────────────────────────
   tagsWrap: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: space.sm,
+    gap: SP[2],                                  // 8px
   },
   tag: {
-    backgroundColor: '#F4F4F6',
-    borderRadius: radius.sm,
-    paddingHorizontal: space.md,
-    paddingVertical: space.xs,
+    backgroundColor: TC.surface2,                // --color-surface-2
+    borderRadius: TR.sm,                         // 8px
+    paddingHorizontal: SP[3],                    // 12px
+    paddingVertical: SP[1],                      // 4px
   },
-  tagBlue: {
-    backgroundColor: 'rgba(11,109,195,0.1)',
+  tagHighlight: {
+    backgroundColor: TC.primaryLight,            // --color-primary-light
   },
   tagText: {
-    fontSize: fontSize.sm,
-    fontWeight: fontWeight.medium,
-    color: '#555',
+    ...typeScale.caption,
+    color: TC.textSecondary,
   },
-  tagTextBlue: {
-    color: colors.bluePrimary,
+  tagTextHighlight: {
+    color: TC.primary,                           // --color-primary
   },
 
   // New post modal — same sheet style
@@ -1061,21 +1071,21 @@ const styles = StyleSheet.create({
     borderBottomColor: 'rgba(0,0,0,0.06)',
   },
   postModalTitle: {
-    fontSize: fontSize.md,
-    fontWeight: fontWeight.bold,
+    ...typeScale.title,
     color: '#111',
-    letterSpacing: letterSpacing.tight,
   },
   postShareBtn: {
-    backgroundColor: colors.bluePrimary,
-    borderRadius: radius.sm,
+    backgroundColor: TC.primary,
+    borderRadius: radius.full,
     paddingHorizontal: space.base,
     paddingVertical: space.sm,
+    minHeight: 36,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   postShareBtnText: {
+    ...typeScale.button,
     color: '#fff',
-    fontSize: fontSize.sm,
-    fontWeight: fontWeight.bold,
   },
   postModalBody: {
     paddingHorizontal: space.lg,
@@ -1096,30 +1106,27 @@ const styles = StyleSheet.create({
     marginBottom: space.base,
   },
   uploadLabel: {
-    fontSize: fontSize.sm,
-    fontWeight: fontWeight.bold,
+    ...typeScale.caption,
+    fontWeight: '600',
     color: '#555',
   },
   uploadSub: {
-    fontSize: fontSize.xs,
+    ...typeScale.caption,
     color: '#bbb',
     opacity: 0.44,
   },
   fieldLabel: {
-    fontSize: fontSize.xs,
-    fontWeight: fontWeight.bold,
+    ...typeScale.micro,
     color: '#A0A0A8',
-    letterSpacing: letterSpacing.wider,
-    textTransform: 'uppercase',
     marginBottom: space.sm,
   },
   fieldInput: {
-    borderWidth: 1,
+    borderWidth: 1.5,
     borderColor: 'rgba(0,0,0,0.08)',
     borderRadius: radius.md,
-    paddingHorizontal: space.md,
-    paddingVertical: space.sm,
-    fontSize: fontSize.sm,
+    paddingHorizontal: space.base,
+    height: 48,                                  // form input spec: 48px height
+    ...typeScale.body,
     color: '#111',
     marginBottom: space.md,
     backgroundColor: '#FFFFFF',
@@ -1138,12 +1145,11 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(11,109,195,0.12)',
   },
   postTagChipText: {
-    fontSize: fontSize.sm,
-    fontWeight: fontWeight.medium,
+    ...typeScale.caption,
     color: '#555',
   },
   postTagChipTextSelected: {
-    color: colors.bluePrimary,
+    color: TC.primary,
   },
 
   // Empty state
@@ -1154,17 +1160,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: space['2xl'],
   },
   emptyStateTitle: {
-    fontSize: fontSize.lg,
-    fontWeight: fontWeight.bold,
+    ...typeScale.title,
     color: '#111',
     marginBottom: space.sm,
-    letterSpacing: letterSpacing.tight,
   },
   emptyStateSub: {
-    fontSize: fontSize.base,
+    ...typeScale.body,
     color: '#A0A0A8',
-    opacity: 0.44,
     textAlign: 'center',
-    lineHeight: fontSize.base * 1.5,
   },
 });

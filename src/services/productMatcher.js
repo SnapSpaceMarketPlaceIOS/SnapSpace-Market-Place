@@ -19,10 +19,10 @@ const MAX_PER_CATEGORY = 2;
  * @returns {object[]}          - Sorted, diversified product array
  */
 export function matchProducts(parsedPrompt, limit = 6) {
-  const { roomType, styles, materials } = parsedPrompt;
+  const { roomType, styles, materials, furnitureCategories = [], moods = [] } = parsedPrompt;
 
   const scored = PRODUCT_CATALOG.map((product) => {
-    const score = scoreProduct(product, roomType, styles, materials);
+    const score = scoreProduct(product, roomType, styles, materials, furnitureCategories, moods);
     return { ...product, _score: score };
   });
 
@@ -31,31 +31,79 @@ export function matchProducts(parsedPrompt, limit = 6) {
   return diversify(scored, limit);
 }
 
+// Moods that suggest higher-end / premium items — boosts rating weight
+const LUXURY_MOODS = ['luxurious', 'elegant', 'opulent', 'rich', 'sophisticated', 'dark-luxe'];
+const COZY_MOODS   = ['cozy', 'warm', 'inviting', 'comfortable', 'relaxed'];
+
 /**
  * Score a single product against the detected design intent.
+ * Scoring formula (revised):
+ *   style match:            35 pts
+ *   room type match:        25 pts
+ *   material match:         15 pts
+ *   furniture category:     15 pts  (NEW — uses furnitureCategories)
+ *   mood bonus:              5 pts  (NEW — uses moods)
+ *   rating bonus:            5 pts
  */
-function scoreProduct(product, roomType, styles, materials) {
+function scoreProduct(product, roomType, styles, materials, furnitureCategories = [], moods = []) {
   let score = 0;
 
-  // ── Room type match (30 points) ───────────────────────────────────────────
-  if (product.roomType.includes(roomType)) {
-    score += 30;
-  } else if (product.roomType.includes('living-room')) {
-    // Living room products are versatile fallbacks
-    score += 8;
+  // ── Room type match (25 points) ───────────────────────────────────────────
+  const productRooms = Array.isArray(product.roomType) ? product.roomType : [product.roomType];
+  if (productRooms.includes(roomType)) {
+    score += 25;
+  } else if (productRooms.includes('living-room')) {
+    score += 6;
   }
 
-  // ── Style match (40 points) ───────────────────────────────────────────────
+  // ── Style match (35 points) ───────────────────────────────────────────────
   const styleScore = computeStyleScore(product.styles, styles);
-  score += styleScore * 40;
+  score += styleScore * 35;
 
-  // ── Material match (20 points) ────────────────────────────────────────────
+  // ── Material match (15 points) ────────────────────────────────────────────
   if (materials && materials.length > 0) {
-    const materialMatches = product.materials.filter((m) =>
+    const materialMatches = (product.materials || []).filter((m) =>
       materials.includes(m)
     ).length;
     const materialScore = Math.min(materialMatches / materials.length, 1);
-    score += materialScore * 20;
+    score += materialScore * 15;
+  }
+
+  // ── Furniture category match (15 points) — NEW ────────────────────────────
+  if (furnitureCategories && furnitureCategories.length > 0) {
+    if (furnitureCategories.includes(product.category)) {
+      score += 15;
+    } else {
+      // Partial credit for related categories
+      const RELATED = {
+        'sofa': ['accent-chair', 'loveseat'],
+        'bed': ['nightstand', 'dresser'],
+        'dining-table': ['dining-chair'],
+        'desk': ['desk-chair', 'bookshelf'],
+        'lamp': ['floor-lamp', 'table-lamp', 'pendant-light'],
+      };
+      for (const requested of furnitureCategories) {
+        const related = RELATED[requested] || [];
+        if (related.includes(product.category)) {
+          score += 5;
+          break;
+        }
+      }
+    }
+  }
+
+  // ── Mood bonus (5 points) — NEW ───────────────────────────────────────────
+  if (moods && moods.length > 0) {
+    const isLuxury = moods.some((m) => LUXURY_MOODS.includes(m));
+    const isCozy   = moods.some((m) => COZY_MOODS.includes(m));
+
+    if (isLuxury && product.rating && product.rating >= 4.5) {
+      score += 5;
+    } else if (isCozy && (product.materials || []).some((m) => ['velvet', 'linen', 'wool', 'cotton', 'rattan'].includes(m))) {
+      score += 5;
+    } else if (moods.length > 0) {
+      score += 1;
+    }
   }
 
   // ── Rating bonus (up to 5 points) ────────────────────────────────────────
@@ -127,6 +175,25 @@ function diversify(sorted, limit) {
           result.push(product);
           categoryCounts[product.category] = (categoryCounts[product.category] || 0) + 1;
         }
+      }
+    }
+  }
+
+  // Enforce minimum 4 unique categories when limit >= 6
+  if (limit >= 6 && result.length >= 6) {
+    const uniqueCategories = new Set(result.slice(0, 6).map((p) => p.category)).size;
+    if (uniqueCategories < 4) {
+      // Replace duplicates with highest-scored products from new categories
+      const usedCategories = new Set(result.slice(0, 6).map((p) => p.category));
+      const extras = sorted.filter(
+        (p) => !usedCategories.has(p.category) && !result.find((r) => r.id === p.id)
+      );
+      let replaceIdx = result.length - 1;
+      for (const extra of extras) {
+        if (usedCategories.size >= 4) break;
+        result[replaceIdx] = extra;
+        usedCategories.add(extra.category);
+        replaceIdx--;
       }
     }
   }

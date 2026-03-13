@@ -17,8 +17,8 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path, Circle, Line, Polyline, Rect } from 'react-native-svg';
-import { colors } from '../constants/colors';
-import { fontSize, fontWeight, letterSpacing, space, radius, shadow } from '../constants/tokens';
+import { colors as C } from '../constants/theme';
+import { fontSize, fontWeight, letterSpacing, space, radius, shadow, typeScale } from '../constants/tokens';
 import { useLiked } from '../context/LikedContext';
 import { useShared } from '../context/SharedContext';
 import { useAuth } from '../context/AuthContext';
@@ -55,7 +55,7 @@ function PencilIcon() {
 
 function VerifiedIcon() {
   return (
-    <Svg width={16} height={16} viewBox="0 0 24 24" fill={colors.bluePrimary} stroke="none">
+    <Svg width={16} height={16} viewBox="0 0 24 24" fill={C.primary} stroke="none">
       <Path d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
     </Svg>
   );
@@ -198,7 +198,7 @@ function InfoIcon() {
 
 // ── Data ──────────────────────────────────────────────────────────────────────
 
-const MY_DESIGNS = DESIGNS;
+const MY_DESIGNS = DESIGNS.slice(0, 12);
 
 const ACCOUNT_ITEMS = [
   { label: 'Saved Designs',          icon: <SavedIcon />, screen: 'Explore' },
@@ -431,11 +431,17 @@ export default function ProfileScreen({ navigation }) {
 
         {/* ── Designs Grid ── */}
         <View style={styles.grid}>
-          {MY_DESIGNS.map(design => (
+          {(activeTab === 0
+            ? MY_DESIGNS
+            : activeTab === 1
+              ? MY_DESIGNS.filter(d => liked[d.id])
+              : MY_DESIGNS.filter(d => shared[d.id])
+          ).map(design => (
             <PressableCard
               key={design.id}
               style={styles.card}
               animStyle={{ width: CARD_WIDTH }}
+              onPress={() => navigation.navigate('ShopTheLook', { design })}
             >
               <View style={styles.cardImg}>
                 <View style={styles.cardImgBg} />
@@ -818,7 +824,7 @@ const styles = StyleSheet.create({
   },
   bannerGradient: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: colors.blueDeep,
+    backgroundColor: C.primary,
     opacity: 0.9,
   },
   bannerImage: {
@@ -834,8 +840,8 @@ const styles = StyleSheet.create({
     paddingTop: space.xs,
   },
   navBtn: {
-    width: space['2xl'],
-    height: space['2xl'],
+    width: 44,
+    height: 44,
     borderRadius: radius.full,
     backgroundColor: 'rgba(255,255,255,0.92)',
     alignItems: 'center',
@@ -879,7 +885,7 @@ const styles = StyleSheet.create({
   avatarInner: {
     flex: 1,
     borderRadius: radius.full,
-    backgroundColor: colors.blueDeep,
+    backgroundColor: C.primary,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -904,9 +910,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   editProfileBtnText: {
+    ...typeScale.button,
     color: '#222',
-    fontSize: fontSize.sm,
-    fontWeight: fontWeight.bold,
   },
 
   // Name block
@@ -916,27 +921,24 @@ const styles = StyleSheet.create({
     marginBottom: space.xs,
   },
   displayName: {
-    fontSize: fontSize.xl,
-    fontWeight: fontWeight.xbold,
+    ...typeScale.title,
+    fontWeight: '800',
     color: '#111',
     letterSpacing: letterSpacing.tight,
   },
   // verifiedDot replaced by VerifiedBadge component
   username: {
-    fontSize: fontSize.sm,
+    ...typeScale.caption,
     color: '#888',
     opacity: 0.44,
     marginBottom: space.sm,
-    fontWeight: fontWeight.regular,
     marginTop: space.xs,
   },
   bio: {
-    fontSize: fontSize.sm,
+    ...typeScale.body,
     color: '#333',
     opacity: 0.72,
-    lineHeight: fontSize.sm * 1.5,
     marginBottom: space.md,
-    fontWeight: fontWeight.regular,
     marginTop: space.sm,
   },
 
@@ -951,15 +953,14 @@ const styles = StyleSheet.create({
     alignItems: 'baseline',
   },
   followValue: {
-    fontSize: fontSize.base,
-    fontWeight: fontWeight.bold,
+    ...typeScale.body,
+    fontWeight: '700',
     color: '#111',
   },
   followLabel: {
-    fontSize: fontSize.base,
+    ...typeScale.body,
     color: '#888',
     opacity: 0.44,
-    fontWeight: fontWeight.regular,
   },
 
   // Action pill chips — horizontal scroll row
@@ -981,9 +982,9 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   actionChipLabel: {
-    fontSize: fontSize.xs,
-    fontWeight: fontWeight.medium,
+    ...typeScale.micro,
     color: '#333',
+    textTransform: undefined,
   },
 
   // Tabs
@@ -998,13 +999,14 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   tabLabel: {
-    fontSize: fontSize.sm,
-    fontWeight: fontWeight.medium,
+    ...typeScale.caption,
+    fontWeight: '500',
     color: '#A0A0A8',
   },
   tabLabelActive: {
+    ...typeScale.caption,
+    fontWeight: '700',
     color: '#111',
-    fontWeight: fontWeight.bold,
   },
   tabUnderline: {
     position: 'absolute',
@@ -1012,7 +1014,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     height: 2.5,
-    backgroundColor: colors.bluePrimary,
+    backgroundColor: C.primary,
     borderRadius: 2,
   },
   tabBorder: {
@@ -1119,17 +1121,14 @@ const styles = StyleSheet.create({
     borderBottomColor: 'rgba(0,0,0,0.06)',
   },
   settingsTitle: {
-    fontSize: fontSize.md,
-    fontWeight: fontWeight.bold,
+    ...typeScale.headline,
+    fontWeight: '700',
     color: '#111',
     letterSpacing: letterSpacing.tight,
   },
   settingsSectionLabel: {
-    fontSize: fontSize.xs,
-    fontWeight: fontWeight.bold,
+    ...typeScale.subheadline,
     color: '#A0A0A8',
-    letterSpacing: letterSpacing.wider,
-    textTransform: 'uppercase',
     paddingHorizontal: space.lg,
     paddingTop: space.base,
     paddingBottom: space.sm,
@@ -1168,13 +1167,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   settingsLabel: {
-    fontSize: fontSize.base,
-    fontWeight: fontWeight.medium,
+    ...typeScale.body,
+    fontWeight: '500',
     color: '#111',
   },
   settingsValue: {
-    fontSize: fontSize.sm,
-    fontWeight: fontWeight.regular,
+    ...typeScale.caption,
     color: '#A0A0A8',
     opacity: 0.44,
   },
@@ -1192,13 +1190,13 @@ const styles = StyleSheet.create({
     marginBottom: space.base,
   },
   logoutText: {
-    fontSize: fontSize.base,
-    fontWeight: fontWeight.bold,
+    ...typeScale.body,
+    fontWeight: '700',
     color: '#EF4444',
   },
   version: {
+    ...typeScale.caption,
     textAlign: 'center',
-    fontSize: fontSize.xs,
     color: '#BBB',
   },
 
@@ -1237,7 +1235,7 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: radius.full,
-    backgroundColor: colors.blueDeep,
+    backgroundColor: C.primary,
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'hidden',
@@ -1252,9 +1250,9 @@ const styles = StyleSheet.create({
     color: '#fff',
   },
   photoOptionLabel: {
-    fontSize: fontSize.base,
-    fontWeight: fontWeight.bold,
-    color: colors.bluePrimary,
+    ...typeScale.body,
+    fontWeight: '700',
+    color: C.primary,
   },
   bannerOptionRow: {
     width: '100%',
@@ -1275,26 +1273,23 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   bannerOptionPlaceholderText: {
-    fontSize: fontSize.sm,
+    ...typeScale.caption,
     color: '#888',
-    fontWeight: fontWeight.medium,
   },
   editProfileLabel: {
-    fontSize: fontSize.xs,
-    fontWeight: fontWeight.bold,
+    ...typeScale.micro,
     color: '#888',
-    letterSpacing: letterSpacing.wide,
     textTransform: 'uppercase',
     marginBottom: space.sm,
     marginTop: space.md,
   },
   editProfileInput: {
+    ...typeScale.body,
     borderWidth: 1,
     borderColor: 'rgba(0,0,0,0.08)',
     borderRadius: radius.md,
     paddingHorizontal: space.md,
     paddingVertical: space.md,
-    fontSize: fontSize.base,
     color: '#111',
     backgroundColor: '#fff',
   },
@@ -1308,9 +1303,9 @@ const styles = StyleSheet.create({
     paddingLeft: space.md,
   },
   usernamePrefix: {
-    fontSize: fontSize.base,
+    ...typeScale.body,
     color: '#888',
-    fontWeight: fontWeight.medium,
+    fontWeight: '500',
   },
   usernameInput: {
     flex: 1,
@@ -1324,16 +1319,16 @@ const styles = StyleSheet.create({
   },
   saveProfileBtn: {
     marginTop: space.xl,
-    backgroundColor: colors.bluePrimary,
+    backgroundColor: C.primary,
     borderRadius: radius.md,
     paddingVertical: space.md,
     alignItems: 'center',
     justifyContent: 'center',
   },
   saveProfileBtnText: {
+    ...typeScale.button,
+    fontWeight: '700',
     color: '#fff',
-    fontSize: fontSize.md,
-    fontWeight: fontWeight.bold,
   },
 
   // ── Seller Dashboard CTA (shown to verified suppliers) ────────────────────
@@ -1363,15 +1358,15 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   dashboardCtaTitle: {
-    fontSize: fontSize.sm,
-    fontWeight: fontWeight.bold,
+    ...typeScale.caption,
+    fontWeight: '700',
     color: '#fff',
     marginBottom: 2,
   },
   dashboardCtaSubtitle: {
-    fontSize: 11,
+    ...typeScale.micro,
+    textTransform: undefined,
     color: 'rgba(255,255,255,0.7)',
-    fontWeight: fontWeight.medium,
   },
 
   // ── Become a Supplier CTA ──────────────────────────────────────────────────
@@ -1404,15 +1399,15 @@ const styles = StyleSheet.create({
   },
   supplierCtaText: { flex: 1 },
   supplierCtaTitle: {
-    fontSize: fontSize.sm,
-    fontWeight: fontWeight.bold,
+    ...typeScale.caption,
+    fontWeight: '700',
     color: '#1E3A5F',
     marginBottom: 2,
   },
   supplierCtaSubtitle: {
-    fontSize: 11,
+    ...typeScale.micro,
+    textTransform: undefined,
     color: '#3B82F6',
-    fontWeight: fontWeight.medium,
   },
   supplierCtaBtn: {
     backgroundColor: '#1D4ED8',
@@ -1422,8 +1417,7 @@ const styles = StyleSheet.create({
     marginLeft: space.md,
   },
   supplierCtaBtnText: {
+    ...typeScale.button,
     color: '#fff',
-    fontSize: fontSize.sm,
-    fontWeight: fontWeight.bold,
   },
 });

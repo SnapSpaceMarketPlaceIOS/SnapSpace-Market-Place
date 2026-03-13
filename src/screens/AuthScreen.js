@@ -35,6 +35,8 @@ function MinimalInput({
   secureTextEntry,
   keyboardType,
   autoCapitalize,
+  textContentType,
+  autoComplete,
   showToggle,
   onToggle,
   showPassword,
@@ -45,6 +47,7 @@ function MinimalInput({
   return (
     <View style={[inputStyles.wrap, focused && inputStyles.wrapFocused]}>
       <TextInput
+        key={secureTextEntry ? 'secure' : 'plain'}
         style={inputStyles.input}
         placeholder={placeholder}
         placeholderTextColor="#ABABAB"
@@ -52,8 +55,11 @@ function MinimalInput({
         onChangeText={onChangeText}
         secureTextEntry={secureTextEntry}
         keyboardType={keyboardType || 'default'}
-        autoCapitalize={autoCapitalize || 'none'}
+        autoCapitalize="none"
         autoCorrect={false}
+        spellCheck={false}
+        textContentType={textContentType}
+        autoComplete={autoComplete}
         editable={editable}
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
@@ -196,8 +202,11 @@ export default function AuthScreen({ navigation }) {
             <MinimalInput
               placeholder="Email"
               value={email}
-              onChangeText={setEmail}
+              onChangeText={(t) => setEmail(t.toLowerCase())}
               keyboardType="email-address"
+              autoCapitalize="none"
+              autoComplete="email"
+              textContentType="emailAddress"
             />
             {errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
 
@@ -206,6 +215,8 @@ export default function AuthScreen({ navigation }) {
               value={password}
               onChangeText={setPassword}
               secureTextEntry={!showPassword}
+              textContentType={isSignUp ? 'newPassword' : 'password'}
+              autoComplete={isSignUp ? 'new-password' : 'current-password'}
               showToggle
               onToggle={() => setShowPassword((v) => !v)}
               showPassword={showPassword}
@@ -219,6 +230,8 @@ export default function AuthScreen({ navigation }) {
                   value={confirmPassword}
                   onChangeText={setConfirmPassword}
                   secureTextEntry={!showPassword}
+                  textContentType="newPassword"
+                  autoComplete="new-password"
                 />
                 {errors.confirmPassword && (
                   <Text style={styles.errorText}>{errors.confirmPassword}</Text>

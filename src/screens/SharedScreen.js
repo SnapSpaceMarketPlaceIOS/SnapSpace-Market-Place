@@ -6,10 +6,12 @@ import {
   StyleSheet,
   TouchableOpacity,
   Dimensions,
+  Image,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import Svg, { Path, Circle, Line, Polyline, Rect } from 'react-native-svg';
-import { colors } from '../constants/colors';
+import Svg, { Path, Circle, Line, Polyline } from 'react-native-svg';
+import { colors as C } from '../constants/theme';
+import { typeScale, radius, space } from '../constants/tokens';
 import { useShared } from '../context/SharedContext';
 import { DESIGNS } from '../data/designs';
 
@@ -26,22 +28,12 @@ function BackIcon() {
 
 function SharedIcon() {
   return (
-    <Svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke={colors.bluePrimary} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+    <Svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke={C.primary} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
       <Circle cx={18} cy={5} r={3} />
       <Circle cx={6} cy={12} r={3} />
       <Circle cx={18} cy={19} r={3} />
       <Line x1={8.59} y1={13.51} x2={15.42} y2={17.49} />
       <Line x1={15.41} y1={6.51} x2={8.59} y2={10.49} />
-    </Svg>
-  );
-}
-
-function ImagePlaceholderIcon() {
-  return (
-    <Svg width={24} height={24} viewBox="0 0 24 24" fill="none" stroke="#aaa" strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round">
-      <Rect x={3} y={3} width={18} height={18} rx={2} />
-      <Circle cx={8.5} cy={8.5} r={1.5} />
-      <Polyline points="21 15 16 10 5 21" />
     </Svg>
   );
 }
@@ -111,13 +103,23 @@ export default function SharedScreen({ navigation }) {
                 key={design.id}
                 style={styles.cell}
                 activeOpacity={0.88}
+                onPress={() => navigation.navigate('ShopTheLook', { design })}
               >
                 <View style={styles.cellImg}>
-                  <ImagePlaceholderIcon />
+                  {design.imageUrl ? (
+                    <Image
+                      source={{ uri: design.imageUrl }}
+                      style={styles.cellPhoto}
+                      resizeMode="cover"
+                    />
+                  ) : (
+                    <View style={styles.cellPhotoFallback} />
+                  )}
                   <View style={styles.sharedBadge}>
                     <SharedIcon />
                   </View>
                 </View>
+                <Text style={styles.cellTitle} numberOfLines={1}>{design.title}</Text>
               </TouchableOpacity>
             ))}
           </View>
@@ -132,7 +134,7 @@ export default function SharedScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: C.bg,
   },
 
   header: {
@@ -142,43 +144,40 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 14,
     borderBottomWidth: 1,
-    borderBottomColor: '#F0F0F0',
+    borderBottomColor: C.border,
   },
   backBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: '#F4F4F6',
+    width: 44,
+    height: 44,
+    borderRadius: radius.full,
+    backgroundColor: C.surface2,
     alignItems: 'center',
     justifyContent: 'center',
   },
   headerTitle: {
-    fontSize: 17,
-    fontWeight: '800',
-    color: '#111',
-    letterSpacing: -0.3,
+    ...typeScale.title,
+    color: C.textPrimary,
   },
   headerRight: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 5,
-    width: 36,
+    width: 44,
     justifyContent: 'flex-end',
   },
   headerCount: {
-    fontSize: 14,
+    ...typeScale.button,
     fontWeight: '700',
-    color: colors.bluePrimary,
+    color: C.primary,
   },
 
   scrollContent: {
     paddingTop: 14,
   },
   countLabel: {
-    fontSize: 13,
-    color: '#999',
-    fontWeight: '500',
-    paddingHorizontal: 16,
+    ...typeScale.caption,
+    color: C.textSecondary,
+    paddingHorizontal: space.base,
     marginBottom: 10,
   },
 
@@ -189,14 +188,33 @@ const styles = StyleSheet.create({
   },
   cell: {
     width: CARD_WIDTH,
+    marginBottom: 4,
   },
   cellImg: {
     width: '100%',
     aspectRatio: 1,
-    backgroundColor: '#D7D7D7',
+    backgroundColor: C.surface2,
     alignItems: 'center',
     justifyContent: 'center',
     position: 'relative',
+    overflow: 'hidden',
+  },
+  cellPhoto: {
+    width: '100%',
+    height: '100%',
+  },
+  cellPhotoFallback: {
+    width: '100%',
+    height: '100%',
+    backgroundColor: C.surface2,
+  },
+  cellTitle: {
+    ...typeScale.micro,
+    color: C.textPrimary,
+    textTransform: undefined,
+    paddingHorizontal: 4,
+    paddingTop: 4,
+    paddingBottom: 2,
   },
   sharedBadge: {
     position: 'absolute',
@@ -218,27 +236,27 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   emptyTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#222',
+    ...typeScale.title,
+    color: C.textPrimary,
     marginTop: 8,
   },
   emptySubtitle: {
-    fontSize: 14,
-    color: '#999',
+    ...typeScale.body,
+    color: C.textSecondary,
     textAlign: 'center',
-    lineHeight: 20,
   },
   browseBtn: {
     marginTop: 8,
-    backgroundColor: colors.bluePrimary,
-    borderRadius: 22,
+    backgroundColor: C.primary,
+    borderRadius: radius.button,
     paddingHorizontal: 28,
     paddingVertical: 12,
+    minHeight: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   browseBtnText: {
-    color: '#fff',
-    fontSize: 14,
-    fontWeight: '700',
+    ...typeScale.button,
+    color: C.white,
   },
 });
