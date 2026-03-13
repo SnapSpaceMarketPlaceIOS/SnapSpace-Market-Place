@@ -75,11 +75,17 @@ export default function RoomResultScreen({ route, navigation }) {
   const { addToCart } = useCart();
   const prompt = route?.params?.prompt || 'Modern minimalist redesign';
   const resultUri = route?.params?.resultUri || null;
+  const passedProducts = route?.params?.products || null;
 
   useEffect(() => {
-    const matched = getProductsForPrompt(prompt, 6);
-    setProducts(matched);
-  }, [prompt]);
+    // Use products passed from SnapScreen if available, otherwise match locally
+    if (passedProducts && passedProducts.length > 0) {
+      setProducts(passedProducts);
+    } else {
+      const matched = getProductsForPrompt(prompt, 6);
+      setProducts(matched);
+    }
+  }, [prompt, passedProducts]);
 
   // Animated value starts at collapsed position
   const sheetY = useRef(new Animated.Value(SHEET_COLLAPSED)).current;

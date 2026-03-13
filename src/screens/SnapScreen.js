@@ -12,9 +12,11 @@ import {
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import Svg, { Path, Circle, Polyline, Line } from 'react-native-svg';
 import { colors } from '../constants/colors';
+import { palette, fontSize, fontWeight, space, radius, shadow } from '../constants/tokens';
 import { useAuth } from '../context/AuthContext';
 import { uploadRoomPhoto } from '../services/supabase';
 import { generateInteriorDesign } from '../services/replicate';
+import { getProductsForPrompt } from '../services/affiliateProducts';
 
 function FlashIcon({ off }) {
   return (
@@ -115,15 +117,21 @@ export default function SnapScreen({ navigation }) {
       setStatusText('Uploading photo…');
       const imageUrl = await uploadRoomPhoto(user?.id || 'anonymous', photo.uri, photo.base64);
 
+      const designPrompt = prompt || 'Modern minimalist redesign';
+
       setStatusText('Generating your design… (this takes ~30s)');
-      const resultUrl = await generateInteriorDesign(imageUrl, prompt || 'Modern minimalist redesign');
+      const resultUrl = await generateInteriorDesign(imageUrl, designPrompt);
+
+      setStatusText('Finding matching products…');
+      const matchedProducts = getProductsForPrompt(designPrompt, 6);
 
       setLoading(false);
       setStatusText('');
       navigation?.navigate('RoomResult', {
         imageUri: photo.uri,
         resultUri: resultUrl,
-        prompt: prompt || 'Modern minimalist redesign',
+        prompt: designPrompt,
+        products: matchedProducts,
       });
     } catch (err) {
       setLoading(false);
@@ -203,64 +211,64 @@ export default function SnapScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.black,
+    backgroundColor: palette.textPrimary,
   },
   camera: {
     flex: 1,
   },
   permissionContainer: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: palette.background,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 40,
+    paddingHorizontal: space['3xl'],
   },
   permissionTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: colors.black,
-    marginTop: 20,
-    marginBottom: 10,
+    fontSize: fontSize.lg,
+    fontWeight: fontWeight.bold,
+    color: palette.textPrimary,
+    marginTop: space.lg,
+    marginBottom: space.sm,
   },
   permissionText: {
-    fontSize: 14,
-    color: '#888',
+    fontSize: fontSize.sm,
+    color: palette.textSecondary,
     textAlign: 'center',
-    lineHeight: 20,
-    marginBottom: 30,
+    lineHeight: fontSize.sm * 1.5,
+    marginBottom: space['2xl'],
   },
   permissionBtn: {
-    backgroundColor: colors.bluePrimary,
-    paddingHorizontal: 32,
-    paddingVertical: 14,
-    borderRadius: 14,
+    backgroundColor: palette.primaryBlue,
+    paddingHorizontal: space['2xl'],
+    paddingVertical: space.md,
+    borderRadius: radius.md,
   },
   permissionBtnText: {
-    color: colors.white,
-    fontSize: 15,
-    fontWeight: '700',
+    color: palette.textWhite,
+    fontSize: fontSize.base,
+    fontWeight: fontWeight.bold,
   },
   topControls: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingTop: 60,
-    paddingHorizontal: 20,
+    paddingTop: space['5xl'] + space.xs,
+    paddingHorizontal: space.lg,
   },
   topRight: {
     flexDirection: 'row',
-    gap: 10,
+    gap: space.sm + 2,
   },
   controlBtn: {
     width: 44,
     height: 44,
-    borderRadius: 22,
+    borderRadius: radius.full,
     backgroundColor: 'rgba(0,0,0,0.35)',
     alignItems: 'center',
     justifyContent: 'center',
   },
   guideContainer: {
     flex: 1,
-    margin: 40,
+    margin: space['3xl'],
   },
   corner: {
     position: 'absolute',
@@ -273,9 +281,9 @@ const styles = StyleSheet.create({
   cornerBL: { bottom: 0, left: 0, borderBottomWidth: 2, borderLeftWidth: 2 },
   cornerBR: { bottom: 0, right: 0, borderBottomWidth: 2, borderRightWidth: 2 },
   bottomOverlay: {
-    paddingHorizontal: 20,
-    paddingBottom: 40,
-    gap: 14,
+    paddingHorizontal: space.lg,
+    paddingBottom: space['3xl'],
+    gap: space.md + 2,
   },
   promptWrap: {
     flexDirection: 'row',
@@ -283,37 +291,37 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.5)',
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.15)',
-    borderRadius: 16,
-    paddingHorizontal: 16,
+    borderRadius: radius.lg,
+    paddingHorizontal: space.base,
     height: 50,
-    gap: 10,
+    gap: space.sm + 2,
   },
   promptInput: {
     flex: 1,
-    color: colors.white,
-    fontSize: 14,
+    color: palette.textWhite,
+    fontSize: fontSize.sm,
   },
   generateBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: colors.bluePrimary,
-    borderRadius: 16,
+    backgroundColor: palette.primaryBlue,
+    borderRadius: radius.lg,
     height: 54,
-    gap: 10,
+    gap: space.sm + 2,
   },
   generateBtnDisabled: {
     opacity: 0.7,
   },
   generateText: {
-    color: colors.white,
-    fontSize: 16,
-    fontWeight: '700',
+    color: palette.textWhite,
+    fontSize: fontSize.md,
+    fontWeight: fontWeight.bold,
   },
   statusText: {
     color: 'rgba(255,255,255,0.85)',
-    fontSize: 13,
-    fontWeight: '500',
-    marginLeft: 8,
+    fontSize: fontSize.sm,
+    fontWeight: fontWeight.medium,
+    marginLeft: space.sm,
   },
 });
