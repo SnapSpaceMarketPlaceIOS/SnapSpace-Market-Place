@@ -8,6 +8,7 @@ import {
   Dimensions,
   Image,
 } from 'react-native';
+import CardImage from '../components/CardImage';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path, Polyline } from 'react-native-svg';
 import { colors as C } from '../constants/theme';
@@ -106,15 +107,7 @@ export default function LikedScreen({ navigation }) {
                 onPress={() => handleCardPress(design)}
               >
                 <View style={styles.cellImg}>
-                  {design.imageUrl ? (
-                    <Image
-                      source={{ uri: design.imageUrl }}
-                      style={styles.cellPhoto}
-                      resizeMode="cover"
-                    />
-                  ) : (
-                    <View style={styles.cellPhotoFallback} />
-                  )}
+                  <CardImage uri={design.imageUrl} style={styles.cellPhoto} placeholderColor="#D0D7E3" />
                   {/* Unlike button */}
                   <TouchableOpacity
                     style={styles.heartBtn}

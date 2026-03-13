@@ -9,6 +9,7 @@ import {
   Alert,
   Image,
 } from 'react-native';
+import CardImage from '../components/CardImage';
 import Svg, { Path, Circle, Polyline, Line } from 'react-native-svg';
 import { colors } from '../constants/colors';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -70,6 +71,7 @@ export default function ShopTheLookScreen({ route, navigation }) {
   const { addToCart, items } = useCart();
   const [addedKeys, setAddedKeys] = useState({});
   const [products, setProducts] = useState(design.products || []);
+  const [heroImgError, setHeroImgError] = useState(false);
 
   useEffect(() => {
     const matched = getProductsForDesign(design, 5);
@@ -124,7 +126,16 @@ export default function ShopTheLookScreen({ route, navigation }) {
         {/* Post Preview Card */}
         <View style={styles.postCard}>
           <View style={styles.postImage}>
-            <Skeleton width="100%" height="100%" borderRadius={0} />
+            {design.imageUrl && !heroImgError ? (
+              <Image
+                source={{ uri: design.imageUrl }}
+                style={StyleSheet.absoluteFill}
+                resizeMode="cover"
+                onError={() => setHeroImgError(true)}
+              />
+            ) : (
+              <Skeleton width="100%" height="100%" borderRadius={0} />
+            )}
           </View>
           <View style={styles.postInfo}>
             <View style={styles.postUserRow}>
@@ -158,15 +169,11 @@ export default function ShopTheLookScreen({ route, navigation }) {
               onPress={() => navigation.navigate('ProductDetail', { product, design })}
             >
               <View style={styles.productImgWrap}>
-                {product.imageUrl ? (
-                  <Image
-                    source={{ uri: product.imageUrl }}
-                    style={{ width: 56, height: 56, borderRadius: radius.lg }}
-                    resizeMode="cover"
-                  />
-                ) : (
-                  <Skeleton width={56} height={56} borderRadius={radius.lg} />
-                )}
+                <CardImage
+                  uri={product.imageUrl}
+                  style={{ width: 56, height: 56, borderRadius: radius.lg }}
+                  placeholderColor="#D0D7E3"
+                />
               </View>
               <View style={styles.productDetails}>
                 <Text style={styles.productName}>{product.name}</Text>

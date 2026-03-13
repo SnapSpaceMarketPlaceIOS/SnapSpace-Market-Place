@@ -201,6 +201,7 @@ function searchAndFilter(designs, query, categoryIndex, roomTypeFilter, styleFil
 
 function GridCard({ design, isLiked, onLike, onPress }) {
   const heartScale = useRef(new Animated.Value(1)).current;
+  const [imgError, setImgError] = useState(false);
 
   const handleLike = () => {
     onLike();
@@ -230,14 +231,16 @@ function GridCard({ design, isLiked, onLike, onPress }) {
       {/* Card image or placeholder */}
       <View style={styles.cardImg}>
         <View style={styles.cardImgBg} />
-        {design.imageUrl ? (
+        {design.imageUrl && !imgError ? (
           <Image
             source={{ uri: design.imageUrl }}
             style={styles.cardImgPhoto}
             resizeMode="cover"
-            onError={() => {}}
+            onError={() => setImgError(true)}
           />
-        ) : null}
+        ) : (
+          <ImagePlaceholderIcon />
+        )}
         {/* Action buttons */}
         <View style={styles.cardActions}>
           <TouchableOpacity

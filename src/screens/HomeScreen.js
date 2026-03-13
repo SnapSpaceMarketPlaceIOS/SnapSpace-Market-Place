@@ -18,6 +18,7 @@ import { fontSize, fontWeight, letterSpacing, palette, space, radius, shadow, ty
 import { colors as C } from '../constants/theme';
 import SectionHeader from '../components/ds/SectionHeader';
 import Badge, { HeartCountPill } from '../components/ds/Badge';
+import CardImage from '../components/CardImage';
 import { useAuth } from '../context/AuthContext';
 import { useLiked } from '../context/LikedContext';
 import { DESIGNS } from '../data/designs';
@@ -35,21 +36,21 @@ const COLL_CARD_W = (width - space.lg * 2 - space.sm) / 2;
 const STYLE_CARD_W = Math.floor((width - space.lg * 2 - space.sm * 2) / 3);
 
 const HERO_IMAGES = [
-  'https://images.unsplash.com/photo-1613545325268-9265e1609167?w=1600&q=90&fit=crop',
-  'https://images.unsplash.com/photo-1632119580908-ae947d4c7691?w=1600&q=90&fit=crop',
-  'https://images.unsplash.com/photo-1628744876490-19b035ecf9c3?w=1600&q=90&fit=crop',
-  'https://images.unsplash.com/photo-1638541420159-cadd0634f08f?w=1600&q=90&fit=crop',
-  'https://images.unsplash.com/photo-1639059790587-95625e6b764c?w=1600&q=90&fit=crop',
-  'https://images.unsplash.com/photo-1649083048770-82e8ffd80431?w=1600&q=90&fit=crop',
-  'https://images.unsplash.com/photo-1669387448840-610c588f003d?w=1600&q=90&fit=crop',
-  'https://images.unsplash.com/photo-1668512624222-2e375314be39?w=1600&q=90&fit=crop',
-  'https://images.unsplash.com/photo-1590490359854-dfba19688d70?w=1600&q=90&fit=crop',
-  'https://images.unsplash.com/photo-1668512624275-0ee56aca4c1a?w=1600&q=90&fit=crop',
-  'https://images.unsplash.com/photo-1719297493975-0fa857dcc8b8?w=1600&q=90&fit=crop',
-  'https://images.unsplash.com/photo-1615529182904-14819c35db37?w=1600&q=90&fit=crop',
-  'https://images.unsplash.com/photo-1760067538241-33a8694d9e23?w=1600&q=90&fit=crop',
-  'https://images.unsplash.com/photo-1628744876497-eb30460be9f6?w=1600&q=90&fit=crop',
-  'https://images.unsplash.com/photo-1679862342541-e408d4f3ab80?w=1600&q=90&fit=crop',
+  'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1600&q=90&fit=crop',
+  'https://images.unsplash.com/photo-1616046229478-9901c5536a45?w=1600&q=90&fit=crop',
+  'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=1600&q=90&fit=crop',
+  'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=1600&q=90&fit=crop',
+  'https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?w=1600&q=90&fit=crop',
+  'https://images.unsplash.com/photo-1565538810643-b5bdb714032a?w=1600&q=90&fit=crop',
+  'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1600&q=90&fit=crop',
+  'https://images.unsplash.com/photo-1540518614846-7eded433c457?w=1600&q=90&fit=crop',
+  'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=1600&q=90&fit=crop',
+  'https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?w=1600&q=90&fit=crop',
+  'https://images.unsplash.com/photo-1618219908412-a29a1bb7b86e?w=1600&q=90&fit=crop',
+  'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1600&q=90&fit=crop',
+  'https://images.unsplash.com/photo-1550581190-9c1c48d21d6c?w=1600&q=90&fit=crop',
+  'https://images.unsplash.com/photo-1593642632559-0c6d3fc62b89?w=1600&q=90&fit=crop',
+  'https://images.unsplash.com/photo-1513694203232-719a280e022f?w=1600&q=90&fit=crop',
 ];
 
 // ── Room type quick-nav ────────────────────────────────────────────────────────
@@ -342,7 +343,7 @@ const STYLE_CATEGORIES = [
     imageUrl: 'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=600&q=85' },
   { key: 'farmhouse',   label: 'Farmhouse',   sub: 'Warm & Rooted',  size: 'short',
     bg: '#FAF6F0', text: '#713F12', accent: '#A16207',
-    imageUrl: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=600&q=85' },
+    imageUrl: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=600&q=85' },
 ];
 
 // Product counts per style (computed once at module load)
@@ -868,16 +869,12 @@ export default function HomeScreen({ navigation }) {
                 activeOpacity={0.82}
                 onPress={() => navigation?.navigate('ShopTheLook', { design })}
               >
-                <Image
-                  source={{ uri: design.imageUrl }}
-                  style={styles.forYouCardImg}
-                  resizeMode="cover"
-                />
-                <LinearGradient
-                  colors={['rgba(0,0,0,0.18)', 'transparent', 'rgba(0,0,0,0.72)']}
-                  locations={[0, 0.4, 1]}
-                  style={StyleSheet.absoluteFill}
-                />
+    <CardImage uri={design.imageUrl} style={styles.forYouCardImg} />
+    <LinearGradient
+      colors={['rgba(0,0,0,0.18)', 'transparent', 'rgba(0,0,0,0.72)']}
+      locations={[0, 0.4, 1]}
+      style={StyleSheet.absoluteFill}
+    />
                 {/* Style badge top-left — outline ghost style */}
                 {design.styles?.[0] && (
                   <Badge
@@ -917,11 +914,7 @@ export default function HomeScreen({ navigation }) {
                   heroImage: col.imageUrl,
                 })}
               >
-                <Image
-                  source={{ uri: col.imageUrl }}
-                  style={styles.collectionCardImg}
-                  resizeMode="cover"
-                />
+                <CardImage uri={col.imageUrl} style={styles.collectionCardImg} placeholderColor="#D0D7E3" />
                 <LinearGradient
                   colors={['transparent', 'rgba(0,0,0,0.75)']}
                   locations={[0.3, 1]}
@@ -968,11 +961,7 @@ export default function HomeScreen({ navigation }) {
                     title: cat.label,
                   })}
                 >
-                  <Image
-                    source={{ uri: cat.imageUrl }}
-                    style={StyleSheet.absoluteFill}
-                    resizeMode="cover"
-                  />
+                  <CardImage uri={cat.imageUrl} style={StyleSheet.absoluteFill} placeholderColor="#C8D4E8" />
                   <LinearGradient
                     colors={['transparent', 'rgba(0,0,0,0.72)']}
                     locations={[0.3, 1]}
@@ -1011,11 +1000,7 @@ export default function HomeScreen({ navigation }) {
                 activeOpacity={0.85}
                 onPress={() => navigation?.navigate('ShopTheLook', { design })}
               >
-                <Image
-                  source={{ uri: design.imageUrl }}
-                  style={styles.collectionCardImg}
-                  resizeMode="cover"
-                />
+                <CardImage uri={design.imageUrl} style={styles.collectionCardImg} placeholderColor="#D0D7E3" />
                 <LinearGradient
                   colors={['transparent', 'rgba(0,0,0,0.75)']}
                   locations={[0.3, 1]}
@@ -1078,15 +1063,7 @@ export default function HomeScreen({ navigation }) {
                   <View style={styles.dealImgOuter}>
                     <View style={styles.dealImgGlowRing} />
                     <View style={styles.dealImgWrap}>
-                      {dealProduct.imageUrl ? (
-                        <Image
-                          source={{ uri: dealProduct.imageUrl }}
-                          style={styles.dealImg}
-                          resizeMode="cover"
-                        />
-                      ) : (
-                        <View style={[styles.dealImg, { backgroundColor: '#1A2E50' }]} />
-                      )}
+    <CardImage uri={dealProduct.imageUrl} style={styles.dealImg} placeholderColor="#1A2E50" />
                     </View>
                   </View>
 
@@ -1144,15 +1121,7 @@ export default function HomeScreen({ navigation }) {
                 onPress={() => navigation?.navigate('ShopTheLook', { design })}
               >
                 <View style={styles.portraitCardImgWrap}>
-                  {design.imageUrl ? (
-                    <Image
-                      source={{ uri: design.imageUrl }}
-                      style={styles.portraitCardImg}
-                      resizeMode="cover"
-                    />
-                  ) : (
-                    <View style={[styles.portraitCardImg, { backgroundColor: '#D0D7E3' }]} />
-                  )}
+      <CardImage uri={design.imageUrl} style={styles.portraitCardImg} />
                   <LinearGradient
                     colors={['transparent', 'rgba(0,0,0,0.52)']}
                     locations={[0.35, 1]}
@@ -1198,11 +1167,7 @@ export default function HomeScreen({ navigation }) {
                   activeOpacity={0.82}
                   onPress={() => navigation?.navigate('ShopTheLook', { design: item })}
                 >
-                  {item.imageUrl ? (
-                    <Image source={{ uri: item.imageUrl }} style={styles.recentCardImg} resizeMode="cover" />
-                  ) : (
-                    <View style={[styles.recentCardImg, { backgroundColor: '#E5E7EB' }]} />
-                  )}
+    <CardImage uri={item.imageUrl} style={styles.recentCardImg} placeholderColor="#E5E7EB" />
                   <Text style={styles.recentCardTitle} numberOfLines={2}>{item.title?.replace('...', '')}</Text>
                 </TouchableOpacity>
               ))}
@@ -1231,15 +1196,7 @@ export default function HomeScreen({ navigation }) {
                 activeOpacity={0.85}
                 onPress={() => navigation?.navigate('ProductDetail', { product })}
               >
-                {product.imageUrl ? (
-                  <Image
-                    source={{ uri: product.imageUrl }}
-                    style={styles.collectionCardImg}
-                    resizeMode="cover"
-                  />
-                ) : (
-                  <View style={[styles.collectionCardImg, { backgroundColor: '#E8EDF5' }]} />
-                )}
+    <CardImage uri={product.imageUrl} style={styles.collectionCardImg} placeholderColor="#E8EDF5" />
                 <LinearGradient
                   colors={['transparent', 'rgba(0,0,0,0.75)']}
                   locations={[0.3, 1]}

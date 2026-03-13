@@ -14,6 +14,7 @@ import {
   PanResponder,
   Linking,
 } from 'react-native';
+import CardImage from '../components/CardImage';
 import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Path, Circle, Line, Polyline } from 'react-native-svg';
 import { colors } from '../constants/colors';
@@ -249,17 +250,7 @@ export default function RoomResultScreen({ route, navigation }) {
               const isAdded = addedItems[product.id];
               return (
                 <View key={product.id} style={styles.productCard}>
-                  {product.imageUrl ? (
-                    <Image
-                      source={{ uri: product.imageUrl }}
-                      style={styles.productThumb}
-                      resizeMode="cover"
-                    />
-                  ) : (
-                    <View style={[styles.productThumb, { backgroundColor: '#2C3E50' }]}>
-                      <SofaIcon />
-                    </View>
-                  )}
+                  <CardImage uri={product.imageUrl} style={styles.productThumb} placeholderColor="#2C3E50" />
                   <Text style={styles.productName} numberOfLines={2}>{product.name}</Text>
                   <Text style={styles.productRetailer}>{product.brand}</Text>
                   <View style={styles.productBottom}>

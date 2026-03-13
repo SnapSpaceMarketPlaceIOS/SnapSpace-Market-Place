@@ -8,6 +8,7 @@ import {
   Image,
   Dimensions,
 } from 'react-native';
+import CardImage from '../components/CardImage';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Path, Polyline, Circle } from 'react-native-svg';
@@ -172,7 +173,7 @@ export default function BrowseScreen({ navigation, route }) {
         {/* ── Hero banner ───────────────────────────────────────────── */}
         {resolvedHero ? (
           <View style={styles.hero}>
-            <Image source={{ uri: resolvedHero }} style={styles.heroImage} resizeMode="cover" />
+            <CardImage uri={resolvedHero} style={styles.heroImage} />
             <LinearGradient
               colors={['rgba(0,0,0,0.08)', 'rgba(0,0,0,0.55)']}
               locations={[0.3, 1]}
@@ -211,15 +212,7 @@ export default function BrowseScreen({ navigation, route }) {
                   activeOpacity={0.85}
                   onPress={() => navigation.navigate('ShopTheLook', { design })}
                 >
-                  {design.imageUrl ? (
-                    <Image
-                      source={{ uri: design.imageUrl }}
-                      style={styles.designCardImg}
-                      resizeMode="cover"
-                    />
-                  ) : (
-                    <View style={[styles.designCardImg, { backgroundColor: '#D0D7E3' }]} />
-                  )}
+                  <CardImage uri={design.imageUrl} style={styles.designCardImg} placeholderColor="#D0D7E3" />
                   <LinearGradient
                     colors={['rgba(0,0,0,0.04)', 'transparent', 'rgba(0,0,0,0.70)']}
                     locations={[0, 0.35, 1]}
@@ -259,15 +252,7 @@ export default function BrowseScreen({ navigation, route }) {
                 >
                   {/* Image container — gradient and badge scoped inside */}
                   <View style={styles.productCardImgWrap}>
-                    {product.imageUrl ? (
-                      <Image
-                        source={{ uri: product.imageUrl }}
-                        style={styles.productCardImg}
-                        resizeMode="cover"
-                      />
-                    ) : (
-                      <View style={[styles.productCardImg, { backgroundColor: '#E8EDF5' }]} />
-                    )}
+                    <CardImage uri={product.imageUrl} style={styles.productCardImg} placeholderColor="#E8EDF5" />
                     <LinearGradient
                       colors={['transparent', 'rgba(0,0,0,0.55)']}
                       locations={[0.5, 1]}

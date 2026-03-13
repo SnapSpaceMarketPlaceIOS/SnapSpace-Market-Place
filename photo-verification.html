@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Photo Verification</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #0a0a0a;
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px;
+    }
+    .container {
+      max-width: 1200px;
+      width: 100%;
+    }
+    h1 {
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 10px;
+      color: #fff;
+    }
+    .photo-id {
+      font-size: 14px;
+      color: #888;
+      margin-bottom: 30px;
+      font-family: 'Courier New', monospace;
+    }
+    .image-wrapper {
+      background: #1a1a1a;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 30px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    }
+    img {
+      width: 100%;
+      height: auto;
+      border-radius: 8px;
+      display: block;
+      max-height: 70vh;
+      object-fit: contain;
+    }
+    .controls {
+      display: flex;
+      gap: 15px;
+      margin-top: 20px;
+    }
+    button {
+      flex: 1;
+      padding: 15px 30px;
+      font-size: 16px;
+      font-weight: 600;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-prev {
+      background: #333;
+      color: #fff;
+    }
+    .btn-prev:hover { background: #444; }
+    .btn-next {
+      background: #0B6DC3;
+      color: #fff;
+    }
+    .btn-next:hover { background: #035DA8; }
+    .progress {
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 14px;
+      color: #888;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="progress" id="progress">Loading...</div>
+    <h1 id="title">Photo Verification</h1>
+    <div class="photo-id" id="photoId"></div>
+    <div class="image-wrapper">
+      <img id="mainImage" src="" alt="Photo" />
+    </div>
+    <div class="controls">
+      <button class="btn-prev" onclick="prevPhoto()">← Previous</button>
+      <button class="btn-next" onclick="nextPhoto()">Next →</button>
+    </div>
+  </div>
+
+  <script>
+    const photos = [
+      'photo-1588880331179-bc9b93a8cb5e',
+      'photo-1555396273-367ea4eb4db5',
+      'photo-1581428982868-e410dd047a90',
+      'photo-1558618666-fcd25c85cd64',
+      'photo-1600566753086-00f18fb6b3ea',
+      'photo-1567016376408-0226e4d0c1ea',
+      'photo-1552321554-5fefe8c9ef14',
+      'photo-1560185127-6ed189bf02f4',
+      'photo-1570288685369-f7305163d0e3',
+      'photo-1517089596392-fb9a9033e05b',
+      'photo-1584622650111-993a426fbf0a',
+      'photo-1502005229762-cf1b2da7c5d6',
+      'photo-1607604276583-eef5d076aa5f',
+      'photo-1530099486328-e021101a494a',
+      'photo-1565028100600-4a33e22e2527',
+      'photo-1555529669-e69e7aa0ba9a',
+      'photo-1536318431364-5cc762cfc8ec',
+      'photo-1525610553991-2bede1a236e2',
+      'photo-1484101403633-562f891dc89a',
+      'photo-1531973486364-5fa64260d75b',
+      'photo-1505330622279-bf7d7fc918f4',
+      'photo-1533090161767-e6ffed986c88',
+      'photo-1497366412874-3415097a27e7',
+      'photo-1600210492493-0946911123ea',
+      'photo-1565182999561-18d7dc61c393',
+      'photo-1516455590571-18256e5bb9ff',
+      'photo-1615873968403-89e068629265',
+      'photo-1512820790803-83ca734da794'
+    ];
+
+    let currentIndex = 0;
+
+    function updatePhoto() {
+      const photoId = photos[currentIndex];
+      const imageUrl = `https://images.unsplash.com/${photoId}?w=800&q=80`;
+      
+      document.getElementById('mainImage').src = imageUrl;
+      document.getElementById('photoId').textContent = `Photo ID: ${photoId}`;
+      document.getElementById('progress').textContent = `Photo ${currentIndex + 1} of ${photos.length}`;
+    }
+
+    function nextPhoto() {
+      if (currentIndex < photos.length - 1) {
+        currentIndex++;
+        updatePhoto();
+      }
+    }
+
+    function prevPhoto() {
+      if (currentIndex > 0) {
+        currentIndex--;
+        updatePhoto();
+      }
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight') nextPhoto();
+      if (e.key === 'ArrowLeft') prevPhoto();
+    });
+
+    updatePhoto();
+  </script>
+</body>
+</html>
