@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useRef } from 'react';
+import React, { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -14,12 +14,12 @@ import {
   Image,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useFocusEffect } from '@react-navigation/native';
 import Svg, { Circle, Line, Path, Rect, Polyline } from 'react-native-svg';
 import { fontSize, fontWeight, letterSpacing, space, radius, shadow, typeScale } from '../constants/tokens';
 import theme from '../constants/theme';
 import { useLiked } from '../context/LikedContext';
 import { DESIGNS } from '../data/designs';
-import Skeleton from '../components/Skeleton';
 import PressableCard from '../components/PressableCard';
 import { SellerName } from '../components/VerifiedBadge';
 import { getProductsForDesign } from '../services/affiliateProducts';
@@ -125,61 +125,72 @@ const CATEGORY_KEYWORDS = [
 
 // ── Search engine ──────────────────────────────────────────────────────────────
 
-function searchAndFilter(designs, query, categoryIndex) {
+function searchAndFilter(designs, query, categoryIndex, roomTypeFilter, styleFilter) {
   const raw = query.trim().toLowerCase().replace(/^#/, '');
 
-  // Step 1: category filter
+  // Step 1: roomType filter (from route params)
+  let pool = designs;
+  if (roomTypeFilter) {
+    const rt = roomTypeFilter.toLowerCase();
+    pool = pool.filter((d) => {
+      const dRoom = (d.roomType || '').toLowerCase();
+      // Match 'living-room' → 'living', 'bedroom' → 'bedroom', etc.
+      return dRoom === rt ||
+        dRoom === rt.replace('-room', '') ||
+        rt.replace('-room', '') === dRoom.replace('-room', '') ||
+        (d.tags || []).some(t => t.toLowerCase().includes(rt.replace('-room', '')));
+    });
+  }
+
+  // Step 2: style filter (from route params or chip selection)
+  if (styleFilter) {
+    pool = pool.filter((d) => (d.styles || []).includes(styleFilter));
+  }
+
+  // Step 3: category filter (existing tab pills)
   const keywords = CATEGORY_KEYWORDS[categoryIndex] ?? [];
-  let pool = categoryIndex === 0
-    ? designs
-    : designs.filter((d) => {
-        const haystack = [
-          d.title,
-          d.description,
-          ...d.tags,
-        ].join(' ').toLowerCase();
-        return keywords.some((kw) => haystack.includes(kw));
-      });
+  if (categoryIndex !== 0) {
+    pool = pool.filter((d) => {
+      const haystack = [d.title, d.description, ...(d.tags || [])].join(' ').toLowerCase();
+      return keywords.some((kw) => haystack.includes(kw));
+    });
+  }
 
-  // Step 2: if no search query return category-filtered results as-is
-  if (!raw) return pool;
+  // Step 4: if no text query return filtered pool sorted by likes
+  if (!raw) return pool.sort((a, b) => b.likes - a.likes);
 
-  // Step 3: score each design
+  // Step 5: score by text relevance
   const scored = pool.map((d) => {
     let score = 0;
     const titleLower = d.title.toLowerCase();
     const descLower  = d.description.toLowerCase();
     const userLower  = d.user.toLowerCase();
 
-    // Title match
     if (titleLower.includes(raw)) score += 4;
 
-    // Tag matches
-    d.tags.forEach((tag) => {
+    (d.tags || []).forEach((tag) => {
       const clean = tag.toLowerCase().replace(/^#/, '');
-      if (clean === raw)          score += 4; // exact
-      else if (clean.includes(raw)) score += 2; // partial
+      if (clean === raw)            score += 4;
+      else if (clean.includes(raw)) score += 2;
     });
 
-    // Description match
     if (descLower.includes(raw)) score += 2;
 
-    // Product name / brand match
-    d.products.forEach((p) => {
-      if (p.name.toLowerCase().includes(raw))  score += 2;
-      if (p.brand.toLowerCase().includes(raw)) score += 1;
+    (d.products || []).forEach((p) => {
+      if ((p.name || '').toLowerCase().includes(raw))  score += 2;
+      if ((p.brand || '').toLowerCase().includes(raw)) score += 1;
     });
 
-    // Username match
     if (userLower.includes(raw)) score += 1;
 
-    // Social-proof tie-break
-    score *= 1 + d.likes / 1000;
+    // Style/room match bonus
+    if ((d.styles || []).some(s => s.includes(raw))) score += 3;
+    if ((d.roomType || '').includes(raw)) score += 2;
 
+    score *= 1 + d.likes / 1000;
     return { design: d, score };
   });
 
-  // Step 4: filter out zero-score results and sort descending
   return scored
     .filter((s) => s.score > 0)
     .sort((a, b) => b.score - a.score)
@@ -254,9 +265,26 @@ function GridCard({ design, isLiked, onLike, onPress }) {
   );
 }
 
+// ── Style label map ──────────────────────────────────────────────────────────
+const STYLE_LABEL_MAP = {
+  minimalist: 'Minimalist', scandi: 'Scandi', bohemian: 'Boho',
+  luxury: 'Luxury', japandi: 'Japandi', 'mid-century': 'Mid-Century',
+  'dark-luxe': 'Dark Luxe', farmhouse: 'Farmhouse', biophilic: 'Biophilic',
+  glam: 'Glam', rustic: 'Rustic', coastal: 'Coastal', retro: 'Retro',
+  'wabi-sabi': 'Wabi-Sabi', industrial: 'Industrial',
+  'french-country': 'French Country', 'art-deco': 'Art Deco', transitional: 'Transitional',
+};
+
+const ROOM_LABEL_MAP = {
+  'living-room': 'Living Room', bedroom: 'Bedroom', kitchen: 'Kitchen',
+  'dining-room': 'Dining Room', office: 'Office', outdoor: 'Outdoor',
+  bathroom: 'Bathroom', entryway: 'Entryway', 'kids-room': 'Kids Room',
+  nursery: 'Nursery',
+};
+
 // ── Main Component ─────────────────────────────────────────────────────────────
 
-export default function ExploreScreen({ navigation }) {
+export default function ExploreScreen({ navigation, route }) {
   const { liked, toggleLiked } = useLiked();
   const [activeCategory, setActiveCategory] = useState(0);
   const [search, setSearch] = useState('');
@@ -264,15 +292,78 @@ export default function ExploreScreen({ navigation }) {
   const [showPostModal, setShowPostModal] = useState(false);
   const [selectedTags, setSelectedTags] = useState(['#Minimalist']);
 
+  // ── Incoming filter state from navigation params ─────────────────────────
+  const [activeRoomFilter, setActiveRoomFilter] = useState(null);
+  const [activeStyleFilter, setActiveStyleFilter] = useState(null);
+  const [filterLabel, setFilterLabel] = useState(null);
+  const [overrideDesigns, setOverrideDesigns] = useState(null);
+  const consumedParamsRef = useRef(null);
+
+  // Apply params on every focus (handles tab-switch AND fresh navigation)
+  useFocusEffect(
+    useCallback(() => {
+      const params = route?.params;
+      if (!params || params === consumedParamsRef.current) return;
+      consumedParamsRef.current = params;
+
+      // Clear previous filters before applying new ones
+      setActiveRoomFilter(null);
+      setActiveStyleFilter(null);
+      setOverrideDesigns(null);
+      setActiveCategory(0);
+      setSearch('');
+
+      if (params.filterRoomType) {
+        setActiveRoomFilter(params.filterRoomType);
+        setFilterLabel(params.title || ROOM_LABEL_MAP[params.filterRoomType] || params.filterRoomType);
+      } else if (params.filterStyle) {
+        setActiveStyleFilter(params.filterStyle);
+        setFilterLabel(params.title || STYLE_LABEL_MAP[params.filterStyle] || params.filterStyle);
+      } else if (params.designs) {
+        setOverrideDesigns(params.designs);
+        setFilterLabel(params.title || null);
+      } else if (params.filterQuery) {
+        // Pre-fill the search bar from home search
+        setSearch(params.filterQuery);
+        setFilterLabel(params.title || params.filterQuery);
+      } else if (params.title) {
+        setFilterLabel(params.title);
+      }
+    }, [route?.params]),
+  );
+
+  const clearFilters = useCallback(() => {
+    setActiveRoomFilter(null);
+    setActiveStyleFilter(null);
+    setOverrideDesigns(null);
+    setFilterLabel(null);
+    setActiveCategory(0);
+    setSearch('');
+    // Reset route params so next navigation can apply fresh ones
+    navigation.setParams({
+      filterRoomType: undefined,
+      filterStyle: undefined,
+      designs: undefined,
+      filterQuery: undefined,
+      title: undefined,
+    });
+    consumedParamsRef.current = null;
+  }, [navigation]);
+
+  // filterLabel is set when any param-driven filter is active (room, style, designs, or query)
+  const hasActiveFilter = !!(activeRoomFilter || activeStyleFilter || overrideDesigns || filterLabel);
+
   const togglePostTag = (tag) => {
     setSelectedTags((prev) =>
       prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
     );
   };
 
+  const baseDesigns = overrideDesigns || DESIGNS;
+
   const filteredDesigns = useMemo(
-    () => searchAndFilter(DESIGNS, search, activeCategory),
-    [search, activeCategory],
+    () => searchAndFilter(baseDesigns, search, activeCategory, activeRoomFilter, activeStyleFilter),
+    [search, activeCategory, activeRoomFilter, activeStyleFilter, baseDesigns],
   );
 
   return (
@@ -283,8 +374,12 @@ export default function ExploreScreen({ navigation }) {
           contentContainerStyle={styles.scrollContent}
         >
           {/* ── Header ── */}
-          <Text style={styles.title}>Explore</Text>
-          <Text style={styles.subtitle}>Shop AI-Generated Room Designs</Text>
+          <Text style={styles.title}>{filterLabel && hasActiveFilter ? filterLabel : 'Explore'}</Text>
+          <Text style={styles.subtitle}>
+            {hasActiveFilter
+              ? `${filteredDesigns.length} AI-generated space${filteredDesigns.length !== 1 ? 's' : ''}`
+              : 'Shop AI-Generated Room Designs'}
+          </Text>
 
           {/* ── Search Row ── */}
           <View style={styles.searchRow}>
@@ -332,6 +427,23 @@ export default function ExploreScreen({ navigation }) {
             ))}
           </ScrollView>
           <View style={styles.tabBorder} />
+
+          {/* ── Active Filter Banner ── */}
+          {hasActiveFilter && (
+            <View style={styles.filterBanner}>
+              <View style={styles.filterBannerLeft}>
+                {filterLabel && (
+                  <Text style={styles.filterBannerTitle} numberOfLines={1}>{filterLabel}</Text>
+                )}
+                <Text style={styles.filterBannerCount}>
+                  {filteredDesigns.length} space{filteredDesigns.length !== 1 ? 's' : ''}
+                </Text>
+              </View>
+              <TouchableOpacity style={styles.filterClearBtn} onPress={clearFilters} activeOpacity={0.7}>
+                <Text style={styles.filterClearText}>✕  Clear</Text>
+              </TouchableOpacity>
+            </View>
+          )}
 
           {/* ── Grid ── */}
           {filteredDesigns.length === 0 ? (
@@ -1150,6 +1262,49 @@ const styles = StyleSheet.create({
   },
   postTagChipTextSelected: {
     color: TC.primary,
+  },
+
+  // ── Active filter banner ──────────────────────────────────────────────────
+  filterBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginHorizontal: space.lg,
+    marginBottom: space.md,
+    paddingHorizontal: space.base,
+    paddingVertical: 10,
+    backgroundColor: TC.primaryLight,
+    borderRadius: radius.md,
+    borderWidth: 1,
+    borderColor: 'rgba(29,78,216,0.14)',
+  },
+  filterBannerLeft: {
+    flex: 1,
+  },
+  filterBannerTitle: {
+    fontSize: fontSize.sm,
+    fontWeight: fontWeight.bold,
+    color: TC.primary,
+    letterSpacing: 0.2,
+    marginBottom: 1,
+  },
+  filterBannerCount: {
+    fontSize: 11,
+    color: TC.primary,
+    opacity: 0.72,
+  },
+  filterClearBtn: {
+    paddingHorizontal: space.md,
+    paddingVertical: 6,
+    borderRadius: radius.full,
+    backgroundColor: TC.primary,
+    marginLeft: space.sm,
+  },
+  filterClearText: {
+    fontSize: 11,
+    fontWeight: fontWeight.bold,
+    color: '#FFFFFF',
+    letterSpacing: 0.3,
   },
 
   // Empty state

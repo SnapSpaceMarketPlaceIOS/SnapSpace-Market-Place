@@ -42,6 +42,8 @@ import AdminApplicationsScreen from './src/screens/AdminApplicationsScreen';
 import AdminApplicationDetailScreen from './src/screens/AdminApplicationDetailScreen';
 import SupplierOnboardingScreen from './src/screens/SupplierOnboardingScreen';
 import SupplierDashboardScreen from './src/screens/SupplierDashboardScreen';
+import BrowseScreen from './src/screens/BrowseScreen';
+import AllCollectionsScreen from './src/screens/AllCollectionsScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -224,6 +226,8 @@ function RootNavigator() {
       <Stack.Screen name="AdminApplicationDetail" component={AdminApplicationDetailScreen} />
       <Stack.Screen name="SupplierOnboarding" component={SupplierOnboardingScreen} />
       <Stack.Screen name="SupplierDashboard" component={SupplierDashboardScreen} />
+      <Stack.Screen name="Browse" component={BrowseScreen} />
+      <Stack.Screen name="AllCollections" component={AllCollectionsScreen} />
     </Stack.Navigator>
   );
 }

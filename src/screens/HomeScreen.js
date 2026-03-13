@@ -66,6 +66,8 @@ const ROOM_TYPES = [
   { key: 'nursery',     label: 'Nursery',  bg: '#EBFAF9' },
 ];
 
+const NEW_ROOM_KEYS = ['entryway', 'kids-room', 'nursery'];
+
 const ROOM_ICON_PRIMARY   = '#0B6DC3';
 const ROOM_ICON_ACCENT    = '#67ACE9';
 const ROOM_ICON_WARM      = '#E07B39';
@@ -674,7 +676,11 @@ export default function HomeScreen({ navigation }) {
               <View style={styles.logoDot} />
             </View>
             <View style={styles.topIcons}>
-              <TouchableOpacity style={styles.iconBtn} activeOpacity={0.75}>
+              <TouchableOpacity
+                style={styles.iconBtn}
+                activeOpacity={0.75}
+                onPress={() => navigation?.navigate('Notifications')}
+              >
                 <BellIcon />
               </TouchableOpacity>
               <TouchableOpacity
@@ -710,7 +716,21 @@ export default function HomeScreen({ navigation }) {
                 onChangeText={setPrompt}
                 returnKeyType="search"
               />
-              <TouchableOpacity style={styles.searchSendBtn} activeOpacity={0.8}>
+              <TouchableOpacity
+                style={styles.searchSendBtn}
+                activeOpacity={0.8}
+                onPress={() => {
+                  if (prompt.trim()) {
+                    navigation?.navigate('Explore', {
+                      filterQuery: prompt.trim(),
+                      title: prompt.trim(),
+                    });
+                    setPrompt('');
+                  } else {
+                    navigation?.navigate('Explore');
+                  }
+                }}
+              >
                 <SendIcon />
               </TouchableOpacity>
             </View>
@@ -797,10 +817,20 @@ export default function HomeScreen({ navigation }) {
                   key={rt.key}
                   style={styles.roomNavItem}
                   activeOpacity={0.7}
-                  onPress={() => navigation?.navigate('Explore', { filterRoomType: rt.key })}
+                  onPress={() => navigation?.navigate('Explore', {
+                    filterRoomType: rt.key,
+                    title: rt.label,
+                  })}
                 >
-                  <View style={[styles.roomNavCircle, { backgroundColor: rt.bg }]}>
-                    <RoomIcon roomKey={rt.key} size={28} />
+                  <View style={styles.roomNavIconWrap}>
+                    <View style={[styles.roomNavCircle, { backgroundColor: rt.bg }]}>
+                      <RoomIcon roomKey={rt.key} size={28} />
+                    </View>
+                    {NEW_ROOM_KEYS.includes(rt.key) && (
+                      <View style={styles.roomNavNewBadge}>
+                        <Text style={styles.roomNavNewBadgeText}>NEW</Text>
+                      </View>
+                    )}
                   </View>
                   <Text style={styles.roomNavItemLabel}>{rt.label}</Text>
                 </TouchableOpacity>
@@ -816,7 +846,10 @@ export default function HomeScreen({ navigation }) {
             title={userStyleDNA.length > 0 ? 'PICKED FOR YOU' : 'TOP SPACES'}
             icon={<SparkleIcon size={13} color={C.primary} />}
             actionLabel="See all"
-            onAction={() => navigation?.navigate('Explore')}
+            onAction={() => navigation?.navigate('Explore', {
+              designs: forYouDesigns,
+              title: userStyleDNA.length > 0 ? 'Picked For You' : 'Top Spaces',
+            })}
           />
           {userStyleDNA.length > 0 && (
             <Text style={styles.sectionSub}>
@@ -868,7 +901,7 @@ export default function HomeScreen({ navigation }) {
             noTopMargin
             title="CURATED COLLECTIONS"
             actionLabel="See all"
-            onAction={() => navigation?.navigate('Explore')}
+            onAction={() => navigation?.navigate('AllCollections')}
           />
           <View style={styles.collectionsGrid}>
             {CURATED_COLLECTIONS.slice(0, 4).map(col => (
@@ -876,7 +909,13 @@ export default function HomeScreen({ navigation }) {
                 key={col.id}
                 style={styles.collectionCard}
                 activeOpacity={0.85}
-                onPress={() => navigation?.navigate('Explore', { filterStyle: col.styles[0] })}
+                onPress={() => navigation?.navigate('Browse', {
+                  mode: 'collection',
+                  title: col.title.replace('\n', ' '),
+                  subtitle: col.subtitle,
+                  collection: col,
+                  heroImage: col.imageUrl,
+                })}
               >
                 <Image
                   source={{ uri: col.imageUrl }}
@@ -904,7 +943,14 @@ export default function HomeScreen({ navigation }) {
 
         {/* ── 4. Shop By Style ────────────────────────────────────────── */}
         <View style={[styles.section, styles.sectionAlt]}>
-          <SectionHeader noTopMargin title="SHOP BY STYLE" />
+          <SectionHeader
+            noTopMargin
+            title="SHOP BY STYLE"
+            actionLabel="See all"
+            onAction={() => navigation?.navigate('Explore', {
+              title: 'All Styles',
+            })}
+          />
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
@@ -917,7 +963,10 @@ export default function HomeScreen({ navigation }) {
                   key={cat.key}
                   style={styles.styleChipCard}
                   activeOpacity={0.8}
-                  onPress={() => navigation?.navigate('Explore', { filterStyle: cat.key })}
+                  onPress={() => navigation?.navigate('Explore', {
+                    filterStyle: cat.key,
+                    title: cat.label,
+                  })}
                 >
                   <Image
                     source={{ uri: cat.imageUrl }}
@@ -943,59 +992,53 @@ export default function HomeScreen({ navigation }) {
           </ScrollView>
         </View>
 
-        {/* ── 5. Trending This Week (upgraded) ────────────────────────── */}
+        {/* ── 5. Trending This Week ────────────────────────────────────── */}
         <View style={styles.section}>
           <SectionHeader
             noTopMargin
             title="TRENDING THIS WEEK"
             actionLabel="See all"
-            onAction={() => navigation?.navigate('Explore')}
+            onAction={() => navigation?.navigate('Explore', {
+              designs: TRENDING_DESIGNS,
+              title: 'Trending This Week',
+            })}
           />
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.hScroll}
-          >
-            {TRENDING_DESIGNS.map(design => (
+          <View style={styles.collectionsGrid}>
+            {TRENDING_DESIGNS.slice(0, 4).map(design => (
               <TouchableOpacity
                 key={design.id}
-                style={styles.trendCard}
-                activeOpacity={0.82}
+                style={styles.collectionCard}
+                activeOpacity={0.85}
                 onPress={() => navigation?.navigate('ShopTheLook', { design })}
               >
-                <View style={styles.trendCardImgWrap}>
-                  <Image
-                    source={{ uri: design.imageUrl }}
-                    style={styles.trendCardImg}
-                    resizeMode="cover"
-                  />
-                  <LinearGradient
-                    colors={['transparent', 'rgba(0,0,0,0.45)']}
-                    locations={[0.4, 1]}
-                    style={StyleSheet.absoluteFill}
-                  />
-                  <Badge
-                    variant="style"
-                    label={`${design.products?.length || 3} items`}
-                    style={styles.trendItemsBadgePos}
-                  />
-                  <HeartCountPill
-                    count={design.likes}
-                    icon={<HeartIcon size={9} color="#fff" />}
-                    style={styles.trendLikeBadgePos}
-                  />
+                <Image
+                  source={{ uri: design.imageUrl }}
+                  style={styles.collectionCardImg}
+                  resizeMode="cover"
+                />
+                <LinearGradient
+                  colors={['transparent', 'rgba(0,0,0,0.75)']}
+                  locations={[0.3, 1]}
+                  style={StyleSheet.absoluteFill}
+                />
+                <View style={styles.collectionCardContent}>
+                  <Text style={styles.collectionCardTitle} numberOfLines={2}>
+                    {design.title.replace('...', '')}
+                  </Text>
+                  <View style={styles.collectionCardFooter}>
+                    <Text style={styles.collectionCardSub}>
+                      {design.styles?.[0]
+                        ? (STYLE_LABEL_MAP[design.styles[0]] || design.styles[0])
+                        : `♥ ${design.likes}`}
+                    </Text>
+                    <View style={styles.collectionExploreBtn}>
+                      <Text style={styles.collectionExploreBtnText}>View Look</Text>
+                    </View>
+                  </View>
                 </View>
-                <Text style={styles.trendCardTitle} numberOfLines={2}>
-                  {design.title.replace('...', '')}
-                </Text>
-                <Text style={styles.trendCardTag} numberOfLines={1}>
-                  {design.styles?.[0]
-                    ? (STYLE_LABEL_MAP[design.styles[0]] || design.styles[0])
-                    : design.user}
-                </Text>
               </TouchableOpacity>
             ))}
-          </ScrollView>
+          </View>
         </View>
 
         {/* ── 6. Deal of the Day — premium editorial treatment ────────── */}
@@ -1083,7 +1126,10 @@ export default function HomeScreen({ navigation }) {
             noTopMargin
             title="NEW ARRIVALS"
             actionLabel="See all"
-            onAction={() => navigation?.navigate('Explore')}
+            onAction={() => navigation?.navigate('Explore', {
+              designs: NEW_ARRIVALS,
+              title: 'New Arrivals',
+            })}
           />
           <ScrollView
             horizontal
@@ -1094,7 +1140,7 @@ export default function HomeScreen({ navigation }) {
               <TouchableOpacity
                 key={design.id}
                 style={styles.portraitCard}
-                activeOpacity={0.88}
+                activeOpacity={0.82}
                 onPress={() => navigation?.navigate('ShopTheLook', { design })}
               >
                 <View style={styles.portraitCardImgWrap}>
@@ -1108,7 +1154,8 @@ export default function HomeScreen({ navigation }) {
                     <View style={[styles.portraitCardImg, { backgroundColor: '#D0D7E3' }]} />
                   )}
                   <LinearGradient
-                    colors={['transparent', 'rgba(0,0,0,0.55)']}
+                    colors={['transparent', 'rgba(0,0,0,0.52)']}
+                    locations={[0.35, 1]}
                     style={StyleSheet.absoluteFill}
                   />
                   <Badge
@@ -1116,13 +1163,8 @@ export default function HomeScreen({ navigation }) {
                     label="NEW"
                     style={styles.newBadgePos}
                   />
-                  <Badge
-                    variant="style"
-                    label={`${design.products?.length ?? 0} items`}
-                    style={styles.portraitItemsBadgePos}
-                  />
                 </View>
-                <Text style={styles.portraitCardTitle} numberOfLines={2}>
+                <Text style={styles.portraitCardTitle} numberOfLines={1}>
                   {design.title.replace('...', '')}
                 </Text>
                 <Text style={styles.portraitCardTag}>
@@ -1168,57 +1210,65 @@ export default function HomeScreen({ navigation }) {
           </View>
         )}
 
-        {/* ── 9. Featured Products (upgraded) ─────────────────────────── */}
+        {/* ── 9. Featured Products ─────────────────────────────────────── */}
         <View style={styles.section}>
           <SectionHeader
             noTopMargin
             title="FEATURED PRODUCTS"
             actionLabel="Shop all"
-            onAction={() => navigation?.navigate('Explore')}
+            onAction={() => navigation?.navigate('Browse', {
+              mode: 'products',
+              title: 'Featured Products',
+              products: FEATURED_PRODUCTS,
+            })}
           />
           <Text style={styles.affiliateDisclosure}>We may earn a commission on purchases.</Text>
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.hScroll}
-          >
-            {FEATURED_PRODUCTS.map((product, i) => (
+          <View style={styles.collectionsGrid}>
+            {FEATURED_PRODUCTS.slice(0, 4).map((product, i) => (
               <TouchableOpacity
                 key={product.id || i}
-                style={styles.productCard}
-                activeOpacity={0.82}
+                style={styles.collectionCard}
+                activeOpacity={0.85}
                 onPress={() => navigation?.navigate('ProductDetail', { product })}
               >
-                <View style={styles.productCardImgWrap}>
-                  {product.imageUrl ? (
-                    <Image
-                      source={{ uri: product.imageUrl }}
-                      style={styles.productCardImg}
-                      resizeMode="cover"
-                    />
-                  ) : (
-                    <View style={[styles.productCardImg, { backgroundColor: '#E8EDF5' }]} />
-                  )}
-                  <Badge
-                    variant="source"
-                    label={product.source === 'amazon' ? 'Amazon' : product.source}
-                    color={getSourceColor(product.source)}
-                    style={styles.productSourceBadgePos}
+                {product.imageUrl ? (
+                  <Image
+                    source={{ uri: product.imageUrl }}
+                    style={styles.collectionCardImg}
+                    resizeMode="cover"
                   />
-                  {/* Quick-add overlay */}
-                  <TouchableOpacity
-                    style={styles.quickAddBtn}
-                    activeOpacity={0.8}
-                    onPress={() => navigation?.navigate('ProductDetail', { product })}
-                  >
-                    <Text style={styles.quickAddText}>+</Text>
-                  </TouchableOpacity>
+                ) : (
+                  <View style={[styles.collectionCardImg, { backgroundColor: '#E8EDF5' }]} />
+                )}
+                <LinearGradient
+                  colors={['transparent', 'rgba(0,0,0,0.75)']}
+                  locations={[0.3, 1]}
+                  style={StyleSheet.absoluteFill}
+                />
+                <Badge
+                  variant="source"
+                  label={product.source === 'amazon' ? 'Amazon' : product.source}
+                  color={getSourceColor(product.source)}
+                  style={styles.productSourceBadgePos}
+                />
+                <View style={styles.collectionCardContent}>
+                  <Text style={styles.collectionCardTitle} numberOfLines={2}>
+                    {product.name}
+                  </Text>
+                  <View style={styles.collectionCardFooter}>
+                    <Text style={styles.collectionCardSub}>
+                      {typeof product.priceValue === 'number'
+                        ? `$${product.priceValue.toLocaleString()}`
+                        : product.price}
+                    </Text>
+                    <View style={styles.collectionExploreBtn}>
+                      <Text style={styles.collectionExploreBtnText}>Shop Now</Text>
+                    </View>
+                  </View>
                 </View>
-                <Text style={styles.productCardName} numberOfLines={2}>{product.name}</Text>
-                <Text style={styles.productCardPrice}>{product.price}</Text>
               </TouchableOpacity>
             ))}
-          </ScrollView>
+          </View>
         </View>
 
       </Animated.ScrollView>
@@ -1501,9 +1551,32 @@ const styles = StyleSheet.create({
   },
   roomNavScroll: {
     paddingHorizontal: space.lg,
+    paddingTop: 8,
     gap: space.xl,
   },
   roomNavItem: { alignItems: 'center', gap: 5 },
+  roomNavIconWrap: {
+    width: 58,
+    height: 58,
+  },
+  roomNavNewBadge: {
+    position: 'absolute',
+    top: -6,
+    right: -8,
+    backgroundColor: '#0B6DC3',
+    borderRadius: 6,
+    paddingHorizontal: 5,
+    paddingVertical: 2.5,
+    borderWidth: 1.5,
+    borderColor: '#FFFFFF',
+    zIndex: 10,
+  },
+  roomNavNewBadgeText: {
+    fontSize: 8,
+    fontWeight: '800',
+    color: '#FFFFFF',
+    letterSpacing: 0.5,
+  },
   roomNavCircle: {
     width: 58,
     height: 58,
@@ -1890,22 +1963,22 @@ const styles = StyleSheet.create({
 
   // ── Portrait cards (New Arrivals) ────────────────────────────────────────────
   portraitCard: {
-    width: 125,
+    width: STYLE_CARD_W,
   },
   portraitCardImgWrap: {
-    width: 125,
-    height: 165,
-    borderRadius: radius.md,
+    width: STYLE_CARD_W,
+    height: STYLE_CARD_W,
+    borderRadius: radius.sm,
     overflow: 'hidden',
-    marginBottom: space.sm,
+    marginBottom: space.xs,
     borderWidth: 1,
     borderColor: 'rgba(0,0,0,0.06)',
   },
   portraitCardImg: { width: '100%', height: '100%' },
   newBadgePos: {
     position: 'absolute',
-    top: 7,
-    left: 7,
+    top: 6,
+    left: 6,
   },
   portraitItemsBadgePos: {
     position: 'absolute',
@@ -1913,12 +1986,14 @@ const styles = StyleSheet.create({
     right: 6,
   },
   portraitCardTitle: {
-    ...typeScale.headline,
+    ...typeScale.body,
+    fontWeight: '600',
     color: C.textPrimary,
-    marginBottom: 2,
+    marginBottom: 1,
   },
   portraitCardTag: {
-    ...typeScale.caption,
+    fontSize: 10,
+    fontWeight: '400',
     color: C.textSecondary,
   },
 
