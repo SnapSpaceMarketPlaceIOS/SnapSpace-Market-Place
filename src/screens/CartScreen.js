@@ -12,6 +12,7 @@ import {
   Image,
 } from 'react-native';
 import Svg, { Path, Circle, Line, Polyline, Rect } from 'react-native-svg';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useStripe } from '@stripe/stripe-react-native';
 import theme from '../constants/theme';
 import { typeScale } from '../constants/tokens';
@@ -65,6 +66,16 @@ function CheckoutCartIcon() {
       <Path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
       <Circle cx={10} cy={20.5} r={1} fill="#FFFFFF" stroke="#FFFFFF" strokeWidth={1} />
       <Circle cx={17} cy={20.5} r={1} fill="#FFFFFF" stroke="#FFFFFF" strokeWidth={1} />
+    </Svg>
+  );
+}
+
+function LockIcon() {
+  return (
+    <Svg width={13} height={13} viewBox="0 0 24 24" fill="none"
+      stroke="rgba(255,255,255,0.7)" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
+      <Rect x={3} y={11} width={18} height={11} rx={2} ry={2} />
+      <Path d="M7 11V7a5 5 0 0 1 10 0v4" />
     </Svg>
   );
 }
@@ -462,26 +473,27 @@ export default function CartScreen({ navigation }) {
 
       {/* ── Section 2D: Checkout Bar ────────────────────────────────── */}
       <View style={styles.checkoutWrap}>
-        {/* handleCheckout routing logic unchanged */}
         <TouchableOpacity
-          style={[styles.checkoutBtn, checkingOut && { opacity: 0.7 }]}
-          activeOpacity={0.85}
+          style={[styles.checkoutBtn, checkingOut && { opacity: 0.6 }]}
+          activeOpacity={0.88}
           disabled={checkingOut}
           onPress={handleCheckout}
           accessibilityLabel={`Checkout for $${total.toLocaleString()}`}
         >
-          {checkingOut ? (
-            <ActivityIndicator color="#fff" size="small" />
-          ) : (
-            <View style={styles.checkoutBtnInner}>
-              <View style={styles.checkoutLeft}>
-                <CheckoutCartIcon />
-                <Text style={styles.checkoutLabel}>  Checkout</Text>
+          <LinearGradient
+            colors={['#1E5AB0', '#0B6DC3', '#1D4ED8']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.checkoutGradient}
+          >
+            {checkingOut ? (
+              <ActivityIndicator color="#fff" size="small" />
+            ) : (
+              <View style={styles.checkoutBtnInner}>
+                <Text style={styles.checkoutLabel}>Complete Purchase</Text>
               </View>
-              <View style={styles.checkoutDivider} />
-              <Text style={styles.checkoutPrice}>${total.toLocaleString()}</Text>
-            </View>
-          )}
+            )}
+          </LinearGradient>
         </TouchableOpacity>
       </View>
 
@@ -608,15 +620,19 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
   },
   inStockPill: {
-    backgroundColor: C.successBg,  // #DCFCE7
-    borderRadius: R.full,
-    paddingVertical: 4,
-    paddingHorizontal: 8,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 0.75,
+    borderColor: C.success,
+    borderRadius: 6,
+    paddingVertical: 2,
+    paddingHorizontal: 6,
+    alignSelf: 'flex-start',
   },
   inStockText: {
-    ...typeScale.micro,
+    fontSize: 10,
+    fontWeight: '600',
     color: C.success,
-    textTransform: undefined,
+    letterSpacing: 0.2,
   },
   shippingText: {
     ...typeScale.caption,
@@ -729,8 +745,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: C.successBg,  // #DCFCE7
-    borderRadius: R.md,             // 12px
+    backgroundColor: '#FFFFFF',
+    borderWidth: 0.75,
+    borderColor: C.success,
+    borderRadius: 6,
     paddingVertical: 10,
     paddingHorizontal: SP[3],       // 12px
     marginTop: SP[4],               // 16px
@@ -759,50 +777,39 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    paddingHorizontal: SP[5],       // 20px
-    paddingBottom: 34,              // 20px + 14px safe area
-    paddingTop: SP[3],              // 12px
-    backgroundColor: C.bg,         // white — no gradient
+    paddingHorizontal: SP[5],
+    paddingBottom: 34,
+    paddingTop: SP[3],
+    backgroundColor: C.bg,
     borderTopWidth: 1,
     borderTopColor: C.border,
   },
   checkoutBtn: {
-    backgroundColor: C.primary,    // #1D4ED8
-    borderRadius: R.full,           // 9999px pill
-    height: 56,
+    borderRadius: R.full,
+    overflow: 'hidden',
+    height: 58,
+    shadowColor: '#1D4ED8',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.35,
+    shadowRadius: 16,
+    elevation: 8,
+  },
+  checkoutGradient: {
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: SH.md.shadowColor,
-    shadowOffset: SH.md.shadowOffset,
-    shadowOpacity: SH.md.shadowOpacity,
-    shadowRadius: SH.md.shadowRadius,
-    elevation: SH.md.elevation,
   },
   checkoutBtnInner: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    width: '100%',
-    paddingHorizontal: SP[5],       // 20px
-  },
-  checkoutLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
   },
   checkoutLabel: {
-    ...typeScale.button,
-    color: C.white,
-  },
-  checkoutDivider: {
-    width: 1,
-    height: 20,
-    backgroundColor: 'rgba(255,255,255,0.3)',
-  },
-  checkoutPrice: {
-    ...typeScale.button,
-    fontWeight: '800',
-    color: C.white,
-    fontVariant: ['tabular-nums'],
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#FFFFFF',
+    letterSpacing: 0.2,
   },
 
   // ── Empty state ──────────────────────────────────────────────────────────────

@@ -36,21 +36,21 @@ const COLL_CARD_W = (width - space.lg * 2 - space.sm) / 2;
 const STYLE_CARD_W = Math.floor((width - space.lg * 2 - space.sm * 2) / 3);
 
 const HERO_IMAGES = [
-  'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1600&q=90&fit=crop',
-  'https://images.unsplash.com/photo-1616046229478-9901c5536a45?w=1600&q=90&fit=crop',
-  'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=1600&q=90&fit=crop',
-  'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=1600&q=90&fit=crop',
-  'https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?w=1600&q=90&fit=crop',
-  'https://images.unsplash.com/photo-1565538810643-b5bdb714032a?w=1600&q=90&fit=crop',
-  'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1600&q=90&fit=crop',
-  'https://images.unsplash.com/photo-1540518614846-7eded433c457?w=1600&q=90&fit=crop',
-  'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=1600&q=90&fit=crop',
-  'https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?w=1600&q=90&fit=crop',
-  'https://images.unsplash.com/photo-1618219908412-a29a1bb7b86e?w=1600&q=90&fit=crop',
-  'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1600&q=90&fit=crop',
-  'https://images.unsplash.com/photo-1550581190-9c1c48d21d6c?w=1600&q=90&fit=crop',
-  'https://images.unsplash.com/photo-1593642632559-0c6d3fc62b89?w=1600&q=90&fit=crop',
-  'https://images.unsplash.com/photo-1513694203232-719a280e022f?w=1600&q=90&fit=crop',
+  'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1600&q=90&fit=crop',  // minimalist living room, white sofa
+  'https://images.unsplash.com/photo-1616046229478-9901c5536a45?w=1600&q=90&fit=crop',  // minimalist bedroom, wooden headboard
+  'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=1600&q=90&fit=crop',     // green velvet sofa living room
+  'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=1600&q=90&fit=crop',     // open-concept living room (replaces exterior pool shot)
+  'https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?w=1600&q=90&fit=crop',  // modern dark kitchen
+  'https://images.unsplash.com/photo-1565538810643-b5bdb714032a?w=1600&q=90&fit=crop',  // round coffee table living room
+  'https://images.unsplash.com/photo-1598928506311-c55ded91a20c?w=1600&q=90&fit=crop',  // bright luxury living room (replaces commercial office)
+  'https://images.unsplash.com/photo-1540518614846-7eded433c457?w=1600&q=90&fit=crop',  // white bedding bedroom
+  'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=1600&q=90&fit=crop',  // architectural bedroom, warm lighting
+  'https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?w=1600&q=90&fit=crop',  // warm-toned living room
+  'https://images.unsplash.com/photo-1618219908412-a29a1bb7b86e?w=1600&q=90&fit=crop',  // minimal bedroom/bathroom
+  'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1600&q=90&fit=crop',     // warm bedroom, wood furniture
+  'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=1600&q=90&fit=crop',  // living room, yellow accent chair (replaces dog kitchen)
+  'https://images.unsplash.com/photo-1615874694520-474822394e73?w=1600&q=90&fit=crop',  // living room with bookshelves & fireplace (replaces MacBook shot)
+  'https://images.unsplash.com/photo-1513694203232-719a280e022f?w=1600&q=90&fit=crop',  // cozy living room, warm ambient lighting
 ];
 
 // ── Room type quick-nav ────────────────────────────────────────────────────────
@@ -475,6 +475,49 @@ function TagIcon({ size = 13, color = '#F59E0B' }) {
       <Path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" />
       <Line x1={7} y1={7} x2={7.01} y2={7} />
     </Svg>
+  );
+}
+
+// Amazon logo badge — white pill with "amazon" text + orange smile arrow
+function AmazonLogoBadge() {
+  return (
+    <View style={{
+      backgroundColor: '#FFFFFF',
+      paddingHorizontal: 5,
+      paddingTop: 3,
+      paddingBottom: 4,
+      borderRadius: 6,
+      alignItems: 'center',
+      justifyContent: 'center',
+    }}>
+      {/* "amazon" wordmark */}
+      <Text style={{
+        fontSize: 7,
+        fontWeight: '800',
+        color: '#1A1A1A',
+        letterSpacing: -0.2,
+        lineHeight: 8,
+        fontStyle: 'italic',
+      }}>amazon</Text>
+      {/* Orange smile arrow */}
+      <Svg width={20} height={4} viewBox="0 0 40 7">
+        <Path
+          d="M2 2 Q20 10 38 2"
+          fill="none"
+          stroke="#FF9900"
+          strokeWidth="2.2"
+          strokeLinecap="round"
+        />
+        <Path
+          d="M34 1 L38 2 L36 5"
+          fill="none"
+          stroke="#FF9900"
+          strokeWidth="2.2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </Svg>
+    </View>
   );
 }
 
@@ -1029,70 +1072,65 @@ export default function HomeScreen({ navigation }) {
         {/* ── 6. Deal of the Day — premium editorial treatment ────────── */}
         {dealProduct && (
           <View style={styles.dealSection}>
-            {/* Section eyebrow */}
-            <View style={styles.dealEyebrowRow}>
-              <View style={styles.dealEyebrowLine} />
-              <Text style={styles.dealEyebrow}>Today's Highlight</Text>
-              <View style={styles.dealEyebrowLine} />
-            </View>
 
             <TouchableOpacity
               activeOpacity={0.93}
               onPress={() => navigation?.navigate('ProductDetail', { product: dealProduct })}
             >
-              <LinearGradient
-                colors={['#080D1A', '#0C1730', '#0F2040']}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={styles.dealCard}
-              >
-                {/* Ambient warm glow — top-right decoration */}
-                <View style={styles.dealAmbientGlow} pointerEvents="none" />
+              <View style={styles.dealCard}>
 
-                {/* Badge row */}
-                <View style={styles.dealBadgeRow}>
-                  <View style={styles.dealBadge}>
-                    <TagIcon size={10} color="#C9A84C" />
-                    <Text style={styles.dealBadgeText}>DEAL OF THE DAY</Text>
-                  </View>
-                </View>
-
-                {/* Body: image + info side by side */}
-                <View style={styles.dealBody}>
-                  {/* Product image with warm glow ring */}
-                  <View style={styles.dealImgOuter}>
-                    <View style={styles.dealImgGlowRing} />
-                    <View style={styles.dealImgWrap}>
-    <CardImage uri={dealProduct.imageUrl} style={styles.dealImg} placeholderColor="#1A2E50" />
+                {/* Full-width product image */}
+                <View style={styles.dealImgWrap}>
+                  <CardImage uri={dealProduct.imageUrl} style={styles.dealImg} placeholderColor="#E8EDF5" />
+                  {/* DEAL OF THE DAY — top left */}
+                  <View style={styles.dealBadgePos}>
+                    <View style={styles.dealBadge}>
+                      <TagIcon size={10} color="#C9A84C" />
+                      <Text style={styles.dealBadgeText}>DEAL OF THE DAY</Text>
                     </View>
                   </View>
-
-                  {/* Right info column */}
-                  <View style={styles.dealInfo}>
-                    <Text style={styles.dealProductName} numberOfLines={3}>
-                      {dealProduct.name}
-                    </Text>
-
-                    <View style={styles.dealPriceRow}>
-                      <Text style={styles.dealPrice}>{dealProduct.price}</Text>
-                    </View>
-
+                  {/* LIMITED TIME — top right */}
+                  <View style={styles.dealLimitedPos}>
                     <View style={styles.dealLimitedPill}>
-                      <Text style={styles.dealLimitedText}>Limited Time</Text>
+                      <Text style={styles.dealLimitedText}>LIMITED TIME</Text>
                     </View>
                   </View>
                 </View>
 
-                {/* CTA pill */}
+                {/* Info block */}
+                <View style={styles.dealInfo}>
+                  <Text style={styles.dealProductName} numberOfLines={2}>
+                    {dealProduct.name}
+                  </Text>
+
+                  {dealProduct.brand ? (
+                    <Text style={styles.dealBrand}>{dealProduct.brand}</Text>
+                  ) : null}
+
+                  <View style={styles.dealRatingRow}>
+                    <Svg width={13} height={13} viewBox="0 0 24 24" fill="#F1C40F" stroke="#F1C40F" strokeWidth={1.5}>
+                      <Path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                    </Svg>
+                    <Text style={styles.dealRatingText}>
+                      {dealProduct.rating ?? '4.5'}
+                    </Text>
+                    <Text style={styles.dealReviewCount}>
+                      ({dealProduct.reviewCount ? dealProduct.reviewCount.toLocaleString() : '0'} reviews)
+                    </Text>
+                  </View>
+
+                  <Text style={styles.dealPrice}>{dealProduct.price}</Text>
+                </View>
+
+                {/* CTA */}
                 <TouchableOpacity
                   style={styles.dealShopBtn}
                   activeOpacity={0.82}
                   onPress={() => navigation?.navigate('ProductDetail', { product: dealProduct })}
                 >
                   <Text style={styles.dealShopBtnText}>Shop Now</Text>
-                  <ChevronRight color="#0F172A" />
                 </TouchableOpacity>
-              </LinearGradient>
+              </View>
             </TouchableOpacity>
           </View>
         )}
@@ -1111,7 +1149,7 @@ export default function HomeScreen({ navigation }) {
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.hScroll}
+            contentContainerStyle={styles.hScrollNewArrivals}
           >
             {NEW_ARRIVALS.map(design => (
               <TouchableOpacity
@@ -1121,17 +1159,16 @@ export default function HomeScreen({ navigation }) {
                 onPress={() => navigation?.navigate('ShopTheLook', { design })}
               >
                 <View style={styles.portraitCardImgWrap}>
-      <CardImage uri={design.imageUrl} style={styles.portraitCardImg} />
+                  <CardImage uri={design.imageUrl} style={styles.portraitCardImg} />
                   <LinearGradient
                     colors={['transparent', 'rgba(0,0,0,0.52)']}
                     locations={[0.35, 1]}
                     style={StyleSheet.absoluteFill}
                   />
-                  <Badge
-                    variant="status"
-                    label="NEW"
-                    style={styles.newBadgePos}
-                  />
+                </View>
+                {/* Badge peeks off top-right corner of the image */}
+                <View style={styles.newArrivalBadge}>
+                  <Text style={styles.newArrivalBadgeText}>NEW</Text>
                 </View>
                 <Text style={styles.portraitCardTitle} numberOfLines={1}>
                   {design.title.replace('...', '')}
@@ -1192,36 +1229,30 @@ export default function HomeScreen({ navigation }) {
             {FEATURED_PRODUCTS.slice(0, 4).map((product, i) => (
               <TouchableOpacity
                 key={product.id || i}
-                style={styles.collectionCard}
+                style={styles.featuredProductCard}
                 activeOpacity={0.85}
                 onPress={() => navigation?.navigate('ProductDetail', { product })}
               >
-    <CardImage uri={product.imageUrl} style={styles.collectionCardImg} placeholderColor="#E8EDF5" />
-                <LinearGradient
-                  colors={['transparent', 'rgba(0,0,0,0.75)']}
-                  locations={[0.3, 1]}
-                  style={StyleSheet.absoluteFill}
-                />
-                <Badge
-                  variant="source"
-                  label={product.source === 'amazon' ? 'Amazon' : product.source}
-                  color={getSourceColor(product.source)}
-                  style={styles.productSourceBadgePos}
-                />
-                <View style={styles.collectionCardContent}>
-                  <Text style={styles.collectionCardTitle} numberOfLines={2}>
+                {/* Image with source badge */}
+                <View style={styles.featuredProductImgWrap}>
+                  <CardImage uri={product.imageUrl} style={styles.featuredProductImg} placeholderColor="#E8EDF5" />
+                  <View style={styles.productSourceBadgePos}>
+                    {product.source === 'amazon'
+                      ? <AmazonLogoBadge />
+                      : <Badge variant="source" label={product.source} color={getSourceColor(product.source)} />
+                    }
+                  </View>
+                </View>
+                {/* Info box below the image */}
+                <View style={styles.featuredProductInfo}>
+                  <Text style={styles.featuredProductName} numberOfLines={2}>
                     {product.name}
                   </Text>
-                  <View style={styles.collectionCardFooter}>
-                    <Text style={styles.collectionCardSub}>
-                      {typeof product.priceValue === 'number'
-                        ? `$${product.priceValue.toLocaleString()}`
-                        : product.price}
-                    </Text>
-                    <View style={styles.collectionExploreBtn}>
-                      <Text style={styles.collectionExploreBtnText}>Shop Now</Text>
-                    </View>
-                  </View>
+                  <Text style={styles.featuredProductPrice}>
+                    {typeof product.priceValue === 'number'
+                      ? `$${product.priceValue.toLocaleString()}`
+                      : product.price}
+                  </Text>
                 </View>
               </TouchableOpacity>
             ))}
@@ -1598,6 +1629,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: space.lg,
     gap: space.sm,
   },
+  hScrollNewArrivals: {
+    paddingHorizontal: space.lg,
+    paddingTop: 14,
+    gap: space.sm,
+  },
 
   // ── For You cards (50% screen width) ─────────────────────────────────────────
   forYouCard: {
@@ -1652,6 +1688,41 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     borderWidth: 1,
     borderColor: 'rgba(0,0,0,0.06)',
+  },
+
+  // ── Featured Products cards (image top, info box bottom) ────────────────────
+  featuredProductCard: {
+    width: COLL_CARD_W,
+    borderRadius: radius.md,
+    overflow: 'hidden',
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: 'rgba(0,0,0,0.07)',
+    ...shadow.low,
+  },
+  featuredProductImgWrap: {
+    width: '100%',
+    height: 148,
+  },
+  featuredProductImg: {
+    width: '100%',
+    height: '100%',
+  },
+  featuredProductInfo: {
+    paddingHorizontal: space.sm,
+    paddingTop: space.xs + 2,
+    paddingBottom: space.sm,
+    gap: 3,
+  },
+  featuredProductName: {
+    ...typeScale.caption,
+    color: palette.textPrimary,
+    fontWeight: '600',
+    lineHeight: 16,
+  },
+  featuredProductPrice: {
+    ...typeScale.price,
+    color: palette.textPrimary,
   },
   collectionCardImg: {
     width: '100%',
@@ -1795,34 +1866,40 @@ const styles = StyleSheet.create({
     color: 'rgba(0,0,0,0.38)',
   },
   dealCard: {
-    borderRadius: 20,
+    borderRadius: radius.xl,
     overflow: 'hidden',
-    padding: space.lg,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#E2E6EA',
     paddingBottom: space.base,
+    ...shadow.medium,
   },
-  dealAmbientGlow: {
-    position: 'absolute',
-    top: -40,
-    right: -40,
-    width: 180,
-    height: 180,
-    borderRadius: 90,
-    backgroundColor: 'rgba(180,130,50,0.09)',
-  },
-  dealBadgeRow: {
-    flexDirection: 'row',
+  dealImgWrap: {
+    width: '100%',
+    height: 200,
+    overflow: 'hidden',
     marginBottom: space.base,
+  },
+  dealImg: {
+    width: '100%',
+    height: '100%',
+  },
+  // DEAL OF THE DAY — top left of image
+  dealBadgePos: {
+    position: 'absolute',
+    top: space.sm,
+    left: space.sm,
   },
   dealBadge: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 5,
-    backgroundColor: 'rgba(201,168,76,0.12)',
+    backgroundColor: 'rgba(10,16,32,0.70)',
     paddingHorizontal: 10,
     paddingVertical: 5,
     borderRadius: radius.full,
     borderWidth: 1,
-    borderColor: 'rgba(201,168,76,0.35)',
+    borderColor: 'rgba(201,168,76,0.5)',
   },
   dealBadgeText: {
     color: '#C9A84C',
@@ -1831,96 +1908,89 @@ const styles = StyleSheet.create({
     letterSpacing: 1.2,
     textTransform: 'uppercase',
   },
-  dealBody: {
-    flexDirection: 'row',
-    gap: space.base,
-    alignItems: 'flex-start',
-    marginBottom: space.base,
-  },
-  dealImgOuter: {
-    position: 'relative',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  dealImgGlowRing: {
+  // LIMITED TIME — top right of image
+  dealLimitedPos: {
     position: 'absolute',
-    width: 118,
-    height: 118,
-    borderRadius: 59,
-    backgroundColor: 'rgba(180,130,50,0.14)',
+    top: space.sm,
+    right: space.sm,
   },
-  dealImgWrap: {
-    width: 108,
-    height: 108,
-    borderRadius: 14,
-    overflow: 'hidden',
-    backgroundColor: '#1A2E50',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.06)',
+  dealLimitedPill: {
+    backgroundColor: '#C0392B',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: radius.full,
   },
-  dealImg: {
-    width: '100%',
-    height: '100%',
+  dealLimitedText: {
+    fontSize: 9,
+    fontWeight: fontWeight.bold,
+    letterSpacing: 1.0,
+    color: '#FFFFFF',
+    textTransform: 'uppercase',
   },
+  // Info block — generous spacing between each row
   dealInfo: {
-    flex: 1,
-    gap: 8,
-    paddingTop: 2,
+    paddingHorizontal: space.lg,
+    paddingTop: space.base,
+    paddingBottom: space.sm,
+    gap: 10,
   },
   dealProductName: {
     fontSize: 16,
     fontWeight: fontWeight.bold,
-    color: '#FFFFFF',
+    color: '#0F172A',
     lineHeight: 22,
     letterSpacing: -0.2,
   },
-  dealPriceRow: {
+  dealBrand: {
+    fontSize: 12,
+    fontWeight: fontWeight.medium,
+    color: '#9CA3AF',
+    letterSpacing: 0.2,
+    marginTop: -4,
+  },
+  dealRatingRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    gap: 4,
+  },
+  dealRatingText: {
+    fontSize: 13,
+    fontWeight: fontWeight.semibold,
+    color: '#0F172A',
+  },
+  dealReviewCount: {
+    fontSize: 12,
+    fontWeight: fontWeight.regular,
+    color: '#9CA3AF',
   },
   dealPrice: {
-    fontSize: 22,
+    fontSize: 28,
     fontWeight: fontWeight.xbold,
-    color: '#FFFFFF',
-    letterSpacing: -0.5,
-  },
-  dealLimitedPill: {
-    alignSelf: 'flex-start',
-    backgroundColor: 'rgba(255,255,255,0.08)',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: radius.full,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.14)',
-  },
-  dealLimitedText: {
-    fontSize: 10,
-    fontWeight: fontWeight.semibold,
-    letterSpacing: 0.6,
-    color: 'rgba(255,255,255,0.55)',
-    textTransform: 'uppercase',
+    color: '#0F172A',
+    letterSpacing: -1,
+    marginTop: 2,
   },
   dealShopBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    alignSelf: 'stretch',
-    backgroundColor: '#F5F0E8',
-    paddingVertical: 14,
-    borderRadius: radius.button,
-    gap: 4,
-    marginTop: 4,
+    marginHorizontal: space.lg,
+    backgroundColor: '#0B6DC3',
+    paddingVertical: 13,
+    borderRadius: radius.md,
+    gap: 6,
   },
   dealShopBtnText: {
-    fontSize: 14,
-    fontWeight: fontWeight.semibold,
-    color: '#0F172A',
-    letterSpacing: 0.2,
+    fontSize: 15,
+    fontWeight: fontWeight.bold,
+    color: '#FFFFFF',
+    letterSpacing: 0.1,
   },
 
   // ── Portrait cards (New Arrivals) ────────────────────────────────────────────
   portraitCard: {
     width: STYLE_CARD_W,
+    position: 'relative',
   },
   portraitCardImgWrap: {
     width: STYLE_CARD_W,
@@ -1952,6 +2022,24 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontWeight: '400',
     color: C.textSecondary,
+  },
+  newArrivalBadge: {
+    position: 'absolute',
+    top: -10,
+    right: -8,
+    backgroundColor: '#0B6DC3',
+    borderRadius: 8,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderWidth: 1.5,
+    borderColor: '#FFFFFF',
+    zIndex: 10,
+  },
+  newArrivalBadgeText: {
+    fontSize: 9,
+    fontWeight: '800',
+    color: '#FFFFFF',
+    letterSpacing: 0.5,
   },
 
   // ── Recently Viewed cards ────────────────────────────────────────────────────
