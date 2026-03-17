@@ -310,7 +310,7 @@ const id = StyleSheet.create({
   title:     { fontSize: 22, fontWeight: T.w700, color: T.txtPri, lineHeight: 29, letterSpacing: -0.3 },
   desc:      { fontSize: 14, fontWeight: T.w400, color: T.txtSec, lineHeight: 22, marginTop: 8 },
   byRow:     { flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 10 },
-  byLine:    { fontSize: 14, fontWeight: T.w400, color: T.txtSec, lineHeight: 20 },
+  byLine:    { fontSize: 14, fontWeight: T.w400, color: T.blue, lineHeight: 20 },
   stockPill: { flexDirection: 'row', alignItems: 'center', gap: 5, backgroundColor: T.greenBg, borderRadius: T.rPill, paddingHorizontal: 10, paddingVertical: 4 },
   dot:       { width: 7, height: 7, borderRadius: 4, backgroundColor: T.green },
   stockTxt:  { fontSize: 12, fontWeight: T.w600, color: T.green, lineHeight: 16 },
