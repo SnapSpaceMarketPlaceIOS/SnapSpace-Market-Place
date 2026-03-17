@@ -35,6 +35,11 @@ const { width } = Dimensions.get('window');
 // 20px padding each side + 12px gap between cards
 const CARD_WIDTH = (width - 4 * 2 - 4) / 2;
 
+// 10% corner radius for the modal hero image (width minus 20px padding each side)
+const MODAL_IMG_RADIUS = Math.round((width - SP[5] * 2) * 0.10);
+// Product thumbnail — 1/3 larger than original 56px
+const PRODUCT_IMG_SIZE = 76;
+
 // ── Icons ─────────────────────────────────────────────────────────────────────
 
 function SearchIcon({ color = '#fff', size = 16 }) {
@@ -88,6 +93,15 @@ function CloseIcon({ size = 12 }) {
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="#555" strokeWidth={2.5} strokeLinecap="round">
       <Line x1={18} y1={6} x2={6} y2={18} />
       <Line x1={6} y1={6} x2={18} y2={18} />
+    </Svg>
+  );
+}
+
+function StarIconSmall({ filled = true, size = 11 }) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24"
+      fill={filled ? '#F5A623' : '#E5E7EB'} stroke={filled ? '#F5A623' : '#D1D5DB'} strokeWidth={1}>
+      <Path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
     </Svg>
   );
 }
@@ -606,9 +620,47 @@ export default function ExploreScreen({ navigation, route }) {
                     </View>
                     <View style={styles.productInfo}>
                       <Text style={styles.productName} numberOfLines={2}>{p.name}</Text>
-                      <Text style={styles.productBrand}>{p.brand}</Text>
+
+                      {/* Rating row */}
+                      {!!p.rating && (
+                        <View style={styles.productRatingRow}>
+                          {[1,2,3,4,5].map(i => (
+                            <StarIconSmall key={i} size={11} filled={i <= Math.round(p.rating)} />
+                          ))}
+                          <Text style={styles.productRatingScore}>{p.rating.toFixed(1)}</Text>
+                          {!!p.reviewCount && (
+                            <Text style={styles.productReviewCount}>
+                              ({p.reviewCount.toLocaleString()})
+                            </Text>
+                          )}
+                        </View>
+                      )}
+
+                      {/* Brand + source badge */}
+                      <View style={styles.productMetaRow}>
+                        <Text style={styles.productBrand}>{p.brand}</Text>
+                        {p.source === 'amazon' && (
+                          <View style={styles.productSourceBadge}>
+                            <Text style={styles.productSourceText}>Amazon</Text>
+                          </View>
+                        )}
+                      </View>
+
+                      {/* Free shipping indicator */}
+                      <Text style={styles.productShipping}>✓ Free Shipping</Text>
                     </View>
-                    <Text style={styles.productPrice}>{p.price}</Text>
+
+                    {/* Price + optional discount */}
+                    <View style={styles.productPriceCol}>
+                      <Text style={styles.productPrice}>
+                        {typeof p.price === 'number' ? `$${p.price.toLocaleString()}` : p.price}
+                      </Text>
+                      {!!p.originalPrice && (
+                        <Text style={styles.productOrigPrice}>
+                          ${p.originalPrice.toLocaleString()}
+                        </Text>
+                      )}
+                    </View>
                   </TouchableOpacity>
                 ))}
 
@@ -976,7 +1028,7 @@ const styles = StyleSheet.create({
     width: '100%',
     aspectRatio: 4 / 3,
     backgroundColor: TC.surface,
-    borderRadius: TR.lg,                         // 16px
+    borderRadius: MODAL_IMG_RADIUS,              // 10% of image width
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: SP[4],
@@ -1105,16 +1157,15 @@ const styles = StyleSheet.create({
   productRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: SP[3],                                  // 12px
-    minHeight: 72,                               // spec: 72px minimum
-    paddingVertical: SP[2],                      // 8px vertical padding
+    gap: SP[3],
+    paddingVertical: SP[3],                      // 12px — taller to fit new content
     borderBottomWidth: 1,
     borderBottomColor: TC.border,
   },
   productImg: {
-    width: 56,                                   // spec: 56×56px SQUARE
-    height: 56,
-    borderRadius: TR.md,                         // 12px
+    width: PRODUCT_IMG_SIZE,                     // 76px — 1/3 larger than original 56px
+    height: PRODUCT_IMG_SIZE,
+    borderRadius: Math.round(PRODUCT_IMG_SIZE * 0.05), // 5% radius ≈ 4px
     backgroundColor: TC.surface,
     alignItems: 'center',
     justifyContent: 'center',
@@ -1123,19 +1174,81 @@ const styles = StyleSheet.create({
   },
   productInfo: {
     flex: 1,
+    gap: 3,
   },
   productName: {
     ...typeScale.headline,
     color: TC.textPrimary,
   },
+
+  // ── Rating row ──────────────────────────────────────────────────────────────
+  productRatingRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 2,
+    marginTop: 2,
+  },
+  productRatingScore: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: TC.textPrimary,
+    marginLeft: 3,
+    lineHeight: 14,
+  },
+  productReviewCount: {
+    fontSize: 11,
+    fontWeight: '400',
+    color: TC.textSecondary,
+    lineHeight: 14,
+  },
+
+  // ── Brand + source row ───────────────────────────────────────────────────────
+  productMetaRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
   productBrand: {
     ...typeScale.caption,
     color: TC.textTertiary,
-    marginTop: 4,
+  },
+  productSourceBadge: {
+    backgroundColor: '#FFF3E0',
+    borderRadius: 4,
+    paddingHorizontal: 5,
+    paddingVertical: 1,
+  },
+  productSourceText: {
+    fontSize: 9,
+    fontWeight: '700',
+    color: '#E65100',
+    letterSpacing: 0.3,
+    textTransform: 'uppercase',
+  },
+
+  // ── Shipping ─────────────────────────────────────────────────────────────────
+  productShipping: {
+    fontSize: 11,
+    fontWeight: '400',
+    color: '#16A34A',
+    lineHeight: 14,
+  },
+
+  // ── Price column ─────────────────────────────────────────────────────────────
+  productPriceCol: {
+    alignItems: 'flex-end',
+    gap: 2,
   },
   productPrice: {
     ...typeScale.price,
     color: TC.primary,
+    textAlign: 'right',
+  },
+  productOrigPrice: {
+    fontSize: 11,
+    fontWeight: '400',
+    color: TC.textTertiary,
+    textDecorationLine: 'line-through',
     textAlign: 'right',
   },
 
