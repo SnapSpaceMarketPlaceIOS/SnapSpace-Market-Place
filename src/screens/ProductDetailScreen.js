@@ -141,9 +141,9 @@ const ShareIcon = () => (
   </Svg>
 );
 
-const StarIcon = ({ size = 15 }) => (
+const StarIcon = ({ size = 15, filled = true }) => (
   <Svg width={size} height={size} viewBox="0 0 24 24"
-    fill="#F5A623" stroke="#F5A623" strokeWidth={1}>
+    fill={filled ? '#F5A623' : '#E5E7EB'} stroke={filled ? '#F5A623' : '#D1D5DB'} strokeWidth={1}>
     <Path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
   </Svg>
 );
@@ -265,13 +265,20 @@ const hs = StyleSheet.create({
 });
 
 // ─── S1: ProductIdentity ──────────────────────────────────────────────────────
+// Layout: Title → "By [Brand]" + In-Stock pill → 5-star rating row
 
 function ProductIdentity({ brand, title, rating, reviewCount, inStock }) {
+  const ratingVal  = typeof rating === 'number' ? rating : parseFloat(rating) || 4.0;
+  const filledStars = Math.round(ratingVal);          // 0–5
+
   return (
     <View style={id.wrap}>
-      {/* Brand + In-Stock row */}
-      <View style={id.row1}>
-        <Text style={id.brand}>{(brand ?? '').toUpperCase()}</Text>
+      {/* Title — always first */}
+      <Text style={id.title}>{title}</Text>
+
+      {/* By [Brand] + In Stock inline */}
+      <View style={id.byRow}>
+        <Text style={id.byLine}>By {brand ?? 'Unknown'}</Text>
         {inStock !== false && (
           <View style={id.stockPill}>
             <View style={id.dot} />
@@ -279,12 +286,13 @@ function ProductIdentity({ brand, title, rating, reviewCount, inStock }) {
           </View>
         )}
       </View>
-      {/* Title */}
-      <Text style={id.title}>{title}</Text>
-      {/* Rating */}
+
+      {/* 5-star rating row */}
       <TouchableOpacity style={id.ratingRow} activeOpacity={0.7}>
-        <StarIcon size={15} />
-        <Text style={id.score}>{rating ?? '4.0'}</Text>
+        {[1, 2, 3, 4, 5].map(i => (
+          <StarIcon key={i} size={15} filled={i <= filledStars} />
+        ))}
+        <Text style={id.score}>{ratingVal.toFixed(1)}</Text>
         <Text style={id.reviews}>({(reviewCount ?? 128).toLocaleString()} Reviews )</Text>
         <ChevRight size={12} color={T.txtSec} />
       </TouchableOpacity>
@@ -294,14 +302,14 @@ function ProductIdentity({ brand, title, rating, reviewCount, inStock }) {
 
 const id = StyleSheet.create({
   wrap:      { paddingHorizontal: T.padH, paddingTop: 22 },
-  row1:      { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  brand:     { fontSize: 12, fontWeight: T.w600, color: T.blue, letterSpacing: 0.8, lineHeight: 16 },
-  stockPill: { flexDirection: 'row', alignItems: 'center', gap: 5, backgroundColor: T.greenBg, borderRadius: T.rPill, paddingHorizontal: 10, paddingVertical: 5 },
+  title:     { fontSize: 22, fontWeight: T.w700, color: T.txtPri, lineHeight: 29, letterSpacing: -0.3 },
+  byRow:     { flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 6 },
+  byLine:    { fontSize: 14, fontWeight: T.w400, color: T.txtSec, lineHeight: 20 },
+  stockPill: { flexDirection: 'row', alignItems: 'center', gap: 5, backgroundColor: T.greenBg, borderRadius: T.rPill, paddingHorizontal: 10, paddingVertical: 4 },
   dot:       { width: 7, height: 7, borderRadius: 4, backgroundColor: T.green },
   stockTxt:  { fontSize: 12, fontWeight: T.w600, color: T.green, lineHeight: 16 },
-  title:     { fontSize: 22, fontWeight: T.w700, color: T.txtPri, lineHeight: 29, letterSpacing: -0.3, marginTop: 8 },
-  ratingRow: { flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 10 },
-  score:     { fontSize: 14, fontWeight: T.w600, color: T.txtPri, lineHeight: 18 },
+  ratingRow: { flexDirection: 'row', alignItems: 'center', gap: 3, marginTop: 10 },
+  score:     { fontSize: 14, fontWeight: T.w600, color: T.txtPri, lineHeight: 18, marginLeft: 3 },
   reviews:   { fontSize: 13, fontWeight: T.w400, color: T.txtSec, lineHeight: 18 },
 });
 
@@ -339,8 +347,9 @@ function VariantSelector({ variants, selectedId, onSelect }) {
               style={[va.tile, active && va.tileOn]}
               onPress={() => onSelect(v.id)}
               activeOpacity={0.75}>
+              {/* Color preview square — only shown when color data exists */}
               {v.color && (
-                <View style={[va.swatch, { backgroundColor: v.color }]} />
+                <View style={[va.colorBlock, { backgroundColor: v.color }]} />
               )}
               <Text style={[va.tileLabel, active && va.tileLabelOn]}>
                 {v.label}
@@ -357,10 +366,12 @@ const va = StyleSheet.create({
   wrap:       { paddingTop: 18 },
   hint:       { fontSize: 12, fontWeight: T.w400, color: T.txtSec, lineHeight: 16, paddingHorizontal: T.padH, marginBottom: 10 },
   scroll:     { paddingHorizontal: T.padH, gap: 10 },
-  tile:       { width: 90, minHeight: 78, borderRadius: T.rVariant, borderWidth: 1.5, borderColor: T.border, backgroundColor: T.surface, alignItems: 'center', justifyContent: 'flex-end', paddingBottom: 10, paddingTop: 10 },
+  // Tile: tall rectangle, color block fills top portion, label at bottom
+  tile:       { width: 100, height: 96, borderRadius: T.rVariant, borderWidth: 1.5, borderColor: T.border, backgroundColor: T.surface, overflow: 'hidden', justifyContent: 'flex-end' },
   tileOn:     { borderColor: T.blue, borderWidth: 2 },
-  swatch:     { width: 34, height: 34, borderRadius: 7, marginBottom: 7, borderWidth: 1, borderColor: 'rgba(0,0,0,0.06)' },
-  tileLabel:  { fontSize: 12, fontWeight: T.w400, color: T.txtSec, textAlign: 'center' },
+  // Color block fills top 58px of the tile
+  colorBlock: { position: 'absolute', top: 0, left: 0, right: 0, height: 58 },
+  tileLabel:  { fontSize: 12, fontWeight: T.w400, color: T.txtSec, textAlign: 'center', paddingBottom: 8, paddingTop: 4, paddingHorizontal: 4, backgroundColor: T.surface },
   tileLabelOn:{ fontWeight: T.w600, color: T.txtPri },
 });
 
@@ -479,27 +490,39 @@ const dv = StyleSheet.create({
 function QuantitySelector({ qty, onDecrease, onIncrease }) {
   return (
     <View style={qs.wrap}>
-      <TouchableOpacity style={[qs.btn, qty <= 1 && qs.btnDim]}
-        onPress={onDecrease} activeOpacity={0.7} disabled={qty <= 1}
-        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
-        <Text style={[qs.symbol, qty <= 1 && qs.symbolDim]}>−</Text>
-      </TouchableOpacity>
-      <Text style={qs.count}>{qty}</Text>
-      <TouchableOpacity style={qs.btn} onPress={onIncrease} activeOpacity={0.7}
-        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
-        <Text style={qs.symbol}>+</Text>
-      </TouchableOpacity>
+      <View style={qs.pill}>
+        {/* − button */}
+        <TouchableOpacity style={[qs.btn, qty <= 1 && qs.btnDim]}
+          onPress={onDecrease} activeOpacity={0.7} disabled={qty <= 1}
+          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+          <Text style={[qs.symbol, qty <= 1 && qs.symbolDim]}>−</Text>
+        </TouchableOpacity>
+
+        {/* Divider + count + divider */}
+        <View style={qs.divider} />
+        <Text style={qs.count}>{qty}</Text>
+        <View style={qs.divider} />
+
+        {/* + button */}
+        <TouchableOpacity style={qs.btn} onPress={onIncrease} activeOpacity={0.7}
+          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+          <Text style={qs.symbol}>+</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
 
 const qs = StyleSheet.create({
-  wrap:      { flexDirection: 'row', alignItems: 'center', paddingHorizontal: T.padH, marginTop: 16, gap: 0 },
-  btn:       { width: 38, height: 38, borderRadius: 10, borderWidth: 1, borderColor: T.border, backgroundColor: T.surface, alignItems: 'center', justifyContent: 'center' },
-  btnDim:    { opacity: 0.35 },
+  // Single pill container — all three elements (−, count, +) live inside one rounded border
+  wrap:      { flexDirection: 'row', alignItems: 'center', paddingHorizontal: T.padH, marginTop: 16 },
+  pill:      { flexDirection: 'row', alignItems: 'center', borderWidth: 1.5, borderColor: T.border, borderRadius: T.rPill, backgroundColor: T.surface, overflow: 'hidden' },
+  btn:       { width: 44, height: 44, alignItems: 'center', justifyContent: 'center' },
+  btnDim:    { opacity: 0.32 },
+  divider:   { width: 1, height: 24, backgroundColor: T.border },
   symbol:    { fontSize: 22, fontWeight: T.w400, color: T.txtPri, lineHeight: 26, marginTop: -2 },
   symbolDim: { color: T.txtMeta },
-  count:     { fontSize: 17, fontWeight: T.w600, color: T.txtPri, width: 46, textAlign: 'center', lineHeight: 24 },
+  count:     { fontSize: 17, fontWeight: T.w600, color: T.txtPri, width: 48, textAlign: 'center', lineHeight: 24 },
 });
 
 // ─── S9: ProductDetails ───────────────────────────────────────────────────────
