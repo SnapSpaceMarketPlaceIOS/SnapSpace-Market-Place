@@ -45,7 +45,7 @@ import { SellerName } from '../components/VerifiedBadge';
 import { shadow } from '../constants/tokens';
 
 const { width: SW, height: SH } = Dimensions.get('window');
-const IMAGE_H     = Math.round(SH * 0.50);
+const IMAGE_H     = Math.round(SW * 0.75);  // 3:4 ratio off screen width — device-agnostic, never clips
 const CARD_LIFT   = 24;   // px the white card overlaps the hero
 
 // ─── Design tokens (PDP-local, all values are token-aligned) ─────────────────
@@ -58,6 +58,7 @@ const T = {
   surface:      '#FFFFFF',
   pageBg:       '#F5F6F8',
   imageBg:      '#ECEEF2',
+  heroBg:       '#F0F2F5',   // neutral behind contain'd product image
   featBg:       '#EEF4FD',
   // Text
   txtPri:       '#0F1E35',
@@ -222,18 +223,16 @@ const WrenchIcon  = () => <Svg width={18} height={18} viewBox="0 0 24 24" fill="
 
 // ─── S0: ProductHero ──────────────────────────────────────────────────────────
 
-function ProductHero({ imageUrl, liked, onBack, onLike, onShare, scrollY, topInset }) {
-  const imgParallax = scrollY.interpolate({
-    inputRange:  [0, IMAGE_H],
-    outputRange: [0, -IMAGE_H * 0.18],
-    extrapolate: 'clamp',
-  });
+function ProductHero({ imageUrl, liked, onBack, onLike, onShare, topInset }) {
   return (
     <View style={hs.root}>
-      {/* Parallax image */}
-      <Animated.View style={[hs.clip, { transform: [{ translateY: imgParallax }] }]}>
-        <CardImage uri={imageUrl} style={hs.img} resizeMode="cover" placeholderColor={T.imageBg} />
-      </Animated.View>
+      {/* Full image — contain shows 100% of product, no crop, no zoom */}
+      <CardImage
+        uri={imageUrl}
+        style={hs.img}
+        resizeMode="contain"
+        placeholderColor={T.heroBg}
+      />
       {/* Floating nav */}
       <View style={[hs.topBar, { paddingTop: topInset + 14 }]}>
         <TouchableOpacity style={hs.navBtn} onPress={onBack}
@@ -256,9 +255,10 @@ function ProductHero({ imageUrl, liked, onBack, onLike, onShare, scrollY, topIns
 }
 
 const hs = StyleSheet.create({
-  root:     { width: '100%', height: IMAGE_H },
-  clip:     { position: 'absolute', top: 0, left: 0, right: 0, bottom: -IMAGE_H * 0.18, backgroundColor: T.imageBg },
-  img:      { flex: 1, width: '100%' },
+  // Root = exact image frame — width 100%, height = 75% of screen width (3:4 device-agnostic)
+  root:     { width: '100%', height: IMAGE_H, backgroundColor: '#F0F2F5' },
+  // Image fills the frame fully — contain renders 100% of photo, no crop
+  img:      { width: '100%', height: '100%' },
   topBar:   { position: 'absolute', top: 0, left: 0, right: 0, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: T.padH },
   topRight: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   navBtn:   { width: 42, height: 42, borderRadius: 21, backgroundColor: 'rgba(255,255,255,0.92)', alignItems: 'center', justifyContent: 'center', ...shadow.medium },
@@ -1063,7 +1063,6 @@ export default function ProductDetailScreen({ route, navigation }) {
           onBack={() => navigation?.goBack()}
           onLike={() => setLiked(p => !p)}
           onShare={() => Alert.alert('Share', `Share "${name}"?`)}
-          scrollY={scrollY}
           topInset={insets.top}
         />
 
