@@ -265,18 +265,23 @@ const hs = StyleSheet.create({
 });
 
 // ─── S1: ProductIdentity ──────────────────────────────────────────────────────
-// Layout: Title → "By [Brand]" + In-Stock pill → 5-star rating row
+// Layout: Title → Description (short) → "By [Brand]" + In-Stock → 5-star row
 
-function ProductIdentity({ brand, title, rating, reviewCount, inStock }) {
-  const ratingVal  = typeof rating === 'number' ? rating : parseFloat(rating) || 4.0;
-  const filledStars = Math.round(ratingVal);          // 0–5
+function ProductIdentity({ brand, title, description, rating, reviewCount, inStock }) {
+  const ratingVal   = typeof rating === 'number' ? rating : parseFloat(rating) || 4.0;
+  const filledStars = Math.round(ratingVal);
 
   return (
     <View style={id.wrap}>
-      {/* Title — always first */}
+      {/* 1. Title */}
       <Text style={id.title}>{title}</Text>
 
-      {/* By [Brand] + In Stock inline */}
+      {/* 2. Short description — directly under title, above byline */}
+      {!!description && (
+        <Text style={id.desc} numberOfLines={3}>{description}</Text>
+      )}
+
+      {/* 3. By [Brand] + In Stock pill */}
       <View style={id.byRow}>
         <Text style={id.byLine}>By {brand ?? 'Unknown'}</Text>
         {inStock !== false && (
@@ -287,7 +292,7 @@ function ProductIdentity({ brand, title, rating, reviewCount, inStock }) {
         )}
       </View>
 
-      {/* 5-star rating row */}
+      {/* 4. 5-star rating row */}
       <TouchableOpacity style={id.ratingRow} activeOpacity={0.7}>
         {[1, 2, 3, 4, 5].map(i => (
           <StarIcon key={i} size={15} filled={i <= filledStars} />
@@ -303,7 +308,8 @@ function ProductIdentity({ brand, title, rating, reviewCount, inStock }) {
 const id = StyleSheet.create({
   wrap:      { paddingHorizontal: T.padH, paddingTop: 22 },
   title:     { fontSize: 22, fontWeight: T.w700, color: T.txtPri, lineHeight: 29, letterSpacing: -0.3 },
-  byRow:     { flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 6 },
+  desc:      { fontSize: 14, fontWeight: T.w400, color: T.txtSec, lineHeight: 22, marginTop: 8 },
+  byRow:     { flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 10 },
   byLine:    { fontSize: 14, fontWeight: T.w400, color: T.txtSec, lineHeight: 20 },
   stockPill: { flexDirection: 'row', alignItems: 'center', gap: 5, backgroundColor: T.greenBg, borderRadius: T.rPill, paddingHorizontal: 10, paddingVertical: 4 },
   dot:       { width: 7, height: 7, borderRadius: 4, backgroundColor: T.green },
@@ -564,28 +570,52 @@ const pdt = StyleSheet.create({
   val:     { fontSize: 14, fontWeight: T.w700, color: T.txtPri, textAlign: 'right', maxWidth: '58%', lineHeight: 20 },
 });
 
-// ─── S10: KeyFeatures ─────────────────────────────────────────────────────────
+// ─── S10: KeyFeatures — Premium Numbered Infographic ─────────────────────────
+//
+// Design: single bordered panel, each feature is a numbered row.
+// Left  → number badge (01, 02…) + icon circle
+// Right → feature title (bold) + one-line benefit copy
+// Rows separated by hairline dividers — clean, professional, zero clutter.
 
 const DEF_FEATURES = [
-  { label: 'Hardwood Frame',    sub: 'Solid & long-lasting',  Icon: ShieldIcon  },
-  { label: 'High-Density Foam', sub: 'All-day comfort',       Icon: LayersIcon  },
-  { label: 'Stain Resistant',   sub: 'Easy clean upholstery', Icon: DropletIcon },
-  { label: 'Tool-Free Setup',   sub: 'Ready in 20 minutes',   Icon: WrenchIcon  },
+  { label: 'Hardwood Frame',    sub: 'Built to last decades — solid, warp-resistant construction.',  Icon: ShieldIcon  },
+  { label: 'High-Density Foam', sub: 'Conforms to your body for deep, restorative comfort.',          Icon: LayersIcon  },
+  { label: 'Stain Resistant',   sub: 'Performance fabric repels spills — wipes clean in seconds.',   Icon: DropletIcon },
+  { label: 'Tool-Free Setup',   sub: 'Snap-together design — fully assembled in under 20 minutes.',  Icon: WrenchIcon  },
 ];
 
 function KeyFeatures({ features }) {
   const items = features ?? DEF_FEATURES;
   return (
     <View style={kf.wrap}>
-      <Text style={kf.sLabel}>KEY FEATURES</Text>
-      <View style={kf.grid}>
+      {/* Section header with blue left-accent */}
+      <View style={kf.headerRow}>
+        <View style={kf.headerAccent} />
+        <Text style={kf.sLabel}>KEY FEATURES</Text>
+      </View>
+
+      {/* Single panel — all rows inside */}
+      <View style={kf.panel}>
         {items.map((f, i) => (
-          <View key={i} style={kf.tile}>
-            <View style={kf.iconCircle}>
-              {f.Icon ? <f.Icon /> : null}
+          <View key={i}>
+            <View style={kf.row}>
+              {/* Left: number + icon stacked */}
+              <View style={kf.leftCol}>
+                <Text style={kf.num}>{String(i + 1).padStart(2, '0')}</Text>
+                <View style={kf.iconCircle}>
+                  {f.Icon ? <f.Icon /> : null}
+                </View>
+              </View>
+
+              {/* Right: title + benefit copy */}
+              <View style={kf.rightCol}>
+                <Text style={kf.featureName}>{f.label}</Text>
+                {!!f.sub && <Text style={kf.featureSub}>{f.sub}</Text>}
+              </View>
             </View>
-            <Text style={kf.tileName}>{f.label}</Text>
-            {!!f.sub && <Text style={kf.tileSub}>{f.sub}</Text>}
+
+            {/* Hairline divider — not after last row */}
+            {i < items.length - 1 && <View style={kf.divider} />}
           </View>
         ))}
       </View>
@@ -594,13 +624,29 @@ function KeyFeatures({ features }) {
 }
 
 const kf = StyleSheet.create({
-  wrap:       { paddingHorizontal: T.padH, marginTop: 24 },
-  sLabel:     { fontSize: 10, fontWeight: T.w600, color: T.txtSec, letterSpacing: 1.0, textTransform: 'uppercase', lineHeight: 14 },
-  grid:       { flexDirection: 'row', flexWrap: 'wrap', gap: 12, marginTop: 12 },
-  tile:       { width: (SW - T.padH * 2 - 12) / 2, backgroundColor: T.surface, borderRadius: T.rMd, borderWidth: 1, borderColor: T.border, padding: 14 },
-  iconCircle: { width: 36, height: 36, borderRadius: 8, backgroundColor: T.featBg, alignItems: 'center', justifyContent: 'center' },
-  tileName:   { fontSize: 13, fontWeight: T.w600, color: T.txtPri, lineHeight: 18, marginTop: 8 },
-  tileSub:    { fontSize: 12, fontWeight: T.w400, color: T.txtSec, lineHeight: 16, marginTop: 2 },
+  wrap:        { paddingHorizontal: T.padH, marginTop: 28 },
+
+  // Header with blue left-accent bar
+  headerRow:   { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 14 },
+  headerAccent:{ width: 3, height: 14, borderRadius: 2, backgroundColor: T.blue },
+  sLabel:      { fontSize: 11, fontWeight: T.w700, color: T.txtSec, letterSpacing: 1.2, textTransform: 'uppercase' },
+
+  // Outer panel — single rounded card
+  panel:       { borderRadius: T.rMd, borderWidth: 1, borderColor: T.border, backgroundColor: T.surface, overflow: 'hidden' },
+
+  // Each feature row
+  row:         { flexDirection: 'row', alignItems: 'center', paddingVertical: 16, paddingHorizontal: 16, gap: 14 },
+  divider:     { height: StyleSheet.hairlineWidth, backgroundColor: T.divider, marginHorizontal: 16 },
+
+  // Left column: number above icon
+  leftCol:     { alignItems: 'center', gap: 6, width: 44 },
+  num:         { fontSize: 11, fontWeight: T.w700, color: T.blue, letterSpacing: 0.5, lineHeight: 14 },
+  iconCircle:  { width: 40, height: 40, borderRadius: 10, backgroundColor: T.featBg, alignItems: 'center', justifyContent: 'center' },
+
+  // Right column: title + sub
+  rightCol:    { flex: 1 },
+  featureName: { fontSize: 14, fontWeight: T.w600, color: T.txtPri, lineHeight: 20 },
+  featureSub:  { fontSize: 13, fontWeight: T.w400, color: T.txtSec, lineHeight: 19, marginTop: 3 },
 });
 
 // ─── S11: TrustBadges ────────────────────────────────────────────────────────
@@ -975,10 +1021,11 @@ export default function ProductDetailScreen({ route, navigation }) {
         {/* White content card (overlaps hero by CARD_LIFT px) */}
         <View style={rs.card}>
 
-          {/* S1: Brand · InStock · Title · Rating */}
+          {/* S1: Title → Description → By Brand → Rating */}
           <ProductIdentity
             brand={brand}
             title={name}
+            description={description}
             rating={rating}
             reviewCount={reviewCount}
             inStock={inStock}
@@ -993,9 +1040,6 @@ export default function ProductDetailScreen({ route, navigation }) {
             selectedId={selectedVar}
             onSelect={setSelectedVar}
           />
-
-          {/* S4: Description  ← ABOVE price per spec */}
-          <ProductDescription text={description} />
 
           {/* S5: FTC disclosure */}
           <FTCNote />
