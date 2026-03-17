@@ -89,7 +89,7 @@ const styles = StyleSheet.create({
   },
   title: {
     ...typeScale.subheadline,
-    color: C.primary,
+    color: C.textTertiary,
   },
   actionTouch: {
     minHeight: 36,          // compact touch target
