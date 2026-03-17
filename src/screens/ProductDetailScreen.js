@@ -334,7 +334,9 @@ function SnapSpaceVerified() {
 
 const vb = StyleSheet.create({
   wrap: { paddingHorizontal: T.padH, marginTop: 14 },
-  pill: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: T.blue, borderRadius: T.rPill, paddingVertical: 11, paddingHorizontal: 20, gap: 7 },
+  // alignSelf: 'flex-start' shrinks the pill to content width — same span as the rating row
+  // borderRadius: 10 ≈ 5% corner radius on a ~40px tall element
+  pill: { flexDirection: 'row', alignItems: 'center', alignSelf: 'flex-start', backgroundColor: T.blue, borderRadius: 10, paddingVertical: 11, paddingHorizontal: 18, gap: 7 },
   label: { fontSize: 13, fontWeight: T.w600, color: '#FFFFFF', lineHeight: 18 },
 });
 
