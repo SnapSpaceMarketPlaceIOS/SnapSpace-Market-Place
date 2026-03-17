@@ -35,8 +35,8 @@ const { width } = Dimensions.get('window');
 // 20px padding each side + 12px gap between cards
 const CARD_WIDTH = (width - 4 * 2 - 4) / 2;
 
-// 10% corner radius for the modal hero image (width minus 20px padding each side)
-const MODAL_IMG_RADIUS = Math.round((width - SP[5] * 2) * 0.10);
+// 5% corner radius for the modal hero image (width minus 20px padding each side)
+const MODAL_IMG_RADIUS = Math.round((width - SP[5] * 2) * 0.05);
 // Product thumbnail — 1/3 larger than original 56px
 const PRODUCT_IMG_SIZE = 76;
 
@@ -97,24 +97,20 @@ function CloseIcon({ size = 12 }) {
   );
 }
 
-// Amazon logo mark — "amazon" wordmark + orange smile arrow (no image assets needed)
+// Amazon logo mark — 50% smaller: fontSize 6, SVG 18×4
 function AmazonLogoMark() {
   return (
     <View style={{ alignItems: 'flex-start' }}>
-      {/* Wordmark: lowercase bold, Amazon navy */}
       <Text style={{
-        fontSize: 10,
+        fontSize: 6,
         fontWeight: '800',
         color: '#232F3E',
-        letterSpacing: -0.3,
-        lineHeight: 13,
+        letterSpacing: -0.2,
+        lineHeight: 8,
       }}>amazon</Text>
-      {/* Orange smile arrow SVG */}
-      <Svg width={36} height={6} viewBox="0 0 36 6" style={{ marginTop: 1 }}>
-        {/* Curved arc from left to right */}
-        <Path d="M1 3 Q18 7 34 3" stroke="#FF9900" strokeWidth="2" fill="none" strokeLinecap="round" />
-        {/* Arrowhead pointing right */}
-        <Path d="M30.5 1 L34 3.2 L30.5 5.2" stroke="#FF9900" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+      <Svg width={18} height={4} viewBox="0 0 36 6" style={{ marginTop: 0 }}>
+        <Path d="M1 3 Q18 7 34 3" stroke="#FF9900" strokeWidth="2.5" fill="none" strokeLinecap="round" />
+        <Path d="M30.5 1 L34 3.2 L30.5 5.2" stroke="#FF9900" strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
       </Svg>
     </View>
   );
@@ -1237,11 +1233,11 @@ const styles = StyleSheet.create({
   },
   productSourceBadge: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 4,
+    borderRadius: 3,
     borderWidth: 0.5,
     borderColor: 'rgba(0,0,0,0.08)',
-    paddingHorizontal: 5,
-    paddingVertical: 3,
+    paddingHorizontal: 3,
+    paddingVertical: 2,
   },
 
   // ── Shipping ─────────────────────────────────────────────────────────────────
