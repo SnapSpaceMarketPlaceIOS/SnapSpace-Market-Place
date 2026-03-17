@@ -12,7 +12,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Svg, { Path, Circle, Polyline, Line, Rect, G } from 'react-native-svg';
 import { colors as C } from './src/constants/theme';
-import { shadow, fontSize, fontWeight, radius } from './src/constants/tokens';
+import { shadow, fontSize, fontWeight, radius, colors } from './src/constants/tokens';
 
 import HomeScreen from './src/screens/HomeScreen';
 import ExploreScreen from './src/screens/ExploreScreen';
@@ -71,9 +71,9 @@ function Frame3Icon() {
   return (
     <Svg width={66} height={40} viewBox="0 0 80 49" fill="none">
       {/* Right dark-blue ear */}
-      <Rect x={8} y={7} width={72} height={35} rx={10} fill="#035DA8" />
+      <Rect x={8} y={7} width={72} height={35} rx={10} fill={colors.blueDeep} />
       {/* Left light-blue ear */}
-      <Rect x={0} y={7} width={48} height={35} rx={10} fill="#67ACE9" />
+      <Rect x={0} y={7} width={48} height={35} rx={10} fill={colors.blueLight} />
       {/* Main black body */}
       <Rect x={4} y={0} width={72} height={49} rx={10} fill="black" />
       {/* Camera icon — centered at (39.5, 22.5) in the 80×49 canvas */}

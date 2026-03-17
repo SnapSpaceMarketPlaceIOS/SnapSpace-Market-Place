@@ -492,6 +492,17 @@ export const motion = {
 };
 
 // ── Default export: everything as a single object ─────────────────────────────
+// ── Room Chip Backgrounds — used by HomeScreen room-type nav ──────────────────
+export const roomChipColors = {
+  'living-room': '#E8F0FA',
+  'bedroom':     '#EEF1FD',
+  'kitchen':     '#FDF4EC',
+  'dining-room': '#ECFAF3',
+  'office':      '#E8F0FA',
+  'outdoor':     '#EAF6EE',
+  'bathroom':    '#F3EEFF',
+};
+
 const tokens = {
   palette,
   uiColors,

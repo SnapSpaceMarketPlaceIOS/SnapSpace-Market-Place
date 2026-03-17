@@ -36,13 +36,13 @@ import {
   Alert,
   Animated,
   Linking,
-  Image,
 } from 'react-native';
 import Svg, { Path, Circle, Polyline, Line, Rect } from 'react-native-svg';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useCart } from '../context/CartContext';
 import CardImage from '../components/CardImage';
 import { SellerName } from '../components/VerifiedBadge';
+import { shadow } from '../constants/tokens';
 
 const { width: SW, height: SH } = Dimensions.get('window');
 const IMAGE_H     = Math.round(SH * 0.50);
@@ -232,10 +232,7 @@ function ProductHero({ imageUrl, liked, onBack, onLike, onShare, scrollY, topIns
     <View style={hs.root}>
       {/* Parallax image */}
       <Animated.View style={[hs.clip, { transform: [{ translateY: imgParallax }] }]}>
-        {imageUrl
-          ? <Image source={{ uri: imageUrl }} style={hs.img} resizeMode="cover" accessibilityIgnoresInvertColors />
-          : <View style={[hs.img, { backgroundColor: T.imageBg }]} />
-        }
+        <CardImage uri={imageUrl} style={hs.img} resizeMode="cover" placeholderColor={T.imageBg} />
       </Animated.View>
       {/* Floating nav */}
       <View style={[hs.topBar, { paddingTop: topInset + 14 }]}>
@@ -264,7 +261,7 @@ const hs = StyleSheet.create({
   img:      { flex: 1, width: '100%' },
   topBar:   { position: 'absolute', top: 0, left: 0, right: 0, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: T.padH },
   topRight: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  navBtn:   { width: 42, height: 42, borderRadius: 21, backgroundColor: 'rgba(255,255,255,0.92)', alignItems: 'center', justifyContent: 'center', shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.12, shadowRadius: 8, elevation: 4 },
+  navBtn:   { width: 42, height: 42, borderRadius: 21, backgroundColor: 'rgba(255,255,255,0.92)', alignItems: 'center', justifyContent: 'center', ...shadow.medium },
 });
 
 // ─── S1: ProductIdentity ──────────────────────────────────────────────────────

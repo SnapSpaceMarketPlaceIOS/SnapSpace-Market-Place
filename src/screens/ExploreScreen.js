@@ -11,8 +11,8 @@ import {
   Keyboard,
   Animated,
   Easing,
-  Image,
 } from 'react-native';
+import CardImage from '../components/CardImage';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
 import Svg, { Circle, Line, Path, Rect, Polyline } from 'react-native-svg';
@@ -201,7 +201,6 @@ function searchAndFilter(designs, query, categoryIndex, roomTypeFilter, styleFil
 
 function GridCard({ design, isLiked, onLike, onPress }) {
   const heartScale = useRef(new Animated.Value(1)).current;
-  const [imgError, setImgError] = useState(false);
 
   const handleLike = () => {
     onLike();
@@ -231,16 +230,7 @@ function GridCard({ design, isLiked, onLike, onPress }) {
       {/* Card image or placeholder */}
       <View style={styles.cardImg}>
         <View style={styles.cardImgBg} />
-        {design.imageUrl && !imgError ? (
-          <Image
-            source={{ uri: design.imageUrl }}
-            style={styles.cardImgPhoto}
-            resizeMode="cover"
-            onError={() => setImgError(true)}
-          />
-        ) : (
-          <ImagePlaceholderIcon />
-        )}
+        <CardImage uri={design.imageUrl} style={styles.cardImgPhoto} resizeMode="cover" />
         {/* Action buttons */}
         <View style={styles.cardActions}>
           <TouchableOpacity
@@ -513,15 +503,7 @@ export default function ExploreScreen({ navigation, route }) {
               >
                 {/* Post image */}
                 <View style={styles.modalImage}>
-                  {selectedCard.imageUrl ? (
-                    <Image
-                      source={{ uri: selectedCard.imageUrl }}
-                      style={styles.modalImagePhoto}
-                      resizeMode="cover"
-                    />
-                  ) : (
-                    <ImagePlaceholderIcon />
-                  )}
+                  <CardImage uri={selectedCard.imageUrl} style={styles.modalImagePhoto} resizeMode="cover" />
                 </View>
 
                 {/* 3B: Seller header row — tap to visit profile */}
@@ -613,8 +595,8 @@ export default function ExploreScreen({ navigation, route }) {
                   >
                     <View style={styles.productImg}>
                       {p.imageUrl ? (
-                        <Image
-                          source={{ uri: p.imageUrl }}
+                        <CardImage
+                          uri={p.imageUrl}
                           style={{ width: '100%', height: '100%' }}
                           resizeMode="cover"
                         />
@@ -629,6 +611,11 @@ export default function ExploreScreen({ navigation, route }) {
                     <Text style={styles.productPrice}>{p.price}</Text>
                   </TouchableOpacity>
                 ))}
+
+                {/* FTC Disclosure */}
+                <Text style={styles.ftcDisclosure}>
+                  We may earn a commission when you buy through links on this app.
+                </Text>
 
                 {/* 3F: Tags */}
                 <Text style={[styles.sectionLabel, { marginTop: SP[5] }]}>TAGS</Text>
@@ -1150,6 +1137,15 @@ const styles = StyleSheet.create({
     ...typeScale.price,
     color: TC.primary,
     textAlign: 'right',
+  },
+
+  ftcDisclosure: {
+    fontSize: 11,
+    fontStyle: 'italic',
+    color: TC.textTertiary,
+    textAlign: 'center',
+    marginTop: SP[4],
+    marginBottom: SP[2],
   },
 
   // ── Section 3F: Tags ──────────────────────────────────────────────────────

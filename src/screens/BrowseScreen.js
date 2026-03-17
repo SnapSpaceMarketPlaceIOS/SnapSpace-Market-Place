@@ -5,7 +5,6 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Image,
   Dimensions,
 } from 'react-native';
 import CardImage from '../components/CardImage';
