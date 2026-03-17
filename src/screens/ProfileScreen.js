@@ -10,11 +10,11 @@ import {
   TextInput,
   KeyboardAvoidingView,
   Platform,
-  Image,
   Alert,
   Share,
   Linking,
 } from 'react-native';
+import CardImage from '../components/CardImage';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path, Circle, Line, Polyline, Rect } from 'react-native-svg';
 import { colors as C } from '../constants/theme';
@@ -350,11 +350,7 @@ export default function ProfileScreen({ navigation }) {
 
         {/* ── Banner ── */}
         <View style={styles.banner}>
-          {profile.bannerUri ? (
-            <Image source={{ uri: profile.bannerUri }} style={styles.bannerImage} resizeMode="cover" />
-          ) : (
-            <View style={styles.bannerGradient} />
-          )}
+          <CardImage uri={profile.bannerUri} style={styles.bannerImage} resizeMode="cover" />
           <SafeAreaView style={styles.navRow}>
             <View style={{ width: space['2xl'] + space.xs }} />
             <TouchableOpacity style={styles.navBtn} onPress={() => setShowSettings(true)}>
@@ -371,7 +367,7 @@ export default function ProfileScreen({ navigation }) {
               <View style={styles.avatar}>
                 <View style={styles.avatarInner}>
                   {profile.avatarUri ? (
-                    <Image source={{ uri: profile.avatarUri }} style={styles.avatarImage} resizeMode="cover" />
+                    <CardImage uri={profile.avatarUri} style={styles.avatarImage} resizeMode="cover" />
                   ) : (
                     <Text style={styles.avatarInitial}>{(profile.displayName || 'S').charAt(0).toUpperCase()}</Text>
                   )}
@@ -445,13 +441,7 @@ export default function ProfileScreen({ navigation }) {
             >
               <View style={styles.cardImg}>
                 <View style={styles.cardImgBg} />
-                {design.imageUrl ? (
-                  <Image
-                    source={{ uri: design.imageUrl }}
-                    style={styles.cardImgPhoto}
-                    resizeMode="cover"
-                  />
-                ) : null}
+                <CardImage uri={design.imageUrl} style={styles.cardImgPhoto} resizeMode="cover" />
                 <View style={styles.cardActions}>
                   <TouchableOpacity
                     style={styles.cardActionBtn}
@@ -740,7 +730,7 @@ export default function ProfileScreen({ navigation }) {
                 <TouchableOpacity style={styles.photoOptionRow} onPress={() => pickImage('avatar')} activeOpacity={0.7}>
                   <View style={styles.photoOptionPreview}>
                     {editDraft.avatarUri ? (
-                      <Image source={{ uri: editDraft.avatarUri }} style={styles.photoOptionPreviewImage} resizeMode="cover" />
+                      <CardImage uri={editDraft.avatarUri} style={styles.photoOptionPreviewImage} resizeMode="cover" />
                     ) : (
                       <Text style={styles.photoOptionPlaceholder}>{(editDraft.displayName || 'S').charAt(0).toUpperCase()}</Text>
                     )}
@@ -751,7 +741,7 @@ export default function ProfileScreen({ navigation }) {
                 <Text style={styles.editProfileLabel}>Banner photo</Text>
                 <TouchableOpacity style={styles.bannerOptionRow} onPress={() => pickImage('banner')} activeOpacity={0.7}>
                   {editDraft.bannerUri ? (
-                    <Image source={{ uri: editDraft.bannerUri }} style={styles.bannerOptionPreview} resizeMode="cover" />
+                    <CardImage uri={editDraft.bannerUri} style={styles.bannerOptionPreview} resizeMode="cover" />
                   ) : (
                     <View style={styles.bannerOptionPlaceholder}>
                       <Text style={styles.bannerOptionPlaceholderText}>Tap to add banner</Text>

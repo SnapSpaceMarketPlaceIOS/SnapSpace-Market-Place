@@ -14,7 +14,7 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Svg, { Path, Circle, Line, Polyline, Rect, Ellipse, G } from 'react-native-svg';
 import { LinearGradient } from 'expo-linear-gradient';
-import { fontSize, fontWeight, letterSpacing, palette, space, radius, shadow, typeScale } from '../constants/tokens';
+import { fontSize, fontWeight, letterSpacing, palette, space, radius, shadow, typeScale, roomChipColors } from '../constants/tokens';
 import { colors as C } from '../constants/theme';
 import SectionHeader from '../components/ds/SectionHeader';
 import Badge, { HeartCountPill } from '../components/ds/Badge';
@@ -22,6 +22,7 @@ import CardImage from '../components/CardImage';
 import { useAuth } from '../context/AuthContext';
 import { useLiked } from '../context/LikedContext';
 import { DESIGNS } from '../data/designs';
+import { SELLERS } from '../data/sellers';
 import { searchProducts, getSourceColor } from '../services/affiliateProducts';
 
 const { width, height } = Dimensions.get('window');
@@ -34,6 +35,10 @@ const HERO_FADE_DURATION   = 1800;
 const CARD_W = width * 0.50;
 const COLL_CARD_W = (width - space.lg * 2 - space.sm) / 2;
 const STYLE_CARD_W = Math.floor((width - space.lg * 2 - space.sm * 2) / 3);
+const ARRIVAL_CARD_W = Math.round(width * 0.42);
+
+// Seller lookup map: handle → seller object
+const SELLER_MAP = SELLERS.reduce((acc, s) => { acc[s.handle] = s; return acc; }, {});
 
 const HERO_IMAGES = [
   'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1600&q=90&fit=crop',
@@ -55,13 +60,13 @@ const HERO_IMAGES = [
 
 // ── Room type quick-nav ────────────────────────────────────────────────────────
 const ROOM_TYPES = [
-  { key: 'living-room', label: 'Living',   bg: '#E8F0FA' },
-  { key: 'bedroom',     label: 'Bedroom',  bg: '#EEF1FD' },
-  { key: 'kitchen',     label: 'Kitchen',  bg: '#FDF4EC' },
-  { key: 'dining-room', label: 'Dining',   bg: '#ECFAF3' },
-  { key: 'office',      label: 'Office',   bg: '#E8F0FA' },
-  { key: 'outdoor',     label: 'Outdoor',  bg: '#EAF6EE' },
-  { key: 'bathroom',    label: 'Bathroom', bg: '#F3EEFF' },
+  { key: 'living-room', label: 'Living',   bg: roomChipColors['living-room'] },
+  { key: 'bedroom',     label: 'Bedroom',  bg: roomChipColors['bedroom'] },
+  { key: 'kitchen',     label: 'Kitchen',  bg: roomChipColors['kitchen'] },
+  { key: 'dining-room', label: 'Dining',   bg: roomChipColors['dining-room'] },
+  { key: 'office',      label: 'Office',   bg: roomChipColors['office'] },
+  { key: 'outdoor',     label: 'Outdoor',  bg: roomChipColors['outdoor'] },
+  { key: 'bathroom',    label: 'Bathroom', bg: roomChipColors['bathroom'] },
   { key: 'entryway',    label: 'Entryway', bg: '#FFF8EC' },
   { key: 'kids-room',   label: 'Kids',     bg: '#FFF0F5' },
   { key: 'nursery',     label: 'Nursery',  bg: '#EBFAF9' },
@@ -325,13 +330,13 @@ const STYLE_CATEGORIES = [
     imageUrl: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=600&q=85' },
   { key: 'scandi',      label: 'Scandi',      sub: 'Pure & Airy',    size: 'short',
     bg: '#EFF6FF', text: '#1E40AF', accent: '#3B82F6',
-    imageUrl: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=600&q=85' },
+    imageUrl: 'https://images.unsplash.com/photo-1649083048381-520a5b3d91ff?w=600&q=85' },
   { key: 'mid-century', label: 'Mid-Century', sub: 'Bold Heritage',  size: 'medium',
     bg: '#FFF7ED', text: '#9A3412', accent: '#EA580C',
-    imageUrl: 'https://images.unsplash.com/photo-1618221195710-2d01d1e0a0a0?w=600&q=85' },
+    imageUrl: 'https://images.unsplash.com/photo-1541085929911-dea736e9287b?w=600&q=85' },
   { key: 'dark-luxe',   label: 'Dark Luxe',   sub: 'Moody & Rich',   size: 'tall',
     bg: '#1E1B4B', text: '#C7D2FE', accent: '#818CF8',
-    imageUrl: 'https://images.unsplash.com/photo-1522771739844-ee4e8089f9e0?w=600&q=85' },
+    imageUrl: 'https://images.unsplash.com/photo-1668089677938-b52086753f77?w=600&q=85' },
   { key: 'bohemian',    label: 'Boho',        sub: 'Free Spirit',    size: 'short',
     bg: '#FEF3C7', text: '#92400E', accent: '#D97706',
     imageUrl: 'https://images.unsplash.com/photo-1632119580908-ae947d4c7691?w=600&q=85' },
@@ -343,7 +348,7 @@ const STYLE_CATEGORIES = [
     imageUrl: 'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=600&q=85' },
   { key: 'farmhouse',   label: 'Farmhouse',   sub: 'Warm & Rooted',  size: 'short',
     bg: '#FAF6F0', text: '#713F12', accent: '#A16207',
-    imageUrl: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=600&q=85' },
+    imageUrl: 'https://images.unsplash.com/photo-1764076327046-fe35f955cba1?w=600&q=85' },
 ];
 
 // Product counts per style (computed once at module load)
@@ -477,6 +482,58 @@ function TagIcon({ size = 13, color = '#F59E0B' }) {
     </Svg>
   );
 }
+
+// ─── Amazon Logo Badge ────────────────────────────────────────────────────────
+
+function AmazonBadge() {
+  return (
+    <View style={amazonBadgeStyle.wrap}>
+      <Text style={amazonBadgeStyle.wordmark}>amazon</Text>
+      <Svg width={44} height={9} viewBox="0 0 44 9">
+        {/* Smile arrow from 'a' to 'z' */}
+        <Path
+          d="M2 3.5 Q22 9.5 42 3.5"
+          stroke="#FF9900"
+          strokeWidth={2.5}
+          fill="none"
+          strokeLinecap="round"
+        />
+        {/* Arrowhead */}
+        <Path
+          d="M38.5 1.5 L42 3.5 L38.5 6"
+          stroke="#FF9900"
+          strokeWidth={2}
+          fill="none"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </Svg>
+    </View>
+  );
+}
+
+const amazonBadgeStyle = StyleSheet.create({
+  wrap: {
+    backgroundColor: '#fff',
+    borderRadius: radius.sm,
+    paddingHorizontal: 8,
+    paddingTop: 5,
+    paddingBottom: 4,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.12,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  wordmark: {
+    fontSize: 11,
+    fontWeight: '800',
+    color: '#232F3E',
+    letterSpacing: -0.3,
+    lineHeight: 13,
+  },
+});
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -866,27 +923,31 @@ export default function HomeScreen({ navigation }) {
               <TouchableOpacity
                 key={design.id}
                 style={styles.forYouCard}
-                activeOpacity={0.82}
+                activeOpacity={0.88}
                 onPress={() => navigation?.navigate('ShopTheLook', { design })}
               >
-    <CardImage uri={design.imageUrl} style={styles.forYouCardImg} />
-    <LinearGradient
-      colors={['rgba(0,0,0,0.18)', 'transparent', 'rgba(0,0,0,0.72)']}
-      locations={[0, 0.4, 1]}
-      style={StyleSheet.absoluteFill}
-    />
-                {/* Style badge top-left — outline ghost style */}
-                {design.styles?.[0] && (
-                  <Badge
-                    variant="outline"
-                    label={STYLE_LABEL_MAP[design.styles[0]] || design.styles[0]}
-                    style={styles.forYouStyleTag}
-                  />
-                )}
-                {/* Title — clean bottom area */}
-                <Text style={styles.forYouCardTitle} numberOfLines={2}>
-                  {design.title.replace('...', '')}
-                </Text>
+                {/* Photo — subtle dark overlay + style badge top-left */}
+                <View style={styles.forYouImgWrap}>
+                  <CardImage uri={design.imageUrl} style={styles.forYouCardImg} />
+                  <View style={styles.forYouImgOverlay} />
+                  {design.styles?.[0] && (
+                    <Badge
+                      variant="outline"
+                      label={STYLE_LABEL_MAP[design.styles[0]] || design.styles[0]}
+                      style={styles.forYouStyleTag}
+                    />
+                  )}
+                </View>
+
+                {/* Info box below image */}
+                <View style={styles.forYouInfoBox}>
+                  <Text style={styles.forYouInfoCreator} numberOfLines={1}>
+                    {SELLER_MAP[design.user]?.displayName || design.user}
+                  </Text>
+                  <Text style={styles.forYouCardTitle} numberOfLines={2}>
+                    {design.title.replace('...', '')}
+                  </Text>
+                </View>
               </TouchableOpacity>
             ))}
           </ScrollView>
@@ -954,26 +1015,24 @@ export default function HomeScreen({ navigation }) {
               return (
                 <TouchableOpacity
                   key={cat.key}
-                  style={styles.styleChipCard}
-                  activeOpacity={0.8}
+                  style={styles.styleCard}
+                  activeOpacity={0.85}
                   onPress={() => navigation?.navigate('Explore', {
                     filterStyle: cat.key,
                     title: cat.label,
                   })}
                 >
-                  <CardImage uri={cat.imageUrl} style={StyleSheet.absoluteFill} placeholderColor="#C8D4E8" />
-                  <LinearGradient
-                    colors={['transparent', 'rgba(0,0,0,0.72)']}
-                    locations={[0.3, 1]}
-                    style={StyleSheet.absoluteFill}
-                  />
-                  <View style={styles.styleChipOverlay}>
-                    <View style={styles.styleChipLabelPill}>
-                      <Text style={styles.styleChipLabel}>{cat.label}</Text>
-                    </View>
-                    {count > 0 && (
-                      <Text style={styles.styleChipCount}>+{count} products</Text>
-                    )}
+                  <View style={styles.styleCardImgWrap}>
+                    <CardImage
+                      uri={cat.imageUrl}
+                      style={StyleSheet.absoluteFill}
+                      placeholderColor="#C8D4E8"
+                      resizeMode="cover"
+                    />
+                  </View>
+                  <View style={styles.styleCardInfoBox}>
+                    <Text style={styles.styleCardLabel} numberOfLines={1}>{cat.label}</Text>
+                    <Text style={styles.styleCardSub} numberOfLines={1}>{cat.sub}</Text>
                   </View>
                 </TouchableOpacity>
               );
@@ -1116,31 +1175,27 @@ export default function HomeScreen({ navigation }) {
             {NEW_ARRIVALS.map(design => (
               <TouchableOpacity
                 key={design.id}
-                style={styles.portraitCard}
-                activeOpacity={0.82}
+                style={styles.arrivalCard}
+                activeOpacity={0.88}
                 onPress={() => navigation?.navigate('ShopTheLook', { design })}
               >
-                <View style={styles.portraitCardImgWrap}>
-      <CardImage uri={design.imageUrl} style={styles.portraitCardImg} />
-                  <LinearGradient
-                    colors={['transparent', 'rgba(0,0,0,0.52)']}
-                    locations={[0.35, 1]}
-                    style={StyleSheet.absoluteFill}
-                  />
-                  <Badge
-                    variant="status"
-                    label="NEW"
-                    style={styles.newBadgePos}
-                  />
+                {/* Photo + badge overlaid on top-right */}
+                <View style={styles.arrivalImgWrap}>
+                  <CardImage uri={design.imageUrl} style={styles.arrivalImg} />
+                  <View style={styles.arrivalNewBadge}>
+                    <Text style={styles.arrivalNewBadgeText}>NEW</Text>
+                  </View>
                 </View>
-                <Text style={styles.portraitCardTitle} numberOfLines={1}>
-                  {design.title.replace('...', '')}
-                </Text>
-                <Text style={styles.portraitCardTag}>
-                  {design.styles?.[0]
-                    ? (STYLE_LABEL_MAP[design.styles[0]] || design.styles[0])
-                    : design.user}
-                </Text>
+
+                {/* Info box below image */}
+                <View style={styles.arrivalInfoBox}>
+                  <Text style={styles.arrivalInfoCreator} numberOfLines={1}>
+                    {SELLER_MAP[design.user]?.displayName || design.user}
+                  </Text>
+                  <Text style={styles.arrivalInfoTitle} numberOfLines={2}>
+                    {design.title.replace('...', '')}
+                  </Text>
+                </View>
               </TouchableOpacity>
             ))}
           </ScrollView>
@@ -1192,34 +1247,39 @@ export default function HomeScreen({ navigation }) {
             {FEATURED_PRODUCTS.slice(0, 4).map((product, i) => (
               <TouchableOpacity
                 key={product.id || i}
-                style={styles.collectionCard}
-                activeOpacity={0.85}
+                style={styles.featuredProductCard}
+                activeOpacity={0.88}
                 onPress={() => navigation?.navigate('ProductDetail', { product })}
               >
-    <CardImage uri={product.imageUrl} style={styles.collectionCardImg} placeholderColor="#E8EDF5" />
-                <LinearGradient
-                  colors={['transparent', 'rgba(0,0,0,0.75)']}
-                  locations={[0.3, 1]}
-                  style={StyleSheet.absoluteFill}
-                />
-                <Badge
-                  variant="source"
-                  label={product.source === 'amazon' ? 'Amazon' : product.source}
-                  color={getSourceColor(product.source)}
-                  style={styles.productSourceBadgePos}
-                />
-                <View style={styles.collectionCardContent}>
-                  <Text style={styles.collectionCardTitle} numberOfLines={2}>
+                {/* ── Image area ── */}
+                <View style={styles.featuredProductImgWrap}>
+                  <CardImage uri={product.imageUrl} style={styles.featuredProductImg} placeholderColor="#E8EDF5" />
+                  {/* Source badge top-right */}
+                  <View style={styles.featuredSourceBadgePos}>
+                    {product.source === 'amazon'
+                      ? <AmazonBadge />
+                      : <Badge
+                          variant="source"
+                          label={product.source}
+                          color={getSourceColor(product.source)}
+                        />
+                    }
+                  </View>
+                </View>
+
+                {/* ── Info below image ── */}
+                <View style={styles.featuredProductBody}>
+                  <Text style={styles.featuredProductName} numberOfLines={2}>
                     {product.name}
                   </Text>
-                  <View style={styles.collectionCardFooter}>
-                    <Text style={styles.collectionCardSub}>
+                  <View style={styles.featuredProductRow}>
+                    <Text style={styles.featuredProductPrice}>
                       {typeof product.priceValue === 'number'
                         ? `$${product.priceValue.toLocaleString()}`
                         : product.price}
                     </Text>
-                    <View style={styles.collectionExploreBtn}>
-                      <Text style={styles.collectionExploreBtnText}>Shop Now</Text>
+                    <View style={styles.featuredShopBtn}>
+                      <Text style={styles.featuredShopBtnText}>Shop Now</Text>
                     </View>
                   </View>
                 </View>
@@ -1601,35 +1661,55 @@ const styles = StyleSheet.create({
 
   // ── For You cards (50% screen width) ─────────────────────────────────────────
   forYouCard: {
-    width: CARD_W,
-    height: CARD_W * 1.0,
-    borderRadius: radius.sm,
+    width: ARRIVAL_CARD_W,
+    borderRadius: radius.md,
+    backgroundColor: '#fff',
+    ...shadow.low,
+  },
+  forYouImgWrap: {
+    width: '100%',
+    height: ARRIVAL_CARD_W,
+    borderTopLeftRadius: radius.md,
+    borderTopRightRadius: radius.md,
     overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: 'rgba(0,0,0,0.06)',
   },
   forYouCardImg: {
     width: '100%',
     height: '100%',
   },
+  forYouImgOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,0,0,0.20)',
+  },
   forYouStyleTag: {
     position: 'absolute',
-    top: 8,
-    left: 8,
+    top: 10,
+    left: 10,
+  },
+  forYouInfoBox: {
+    paddingHorizontal: 10,
+    paddingTop: 8,
+    paddingBottom: 10,
+    borderTopWidth: 1,
+    borderColor: 'rgba(0,0,0,0.06)',
+    gap: 2,
+  },
+  forYouInfoCreator: {
+    fontSize: 10,
+    fontWeight: '600',
+    color: palette.primaryBlue,
+    letterSpacing: 0.1,
+  },
+  forYouCardTitle: {
+    ...typeScale.caption,
+    fontWeight: fontWeight.semibold,
+    color: palette.textPrimary,
+    lineHeight: 16,
   },
   forYouLikePosition: {
     position: 'absolute',
     top: 8,
     right: 8,
-  },
-  forYouCardTitle: {
-    position: 'absolute',
-    bottom: 10,
-    left: 10,
-    right: 10,
-    color: '#fff',
-    ...typeScale.headline,
-    letterSpacing: -0.2,
   },
   forYouLikePill: {
     backgroundColor: 'transparent',
@@ -1695,41 +1775,37 @@ const styles = StyleSheet.create({
   },
 
   // ── Shop By Style cards ──────────────────────────────────────────────────────
-  styleChipCard: {
+  styleCard: {
     width: STYLE_CARD_W,
+    borderRadius: radius.md,
+    backgroundColor: '#fff',
+    ...shadow.low,
+  },
+  styleCardImgWrap: {
+    width: '100%',
     height: STYLE_CARD_W,
-    borderRadius: radius.sm,
+    borderTopLeftRadius: radius.md,
+    borderTopRightRadius: radius.md,
     overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: 'rgba(0,0,0,0.06)',
   },
-  styleChipOverlay: {
-    position: 'absolute',
-    bottom: 8,
-    left: 6,
-    right: 6,
-    gap: 4,
+  styleCardInfoBox: {
+    paddingHorizontal: 8,
+    paddingTop: 7,
+    paddingBottom: 9,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(0,0,0,0.06)',
+    gap: 2,
   },
-  styleChipLabelPill: {
-    alignSelf: 'flex-start',
-    backgroundColor: 'transparent',
-    borderWidth: 1.5,
-    borderColor: 'rgba(255,255,255,0.85)',
-    borderRadius: radius.sm,
-    paddingHorizontal: 7,
-    paddingVertical: 3,
-  },
-  styleChipLabel: {
-    fontSize: 10,
+  styleCardLabel: {
+    fontSize: 12,
     fontWeight: fontWeight.bold,
-    color: '#FFFFFF',
-    letterSpacing: 0.2,
-  },
-  styleChipCount: {
-    fontSize: 9,
-    fontWeight: '500',
-    color: 'rgba(255,255,255,0.78)',
+    color: palette.textPrimary,
     letterSpacing: 0.1,
+  },
+  styleCardSub: {
+    fontSize: 10,
+    fontWeight: '400',
+    color: palette.primaryBlue,
   },
 
   // ── Trending cards ───────────────────────────────────────────────────────────
@@ -1918,40 +1994,68 @@ const styles = StyleSheet.create({
     letterSpacing: 0.2,
   },
 
-  // ── Portrait cards (New Arrivals) ────────────────────────────────────────────
-  portraitCard: {
-    width: STYLE_CARD_W,
+  // ── New Arrivals cards ────────────────────────────────────────────────────────
+  arrivalCard: {
+    width: ARRIVAL_CARD_W,
+    borderRadius: radius.md,
+    backgroundColor: '#fff',
+    ...shadow.low,
   },
-  portraitCardImgWrap: {
-    width: STYLE_CARD_W,
-    height: STYLE_CARD_W,
-    borderRadius: radius.sm,
-    overflow: 'hidden',
-    marginBottom: space.xs,
-    borderWidth: 1,
-    borderColor: 'rgba(0,0,0,0.06)',
-  },
-  portraitCardImg: { width: '100%', height: '100%' },
-  newBadgePos: {
+  arrivalNewBadge: {
     position: 'absolute',
-    top: 6,
-    left: 6,
+    top: 10,
+    right: 10,
+    zIndex: 10,
+    backgroundColor: palette.primaryBlue,
+    borderRadius: radius.sm,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    shadowColor: palette.primaryBlue,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.35,
+    shadowRadius: 4,
+    elevation: 4,
   },
+  arrivalNewBadgeText: {
+    fontSize: 10,
+    fontWeight: '800',
+    color: '#fff',
+    letterSpacing: 1.2,
+  },
+  arrivalImgWrap: {
+    width: '100%',
+    height: ARRIVAL_CARD_W,
+    borderTopLeftRadius: radius.md,
+    borderTopRightRadius: radius.md,
+    overflow: 'hidden',
+  },
+  arrivalImg: { width: '100%', height: '100%' },
+  arrivalInfoBox: {
+    paddingHorizontal: 10,
+    paddingTop: 8,
+    paddingBottom: 10,
+    borderTopWidth: 1,
+    borderColor: 'rgba(0,0,0,0.06)',
+    gap: 2,
+  },
+  arrivalInfoCreator: {
+    fontSize: 10,
+    fontWeight: '600',
+    color: palette.primaryBlue,
+    letterSpacing: 0.1,
+  },
+  arrivalInfoTitle: {
+    ...typeScale.caption,
+    fontWeight: fontWeight.semibold,
+    color: palette.textPrimary,
+    lineHeight: 16,
+  },
+
+  // legacy — kept for other sections that still reference these
   portraitItemsBadgePos: {
     position: 'absolute',
     bottom: 6,
     right: 6,
-  },
-  portraitCardTitle: {
-    ...typeScale.body,
-    fontWeight: '600',
-    color: C.textPrimary,
-    marginBottom: 1,
-  },
-  portraitCardTag: {
-    fontSize: 10,
-    fontWeight: '400',
-    color: C.textSecondary,
   },
 
   // ── Recently Viewed cards ────────────────────────────────────────────────────
@@ -2002,6 +2106,63 @@ const styles = StyleSheet.create({
     top: 6,
     right: 6,
   },
+
+  // ── Featured Products card (below-image layout) ───────────────────────────
+  featuredProductCard: {
+    width: COLL_CARD_W,
+    borderRadius: radius.md,
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: 'rgba(0,0,0,0.07)',
+    overflow: 'hidden',
+    ...shadow.low,
+  },
+  featuredProductImgWrap: {
+    width: '100%',
+    height: 142,
+    overflow: 'hidden',
+  },
+  featuredProductImg: {
+    width: '100%',
+    height: '100%',
+  },
+  featuredSourceBadgePos: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+  },
+  featuredProductBody: {
+    padding: 10,
+    gap: 8,
+  },
+  featuredProductName: {
+    ...typeScale.caption,
+    fontWeight: fontWeight.semibold,
+    color: palette.textPrimary,
+    lineHeight: 17,
+  },
+  featuredProductRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  featuredProductPrice: {
+    ...typeScale.price,
+    color: palette.textPrimary,
+  },
+  featuredShopBtn: {
+    backgroundColor: palette.primaryBlue,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: radius.button,
+  },
+  featuredShopBtnText: {
+    fontSize: 11,
+    fontWeight: fontWeight.semibold,
+    color: '#fff',
+    letterSpacing: 0.1,
+  },
+
   quickAddBtn: {
     position: 'absolute',
     bottom: 6,

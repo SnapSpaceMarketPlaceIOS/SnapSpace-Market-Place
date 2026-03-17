@@ -9,8 +9,8 @@ import {
   Animated,
   Easing,
   ActivityIndicator,
-  Image,
 } from 'react-native';
+import CardImage from '../components/CardImage';
 import Svg, { Path, Circle, Line, Polyline, Rect } from 'react-native-svg';
 import { useStripe } from '@stripe/stripe-react-native';
 import theme from '../constants/theme';
@@ -339,15 +339,7 @@ export default function CartScreen({ navigation }) {
 
               {/* Product image — 88×88 square, light gray bg, radius-lg */}
               <View style={styles.itemImageWrap}>
-                {item.imageUrl ? (
-                  <Image
-                    source={{ uri: item.imageUrl }}
-                    style={styles.itemImage}
-                    resizeMode="cover"
-                  />
-                ) : (
-                  <CategoryIcon type={category.icon} />
-                )}
+                <CardImage uri={item.imageUrl} style={styles.itemImage} resizeMode="cover" />
               </View>
 
               {/* Content column */}
@@ -456,6 +448,10 @@ export default function CartScreen({ navigation }) {
           </View>
 
         </View>
+
+        <Text style={styles.ftcDisclosure}>
+          We may earn a commission when you buy through links on this app.
+        </Text>
 
         <View style={{ height: 120 }} />
       </ScrollView>
@@ -751,6 +747,15 @@ const styles = StyleSheet.create({
     ...typeScale.micro,
     color: C.success,
     textTransform: undefined,
+  },
+
+  ftcDisclosure: {
+    fontSize: 11,
+    fontStyle: 'italic',
+    color: C.textTertiary,
+    textAlign: 'center',
+    marginTop: 16,
+    marginHorizontal: 20,
   },
 
   // ── Section 2D: Checkout Bar ─────────────────────────────────────────────────

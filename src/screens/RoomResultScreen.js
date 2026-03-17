@@ -82,13 +82,15 @@ export default function RoomResultScreen({ route, navigation }) {
 
   useEffect(() => {
     // Use products passed from SnapScreen if available, otherwise match locally
-    if (passedProducts && passedProducts.length > 0) {
-      setProducts(passedProducts);
+    const routeProducts = route?.params?.products;
+    if (routeProducts && routeProducts.length > 0) {
+      setProducts(routeProducts);
     } else {
       const matched = getProductsForPrompt(prompt, 6);
       setProducts(matched);
     }
-  }, [prompt, passedProducts]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [prompt, route.params]);
 
   // Animated value starts at collapsed position
   const sheetY = useRef(new Animated.Value(SHEET_COLLAPSED)).current;

@@ -6,7 +6,6 @@ import {
   StyleSheet,
   TouchableOpacity,
   Dimensions,
-  Image,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path, Circle, Line, Polyline, LinearGradient, Defs, Stop } from 'react-native-svg';
@@ -14,6 +13,7 @@ import { colors as C } from '../constants/theme';
 import { typeScale, radius } from '../constants/tokens';
 import { VerifiedBadge } from '../components/VerifiedBadge';
 import { DESIGNS } from '../data/designs';
+import CardImage from '../components/CardImage';
 
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = (width - 48) / 2;
@@ -350,15 +350,7 @@ export default function UserProfileScreen({ navigation, route }) {
               onPress={() => navigation?.navigate('ShopTheLook', { design: post })}
             >
               <View style={styles.cardImg}>
-                {post.imageUrl ? (
-                  <Image
-                    source={{ uri: post.imageUrl }}
-                    style={styles.cardPhoto}
-                    resizeMode="cover"
-                  />
-                ) : (
-                  <View style={styles.cardPhotoFallback} />
-                )}
+                <CardImage uri={post.imageUrl} style={styles.cardPhoto} resizeMode="cover" />
                 <View style={styles.cardActions}>
                   <TouchableOpacity
                     style={styles.cardActionBtn}

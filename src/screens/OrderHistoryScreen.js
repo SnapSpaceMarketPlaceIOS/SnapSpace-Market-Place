@@ -6,8 +6,8 @@ import {
   StyleSheet,
   TouchableOpacity,
   Dimensions,
-  Image,
 } from 'react-native';
+import CardImage from '../components/CardImage';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path, Circle, Polyline, Line, Rect, G } from 'react-native-svg';
 import { colors as C } from '../constants/theme';
@@ -142,15 +142,7 @@ function OrderCard({ order }) {
           {order.items.map((item, idx) => (
             <View key={item.key || idx} style={styles.itemRow}>
               <View style={[styles.itemThumb, { backgroundColor: getThumbColor(item.name) }]}>
-                {item.imageUrl ? (
-                  <Image
-                    source={{ uri: item.imageUrl }}
-                    style={styles.itemThumbPhoto}
-                    resizeMode="cover"
-                  />
-                ) : (
-                  <SofaSmallIcon />
-                )}
+                <CardImage uri={item.imageUrl} style={styles.itemThumbPhoto} resizeMode="cover" />
               </View>
               <View style={styles.itemInfo}>
                 <Text style={styles.itemName} numberOfLines={1}>{item.name}</Text>
