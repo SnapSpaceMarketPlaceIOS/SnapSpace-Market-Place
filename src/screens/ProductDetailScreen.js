@@ -311,9 +311,9 @@ const id = StyleSheet.create({
   desc:      { fontSize: 14, fontWeight: T.w400, color: T.txtSec, lineHeight: 22, marginTop: 8 },
   byRow:     { flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 10 },
   byLine:    { fontSize: 14, fontWeight: T.w400, color: T.blue, lineHeight: 20 },
-  stockPill: { flexDirection: 'row', alignItems: 'center', gap: 5, backgroundColor: T.greenBg, borderRadius: T.rPill, paddingHorizontal: 10, paddingVertical: 4 },
-  dot:       { width: 7, height: 7, borderRadius: 4, backgroundColor: T.green },
-  stockTxt:  { fontSize: 12, fontWeight: T.w600, color: T.green, lineHeight: 16 },
+  stockPill: { flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: T.greenBg, borderRadius: T.rPill, paddingHorizontal: 7, paddingVertical: 3, borderWidth: 1, borderColor: T.green },
+  dot:       { width: 5, height: 5, borderRadius: 3, backgroundColor: T.green },
+  stockTxt:  { fontSize: 11, fontWeight: T.w600, color: T.green, lineHeight: 14 },
   ratingRow: { flexDirection: 'row', alignItems: 'center', gap: 3, marginTop: 10 },
   score:     { fontSize: 14, fontWeight: T.w600, color: T.txtPri, lineHeight: 18, marginLeft: 3 },
   reviews:   { fontSize: 13, fontWeight: T.w400, color: T.txtSec, lineHeight: 18 },
@@ -376,7 +376,7 @@ const va = StyleSheet.create({
   scroll:     { paddingHorizontal: T.padH, gap: 10 },
   // Tile: tall rectangle, color block fills top portion, label at bottom
   tile:       { width: 100, height: 96, borderRadius: T.rVariant, borderWidth: 1.5, borderColor: T.border, backgroundColor: T.surface, overflow: 'hidden', justifyContent: 'flex-end' },
-  tileOn:     { borderColor: T.blue, borderWidth: 2 },
+  tileOn:     { borderColor: T.blue, borderWidth: 1 },
   // Color block fills top 58px of the tile
   colorBlock: { position: 'absolute', top: 0, left: 0, right: 0, height: 58 },
   tileLabel:  { fontSize: 12, fontWeight: T.w400, color: T.txtSec, textAlign: 'center', paddingBottom: 8, paddingTop: 4, paddingHorizontal: 4, backgroundColor: T.surface },
@@ -486,7 +486,7 @@ function DeliveryBox({ date }) {
 }
 
 const dv = StyleSheet.create({
-  box:      { marginHorizontal: T.padH, marginTop: 16, borderWidth: 1.5, borderColor: T.blue, borderRadius: T.rMd, paddingVertical: 14, paddingHorizontal: 16, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: T.surface },
+  box:      { marginHorizontal: T.padH, marginTop: 16, borderWidth: 0.75, borderColor: T.blue, borderRadius: T.rMd, paddingVertical: 14, paddingHorizontal: 16, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: T.surface },
   left:     { flex: 1, gap: 5 },
   greenPill:{ alignSelf: 'flex-start', backgroundColor: '#F0FDF4', borderRadius: T.rPill, paddingHorizontal: 10, paddingVertical: 4, borderWidth: 1, borderColor: T.green },
   greenTxt: { fontSize: 12, fontWeight: T.w600, color: T.green, lineHeight: 16 },
