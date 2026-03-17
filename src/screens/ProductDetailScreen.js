@@ -867,35 +867,82 @@ function CTABar({ inCart, liked, onAddToCart, onWishlist, affiliateUrl, source, 
 }
 
 const cta = StyleSheet.create({
-  bar:         { position: 'absolute', bottom: 0, left: 0, right: 0, backgroundColor: T.surface, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: 'rgba(0,0,0,0.08)', paddingHorizontal: T.padH, paddingTop: 10 },
-  affiliateRow:{ alignItems: 'center', marginBottom: 8 },
-  affiliateTxt:{ fontSize: 12, fontWeight: T.w400, color: T.txtSec, lineHeight: 16 },
-  row:         { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  // ── Bar container ─────────────────────────────────────────────────────────
+  // Elevated surface with soft top shadow — lifts off the scroll content
+  bar: {
+    position: 'absolute',
+    bottom: 0, left: 0, right: 0,
+    backgroundColor: T.surface,
+    paddingHorizontal: T.padH,
+    paddingTop: 12,
+    // Top shadow so the bar feels grounded, not floating
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -3 },
+    shadowOpacity: 0.06,
+    shadowRadius: 12,
+    elevation: 12,
+  },
 
-  /* Cart button */
-  cartWrap:    { flex: 1 },
-  cartBtn:     { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: T.blue, borderRadius: T.rCta, height: 54, gap: 8 },
-  cartBtnGreen:{ backgroundColor: T.green },
+  // ── Affiliate link ────────────────────────────────────────────────────────
+  affiliateRow: { alignItems: 'center', marginBottom: 10 },
+  affiliateTxt: { fontSize: 12, fontWeight: T.w500, color: T.txtSec, lineHeight: 16 },
 
-  /* Label container — fixed height, both labels absolutely positioned */
+  // ── Buttons row ───────────────────────────────────────────────────────────
+  row: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+
+  // ── Add to Cart button ────────────────────────────────────────────────────
+  cartWrap:     { flex: 1 },
+  cartBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: T.blue,
+    borderRadius: 16,
+    height: 56,
+    gap: 10,
+    // Subtle inner shadow illusion with opacity — feels dimensional
+    shadowColor: T.blueDeep,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.30,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  cartBtnGreen: { backgroundColor: T.green, shadowColor: T.green },
+
+  // ── Label box — FIXED width so icon + label centre as one unit ────────────
+  // Both animated labels stack absolutely inside — no layout shift ever
   labelBox: {
+    width: 116,          // fixed: wide enough for "Add to Cart" at 16/700
     height: 22,
-    flex: 1,
     position: 'relative',
   },
   label: {
     position: 'absolute',
     top: 0, left: 0, right: 0,
     fontSize: 16,
-    fontWeight: T.w600,
+    fontWeight: T.w700,
     color: '#FFFFFF',
     lineHeight: 22,
     textAlign: 'center',
+    letterSpacing: 0.1,
   },
 
-  /* Wishlist button */
-  wishBtn:   { width: 54, height: 54, borderRadius: T.rCta, backgroundColor: T.surface, borderWidth: 1, borderColor: 'rgba(0,0,0,0.10)', alignItems: 'center', justifyContent: 'center' },
-  wishBtnOn: { borderColor: T.red, backgroundColor: '#FFF1F2' },
+  // ── Wishlist / Heart button ───────────────────────────────────────────────
+  // Matches cart button height exactly; border-radius mirrors cart btn
+  wishBtn: {
+    width: 56,
+    height: 56,
+    borderRadius: 16,
+    backgroundColor: T.surface,
+    borderWidth: 1.5,
+    borderColor: 'rgba(0,0,0,0.10)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  wishBtnOn: {
+    borderColor: T.red,
+    backgroundColor: '#FFF1F2',
+  },
 });
 
 // ─── ProductDetailScreen (main) ───────────────────────────────────────────────
