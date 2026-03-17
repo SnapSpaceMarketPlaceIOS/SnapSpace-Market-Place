@@ -483,6 +483,14 @@ function TagIcon({ size = 13, color = '#F59E0B' }) {
   );
 }
 
+function StarIcon({ size = 12, color = '#F59E0B' }) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill={color} stroke={color} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
+      <Path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+    </Svg>
+  );
+}
+
 // ─── Amazon Logo Badge ────────────────────────────────────────────────────────
 
 function AmazonBadge() {
@@ -926,17 +934,10 @@ export default function HomeScreen({ navigation }) {
                 activeOpacity={0.88}
                 onPress={() => navigation?.navigate('ShopTheLook', { design })}
               >
-                {/* Photo — subtle dark overlay + style badge top-left */}
+                {/* Photo */}
                 <View style={styles.forYouImgWrap}>
                   <CardImage uri={design.imageUrl} style={styles.forYouCardImg} />
                   <View style={styles.forYouImgOverlay} />
-                  {design.styles?.[0] && (
-                    <Badge
-                      variant="outline"
-                      label={STYLE_LABEL_MAP[design.styles[0]] || design.styles[0]}
-                      style={styles.forYouStyleTag}
-                    />
-                  )}
                 </View>
 
                 {/* Info box below image */}
@@ -1096,62 +1097,88 @@ export default function HomeScreen({ navigation }) {
             </View>
 
             <TouchableOpacity
-              activeOpacity={0.93}
+              activeOpacity={0.95}
               onPress={() => navigation?.navigate('ProductDetail', { product: dealProduct })}
+              style={styles.dealCard}
             >
-              <LinearGradient
-                colors={['#080D1A', '#0C1730', '#0F2040']}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={styles.dealCard}
-              >
-                {/* Ambient warm glow — top-right decoration */}
-                <View style={styles.dealAmbientGlow} pointerEvents="none" />
-
-                {/* Badge row */}
-                <View style={styles.dealBadgeRow}>
+              {/* ── Hero image (full-width, top) ── */}
+              <View style={styles.dealImgWrap}>
+                <CardImage
+                  uri={dealProduct.imageUrl}
+                  style={styles.dealImg}
+                  placeholderColor="#E8EDF5"
+                  resizeMode="cover"
+                />
+                {/* Overlaid badge on the image — Deal of the Day only */}
+                <View style={styles.dealOverlayRow}>
                   <View style={styles.dealBadge}>
-                    <TagIcon size={10} color="#C9A84C" />
+                    <TagIcon size={9} color="#fff" />
                     <Text style={styles.dealBadgeText}>DEAL OF THE DAY</Text>
                   </View>
                 </View>
+              </View>
 
-                {/* Body: image + info side by side */}
-                <View style={styles.dealBody}>
-                  {/* Product image with warm glow ring */}
-                  <View style={styles.dealImgOuter}>
-                    <View style={styles.dealImgGlowRing} />
-                    <View style={styles.dealImgWrap}>
-    <CardImage uri={dealProduct.imageUrl} style={styles.dealImg} placeholderColor="#1A2E50" />
-                    </View>
+              {/* ── Info area (below image) ── */}
+              <View style={styles.dealInfoArea}>
+                {/* Brand */}
+                {dealProduct.brand && (
+                  <Text style={styles.dealBrand}>{dealProduct.brand.toUpperCase()}</Text>
+                )}
+
+                {/* Product name */}
+                <Text style={styles.dealProductName} numberOfLines={2}>
+                  {dealProduct.name}
+                </Text>
+
+                {/* Short description */}
+                {dealProduct.description && (
+                  <Text style={styles.dealDescription} numberOfLines={2}>
+                    {dealProduct.description}
+                  </Text>
+                )}
+
+                {/* Rating row */}
+                {dealProduct.rating && (
+                  <View style={styles.dealRatingRow}>
+                    {[1,2,3,4,5].map(i => (
+                      <StarIcon
+                        key={i}
+                        size={13}
+                        color={i <= Math.round(dealProduct.rating) ? '#F59E0B' : '#E5E7EB'}
+                      />
+                    ))}
+                    <Text style={styles.dealRatingScore}>{dealProduct.rating.toFixed(1)}</Text>
+                    {dealProduct.reviewCount && (
+                      <Text style={styles.dealReviewCount}>
+                        ({dealProduct.reviewCount.toLocaleString()} reviews)
+                      </Text>
+                    )}
+                    {dealProduct.source && (
+                      <Text style={styles.dealSourceTag}>
+                        {dealProduct.source === 'amazon' ? 'via Amazon' : dealProduct.source}
+                      </Text>
+                    )}
                   </View>
+                )}
 
-                  {/* Right info column */}
-                  <View style={styles.dealInfo}>
-                    <Text style={styles.dealProductName} numberOfLines={3}>
-                      {dealProduct.name}
-                    </Text>
-
-                    <View style={styles.dealPriceRow}>
-                      <Text style={styles.dealPrice}>{dealProduct.price}</Text>
-                    </View>
-
-                    <View style={styles.dealLimitedPill}>
-                      <Text style={styles.dealLimitedText}>Limited Time</Text>
-                    </View>
-                  </View>
+                {/* Price row */}
+                <View style={styles.dealPriceRow}>
+                  <Text style={styles.dealPrice}>
+                    {typeof dealProduct.price === 'number'
+                      ? `$${dealProduct.price.toLocaleString()}`
+                      : dealProduct.price}
+                  </Text>
+                  {dealProduct.priceDisplay && dealProduct.priceDisplay !== dealProduct.price && (
+                    <Text style={styles.dealPriceOrig}>{dealProduct.priceDisplay}</Text>
+                  )}
                 </View>
 
-                {/* CTA pill */}
-                <TouchableOpacity
-                  style={styles.dealShopBtn}
-                  activeOpacity={0.82}
-                  onPress={() => navigation?.navigate('ProductDetail', { product: dealProduct })}
-                >
+                {/* CTA button */}
+                <View style={styles.dealShopBtn}>
                   <Text style={styles.dealShopBtnText}>Shop Now</Text>
-                  <ChevronRight color="#0F172A" />
-                </TouchableOpacity>
-              </LinearGradient>
+                  <ChevronRight color="#fff" />
+                </View>
+              </View>
             </TouchableOpacity>
           </View>
         )}
@@ -1848,7 +1875,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: space.lg,
     paddingTop: space.xl,
     paddingBottom: space.xl,
-    backgroundColor: '#FAFAF8',
+    backgroundColor: palette.background,
     borderTopWidth: 1,
     borderTopColor: 'rgba(0,0,0,0.06)',
   },
@@ -1870,128 +1897,135 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
     color: 'rgba(0,0,0,0.38)',
   },
+  // Card: white bg, gray border, same 20 radius
   dealCard: {
-    borderRadius: 20,
+    borderRadius: radius.xl,
     overflow: 'hidden',
-    padding: space.lg,
-    paddingBottom: space.base,
-  },
-  dealAmbientGlow: {
-    position: 'absolute',
-    top: -40,
-    right: -40,
-    width: 180,
-    height: 180,
-    borderRadius: 90,
-    backgroundColor: 'rgba(180,130,50,0.09)',
-  },
-  dealBadgeRow: {
-    flexDirection: 'row',
-    marginBottom: space.base,
-  },
-  dealBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 5,
-    backgroundColor: 'rgba(201,168,76,0.12)',
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: radius.full,
+    backgroundColor: '#FFFFFF',
     borderWidth: 1,
-    borderColor: 'rgba(201,168,76,0.35)',
+    borderColor: 'rgba(0,0,0,0.09)',
+    ...shadow.medium,
   },
-  dealBadgeText: {
-    color: '#C9A84C',
-    fontSize: 9,
-    fontWeight: fontWeight.bold,
-    letterSpacing: 1.2,
-    textTransform: 'uppercase',
-  },
-  dealBody: {
-    flexDirection: 'row',
-    gap: space.base,
-    alignItems: 'flex-start',
-    marginBottom: space.base,
-  },
-  dealImgOuter: {
-    position: 'relative',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  dealImgGlowRing: {
-    position: 'absolute',
-    width: 118,
-    height: 118,
-    borderRadius: 59,
-    backgroundColor: 'rgba(180,130,50,0.14)',
-  },
+  // Full-width hero image at top
   dealImgWrap: {
-    width: 108,
-    height: 108,
-    borderRadius: 14,
-    overflow: 'hidden',
-    backgroundColor: '#1A2E50',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.06)',
+    width: '100%',
+    height: 210,
+    backgroundColor: '#F0F2F5',
+    position: 'relative',
   },
   dealImg: {
     width: '100%',
     height: '100%',
   },
-  dealInfo: {
-    flex: 1,
-    gap: 8,
-    paddingTop: 2,
-  },
-  dealProductName: {
-    fontSize: 16,
-    fontWeight: fontWeight.bold,
-    color: '#FFFFFF',
-    lineHeight: 22,
-    letterSpacing: -0.2,
-  },
-  dealPriceRow: {
+  // Badge overlaid on top of image (Deal of the Day only)
+  dealOverlayRow: {
+    position: 'absolute',
+    top: 14,
+    left: 14,
     flexDirection: 'row',
     alignItems: 'center',
   },
-  dealPrice: {
-    fontSize: 22,
-    fontWeight: fontWeight.xbold,
+  dealBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    backgroundColor: palette.primaryBlue,
+    paddingHorizontal: 11,
+    paddingVertical: 6,
+    borderRadius: radius.full,
+  },
+  dealBadgeText: {
     color: '#FFFFFF',
+    fontSize: 9,
+    fontWeight: fontWeight.bold,
+    letterSpacing: 1.2,
+    textTransform: 'uppercase',
+  },
+  // Info area below image
+  dealInfoArea: {
+    paddingHorizontal: 18,
+    paddingTop: 18,
+    paddingBottom: 20,
+    gap: 8,
+  },
+  dealBrand: {
+    fontSize: 10,
+    fontWeight: fontWeight.bold,
+    letterSpacing: 1.4,
+    color: palette.primaryBlue,
+    textTransform: 'uppercase',
+  },
+  dealProductName: {
+    fontSize: 17,
+    fontWeight: fontWeight.bold,
+    color: palette.textPrimary,
+    lineHeight: 23,
+    letterSpacing: -0.2,
+  },
+  dealDescription: {
+    fontSize: 13,
+    fontWeight: fontWeight.regular,
+    color: palette.textSecondary,
+    lineHeight: 19,
+    marginTop: 1,
+  },
+  dealRatingRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 3,
+    marginTop: 2,
+  },
+  dealRatingScore: {
+    fontSize: 13,
+    fontWeight: fontWeight.semibold,
+    color: palette.textPrimary,
+    marginLeft: 3,
+  },
+  dealReviewCount: {
+    fontSize: 12,
+    fontWeight: fontWeight.regular,
+    color: palette.textSecondary,
+  },
+  dealSourceTag: {
+    fontSize: 11,
+    fontWeight: fontWeight.medium,
+    color: palette.textTertiary,
+    marginLeft: 4,
+  },
+  dealPriceRow: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    gap: 8,
+    marginTop: 4,
+  },
+  dealPrice: {
+    fontSize: 28,
+    fontWeight: fontWeight.xbold,
+    color: palette.textPrimary,
     letterSpacing: -0.5,
   },
-  dealLimitedPill: {
-    alignSelf: 'flex-start',
-    backgroundColor: 'rgba(255,255,255,0.08)',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: radius.full,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.14)',
-  },
-  dealLimitedText: {
-    fontSize: 10,
-    fontWeight: fontWeight.semibold,
-    letterSpacing: 0.6,
-    color: 'rgba(255,255,255,0.55)',
-    textTransform: 'uppercase',
+  dealPriceOrig: {
+    fontSize: 14,
+    fontWeight: fontWeight.regular,
+    color: palette.textSecondary,
+    textDecorationLine: 'line-through',
   },
   dealShopBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     alignSelf: 'stretch',
-    backgroundColor: '#F5F0E8',
-    paddingVertical: 14,
+    backgroundColor: palette.primaryBlue,
+    paddingVertical: 16,
     borderRadius: radius.button,
-    gap: 4,
-    marginTop: 4,
+    gap: 5,
+    marginTop: 8,
   },
   dealShopBtnText: {
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: fontWeight.semibold,
-    color: '#0F172A',
-    letterSpacing: 0.2,
+    color: '#FFFFFF',
+    letterSpacing: 0.1,
   },
 
   // ── New Arrivals cards ────────────────────────────────────────────────────────
