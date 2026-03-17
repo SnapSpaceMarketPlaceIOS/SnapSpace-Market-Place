@@ -97,6 +97,29 @@ function CloseIcon({ size = 12 }) {
   );
 }
 
+// Amazon logo mark — "amazon" wordmark + orange smile arrow (no image assets needed)
+function AmazonLogoMark() {
+  return (
+    <View style={{ alignItems: 'flex-start' }}>
+      {/* Wordmark: lowercase bold, Amazon navy */}
+      <Text style={{
+        fontSize: 10,
+        fontWeight: '800',
+        color: '#232F3E',
+        letterSpacing: -0.3,
+        lineHeight: 13,
+      }}>amazon</Text>
+      {/* Orange smile arrow SVG */}
+      <Svg width={36} height={6} viewBox="0 0 36 6" style={{ marginTop: 1 }}>
+        {/* Curved arc from left to right */}
+        <Path d="M1 3 Q18 7 34 3" stroke="#FF9900" strokeWidth="2" fill="none" strokeLinecap="round" />
+        {/* Arrowhead pointing right */}
+        <Path d="M30.5 1 L34 3.2 L30.5 5.2" stroke="#FF9900" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+      </Svg>
+    </View>
+  );
+}
+
 function StarIconSmall({ filled = true, size = 11 }) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24"
@@ -641,7 +664,7 @@ export default function ExploreScreen({ navigation, route }) {
                         <Text style={styles.productBrand}>{p.brand}</Text>
                         {p.source === 'amazon' && (
                           <View style={styles.productSourceBadge}>
-                            <Text style={styles.productSourceText}>Amazon</Text>
+                            <AmazonLogoMark />
                           </View>
                         )}
                       </View>
@@ -1213,17 +1236,12 @@ const styles = StyleSheet.create({
     color: TC.textTertiary,
   },
   productSourceBadge: {
-    backgroundColor: '#FFF3E0',
+    backgroundColor: '#FFFFFF',
     borderRadius: 4,
+    borderWidth: 0.5,
+    borderColor: 'rgba(0,0,0,0.08)',
     paddingHorizontal: 5,
-    paddingVertical: 1,
-  },
-  productSourceText: {
-    fontSize: 9,
-    fontWeight: '700',
-    color: '#E65100',
-    letterSpacing: 0.3,
-    textTransform: 'uppercase',
+    paddingVertical: 3,
   },
 
   // ── Shipping ─────────────────────────────────────────────────────────────────
