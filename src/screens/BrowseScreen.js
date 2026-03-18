@@ -202,7 +202,6 @@ export default function BrowseScreen({ navigation, route }) {
                     <Text style={styles.designCardTitle} numberOfLines={2}>
                       {design.title?.replace('...', '')}
                     </Text>
-                    <Text style={styles.designCardLikes}>♥ {design.likes}</Text>
                     {design.styles?.[0] && (
                       <Badge
                         variant="source"
@@ -375,7 +374,7 @@ const styles = StyleSheet.create({
   // ── Design cards — photo top, content below ───────────────────────────────
   designCard: {
     width: CARD_W,
-    borderRadius: radius.xl,
+    borderRadius: Math.round(CARD_W * 0.05),
     overflow: 'hidden',
     backgroundColor: '#FFFFFF',
     borderWidth: 1,
@@ -417,7 +416,7 @@ const styles = StyleSheet.create({
   // ── Product cards — photo top, content below ──────────────────────────────
   productCard: {
     width: CARD_W,
-    borderRadius: radius.xl,
+    borderRadius: Math.round(CARD_W * 0.05),
     overflow: 'hidden',
     backgroundColor: '#FFFFFF',
     borderWidth: 1,
