@@ -64,6 +64,29 @@ function CartWhiteIcon() {
   );
 }
 
+function AmazonLogoMark() {
+  return (
+    <View style={{ alignItems: 'flex-start' }}>
+      <Text style={{ fontSize: 6, fontWeight: '800', color: '#232F3E', letterSpacing: -0.2, lineHeight: 8 }}>amazon</Text>
+      <Svg width={18} height={4} viewBox="0 0 36 6" style={{ marginTop: 0 }}>
+        <Path d="M1 3 Q18 7 34 3" stroke="#FF9900" strokeWidth="2.5" fill="none" strokeLinecap="round" />
+        <Path d="M30.5 1 L34 3.2 L30.5 5.2" stroke="#FF9900" strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+      </Svg>
+    </View>
+  );
+}
+
+function StarIconSmall({ filled = true, size = 11 }) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24"
+      fill={filled ? '#F5A623' : '#E5E7EB'} stroke={filled ? '#F5A623' : '#D1D5DB'} strokeWidth={1}>
+      <Path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+    </Svg>
+  );
+}
+
+const PRODUCT_IMG_SIZE = 88;
+
 export default function ShopTheLookScreen({ route, navigation }) {
   const { design } = route.params;
   const { addToCart, items } = useCart();
@@ -150,31 +173,65 @@ export default function ShopTheLookScreen({ route, navigation }) {
 
         {products.map((product, index) => {
           const inCart = isInCart(product);
+          const ratingVal = typeof product.rating === 'number' ? product.rating : parseFloat(product.rating) || 0;
           return (
             <PressableCard
               key={product.id || index}
               style={styles.productCard}
               onPress={() => navigation.navigate('ProductDetail', { product, design })}
             >
+              {/* Thumbnail */}
               <View style={styles.productImgWrap}>
                 <CardImage
                   uri={product.imageUrl}
-                  style={{ width: 56, height: 56, borderRadius: radius.lg }}
+                  style={{ width: '100%', height: '100%' }}
+                  resizeMode="cover"
                   placeholderColor="#D0D7E3"
                 />
               </View>
+
+              {/* Info column */}
               <View style={styles.productDetails}>
-                <Text style={styles.productName}>{product.name}</Text>
-                <Text style={styles.productBrand}>{product.brand}</Text>
-                <Text style={styles.productPrice}>{product.price}</Text>
+                <Text style={styles.productName} numberOfLines={2}>{product.name}</Text>
+
+                {/* Stars */}
+                {ratingVal > 0 && (
+                  <View style={styles.ratingRow}>
+                    {[1,2,3,4,5].map(i => (
+                      <StarIconSmall key={i} size={11} filled={i <= Math.round(ratingVal)} />
+                    ))}
+                    <Text style={styles.ratingScore}>{ratingVal.toFixed(1)}</Text>
+                    {!!product.reviewCount && (
+                      <Text style={styles.reviewCount}>({product.reviewCount.toLocaleString()})</Text>
+                    )}
+                  </View>
+                )}
+
+                {/* Brand + Amazon badge */}
+                <View style={styles.metaRow}>
+                  <Text style={styles.productBrand}>{product.brand}</Text>
+                  {product.source === 'amazon' && (
+                    <View style={styles.sourceBadge}><AmazonLogoMark /></View>
+                  )}
+                </View>
+
+                {/* Free Shipping */}
+                <Text style={styles.shipping}>✓ Free Shipping</Text>
               </View>
-              <TouchableOpacity
-                style={[styles.addBtn, inCart && styles.addBtnAdded]}
-                onPress={() => !inCart && handleAddToCart(product)}
-                activeOpacity={inCart ? 1 : 0.7}
-              >
-                {inCart ? <CheckIcon /> : <PlusSmallIcon />}
-              </TouchableOpacity>
+
+              {/* Price + add button */}
+              <View style={styles.rightCol}>
+                <Text style={styles.productPrice}>
+                  {typeof product.price === 'number' ? `$${product.price.toLocaleString()}` : product.price}
+                </Text>
+                <TouchableOpacity
+                  style={[styles.addBtn, inCart && styles.addBtnAdded]}
+                  onPress={() => !inCart && handleAddToCart(product)}
+                  activeOpacity={inCart ? 1 : 0.7}
+                >
+                  {inCart ? <CheckIcon /> : <PlusSmallIcon />}
+                </TouchableOpacity>
+              </View>
             </PressableCard>
           );
         })}
@@ -320,7 +377,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginHorizontal: space.lg,
-    padding: space.base,
+    padding: space.md,
     backgroundColor: '#FFFFFF',
     borderRadius: radius.xl,
     marginBottom: space.md,
@@ -331,38 +388,77 @@ const styles = StyleSheet.create({
     shadowOpacity: shadow.low.shadowOpacity,
     shadowRadius: shadow.low.shadowRadius,
     elevation: shadow.low.elevation,
+    gap: space.md,
   },
   productImgWrap: {
-    width: space['5xl'],
-    height: space['5xl'],
-    // Inner image inside radius.xl card (padding 16) → nesting: 20-16=4, but spec says radius.lg for ShopTheLook thumbnails
-    borderRadius: radius.lg,
+    width: PRODUCT_IMG_SIZE,
+    height: PRODUCT_IMG_SIZE,
+    borderRadius: Math.round(PRODUCT_IMG_SIZE * 0.05),
     backgroundColor: '#F1F5F9',
-    alignItems: 'center',
-    justifyContent: 'center',
     overflow: 'hidden',
+    flexShrink: 0,
   },
   productDetails: {
     flex: 1,
-    marginLeft: space.md,
+    gap: 3,
   },
   productName: {
-    ...typeScale.body,
-    fontWeight: '700',
+    ...typeScale.headline,
     color: '#111',
-    marginBottom: space.xs,
+  },
+  ratingRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 2,
+    marginTop: 2,
+  },
+  ratingScore: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: '#111',
+    marginLeft: 3,
+    lineHeight: 14,
+  },
+  reviewCount: {
+    fontSize: 11,
+    fontWeight: '400',
+    color: '#6B7280',
+    lineHeight: 14,
+  },
+  metaRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
   },
   productBrand: {
     ...typeScale.caption,
-    color: '#A0A0A8',
-    opacity: 0.44,
-    marginBottom: space.xs,
+    color: '#9CA3AF',
+  },
+  sourceBadge: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 3,
+    borderWidth: 0.5,
+    borderColor: 'rgba(0,0,0,0.08)',
+    paddingHorizontal: 3,
+    paddingVertical: 2,
+  },
+  shipping: {
+    fontSize: 11,
+    fontWeight: '400',
+    color: '#16A34A',
+    lineHeight: 14,
+  },
+  rightCol: {
+    alignItems: 'flex-end',
+    gap: 8,
+    flexShrink: 0,
   },
   productPrice: {
     ...typeScale.price,
     color: colors.bluePrimary,
     letterSpacing: letterSpacing.tight,
     fontVariant: ['tabular-nums'],
+    textAlign: 'right',
   },
   addBtn: {
     width: space['3xl'],
@@ -371,7 +467,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.bluePrimary,
     alignItems: 'center',
     justifyContent: 'center',
-    marginLeft: space.sm,
   },
   addBtnAdded: {
     backgroundColor: '#34C759',
