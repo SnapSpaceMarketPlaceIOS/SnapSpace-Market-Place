@@ -7,10 +7,9 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import CardImage from '../components/CardImage';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { LinearGradient } from 'expo-linear-gradient';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path, Polyline } from 'react-native-svg';
-import { space, radius, shadow, typeScale, fontWeight, letterSpacing, palette } from '../constants/tokens';
+import { space, radius, shadow, typeScale, fontWeight, letterSpacing } from '../constants/tokens';
 import { colors } from '../constants/colors';
 import { Badge } from '../components/ds';
 
@@ -87,20 +86,10 @@ const CURATED_COLLECTIONS = [
 
 function BackIcon() {
   return (
-    <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="#FFFFFF"
-      strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round">
+    <Svg width={20} height={20} viewBox="0 0 24 24" fill="none"
+      stroke="#111827" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round">
       <Path d="M19 12H5" />
       <Polyline points="12 19 5 12 12 5" />
-    </Svg>
-  );
-}
-
-function ArrowRightIcon() {
-  return (
-    <Svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="#FFFFFF"
-      strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
-      <Path d="M5 12h14" />
-      <Polyline points="12 5 19 12 12 19" />
     </Svg>
   );
 }
@@ -108,83 +97,69 @@ function ArrowRightIcon() {
 // ── Screen ────────────────────────────────────────────────────────────────────
 
 export default function AllCollectionsScreen({ navigation }) {
-  const insets = useSafeAreaInsets();
-
   return (
     <View style={styles.root}>
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-        bounces
-      >
-        {/* ── Hero banner — back button floated over gradient, no separate nav bar */}
-        <LinearGradient
-          colors={[palette.heroStart, palette.heroEnd]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={[styles.heroBanner, { paddingTop: insets.top + 16 }]}
+      <SafeAreaView edges={['top']} style={styles.safeArea}>
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+          bounces
         >
-          <TouchableOpacity
-            style={styles.backBtn}
-            onPress={() => navigation.goBack()}
-            activeOpacity={0.7}
-          >
-            <BackIcon />
-          </TouchableOpacity>
-
-          <View style={styles.heroTextWrap}>
-            <Text style={styles.introEyebrow}>CURATED FOR YOU</Text>
-            <Text style={styles.introTitle}>Explore Collections</Text>
-            <Text style={styles.introSub}>Handpicked room themes, styles, and product sets</Text>
-          </View>
-        </LinearGradient>
-
-        {/* ── Collections list */}
-        <View style={styles.listContainer}>
-          {CURATED_COLLECTIONS.map((col) => (
+          {/* ── Header — matches Explore page pattern ─────────────────── */}
+          <View style={styles.headerRow}>
             <TouchableOpacity
-              key={col.id}
-              style={styles.collectionCard}
-              activeOpacity={0.88}
-              onPress={() =>
-                navigation.navigate('Browse', {
-                  mode: 'collection',
-                  title: col.title,
-                  subtitle: col.subtitle,
-                  collection: col,
-                  heroImage: col.imageUrl,
-                })
-              }
+              style={styles.backBtn}
+              onPress={() => navigation.goBack()}
+              activeOpacity={0.7}
             >
-              {/* Room photo */}
-              <CardImage uri={col.imageUrl} style={styles.cardImage} resizeMode="cover" />
+              <BackIcon />
+            </TouchableOpacity>
+          </View>
 
-              {/* Bottom-weighted gradient for text legibility */}
-              <LinearGradient
-                colors={['rgba(0,0,0,0)', 'rgba(0,0,0,0.75)']}
-                locations={[0.4, 1]}
-                style={StyleSheet.absoluteFill}
-              />
+          <Text style={styles.eyebrow}>CURATED FOR YOU</Text>
+          <Text style={styles.pageTitle}>Explore Collections</Text>
+          <Text style={styles.pageSub}>Handpicked room themes, styles, and product sets</Text>
 
-              {/* Style badge — top left */}
-              <Badge variant="outline" label={col.tag} style={styles.styleBadge} />
+          {/* ── Collections list ──────────────────────────────────────── */}
+          <View style={styles.listContainer}>
+            {CURATED_COLLECTIONS.map((col) => (
+              <TouchableOpacity
+                key={col.id}
+                style={styles.card}
+                activeOpacity={0.88}
+                onPress={() =>
+                  navigation.navigate('Browse', {
+                    mode: 'collection',
+                    title: col.title,
+                    subtitle: col.subtitle,
+                    collection: col,
+                    heroImage: col.imageUrl,
+                  })
+                }
+              >
+                {/* Photo — clean, no overlay */}
+                <View style={styles.photoWrap}>
+                  <CardImage
+                    uri={col.imageUrl}
+                    style={styles.photo}
+                    resizeMode="cover"
+                    placeholderColor="#D0D7E3"
+                  />
+                </View>
 
-              {/* Title + arrow — bottom */}
-              <View style={styles.cardContent}>
-                <View style={styles.cardTextWrap}>
+                {/* Content below photo */}
+                <View style={styles.cardBody}>
                   <Text style={styles.cardTitle}>{col.title}</Text>
                   <Text style={styles.cardSubtitle}>{col.subtitle}</Text>
+                  <Badge variant="style" label={col.tag} style={styles.badge} />
                 </View>
-                <View style={styles.arrowBtn}>
-                  <ArrowRightIcon />
-                </View>
-              </View>
-            </TouchableOpacity>
-          ))}
-        </View>
+              </TouchableOpacity>
+            ))}
+          </View>
 
-        <View style={styles.bottomSpacer} />
-      </ScrollView>
+          <View style={styles.bottomSpacer} />
+        </ScrollView>
+      </SafeAreaView>
     </View>
   );
 }
@@ -196,117 +171,104 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#FFFFFF',
   },
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+  },
   scrollContent: {
     flexGrow: 1,
   },
 
-  // ── Hero ───────────────────────────────────────────────────────────────────
-  heroBanner: {
+  // ── Header ─────────────────────────────────────────────────────────────────
+  headerRow: {
     paddingHorizontal: space.lg,
-    paddingBottom: space['2xl'],
+    paddingTop: space.base,
+    paddingBottom: space.sm,
   },
   backBtn: {
     width: 40,
     height: 40,
     borderRadius: radius.full,
-    backgroundColor: 'rgba(255,255,255,0.15)',
+    backgroundColor: 'rgba(0,0,0,0.05)',
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: space.lg,
   },
-  heroTextWrap: {},
-  introEyebrow: {
+  eyebrow: {
     fontSize: 11,
-    fontWeight: fontWeight.bold,
-    color: 'rgba(255,255,255,0.60)',
-    letterSpacing: 2,
+    fontWeight: '700',
+    color: '#9CA3AF',
+    letterSpacing: 1.5,
     textTransform: 'uppercase',
-    marginBottom: 6,
+    paddingHorizontal: space.lg,
+    marginBottom: 4,
   },
-  introTitle: {
+  pageTitle: {
     fontSize: 28,
-    fontWeight: fontWeight.xbold,
-    color: '#FFFFFF',
+    fontWeight: '800',
+    color: colors.bluePrimary,
     letterSpacing: letterSpacing.tight,
+    paddingHorizontal: space.lg,
     marginBottom: 6,
   },
-  introSub: {
+  pageSub: {
     ...typeScale.body,
-    color: 'rgba(255,255,255,0.72)',
+    color: '#6B7280',
+    paddingHorizontal: space.lg,
+    marginBottom: space.xl,
   },
 
   // ── List ───────────────────────────────────────────────────────────────────
   listContainer: {
     paddingHorizontal: space.lg,
-    paddingTop: space.lg,
-    gap: space.md,                        // 12px — more breathing room
+    gap: space.md,
   },
 
   // ── Card ───────────────────────────────────────────────────────────────────
-  collectionCard: {
-    height: 180,                          // taller to show the room image properly
-    borderRadius: radius.xl,             // 20px — consistent with rest of app
+  card: {
+    borderRadius: radius.xl,
     overflow: 'hidden',
+    backgroundColor: '#FFFFFF',
     borderWidth: 1,
     borderColor: 'rgba(0,0,0,0.06)',
-    shadowColor: shadow.medium.shadowColor,
-    shadowOffset: shadow.medium.shadowOffset,
-    shadowOpacity: shadow.medium.shadowOpacity,
-    shadowRadius: shadow.medium.shadowRadius,
-    elevation: shadow.medium.elevation,
+    shadowColor: shadow.low.shadowColor,
+    shadowOffset: shadow.low.shadowOffset,
+    shadowOpacity: shadow.low.shadowOpacity,
+    shadowRadius: shadow.low.shadowRadius,
+    elevation: shadow.low.elevation,
   },
-  cardImage: {
+
+  // Photo — top half of card, clean with no overlay
+  photoWrap: {
+    width: '100%',
+    height: 180,
+    overflow: 'hidden',
+  },
+  photo: {
     width: '100%',
     height: '100%',
   },
-  styleBadge: {
-    position: 'absolute',
-    top: 12,
-    left: 12,
-  },
-  cardContent: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+
+  // Content area — white, below photo
+  cardBody: {
     paddingHorizontal: space.base,
-    paddingBottom: 16,
-  },
-  cardTextWrap: {
-    flex: 1,
-    paddingRight: space.sm,
+    paddingTop: space.md,
+    paddingBottom: space.base,
+    gap: 4,
+    backgroundColor: '#FFFFFF',
   },
   cardTitle: {
-    fontSize: 20,
-    fontWeight: '800',
-    color: '#FFFFFF',
+    fontSize: 17,
+    fontWeight: '700',
+    color: '#111827',
     letterSpacing: letterSpacing.tight,
-    marginBottom: 3,
-    textShadowColor: 'rgba(0,0,0,0.3)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 6,
   },
   cardSubtitle: {
     ...typeScale.caption,
-    color: 'rgba(255,255,255,0.80)',
+    color: '#6B7280',
+    marginBottom: 4,
   },
-
-  // Solid brand-blue arrow — matches every CTA in the app
-  arrowBtn: {
-    width: 38,
-    height: 38,
-    borderRadius: radius.full,
-    backgroundColor: colors.bluePrimary,
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: colors.blueDeep,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.35,
-    shadowRadius: 6,
-    elevation: 4,
+  badge: {
+    alignSelf: 'flex-start',
   },
 
   bottomSpacer: {
