@@ -335,7 +335,7 @@ const styles = StyleSheet.create({
   pageTitle: {
     fontSize: 24,
     fontWeight: '800',
-    color: '#111827',
+    color: colors.bluePrimary,
     letterSpacing: letterSpacing.tight,
     marginBottom: 4,
   },
