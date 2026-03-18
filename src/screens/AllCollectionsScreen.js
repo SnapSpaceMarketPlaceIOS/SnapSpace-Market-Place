@@ -151,7 +151,7 @@ export default function AllCollectionsScreen({ navigation }) {
                 <View style={styles.cardBody}>
                   <Text style={styles.cardTitle}>{col.title}</Text>
                   <Text style={styles.cardSubtitle}>{col.subtitle}</Text>
-                  <Badge variant="style" label={col.tag} style={styles.badge} />
+                  <Badge variant="source" label={col.tag} color={colors.bluePrimary} style={styles.badge} />
                 </View>
               </TouchableOpacity>
             ))}
