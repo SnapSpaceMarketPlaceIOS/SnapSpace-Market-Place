@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { requestATT, initialize as initTracking } from './src/services/trackingService';
 import { StripeProvider } from '@stripe/stripe-react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -233,6 +234,17 @@ function RootNavigator() {
 }
 
 export default function App() {
+  // Module A — ATT must fire before tracking initializes.
+  // 1-second delay matches Apple's recommendation to show ATT after
+  // the app's first meaningful frame has rendered.
+  useEffect(() => {
+    const timer = setTimeout(async () => {
+      await requestATT();      // shows "Allow Tracking?" popup
+      await initTracking();    // initializes AFTER ATT resolves
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <StripeProvider publishableKey={process.env.EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY}>
       <SafeAreaProvider>

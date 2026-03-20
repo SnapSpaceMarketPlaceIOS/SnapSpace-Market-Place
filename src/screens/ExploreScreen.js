@@ -23,6 +23,7 @@ import { DESIGNS } from '../data/designs';
 import PressableCard from '../components/PressableCard';
 import { SellerName } from '../components/VerifiedBadge';
 import { getProductsForDesign } from '../services/affiliateProducts';
+import { recordStyleSignal } from '../services/styleDnaService';
 
 const TC = theme.colors;
 const TY = theme.typography;
@@ -486,7 +487,10 @@ export default function ExploreScreen({ navigation, route }) {
                   key={design.id}
                   design={design}
                   isLiked={!!liked[design.id]}
-                  onLike={() => toggleLiked(design.id)}
+                  onLike={() => {
+                    toggleLiked(design.id);
+                    if (design.styles?.[0]) recordStyleSignal(design.styles[0]);
+                  }}
                   onPress={() => {
                     const enrichedProducts = getProductsForDesign(design, 4);
                     const enriched = { ...design, products: enrichedProducts.length ? enrichedProducts : design.products };
@@ -583,7 +587,10 @@ export default function ExploreScreen({ navigation, route }) {
                       styles.actionCircle,
                       liked[selectedCard.id] && styles.actionCircleLiked,
                     ]}
-                    onPress={() => toggleLiked(selectedCard.id)}
+                    onPress={() => {
+                      toggleLiked(selectedCard.id);
+                      if (selectedCard.styles?.[0]) recordStyleSignal(selectedCard.styles[0]);
+                    }}
                   >
                     <HeartIcon filled={!!liked[selectedCard.id]} size={20} />
                     <Text style={styles.actionCircleCount}>

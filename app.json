@@ -32,6 +32,12 @@
     "plugins": [
       "expo-font",
       [
+        "expo-tracking-transparency",
+        {
+          "userTrackingPermission": "SnapSpace uses this to show you home products matched to your style and to measure which products you love most."
+        }
+      ],
+      [
         "expo-camera",
         {
           "cameraPermission": "Allow SnapSpace to access your camera so you can scan your room and generate AI design ideas.",

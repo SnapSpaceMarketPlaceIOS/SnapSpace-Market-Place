@@ -43,6 +43,7 @@ import { useCart } from '../context/CartContext';
 import CardImage from '../components/CardImage';
 import { SellerName } from '../components/VerifiedBadge';
 import { shadow } from '../constants/tokens';
+import { handleShopNow } from '../services/productTapHandler';
 
 const { width: SW, height: SH } = Dimensions.get('window');
 const IMAGE_H     = Math.round(SW * 0.75);  // 3:4 ratio off screen width — device-agnostic, never clips
@@ -815,7 +816,7 @@ function CTABar({ inCart, liked, onAddToCart, onWishlist, affiliateUrl, source, 
       {/* "Also available on Amazon ›" */}
       {!!affiliateUrl && (
         <TouchableOpacity
-          onPress={() => Linking.openURL(affiliateUrl).catch(() => null)}
+          onPress={() => handleShopNow({ affiliateUrl, source })}
           activeOpacity={0.7}
           style={cta.affiliateRow}>
           <Text style={cta.affiliateTxt}>

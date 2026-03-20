@@ -1,4 +1,5 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
+import { handleShopNow } from '../services/productTapHandler';
 import {
   View,
   Text,
@@ -170,13 +171,8 @@ export default function RoomResultScreen({ route, navigation }) {
     Alert.alert('Added to Cart', `${product.name} has been added to your cart.`);
   };
 
-  const handleBuyNow = async (product) => {
-    if (product.affiliateUrl) {
-      const supported = await Linking.canOpenURL(product.affiliateUrl);
-      if (supported) {
-        await Linking.openURL(product.affiliateUrl);
-      }
-    }
+  const handleBuyNow = (product) => {
+    handleShopNow(product);
   };
 
   // Dim overlay fades in as sheet expands
