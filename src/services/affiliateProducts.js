@@ -2,13 +2,14 @@ import { parseDesignPrompt } from '../utils/promptParser';
 import { matchProducts, matchProductsForDesign } from './productMatcher';
 import { getProductsByIds } from '../data/productCatalog';
 import { uiColors } from '../constants/tokens';
+import { searchAmazonProducts, getAmazonProductsForPrompt } from './amazonProductService';
 
 /**
  * Main affiliate product service.
  * Single interface for all product retrieval across the app.
  *
- * Phase 1 (current): Returns curated local catalog products.
- * Phase 2 (after PA-API unlock): Will call amazonApi.js for live results.
+ * Phase 1 (sync):  Returns curated local catalog products (getProductsForPrompt / searchProducts).
+ * Phase 2 (async): Amazon PA-API primary → local catalog fallback (getProductsForPromptAsync / searchProductsAsync).
  */
 
 /**
@@ -156,4 +157,59 @@ export function getAffiliateUrl(product) {
 export function getProductsByDesign(designId) {
   // This will be wired to the DB when live; for now uses catalog matching
   return [];
+}
+
+// ── Async variants — Amazon primary, local catalog fallback ──────────────────
+
+/**
+ * Async version of getProductsForPrompt.
+ * Tries Amazon PA-API first; falls back to local catalog if unavailable/error.
+ *
+ * @param {string} promptText - The user's AI generation prompt
+ * @param {number} limit      - Number of products to return (default 6)
+ * @returns {Promise<object[]>} - Matched products with affiliate URLs
+ */
+export async function getProductsForPromptAsync(promptText, limit = 6) {
+  const parsed = parseDesignPrompt(promptText);
+  const roomType = parsed.roomType || 'living-room';
+
+  const { products: amazonProducts, source } = await getAmazonProductsForPrompt(promptText, roomType, limit);
+
+  if (source === 'amazon' && amazonProducts.length > 0) {
+    return amazonProducts;
+  }
+
+  // Fallback: local catalog
+  const localProducts = matchProducts(parsed, limit);
+  return localProducts.map(normalizeProduct);
+}
+
+/**
+ * Async version of searchProducts.
+ * Tries Amazon PA-API first; falls back to local catalog if unavailable/error.
+ *
+ * @param {object} options
+ * @param {string} options.keywords  - Search terms
+ * @param {string} options.roomType  - Room type filter (optional)
+ * @param {string} options.style     - Style filter (optional)
+ * @param {number} options.limit     - Max results
+ * @returns {Promise<object[]>}
+ */
+export async function searchProductsAsync({ keywords = '', roomType = null, style = null, limit = 12 }) {
+  const searchKeywords = [keywords, style].filter(Boolean).join(' ') || 'home furniture decor';
+
+  const { products: amazonProducts, source } = await searchAmazonProducts(
+    searchKeywords,
+    roomType || 'living-room',
+    Math.min(limit, 10), // PA-API max is 10
+  );
+
+  if (source === 'amazon' && amazonProducts.length > 0) {
+    return amazonProducts.slice(0, limit);
+  }
+
+  // Fallback: local catalog
+  const parsed = parseDesignPrompt([keywords, roomType, style].filter(Boolean).join(' '));
+  const localProducts = matchProducts(parsed, limit);
+  return localProducts.map(normalizeProduct);
 }

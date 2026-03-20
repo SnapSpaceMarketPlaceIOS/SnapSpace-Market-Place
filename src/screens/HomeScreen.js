@@ -23,7 +23,7 @@ import { useAuth } from '../context/AuthContext';
 import { useLiked } from '../context/LikedContext';
 import { DESIGNS } from '../data/designs';
 import { SELLERS } from '../data/sellers';
-import { searchProducts, getSourceColor } from '../services/affiliateProducts';
+import { searchProducts, searchProductsAsync, getSourceColor } from '../services/affiliateProducts';
 
 const { width, height } = Dimensions.get('window');
 
@@ -395,7 +395,8 @@ const STYLE_LABEL_MAP = {
 // ── Derived static data ────────────────────────────────────────────────────────
 const TRENDING_DESIGNS   = [...DESIGNS].sort((a, b) => b.likes - a.likes).slice(0, 8);
 const NEW_ARRIVALS       = [...DESIGNS].reverse().slice(0, 8);
-const FEATURED_PRODUCTS  = searchProducts({ keywords: 'modern living room bedroom', limit: 8 });
+// FEATURED_PRODUCTS is now loaded async in HomeScreen via useEffect (Amazon primary, local fallback)
+const FEATURED_PRODUCTS_FALLBACK = searchProducts({ keywords: 'modern living room bedroom', limit: 8 });
 
 // ─── Icons ────────────────────────────────────────────────────────────────────
 
@@ -570,6 +571,14 @@ export default function HomeScreen({ navigation }) {
   const [prompt, setPrompt] = useState('');
   const [greeting, setGreeting] = useState(getGreeting());
   const [recentlyViewed, setRecentlyViewed] = useState([]);
+  const [featuredProducts, setFeaturedProducts] = useState(FEATURED_PRODUCTS_FALLBACK);
+
+  // Load featured products — Amazon primary, local fallback
+  useEffect(() => {
+    searchProductsAsync({ keywords: 'modern living room bedroom furniture', limit: 8 })
+      .then(products => { if (products.length > 0) setFeaturedProducts(products); })
+      .catch(() => {}); // silently keep fallback on error
+  }, []);
 
   // Ping-pong hero slots
   const [slotA, setSlotA] = useState(HERO_IMAGES[0]);
@@ -615,7 +624,7 @@ export default function HomeScreen({ navigation }) {
     [liked]
   );
 
-  const dealProduct = FEATURED_PRODUCTS[0] || null;
+  const dealProduct = featuredProducts[0] || null;
 
   // ── Effects ─────────────────────────────────────────────────────────────────
 
@@ -1266,12 +1275,12 @@ export default function HomeScreen({ navigation }) {
             onAction={() => navigation?.navigate('Browse', {
               mode: 'products',
               title: 'Featured Products',
-              products: FEATURED_PRODUCTS,
+              products: featuredProducts,
             })}
           />
           <Text style={styles.affiliateDisclosure}>We may earn a commission on purchases.</Text>
           <View style={styles.collectionsGrid}>
-            {FEATURED_PRODUCTS.slice(0, 4).map((product, i) => (
+            {featuredProducts.slice(0, 4).map((product, i) => (
               <TouchableOpacity
                 key={product.id || i}
                 style={styles.featuredProductCard}

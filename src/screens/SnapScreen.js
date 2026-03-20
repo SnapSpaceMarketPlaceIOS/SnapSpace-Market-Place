@@ -17,7 +17,7 @@ import { Button, Badge, SectionHeader } from '../components/ds';
 import { useAuth } from '../context/AuthContext';
 import { uploadRoomPhoto } from '../services/supabase';
 import { generateInteriorDesign } from '../services/replicate';
-import { getProductsForPrompt } from '../services/affiliateProducts';
+import { getProductsForPromptAsync } from '../services/affiliateProducts';
 
 function FlashIcon({ off }) {
   return (
@@ -124,7 +124,7 @@ export default function SnapScreen({ navigation }) {
       const resultUrl = await generateInteriorDesign(imageUrl, designPrompt);
 
       setStatusText('Finding matching products…');
-      const matchedProducts = getProductsForPrompt(designPrompt, 6);
+      const matchedProducts = await getProductsForPromptAsync(designPrompt, 6);
 
       setLoading(false);
       setStatusText('');
