@@ -20,6 +20,7 @@ import { fontSize, fontWeight, letterSpacing, space, radius, shadow, typeScale }
 import theme from '../constants/theme';
 import { useLiked } from '../context/LikedContext';
 import { DESIGNS } from '../data/designs';
+import { PRODUCT_CATALOG } from '../data/productCatalog';
 import PressableCard from '../components/PressableCard';
 import { SellerName } from '../components/VerifiedBadge';
 import { getProductsForDesign } from '../services/affiliateProducts';
@@ -138,6 +139,16 @@ function UploadIcon() {
 // ── Data ──────────────────────────────────────────────────────────────────────
 
 const CATEGORIES = ['All', 'Living Room', 'Bedroom', 'Kitchen', 'Office', 'Dining'];
+
+// Product catalog category pills
+const PRODUCT_CATEGORIES = ['All', 'Sofas', 'Tables', 'Rugs', 'Wall Art', 'Mirrors'];
+const PRODUCT_CAT_MAP = {
+  'Sofas':    ['sofa'],
+  'Tables':   ['coffee-table', 'dining-table', 'side-table'],
+  'Rugs':     ['rug'],
+  'Wall Art': ['wall-art'],
+  'Mirrors':  ['mirror'],
+};
 
 const POST_TAGS = [
   '#Minimalist', '#LivingRoom', '#Bedroom', '#Kitchen',
@@ -312,7 +323,9 @@ const ROOM_LABEL_MAP = {
 
 export default function ExploreScreen({ navigation, route }) {
   const { liked, toggleLiked } = useLiked();
+  const [activeTab, setActiveTab] = useState('spaces'); // 'spaces' | 'products'
   const [activeCategory, setActiveCategory] = useState(0);
+  const [activeProdCat, setActiveProdCat] = useState(0);
   const [search, setSearch] = useState('');
   const [selectedCard, setSelectedCard] = useState(null);
   const [showPostModal, setShowPostModal] = useState(false);
@@ -392,6 +405,21 @@ export default function ExploreScreen({ navigation, route }) {
     [search, activeCategory, activeRoomFilter, activeStyleFilter, baseDesigns],
   );
 
+  const filteredProducts = useMemo(() => {
+    const catLabel = PRODUCT_CATEGORIES[activeProdCat];
+    const cats = PRODUCT_CAT_MAP[catLabel];
+    let pool = cats ? PRODUCT_CATALOG.filter((p) => cats.includes(p.category)) : PRODUCT_CATALOG;
+    if (search.trim()) {
+      const q = search.trim().toLowerCase();
+      pool = pool.filter((p) =>
+        p.name.toLowerCase().includes(q) ||
+        p.brand.toLowerCase().includes(q) ||
+        (p.styles || []).some((s) => s.includes(q))
+      );
+    }
+    return pool;
+  }, [activeProdCat, search]);
+
   return (
     <View style={styles.container}>
       <SafeAreaView style={styles.safeArea}>
@@ -402,9 +430,11 @@ export default function ExploreScreen({ navigation, route }) {
           {/* ── Header ── */}
           <Text style={styles.title}>{filterLabel && hasActiveFilter ? filterLabel : 'Explore'}</Text>
           <Text style={styles.subtitle}>
-            {hasActiveFilter
-              ? `${filteredDesigns.length} AI-generated space${filteredDesigns.length !== 1 ? 's' : ''}`
-              : 'Shop AI-Generated Room Designs'}
+            {activeTab === 'products'
+              ? `${filteredProducts.length} curated product${filteredProducts.length !== 1 ? 's' : ''}`
+              : hasActiveFilter
+                ? `${filteredDesigns.length} AI-generated space${filteredDesigns.length !== 1 ? 's' : ''}`
+                : 'Shop AI-Generated Room Designs'}
           </Text>
 
           {/* ── Search Row ── */}
@@ -432,6 +462,28 @@ export default function ExploreScreen({ navigation, route }) {
             </TouchableOpacity>
           </View>
 
+          {/* ── Spaces / Products toggle ── */}
+          <View style={styles.modeToggleRow}>
+            <TouchableOpacity
+              style={[styles.modeToggleBtn, activeTab === 'spaces' && styles.modeToggleBtnActive]}
+              onPress={() => setActiveTab('spaces')}
+              activeOpacity={0.8}
+            >
+              <Text style={[styles.modeToggleLabel, activeTab === 'spaces' && styles.modeToggleLabelActive]}>
+                Spaces
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.modeToggleBtn, activeTab === 'products' && styles.modeToggleBtnActive]}
+              onPress={() => setActiveTab('products')}
+              activeOpacity={0.8}
+            >
+              <Text style={[styles.modeToggleLabel, activeTab === 'products' && styles.modeToggleLabelActive]}>
+                Products
+              </Text>
+            </TouchableOpacity>
+          </View>
+
           {/* ── Category Filter Pills ── */}
           <ScrollView
             horizontal
@@ -439,18 +491,21 @@ export default function ExploreScreen({ navigation, route }) {
             style={styles.tabsScroll}
             contentContainerStyle={styles.tabsContent}
           >
-            {CATEGORIES.map((cat, i) => (
-              <TouchableOpacity
-                key={cat}
-                style={[styles.tab, activeCategory === i && styles.tabActive]}
-                onPress={() => setActiveCategory(i)}
-                activeOpacity={0.75}
-              >
-                <Text style={[styles.tabLabel, activeCategory === i && styles.tabLabelActive]}>
-                  {cat}
-                </Text>
-              </TouchableOpacity>
-            ))}
+            {(activeTab === 'products' ? PRODUCT_CATEGORIES : CATEGORIES).map((cat, i) => {
+              const isActive = activeTab === 'products' ? activeProdCat === i : activeCategory === i;
+              return (
+                <TouchableOpacity
+                  key={cat}
+                  style={[styles.tab, isActive && styles.tabActive]}
+                  onPress={() => activeTab === 'products' ? setActiveProdCat(i) : setActiveCategory(i)}
+                  activeOpacity={0.75}
+                >
+                  <Text style={[styles.tabLabel, isActive && styles.tabLabelActive]}>
+                    {cat}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
           </ScrollView>
           <View style={styles.tabBorder} />
 
@@ -472,7 +527,46 @@ export default function ExploreScreen({ navigation, route }) {
           )}
 
           {/* ── Grid ── */}
-          {filteredDesigns.length === 0 ? (
+          {activeTab === 'products' ? (
+            filteredProducts.length === 0 ? (
+              <View style={styles.emptyState}>
+                <Text style={styles.emptyStateTitle}>No products found</Text>
+                <Text style={styles.emptyStateSub}>Try a different category or search</Text>
+              </View>
+            ) : (
+              <View style={styles.grid}>
+                {filteredProducts.map((product) => (
+                  <TouchableOpacity
+                    key={product.id}
+                    style={[styles.card, { width: CARD_WIDTH }]}
+                    activeOpacity={0.88}
+                    onPress={() => navigation?.navigate('ProductDetail', { product: {
+                      ...product,
+                      price: product.priceDisplay,
+                      priceValue: product.price,
+                      source: product.source,
+                    }})}
+                  >
+                    <View style={styles.cardImg}>
+                      <View style={styles.cardImgBg} />
+                      <CardImage uri={product.imageUrl} style={styles.cardImgPhoto} resizeMode="cover" />
+                      {/* Amazon badge */}
+                      <View style={styles.prodBadgePos}>
+                        <View style={styles.prodAmazonBadge}>
+                          <AmazonLogoMark />
+                        </View>
+                      </View>
+                    </View>
+                    <View style={styles.prodCardBody}>
+                      <Text style={styles.prodCardName} numberOfLines={2}>{product.name}</Text>
+                      <Text style={styles.prodCardBrand}>{product.brand}</Text>
+                      <Text style={styles.prodCardPrice}>{product.priceDisplay}</Text>
+                    </View>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            )
+          ) : filteredDesigns.length === 0 ? (
             <View style={styles.emptyState}>
               <Text style={styles.emptyStateTitle}>No results found</Text>
               <Text style={styles.emptyStateSub}>
@@ -928,6 +1022,39 @@ const styles = StyleSheet.create({
     marginTop: space.xs,
   },
 
+  // Spaces / Products mode toggle
+  modeToggleRow: {
+    flexDirection: 'row',
+    marginHorizontal: space.lg,
+    marginBottom: space.sm,
+    backgroundColor: '#F1F5F9',
+    borderRadius: radius.full,
+    padding: 3,
+  },
+  modeToggleBtn: {
+    flex: 1,
+    height: 36,
+    borderRadius: radius.full,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  modeToggleBtnActive: {
+    backgroundColor: '#FFFFFF',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  modeToggleLabel: {
+    ...typeScale.button,
+    color: 'rgba(0,0,0,0.45)',
+  },
+  modeToggleLabelActive: {
+    color: TC.primary,
+    fontWeight: '700',
+  },
+
   // Grid
   grid: {
     flexDirection: 'row',
@@ -995,6 +1122,43 @@ const styles = StyleSheet.create({
   cardTitle: {
     ...typeScale.headline,
     color: '#111',
+  },
+
+  // Product card styles
+  prodBadgePos: {
+    position: 'absolute',
+    bottom: space.xs,
+    left: space.xs,
+  },
+  prodAmazonBadge: {
+    backgroundColor: 'rgba(255,255,255,0.92)',
+    borderRadius: radius.sm,
+    paddingHorizontal: 6,
+    paddingVertical: 3,
+  },
+  prodCardBody: {
+    paddingHorizontal: space.sm,
+    paddingTop: space.sm,
+    paddingBottom: space.sm,
+    gap: 2,
+  },
+  prodCardName: {
+    ...typeScale.caption,
+    color: '#111',
+    fontWeight: '600',
+    lineHeight: 16,
+  },
+  prodCardBrand: {
+    ...typeScale.micro,
+    color: TC.textSecondary,
+    textTransform: 'none',
+    letterSpacing: 0,
+    marginTop: 1,
+  },
+  prodCardPrice: {
+    ...typeScale.priceSmall,
+    color: TC.primary,
+    marginTop: 3,
   },
 
   // ── Section 3A: Drawer Shell ─────────────────────────────────────────────────

@@ -18,10 +18,10 @@ const MAX_PER_CATEGORY = 2;
  * @param {number} limit        - Max products to return (default 6)
  * @returns {object[]}          - Sorted, diversified product array
  */
-export function matchProducts(parsedPrompt, limit = 6) {
+export function matchProducts(parsedPrompt, limit = 6, catalog = PRODUCT_CATALOG) {
   const { roomType, styles, materials, furnitureCategories = [], moods = [] } = parsedPrompt;
 
-  const scored = PRODUCT_CATALOG.map((product) => {
+  const scored = catalog.map((product) => {
     const score = scoreProduct(product, roomType, styles, materials, furnitureCategories, moods);
     return { ...product, _score: score };
   });
@@ -205,7 +205,7 @@ function diversify(sorted, limit) {
  * Convenience: match products from raw design tags (used by Explore designs).
  * Converts design.styles and design.roomType into the parsedPrompt shape.
  */
-export function matchProductsForDesign(design, limit = 4) {
+export function matchProductsForDesign(design, limit = 4, catalog = PRODUCT_CATALOG) {
   const parsedPrompt = {
     roomType: design.roomType || 'living-room',
     styles: design.styles || [],
@@ -213,5 +213,5 @@ export function matchProductsForDesign(design, limit = 4) {
     moods: [],
     furnitureCategories: [],
   };
-  return matchProducts(parsedPrompt, limit);
+  return matchProducts(parsedPrompt, limit, catalog);
 }
