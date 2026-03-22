@@ -154,16 +154,19 @@ function diversify(sorted, limit) {
   const categoryCounts = {};
   const result = [];
 
-  // First pass: include highest-scoring product from each priority category
+  // First pass: from top scorers per category, pick randomly among top 2
+  // so results vary between generations with the same small catalog
   for (const cat of CATEGORY_PRIORITY) {
     if (result.length >= limit) break;
-    const candidate = sorted.find(
+    const candidates = sorted.filter(
       (p) => p.category === cat && (categoryCounts[cat] || 0) < MAX_PER_CATEGORY
     );
-    if (candidate) {
-      result.push(candidate);
-      categoryCounts[cat] = (categoryCounts[cat] || 0) + 1;
-    }
+    if (candidates.length === 0) continue;
+    // Pick randomly among top 2 scorers in this category (weighted variety)
+    const pool = candidates.slice(0, 2);
+    const candidate = pool[Math.floor(Math.random() * pool.length)];
+    result.push(candidate);
+    categoryCounts[cat] = (categoryCounts[cat] || 0) + 1;
   }
 
   // Second pass: fill remaining slots with highest-scored remaining items

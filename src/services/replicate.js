@@ -62,11 +62,11 @@ export async function generateInteriorDesign(imageUrl, prompt) {
       version: MODEL_VERSION,
       input: {
         image: imageUrl,
-        prompt: `photorealistic, 8K, professional interior photography, sharp focus, high detail, ${prompt || 'modern minimalist interior design, bright and airy'}`,
-        guidance_scale: 8,
-        negative_prompt: 'lowres, watermark, banner, logo, contactinfo, text, deformed, blurry, blur, out of focus, bad anatomy, ugly, unrealistic, cartoon, painting, illustration, oversaturated, noisy, grainy, pixelated',
+        prompt: `${prompt || 'modern minimalist interior design'}, furnished interior, complete room setup with furniture, interior design magazine quality, warm lighting`,
+        guidance_scale: 15,
+        negative_prompt: 'lowres, watermark, text, deformed, blurry, out of focus, empty room, no furniture, bare walls, ugly, cartoon, unrealistic, overexposed, dark',
         num_inference_steps: 50,
-        prompt_strength: 0.65,
+        prompt_strength: 0.8,
       },
     }),
   });
