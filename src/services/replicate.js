@@ -2,10 +2,9 @@ const API_URL = 'https://api.replicate.com/v1';
 const TOKEN = process.env.EXPO_PUBLIC_REPLICATE_API_TOKEN;
 
 // xlabs-ai/flux-dev-controlnet — Flux.1 Dev with depth/canny/soft-edge ControlNets (XLabs v3)
-// Uses /models/ endpoint so we always run the latest deployed version without version hash lock.
+// Version hash from: https://replicate.com/xlabs-ai/flux-dev-controlnet/versions
 // A100 80GB — high quality, ~20-40s warm / up to 3min cold boot.
-// https://replicate.com/xlabs-ai/flux-dev-controlnet
-const FLUX_MODEL = 'xlabs-ai/flux-dev-controlnet';
+const MODEL_VERSION = '9a8db105db745f8b11ad3afe5c8bd892428b2a43ade0b67edc4e0ccd52ff2fda';
 
 const POLL_INTERVAL_MS = 3000;
 const MAX_POLLS = 80; // 3s × 80 = 4 min timeout (accounts for cold boot)
@@ -62,14 +61,14 @@ export async function uploadImageToReplicate(base64) {
 export async function generateInteriorDesign(imageUrl, prompt) {
   if (!TOKEN) throw new Error('Replicate API token is missing. Add EXPO_PUBLIC_REPLICATE_API_TOKEN to your .env file.');
 
-  // Use the /models/ endpoint — always runs latest version, no version hash needed
-  const res = await fetch(`${API_URL}/models/${FLUX_MODEL}/predictions`, {
+  const res = await fetch(`${API_URL}/predictions`, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${TOKEN}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
+      version: MODEL_VERSION,
       input: {
         // The reference room photo — ControlNet extracts depth map to preserve structure
         control_image: imageUrl,
@@ -80,26 +79,24 @@ export async function generateInteriorDesign(imageUrl, prompt) {
 
         negative_prompt: 'lowres, watermark, text, banner, logo, deformed, blurry, out of focus, empty room, bare walls, no furniture, bare floor, people, person, human, outdoor, exterior, cartoon, anime, sketch, overexposed, underexposed, ugly',
 
-        // Flux Dev guidance: 3.5-4.5 is the sweet spot (much lower than SD's 7-15)
-        guidance: 4.0,
+        // depth = extracts room geometry (walls, floor, windows) as structural constraint
+        control_type: 'depth',
 
-        // 25-30 steps = sharp, detailed output without wasted compute
+        // Flux Dev guidance range: 3.5-7.0 (much lower than SD's 7-15)
+        guidance_scale: 4.0,
+
+        // 25-30 steps is the Flux sweet spot
         steps: 28,
 
-        // Random seed per generation = different output every run (no repeated results)
+        // Random seed = different output every generation
         seed: Math.floor(Math.random() * 999999999),
 
-        // How hard the depth ControlNet constrains room geometry.
-        // 0.5-0.65 = preserves walls/windows while allowing furniture freedom.
-        // Too high (>0.8) = rigid, artifacts. Too low (<0.3) = structure ignored.
-        controlnet_conditioning_scale: 0.6,
+        // How hard depth ControlNet constrains room geometry (0.0-2.0)
+        // 0.6 = preserves walls/windows while allowing furniture freedom
+        control_strength: 0.6,
 
-        // true_cfg = 1.0 keeps the prompt influence standard (no double-conditioning)
-        true_cfg: 1.0,
-
-        // 1024×1024 = Flux Dev native resolution for maximum quality
-        width: 1024,
-        height: 1024,
+        output_format: 'webp',
+        output_quality: 95,
       },
     }),
   });
