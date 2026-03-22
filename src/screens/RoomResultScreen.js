@@ -195,7 +195,7 @@ export default function RoomResultScreen({ route, navigation }) {
             <Image
               source={{ uri: resultUri }}
               style={StyleSheet.absoluteFill}
-              resizeMode="contain"
+              resizeMode="cover"
               onLoadEnd={() => setImageLoading(false)}
             />
             {imageLoading && (

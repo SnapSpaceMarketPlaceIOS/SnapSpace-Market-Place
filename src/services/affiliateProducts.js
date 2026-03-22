@@ -23,9 +23,10 @@ const CATEGORY_MAP = {
 };
 
 // Maps curatedProducts.style (Title Case) → PRODUCT_CATALOG style values
+// IMPORTANT: must match keys in STYLE_AFFINITY (styleMap.js) exactly
 const STYLE_MAP = {
   'Japandi':   'japandi',
-  'Modern':    'modern',
+  'Modern':    'contemporary',   // 'modern' is not in STYLE_AFFINITY — use 'contemporary'
   'Rustic':    'rustic',
   'Dark Luxe': 'dark-luxe',
   'Coastal':   'coastal',
@@ -61,7 +62,9 @@ function normalizeCuratedProduct(p) {
 }
 
 // Lazy-built combined catalog: PRODUCT_CATALOG + curatedProducts (PA-API fallback)
+// Set to null to force rebuild on next call (e.g. after style map changes)
 let _combinedCatalog = null;
+export function resetCatalogCache() { _combinedCatalog = null; }
 function getCombinedCatalog() {
   if (!_combinedCatalog) {
     const curatedNormalized = curatedProducts.map(normalizeCuratedProduct);
