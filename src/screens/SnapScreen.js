@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   View,
   Text,
@@ -10,13 +10,14 @@ import {
   Platform,
 } from 'react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
-import Svg, { Path, Circle, Polyline, Line } from 'react-native-svg';
+import * as ImagePicker from 'expo-image-picker';
+import * as FileSystem from 'expo-file-system';
+import Svg, { Path, Circle, Polyline, Line, Rect } from 'react-native-svg';
 import { colors } from '../constants/colors';
-import { palette, fontSize, fontWeight, space, radius, shadow } from '../constants/tokens';
-import { Button, Badge, SectionHeader } from '../components/ds';
+import { palette, fontSize, fontWeight, space, radius } from '../constants/tokens';
 import { useAuth } from '../context/AuthContext';
 import { uploadRoomPhoto } from '../services/supabase';
-import { generateInteriorDesign } from '../services/replicate';
+import { generateInteriorDesign, uploadImageToReplicate } from '../services/replicate';
 import { getProductsForPrompt } from '../services/affiliateProducts';
 
 function FlashIcon({ off }) {
@@ -52,6 +53,16 @@ function XIcon() {
     <Svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke={colors.white} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
       <Line x1={18} y1={6} x2={6} y2={18} />
       <Line x1={6} y1={6} x2={18} y2={18} />
+    </Svg>
+  );
+}
+
+function GalleryIcon() {
+  return (
+    <Svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke={colors.white} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+      <Rect x={3} y={3} width={18} height={18} rx={2} ry={2} />
+      <Circle cx={8.5} cy={8.5} r={1.5} />
+      <Polyline points="21 15 16 10 5 21" />
     </Svg>
   );
 }
@@ -107,20 +118,22 @@ export default function SnapScreen({ navigation }) {
     );
   }
 
-  const handleCapture = async () => {
-    if (!cameraRef.current || loading) return;
+  // Shared generation logic — accepts a photo object with { uri, base64 }
+  const runGeneration = async (photo) => {
     setLoading(true);
-    setStatusText('Capturing photo…');
     try {
-      // base64:true gives us the data inline — no FileSystem read needed
-      const photo = await cameraRef.current.takePictureAsync({ quality: 0.7, base64: true });
-
       setStatusText('Uploading photo…');
-      const imageUrl = await uploadRoomPhoto(user?.id || 'anonymous', photo.uri, photo.base64);
+      let imageUrl;
+      try {
+        imageUrl = await uploadRoomPhoto(user?.id || 'anonymous', photo.uri, photo.base64);
+      } catch {
+        setStatusText('Uploading via Replicate…');
+        imageUrl = await uploadImageToReplicate(photo.base64);
+      }
 
       const designPrompt = prompt || 'Modern minimalist redesign';
 
-      setStatusText('Generating your design… (this takes ~30s)');
+      setStatusText('Generating your design… (~30s)');
       const resultUrl = await generateInteriorDesign(imageUrl, designPrompt);
 
       setStatusText('Finding matching products…');
@@ -139,6 +152,32 @@ export default function SnapScreen({ navigation }) {
       setStatusText('');
       Alert.alert('Generation Failed', err.message || 'Something went wrong. Please try again.');
     }
+  };
+
+  // Capture from live camera
+  const handleCapture = async () => {
+    if (!cameraRef.current || loading) return;
+    setStatusText('Capturing photo…');
+    const photo = await cameraRef.current.takePictureAsync({ quality: 0.7, base64: true });
+    await runGeneration(photo);
+  };
+
+  // Pick from photo library — works in the iOS Simulator (no camera needed)
+  const handlePickFromLibrary = async () => {
+    if (loading) return;
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Permission Required', 'Please allow access to your photo library.');
+      return;
+    }
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      quality: 0.7,
+      base64: true,
+    });
+    if (result.canceled || !result.assets?.length) return;
+    const asset = result.assets[0];
+    await runGeneration({ uri: asset.uri, base64: asset.base64 });
   };
 
   return (
@@ -160,6 +199,9 @@ export default function SnapScreen({ navigation }) {
             </TouchableOpacity>
             <TouchableOpacity style={styles.controlBtn} onPress={() => setFacing(facing === 'back' ? 'front' : 'back')}>
               <FlipIcon />
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.controlBtn} onPress={handlePickFromLibrary} disabled={loading}>
+              <GalleryIcon />
             </TouchableOpacity>
           </View>
         </View>

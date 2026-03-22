@@ -1019,7 +1019,15 @@ export default function ProductDetailScreen({ route, navigation }) {
       navigation.navigate('Main', { screen: 'Cart' });
       return;
     }
-    addToCart({ name, brand, price: rawPrice });
+    addToCart({
+      name,
+      brand,
+      price: rawPrice,
+      imageUrl: product?.imageUrl ?? null,
+      affiliateUrl: product?.affiliateUrl ?? null,
+      source: product?.source ?? 'amazon',
+      asin: product?.asin ?? null,
+    });
     Animated.parallel([
       Animated.timing(cartLabelOpacity,  { toValue: 0, duration: 150, useNativeDriver: true }),
       Animated.timing(addedLabelOpacity, { toValue: 1, duration: 150, useNativeDriver: true }),

@@ -9,6 +9,7 @@ import {
   Animated,
   Easing,
   ActivityIndicator,
+  Linking,
 } from 'react-native';
 import CardImage from '../components/CardImage';
 import Svg, { Path, Circle, Line, Polyline, Rect } from 'react-native-svg';
@@ -235,10 +236,40 @@ export default function CartScreen({ navigation }) {
   const shipping   = items.length > 0 ? 29 : 0;
   const total      = subtotal + shipping;
   const totalItems = items.reduce((sum, i) => sum + i.quantity, 0);
+  const allAmazon  = items.length > 0 && items.every((i) => i.source === 'amazon');
 
   // ── ALL checkout logic unchanged ─────────────────────────────────────────────
   const handleCheckout = useCallback(async () => {
     if (checkingOut) return;
+
+    // All curated products are Amazon affiliate items — build a single multi-cart URL
+    const amazonItems = items.filter((i) => i.source === 'amazon');
+    if (amazonItems.length === items.length && items.length > 0) {
+      // Amazon multi-cart URL: adds ALL items to the user's Amazon cart in one tap
+      // Format: /gp/aws/cart/add.html?ASIN.1=XXX&Quantity.1=1&ASIN.2=YYY&Quantity.2=2&tag=snapspace20-20
+      const AFFILIATE_TAG = 'snapspace20-20';
+      const itemsWithAsin = amazonItems.filter((i) => i.asin);
+
+      if (itemsWithAsin.length > 0) {
+        // Build multi-cart URL with all ASINs + quantities
+        const params = itemsWithAsin.map((item, idx) =>
+          `ASIN.${idx + 1}=${item.asin}&Quantity.${idx + 1}=${item.quantity}`
+        ).join('&');
+        const multiCartUrl = `https://www.amazon.com/gp/aws/cart/add.html?${params}&tag=${AFFILIATE_TAG}`;
+        try { await Linking.openURL(multiCartUrl); } catch (e) {
+          // Fallback: open first item's affiliate URL
+          if (amazonItems[0]?.affiliateUrl) {
+            await Linking.openURL(amazonItems[0].affiliateUrl);
+          }
+        }
+      } else if (amazonItems[0]?.affiliateUrl) {
+        // No ASINs stored yet — fall back to first item's affiliate URL
+        await Linking.openURL(amazonItems[0].affiliateUrl);
+      }
+      return;
+    }
+
+    // SnapSpace marketplace checkout (Stripe) for non-affiliate items
     setCheckingOut(true);
     try {
       const { data, error: fnError } = await supabase.functions.invoke('create-payment-intent', {
@@ -397,6 +428,17 @@ export default function CartScreen({ navigation }) {
                   </View>
                 </View>
 
+                {/* Per-item Buy on Amazon link */}
+                {item.source === 'amazon' && item.affiliateUrl && (
+                  <TouchableOpacity
+                    onPress={() => Linking.openURL(item.affiliateUrl)}
+                    activeOpacity={0.7}
+                    style={styles.itemAmazonBtn}
+                  >
+                    <Text style={styles.itemAmazonBtnText}>Buy on Amazon →</Text>
+                  </TouchableOpacity>
+                )}
+
               </View>
             </View>
           );
@@ -472,10 +514,10 @@ export default function CartScreen({ navigation }) {
             <View style={styles.checkoutBtnInner}>
               <View style={styles.checkoutLeft}>
                 <CheckoutCartIcon />
-                <Text style={styles.checkoutLabel}>  Checkout</Text>
+                <Text style={styles.checkoutLabel}>  {allAmazon ? 'Buy on Amazon' : 'Checkout'}</Text>
               </View>
               <View style={styles.checkoutDivider} />
-              <Text style={styles.checkoutPrice}>${total.toLocaleString()}</Text>
+              <Text style={styles.checkoutPrice}>{allAmazon ? '›' : `$${total.toLocaleString()}`}</Text>
             </View>
           )}
         </TouchableOpacity>
@@ -613,6 +655,15 @@ const styles = StyleSheet.create({
     ...typeScale.micro,
     color: C.success,
     textTransform: undefined,
+  },
+  itemAmazonBtn: {
+    marginTop: 8,
+    alignSelf: 'flex-start',
+  },
+  itemAmazonBtnText: {
+    ...typeScale.caption,
+    color: '#FF9900',
+    fontWeight: '600',
   },
   shippingText: {
     ...typeScale.caption,

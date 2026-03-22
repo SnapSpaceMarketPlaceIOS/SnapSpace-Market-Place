@@ -128,11 +128,13 @@ export default function AuthScreen({ navigation }) {
         if (result.needsEmailVerification) {
           navigation.replace('VerifyEmailSent', { email });
         } else {
-          navigation.goBack();
+          navigation.reset({ index: 0, routes: [{ name: 'Main' }] });
         }
       } else {
         await signIn(email, password);
-        navigation.goBack();
+        // Use reset instead of goBack — goBack silently fails if Auth was
+        // the first screen (cold start), leaving the spinner stuck forever.
+        navigation.reset({ index: 0, routes: [{ name: 'Main' }] });
       }
     } catch (err) {
       Alert.alert('Error', err.message);

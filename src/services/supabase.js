@@ -29,6 +29,18 @@ function base64ToUint8Array(base64) {
   return bytes;
 }
 
+// Wraps fetch with an AbortController timeout so Supabase requests never
+// hang indefinitely inside the iOS simulator / React Native runtime.
+function fetchWithTimeout(ms) {
+  return (url, options = {}) => {
+    const controller = new AbortController();
+    const id = setTimeout(() => controller.abort(), ms);
+    return fetch(url, { ...options, signal: controller.signal }).finally(() =>
+      clearTimeout(id)
+    );
+  };
+}
+
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   auth: {
     storage: AsyncStorage,
@@ -36,7 +48,29 @@ export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
     autoRefreshToken: true,
     detectSessionInUrl: false,
   },
+  global: {
+    // 10-second hard timeout per request — prevents silent hangs on auth calls
+    fetch: fetchWithTimeout(10000),
+  },
 });
+
+/**
+ * Wipes the locally-stored Supabase auth token from AsyncStorage.
+ * Call this before signInWithPassword when the client may have a
+ * stale/corrupted session (e.g. after a crash with bad env vars).
+ */
+export async function clearStoredSession() {
+  try {
+    // Supabase v2 stores the session under this key pattern
+    const projectRef = SUPABASE_URL.match(/https?:\/\/([^.]+)\./)?.[1] ?? '';
+    const key = `sb-${projectRef}-auth-token`;
+    await AsyncStorage.removeItem(key);
+    // Also wipe legacy key used by older supabase-js versions
+    await AsyncStorage.removeItem('supabase.auth.token');
+  } catch {
+    // Non-fatal — proceed regardless
+  }
+}
 
 // ─── Profile Helpers ──────────────────────────────────────────────────────────
 

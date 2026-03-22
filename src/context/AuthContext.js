@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import * as AppleAuthentication from 'expo-apple-authentication';
-import { supabase, fetchProfile } from '../services/supabase';
+import { supabase, fetchProfile, clearStoredSession } from '../services/supabase';
 import { registerForPushNotifications } from '../services/notifications';
 
 const AuthContext = createContext();
@@ -112,10 +112,21 @@ export function AuthProvider({ children }) {
    * Throws an Error with a user-friendly message on failure.
    */
   const signIn = async (email, password) => {
-    const { error } = await supabase.auth.signInWithPassword({
+    // Clear any stale/corrupted session from AsyncStorage before signing in.
+    // Without this, signInWithPassword can hang indefinitely trying to refresh
+    // an invalid cached token (e.g. after a crash with bad env vars).
+    await clearStoredSession();
+
+    // Race the auth call against a 15s timeout so the spinner never hangs
+    // silently (e.g. flaky network, Supabase cold start).
+    const authCall = supabase.auth.signInWithPassword({
       email: email.trim().toLowerCase(),
       password,
     });
+    const timeout = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('Connection timed out. Check your network and try again.')), 15000)
+    );
+    const { error } = await Promise.race([authCall, timeout]);
     if (error) {
       if (error.message.includes('Email not confirmed')) {
         throw new Error('Please verify your email before signing in. Check your inbox for a verification link.');
