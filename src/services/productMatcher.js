@@ -27,7 +27,10 @@ export function matchProducts(parsedPrompt, limit = 6, catalog = PRODUCT_CATALOG
 
   const scored = catalog.map((product) => {
     const score = scoreProduct(product, roomType, styles, materials, furnitureCategories, moods);
-    return { ...product, _score: score };
+    // Add ±8% random noise so high-scoring products rotate between generations.
+    // Without this, the same top-N products win every time on an identical prompt.
+    const noise = (Math.random() - 0.5) * Math.max(score, 5) * 0.16;
+    return { ...product, _score: score + noise };
   });
 
   scored.sort((a, b) => b._score - a._score);

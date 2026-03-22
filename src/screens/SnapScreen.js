@@ -281,7 +281,7 @@ export default function SnapScreen({ navigation }) {
       }
 
       // ── Step 4: Generate with the furniture-specific prompt
-      setStatusText('Generating your design… (~30–45s)');
+      setStatusText('Generating your design… (40–90s)');
       const resultUrl = await generateInteriorDesign(imageUrl, enrichedPrompt);
       setLoading(false);
       setStatusText('');
