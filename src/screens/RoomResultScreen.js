@@ -165,7 +165,8 @@ export default function RoomResultScreen({ route, navigation }) {
   };
 
   const handleAddToCart = (product) => {
-    addToCart(product);
+    // Pass priceValue (number) as price so CartContext subtotal math works
+    addToCart({ ...product, price: product.priceValue ?? product.price });
     setAddedItems((prev) => ({ ...prev, [product.id]: true }));
     Alert.alert('Added to Cart', `${product.name} has been added to your cart.`);
   };

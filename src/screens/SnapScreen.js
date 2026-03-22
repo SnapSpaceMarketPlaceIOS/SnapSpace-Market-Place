@@ -61,6 +61,59 @@ function XIcon({ size = 16, color = '#fff' }) {
   );
 }
 
+// ─── Furniture label map ──────────────────────────────────────────────────────
+
+const FURNITURE_LABELS = {
+  'sofa':         'sofa',
+  'accent-chair': 'accent chair',
+  'coffee-table': 'coffee table',
+  'rug':          'area rug',
+  'wall-art':     'wall art',
+  'mirror':       'floor mirror',
+  'side-table':   'side table',
+  'bookshelf':    'bookshelf',
+  'floor-lamp':   'floor lamp',
+  'table-lamp':   'table lamp',
+  'nightstand':   'nightstand',
+  'dresser':      'dresser',
+  'bed':          'bed',
+  'pendant-light':'pendant light',
+};
+
+// Visual keywords extracted from product names — helps AI draw what we'll show
+const VISUAL_WORDS = [
+  'boucle','velvet','leather','linen','rattan','jute','wool','chenille',
+  'marble','glass','wood','walnut','oak','brass','gold','concrete',
+  'curved','round','oval','modular','sectional','oversized','wavy',
+  'abstract','geometric','textured','3d','layered',
+  'cream','beige','white','gray','black','camel','sage','green','brown',
+];
+
+function extractVisualHints(name) {
+  const lower = name.toLowerCase();
+  return VISUAL_WORDS.filter(w => lower.includes(w)).slice(0, 2).join(' ');
+}
+
+/**
+ * Builds an enriched generation prompt that names the SPECIFIC furniture pieces
+ * from the pre-selected products. This way the AI draws furniture that matches
+ * what will appear in "Shop This Look".
+ *
+ * @param {string}   userPrompt - The original user style prompt
+ * @param {object[]} products   - Pre-selected matched products
+ * @returns {string}            - Enriched generation prompt
+ */
+function buildEnrichedPrompt(userPrompt, products) {
+  const pieces = products.slice(0, 4).map(p => {
+    const label = FURNITURE_LABELS[p.category] || p.category.replace(/-/g, ' ');
+    const hints = extractVisualHints(p.name);
+    return hints ? `${hints} ${label}` : label;
+  });
+
+  const furnitureList = pieces.length > 0 ? `, with ${pieces.join(', ')}` : '';
+  return `${userPrompt}${furnitureList}, fully furnished interior, warm soft lighting`;
+}
+
 // ─── Style suggestions ────────────────────────────────────────────────────────
 
 const PROMPT_SUGGESTIONS = [
@@ -209,6 +262,15 @@ export default function SnapScreen({ navigation }) {
     const designPrompt = prompt.trim();
     setLoading(true);
     try {
+      // ── Step 1: Pre-select products so we can build the generation prompt from them
+      setStatusText('Curating products…');
+      const matchedProducts = getProductsForPrompt(designPrompt, 6);
+
+      // ── Step 2: Build enriched prompt that names the specific furniture pieces
+      // This makes the AI draw exactly what we'll show in Shop This Look
+      const enrichedPrompt = buildEnrichedPrompt(designPrompt, matchedProducts);
+
+      // ── Step 3: Upload the room photo
       setStatusText('Uploading photo…');
       let imageUrl;
       try {
@@ -217,10 +279,10 @@ export default function SnapScreen({ navigation }) {
         setStatusText('Uploading via Replicate…');
         imageUrl = await uploadImageToReplicate(photo.base64);
       }
-      setStatusText('Generating your design… (~30s)');
-      const resultUrl = await generateInteriorDesign(imageUrl, designPrompt);
-      setStatusText('Matching products…');
-      const matchedProducts = getProductsForPrompt(designPrompt, 6);
+
+      // ── Step 4: Generate with the furniture-specific prompt
+      setStatusText('Generating your design… (~30–45s)');
+      const resultUrl = await generateInteriorDesign(imageUrl, enrichedPrompt);
       setLoading(false);
       setStatusText('');
       navigation?.navigate('RoomResult', {

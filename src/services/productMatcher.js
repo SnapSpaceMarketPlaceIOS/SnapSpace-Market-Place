@@ -4,6 +4,10 @@ import { STYLE_AFFINITY } from '../data/styleMap';
 // Max products per category in a single result set (prevents showing 6 sofas)
 const MAX_PER_CATEGORY = 2;
 
+// How many top candidates per category to randomize among
+// Higher = more variety between generations (at slight cost to relevance)
+const RANDOM_POOL_SIZE = 4;
+
 /**
  * Scores and ranks catalog products against a parsed design prompt.
  * Returns top N products, diversified across furniture categories.
@@ -162,8 +166,8 @@ function diversify(sorted, limit) {
       (p) => p.category === cat && (categoryCounts[cat] || 0) < MAX_PER_CATEGORY
     );
     if (candidates.length === 0) continue;
-    // Pick randomly among top 2 scorers in this category (weighted variety)
-    const pool = candidates.slice(0, 2);
+    // Pick randomly among top scorers in this category for variety between generations
+    const pool = candidates.slice(0, RANDOM_POOL_SIZE);
     const candidate = pool[Math.floor(Math.random() * pool.length)];
     result.push(candidate);
     categoryCounts[cat] = (categoryCounts[cat] || 0) + 1;
