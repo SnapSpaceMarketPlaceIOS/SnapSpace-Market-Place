@@ -127,6 +127,49 @@ export async function uploadRoomPhoto(userId, uri, base64Data = null) {
   return uploadImage('room-uploads', `${userId}/${ts}.jpeg`, uri, base64Data);
 }
 
+// ─── User Designs Helpers ────────────────────────────────────────────────────
+
+/** Save a new user design to the database. */
+export async function saveUserDesign(userId, { imageUrl, prompt, styleTags, products, visibility }) {
+  const { data, error } = await supabase
+    .from('user_designs')
+    .insert({
+      user_id: userId,
+      image_url: imageUrl,
+      prompt: prompt || '',
+      style_tags: styleTags || [],
+      products: products || [],
+      visibility: visibility || 'public',
+    })
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
+}
+
+/** Get all designs for a specific user (own profile). */
+export async function getUserDesigns(userId) {
+  const { data, error } = await supabase
+    .from('user_designs')
+    .select('*')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false });
+  if (error) throw error;
+  return data || [];
+}
+
+/** Get public designs for the Explore feed. */
+export async function getPublicDesigns(limit = 20, offset = 0) {
+  const { data, error } = await supabase
+    .from('user_designs')
+    .select('*, author:profiles!user_designs_user_id_fkey(id, full_name, username, avatar_url, is_verified_supplier)')
+    .eq('visibility', 'public')
+    .order('created_at', { ascending: false })
+    .range(offset, offset + limit - 1);
+  if (error) throw error;
+  return data || [];
+}
+
 // ─── Push Token Helpers ───────────────────────────────────────────────────────
 
 /** Save a push notification token to the user's profile row. */

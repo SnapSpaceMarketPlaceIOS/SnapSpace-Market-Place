@@ -23,10 +23,10 @@ const RANDOM_POOL_SIZE = 4;
  * @returns {object[]}          - Sorted, diversified product array
  */
 export function matchProducts(parsedPrompt, limit = 6, catalog = PRODUCT_CATALOG) {
-  const { roomType, styles, materials, furnitureCategories = [], moods = [] } = parsedPrompt;
+  const { roomType, styles, materials, furnitureCategories = [], moods = [], promptTokens = [] } = parsedPrompt;
 
   const scored = catalog.map((product) => {
-    const score = scoreProduct(product, roomType, styles, materials, furnitureCategories, moods);
+    const score = scoreProduct(product, roomType, styles, materials, furnitureCategories, moods, promptTokens);
     // Add ±8% random noise so high-scoring products rotate between generations.
     // Without this, the same top-N products win every time on an identical prompt.
     const noise = (Math.random() - 0.5) * Math.max(score, 5) * 0.16;
@@ -44,44 +44,58 @@ const COZY_MOODS   = ['cozy', 'warm', 'inviting', 'comfortable', 'relaxed'];
 
 /**
  * Score a single product against the detected design intent.
- * Scoring formula (revised):
- *   style match:            35 pts
- *   room type match:        25 pts
- *   material match:         15 pts
- *   furniture category:     15 pts  (NEW — uses furnitureCategories)
- *   mood bonus:              5 pts  (NEW — uses moods)
+ * Scoring formula (with semantic tags):
+ *   style match:            30 pts
+ *   room type match:        20 pts
+ *   tag match:              15 pts  (matches product.tags against raw prompt words)
+ *   material match:         10 pts
+ *   furniture category:     10 pts
+ *   mood bonus:              5 pts
  *   rating bonus:            5 pts
+ *   name match bonus:        5 pts  (direct product name word overlap with prompt)
  */
-function scoreProduct(product, roomType, styles, materials, furnitureCategories = [], moods = []) {
+function scoreProduct(product, roomType, styles, materials, furnitureCategories = [], moods = [], promptTokens = []) {
   let score = 0;
 
-  // ── Room type match (25 points) ───────────────────────────────────────────
+  // ── Room type match (20 points) ───────────────────────────────────────────
   const productRooms = Array.isArray(product.roomType) ? product.roomType : [product.roomType];
   if (productRooms.includes(roomType)) {
-    score += 25;
+    score += 20;
   } else if (productRooms.includes('living-room')) {
-    score += 6;
+    score += 5;
   }
 
-  // ── Style match (35 points) ───────────────────────────────────────────────
+  // ── Style match (30 points) ───────────────────────────────────────────────
   const styleScore = computeStyleScore(product.styles, styles);
-  score += styleScore * 35;
+  score += styleScore * 30;
 
-  // ── Material match (15 points) ────────────────────────────────────────────
+  // ── Tag match (15 points) — matches product.tags against raw prompt words ─
+  if (product.tags && product.tags.length > 0 && promptTokens.length > 0) {
+    const tokenSet = new Set(promptTokens);
+    // Also include parsed styles/materials/moods as matchable tokens
+    for (const s of styles) tokenSet.add(s);
+    for (const m of materials) tokenSet.add(m);
+    for (const mo of moods) tokenSet.add(mo);
+    const tagHits = product.tags.filter(t => tokenSet.has(t)).length;
+    // 4+ tag hits = full 15 points
+    const tagScore = Math.min(tagHits / 4, 1);
+    score += tagScore * 15;
+  }
+
+  // ── Material match (10 points) ────────────────────────────────────────────
   if (materials && materials.length > 0) {
     const materialMatches = (product.materials || []).filter((m) =>
       materials.includes(m)
     ).length;
     const materialScore = Math.min(materialMatches / materials.length, 1);
-    score += materialScore * 15;
+    score += materialScore * 10;
   }
 
-  // ── Furniture category match (15 points) — NEW ────────────────────────────
+  // ── Furniture category match (10 points) ──────────────────────────────────
   if (furnitureCategories && furnitureCategories.length > 0) {
     if (furnitureCategories.includes(product.category)) {
-      score += 15;
+      score += 10;
     } else {
-      // Partial credit for related categories
       const RELATED = {
         'sofa': ['accent-chair', 'loveseat'],
         'bed': ['nightstand', 'dresser'],
@@ -92,14 +106,14 @@ function scoreProduct(product, roomType, styles, materials, furnitureCategories 
       for (const requested of furnitureCategories) {
         const related = RELATED[requested] || [];
         if (related.includes(product.category)) {
-          score += 5;
+          score += 3;
           break;
         }
       }
     }
   }
 
-  // ── Mood bonus (5 points) — NEW ───────────────────────────────────────────
+  // ── Mood bonus (5 points) ─────────────────────────────────────────────────
   if (moods && moods.length > 0) {
     const isLuxury = moods.some((m) => LUXURY_MOODS.includes(m));
     const isCozy   = moods.some((m) => COZY_MOODS.includes(m));
@@ -116,6 +130,14 @@ function scoreProduct(product, roomType, styles, materials, furnitureCategories 
   // ── Rating bonus (up to 5 points) ────────────────────────────────────────
   if (product.rating) {
     score += ((product.rating - 3.5) / 1.5) * 5;
+  }
+
+  // ── Name match bonus (up to 5 points) ────────────────────────────────────
+  // Rewards products whose name contains words from the prompt
+  if (promptTokens.length > 0) {
+    const nameLower = (product.name || '').toLowerCase();
+    const nameHits = promptTokens.filter(t => t.length >= 4 && nameLower.includes(t)).length;
+    score += Math.min(nameHits, 3) * (5 / 3);
   }
 
   return score;

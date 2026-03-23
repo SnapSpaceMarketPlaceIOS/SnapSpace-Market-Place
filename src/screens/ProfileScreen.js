@@ -22,7 +22,8 @@ import { fontSize, fontWeight, letterSpacing, space, radius, shadow, typeScale }
 import { useLiked } from '../context/LikedContext';
 import { useShared } from '../context/SharedContext';
 import { useAuth } from '../context/AuthContext';
-import { updateProfile, uploadAvatar } from '../services/supabase';
+import { useFocusEffect } from '@react-navigation/native';
+import { updateProfile, uploadAvatar, getUserDesigns } from '../services/supabase';
 import { DESIGNS } from '../data/designs';
 import Skeleton from '../components/Skeleton';
 import PressableCard from '../components/PressableCard';
@@ -198,7 +199,8 @@ function InfoIcon() {
 
 // ── Data ──────────────────────────────────────────────────────────────────────
 
-const MY_DESIGNS = DESIGNS.slice(0, 12);
+// Fallback to seed designs if DB query fails or returns empty
+const FALLBACK_DESIGNS = DESIGNS.slice(0, 12);
 
 const ACCOUNT_ITEMS = [
   { label: 'Saved Designs',          icon: <SavedIcon />, screen: 'Explore' },
@@ -275,6 +277,38 @@ export default function ProfileScreen({ navigation }) {
   const [saving, setSaving] = useState(false);
   const [profile, setProfile] = useState(() => getInitialProfile(user));
   const [editDraft, setEditDraft] = useState(() => getInitialProfile(user));
+  const [myDesigns, setMyDesigns] = useState(FALLBACK_DESIGNS);
+
+  // Fetch user's own designs from Supabase
+  useFocusEffect(
+    useCallback(() => {
+      if (user?.id) {
+        getUserDesigns(user.id).then(designs => {
+          if (designs.length > 0) {
+            const normalized = designs.map(d => ({
+              id: `user-${d.id}`,
+              title: d.prompt || 'My Design',
+              user: user.username || user.name || 'Me',
+              initial: (user.name || 'M')[0],
+              verified: false,
+              imageUrl: d.image_url,
+              description: d.prompt,
+              prompt: d.prompt,
+              roomType: 'living-room',
+              styles: d.style_tags || [],
+              products: [],
+              tags: (d.style_tags || []).map(s => `#${s}`),
+              likes: d.likes || 0,
+              shares: 0,
+              visibility: d.visibility,
+              isUserDesign: true,
+            }));
+            setMyDesigns(normalized);
+          }
+        }).catch(() => {});
+      }
+    }, [user?.id])
+  );
 
   const openEditProfile = useCallback(() => {
     setEditDraft(profile);
@@ -428,10 +462,10 @@ export default function ProfileScreen({ navigation }) {
         {/* ── Designs Grid ── */}
         <View style={styles.grid}>
           {(activeTab === 0
-            ? MY_DESIGNS
+            ? myDesigns
             : activeTab === 1
-              ? MY_DESIGNS.filter(d => liked[d.id])
-              : MY_DESIGNS.filter(d => shared[d.id])
+              ? myDesigns.filter(d => liked[d.id])
+              : myDesigns.filter(d => shared[d.id])
           ).map(design => (
             <PressableCard
               key={design.id}

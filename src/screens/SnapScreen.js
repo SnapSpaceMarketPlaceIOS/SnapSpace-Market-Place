@@ -20,7 +20,7 @@ import { colors } from '../constants/colors';
 import { palette, space, radius } from '../constants/tokens';
 import { useAuth } from '../context/AuthContext';
 import { uploadRoomPhoto } from '../services/supabase';
-import { generateInteriorDesign, uploadImageToReplicate } from '../services/replicate';
+import { generateInteriorDesign } from '../services/replicate';
 import { getProductsForPrompt } from '../services/affiliateProducts';
 
 // ─── Icons ───────────────────────────────────────────────────────────────────
@@ -104,10 +104,25 @@ function extractVisualHints(name) {
  * @returns {string}            - Enriched generation prompt
  */
 function buildEnrichedPrompt(userPrompt, products) {
-  const pieces = products.slice(0, 4).map(p => {
+  // Visual tag words that help the AI draw specific materials/colors/shapes
+  const TAG_VISUAL = new Set([
+    'boucle', 'velvet', 'leather', 'linen', 'rattan', 'jute', 'chenille',
+    'glass', 'wood', 'walnut', 'oak', 'brass', 'gold', 'marble', 'concrete',
+    'curved', 'round', 'oval', 'modular', 'sectional', 'oversized', 'wavy', 'fluted',
+    'cream', 'beige', 'white', 'gray', 'black', 'camel', 'sage', 'green', 'brown',
+    'ivory', 'sand', 'cognac', 'emerald', 'monochrome', 'geometric', 'abstract',
+    'plush', 'sculptural', 'textured', 'woven', 'natural-fiber',
+  ]);
+
+  const pieces = products.slice(0, 5).map(p => {
     const label = FURNITURE_LABELS[p.category] || p.category.replace(/-/g, ' ');
-    const hints = extractVisualHints(p.name);
-    return hints ? `${hints} ${label}` : label;
+    // Pull visual hints from both the product name AND tags
+    const nameHints = extractVisualHints(p.name);
+    const tagHints = (p.tags || []).filter(t => TAG_VISUAL.has(t)).slice(0, 2).join(' ');
+    const allHints = [nameHints, tagHints].filter(Boolean).join(' ');
+    // Deduplicate words
+    const uniqueHints = [...new Set(allHints.split(' ').filter(Boolean))].slice(0, 3).join(' ');
+    return uniqueHints ? `${uniqueHints} ${label}` : label;
   });
 
   const furnitureList = pieces.length > 0 ? `, with ${pieces.join(', ')}` : '';
@@ -270,19 +285,9 @@ export default function SnapScreen({ navigation }) {
       // This makes the AI draw exactly what we'll show in Shop This Look
       const enrichedPrompt = buildEnrichedPrompt(designPrompt, matchedProducts);
 
-      // ── Step 3: Upload the room photo
-      setStatusText('Uploading photo…');
-      let imageUrl;
-      try {
-        imageUrl = await uploadRoomPhoto(user?.id || 'anonymous', photo.uri, photo.base64);
-      } catch {
-        setStatusText('Uploading via Replicate…');
-        imageUrl = await uploadImageToReplicate(photo.base64);
-      }
-
-      // ── Step 4: Generate with the furniture-specific prompt
+      // ── Step 3: Generate — uploads photo via native multipart, then runs Flux ControlNet
       setStatusText('Generating your design… (40–90s)');
-      const resultUrl = await generateInteriorDesign(imageUrl, enrichedPrompt);
+      const resultUrl = await generateInteriorDesign(photo.uri, enrichedPrompt, photo.base64);
       setLoading(false);
       setStatusText('');
       navigation?.navigate('RoomResult', {
@@ -307,6 +312,7 @@ export default function SnapScreen({ navigation }) {
     }
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
       quality: 0.8,
       base64: true,
     });

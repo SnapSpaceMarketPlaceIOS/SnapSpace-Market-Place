@@ -13,15 +13,19 @@ import {
   Animated,
   PanResponder,
   Linking,
+  Modal,
 } from 'react-native';
 import CardImage from '../components/CardImage';
 import { LinearGradient } from 'expo-linear-gradient';
-import Svg, { Path, Circle, Line, Polyline } from 'react-native-svg';
+import Svg, { Path, Circle, Line, Polyline, Rect } from 'react-native-svg';
 import { colors } from '../constants/colors';
 import { space, radius, fontWeight, fontSize, uiColors, typeScale, shadow } from '../constants/tokens';
 import { Button, Badge, SectionHeader } from '../components/ds';
 import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
 import { getProductsForPrompt, getSourceLabel, getSourceColor } from '../services/affiliateProducts';
+import { saveUserDesign } from '../services/supabase';
+import * as FileSystem from 'expo-file-system/legacy';
 
 const { width, height } = Dimensions.get('window');
 
@@ -46,6 +50,26 @@ function ShareIcon() {
       <Circle cx={18} cy={19} r={3} />
       <Line x1={8.59} y1={13.51} x2={15.42} y2={17.49} />
       <Line x1={15.41} y1={6.51} x2={8.59} y2={10.49} />
+    </Svg>
+  );
+}
+
+function PostIcon() {
+  return (
+    <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke={colors.white} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+      <Path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
+      <Polyline points="16 6 12 2 8 6" />
+      <Line x1={12} y1={2} x2={12} y2={15} />
+    </Svg>
+  );
+}
+
+function DownloadIcon() {
+  return (
+    <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke={colors.white} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+      <Path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+      <Polyline points="7 10 12 15 17 10" />
+      <Line x1={12} y1={15} x2={12} y2={3} />
     </Svg>
   );
 }
@@ -99,9 +123,15 @@ export default function RoomResultScreen({ route, navigation }) {
   const [products, setProducts] = useState([]);
 
   const { addToCart } = useCart();
+  const { user } = useAuth();
   const prompt = route?.params?.prompt || 'Modern minimalist redesign';
   const resultUri = route?.params?.resultUri || null;
   const passedProducts = route?.params?.products || null;
+  const [saving, setSaving] = useState(false);
+  const [showPostModal, setShowPostModal] = useState(false);
+  const [postVisibility, setPostVisibility] = useState('public');
+  const [posting, setPosting] = useState(false);
+  const [posted, setPosted] = useState(false);
 
   useEffect(() => {
     // Use products passed from SnapScreen if available, otherwise match locally
@@ -162,6 +192,45 @@ export default function RoomResultScreen({ route, navigation }) {
     try {
       await Share.share({ message: `Check out my AI room design on SnapSpace: "${prompt}"` });
     } catch (e) {}
+  };
+
+  const handleSaveToPhotos = async () => {
+    if (!resultUri || saving) return;
+    setSaving(true);
+    try {
+      // Download to local file first — iOS share sheet shows "Save Image" for local files
+      const fileUri = FileSystem.cacheDirectory + 'snapspace_design_' + Date.now() + '.webp';
+      await FileSystem.downloadAsync(resultUri, fileUri);
+      await Share.share({ url: fileUri });
+    } catch (e) {
+      Alert.alert('Save Failed', 'Could not save the image. Please try again.');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handlePostToProfile = async () => {
+    if (!resultUri || !user || posting) return;
+    setPosting(true);
+    try {
+      const styleTags = products.flatMap(p => p.styles || []).filter(Boolean);
+      const uniqueTags = [...new Set(styleTags)];
+      const productSummary = products.map(p => ({ id: p.id, name: p.name, price: p.priceValue ?? p.price }));
+      await saveUserDesign(user.id, {
+        imageUrl: resultUri,
+        prompt,
+        styleTags: uniqueTags,
+        products: productSummary,
+        visibility: postVisibility,
+      });
+      setShowPostModal(false);
+      setPosted(true);
+      Alert.alert('Posted!', `Your design has been saved to your profile${postVisibility === 'public' ? ' and is visible on Explore' : ''}.`);
+    } catch (e) {
+      Alert.alert('Post Failed', e.message || 'Could not save. Please try again.');
+    } finally {
+      setPosting(false);
+    }
   };
 
   const handleAddToCart = (product) => {
@@ -228,9 +297,21 @@ export default function RoomResultScreen({ route, navigation }) {
         <TouchableOpacity style={styles.iconBtn} onPress={() => navigation?.goBack()}>
           <BackIcon />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.iconBtn} onPress={handleShare}>
-          <ShareIcon />
-        </TouchableOpacity>
+        <View style={styles.topBarRight}>
+          {resultUri && !posted && user && (
+            <TouchableOpacity style={styles.iconBtn} onPress={() => setShowPostModal(true)}>
+              <PostIcon />
+            </TouchableOpacity>
+          )}
+          {resultUri && (
+            <TouchableOpacity style={styles.iconBtn} onPress={handleSaveToPhotos} disabled={saving}>
+              <DownloadIcon />
+            </TouchableOpacity>
+          )}
+          <TouchableOpacity style={styles.iconBtn} onPress={handleShare}>
+            <ShareIcon />
+          </TouchableOpacity>
+        </View>
       </View>
 
       {/* Prompt badge at bottom of image */}
@@ -337,6 +418,48 @@ export default function RoomResultScreen({ route, navigation }) {
           })}
         </ScrollView>
       </Animated.View>
+
+      {/* Post to Profile Modal */}
+      <Modal visible={showPostModal} transparent animationType="fade">
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalCard}>
+            <Text style={styles.modalTitle}>Post to Profile</Text>
+            <Text style={styles.modalSubtitle}>Share your AI design with the community</Text>
+
+            {resultUri && (
+              <Image source={{ uri: resultUri }} style={styles.modalPreview} resizeMode="contain" />
+            )}
+
+            <Text style={styles.modalLabel}>Visibility</Text>
+            <View style={styles.toggleRow}>
+              <TouchableOpacity
+                style={[styles.toggleBtn, postVisibility === 'public' && styles.toggleBtnActive]}
+                onPress={() => setPostVisibility('public')}
+              >
+                <Text style={[styles.toggleText, postVisibility === 'public' && styles.toggleTextActive]}>Public</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.toggleBtn, postVisibility === 'private' && styles.toggleBtnActive]}
+                onPress={() => setPostVisibility('private')}
+              >
+                <Text style={[styles.toggleText, postVisibility === 'private' && styles.toggleTextActive]}>Private</Text>
+              </TouchableOpacity>
+            </View>
+
+            <TouchableOpacity
+              style={[styles.postBtn, posting && { opacity: 0.6 }]}
+              onPress={handlePostToProfile}
+              disabled={posting}
+            >
+              <Text style={styles.postBtnText}>{posting ? 'Posting...' : 'Post to Profile'}</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity onPress={() => setShowPostModal(false)} style={styles.cancelBtn}>
+              <Text style={styles.cancelBtnText}>Cancel</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -362,6 +485,10 @@ const styles = StyleSheet.create({
     paddingTop: 56,
     paddingHorizontal: 20,
     zIndex: 10,
+  },
+  topBarRight: {
+    flexDirection: 'row',
+    gap: 10,
   },
   iconBtn: {
     width: 44,
@@ -553,5 +680,93 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 12,
     fontWeight: '700',
+  },
+  // ── Post Modal ────────────────────────────────────────────────────
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 24,
+  },
+  modalCard: {
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    padding: 24,
+    width: '100%',
+    maxWidth: 340,
+    alignItems: 'center',
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: '800',
+    color: '#111',
+    marginBottom: 4,
+  },
+  modalSubtitle: {
+    fontSize: 13,
+    color: '#888',
+    marginBottom: 16,
+  },
+  modalPreview: {
+    width: '100%',
+    height: 160,
+    borderRadius: 12,
+    backgroundColor: '#000',
+    marginBottom: 16,
+  },
+  modalLabel: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#555',
+    alignSelf: 'flex-start',
+    marginBottom: 8,
+  },
+  toggleRow: {
+    flexDirection: 'row',
+    borderRadius: 12,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: colors.bluePrimary,
+    marginBottom: 20,
+    alignSelf: 'stretch',
+  },
+  toggleBtn: {
+    flex: 1,
+    paddingVertical: 10,
+    alignItems: 'center',
+    backgroundColor: '#fff',
+  },
+  toggleBtnActive: {
+    backgroundColor: colors.bluePrimary,
+  },
+  toggleText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: colors.bluePrimary,
+  },
+  toggleTextActive: {
+    color: '#fff',
+  },
+  postBtn: {
+    backgroundColor: colors.bluePrimary,
+    borderRadius: 14,
+    paddingVertical: 14,
+    alignSelf: 'stretch',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  postBtnText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '700',
+  },
+  cancelBtn: {
+    paddingVertical: 8,
+  },
+  cancelBtnText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#888',
   },
 });

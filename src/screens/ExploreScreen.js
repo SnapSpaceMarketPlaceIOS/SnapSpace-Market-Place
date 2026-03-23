@@ -21,6 +21,7 @@ import theme from '../constants/theme';
 import { useLiked } from '../context/LikedContext';
 import { DESIGNS } from '../data/designs';
 import { PRODUCT_CATALOG } from '../data/productCatalog';
+import { getPublicDesigns } from '../services/supabase';
 import PressableCard from '../components/PressableCard';
 import { SellerName } from '../components/VerifiedBadge';
 import { getProductsForDesign } from '../services/affiliateProducts';
@@ -336,6 +337,7 @@ export default function ExploreScreen({ navigation, route }) {
   const [activeStyleFilter, setActiveStyleFilter] = useState(null);
   const [filterLabel, setFilterLabel] = useState(null);
   const [overrideDesigns, setOverrideDesigns] = useState(null);
+  const [communityDesigns, setCommunityDesigns] = useState([]);
   const consumedParamsRef = useRef(null);
 
   // Apply params on every focus (handles tab-switch AND fresh navigation)
@@ -389,6 +391,32 @@ export default function ExploreScreen({ navigation, route }) {
     consumedParamsRef.current = null;
   }, [navigation]);
 
+  // Fetch community (user-posted) designs on screen focus
+  useFocusEffect(
+    useCallback(() => {
+      getPublicDesigns(20, 0).then(designs => {
+        const normalized = designs.map(d => ({
+          id: `user-${d.id}`,
+          title: d.prompt || 'AI Generated Design',
+          user: d.author?.username || d.author?.full_name || 'SnapSpace User',
+          initial: (d.author?.full_name || 'U')[0],
+          verified: d.author?.is_verified_supplier || false,
+          imageUrl: d.image_url,
+          description: d.prompt,
+          prompt: d.prompt,
+          roomType: 'living-room',
+          styles: d.style_tags || [],
+          products: [],
+          tags: (d.style_tags || []).map(s => `#${s}`),
+          likes: d.likes || 0,
+          shares: 0,
+          isUserDesign: true,
+        }));
+        setCommunityDesigns(normalized);
+      }).catch(() => {});
+    }, [])
+  );
+
   // filterLabel is set when any param-driven filter is active (room, style, designs, or query)
   const hasActiveFilter = !!(activeRoomFilter || activeStyleFilter || overrideDesigns || filterLabel);
 
@@ -398,7 +426,7 @@ export default function ExploreScreen({ navigation, route }) {
     );
   };
 
-  const baseDesigns = overrideDesigns || DESIGNS;
+  const baseDesigns = overrideDesigns || [...communityDesigns, ...DESIGNS];
 
   const filteredDesigns = useMemo(
     () => searchAndFilter(baseDesigns, search, activeCategory, activeRoomFilter, activeStyleFilter),

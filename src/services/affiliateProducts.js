@@ -53,6 +53,7 @@ function normalizeCuratedProduct(p) {
     roomType:     [p.room],
     styles:       [style],
     materials:    [],
+    tags:         p.tags || [],
     source:       'amazon',
     affiliateUrl: p.affiliateUrl,
     rating:       4.3,
@@ -155,6 +156,7 @@ function normalizeProduct(product) {
     reviewCount: product.reviewCount,
     description: product.description,
     materials: product.materials,
+    tags: product.tags || [],
   };
 }
 

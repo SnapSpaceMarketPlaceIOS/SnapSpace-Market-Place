@@ -1,65 +1,108 @@
+import * as FileSystem from 'expo-file-system/legacy';
+
 const API_URL = 'https://api.replicate.com/v1';
 const TOKEN = process.env.EXPO_PUBLIC_REPLICATE_API_TOKEN;
 
-// xlabs-ai/flux-dev-controlnet — Flux.1 Dev with depth/canny/soft-edge ControlNets (XLabs v3)
-// Version hash from: https://replicate.com/xlabs-ai/flux-dev-controlnet/versions
-// A100 80GB — high quality, ~20-40s warm / up to 3min cold boot.
+// xlabs-ai/flux-dev-controlnet — Flux.1 Dev with depth/canny/soft-edge ControlNets
 const MODEL_VERSION = '9a8db105db745f8b11ad3afe5c8bd892428b2a43ade0b67edc4e0ccd52ff2fda';
 
 const POLL_INTERVAL_MS = 3000;
-const MAX_POLLS = 80; // 3s × 80 = 4 min timeout (accounts for cold boot)
+const MAX_POLLS = 80; // 3s × 80 = 4 min timeout
 
 /**
- * Uploads a base64-encoded JPEG directly to Replicate's Files API.
- * Use as a fallback when Supabase Storage is unavailable.
- * Returns a Replicate-hosted URL the model can read as input.
+ * Upload image to Replicate Files API.
  *
- * @param {string} base64 - Raw base64 string (no "data:image/..." prefix)
- * @returns {Promise<string>} Replicate file URL
+ * Root cause of all previous failures: iOS returns AVIF/HEIC files from the
+ * photo library. The file URI points to the original AVIF, but expo-image-picker
+ * with quality option already converts to JPEG in the base64 field.
+ *
+ * Strategy: use the picker's base64 (guaranteed JPEG) → write to a .jpg file
+ * → upload via native FormData. If no base64, fall back to reading from URI.
  */
-export async function uploadImageToReplicate(base64) {
-  if (!TOKEN) throw new Error('Replicate API token is missing.');
+async function uploadForReplicate(imageUri, base64Data) {
+  let b64;
 
-  // Decode base64 → Uint8Array
-  const binaryStr = atob(base64);
-  const bytes = new Uint8Array(binaryStr.length);
-  for (let i = 0; i < binaryStr.length; i++) {
-    bytes[i] = binaryStr.charCodeAt(i);
+  if (base64Data && base64Data.length > 100) {
+    // Use the picker's pre-converted JPEG base64 directly
+    console.log('[Replicate] Using picker base64 (guaranteed JPEG), length:', base64Data.length);
+    b64 = base64Data;
+  } else {
+    // Fallback: read from URI (may be AVIF/HEIC — risky but sometimes works)
+    console.log('[Replicate] No picker base64, reading from URI...');
+    b64 = await FileSystem.readAsStringAsync(imageUri, { encoding: 'base64' });
+    console.log('[Replicate] Read base64 from URI, length:', b64.length);
   }
+
+  if (!b64 || b64.length < 100) {
+    throw new Error('No image data available');
+  }
+
+  // Log format detection: JPEG base64 starts with /9j/, PNG with iVBOR, AVIF with AAAA
+  const prefix = b64.substring(0, 8);
+  const isJpeg = prefix.startsWith('/9j/');
+  console.log('[Replicate] Format check — prefix:', prefix, 'isJPEG:', isJpeg);
+
+  // Write JPEG base64 to a real file in cache
+  const tempPath = FileSystem.cacheDirectory + 'replicate_upload_' + Date.now() + '.jpg';
+  await FileSystem.writeAsStringAsync(tempPath, b64, { encoding: 'base64' });
+
+  const info = await FileSystem.getInfoAsync(tempPath);
+  console.log('[Replicate] Temp file size:', info.size, 'bytes');
+
+  if (!info.exists || info.size < 100) {
+    throw new Error('Failed to write temp image file');
+  }
+
+  // Upload via native FormData
+  console.log('[Replicate] Uploading to Files API...');
+  const form = new FormData();
+  form.append('content', {
+    uri: tempPath,
+    type: 'image/jpeg',
+    name: 'room.jpg',
+  });
 
   const res = await fetch(`${API_URL}/files`, {
     method: 'POST',
-    headers: {
-      Authorization: `Bearer ${TOKEN}`,
-      'Content-Type': 'image/jpeg',
-    },
-    body: bytes,
+    headers: { Authorization: `Bearer ${TOKEN}` },
+    body: form,
   });
 
-  const file = await res.json();
-  if (!res.ok) throw new Error(file.detail || 'Failed to upload image to Replicate.');
-  // Replicate Files API returns { urls: { get: "..." } }
-  return file.urls?.get ?? file.url;
+  // Clean up
+  FileSystem.deleteAsync(tempPath, { idempotent: true }).catch(() => {});
+
+  const json = await res.json();
+  console.log('[Replicate] Upload status:', res.status, 'API size:', json?.size, 'local size:', info.size);
+
+  if (!res.ok) {
+    throw new Error(`Image upload failed (${res.status}): ${json?.detail || 'Unknown error'}`);
+  }
+
+  if (!json?.urls?.get) {
+    throw new Error('Upload succeeded but no file URL returned');
+  }
+
+  // Verify sizes match
+  if (json.size && Math.abs(json.size - info.size) > 10) {
+    console.warn('[Replicate] SIZE MISMATCH — API:', json.size, 'vs local:', info.size);
+  }
+
+  return json.urls.get;
 }
 
 /**
- * Sends a room photo URL and design prompt to the Flux ControlNet model.
- * The model preserves your room's spatial structure (walls, windows, layout)
- * while completely restyling it with Flux.1 Dev quality.
+ * Generates a redesigned interior image using Flux ControlNet.
  *
- * Key differences from old SD1.5 model:
- *   - guidance: 4.0   (Flux Dev range: 3-5 — NOT 7-15 like SD)
- *   - steps: 28       (Flux: 25-30 is plenty — more = diminishing returns)
- *   - control_image   (XLabs param name for the structural reference photo)
- *   - controlnet_conditioning_scale: 0.6  (how hard the depth map constrains layout)
- *   - Random seed per call = different output every generation
- *
- * @param {string} imageUrl - Public URL of the room photo (Supabase Storage or Replicate Files)
- * @param {string} prompt   - Enriched design style prompt from SnapScreen buildEnrichedPrompt()
+ * @param {string} imageUri  - Local file URI from expo-image-picker / expo-camera
+ * @param {string} prompt    - Design style prompt
+ * @param {string} [base64]  - Optional JPEG base64 from the image picker
  * @returns {Promise<string>} URL of the AI-generated room image
  */
-export async function generateInteriorDesign(imageUrl, prompt) {
+export async function generateInteriorDesign(imageUri, prompt, base64) {
   if (!TOKEN) throw new Error('Replicate API token is missing. Add EXPO_PUBLIC_REPLICATE_API_TOKEN to your .env file.');
+
+  const controlImage = await uploadForReplicate(imageUri, base64);
+  console.log('[Replicate] control_image URL:', controlImage);
 
   const res = await fetch(`${API_URL}/predictions`, {
     method: 'POST',
@@ -70,31 +113,14 @@ export async function generateInteriorDesign(imageUrl, prompt) {
     body: JSON.stringify({
       version: MODEL_VERSION,
       input: {
-        // The reference room photo — ControlNet extracts depth map to preserve structure
-        control_image: imageUrl,
-
-        // Enriched prompt comes from buildEnrichedPrompt() in SnapScreen.js,
-        // which lists the specific furniture pieces from matched products.
+        control_image: controlImage,
         prompt: `${prompt || 'modern minimalist interior design'}, beautifully furnished interior, professional interior photography, high resolution, staged room, warm soft lighting, interior design magazine quality`,
-
         negative_prompt: 'lowres, watermark, text, banner, logo, deformed, blurry, out of focus, empty room, bare walls, no furniture, bare floor, people, person, human, outdoor, exterior, cartoon, anime, sketch, overexposed, underexposed, ugly',
-
-        // depth = extracts room geometry (walls, floor, windows) as structural constraint
         control_type: 'depth',
-
-        // Flux Dev guidance range: 3.5-7.0 (much lower than SD's 7-15)
         guidance_scale: 4.0,
-
-        // 25-30 steps is the Flux sweet spot
         steps: 28,
-
-        // Random seed = different output every generation
         seed: Math.floor(Math.random() * 999999999),
-
-        // How hard depth ControlNet constrains room geometry (0.0-2.0)
-        // 0.6 = preserves walls/windows while allowing furniture freedom
         control_strength: 0.6,
-
         output_format: 'webp',
         output_quality: 95,
       },
@@ -104,7 +130,6 @@ export async function generateInteriorDesign(imageUrl, prompt) {
   const prediction = await res.json();
   if (!res.ok) throw new Error(prediction.detail || 'Failed to start AI generation.');
 
-  // If already completed (fast warm inference)
   if (prediction.status === 'succeeded') {
     const output = prediction.output;
     return Array.isArray(output) ? output[0] : output;
