@@ -1334,7 +1334,7 @@ const styles = StyleSheet.create({
     paddingBottom: 24,
   },
   overlay: {
-    height: height - 88 + 28 + 20, // fill screen above tab bar + cover peeledCard -28 margin + buffer
+    height: height - 88, // exactly fill visible content area above tab bar
     paddingTop: 60,
   },
 
@@ -1440,7 +1440,7 @@ const styles = StyleSheet.create({
   // Input bar — pinned to hero bottom
   heroBottom: {
     paddingHorizontal: 16,
-    paddingBottom: 16,
+    paddingBottom: 48, // 28px buffer above peeledCard overlap + 20px breathing room
   },
   inputBar: {
     flexDirection: 'row',
