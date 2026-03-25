@@ -317,7 +317,7 @@ export default function CartScreen({ navigation }) {
       <View style={{ flex: 1, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center', padding: 32 }}>
         <Text style={{ fontSize: 22, fontWeight: '800', color: '#111', marginBottom: 8, textAlign: 'center' }}>Sign in to view your cart</Text>
         <Text style={{ fontSize: 14, color: '#6B7280', textAlign: 'center', marginBottom: 28, lineHeight: 21 }}>Create a free account to save items, check out, and track your orders.</Text>
-        <TouchableOpacity onPress={() => navigation.navigate('Auth')} style={{ backgroundColor: '#1D4ED8', borderRadius: 14, paddingVertical: 14, paddingHorizontal: 40 }}>
+        <TouchableOpacity onPress={() => navigation.navigate('Auth')} style={{ backgroundColor: '#0B6DC3', borderRadius: 14, paddingVertical: 14, paddingHorizontal: 40 }}>
           <Text style={{ color: '#fff', fontWeight: '700', fontSize: 15 }}>Sign In / Sign Up</Text>
         </TouchableOpacity>
       </View>
@@ -823,7 +823,7 @@ const styles = StyleSheet.create({
     borderTopColor: C.border,
   },
   checkoutBtn: {
-    backgroundColor: C.primary,    // #1D4ED8
+    backgroundColor: C.primary,    // #0B6DC3
     borderRadius: R.full,           // 9999px pill
     height: 56,
     alignItems: 'center',

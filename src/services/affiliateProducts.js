@@ -182,7 +182,7 @@ export function getSourceColor(source) {
     case 'amazon':  return uiColors.amazon;   // #FF9900 from tokens
     case 'wayfair': return '#7B2D8B';
     case 'houzz':   return '#4DBC15';
-    default:        return uiColors.primary;  // #1D4ED8 from tokens
+    default:        return uiColors.primary;  // #0B6DC3 from tokens
   }
 }
 

@@ -20,7 +20,7 @@ import { Button, Badge, SectionHeader } from '../components/ds';
 import { Supplier } from '../services/api';
 
 const BLUE = '#0B6DC3';
-const BLUE_DARK = '#1D4ED8';
+const BLUE_DARK = '#0B6DC3';
 
 const TOTAL_STEPS = 3;
 

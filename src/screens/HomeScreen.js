@@ -1226,7 +1226,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     overflow: 'hidden',
-    backgroundColor: '#0D1E35', // dark fallback — no white flash at bottom
+    backgroundColor: '#035DA8', // dark fallback — no white flash at bottom
   },
   bgImage: {
     position: 'absolute',

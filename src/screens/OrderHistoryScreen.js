@@ -84,7 +84,7 @@ function formatDate(isoString) {
 }
 
 const STATUS_CONFIG = {
-  Confirmed:  { bg: '#EFF6FF', text: '#1D4ED8', dot: '#3B82F6' },
+  Confirmed:  { bg: '#EFF6FF', text: '#0B6DC3', dot: '#3B82F6' },
   Processing: { bg: '#FFF7ED', text: '#C2410C', dot: '#F97316' },
   Shipped:    { bg: '#F5F3FF', text: '#6D28D9', dot: '#8B5CF6' },
   Delivered:  { bg: '#F0FDF4', text: '#15803D', dot: '#22C55E' },

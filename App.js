@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
+import React, { useRef, useCallback } from 'react';
+import { View, Text, StyleSheet, ActivityIndicator, Animated, Pressable } from 'react-native';
 import { StripeProvider } from '@stripe/stripe-react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -131,6 +131,40 @@ function CartBadge() {
   );
 }
 
+// ─── Animated tab button — subtle scale bounce on press ──────────
+function AnimatedTabButton({ children, onPress, style, ...rest }) {
+  const scale = useRef(new Animated.Value(1)).current;
+  const handlePressIn = useCallback(() => {
+    Animated.spring(scale, {
+      toValue: 0.95,
+      useNativeDriver: true,
+      speed: 50,
+      bounciness: 4,
+    }).start();
+  }, []);
+  const handlePressOut = useCallback(() => {
+    Animated.spring(scale, {
+      toValue: 1,
+      useNativeDriver: true,
+      speed: 20,
+      bounciness: 10,
+    }).start();
+  }, []);
+  return (
+    <Pressable
+      onPress={onPress}
+      onPressIn={handlePressIn}
+      onPressOut={handlePressOut}
+      style={style}
+      {...rest}
+    >
+      <Animated.View style={{ transform: [{ scale }], alignItems: 'center', justifyContent: 'center' }}>
+        {children}
+      </Animated.View>
+    </Pressable>
+  );
+}
+
 // ─── Tab Navigator ───────────────────────────────────────────────
 function TabNavigator() {
   return (
@@ -152,6 +186,7 @@ function TabNavigator() {
           justifyContent: 'center',
           alignItems: 'center',
         },
+        tabBarButton: (props) => <AnimatedTabButton {...props} />,
       }}
     >
       <Tab.Screen

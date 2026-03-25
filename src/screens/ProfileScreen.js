@@ -535,7 +535,7 @@ export default function ProfileScreen({ navigation }) {
           <View style={styles.supplierCta}>
             <View style={styles.supplierCtaLeft}>
               <View style={styles.supplierCtaBadge}>
-                <Svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="#1D4ED8" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round">
+                <Svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="#0B6DC3" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round">
                   <Path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.77 5.82 21 7 14.14 2 9.27l6.91-1.01L12 2z" />
                 </Svg>
               </View>
@@ -616,11 +616,11 @@ export default function ProfileScreen({ navigation }) {
                     >
                       <View style={styles.settingsLeft}>
                         <View style={[styles.settingsIconWrap, { backgroundColor: '#EEF2FF' }]}>
-                          <Svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="#1D4ED8" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                          <Svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="#0B6DC3" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
                             <Path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
                           </Svg>
                         </View>
-                        <Text style={[styles.settingsLabel, { color: '#1D4ED8' }]}>Supplier Applications</Text>
+                        <Text style={[styles.settingsLabel, { color: '#0B6DC3' }]}>Supplier Applications</Text>
                       </View>
                       <ChevronRight />
                     </TouchableOpacity>
@@ -1362,7 +1362,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginHorizontal: space.lg,
     marginTop: space.xl,
-    backgroundColor: '#1D4ED8',
+    backgroundColor: '#0B6DC3',
     borderRadius: radius.lg,
     paddingVertical: space.md,
     paddingHorizontal: space.lg,
@@ -1417,7 +1417,7 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: radius.full,
-    backgroundColor: '#DBEAFE',
+    backgroundColor: 'rgba(103,172,233,0.18)',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -1434,7 +1434,7 @@ const styles = StyleSheet.create({
     color: '#3B82F6',
   },
   supplierCtaBtn: {
-    backgroundColor: '#1D4ED8',
+    backgroundColor: '#0B6DC3',
     borderRadius: radius.sm,
     paddingVertical: 8,
     paddingHorizontal: 16,

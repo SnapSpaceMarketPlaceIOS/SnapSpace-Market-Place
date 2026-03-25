@@ -66,7 +66,7 @@ const RECENT_REQUESTS = [
 ];
 
 const STATUS_CONFIG = {
-  planned:      { label: 'Planned',      bg: '#EFF6FF', text: '#1D4ED8' },
+  planned:      { label: 'Planned',      bg: '#EFF6FF', text: '#0B6DC3' },
   in_progress:  { label: 'In Progress',  bg: '#FFF7ED', text: '#C2410C' },
   under_review: { label: 'Under Review', bg: '#F5F3FF', text: '#6D28D9' },
   shipped:      { label: 'Shipped',      bg: '#F0FDF4', text: '#15803D' },
