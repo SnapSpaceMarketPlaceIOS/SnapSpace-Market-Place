@@ -131,20 +131,28 @@ export async function uploadRoomPhoto(userId, uri, base64Data = null) {
 
 /** Save a new user design to the database. */
 export async function saveUserDesign(userId, { imageUrl, prompt, styleTags, products, visibility }) {
-  const { data, error } = await supabase
-    .from('user_designs')
-    .insert({
-      user_id: userId,
-      image_url: imageUrl,
-      prompt: prompt || '',
-      style_tags: styleTags || [],
-      products: products || [],
-      visibility: visibility || 'public',
-    })
-    .select()
-    .single();
-  if (error) throw error;
-  return data;
+  // Use a timeout to prevent hanging indefinitely
+  const timeoutPromise = new Promise((_, reject) =>
+    setTimeout(() => reject(new Error('Save timed out. Please try again.')), 10000)
+  );
+
+  const insertPromise = (async () => {
+    // First try with auth context (RLS)
+    const { error } = await supabase
+      .from('user_designs')
+      .insert({
+        user_id: userId,
+        image_url: imageUrl,
+        prompt: prompt || '',
+        style_tags: styleTags || [],
+        products: products || [],
+        visibility: visibility || 'public',
+      });
+    if (error) throw error;
+    return { success: true };
+  })();
+
+  return Promise.race([insertPromise, timeoutPromise]);
 }
 
 /** Get all designs for a specific user (own profile). */

@@ -24,13 +24,14 @@ import { useLiked } from '../context/LikedContext';
 import { DESIGNS } from '../data/designs';
 import { SELLERS } from '../data/sellers';
 import { searchProducts, getSourceColor } from '../services/affiliateProducts';
+import { PRODUCT_CATALOG } from '../data/productCatalog';
 
 const { width, height } = Dimensions.get('window');
 
-const PARALLAX_BUDGET = 300;
-const PARALLAX_FACTOR = 0.2;
-const HERO_ROTATE_INTERVAL = 7000;
-const HERO_FADE_DURATION   = 1800;
+const PARALLAX_BUDGET = 60;
+const PARALLAX_FACTOR = 0.08;
+const HERO_ROTATE_INTERVAL = 4000;
+const HERO_FADE_DURATION   = 1200;
 
 const CARD_W = width * 0.50;
 const COLL_CARD_W = (width - space.lg * 2 - space.sm) / 2;
@@ -41,21 +42,12 @@ const ARRIVAL_CARD_W = Math.round(width * 0.42);
 const SELLER_MAP = SELLERS.reduce((acc, s) => { acc[s.handle] = s; return acc; }, {});
 
 const HERO_IMAGES = [
-  'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1600&q=90&fit=crop',
-  'https://images.unsplash.com/photo-1616046229478-9901c5536a45?w=1600&q=90&fit=crop',
-  'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=1600&q=90&fit=crop',
-  'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=1600&q=90&fit=crop',
-  'https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?w=1600&q=90&fit=crop',
-  'https://images.unsplash.com/photo-1565538810643-b5bdb714032a?w=1600&q=90&fit=crop',
-  'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1600&q=90&fit=crop',
-  'https://images.unsplash.com/photo-1540518614846-7eded433c457?w=1600&q=90&fit=crop',
-  'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=1600&q=90&fit=crop',
-  'https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?w=1600&q=90&fit=crop',
-  'https://images.unsplash.com/photo-1618219908412-a29a1bb7b86e?w=1600&q=90&fit=crop',
-  'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1600&q=90&fit=crop',
-  'https://images.unsplash.com/photo-1550581190-9c1c48d21d6c?w=1600&q=90&fit=crop',
-  'https://images.unsplash.com/photo-1593642632559-0c6d3fc62b89?w=1600&q=90&fit=crop',
-  'https://images.unsplash.com/photo-1513694203232-719a280e022f?w=1600&q=90&fit=crop',
+  require('../assets/hero/room1.jpg'),
+  require('../assets/hero/room2.jpg'),
+  require('../assets/hero/room3.jpg'),
+  require('../assets/hero/room4.jpg'),
+  require('../assets/hero/room5.jpg'),
+  require('../assets/hero/room6.jpg'),
 ];
 
 // ── Room type quick-nav ────────────────────────────────────────────────────────
@@ -82,6 +74,12 @@ const ROOM_ICON_PURPLE    = '#7B5EA7';
 const ROOM_ICON_GOLD      = '#C4934A';
 const ROOM_ICON_ROSE      = '#D94F7A';
 const ROOM_ICON_TEAL      = '#2DADA0';
+
+// ── Star rating helper ─────────────────────────────────────────────────────────
+function renderStars(rating) {
+  const filled = Math.round(rating || 0);
+  return '★'.repeat(filled) + '☆'.repeat(5 - filled);
+}
 
 function RoomIcon({ roomKey, size = 28 }) {
   const P = ROOM_ICON_PRIMARY;
@@ -359,29 +357,8 @@ const STYLE_PRODUCT_COUNTS = Object.fromEntries(
   ])
 );
 
-// ── Curated editorial collections ─────────────────────────────────────────────
-const CURATED_COLLECTIONS = [
-  {
-    id: 'summer-refresh', title: 'Summer\nRefresh', subtitle: '12 rooms',
-    imageUrl: 'https://images.unsplash.com/photo-1628744876490-19b035ecf9c3?w=800&q=80',
-    styles: ['minimalist', 'scandi', 'biophilic'],
-  },
-  {
-    id: 'dark-moody', title: 'Dark &\nMoody', subtitle: '8 rooms',
-    imageUrl: 'https://images.unsplash.com/photo-1638541420159-cadd0634f08f?w=800&q=80',
-    styles: ['dark-luxe', 'luxury'],
-  },
-  {
-    id: 'coastal-calm', title: 'Coastal\nCalm', subtitle: '10 rooms',
-    imageUrl: 'https://images.unsplash.com/photo-1679862342541-e408d4f3ab80?w=800&q=80',
-    styles: ['minimalist', 'scandi'],
-  },
-  {
-    id: 'japandi-zen', title: 'Japandi\nZen', subtitle: '9 rooms',
-    imageUrl: 'https://images.unsplash.com/photo-1628744876497-eb30460be9f6?w=800&q=80',
-    styles: ['japandi', 'wabi-sabi'],
-  },
-];
+// ── New Arrivals — first 4 products from catalog ───────────────────────────────
+const NEW_ARRIVAL_PRODUCTS = PRODUCT_CATALOG.slice(0, 4);
 
 // ── Style label display map ────────────────────────────────────────────────────
 const STYLE_LABEL_MAP = {
@@ -638,8 +615,8 @@ export default function HomeScreen({ navigation }) {
     const loop = () => {
       kenBurnsScale.setValue(1);
       Animated.timing(kenBurnsScale, {
-        toValue: 1.08,
-        duration: (HERO_ROTATE_INTERVAL + HERO_FADE_DURATION) * 1.5,
+        toValue: 1.02,
+        duration: (HERO_ROTATE_INTERVAL + HERO_FADE_DURATION) * 2,
         easing: Easing.inOut(Easing.sin),
         useNativeDriver: true,
       }).start(({ finished }) => { if (finished && !stopped) loop(); });
@@ -708,12 +685,12 @@ export default function HomeScreen({ navigation }) {
     <View style={styles.container}>
       {/* Hero background images */}
       <Animated.Image
-        source={{ uri: slotA }}
+        source={slotA}
         style={[styles.bgImage, { transform: [{ translateY: imageTranslateY }, { scale: kenBurnsScale }], opacity: opacityA }]}
         resizeMode="cover"
       />
       <Animated.Image
-        source={{ uri: slotB }}
+        source={slotB}
         style={[styles.bgImage, { transform: [{ translateY: imageTranslateY }, { scale: kenBurnsScale }], opacity: opacityB }]}
         resizeMode="cover"
       />
@@ -728,12 +705,12 @@ export default function HomeScreen({ navigation }) {
         )}
         scrollEventThrottle={16}
         showsVerticalScrollIndicator={false}
-        bounces
+        bounces={false}
       >
         {/* ── Hero overlay ────────────────────────────────────────────── */}
         <LinearGradient
-          colors={['rgba(0,0,0,0.55)', 'rgba(0,0,0,0.10)', 'rgba(0,0,0,0.20)', 'rgba(0,0,0,0.72)']}
-          locations={[0, 0.25, 0.55, 1]}
+          colors={['rgba(0,0,0,0.55)', 'rgba(0,0,0,0.08)', 'rgba(0,0,0,0.18)', 'rgba(0,0,0,0.65)']}
+          locations={[0, 0.3, 0.6, 1]}
           style={styles.overlay}
         >
           <View style={styles.topBar}>
@@ -762,10 +739,7 @@ export default function HomeScreen({ navigation }) {
           <View style={styles.contentBlock}>
             <View style={styles.heroSection}>
               <Text style={styles.greetingEyebrow}>{greetingLine}</Text>
-              <Text style={styles.headline}>
-                {"Let's Snap\n"}
-                <Text style={styles.headlineBold}>Your Space.</Text>
-              </Text>
+              <Text style={styles.headline}>Lets Snap Your Space</Text>
             </View>
 
             <View style={styles.searchBar}>
@@ -801,24 +775,6 @@ export default function HomeScreen({ navigation }) {
               </TouchableOpacity>
             </View>
 
-            <TouchableOpacity
-              style={styles.snapBanner}
-              onPress={() => navigation?.navigate('Snap')}
-              activeOpacity={0.88}
-            >
-              <View style={styles.snapBannerLeft}>
-                <View style={styles.snapIconBox}>
-                  <CameraSmallIcon />
-                </View>
-                <View style={styles.snapBannerText}>
-                  <Text style={styles.snapBannerTitle}>Photograph a Room</Text>
-                  <Text style={styles.snapBannerSub}>Point, snap, and let AI do the rest</Text>
-                </View>
-              </View>
-              <View style={styles.snapChevron}>
-                <ChevronRight />
-              </View>
-            </TouchableOpacity>
           </View>
         </LinearGradient>
 
@@ -829,46 +785,6 @@ export default function HomeScreen({ navigation }) {
 
         {/* ── 1. Style DNA + Room Type Quick-Nav ──────────────────────── */}
         <View style={styles.peeledCard}>
-
-          {/* Style DNA strip */}
-          <SectionHeader
-            noTopMargin
-            title={userStyleDNA.length > 0 ? 'YOUR STYLE DNA' : 'DISCOVER YOUR STYLE'}
-            icon={<SparkleIcon size={13} color={C.primary} />}
-            actionLabel={userStyleDNA.length > 0 ? 'Edit →' : 'Explore →'}
-            onAction={() => navigation?.navigate('Explore')}
-          />
-
-          {userStyleDNA.length > 0 ? (
-            <View style={styles.dnaChipsRow}>
-              {userStyleDNA.map(style => {
-                const cat = STYLE_CATEGORIES.find(c => c.key === style);
-                return (
-                  <View key={style} style={[styles.dnaChip, { backgroundColor: cat?.bg || '#F3F4F6' }]}>
-                    <Text style={[styles.dnaChipText, { color: cat?.accent || '#374151' }]}>
-                      {STYLE_LABEL_MAP[style] || style}
-                    </Text>
-                  </View>
-                );
-              })}
-              <Text style={styles.dnaNote}>
-                Based on {likedCount} liked space{likedCount !== 1 ? 's' : ''}
-              </Text>
-            </View>
-          ) : (
-            <TouchableOpacity
-              style={styles.discoverBtn}
-              activeOpacity={0.8}
-              onPress={() => navigation?.navigate('Explore')}
-            >
-              <Text style={styles.discoverBtnText}>
-                Like spaces to build your style profile
-              </Text>
-              <View style={styles.discoverBtnArrow}>
-                <PaperPlaneIcon size={18} color="#FFFFFF" />
-              </View>
-            </TouchableOpacity>
-          )}
 
           {/* Room Type Quick-Nav */}
           <View style={styles.roomNavWrap}>
@@ -954,41 +870,38 @@ export default function HomeScreen({ navigation }) {
           </ScrollView>
         </View>
 
-        {/* ── 3. Curated Collections ──────────────────────────────────── */}
+        {/* ── 3. New Arrivals ──────────────────────────────────────────── */}
         <View style={styles.section}>
           <SectionHeader
             noTopMargin
-            title="CURATED COLLECTIONS"
+            title="NEW ARRIVALS"
             actionLabel="See all"
-            onAction={() => navigation?.navigate('AllCollections')}
+            onAction={() => navigation?.navigate('Explore', {
+              filterTag: 'new',
+              title: 'New Arrivals',
+            })}
           />
           <View style={styles.collectionsGrid}>
-            {CURATED_COLLECTIONS.slice(0, 4).map(col => (
+            {NEW_ARRIVAL_PRODUCTS.map(product => (
               <TouchableOpacity
-                key={col.id}
-                style={styles.collectionCard}
+                key={product.id}
+                style={styles.newArrivalCard}
                 activeOpacity={0.85}
-                onPress={() => navigation?.navigate('Browse', {
-                  mode: 'collection',
-                  title: col.title.replace('\n', ' '),
-                  subtitle: col.subtitle,
-                  collection: col,
-                  heroImage: col.imageUrl,
-                })}
+                onPress={() => navigation?.navigate('ProductDetail', { product })}
               >
-                <CardImage uri={col.imageUrl} style={styles.collectionCardImg} placeholderColor="#D0D7E3" />
-                <LinearGradient
-                  colors={['transparent', 'rgba(0,0,0,0.75)']}
-                  locations={[0.3, 1]}
-                  style={StyleSheet.absoluteFill}
-                />
-                <View style={styles.collectionCardContent}>
-                  <Text style={styles.collectionCardTitle}>{col.title}</Text>
-                  <View style={styles.collectionCardFooter}>
-                    <Text style={styles.collectionCardSub}>{col.subtitle}</Text>
-                    <View style={styles.collectionExploreBtn}>
-                      <Text style={styles.collectionExploreBtnText}>Explore</Text>
-                    </View>
+                <CardImage uri={product.imageUrl} style={styles.newArrivalCardImg} placeholderColor="#D0D7E3" />
+                <View style={styles.newArrivalCardInfo}>
+                  <Text style={styles.newArrivalCardName} numberOfLines={2}>{product.name}</Text>
+                  <View style={styles.productRatingRow}>
+                    <Text style={styles.productStars}>{renderStars(product.rating)}</Text>
+                    <Text style={styles.productRatingText}>
+                      {product.rating ? ` ${product.rating}` : ''}
+                      {product.reviewCount > 0 ? ` (${product.reviewCount.toLocaleString()})` : ' · New'}
+                    </Text>
+                  </View>
+                  <View style={styles.newArrivalCardFooter}>
+                    <Text style={styles.newArrivalCardBrand}>{product.brand}</Text>
+                    <Text style={styles.newArrivalCardPrice}>{product.priceDisplay}</Text>
                   </View>
                 </View>
               </TouchableOpacity>
@@ -1056,29 +969,22 @@ export default function HomeScreen({ navigation }) {
             {TRENDING_DESIGNS.slice(0, 4).map(design => (
               <TouchableOpacity
                 key={design.id}
-                style={styles.collectionCard}
+                style={styles.newArrivalCard}
                 activeOpacity={0.85}
                 onPress={() => navigation?.navigate('ShopTheLook', { design })}
               >
-                <CardImage uri={design.imageUrl} style={styles.collectionCardImg} placeholderColor="#D0D7E3" />
-                <LinearGradient
-                  colors={['transparent', 'rgba(0,0,0,0.75)']}
-                  locations={[0.3, 1]}
-                  style={StyleSheet.absoluteFill}
-                />
-                <View style={styles.collectionCardContent}>
-                  <Text style={styles.collectionCardTitle} numberOfLines={2}>
+                <CardImage uri={design.imageUrl} style={styles.newArrivalCardImg} placeholderColor="#D0D7E3" />
+                <View style={styles.newArrivalCardInfo}>
+                  <Text style={styles.newArrivalCardName} numberOfLines={2}>
                     {design.title.replace('...', '')}
                   </Text>
-                  <View style={styles.collectionCardFooter}>
-                    <Text style={styles.collectionCardSub}>
+                  <View style={styles.newArrivalCardFooter}>
+                    <Text style={styles.newArrivalCardBrand}>
                       {design.styles?.[0]
                         ? (STYLE_LABEL_MAP[design.styles[0]] || design.styles[0])
                         : `♥ ${design.likes}`}
                     </Text>
-                    <View style={styles.collectionExploreBtn}>
-                      <Text style={styles.collectionExploreBtnText}>View Look</Text>
-                    </View>
+                    <Text style={styles.trendingViewLook}>View Look</Text>
                   </View>
                 </View>
               </TouchableOpacity>
@@ -1281,17 +1187,6 @@ export default function HomeScreen({ navigation }) {
                 {/* ── Image area ── */}
                 <View style={styles.featuredProductImgWrap}>
                   <CardImage uri={product.imageUrl} style={styles.featuredProductImg} placeholderColor="#E8EDF5" />
-                  {/* Source badge top-right */}
-                  <View style={styles.featuredSourceBadgePos}>
-                    {product.source === 'amazon'
-                      ? <AmazonBadge />
-                      : <Badge
-                          variant="source"
-                          label={product.source}
-                          color={getSourceColor(product.source)}
-                        />
-                    }
-                  </View>
                 </View>
 
                 {/* ── Info below image ── */}
@@ -1299,15 +1194,20 @@ export default function HomeScreen({ navigation }) {
                   <Text style={styles.featuredProductName} numberOfLines={2}>
                     {product.name}
                   </Text>
+                  <View style={styles.productRatingRow}>
+                    <Text style={styles.productStars}>{renderStars(product.rating)}</Text>
+                    <Text style={styles.productRatingText}>
+                      {product.rating ? ` ${product.rating}` : ''}
+                      {product.reviewCount > 0 ? ` (${product.reviewCount.toLocaleString()})` : ' · New'}
+                    </Text>
+                  </View>
                   <View style={styles.featuredProductRow}>
                     <Text style={styles.featuredProductPrice}>
                       {typeof product.priceValue === 'number'
                         ? `$${product.priceValue.toLocaleString()}`
                         : product.price}
                     </Text>
-                    <View style={styles.featuredShopBtn}>
-                      <Text style={styles.featuredShopBtnText}>Shop Now</Text>
-                    </View>
+                    <Text style={styles.featuredShopLink}>Shop Now</Text>
                   </View>
                 </View>
               </TouchableOpacity>
@@ -1326,24 +1226,27 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     overflow: 'hidden',
+    backgroundColor: '#0D1E35', // dark fallback — no white flash at bottom
   },
   bgImage: {
     position: 'absolute',
-    width: width * 1.12,
-    left: -(width * 0.06),
-    height: (height + PARALLAX_BUDGET * 2) * 1.12,
+    width: width * 1.02,
+    left: -(width * 0.01),
+    height: (height + PARALLAX_BUDGET * 2) * 1.02,
     top: -PARALLAX_BUDGET,
   },
   heroTint: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0,0,0,0.15)',
+    backgroundColor: 'rgba(0,0,0,0.45)',
   },
   scrollContent: {
     flexGrow: 1,
+    paddingBottom: 24,
   },
   overlay: {
-    height: height,
+    height: height + 40,  // extend past fold so white card never peeks
     paddingTop: space['5xl'],
+    paddingBottom: 40,     // offset the extra height so content stays centered
     justifyContent: 'center',
   },
 
@@ -1395,9 +1298,8 @@ const styles = StyleSheet.create({
   greetingEyebrow: {
     fontSize: fontSize.xs,
     fontWeight: fontWeight.bold,
-    color: '#FFFFFF',
+    color: '#0B6DC3',
     letterSpacing: letterSpacing.wider,
-    opacity: 0.7,
     textTransform: 'uppercase',
     marginBottom: space.sm,
   },
@@ -1416,13 +1318,15 @@ const styles = StyleSheet.create({
   searchBar: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(255,255,255,0.13)',
+    backgroundColor: 'rgba(255,255,255,0.18)',
     borderRadius: 999,
     overflow: 'hidden',
     paddingLeft: space.lg,
     paddingRight: space.xs,
     paddingVertical: space.xs,
     height: space['5xl'],
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.25)',
     shadowColor: '#fff',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.12,
@@ -1442,13 +1346,13 @@ const styles = StyleSheet.create({
     paddingVertical: space.sm,
   },
   searchSendBtn: {
-    width: 40,
-    height: 40,
+    width: 44,
+    height: 44,
     borderRadius: radius.full,
-    backgroundColor: C.primary,
+    backgroundColor: '#111827',
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: space.xs,
+    marginRight: 2,
   },
 
   snapBanner: {
@@ -1689,15 +1593,15 @@ const styles = StyleSheet.create({
   // ── For You cards (50% screen width) ─────────────────────────────────────────
   forYouCard: {
     width: ARRIVAL_CARD_W,
-    borderRadius: radius.md,
+    borderRadius: 6,
     backgroundColor: '#fff',
     ...shadow.low,
   },
   forYouImgWrap: {
     width: '100%',
     height: ARRIVAL_CARD_W,
-    borderTopLeftRadius: radius.md,
-    borderTopRightRadius: radius.md,
+    borderTopLeftRadius: 6,
+    borderTopRightRadius: 6,
     overflow: 'hidden',
   },
   forYouCardImg: {
@@ -1755,7 +1659,7 @@ const styles = StyleSheet.create({
   collectionCard: {
     width: COLL_CARD_W,
     height: 178,
-    borderRadius: radius.sm,
+    borderRadius: 4,
     overflow: 'hidden',
     borderWidth: 1,
     borderColor: 'rgba(0,0,0,0.06)',
@@ -1800,19 +1704,82 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     letterSpacing: 0.2,
   },
+  // ── New Arrivals product cards (split: image top, info bottom) ────────────────
+  newArrivalCard: {
+    width: COLL_CARD_W,
+    borderRadius: 6,
+    overflow: 'hidden',
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: 'rgba(0,0,0,0.07)',
+    ...shadow.low,
+  },
+  newArrivalCardImg: {
+    width: '100%',
+    height: 150,
+  },
+  newArrivalCardInfo: {
+    paddingHorizontal: space.sm,
+    paddingTop: 8,
+    paddingBottom: 10,
+    gap: 4,
+  },
+  newArrivalCardName: {
+    ...typeScale.caption,
+    color: palette.textPrimary,
+    fontWeight: '600',
+    lineHeight: 16,
+  },
+  newArrivalCardFooter: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: 2,
+  },
+  newArrivalCardBrand: {
+    ...typeScale.caption,
+    color: palette.textSecondary,
+    flex: 1,
+  },
+  newArrivalCardPrice: {
+    ...typeScale.caption,
+    color: palette.primaryBlue,
+    fontWeight: '700',
+  },
+  trendingViewLook: {
+    ...typeScale.caption,
+    color: palette.primaryBlue,
+    fontWeight: '600',
+  },
+  productRatingRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 2,
+    marginBottom: 2,
+  },
+  productStars: {
+    fontSize: 11,
+    color: '#F5A623',
+    letterSpacing: 1,
+  },
+  productRatingText: {
+    fontSize: 11,
+    color: palette.textSecondary,
+    fontWeight: '400',
+  },
 
   // ── Shop By Style cards ──────────────────────────────────────────────────────
   styleCard: {
     width: STYLE_CARD_W,
-    borderRadius: radius.md,
+    borderRadius: 6,
     backgroundColor: '#fff',
     ...shadow.low,
   },
   styleCardImgWrap: {
     width: '100%',
     height: STYLE_CARD_W,
-    borderTopLeftRadius: radius.md,
-    borderTopRightRadius: radius.md,
+    borderTopLeftRadius: 6,
+    borderTopRightRadius: 6,
     overflow: 'hidden',
   },
   styleCardInfoBox: {
@@ -1899,7 +1866,7 @@ const styles = StyleSheet.create({
   },
   // Card: white bg, gray border, same 20 radius
   dealCard: {
-    borderRadius: radius.xl,
+    borderRadius: 10,
     overflow: 'hidden',
     backgroundColor: '#FFFFFF',
     borderWidth: 1,
@@ -2144,7 +2111,7 @@ const styles = StyleSheet.create({
   // ── Featured Products card (below-image layout) ───────────────────────────
   featuredProductCard: {
     width: COLL_CARD_W,
-    borderRadius: radius.md,
+    borderRadius: 6,
     backgroundColor: '#fff',
     borderWidth: 1,
     borderColor: 'rgba(0,0,0,0.07)',
@@ -2184,17 +2151,10 @@ const styles = StyleSheet.create({
     ...typeScale.price,
     color: palette.textPrimary,
   },
-  featuredShopBtn: {
-    backgroundColor: palette.primaryBlue,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: radius.button,
-  },
-  featuredShopBtnText: {
-    fontSize: 11,
-    fontWeight: fontWeight.semibold,
-    color: '#fff',
-    letterSpacing: 0.1,
+  featuredShopLink: {
+    ...typeScale.caption,
+    color: palette.primaryBlue,
+    fontWeight: '600',
   },
 
   quickAddBtn: {

@@ -94,13 +94,17 @@ export function AuthProvider({ children }) {
    * Throws an Error with a user-friendly message on failure.
    */
   const signUp = async (fullName, email, password) => {
-    const { data, error } = await supabase.auth.signUp({
+    const authCall = supabase.auth.signUp({
       email: email.trim().toLowerCase(),
       password,
       options: {
         data: { full_name: fullName.trim() },
       },
     });
+    const timeout = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('Connection timed out. Check your network and try again.')), 15000)
+    );
+    const { data, error } = await Promise.race([authCall, timeout]);
     if (error) throw new Error(error.message);
     // If Supabase requires email confirmation, session will be null here.
     // The user must verify their email before they can sign in.

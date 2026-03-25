@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import { StripeProvider } from '@stripe/stripe-react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -10,9 +10,9 @@ import { OrderHistoryProvider } from './src/context/OrderHistoryContext';
 import { AuthProvider, useAuth } from './src/context/AuthContext';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import Svg, { Path, Circle, Polyline, Line, Rect, G } from 'react-native-svg';
+import Svg, { Path, Circle, Polyline, Line } from 'react-native-svg';
 import { colors as C } from './src/constants/theme';
-import { shadow, fontSize, fontWeight, radius, colors } from './src/constants/tokens';
+import { fontSize, fontWeight, radius } from './src/constants/tokens';
 
 import HomeScreen from './src/screens/HomeScreen';
 import ExploreScreen from './src/screens/ExploreScreen';
@@ -48,79 +48,79 @@ import AllCollectionsScreen from './src/screens/AllCollectionsScreen';
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
+// ─── Figma spec constants ────────────────────────────────────────
+const ICON_SIZE = 26;
+
+// ─── Icons — matched to Figma "light" asset set ───────────────────
+
+// Home_light: house outline with small arched window inside
 function HomeIcon({ color, size }) {
   return (
-    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
-      <Path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-      <Polyline points="9 22 9 12 15 12 15 22" />
+    <Svg width={size} height={size} viewBox="0 0 35 35" fill="none">
+      <Path
+        d="M4 15.5L17.5 4L31 15.5V30C31 30.55 30.55 31 30 31H22V23C22 22.45 21.55 22 21 22H14C13.45 22 13 22.45 13 23V31H5C4.45 31 4 30.55 4 30V15.5Z"
+        stroke={color} strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round"
+      />
+      <Path
+        d="M14 31V24H21V31"
+        stroke={color} strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round"
+      />
     </Svg>
   );
 }
 
+// Search_light: clean circle + angled handle
 function SearchIcon({ color, size }) {
   return (
-    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
-      <Circle cx={11} cy={11} r={8} />
-      <Line x1={21} y1={21} x2={16.65} y2={16.65} />
+    <Svg width={size} height={size} viewBox="0 0 31 32" fill="none">
+      <Circle cx={13} cy={13} r={9} stroke={color} strokeWidth={1.6} />
+      <Line x1={20} y1={20} x2={28} y2={28} stroke={color} strokeWidth={1.6} strokeLinecap="round" />
     </Svg>
   );
 }
 
-// Frame 3 — full snap button SVG (ears + body + camera icon)
-function Frame3Icon() {
+// Camera: rounded rect body + bump + circle lens
+function CameraIcon({ color, size }) {
   return (
-    <Svg width={66} height={40} viewBox="0 0 80 49" fill="none">
-      {/* Right dark-blue ear */}
-      <Rect x={8} y={7} width={72} height={35} rx={10} fill={colors.blueDeep} />
-      {/* Left light-blue ear */}
-      <Rect x={0} y={7} width={48} height={35} rx={10} fill={colors.blueLight} />
-      {/* Main black body */}
-      <Rect x={4} y={0} width={72} height={49} rx={10} fill="black" />
-      {/* Camera icon — centered at (39.5, 22.5) in the 80×49 canvas */}
-      <G transform="translate(27.5, 10)">
-        <Path
-          d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"
-          fill="none"
-          stroke="white"
-          strokeWidth={1.8}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-        <Circle cx={12} cy={13} r={4} fill="none" stroke="white" strokeWidth={1.8} />
-      </G>
+    <Svg width={size} height={size} viewBox="0 0 32 31" fill="none">
+      <Path
+        d="M2 10C2 8.9 2.9 8 4 8H8.5L10.5 5H21.5L23.5 8H28C29.1 8 30 8.9 30 10V26C30 27.1 29.1 28 28 28H4C2.9 28 2 27.1 2 26V10Z"
+        stroke={color} strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round"
+      />
+      <Circle cx={16} cy={18} r={5} stroke={color} strokeWidth={1.6} />
     </Svg>
   );
 }
 
+// Basket_alt_3_light: shopping cart with angled handle + 2 wheels
 function CartIcon({ color, size }) {
   return (
-    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
-      <Circle cx={9} cy={21} r={1} />
-      <Circle cx={20} cy={21} r={1} />
-      <Path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+    <Svg width={size} height={size} viewBox="0 0 35 32" fill="none">
+      <Path
+        d="M1 1H6L9 20H27L30 8H6"
+        stroke={color} strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round"
+      />
+      <Circle cx={12} cy={27} r={2} stroke={color} strokeWidth={1.6} />
+      <Circle cx={25} cy={27} r={2} stroke={color} strokeWidth={1.6} />
     </Svg>
   );
 }
 
+// User_cicrle_light: person silhouette inside outer circle
 function ProfileIcon({ color, size }) {
   return (
-    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
-      <Path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-      <Circle cx={12} cy={7} r={4} />
+    <Svg width={size} height={size} viewBox="0 0 30 29" fill="none">
+      <Circle cx={15} cy={14.5} r={13} stroke={color} strokeWidth={1.6} />
+      <Circle cx={15} cy={11} r={4} stroke={color} strokeWidth={1.6} />
+      <Path
+        d="M7 25C7.5 20.5 10.5 18 15 18C19.5 18 22.5 20.5 23 25"
+        stroke={color} strokeWidth={1.6} strokeLinecap="round"
+      />
     </Svg>
   );
 }
 
-function SnapButton({ onPress }) {
-  return (
-    <View style={styles.snapWrap}>
-      <TouchableOpacity onPress={onPress} activeOpacity={0.85}>
-        <Frame3Icon />
-      </TouchableOpacity>
-    </View>
-  );
-}
-
+// ─── Cart badge ──────────────────────────────────────────────────
 function CartBadge() {
   const { cartCount } = useCart();
   if (cartCount === 0) return null;
@@ -131,46 +131,57 @@ function CartBadge() {
   );
 }
 
+// ─── Tab Navigator ───────────────────────────────────────────────
 function TabNavigator() {
   return (
     <Tab.Navigator
       screenOptions={{
         headerShown: false,
         tabBarStyle: styles.tabBar,
-        tabBarActiveTintColor: C.primary,
-        tabBarInactiveTintColor: 'rgba(0,0,0,0.32)',
-        tabBarLabelStyle: styles.tabLabel,
+        tabBarActiveTintColor: '#0B6DC3',
+        tabBarInactiveTintColor: '#111827',
+        tabBarShowLabel: true,
+        tabBarLabelStyle: {
+          fontSize: 10,
+          fontWeight: '500',
+          marginTop: 2,
+        },
+        tabBarItemStyle: {
+          paddingTop: 4,
+          paddingBottom: 0,
+          justifyContent: 'center',
+          alignItems: 'center',
+        },
       }}
     >
       <Tab.Screen
         name="Home"
         component={HomeScreen}
         options={{
-          tabBarIcon: ({ color, size }) => <HomeIcon color={color} size={size} />,
+          tabBarIcon: ({ color }) => <HomeIcon color={color} size={ICON_SIZE} />,
         }}
       />
       <Tab.Screen
         name="Explore"
         component={ExploreScreen}
         options={{
-          tabBarIcon: ({ color, size }) => <SearchIcon color={color} size={size} />,
+          tabBarIcon: ({ color }) => <SearchIcon color={color} size={ICON_SIZE} />,
         }}
       />
       <Tab.Screen
         name="Snap"
         component={SnapScreen}
         options={{
-          tabBarButton: (props) => <SnapButton {...props} />,
-          tabBarLabel: () => null,
+          tabBarIcon: ({ color }) => <CameraIcon color={color} size={ICON_SIZE} />,
         }}
       />
       <Tab.Screen
         name="Cart"
         component={CartScreen}
         options={{
-          tabBarIcon: ({ color, size }) => (
+          tabBarIcon: ({ color }) => (
             <View>
-              <CartIcon color={color} size={size} />
+              <CartIcon color={color} size={ICON_SIZE} />
               <CartBadge />
             </View>
           ),
@@ -180,13 +191,14 @@ function TabNavigator() {
         name="Profile"
         component={ProfileScreen}
         options={{
-          tabBarIcon: ({ color, size }) => <ProfileIcon color={color} size={size} />,
+          tabBarIcon: ({ color }) => <ProfileIcon color={color} size={ICON_SIZE} />,
         }}
       />
     </Tab.Navigator>
   );
 }
 
+// ─── Root Navigator ──────────────────────────────────────────────
 function RootNavigator() {
   const { loading } = useAuth();
 
@@ -201,7 +213,6 @@ function RootNavigator() {
 
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-      {/* ── Full app always accessible (guests + logged-in users) ── */}
       <Stack.Screen name="Main" component={TabNavigator} />
       <Stack.Screen name="Auth" component={AuthScreen} />
       <Stack.Screen name="VerifyEmailSent" component={VerifyEmailSentScreen} />
@@ -254,52 +265,33 @@ export default function App() {
   );
 }
 
+// ─── Styles ──────────────────────────────────────────────────────
 const styles = StyleSheet.create({
   tabBar: {
     backgroundColor: 'rgba(255,255,255,0.96)',
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(0,0,0,0.06)',
-    height: 88,
-    paddingTop: 6,
-    // Subtle upward shadow per spec
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: -1 },
-    shadowOpacity: 0.03,
-    shadowRadius: 8,
-    elevation: 4,
+    borderTopWidth: 0.5,
+    borderTopColor: 'rgba(0,0,0,0.08)',
+    height: 82,
+    paddingTop: 10,
+    paddingBottom: 0,
   },
-  tabLabel: {
-    fontSize: fontSize.xs,
-    fontWeight: fontWeight.medium,
-    marginTop: 2,
-  },
-  snapWrap: {
-    top: 4,
-    alignItems: 'center',
-    justifyContent: 'center',
-    overflow: 'visible',
-    shadowColor: shadow.medium.shadowColor,
-    shadowOffset: shadow.medium.shadowOffset,
-    shadowOpacity: shadow.medium.shadowOpacity,
-    shadowRadius: shadow.medium.shadowRadius,
-    elevation: shadow.medium.elevation,
-  },
+
   badge: {
     position: 'absolute',
-    top: -5,
-    right: -8,
+    top: -2,
+    right: -4,
     backgroundColor: C.destructive,
-    width: 18,
-    height: 18,
-    borderRadius: radius.full,
+    width: 16,
+    height: 16,
+    borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 2,
-    borderColor: C.white,
+    borderWidth: 1.5,
+    borderColor: 'rgba(255,255,255,0.3)',
   },
   badgeText: {
     color: C.white,
-    fontSize: fontSize.xs,
+    fontSize: 9,
     fontWeight: fontWeight.bold,
   },
   loadingScreen: {
