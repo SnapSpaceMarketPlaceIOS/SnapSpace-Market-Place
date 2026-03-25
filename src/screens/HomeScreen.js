@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import {
   View,
   Text,
@@ -14,7 +14,14 @@ import {
   Alert,
   Platform,
   Keyboard,
+  Modal,
+  FlatList,
 } from 'react-native';
+import { BlurView } from 'expo-blur';
+import * as MediaLibrary from 'expo-media-library';
+import * as Sharing from 'expo-sharing';
+import * as FileSystem from 'expo-file-system';
+import { Share } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Svg, { Path, Circle, Line, Polyline, Rect, Ellipse, G } from 'react-native-svg';
@@ -399,7 +406,7 @@ function SendIcon() {
 
 function CameraSmallIcon() {
   return (
-    <Svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+    <Svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.75)" strokeWidth={1} strokeLinecap="round" strokeLinejoin="round">
       <Path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
       <Circle cx={12} cy={13} r={4} />
     </Svg>
@@ -408,10 +415,57 @@ function CameraSmallIcon() {
 
 function GalleryIcon({ size = 18, color = 'rgba(255,255,255,0.75)' }) {
   return (
-    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={1} strokeLinecap="round" strokeLinejoin="round">
       <Rect x={3} y={3} width={18} height={18} rx={2} ry={2} />
       <Circle cx={8.5} cy={8.5} r={1.5} />
       <Polyline points="21 15 16 10 5 21" />
+    </Svg>
+  );
+}
+
+function CheckIcon({ size = 10, color = '#fff' }) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={3.5} strokeLinecap="round" strokeLinejoin="round">
+      <Polyline points="20 6 9 17 4 12" />
+    </Svg>
+  );
+}
+
+function CloseIcon({ size = 20, color = '#fff' }) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+      <Line x1={18} y1={6} x2={6} y2={18} />
+      <Line x1={6} y1={6} x2={18} y2={18} />
+    </Svg>
+  );
+}
+
+function DownloadIcon({ size = 18, color = '#fff' }) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+      <Path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+      <Polyline points="7 10 12 15 17 10" />
+      <Line x1={12} y1={15} x2={12} y2={3} />
+    </Svg>
+  );
+}
+
+function ShareIcon({ size = 18, color = '#fff' }) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+      <Path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
+      <Polyline points="16 6 12 2 8 6" />
+      <Line x1={12} y1={2} x2={12} y2={15} />
+    </Svg>
+  );
+}
+
+function PostIcon({ size = 18, color = '#fff' }) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+      <Circle cx={12} cy={12} r={10} />
+      <Line x1={12} y1={8} x2={12} y2={16} />
+      <Line x1={8} y1={12} x2={16} y2={12} />
     </Svg>
   );
 }
@@ -596,6 +650,14 @@ export default function HomeScreen({ navigation, route }) {
   const [imageLayout, setImageLayout] = useState(null);
   const [generating, setGenerating] = useState(false);
   const [genStatus, setGenStatus] = useState('');
+  const [resultData, setResultData] = useState(null); // { imageUri, resultUri, prompt, products }
+  const [showResult, setShowResult] = useState(false);
+  const [showPostSheet, setShowPostSheet] = useState(false);
+  const [posting, setPosting] = useState(false);
+
+  // Loading bar animation
+  const loadingProgress = useRef(new Animated.Value(0)).current;
+  const loadingAnim = useRef(null);
 
   // Scroll-driven parallax
   const scrollY = useRef(new Animated.Value(0)).current;
@@ -676,6 +738,84 @@ export default function HomeScreen({ navigation, route }) {
     setImageLayout({ landscape: (asset.width || 0) > (asset.height || 0) });
   };
 
+  // Start / stop loading bar animation
+  const startLoadingBar = useCallback(() => {
+    loadingProgress.setValue(0);
+    loadingAnim.current = Animated.loop(
+      Animated.timing(loadingProgress, {
+        toValue: 1,
+        duration: 2000,
+        easing: Easing.inOut(Easing.ease),
+        useNativeDriver: false,
+      })
+    );
+    loadingAnim.current.start();
+  }, [loadingProgress]);
+
+  const stopLoadingBar = useCallback(() => {
+    if (loadingAnim.current) {
+      loadingAnim.current.stop();
+      loadingAnim.current = null;
+    }
+    loadingProgress.setValue(0);
+  }, [loadingProgress]);
+
+  // ── Result actions ──────────────────────────────────────────────────────────
+  const handleDownload = async () => {
+    if (!resultData?.resultUri) return;
+    try {
+      const { status } = await MediaLibrary.requestPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Permission Required', 'Allow photo library access in Settings to save images.');
+        return;
+      }
+      const fileName = `snapspace_${Date.now()}.jpg`;
+      const localUri = `${FileSystem.cacheDirectory}${fileName}`;
+      await FileSystem.downloadAsync(resultData.resultUri, localUri);
+      await MediaLibrary.saveToLibraryAsync(localUri);
+      Alert.alert('Saved!', 'Design saved to your camera roll.');
+    } catch (err) {
+      Alert.alert('Save Failed', 'Could not save image. Please try again.');
+    }
+  };
+
+  const handleShare = async () => {
+    if (!resultData?.resultUri) return;
+    try {
+      const fileName = `snapspace_${Date.now()}.jpg`;
+      const localUri = `${FileSystem.cacheDirectory}${fileName}`;
+      await FileSystem.downloadAsync(resultData.resultUri, localUri);
+      const canShare = await Sharing.isAvailableAsync();
+      if (canShare) {
+        await Sharing.shareAsync(localUri, {
+          mimeType: 'image/jpeg',
+          dialogTitle: 'Share your AI design',
+        });
+      } else {
+        await Share.share({
+          message: `Check out this AI-designed space I created with SnapSpace!\n${resultData.resultUri}`,
+        });
+      }
+    } catch (_) {}
+  };
+
+  const handlePost = (visibility) => {
+    // visibility: 'public' | 'private'
+    setPosting(true);
+    setShowPostSheet(false);
+    // TODO: write to Supabase designs table with visibility flag
+    // For now simulate a brief save and confirm
+    setTimeout(() => {
+      setPosting(false);
+      Alert.alert(
+        visibility === 'public' ? 'Posted to Explore!' : 'Saved to Profile',
+        visibility === 'public'
+          ? 'Your design is now live on the Explore page.'
+          : 'Your design has been saved privately to your profile.'
+      );
+    }, 800);
+  };
+
   const runGeneration = async () => {
     if (!photo) {
       Alert.alert('Add a Room Photo', 'Tap the camera icon to snap your room, or pick from your library.');
@@ -686,25 +826,30 @@ export default function HomeScreen({ navigation, route }) {
       return;
     }
     const designPrompt = prompt.trim();
+    const savedPhoto = { ...photo };
     Keyboard.dismiss();
     setGenerating(true);
+    startLoadingBar();
     try {
       setGenStatus('Curating products…');
       const matchedProducts = getProductsForPrompt(designPrompt, 6);
-      setGenStatus('Generating your design… (40–90s)');
+      setGenStatus('Generating your design…');
       const enrichedPrompt = buildEnrichedPrompt(designPrompt, matchedProducts);
-      const resultUrl = await generateInteriorDesign(photo.uri, enrichedPrompt, photo.base64);
+      const resultUrl = await generateInteriorDesign(savedPhoto.uri, enrichedPrompt, savedPhoto.base64);
+      stopLoadingBar();
       setGenerating(false);
       setGenStatus('');
-      setPhoto(null);
-      setPrompt('');
-      navigation?.navigate('RoomResult', {
-        imageUri: photo.uri,
+      setResultData({
+        imageUri: savedPhoto.uri,
         resultUri: resultUrl,
         prompt: designPrompt,
         products: matchedProducts,
       });
+      setShowResult(true);
+      setPhoto(null);
+      setPrompt('');
     } catch (err) {
+      stopLoadingBar();
       setGenerating(false);
       setGenStatus('');
       Alert.alert('Generation Failed', err.message || 'Something went wrong. Please try again.');
@@ -777,79 +922,67 @@ export default function HomeScreen({ navigation, route }) {
             </View>
           </View>
 
-          {/* Centered headline + subtitle */}
-          <View style={styles.heroCentered}>
-            <Text style={styles.headline}>Design Your Space</Text>
-            <Text style={styles.heroSubtitle}>
-              Describe your style, then add your room photo
-            </Text>
-          </View>
+          {/* Blur overlay when generating */}
+          {generating && (
+            <BlurView intensity={40} tint="dark" style={StyleSheet.absoluteFill} />
+          )}
 
-          {/* Floating suggestion pills — scattered organically */}
-          <View style={styles.floatingPills}>
-            {PROMPT_SUGGESTIONS.map((sug, i) => (
-              <TouchableOpacity
-                key={sug}
-                style={[
-                  styles.floatingPill,
-                  prompt === sug && styles.floatingPillOn,
-                  i === 0 && { alignSelf: 'flex-start', marginLeft: 24 },
-                  i === 1 && { alignSelf: 'flex-end', marginRight: 40 },
-                  i === 2 && { alignSelf: 'flex-start', marginLeft: 50 },
-                  i === 3 && { alignSelf: 'flex-end', marginRight: 24 },
-                  i === 4 && { alignSelf: 'center', marginLeft: -20 },
-                  i === 5 && { alignSelf: 'center', marginRight: -40 },
-                ]}
-                onPress={() => setPrompt(sug)}
-                activeOpacity={0.7}
-              >
-                <Text style={[styles.floatingPillText, prompt === sug && styles.floatingPillTextOn]}>{sug}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
+          {/* Centered headline + subtitle — hidden during generation */}
+          {!generating && (
+            <View style={styles.heroCentered}>
+              <Text style={styles.headline}>Design Your Space</Text>
+              <Text style={styles.heroSubtitle}>
+                Describe your style, then add your room photo
+              </Text>
+            </View>
+          )}
 
-          {/* Photo preview (when photo is attached) */}
-          {photo && (
-            <View style={styles.photoPreviewWrap}>
-              <Image
-                source={{ uri: photo.uri }}
-                style={[styles.photoPreview, imageLayout?.landscape ? styles.photoLandscape : styles.photoPortrait]}
-                resizeMode="cover"
-              />
-              {generating && (
-                <View style={styles.photoOverlay}>
-                  <ActivityIndicator color="#fff" size="large" />
-                  <Text style={styles.photoOverlayText}>{genStatus || 'Generating…'}</Text>
-                </View>
-              )}
-              {!generating && (
-                <TouchableOpacity style={styles.photoRemoveBtn} onPress={() => { setPhoto(null); setImageLayout(null); }}>
-                  <Text style={styles.photoRemoveX}>✕</Text>
-                </TouchableOpacity>
-              )}
+          {/* Generation status — shown during generation */}
+          {generating && (
+            <View style={styles.heroCentered}>
+              <ActivityIndicator color="#fff" size="large" />
+              <Text style={[styles.heroSubtitle, { color: '#fff', marginTop: 16, fontSize: 17, fontWeight: '600' }]}>
+                {genStatus || 'Generating…'}
+              </Text>
             </View>
           )}
 
           {/* Input bar — pinned to bottom of hero */}
           <View style={styles.heroBottom}>
             <View style={styles.inputBar}>
-              <TouchableOpacity
-                style={styles.inputIconBtn}
-                onPress={() => navigation?.navigate('Snap')}
-                activeOpacity={0.6}
-              >
-                <CameraSmallIcon />
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.inputIconBtn}
-                onPress={handlePickFromLibrary}
-                activeOpacity={0.6}
-              >
-                <GalleryIcon />
-              </TouchableOpacity>
+              {/* Camera icon with attachment badge */}
+              <View>
+                <TouchableOpacity
+                  style={styles.inputIconBtn}
+                  onPress={() => navigation?.navigate('Snap')}
+                  activeOpacity={0.6}
+                >
+                  <CameraSmallIcon />
+                </TouchableOpacity>
+                {photo && (
+                  <View style={styles.attachBadge}>
+                    <CheckIcon size={8} color="#fff" />
+                  </View>
+                )}
+              </View>
+              {/* Gallery icon with attachment badge */}
+              <View>
+                <TouchableOpacity
+                  style={styles.inputIconBtn}
+                  onPress={photo ? () => { setPhoto(null); setImageLayout(null); } : handlePickFromLibrary}
+                  activeOpacity={0.6}
+                >
+                  <GalleryIcon />
+                </TouchableOpacity>
+                {photo && (
+                  <View style={styles.attachBadge}>
+                    <CheckIcon size={8} color="#fff" />
+                  </View>
+                )}
+              </View>
               <TextInput
                 style={styles.inputText}
-                placeholder="Describe your style..."
+                placeholder={photo ? "Photo attached — describe your style..." : "Describe your style..."}
                 placeholderTextColor="rgba(255,255,255,0.45)"
                 value={prompt}
                 onChangeText={setPrompt}
@@ -867,6 +1000,22 @@ export default function HomeScreen({ navigation, route }) {
                 {generating ? <ActivityIndicator color="#fff" size="small" /> : <SendIcon />}
               </TouchableOpacity>
             </View>
+            {/* Loading progress bar */}
+            {generating && (
+              <View style={styles.loadingBarTrack}>
+                <Animated.View
+                  style={[
+                    styles.loadingBarFill,
+                    {
+                      width: loadingProgress.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: ['0%', '100%'],
+                      }),
+                    },
+                  ]}
+                />
+              </View>
+            )}
           </View>
         </View>
 
@@ -1308,6 +1457,170 @@ export default function HomeScreen({ navigation, route }) {
         </View>
 
       </Animated.ScrollView>
+
+      {/* ── Result Popup Modal ─────────────────────────────────────────── */}
+      <Modal
+        visible={showResult}
+        animationType="slide"
+        transparent={false}
+        onRequestClose={() => setShowResult(false)}
+      >
+        <View style={resultStyles.container}>
+          {/* Close button — top right */}
+          <TouchableOpacity
+            style={resultStyles.closeBtn}
+            onPress={() => setShowResult(false)}
+            activeOpacity={0.7}
+          >
+            <CloseIcon size={18} color="#fff" />
+          </TouchableOpacity>
+
+          <ScrollView
+            style={resultStyles.scroll}
+            contentContainerStyle={resultStyles.scrollContent}
+            showsVerticalScrollIndicator={false}
+          >
+            {/* Generated image — original aspect ratio + action buttons overlay */}
+            {resultData?.resultUri && (
+              <View style={resultStyles.imageWrap}>
+                <Image
+                  source={{ uri: resultData.resultUri }}
+                  style={[
+                    resultStyles.resultImage,
+                    imageLayout?.landscape
+                      ? { aspectRatio: 16 / 9 }
+                      : { aspectRatio: 3 / 4 },
+                  ]}
+                  resizeMode="cover"
+                />
+                {/* Action buttons — top left of image */}
+                <View style={resultStyles.imageActions}>
+                  <TouchableOpacity
+                    style={resultStyles.imageActionBtn}
+                    onPress={handleDownload}
+                    activeOpacity={0.75}
+                  >
+                    <DownloadIcon size={16} color="#fff" />
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={resultStyles.imageActionBtn}
+                    onPress={handleShare}
+                    activeOpacity={0.75}
+                  >
+                    <ShareIcon size={16} color="#fff" />
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={resultStyles.imageActionBtn}
+                    onPress={() => setShowPostSheet(true)}
+                    activeOpacity={0.75}
+                  >
+                    {posting
+                      ? <ActivityIndicator size="small" color="#fff" />
+                      : <PostIcon size={16} color="#fff" />
+                    }
+                  </TouchableOpacity>
+                </View>
+              </View>
+            )}
+
+            {/* Prompt used */}
+            <Text style={resultStyles.promptLabel}>Your prompt</Text>
+            <Text style={resultStyles.promptText}>{resultData?.prompt}</Text>
+
+            {/* Matched products */}
+            {resultData?.products?.length > 0 && (
+              <View style={resultStyles.productsSection}>
+                <Text style={resultStyles.productsTitle}>SHOP THE LOOK</Text>
+                <Text style={resultStyles.productsSubtitle}>
+                  Products matched to your design
+                </Text>
+                {resultData.products.map((product, idx) => (
+                  <TouchableOpacity
+                    key={product.id || idx}
+                    style={resultStyles.productCard}
+                    activeOpacity={0.7}
+                    onPress={() => {
+                      setShowResult(false);
+                      navigation?.navigate('ProductDetail', { product });
+                    }}
+                  >
+                    <CardImage
+                      uri={product.imageUrl}
+                      style={resultStyles.productImage}
+                      resizeMode="cover"
+                    />
+                    <View style={resultStyles.productInfo}>
+                      <Text style={resultStyles.productBrand}>{product.brand}</Text>
+                      <Text style={resultStyles.productName} numberOfLines={2}>{product.name}</Text>
+                      <Text style={resultStyles.productPrice}>${product.price}</Text>
+                    </View>
+                    <ChevronRight color="#999" />
+                  </TouchableOpacity>
+                ))}
+              </View>
+            )}
+
+            {/* FTC disclosure */}
+            <Text style={resultStyles.disclosure}>
+              We may earn a commission when you buy through links on this app.
+            </Text>
+          </ScrollView>
+        </View>
+      </Modal>
+
+      {/* ── Post Visibility Sheet ───────────────────────────────────────── */}
+      <Modal
+        visible={showPostSheet}
+        animationType="slide"
+        transparent
+        onRequestClose={() => setShowPostSheet(false)}
+      >
+        <TouchableOpacity
+          style={resultStyles.sheetBackdrop}
+          activeOpacity={1}
+          onPress={() => setShowPostSheet(false)}
+        />
+        <View style={resultStyles.sheet}>
+          <View style={resultStyles.sheetHandle} />
+          <Text style={resultStyles.sheetTitle}>Post this design</Text>
+          <Text style={resultStyles.sheetSubtitle}>Choose who can see it</Text>
+
+          <TouchableOpacity
+            style={resultStyles.sheetOption}
+            onPress={() => handlePost('public')}
+            activeOpacity={0.7}
+          >
+            <View style={[resultStyles.sheetOptionIcon, { backgroundColor: '#EFF6FF' }]}>
+              <PostIcon size={20} color="#0B6DC3" />
+            </View>
+            <View style={resultStyles.sheetOptionText}>
+              <Text style={resultStyles.sheetOptionTitle}>Post publicly</Text>
+              <Text style={resultStyles.sheetOptionDesc}>Visible on Explore + your profile</Text>
+            </View>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={resultStyles.sheetOption}
+            onPress={() => handlePost('private')}
+            activeOpacity={0.7}
+          >
+            <View style={[resultStyles.sheetOptionIcon, { backgroundColor: '#F3F4F6' }]}>
+              <PostIcon size={20} color="#6B7280" />
+            </View>
+            <View style={resultStyles.sheetOptionText}>
+              <Text style={resultStyles.sheetOptionTitle}>Save privately</Text>
+              <Text style={resultStyles.sheetOptionDesc}>Only visible on your profile</Text>
+            </View>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={resultStyles.sheetCancel}
+            onPress={() => setShowPostSheet(false)}
+          >
+            <Text style={resultStyles.sheetCancelText}>Cancel</Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -1382,12 +1695,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: space.lg,
-    marginTop: height * 0.14, // ~14% from top → sits at roughly 30% of screen visually
+    marginTop: height * 0.28, // ~28% from top → centered vertically on screen
   },
   heroSubtitle: {
-    fontSize: 13,
-    color: '#67ACE9',
-    lineHeight: 19,
+    fontSize: 16,
+    color: '#0B6DC3',
+    lineHeight: 22,
     marginTop: 6,
     textAlign: 'center',
   },
@@ -1437,10 +1750,12 @@ const styles = StyleSheet.create({
   },
   photoRemoveX: { color: '#fff', fontSize: 11, fontWeight: '700' },
 
-  // Input bar — pinned to hero bottom
+  // Input bar — pinned to hero bottom via absolute positioning
   heroBottom: {
-    paddingHorizontal: 16,
-    paddingBottom: 48, // 28px buffer above peeledCard overlap + 20px breathing room
+    position: 'absolute',
+    bottom: 56,
+    left: 16,
+    right: 16,
   },
   inputBar: {
     flexDirection: 'row',
@@ -1477,10 +1792,10 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.15)',
   },
   headline: {
-    fontSize: 28,
+    fontSize: 34,
     fontWeight: fontWeight.xbold,
     color: '#FFFFFF',
-    lineHeight: 34,
+    lineHeight: 40,
     letterSpacing: letterSpacing.tight,
     textAlign: 'center',
     textShadowColor: 'rgba(0,0,0,0.3)',
@@ -2320,4 +2635,239 @@ const styles = StyleSheet.create({
   },
 
   // ── Get Inspired CTA ─────────────────────────────────────────────────────────
+
+  // ── Photo attachment badge ──────────────────────────────────────────────────
+  attachBadge: {
+    position: 'absolute',
+    top: 2,
+    right: 2,
+    width: 14,
+    height: 14,
+    borderRadius: 7,
+    backgroundColor: '#16A34A',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1.5,
+    borderColor: 'rgba(0,0,0,0.3)',
+  },
+
+  // ── Loading progress bar ───────────────────────────────────────────────────
+  loadingBarTrack: {
+    height: 3,
+    backgroundColor: 'rgba(255,255,255,0.15)',
+    borderRadius: 1.5,
+    marginTop: 8,
+    overflow: 'hidden',
+  },
+  loadingBarFill: {
+    height: 3,
+    backgroundColor: '#0B6DC3',
+    borderRadius: 1.5,
+  },
+});
+
+// ── Result Modal Styles ─────────────────────────────────────────────────────
+const resultStyles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+  imageWrap: {
+    position: 'relative',
+  },
+  imageActions: {
+    position: 'absolute',
+    top: 16,
+    left: 16,
+    flexDirection: 'row',
+    gap: 8,
+  },
+  imageActionBtn: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.15)',
+  },
+  closeBtn: {
+    position: 'absolute',
+    top: 56,
+    right: 20,
+    zIndex: 10,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(0,0,0,0.06)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  scroll: {
+    flex: 1,
+  },
+  scrollContent: {
+    paddingTop: 56,
+    paddingBottom: 40,
+  },
+  resultImage: {
+    width: '100%',
+    borderRadius: 0,
+  },
+  promptLabel: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#9CA3AF',
+    letterSpacing: 1,
+    textTransform: 'uppercase',
+    marginTop: 20,
+    marginHorizontal: 20,
+  },
+  promptText: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#111827',
+    lineHeight: 22,
+    marginTop: 6,
+    marginHorizontal: 20,
+  },
+  productsSection: {
+    marginTop: 28,
+    paddingHorizontal: 20,
+  },
+  productsTitle: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#9CA3AF',
+    letterSpacing: 1.5,
+    textTransform: 'uppercase',
+  },
+  productsSubtitle: {
+    fontSize: 14,
+    fontWeight: '400',
+    color: '#6B7280',
+    marginTop: 4,
+    marginBottom: 16,
+  },
+  productCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(0,0,0,0.06)',
+  },
+  productImage: {
+    width: 56,
+    height: 56,
+    borderRadius: 10,
+    backgroundColor: '#F3F4F6',
+  },
+  productInfo: {
+    flex: 1,
+    marginLeft: 12,
+  },
+  productBrand: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: '#9CA3AF',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  productName: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#111827',
+    lineHeight: 18,
+    marginTop: 2,
+  },
+  productPrice: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#0B6DC3',
+    marginTop: 3,
+  },
+  disclosure: {
+    fontSize: 11,
+    fontWeight: '400',
+    color: '#9CA3AF',
+    fontStyle: 'italic',
+    textAlign: 'center',
+    marginTop: 24,
+    marginHorizontal: 20,
+  },
+  // Post sheet
+  sheetBackdrop: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.45)',
+  },
+  sheet: {
+    backgroundColor: '#fff',
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    paddingHorizontal: 20,
+    paddingTop: 12,
+    paddingBottom: 40,
+  },
+  sheetHandle: {
+    width: 36,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: 'rgba(0,0,0,0.12)',
+    alignSelf: 'center',
+    marginBottom: 20,
+  },
+  sheetTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#111827',
+    textAlign: 'center',
+  },
+  sheetSubtitle: {
+    fontSize: 14,
+    fontWeight: '400',
+    color: '#6B7280',
+    textAlign: 'center',
+    marginTop: 4,
+    marginBottom: 24,
+  },
+  sheetOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 14,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(0,0,0,0.06)',
+  },
+  sheetOptionIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 14,
+  },
+  sheetOptionText: { flex: 1 },
+  sheetOptionTitle: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#111827',
+  },
+  sheetOptionDesc: {
+    fontSize: 13,
+    fontWeight: '400',
+    color: '#6B7280',
+    marginTop: 2,
+  },
+  sheetCancel: {
+    marginTop: 16,
+    paddingVertical: 14,
+    alignItems: 'center',
+    borderRadius: 12,
+    backgroundColor: 'rgba(0,0,0,0.04)',
+  },
+  sheetCancelText: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#6B7280',
+  },
 });
