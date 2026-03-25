@@ -34,8 +34,11 @@ const TR = theme.radius;
 const TS = theme.shadow;
 
 const { width } = Dimensions.get('window');
-// 20px padding each side + 12px gap between cards
-const CARD_WIDTH = (width - 4 * 2 - 4) / 2;
+function colWidthPct(cols) {
+  if (cols === 3) return '33.33%';
+  if (cols === 1) return '100%';
+  return '50%';
+}
 
 // 5% corner radius for the modal hero image (width minus 20px padding each side)
 const MODAL_IMG_RADIUS = Math.round((width - SP[5] * 2) * 0.05);
@@ -95,6 +98,40 @@ function CloseIcon({ size = 12 }) {
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="#555" strokeWidth={2.5} strokeLinecap="round">
       <Line x1={18} y1={6} x2={6} y2={18} />
       <Line x1={6} y1={6} x2={18} y2={18} />
+    </Svg>
+  );
+}
+
+// Grid layout toggle icon — shows current mode
+function GridLayoutIcon({ cols }) {
+  const color = '#555';
+  if (cols === 3) {
+    // 3×2 dots
+    return (
+      <Svg width={20} height={20} viewBox="0 0 18 18" fill="none">
+        {[0,6,12].map(x => [0,6,12].map(y => (
+          <Rect key={`${x}${y}`} x={x} y={y} width={4} height={4} rx={1} fill={color} />
+        )))}
+      </Svg>
+    );
+  }
+  if (cols === 1) {
+    // single-column lines — thin bars
+    return (
+      <Svg width={20} height={20} viewBox="0 0 18 18" fill="none">
+        <Rect x={0} y={1} width={18} height={2} rx={1} fill={color} />
+        <Rect x={0} y={8} width={18} height={2} rx={1} fill={color} />
+        <Rect x={0} y={15} width={18} height={2} rx={1} fill={color} />
+      </Svg>
+    );
+  }
+  // 2×2 squares (default)
+  return (
+    <Svg width={20} height={20} viewBox="0 0 18 18" fill="none">
+      <Rect x={0} y={0} width={7} height={7} rx={1.5} fill={color} />
+      <Rect x={11} y={0} width={7} height={7} rx={1.5} fill={color} />
+      <Rect x={0} y={11} width={7} height={7} rx={1.5} fill={color} />
+      <Rect x={11} y={11} width={7} height={7} rx={1.5} fill={color} />
     </Svg>
   );
 }
@@ -244,60 +281,19 @@ function searchAndFilter(designs, query, categoryIndex, roomTypeFilter, styleFil
 
 // ── Grid card with press-scale + animated heart ────────────────────────────────
 
-function GridCard({ design, isLiked, onLike, onPress }) {
-  const heartScale = useRef(new Animated.Value(1)).current;
-
-  const handleLike = () => {
-    onLike();
-    Animated.sequence([
-      Animated.timing(heartScale, {
-        toValue: 1.4,
-        duration: 120,
-        easing: Easing.out(Easing.ease),
-        useNativeDriver: true,
-      }),
-      Animated.spring(heartScale, {
-        toValue: 1,
-        damping: 10,
-        stiffness: 300,
-        useNativeDriver: true,
-      }),
-    ]).start();
-  };
-
+function GridCard({ design, onPress, cardRadius }) {
+  const r = cardRadius ?? radius.md;
   return (
     <PressableCard
-      style={styles.card}
-      animStyle={{ width: CARD_WIDTH }}
+      style={[styles.card, { borderRadius: r }]}
+      animStyle={{ width: '100%' }}
       onPress={onPress}
       activeOpacity={0.95}
     >
-      {/* Card image or placeholder */}
-      <View style={styles.cardImg}>
+      {/* Image only — no buttons, no title */}
+      <View style={[styles.cardImg, { borderRadius: r }]}>
         <View style={styles.cardImgBg} />
         <CardImage uri={design.imageUrl} style={styles.cardImgPhoto} resizeMode="cover" />
-        {/* Action buttons */}
-        <View style={styles.cardActions}>
-          <TouchableOpacity
-            style={styles.cardActionBtn}
-            onPress={handleLike}
-            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-          >
-            <Animated.View style={{ transform: [{ scale: heartScale }] }}>
-              <HeartIcon filled={isLiked} size={13} />
-            </Animated.View>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.cardActionBtn}
-            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-          >
-            <ShareIcon color="#444" size={13} />
-          </TouchableOpacity>
-        </View>
-      </View>
-      {/* Card title */}
-      <View style={styles.cardBody}>
-        <Text style={styles.cardTitle} numberOfLines={1}>{design.title}</Text>
       </View>
     </PressableCard>
   );
@@ -330,6 +326,10 @@ export default function ExploreScreen({ navigation, route }) {
   const [search, setSearch] = useState('');
   const [selectedCard, setSelectedCard] = useState(null);
   const [showPostModal, setShowPostModal] = useState(false);
+  const [gridCols, setGridCols] = useState(2);
+  const approxCardWidth = width / gridCols;
+  const cardRadius = Math.round(approxCardWidth * (gridCols === 3 ? 0.025 : 0.05));
+  const cycleGrid = () => setGridCols(c => c === 3 ? 1 : c + 1);
   const [selectedTags, setSelectedTags] = useState(['#Minimalist']);
 
   // ── Incoming filter state from navigation params ─────────────────────────
@@ -482,12 +482,6 @@ export default function ExploreScreen({ navigation, route }) {
                 </TouchableOpacity>
               )}
             </View>
-            <TouchableOpacity
-              style={styles.postBtn}
-              onPress={() => setShowPostModal(true)}
-            >
-              <PlusIcon color={TC.primary} size={18} />
-            </TouchableOpacity>
           </View>
 
           {/* ── Spaces / Products toggle ── */}
@@ -512,29 +506,34 @@ export default function ExploreScreen({ navigation, route }) {
             </TouchableOpacity>
           </View>
 
-          {/* ── Category Filter Pills ── */}
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            style={styles.tabsScroll}
-            contentContainerStyle={styles.tabsContent}
-          >
-            {(activeTab === 'products' ? PRODUCT_CATEGORIES : CATEGORIES).map((cat, i) => {
-              const isActive = activeTab === 'products' ? activeProdCat === i : activeCategory === i;
-              return (
-                <TouchableOpacity
-                  key={cat}
-                  style={[styles.tab, isActive && styles.tabActive]}
-                  onPress={() => activeTab === 'products' ? setActiveProdCat(i) : setActiveCategory(i)}
-                  activeOpacity={0.75}
-                >
-                  <Text style={[styles.tabLabel, isActive && styles.tabLabelActive]}>
-                    {cat}
-                  </Text>
-                </TouchableOpacity>
-              );
-            })}
-          </ScrollView>
+          {/* ── Category Filter + Grid Toggle ── */}
+          <View style={styles.tabsRow}>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              style={styles.tabsScroll}
+              contentContainerStyle={styles.tabsContent}
+            >
+              {(activeTab === 'products' ? PRODUCT_CATEGORIES : CATEGORIES).map((cat, i) => {
+                const isActive = activeTab === 'products' ? activeProdCat === i : activeCategory === i;
+                return (
+                  <TouchableOpacity
+                    key={cat}
+                    style={[styles.tab, isActive && styles.tabActive]}
+                    onPress={() => activeTab === 'products' ? setActiveProdCat(i) : setActiveCategory(i)}
+                    activeOpacity={0.75}
+                  >
+                    <Text style={[styles.tabLabel, isActive && styles.tabLabelActive]}>
+                      {cat}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </ScrollView>
+            <TouchableOpacity style={styles.gridToggleBtn} onPress={cycleGrid} activeOpacity={0.7}>
+              <GridLayoutIcon cols={gridCols} />
+            </TouchableOpacity>
+          </View>
           <View style={styles.tabBorder} />
 
           {/* ── Active Filter Banner ── */}
@@ -566,7 +565,7 @@ export default function ExploreScreen({ navigation, route }) {
                 {filteredProducts.map((product) => (
                   <TouchableOpacity
                     key={product.id}
-                    style={[styles.card, { width: CARD_WIDTH }]}
+                    style={[styles.card, { width: colWidthPct(gridCols) }]}
                     activeOpacity={0.88}
                     onPress={() => navigation?.navigate('ProductDetail', { product: {
                       ...product,
@@ -604,17 +603,17 @@ export default function ExploreScreen({ navigation, route }) {
           ) : (
             <View style={styles.grid}>
               {filteredDesigns.map((design) => (
-                <GridCard
-                  key={design.id}
-                  design={design}
-                  isLiked={!!liked[design.id]}
-                  onLike={() => toggleLiked(design.id)}
-                  onPress={() => {
-                    const enrichedProducts = getProductsForDesign(design, 4);
-                    const enriched = { ...design, products: enrichedProducts.length ? enrichedProducts : design.products };
-                    setSelectedCard(enriched);
-                  }}
-                />
+                <View key={design.id} style={{ width: colWidthPct(gridCols), padding: 1 }}>
+                  <GridCard
+                    design={design}
+                    cardRadius={cardRadius}
+                    onPress={() => {
+                      const enrichedProducts = getProductsForDesign(design, 4);
+                      const enriched = { ...design, products: enrichedProducts.length ? enrichedProducts : design.products };
+                      setSelectedCard(enriched);
+                    }}
+                  />
+                </View>
               ))}
             </View>
           )}
@@ -974,11 +973,12 @@ const styles = StyleSheet.create({
   },
   searchWrap: {
     flex: 1,
+    width: '100%',
     flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 1,
     borderColor: 'rgba(0,0,0,0.04)',
-    borderRadius: radius.md,
+    borderRadius: 9999,
     height: 48,
     paddingLeft: space.md,
     paddingRight: space.xs,
@@ -1009,39 +1009,48 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
   },
 
-  // Category filter pills
+  // Category filter row with grid toggle
+  tabsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  gridToggleBtn: {
+    paddingLeft: 8,
+    paddingRight: 20,
+    paddingVertical: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  // Category filter — plain text tabs with underline active state
   tabsScroll: {
+    flex: 1,
     marginHorizontal: 0,
   },
   tabsContent: {
     paddingHorizontal: space.lg,
-    gap: space.sm,
-    paddingVertical: space.sm,
+    gap: 0,
+    paddingVertical: 0,
   },
-  // Inactive pill: transparent bg, border.light — radius.full (pill) per spec
   tab: {
-    height: 36,
-    paddingHorizontal: space.base,
-    borderRadius: radius.full,
-    backgroundColor: 'transparent',
-    borderWidth: 1,
-    borderColor: 'rgba(0,0,0,0.08)',
+    paddingHorizontal: 14,
+    paddingVertical: 10,
     alignItems: 'center',
     justifyContent: 'center',
+    borderBottomWidth: 2,
+    borderBottomColor: 'transparent',
   },
-  // Active pill: brand blue fill, no border
   tabActive: {
-    backgroundColor: TC.primary,
-    borderColor: 'transparent',
+    borderBottomColor: '#0B6DC3',
   },
   tabLabel: {
-    ...typeScale.caption,
-    color: 'rgba(0,0,0,0.6)',
+    fontSize: 14,
+    fontWeight: '500',
+    color: 'rgba(0,0,0,0.45)',
   },
   tabLabelActive: {
-    ...typeScale.caption,
-    color: '#FFFFFF',
+    fontSize: 14,
     fontWeight: '600',
+    color: '#0B6DC3',
   },
   tabBorder: {
     height: 1,
@@ -1087,30 +1096,18 @@ const styles = StyleSheet.create({
   grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: space.xs,
-    paddingHorizontal: space.xs,
   },
   // Grid card — shadow.low + border.subtle
   card: {
     width: '100%',
     borderRadius: radius.md,
     overflow: 'hidden',
-    backgroundColor: '#FFFFFF',
-    borderWidth: 1,
-    borderColor: 'rgba(0,0,0,0.04)',
-    shadowColor: shadow.low.shadowColor,
-    shadowOffset: shadow.low.shadowOffset,
-    shadowOpacity: shadow.low.shadowOpacity,
-    shadowRadius: shadow.low.shadowRadius,
-    elevation: shadow.low.elevation,
+    backgroundColor: '#E8EDF2',
   },
   cardImg: {
     width: '100%',
     aspectRatio: 1,
-    borderTopLeftRadius: radius.md,
-    borderTopRightRadius: radius.md,
-    borderBottomLeftRadius: 0,
-    borderBottomRightRadius: 0,
+    borderRadius: radius.md,
     overflow: 'hidden',
   },
   cardImgBg: {

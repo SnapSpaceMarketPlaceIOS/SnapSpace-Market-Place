@@ -22,6 +22,7 @@ import { fontSize, fontWeight, letterSpacing, space, radius, shadow, typeScale }
 import { useLiked } from '../context/LikedContext';
 import { useShared } from '../context/SharedContext';
 import { useAuth } from '../context/AuthContext';
+import AuthGate from '../components/AuthGate';
 import { useFocusEffect } from '@react-navigation/native';
 import { updateProfile, uploadAvatar, getUserDesigns } from '../services/supabase';
 import { DESIGNS } from '../data/designs';
@@ -318,13 +319,11 @@ export default function ProfileScreen({ navigation }) {
   // Guest gate — must come AFTER all hooks
   if (!user) {
     return (
-      <View style={{ flex: 1, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center', padding: 32 }}>
-        <Text style={{ fontSize: 22, fontWeight: '800', color: '#111', marginBottom: 8, textAlign: 'center' }}>Your profile awaits</Text>
-        <Text style={{ fontSize: 14, color: '#6B7280', textAlign: 'center', marginBottom: 28, lineHeight: 21 }}>Sign in to access your profile, saved designs, and order history.</Text>
-        <TouchableOpacity onPress={() => navigation.navigate('Auth')} style={{ backgroundColor: '#0B6DC3', borderRadius: 14, paddingVertical: 14, paddingHorizontal: 40 }}>
-          <Text style={{ color: '#fff', fontWeight: '700', fontSize: 15 }}>Sign In / Sign Up</Text>
-        </TouchableOpacity>
-      </View>
+      <AuthGate
+        title="Your profile awaits"
+        subtitle="Sign in to access your profile, saved designs, and order history."
+        navigation={navigation}
+      />
     );
   }
 

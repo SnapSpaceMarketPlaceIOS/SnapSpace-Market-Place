@@ -10,7 +10,12 @@ import {
   Easing,
   ScrollView,
   Image,
+  ActivityIndicator,
+  Alert,
+  Platform,
+  Keyboard,
 } from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Svg, { Path, Circle, Line, Polyline, Rect, Ellipse, G } from 'react-native-svg';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -23,15 +28,12 @@ import { useAuth } from '../context/AuthContext';
 import { useLiked } from '../context/LikedContext';
 import { DESIGNS } from '../data/designs';
 import { SELLERS } from '../data/sellers';
-import { searchProducts, getSourceColor } from '../services/affiliateProducts';
+import { searchProducts, getSourceColor, getProductsForPrompt } from '../services/affiliateProducts';
+import { generateInteriorDesign } from '../services/replicate';
 import { PRODUCT_CATALOG } from '../data/productCatalog';
 
 const { width, height } = Dimensions.get('window');
 
-const PARALLAX_BUDGET = 60;
-const PARALLAX_FACTOR = 0.08;
-const HERO_ROTATE_INTERVAL = 4000;
-const HERO_FADE_DURATION   = 1200;
 
 const CARD_W = width * 0.50;
 const COLL_CARD_W = (width - space.lg * 2 - space.sm) / 2;
@@ -41,14 +43,6 @@ const ARRIVAL_CARD_W = Math.round(width * 0.42);
 // Seller lookup map: handle → seller object
 const SELLER_MAP = SELLERS.reduce((acc, s) => { acc[s.handle] = s; return acc; }, {});
 
-const HERO_IMAGES = [
-  require('../assets/hero/room1.jpg'),
-  require('../assets/hero/room2.jpg'),
-  require('../assets/hero/room3.jpg'),
-  require('../assets/hero/room4.jpg'),
-  require('../assets/hero/room5.jpg'),
-  require('../assets/hero/room6.jpg'),
-];
 
 // ── Room type quick-nav ────────────────────────────────────────────────────────
 const ROOM_TYPES = [
@@ -412,6 +406,55 @@ function CameraSmallIcon() {
   );
 }
 
+function GalleryIcon({ size = 18, color = 'rgba(255,255,255,0.75)' }) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+      <Rect x={3} y={3} width={18} height={18} rx={2} ry={2} />
+      <Circle cx={8.5} cy={8.5} r={1.5} />
+      <Polyline points="21 15 16 10 5 21" />
+    </Svg>
+  );
+}
+
+// ── AI generation helpers ─────────────────────────────────────────────────────
+
+const PROMPT_SUGGESTIONS = [
+  'Modern minimalist',
+  'Japandi',
+  'Dark luxe',
+  'Coastal',
+  'Boho eclectic',
+  'Scandi cozy',
+];
+
+const FURNITURE_LABELS = {
+  'sofa': 'sofa', 'accent-chair': 'accent chair', 'coffee-table': 'coffee table',
+  'rug': 'area rug', 'wall-art': 'wall art', 'mirror': 'floor mirror',
+  'bookshelf': 'bookshelf', 'floor-lamp': 'floor lamp', 'bed': 'bed',
+  'pendant-light': 'pendant light', 'nightstand': 'nightstand', 'dresser': 'dresser',
+};
+
+const VISUAL_WORDS = [
+  'boucle','velvet','leather','linen','rattan','marble','glass','wood',
+  'walnut','oak','brass','gold','curved','round','oval','modular',
+  'cream','beige','white','gray','black','camel','sage','green',
+];
+
+function extractVisualHints(name) {
+  const lower = name.toLowerCase();
+  return VISUAL_WORDS.filter(w => lower.includes(w)).slice(0, 2).join(' ');
+}
+
+function buildEnrichedPrompt(userPrompt, products) {
+  const pieces = products.slice(0, 5).map(p => {
+    const label = FURNITURE_LABELS[p.category] || p.category.replace(/-/g, ' ');
+    const hints = extractVisualHints(p.name);
+    return hints ? `${hints} ${label}` : label;
+  });
+  const list = pieces.length > 0 ? `, with ${pieces.join(', ')}` : '';
+  return `${userPrompt}${list}, fully furnished interior, warm soft lighting`;
+}
+
 function ChevronRight({ color = '#fff' }) {
   return (
     <Svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
@@ -541,27 +584,21 @@ const FIRST_VISIT_KEY = 'snapspace_home_visited';
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
-export default function HomeScreen({ navigation }) {
+export default function HomeScreen({ navigation, route }) {
   const { user } = useAuth();
   const { liked } = useLiked();
   const [prompt, setPrompt] = useState('');
   const [greeting, setGreeting] = useState(getGreeting());
   const [recentlyViewed, setRecentlyViewed] = useState([]);
 
-  // Ping-pong hero slots
-  const [slotA, setSlotA] = useState(HERO_IMAGES[0]);
-  const [slotB, setSlotB] = useState(HERO_IMAGES[1]);
-  const nextIdxRef  = useRef(2);
-  const aIsLiveRef  = useRef(true);
-  const opacityA    = useRef(new Animated.Value(1)).current;
-  const opacityB    = useRef(new Animated.Value(0)).current;
-  const cycleTimer  = useRef(null);
+  // Design Your Space state
+  const [photo, setPhoto] = useState(null);
+  const [imageLayout, setImageLayout] = useState(null);
+  const [generating, setGenerating] = useState(false);
+  const [genStatus, setGenStatus] = useState('');
 
   // Scroll-driven parallax
   const scrollY = useRef(new Animated.Value(0)).current;
-
-  // Ken Burns
-  const kenBurnsScale = useRef(new Animated.Value(1)).current;
 
   // ── Personalization ─────────────────────────────────────────────────────────
 
@@ -609,51 +646,70 @@ export default function HomeScreen({ navigation }) {
     });
   }, []);
 
-  // Ken Burns loop
+  // Receive photo captured from Snap tab
   useEffect(() => {
-    let stopped = false;
-    const loop = () => {
-      kenBurnsScale.setValue(1);
-      Animated.timing(kenBurnsScale, {
-        toValue: 1.02,
-        duration: (HERO_ROTATE_INTERVAL + HERO_FADE_DURATION) * 2,
-        easing: Easing.inOut(Easing.sin),
-        useNativeDriver: true,
-      }).start(({ finished }) => { if (finished && !stopped) loop(); });
-    };
-    loop();
-    return () => { stopped = true; kenBurnsScale.stopAnimation(); };
-  }, []);
+    if (route?.params?.capturedPhoto) {
+      const captured = route.params.capturedPhoto;
+      setPhoto(captured);
+      const isLandscape = (captured.width || 0) > (captured.height || 0);
+      setImageLayout({ landscape: isLandscape });
+      navigation.setParams({ capturedPhoto: undefined });
+    }
+  }, [route?.params?.capturedPhoto]);
 
-  // Ping-pong crossfade
-  useEffect(() => {
-    const L = HERO_IMAGES.length;
-    let stopped = false;
-    const runCycle = () => {
-      if (stopped) return;
-      const aLive = aIsLiveRef.current;
-      const liveOp = aLive ? opacityA : opacityB;
-      const idleOp = aLive ? opacityB : opacityA;
-      Animated.parallel([
-        Animated.timing(liveOp, { toValue: 0, duration: HERO_FADE_DURATION, easing: Easing.inOut(Easing.sin), useNativeDriver: true }),
-        Animated.timing(idleOp, { toValue: 1, duration: HERO_FADE_DURATION, easing: Easing.inOut(Easing.sin), useNativeDriver: true }),
-      ]).start(({ finished }) => {
-        if (!finished || stopped) return;
-        aIsLiveRef.current = !aLive;
-        const next = HERO_IMAGES[nextIdxRef.current % L];
-        nextIdxRef.current = (nextIdxRef.current + 1) % L;
-        if (aLive) { setSlotA(next); } else { setSlotB(next); }
-        cycleTimer.current = setTimeout(runCycle, HERO_ROTATE_INTERVAL);
+  const handlePickFromLibrary = async () => {
+    if (generating) return;
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Permission Required', 'Please allow access to your photo library in Settings.');
+      return;
+    }
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: false,
+      quality: 0.8,
+      base64: true,
+    });
+    if (result.canceled || !result.assets?.length) return;
+    const asset = result.assets[0];
+    setPhoto({ uri: asset.uri, base64: asset.base64, width: asset.width, height: asset.height });
+    setImageLayout({ landscape: (asset.width || 0) > (asset.height || 0) });
+  };
+
+  const runGeneration = async () => {
+    if (!photo) {
+      Alert.alert('Add a Room Photo', 'Tap the camera icon to snap your room, or pick from your library.');
+      return;
+    }
+    if (!prompt.trim()) {
+      Alert.alert('Describe Your Style', 'Add a style description so the AI knows what to create.');
+      return;
+    }
+    const designPrompt = prompt.trim();
+    Keyboard.dismiss();
+    setGenerating(true);
+    try {
+      setGenStatus('Curating products…');
+      const matchedProducts = getProductsForPrompt(designPrompt, 6);
+      setGenStatus('Generating your design… (40–90s)');
+      const enrichedPrompt = buildEnrichedPrompt(designPrompt, matchedProducts);
+      const resultUrl = await generateInteriorDesign(photo.uri, enrichedPrompt, photo.base64);
+      setGenerating(false);
+      setGenStatus('');
+      setPhoto(null);
+      setPrompt('');
+      navigation?.navigate('RoomResult', {
+        imageUri: photo.uri,
+        resultUri: resultUrl,
+        prompt: designPrompt,
+        products: matchedProducts,
       });
-    };
-    cycleTimer.current = setTimeout(runCycle, HERO_ROTATE_INTERVAL);
-    return () => {
-      stopped = true;
-      clearTimeout(cycleTimer.current);
-      opacityA.stopAnimation();
-      opacityB.stopAnimation();
-    };
-  }, []);
+    } catch (err) {
+      setGenerating(false);
+      setGenStatus('');
+      Alert.alert('Generation Failed', err.message || 'Something went wrong. Please try again.');
+    }
+  };
 
   // First-visit auth redirect
   useEffect(() => {
@@ -667,13 +723,6 @@ export default function HomeScreen({ navigation }) {
     })();
   }, [user]);
 
-  // Parallax
-  const imageTranslateY = scrollY.interpolate({
-    inputRange: [0, PARALLAX_BUDGET / PARALLAX_FACTOR],
-    outputRange: [0, -PARALLAX_BUDGET],
-    extrapolate: 'extend',
-  });
-
   const firstName = getFirstName(user);
   const greetingLine = firstName
     ? `${greeting} ${firstName.toUpperCase()}`
@@ -683,15 +732,10 @@ export default function HomeScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      {/* Hero background images */}
-      <Animated.Image
-        source={slotA}
-        style={[styles.bgImage, { transform: [{ translateY: imageTranslateY }, { scale: kenBurnsScale }], opacity: opacityA }]}
-        resizeMode="cover"
-      />
-      <Animated.Image
-        source={slotB}
-        style={[styles.bgImage, { transform: [{ translateY: imageTranslateY }, { scale: kenBurnsScale }], opacity: opacityB }]}
+      {/* Static hero background */}
+      <Image
+        source={require('../../assets/snap-bg.jpg')}
+        style={styles.bgImage}
         resizeMode="cover"
       />
       <View style={styles.heroTint} pointerEvents="none" />
@@ -707,12 +751,9 @@ export default function HomeScreen({ navigation }) {
         showsVerticalScrollIndicator={false}
         bounces={false}
       >
-        {/* ── Hero overlay ────────────────────────────────────────────── */}
-        <LinearGradient
-          colors={['rgba(0,0,0,0.55)', 'rgba(0,0,0,0.08)', 'rgba(0,0,0,0.18)', 'rgba(0,0,0,0.65)']}
-          locations={[0, 0.3, 0.6, 1]}
-          style={styles.overlay}
-        >
+        {/* ── Hero section — fills visible screen ─────────────────────── */}
+        <View style={styles.overlay}>
+          {/* Top bar: logo + icons */}
           <View style={styles.topBar}>
             <View style={styles.logoRow}>
               <Text style={styles.logo}>SnapSpace</Text>
@@ -736,47 +777,98 @@ export default function HomeScreen({ navigation }) {
             </View>
           </View>
 
-          <View style={styles.contentBlock}>
-            <View style={styles.heroSection}>
-              <Text style={styles.greetingEyebrow}>{greetingLine}</Text>
-              <Text style={styles.headline}>Lets Snap Your Space</Text>
-            </View>
+          {/* Centered headline + subtitle */}
+          <View style={styles.heroCentered}>
+            <Text style={styles.headline}>Design Your Space</Text>
+            <Text style={styles.heroSubtitle}>
+              Describe your style, then add your room photo
+            </Text>
+          </View>
 
-            <View style={styles.searchBar}>
-              <LinearGradient
-                colors={['rgba(255,255,255,0.28)', 'rgba(255,255,255,0.0)']}
-                style={styles.searchBarHighlight}
-                pointerEvents="none"
+          {/* Floating suggestion pills — scattered organically */}
+          <View style={styles.floatingPills}>
+            {PROMPT_SUGGESTIONS.map((sug, i) => (
+              <TouchableOpacity
+                key={sug}
+                style={[
+                  styles.floatingPill,
+                  prompt === sug && styles.floatingPillOn,
+                  i === 0 && { alignSelf: 'flex-start', marginLeft: 24 },
+                  i === 1 && { alignSelf: 'flex-end', marginRight: 40 },
+                  i === 2 && { alignSelf: 'flex-start', marginLeft: 50 },
+                  i === 3 && { alignSelf: 'flex-end', marginRight: 24 },
+                  i === 4 && { alignSelf: 'center', marginLeft: -20 },
+                  i === 5 && { alignSelf: 'center', marginRight: -40 },
+                ]}
+                onPress={() => setPrompt(sug)}
+                activeOpacity={0.7}
+              >
+                <Text style={[styles.floatingPillText, prompt === sug && styles.floatingPillTextOn]}>{sug}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+
+          {/* Photo preview (when photo is attached) */}
+          {photo && (
+            <View style={styles.photoPreviewWrap}>
+              <Image
+                source={{ uri: photo.uri }}
+                style={[styles.photoPreview, imageLayout?.landscape ? styles.photoLandscape : styles.photoPortrait]}
+                resizeMode="cover"
               />
+              {generating && (
+                <View style={styles.photoOverlay}>
+                  <ActivityIndicator color="#fff" size="large" />
+                  <Text style={styles.photoOverlayText}>{genStatus || 'Generating…'}</Text>
+                </View>
+              )}
+              {!generating && (
+                <TouchableOpacity style={styles.photoRemoveBtn} onPress={() => { setPhoto(null); setImageLayout(null); }}>
+                  <Text style={styles.photoRemoveX}>✕</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+          )}
+
+          {/* Input bar — pinned to bottom of hero */}
+          <View style={styles.heroBottom}>
+            <View style={styles.inputBar}>
+              <TouchableOpacity
+                style={styles.inputIconBtn}
+                onPress={() => navigation?.navigate('Snap')}
+                activeOpacity={0.6}
+              >
+                <CameraSmallIcon />
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.inputIconBtn}
+                onPress={handlePickFromLibrary}
+                activeOpacity={0.6}
+              >
+                <GalleryIcon />
+              </TouchableOpacity>
               <TextInput
-                style={styles.searchInput}
-                placeholder="Describe your dream space..."
-                placeholderTextColor="rgba(255,255,255,0.55)"
+                style={styles.inputText}
+                placeholder="Describe your style..."
+                placeholderTextColor="rgba(255,255,255,0.45)"
                 value={prompt}
                 onChangeText={setPrompt}
-                returnKeyType="search"
+                returnKeyType="done"
+                editable={!generating}
+                multiline
+                maxLength={200}
               />
               <TouchableOpacity
-                style={styles.searchSendBtn}
+                style={[styles.inputSendBtn, (!prompt.trim() && !photo) && styles.inputSendBtnOff]}
                 activeOpacity={0.8}
-                onPress={() => {
-                  if (prompt.trim()) {
-                    navigation?.navigate('Explore', {
-                      filterQuery: prompt.trim(),
-                      title: prompt.trim(),
-                    });
-                    setPrompt('');
-                  } else {
-                    navigation?.navigate('Explore');
-                  }
-                }}
+                onPress={runGeneration}
+                disabled={generating}
               >
-                <SendIcon />
+                {generating ? <ActivityIndicator color="#fff" size="small" /> : <SendIcon />}
               </TouchableOpacity>
             </View>
-
           </View>
-        </LinearGradient>
+        </View>
 
         {/* ════════════════════════════════════════════════════════════════
             BELOW-FOLD CONTENT
@@ -1229,31 +1321,27 @@ const styles = StyleSheet.create({
     backgroundColor: '#035DA8', // dark fallback — no white flash at bottom
   },
   bgImage: {
-    position: 'absolute',
-    width: width * 1.02,
-    left: -(width * 0.01),
-    height: (height + PARALLAX_BUDGET * 2) * 1.02,
-    top: -PARALLAX_BUDGET,
+    ...StyleSheet.absoluteFillObject,
+    width: width,
+    height: height,
   },
   heroTint: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0,0,0,0.45)',
+    backgroundColor: 'rgba(0,0,0,0.35)',
   },
   scrollContent: {
     flexGrow: 1,
     paddingBottom: 24,
   },
   overlay: {
-    height: height + 40,  // extend past fold so white card never peeks
-    paddingTop: space['5xl'],
-    paddingBottom: 40,     // offset the extra height so content stays centered
-    justifyContent: 'center',
+    height: height - 88 + 28 + 20, // fill screen above tab bar + cover peeledCard -28 margin + buffer
+    paddingTop: 60,
   },
 
   // ── Top bar ──────────────────────────────────────────────────────────────────
   topBar: {
     position: 'absolute',
-    top: space['5xl'],
+    top: 60,
     left: 0,
     right: 0,
     flexDirection: 'row',
@@ -1289,71 +1377,118 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255,255,255,0.2)',
   },
 
-  // ── Hero content block ───────────────────────────────────────────────────────
-  contentBlock: {
+  // ── Hero centered content ───────────────────────────────────────────────────
+  heroCentered: {
+    alignItems: 'center',
+    justifyContent: 'center',
     paddingHorizontal: space.lg,
-    gap: space.base,
+    marginTop: height * 0.14, // ~14% from top → sits at roughly 30% of screen visually
   },
-  heroSection: { marginBottom: space.sm },
-  greetingEyebrow: {
-    fontSize: fontSize.xs,
-    fontWeight: fontWeight.bold,
-    color: '#0B6DC3',
-    letterSpacing: letterSpacing.wider,
-    textTransform: 'uppercase',
-    marginBottom: space.sm,
+  heroSubtitle: {
+    fontSize: 13,
+    color: '#67ACE9',
+    lineHeight: 19,
+    marginTop: 6,
+    textAlign: 'center',
+  },
+
+  // Floating pills — scattered organically
+  floatingPills: {
+    flex: 1,
+    justifyContent: 'center',
+    paddingVertical: 16,
+    gap: 10,
+  },
+  floatingPill: {
+    paddingHorizontal: 16,
+    paddingVertical: 9,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255,255,255,0.18)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.22)',
+  },
+  floatingPillOn: { backgroundColor: '#0B6DC3', borderColor: '#0B6DC3' },
+  floatingPillText: { fontSize: 13, fontWeight: '500', color: 'rgba(255,255,255,0.85)' },
+  floatingPillTextOn: { color: '#fff', fontWeight: '600' },
+
+  // Photo preview
+  photoPreviewWrap: {
+    borderRadius: 14,
+    overflow: 'hidden',
+    marginHorizontal: space.lg,
+    marginBottom: 12,
+  },
+  photoPreview: { width: '100%' },
+  photoLandscape: { height: 160 },
+  photoPortrait: { height: 220 },
+  photoOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,0,0,0.55)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
+  },
+  photoOverlayText: { color: '#fff', fontSize: 13, fontWeight: '600' },
+  photoRemoveBtn: {
+    position: 'absolute', top: 8, right: 8,
+    width: 26, height: 26, borderRadius: 13,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    alignItems: 'center', justifyContent: 'center',
+  },
+  photoRemoveX: { color: '#fff', fontSize: 11, fontWeight: '700' },
+
+  // Input bar — pinned to hero bottom
+  heroBottom: {
+    paddingHorizontal: 16,
+    paddingBottom: 16,
+  },
+  inputBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255,255,255,0.12)',
+    borderRadius: 26,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.18)',
+    paddingLeft: 8,
+    paddingRight: 6,
+    paddingVertical: 6,
+    minHeight: 48,
+    maxHeight: 100,
+  },
+  inputIconBtn: {
+    width: 34, height: 34, borderRadius: 17,
+    alignItems: 'center', justifyContent: 'center',
+  },
+  inputText: {
+    flex: 1,
+    fontSize: 15,
+    color: '#fff',
+    lineHeight: 20,
+    maxHeight: 80,
+    paddingVertical: 4,
+    paddingHorizontal: 6,
+  },
+  inputSendBtn: {
+    width: 34, height: 34, borderRadius: 17,
+    backgroundColor: '#0B6DC3',
+    alignItems: 'center', justifyContent: 'center',
+  },
+  inputSendBtnOff: {
+    backgroundColor: 'rgba(255,255,255,0.15)',
   },
   headline: {
-    fontSize: 38,
+    fontSize: 28,
     fontWeight: fontWeight.xbold,
     color: '#FFFFFF',
-    lineHeight: 44,
+    lineHeight: 34,
     letterSpacing: letterSpacing.tight,
+    textAlign: 'center',
     textShadowColor: 'rgba(0,0,0,0.3)',
     textShadowOffset: { width: 0, height: 2 },
     textShadowRadius: 12,
   },
   headlineBold: { fontWeight: fontWeight.xbold },
 
-  searchBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'rgba(255,255,255,0.18)',
-    borderRadius: 999,
-    overflow: 'hidden',
-    paddingLeft: space.lg,
-    paddingRight: space.xs,
-    paddingVertical: space.xs,
-    height: space['5xl'],
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.25)',
-    shadowColor: '#fff',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.12,
-    shadowRadius: 12,
-  },
-  searchBarHighlight: {
-    position: 'absolute',
-    top: 0, left: 0, right: 0,
-    height: '50%',
-    borderTopLeftRadius: 999,
-    borderTopRightRadius: 999,
-  },
-  searchInput: {
-    flex: 1,
-    fontSize: fontSize.base,
-    color: '#fff',
-    paddingVertical: space.sm,
-  },
-  searchSendBtn: {
-    width: 44,
-    height: 44,
-    borderRadius: radius.full,
-    backgroundColor: '#111827',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 2,
-  },
 
   snapBanner: {
     backgroundColor: 'rgba(0,0,0,0.6)',

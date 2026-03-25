@@ -207,7 +207,20 @@ function TabNavigator() {
         name="Snap"
         component={SnapScreen}
         options={{
-          tabBarIcon: ({ color }) => <CameraIcon color={color} size={ICON_SIZE} />,
+          tabBarIcon: ({ color }) => (
+            <View style={{ position: 'relative' }}>
+              <CameraIcon color={color} size={ICON_SIZE} />
+              <View style={{ position: 'absolute', top: -4, right: -4 }}>
+                <Svg width={10} height={10} viewBox="0 0 8 8" fill="none">
+                  {/* 4-pointed AI sparkle star */}
+                  <Path
+                    d="M4 0 L5 3 L8 4 L5 5 L4 8 L3 5 L0 4 L3 3 Z"
+                    fill="#0B6DC3"
+                  />
+                </Svg>
+              </View>
+            </View>
+          ),
         }}
       />
       <Tab.Screen
