@@ -17,6 +17,7 @@ import {
   Alert,
 } from 'react-native';
 import CardImage from '../components/CardImage';
+import AutoImage from '../components/AutoImage';
 import Svg, { Path, Circle, Polyline, Line } from 'react-native-svg';
 import { colors } from '../constants/colors';
 import { colors as C } from '../constants/theme';
@@ -185,9 +186,9 @@ export default function ShopTheLookScreen({ route, navigation }) {
           </TouchableOpacity>
         </View>
 
-        {/* ── Image (matches Explore — padded with border-radius) ── */}
+        {/* ── Image (natural aspect ratio — no cropping) ── */}
         <View style={s.imageWrap}>
-          <CardImage uri={design.imageUrl} style={s.image} resizeMode="cover" />
+          <AutoImage uri={design.imageUrl} borderRadius={IMG_RADIUS} />
         </View>
 
         {/* ── User row + Follow ────────────────────────────────────── */}

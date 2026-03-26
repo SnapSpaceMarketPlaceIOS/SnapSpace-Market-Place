@@ -29,6 +29,7 @@ import { colors as C } from '../constants/theme';
 import SectionHeader from '../components/ds/SectionHeader';
 import Badge, { HeartCountPill } from '../components/ds/Badge';
 import CardImage from '../components/CardImage';
+import AutoImage from '../components/AutoImage';
 import { useAuth } from '../context/AuthContext';
 import { useLiked } from '../context/LikedContext';
 import { DESIGNS } from '../data/designs';
@@ -1664,20 +1665,10 @@ export default function HomeScreen({ navigation, route }) {
             contentContainerStyle={resultStyles.scrollContent}
             showsVerticalScrollIndicator={false}
           >
-            {/* Generated image — original aspect ratio + action buttons overlay */}
+            {/* Generated image — natural aspect ratio, no cropping */}
             {resultData?.resultUri && (
               <View style={resultStyles.imageWrap}>
-                <Image
-                  source={{ uri: resultData.resultUri }}
-                  style={[
-                    resultStyles.resultImage,
-                    imageLayout?.landscape
-                      ? { aspectRatio: 16 / 9 }
-                      : { aspectRatio: 3 / 4 },
-                  ]}
-                  resizeMode="cover"
-                />
-                {/* Action icons moved to SHOP YOUR ROOM header row */}
+                <AutoImage uri={resultData.resultUri} borderRadius={12} />
               </View>
             )}
 

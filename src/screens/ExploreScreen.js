@@ -13,6 +13,7 @@ import {
   Easing,
 } from 'react-native';
 import CardImage from '../components/CardImage';
+import AutoImage from '../components/AutoImage';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
 import Svg, { Circle, Line, Path, Rect, Polyline } from 'react-native-svg';
@@ -655,10 +656,12 @@ export default function ExploreScreen({ navigation, route }) {
                 showsVerticalScrollIndicator={false}
                 contentContainerStyle={styles.modalScrollContent}
               >
-                {/* Post image */}
-                <View style={styles.modalImage}>
-                  <CardImage uri={selectedCard.imageUrl} style={styles.modalImagePhoto} resizeMode="cover" />
-                </View>
+                {/* Post image — natural aspect ratio */}
+                <AutoImage
+                  uri={selectedCard.imageUrl}
+                  borderRadius={MODAL_IMG_RADIUS}
+                  style={{ marginBottom: SP[4] }}
+                />
 
                 {/* 3B: Seller header row — tap to visit profile */}
                 <TouchableOpacity

@@ -27,6 +27,7 @@ import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import Svg, { Path, Line, Polyline, Circle } from 'react-native-svg';
 import { useFocusEffect } from '@react-navigation/native';
 import CardImage from '../components/CardImage';
+import AutoImage from '../components/AutoImage';
 import { useAuth } from '../context/AuthContext';
 import { getUserDesigns } from '../services/supabase';
 import { colors } from '../constants/colors';
@@ -149,9 +150,9 @@ function SpaceDetailModal({ design, visible, onClose, navigation }) {
         </View>
 
         <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 48 }}>
-          {/* Room image with side padding */}
+          {/* Room image — natural aspect ratio */}
           <View style={s.modalImgWrap}>
-            <CardImage uri={design.image_url} style={s.modalImg} resizeMode="cover" />
+            <AutoImage uri={design.image_url} borderRadius={9} />
           </View>
 
           {/* Divider */}

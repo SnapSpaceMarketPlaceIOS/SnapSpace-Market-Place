@@ -459,14 +459,14 @@ export default function ProfileScreen({ navigation }) {
         </View>
         <View style={styles.tabBorder} />
 
-        {/* ── Designs Grid ── */}
+        {/* ── Designs Grid (only cards with images — no empty placeholders) ── */}
         <View style={styles.grid}>
           {(activeTab === 0
             ? myDesigns
             : activeTab === 1
               ? myDesigns.filter(d => liked[d.id])
               : myDesigns.filter(d => shared[d.id])
-          ).map(design => (
+          ).filter(d => !!d.imageUrl).map(design => (
             <PressableCard
               key={design.id}
               style={styles.card}
@@ -476,33 +476,6 @@ export default function ProfileScreen({ navigation }) {
               <View style={styles.cardImg}>
                 <View style={styles.cardImgBg} />
                 <CardImage uri={design.imageUrl} style={styles.cardImgPhoto} resizeMode="cover" />
-                <View style={styles.cardActions}>
-                  <TouchableOpacity
-                    style={styles.cardActionBtn}
-                    onPress={() => toggleLiked(design.id)}
-                    hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-                  >
-                    <HeartIcon filled={!!liked[design.id]} />
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={styles.cardActionBtn}
-                    hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-                    onPress={async () => {
-                      try {
-                        const result = await Share.share({
-                          message: 'Check out this room design on SnapSpace!',
-                        });
-                        if (result.action === Share.sharedAction) {
-                          addShared(design.id);
-                        }
-                      } catch {
-                        // share cancelled or error — no action needed
-                      }
-                    }}
-                  >
-                    <ShareIcon />
-                  </TouchableOpacity>
-                </View>
               </View>
             </PressableCard>
           ))}
