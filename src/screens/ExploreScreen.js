@@ -563,35 +563,43 @@ export default function ExploreScreen({ navigation, route }) {
               </View>
             ) : (
               <View style={styles.grid}>
-                {filteredProducts.map((product) => (
-                  <TouchableOpacity
-                    key={product.id}
-                    style={[styles.card, { width: colWidthPct(gridCols) }]}
-                    activeOpacity={0.88}
-                    onPress={() => navigation?.navigate('ProductDetail', { product: {
-                      ...product,
-                      price: product.priceDisplay,
-                      priceValue: product.price,
-                      source: product.source,
-                    }})}
-                  >
-                    <View style={styles.cardImg}>
-                      <View style={styles.cardImgBg} />
-                      <CardImage uri={product.imageUrl} style={styles.cardImgPhoto} resizeMode="cover" />
-                      {/* Amazon badge */}
-                      <View style={styles.prodBadgePos}>
-                        <View style={styles.prodAmazonBadge}>
-                          <AmazonLogoMark />
+                {filteredProducts.map((product) => {
+                  const ratingVal = typeof product.rating === 'number' ? product.rating : parseFloat(product.rating) || 0;
+                  const navProduct = { ...product, price: product.priceDisplay, priceValue: product.price, source: product.source };
+                  return (
+                    <View key={product.id} style={{ width: colWidthPct(gridCols), padding: 1 }}>
+                      <TouchableOpacity
+                        style={[styles.card, { borderRadius: cardRadius }]}
+                        activeOpacity={0.88}
+                        onPress={() => navigation?.navigate('ProductDetail', { product: navProduct })}
+                      >
+                        <View style={[styles.cardImg, { borderRadius: gridCols === 2 ? cardRadius : cardRadius }]}>
+                          <View style={styles.cardImgBg} />
+                          <CardImage uri={product.imageUrl} style={styles.cardImgPhoto} resizeMode="cover" />
                         </View>
-                      </View>
+                        {/* 2-col: show white info card below image; 3-col: image only */}
+                        {gridCols !== 3 && (
+                          <View style={styles.prodCardBody}>
+                            <Text style={styles.prodCardName} numberOfLines={2}>{product.name}</Text>
+                            <Text style={styles.prodCardBrand}>{product.brand}</Text>
+                            {ratingVal > 0 && (
+                              <View style={styles.prodCardRating}>
+                                {[1,2,3,4,5].map(i => (
+                                  <StarIconSmall key={i} size={10} filled={i <= Math.round(ratingVal)} />
+                                ))}
+                                <Text style={styles.prodCardRatingText}>{ratingVal.toFixed(1)}</Text>
+                                {!!product.reviewCount && (
+                                  <Text style={styles.prodCardReviews}>({product.reviewCount.toLocaleString()})</Text>
+                                )}
+                              </View>
+                            )}
+                            <Text style={styles.prodCardPrice}>{product.priceDisplay}</Text>
+                          </View>
+                        )}
+                      </TouchableOpacity>
                     </View>
-                    <View style={styles.prodCardBody}>
-                      <Text style={styles.prodCardName} numberOfLines={2}>{product.name}</Text>
-                      <Text style={styles.prodCardBrand}>{product.brand}</Text>
-                      <Text style={styles.prodCardPrice}>{product.priceDisplay}</Text>
-                    </View>
-                  </TouchableOpacity>
-                ))}
+                  );
+                })}
               </View>
             )
           ) : filteredDesigns.length === 0 ? (
@@ -1106,19 +1114,9 @@ const styles = StyleSheet.create({
     color: '#111',
   },
 
-  // Product card styles
-  prodBadgePos: {
-    position: 'absolute',
-    bottom: space.xs,
-    left: space.xs,
-  },
-  prodAmazonBadge: {
-    backgroundColor: 'rgba(255,255,255,0.92)',
-    borderRadius: radius.sm,
-    paddingHorizontal: 6,
-    paddingVertical: 3,
-  },
+  // Product card styles (2-col: white info card; 3-col: image only)
   prodCardBody: {
+    backgroundColor: '#FFFFFF',
     paddingHorizontal: space.sm,
     paddingTop: space.sm,
     paddingBottom: space.sm,
@@ -1136,6 +1134,22 @@ const styles = StyleSheet.create({
     textTransform: 'none',
     letterSpacing: 0,
     marginTop: 1,
+  },
+  prodCardRating: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 1,
+    marginTop: 3,
+  },
+  prodCardRatingText: {
+    fontSize: 10,
+    fontWeight: '600',
+    color: '#111',
+    marginLeft: 2,
+  },
+  prodCardReviews: {
+    fontSize: 10,
+    color: TC.textSecondary,
   },
   prodCardPrice: {
     ...typeScale.priceSmall,
