@@ -18,7 +18,7 @@ import {
   FlatList,
 } from 'react-native';
 import { BlurView } from 'expo-blur';
-import * as Sharing from 'expo-sharing';
+// expo-sharing requires native module not in dev client — use RN Share instead
 import * as FileSystem from 'expo-file-system/legacy';
 import * as ImagePicker from 'expo-image-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -861,17 +861,10 @@ export default function HomeScreen({ navigation, route }) {
   const handleDownload = async () => {
     if (!resultData?.resultUri) return;
     try {
-      // Try local download first → opens iOS share sheet with "Save Image"
+      // Try local download → opens iOS share sheet with "Save Image"
       const file = await downloadResultImage();
       if (!file) return;
-      const canShare = await Sharing.isAvailableAsync();
-      if (canShare) {
-        await Sharing.shareAsync(file.localUri, {
-          mimeType: file.mime,
-          dialogTitle: 'Save Image',
-          UTI: file.ext === 'webp' ? 'org.webmproject.webp' : 'public.jpeg',
-        });
-      }
+      await Share.share({ url: file.localUri });
     } catch (err) {
       // Fallback: share the remote URL so user can save from browser
       console.log('[Download] Local download failed, sharing URL:', err.message);
@@ -888,21 +881,14 @@ export default function HomeScreen({ navigation, route }) {
 
   const handleShare = async () => {
     if (!resultData?.resultUri) return;
-    // Share the prompt + image URL — recipient gets a viewable link
     const prompt = resultData.prompt || 'My AI design';
     const shareText = `Check out my AI room design on SnapSpace!\n\n"${prompt}"\n\n${resultData.resultUri}`;
     try {
-      // Try to download and share the actual image file first
+      // Try to download and share the actual image file
       const file = await downloadResultImage();
       if (file) {
-        const canShare = await Sharing.isAvailableAsync();
-        if (canShare) {
-          await Sharing.shareAsync(file.localUri, {
-            mimeType: file.mime,
-            dialogTitle: 'Share your AI design',
-          });
-          return;
-        }
+        await Share.share({ url: file.localUri });
+        return;
       }
     } catch (err) {
       console.log('[Share] File download failed, sharing URL:', err.message);

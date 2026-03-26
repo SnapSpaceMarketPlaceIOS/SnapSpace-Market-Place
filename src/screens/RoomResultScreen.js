@@ -26,7 +26,6 @@ import { useAuth } from '../context/AuthContext';
 import { getProductsForPrompt, getSourceLabel, getSourceColor } from '../services/affiliateProducts';
 import { saveUserDesign } from '../services/supabase';
 import * as FileSystem from 'expo-file-system/legacy';
-import * as Sharing from 'expo-sharing';
 
 const { width, height } = Dimensions.get('window');
 
@@ -223,12 +222,8 @@ export default function RoomResultScreen({ route, navigation }) {
       const fileUri = FileSystem.cacheDirectory + 'snapspace_design_' + Date.now() + '.jpg';
       const { status } = await FileSystem.downloadAsync(resultUri, fileUri);
       if (status === 200) {
-        const canShare = await Sharing.isAvailableAsync();
-        if (canShare) {
-          await Sharing.shareAsync(fileUri, { mimeType: 'image/jpeg', dialogTitle: 'Save or Share Image' });
-        } else {
-          Alert.alert('Saved', 'Image saved to app cache.');
-        }
+        // Use RN Share with file URL — opens native share sheet with "Save Image"
+        await Share.share({ url: fileUri });
       } else {
         throw new Error('Download returned status ' + status);
       }
