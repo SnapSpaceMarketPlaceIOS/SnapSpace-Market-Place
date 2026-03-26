@@ -1,3 +1,11 @@
+/**
+ * ShopTheLookScreen — Full-page view of a design post with shoppable products.
+ *
+ * Layout mirrors the Explore post detail exactly:
+ *   Image → divider → User row + Follow → divider → Title + Description
+ *   → divider → SHOP ROOM horizontal cards → FTC → Tags
+ *   → sticky Add All to Cart bottom bar
+ */
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -7,17 +15,18 @@ import {
   TouchableOpacity,
   Dimensions,
   Alert,
-  Linking,
 } from 'react-native';
 import CardImage from '../components/CardImage';
 import Svg, { Path, Circle, Polyline, Line } from 'react-native-svg';
 import { colors } from '../constants/colors';
+import { colors as C } from '../constants/theme';
 import { LinearGradient } from 'expo-linear-gradient';
-import { fontSize, fontWeight, letterSpacing, space, radius, shadow, typeScale } from '../constants/tokens';
+import { space, radius, shadow, typeScale, letterSpacing } from '../constants/tokens';
 import { useCart } from '../context/CartContext';
 import { getProductsForDesign } from '../services/affiliateProducts';
 
 const { width } = Dimensions.get('window');
+const IMG_RADIUS = Math.round((width - space.lg * 2) * 0.05);
 
 // ── Icons ──────────────────────────────────────────────────────────────────────
 
@@ -58,18 +67,6 @@ function CartWhiteIcon() {
   );
 }
 
-function AmazonLogoMark() {
-  return (
-    <View style={{ alignItems: 'flex-start' }}>
-      <Text style={{ fontSize: 6, fontWeight: '800', color: '#232F3E', letterSpacing: -0.2, lineHeight: 8 }}>amazon</Text>
-      <Svg width={18} height={4} viewBox="0 0 36 6" style={{ marginTop: 0 }}>
-        <Path d="M1 3 Q18 7 34 3" stroke="#FF9900" strokeWidth="2.5" fill="none" strokeLinecap="round" />
-        <Path d="M30.5 1 L34 3.2 L30.5 5.2" stroke="#FF9900" strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-      </Svg>
-    </View>
-  );
-}
-
 function StarIconSmall({ filled = true, size = 10 }) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24"
@@ -89,29 +86,26 @@ function ProductCard({ product, inCart, onAddToCart, onPress }) {
   const ratingVal = typeof product.rating === 'number' ? product.rating : parseFloat(product.rating) || 0;
 
   return (
-    <TouchableOpacity style={styles.hCard} activeOpacity={0.7} onPress={onPress}>
-      <CardImage uri={product.imageUrl} style={styles.hCardImg} resizeMode="cover" placeholderColor="#D0D7E3" />
-      <View style={styles.hCardBody}>
-        <Text style={styles.hCardName} numberOfLines={2}>{product.name}</Text>
-        <Text style={styles.hCardBrand} numberOfLines={1}>{product.brand}</Text>
-        {product.source === 'amazon' && (
-          <View style={{ marginTop: 2 }}><AmazonLogoMark /></View>
-        )}
+    <TouchableOpacity style={s.hCard} activeOpacity={0.7} onPress={onPress}>
+      <CardImage uri={product.imageUrl} style={s.hCardImg} resizeMode="cover" placeholderColor="#D0D7E3" />
+      <View style={s.hCardBody}>
+        <Text style={s.hCardName} numberOfLines={2}>{product.name}</Text>
+        <Text style={s.hCardBrand} numberOfLines={1}>{product.brand}</Text>
         {ratingVal > 0 && (
-          <View style={styles.hCardRating}>
+          <View style={s.hCardRating}>
             {[1,2,3,4,5].map(i => (
               <StarIconSmall key={i} size={10} filled={i <= Math.round(ratingVal)} />
             ))}
-            <Text style={styles.hCardRatingText}>{ratingVal.toFixed(1)}</Text>
+            <Text style={s.hCardRatingText}>{ratingVal.toFixed(1)}</Text>
             {!!product.reviewCount && (
-              <Text style={styles.hCardReviews}>({product.reviewCount.toLocaleString()})</Text>
+              <Text style={s.hCardReviews}>({product.reviewCount.toLocaleString()})</Text>
             )}
           </View>
         )}
-        <Text style={styles.hCardPrice}>{priceStr}</Text>
+        <Text style={s.hCardPrice}>{priceStr}</Text>
       </View>
       <TouchableOpacity
-        style={[styles.hCardAddBtn, inCart && styles.hCardAddBtnDone]}
+        style={[s.hCardAddBtn, inCart && s.hCardAddBtnDone]}
         activeOpacity={0.8}
         onPress={() => !inCart && onAddToCart(product)}
       >
@@ -153,10 +147,7 @@ export default function ShopTheLookScreen({ route, navigation }) {
   const handleAddAll = () => {
     let added = 0;
     products.forEach((p) => {
-      if (!isInCart(p)) {
-        handleAddToCart(p);
-        added++;
-      }
+      if (!isInCart(p)) { handleAddToCart(p); added++; }
     });
     if (added > 0) {
       Alert.alert('Added to Cart', `${added} item${added > 1 ? 's' : ''} added to your cart.`);
@@ -174,63 +165,67 @@ export default function ShopTheLookScreen({ route, navigation }) {
     return sum + num;
   }, 0);
 
-  return (
-    <View style={styles.container}>
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
+  const displayTitle = (design.title || design.prompt || 'My Space').replace('...', '');
+  const displayDesc  = design.description || design.prompt || '';
+  const displayUser  = design.user || 'you';
+  const displayInitial = design.initial || displayUser.charAt(0).toUpperCase();
 
-        {/* Header */}
-        <View style={styles.header}>
-          <TouchableOpacity style={styles.headerBtn} onPress={() => navigation.goBack()}>
+  return (
+    <View style={s.container}>
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={s.scrollContent}>
+
+        {/* ── Header ───────────────────────────────────────────────── */}
+        <View style={s.header}>
+          <TouchableOpacity style={s.headerBtn} onPress={() => navigation.goBack()}>
             <BackIcon />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Shop The Look</Text>
-          <TouchableOpacity
-            style={styles.headerBtn}
-            onPress={() => navigation.navigate('Main', { screen: 'Cart' })}
-          >
+          <Text style={s.headerTitle}>Shop The Look</Text>
+          <TouchableOpacity style={s.headerBtn} onPress={() => navigation.navigate('Main', { screen: 'Cart' })}>
             <CartNavIcon />
           </TouchableOpacity>
         </View>
 
-        {/* Post Hero Card */}
-        <View style={styles.postCard}>
-          <View style={styles.postImage}>
-            <CardImage uri={design.imageUrl} style={StyleSheet.absoluteFill} resizeMode="cover" />
-          </View>
-          <View style={styles.postInfo}>
-            <View style={styles.postUserRow}>
-              <View style={styles.postAvatar}>
-                <Text style={styles.postAvatarText}>{design.initial || (design.user || 'A').charAt(0).toUpperCase()}</Text>
-              </View>
-              <View style={{ flex: 1 }}>
-                <Text style={styles.postTitle} numberOfLines={1}>
-                  {(design.title || design.prompt || 'My Space').replace('...', '')}
-                </Text>
-                <Text style={styles.postUser}>@{design.user || 'Anthony'}</Text>
-              </View>
-            </View>
-          </View>
+        {/* ── Image (matches Explore — padded with border-radius) ── */}
+        <View style={s.imageWrap}>
+          <CardImage uri={design.imageUrl} style={s.image} resizeMode="cover" />
         </View>
 
-        {/* FTC */}
-        <Text style={styles.disclosure}>We may earn a commission on purchases. Prices may vary.</Text>
+        {/* ── User row + Follow ────────────────────────────────────── */}
+        <TouchableOpacity
+          style={s.userRow}
+          activeOpacity={0.75}
+          onPress={() => navigation?.navigate('UserProfile', { username: displayUser })}
+        >
+          <View style={s.avatar}>
+            <Text style={s.avatarText}>{displayInitial}</Text>
+          </View>
+          <View style={s.userInfo}>
+            <Text style={s.username} numberOfLines={1}>@{displayUser}</Text>
+            <Text style={s.userSub}>Tap to view profile</Text>
+          </View>
+          <TouchableOpacity style={s.followBtn} activeOpacity={0.8}>
+            <Text style={s.followBtnText}>Follow</Text>
+          </TouchableOpacity>
+        </TouchableOpacity>
 
-        {/* SHOP YOUR ROOM section */}
+        {/* ── Title + Description ──────────────────────────────────── */}
+        <Text style={s.title}>{displayTitle}</Text>
+        {!!displayDesc && displayDesc !== displayTitle && (
+          <Text style={s.desc} numberOfLines={3}>{displayDesc}</Text>
+        )}
+
+        {/* ── Divider before SHOP ROOM ─────────────────────────────── */}
+        <View style={s.divider} />
+
+        {/* ── SHOP ROOM — horizontal cards ─────────────────────────── */}
         {products.length > 0 && (
-          <View style={styles.productsSection}>
-            <View style={styles.shopHeaderRow}>
-              <View>
-                <Text style={styles.shopTitle}>SHOP YOUR ROOM</Text>
-                <Text style={styles.shopSubtitle}>Products matched to your design</Text>
-              </View>
-              <Text style={styles.productCount}>{products.length} items</Text>
-            </View>
+          <View style={s.productsSection}>
+            <Text style={s.sectionLabel}>SHOP ROOM</Text>
 
-            {/* Horizontal cards */}
             <ScrollView
               horizontal
               showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.hList}
+              contentContainerStyle={s.hList}
             >
               {products.map((product, index) => (
                 <ProductCard
@@ -242,32 +237,54 @@ export default function ShopTheLookScreen({ route, navigation }) {
                 />
               ))}
             </ScrollView>
+
+            {/* FTC Disclosure */}
+            <Text style={s.ftc}>We may earn a commission when you buy through links on this app.</Text>
+          </View>
+        )}
+
+        {/* ── Tags ─────────────────────────────────────────────────── */}
+        {design.tags && design.tags.length > 0 && (
+          <View style={s.tagsSection}>
+            <Text style={s.sectionLabel}>TAGS</Text>
+            <View style={s.tagsWrap}>
+              {design.tags.map((tag) => (
+                <View
+                  key={tag}
+                  style={[s.tag, (tag === '#AIGenerated' || tag === '#ShopTheLook') && s.tagHighlight]}
+                >
+                  <Text style={[s.tagText, (tag === '#AIGenerated' || tag === '#ShopTheLook') && s.tagTextHighlight]}>
+                    {tag}
+                  </Text>
+                </View>
+              ))}
+            </View>
           </View>
         )}
 
         <View style={{ height: 120 }} />
       </ScrollView>
 
-      {/* Bottom Bar */}
-      <View style={styles.bottomBar}>
+      {/* ── Sticky Bottom Bar ──────────────────────────────────────── */}
+      <View style={s.bottomBar}>
         <LinearGradient
           colors={['rgba(255,255,255,0)', '#FFFFFF']}
-          style={styles.bottomBarFade}
+          style={s.bottomBarFade}
           pointerEvents="none"
         />
-        <View style={styles.bottomInfo}>
-          <Text style={styles.bottomLabel}>{products.length} item{products.length !== 1 ? 's' : ''}</Text>
-          <Text style={styles.bottomTotal}>
+        <View style={s.bottomInfo}>
+          <Text style={s.bottomLabel}>{products.length} item{products.length !== 1 ? 's' : ''}</Text>
+          <Text style={s.bottomTotal}>
             Total: {totalPrice.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2 })}
           </Text>
         </View>
         <TouchableOpacity
-          style={[styles.addAllBtn, allInCart && styles.addAllBtnDone]}
+          style={[s.addAllBtn, allInCart && s.addAllBtnDone]}
           activeOpacity={0.85}
           onPress={handleAddAll}
         >
           {!allInCart && <CartWhiteIcon />}
-          <Text style={styles.addAllBtnText}>{allInCart ? '✓ All Added' : 'Add All to Cart'}</Text>
+          <Text style={s.addAllBtnText}>{allInCart ? '✓ All Added' : 'Add All to Cart'}</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -276,11 +293,11 @@ export default function ShopTheLookScreen({ route, navigation }) {
 
 // ── Styles ─────────────────────────────────────────────────────────────────────
 
-const styles = StyleSheet.create({
+const s = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#FFFFFF' },
   scrollContent: { paddingTop: space['5xl'], paddingBottom: space['2xl'] },
 
-  // Header
+  // ── Header ──
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -292,113 +309,154 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: radius.full,
-    backgroundColor: '#F4F4F6',
+    backgroundColor: C.surface,
     alignItems: 'center',
     justifyContent: 'center',
   },
   headerTitle: {
     fontSize: 17,
     fontWeight: '700',
-    color: '#111',
+    color: C.textPrimary,
     letterSpacing: letterSpacing.tight,
   },
 
-  // Post hero card
-  postCard: {
-    marginHorizontal: space.lg,
-    borderRadius: radius.xl,
-    overflow: 'hidden',
-    backgroundColor: '#F8FAFC',
-    marginBottom: space.lg,
-    borderWidth: 1,
-    borderColor: 'rgba(0,0,0,0.04)',
-    ...shadow.low,
+  // ── Image (padded, rounded — matches Explore) ──
+  imageWrap: {
+    paddingHorizontal: space.lg,
+    marginBottom: space.base,
   },
-  postImage: {
+  image: {
     width: '100%',
     aspectRatio: 4 / 3,
+    borderRadius: IMG_RADIUS,
     overflow: 'hidden',
+    backgroundColor: C.surface,
   },
-  postInfo: {
-    padding: space.base,
-  },
-  postUserRow: {
+
+  // ── User row ──
+  userRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: space.sm,
+    gap: 8,
+    marginHorizontal: space.lg,
+    paddingTop: space.base,
+    paddingBottom: space.md,
+    borderTopWidth: 1,
+    borderTopColor: C.border,
+    borderBottomWidth: 1,
+    borderBottomColor: C.border,
+    marginBottom: space.base,
   },
-  postAvatar: {
-    width: 32,
-    height: 32,
+  avatar: {
+    width: 40,
+    height: 40,
     borderRadius: radius.full,
-    backgroundColor: colors.bluePrimary,
+    backgroundColor: C.primary,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  postAvatarText: {
-    fontSize: 13,
+  avatarText: {
+    ...typeScale.caption,
+    color: '#fff',
     fontWeight: '700',
+  },
+  userInfo: { flex: 1 },
+  username: {
+    ...typeScale.headline,
+    color: C.textPrimary,
+  },
+  userSub: {
+    ...typeScale.caption,
+    color: C.textSecondary,
+    marginTop: 2,
+  },
+  followBtn: {
+    backgroundColor: C.primary,
+    borderRadius: radius.full,
+    height: 36,
+    paddingHorizontal: space.lg,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  followBtnText: {
+    ...typeScale.button,
     color: '#fff',
   },
-  postTitle: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: '#111',
+
+  // ── Title + Description ──
+  title: {
+    ...typeScale.title,
+    color: C.textPrimary,
+    marginHorizontal: space.lg,
+    marginBottom: 6,
   },
-  postUser: {
-    fontSize: 12,
-    color: '#9CA3AF',
-    marginTop: 1,
+  desc: {
+    ...typeScale.body,
+    color: C.textSecondary,
+    marginHorizontal: space.lg,
+    marginBottom: space.base,
   },
 
-  // Disclosure
-  disclosure: {
-    fontSize: 11,
-    color: '#C0C0C8',
-    textAlign: 'center',
-    paddingHorizontal: space.lg,
-    marginBottom: space.lg,
-    fontStyle: 'italic',
+  // ── Divider ──
+  divider: {
+    height: 1,
+    backgroundColor: C.border,
+    marginHorizontal: space.lg,
+    marginBottom: space.base,
   },
 
-  // SHOP YOUR ROOM section
+  // ── SHOP ROOM section ──
   productsSection: {
     paddingLeft: space.lg,
   },
-  shopHeaderRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    paddingRight: space.lg,
-    marginBottom: 12,
-  },
-  shopTitle: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: '#9CA3AF',
-    letterSpacing: 1.5,
-    textTransform: 'uppercase',
-  },
-  shopSubtitle: {
-    fontSize: 13,
-    fontWeight: '400',
-    color: '#67ACE9',
-    marginTop: 3,
-  },
-  productCount: {
-    fontSize: 13,
-    fontWeight: '500',
-    color: '#9CA3AF',
-    marginTop: 2,
+  sectionLabel: {
+    ...typeScale.subheadline,
+    color: C.textTertiary,
+    marginBottom: space.md,
   },
   hList: {
     gap: 10,
     paddingRight: space.lg,
     paddingBottom: 4,
-    paddingTop: 2,
+  },
+  ftc: {
+    fontSize: 11,
+    fontStyle: 'italic',
+    color: C.textTertiary,
+    textAlign: 'center',
+    marginTop: space.base,
+    marginBottom: space.sm,
+    paddingRight: space.lg,
   },
 
-  // Horizontal product cards
+  // ── Tags ──
+  tagsSection: {
+    paddingHorizontal: space.lg,
+    marginTop: space.lg,
+  },
+  tagsWrap: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  tag: {
+    backgroundColor: C.surface2,
+    borderRadius: radius.sm,
+    paddingHorizontal: space.md,
+    paddingVertical: space.xs,
+  },
+  tagHighlight: {
+    backgroundColor: C.primaryLight,
+  },
+  tagText: {
+    ...typeScale.caption,
+    color: C.textSecondary,
+  },
+  tagTextHighlight: {
+    color: C.primary,
+  },
+
+  // ── Horizontal product cards ──
   hCard: {
     width: 170,
     backgroundColor: '#FFFFFF',
@@ -406,7 +464,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(0,0,0,0.06)',
     overflow: 'hidden',
-    ...shadow.low,
   },
   hCardImg: {
     width: '100%',
@@ -421,13 +478,13 @@ const styles = StyleSheet.create({
   hCardName: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#111',
+    color: C.textPrimary,
     lineHeight: 17,
   },
   hCardBrand: {
     fontSize: 11,
     fontWeight: '400',
-    color: '#9CA3AF',
+    color: C.textTertiary,
     marginTop: 1,
   },
   hCardRating: {
@@ -439,17 +496,17 @@ const styles = StyleSheet.create({
   hCardRatingText: {
     fontSize: 10,
     fontWeight: '600',
-    color: '#111',
+    color: C.textPrimary,
     marginLeft: 2,
   },
   hCardReviews: {
     fontSize: 10,
-    color: '#6B7280',
+    color: C.textSecondary,
   },
   hCardPrice: {
     fontSize: 14,
     fontWeight: '700',
-    color: colors.bluePrimary,
+    color: C.primary,
     marginTop: 4,
   },
   hCardAddBtn: {
@@ -459,7 +516,7 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: 14,
-    backgroundColor: colors.bluePrimary,
+    backgroundColor: C.primary,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -467,7 +524,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#34C759',
   },
 
-  // Bottom bar
+  // ── Bottom bar ──
   bottomBar: {
     position: 'absolute',
     bottom: 0,
@@ -480,7 +537,7 @@ const styles = StyleSheet.create({
     paddingTop: space.md,
     backgroundColor: '#FFFFFF',
     borderTopWidth: 1,
-    borderTopColor: 'rgba(0,0,0,0.06)',
+    borderTopColor: C.border,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: -1 },
     shadowOpacity: 0.03,
@@ -493,18 +550,16 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     height: 24,
-    pointerEvents: 'none',
   },
   bottomInfo: { flex: 1 },
   bottomLabel: {
-    fontSize: 12,
+    ...typeScale.caption,
     fontWeight: '500',
-    color: '#9CA3AF',
+    color: C.textTertiary,
   },
   bottomTotal: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#111',
+    ...typeScale.title,
+    color: C.textPrimary,
     letterSpacing: letterSpacing.tight,
     marginTop: 2,
   },
@@ -512,7 +567,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: colors.bluePrimary,
+    backgroundColor: C.primary,
     borderRadius: radius.button,
     height: 52,
     paddingHorizontal: space.lg,

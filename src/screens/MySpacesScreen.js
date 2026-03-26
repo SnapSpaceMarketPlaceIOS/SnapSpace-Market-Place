@@ -154,16 +154,22 @@ function SpaceDetailModal({ design, visible, onClose, navigation }) {
             <CardImage uri={design.image_url} style={s.modalImg} resizeMode="cover" />
           </View>
 
+          {/* Divider */}
+          <View style={s.modalDivider} />
+
           {/* YOUR PROMPT */}
           <Text style={s.promptLabel}>YOUR PROMPT</Text>
           <Text style={s.promptText}>{design.prompt}</Text>
 
-          {/* SHOP YOUR ROOM header with action icons */}
+          {/* Divider */}
+          <View style={s.modalDivider} />
+
+          {/* SHOP ROOM header with action icons */}
           {products.length > 0 && (
             <View style={s.productsSection}>
               <View style={s.shopHeaderRow}>
                 <View>
-                  <Text style={s.shopTitle}>SHOP YOUR ROOM</Text>
+                  <Text style={s.shopTitle}>SHOP ROOM</Text>
                   <Text style={s.shopSubtitle}>Products matched to your design</Text>
                 </View>
                 <View style={s.shopActions}>
@@ -368,13 +374,19 @@ const s = StyleSheet.create({
     aspectRatio: 3 / 4,
     borderRadius: 12,
   },
+  modalDivider: {
+    height: 1,
+    backgroundColor: 'rgba(0,0,0,0.06)',
+    marginHorizontal: 20,
+    marginVertical: 16,
+  },
   promptLabel: {
     fontSize: 11,
     fontWeight: '600',
     color: '#9CA3AF',
     letterSpacing: 1,
     textTransform: 'uppercase',
-    marginTop: 24,
+    marginTop: 0,
     marginHorizontal: 20,
   },
   promptText: {
