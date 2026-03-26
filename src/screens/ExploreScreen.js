@@ -40,8 +40,8 @@ function colWidthPct(cols) {
   return '50%';
 }
 
-// 5% corner radius for the modal hero image (width minus 20px padding each side)
-const MODAL_IMG_RADIUS = Math.round((width - SP[5] * 2) * 0.05);
+// 2.5% corner radius for the modal hero image (halved from 5%)
+const MODAL_IMG_RADIUS = Math.round((width - SP[5] * 2) * 0.025);
 // Product thumbnail — 1/3 larger than original 56px
 const PRODUCT_IMG_SIZE = 88;
 

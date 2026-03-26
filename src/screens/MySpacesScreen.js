@@ -372,7 +372,7 @@ const s = StyleSheet.create({
   modalImg: {
     width: '100%',
     aspectRatio: 3 / 4,
-    borderRadius: 12,
+    borderRadius: 9,
   },
   modalDivider: {
     height: 1,

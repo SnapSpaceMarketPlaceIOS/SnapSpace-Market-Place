@@ -26,7 +26,7 @@ import { useCart } from '../context/CartContext';
 import { getProductsForDesign } from '../services/affiliateProducts';
 
 const { width } = Dimensions.get('window');
-const IMG_RADIUS = Math.round((width - space.lg * 2) * 0.05);
+const IMG_RADIUS = Math.round((width - space.lg * 2) * 0.025);
 
 // ── Icons ──────────────────────────────────────────────────────────────────────
 
