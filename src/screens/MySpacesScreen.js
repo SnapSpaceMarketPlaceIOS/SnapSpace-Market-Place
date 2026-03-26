@@ -24,7 +24,7 @@ import {
   Share,
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
-import Svg, { Path, Line, Polyline, Circle } from 'react-native-svg';
+import Svg, { Path, Line, Circle } from 'react-native-svg';
 import { useFocusEffect } from '@react-navigation/native';
 import CardImage from '../components/CardImage';
 import { useAuth } from '../context/AuthContext';
@@ -51,19 +51,31 @@ const CloseIcon = () => (
   </Svg>
 );
 
+// 531-309 "Load_circle_light" — download (arrow down + arc tray)
 const DownloadIcon = () => (
-  <Svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="#6B7280" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-    <Path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-    <Polyline points="7 10 12 15 17 10" />
-    <Line x1={12} y1={15} x2={12} y2={3} />
+  <Svg width={22} height={22} viewBox="0 0 30 30" fill="none">
+    <Path
+      d="M6.54815 18.5147C7.04668 20.3752 8.1452 22.0193 9.67334 23.1918C11.2015 24.3644 13.0738 25 15 25C16.9262 25 18.7985 24.3644 20.3267 23.1918C21.8548 22.0193 22.9533 20.3752 23.4519 18.5147"
+      stroke="#111827" strokeWidth={1.4} strokeLinecap="round"
+    />
+    <Path
+      d="M15 16.25L14.6877 16.6404L15 16.8903L15.3123 16.6404L15 16.25ZM15.5 5C15.5 4.72386 15.2761 4.5 15 4.5C14.7239 4.5 14.5 4.72386 14.5 5L15 5L15.5 5ZM8.75 11.25L8.43765 11.6404L14.6877 16.6404L15 16.25L15.3123 15.8596L9.06235 10.8596L8.75 11.25ZM15 16.25L15.3123 16.6404L21.5623 11.6404L21.25 11.25L20.9377 10.8596L14.6877 15.8596L15 16.25ZM15 16.25L15.5 16.25L15.5 5L15 5L14.5 5L14.5 16.25L15 16.25Z"
+      fill="#111827"
+    />
   </Svg>
 );
 
+// 531-313 "Download_circle_light" — share (arrow up + arc tray)
 const ShareIcon = () => (
-  <Svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="#6B7280" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-    <Circle cx={18} cy={5} r={3} /><Circle cx={6} cy={12} r={3} /><Circle cx={18} cy={19} r={3} />
-    <Line x1={8.59} y1={13.51} x2={15.42} y2={17.49} />
-    <Line x1={15.41} y1={6.51} x2={8.59} y2={10.49} />
+  <Svg width={22} height={22} viewBox="0 0 30 30" fill="none">
+    <Path
+      d="M6.54815 18.5147C7.04668 20.3752 8.1452 22.0193 9.67334 23.1918C11.2015 24.3644 13.0738 25 15 25C16.9262 25 18.7985 24.3644 20.3267 23.1918C21.8548 22.0193 22.9533 20.3752 23.4519 18.5147"
+      stroke="#111827" strokeWidth={1.4} strokeLinecap="round"
+    />
+    <Path
+      d="M15 5L14.6877 4.60957L15 4.35969L15.3123 4.60957L15 5ZM15.5 16.25C15.5 16.5261 15.2761 16.75 15 16.75C14.7239 16.75 14.5 16.5261 14.5 16.25L15 16.25L15.5 16.25ZM8.75 10L8.43765 9.60957L14.6877 4.60957L15 5L15.3123 5.39043L9.06235 10.3904L8.75 10ZM15 5L15.3123 4.60957L21.5623 9.60957L21.25 10L20.9377 10.3904L14.6877 5.39043L15 5ZM15 5L15.5 5L15.5 16.25L15 16.25L14.5 16.25L14.5 5L15 5Z"
+      fill="#111827"
+    />
   </Svg>
 );
 
@@ -393,7 +405,7 @@ const s = StyleSheet.create({
   },
   shopSubtitle: {
     fontSize: 13,
-    color: '#6B7280',
+    color: '#67ACE9',
     marginTop: 3,
   },
   shopActions: { flexDirection: 'row', gap: 8 },

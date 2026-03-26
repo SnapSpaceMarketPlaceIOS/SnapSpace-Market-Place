@@ -42,34 +42,48 @@ function BackIcon() {
   );
 }
 
-function ShareIcon() {
+// ── Figma-exact action icons (node IDs 531-309, 531-323, 531-313) ──────────────
+
+// 531-309 "Load_circle_light" — download arrow (points down) + bottom arc tray
+function FigmaLoadIcon({ size = 22 }) {
   return (
-    <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke={colors.white} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-      <Circle cx={18} cy={5} r={3} />
-      <Circle cx={6} cy={12} r={3} />
-      <Circle cx={18} cy={19} r={3} />
-      <Line x1={8.59} y1={13.51} x2={15.42} y2={17.49} />
-      <Line x1={15.41} y1={6.51} x2={8.59} y2={10.49} />
+    <Svg width={size} height={size} viewBox="0 0 30 30" fill="none">
+      <Path
+        d="M6.54815 18.5147C7.04668 20.3752 8.1452 22.0193 9.67334 23.1918C11.2015 24.3644 13.0738 25 15 25C16.9262 25 18.7985 24.3644 20.3267 23.1918C21.8548 22.0193 22.9533 20.3752 23.4519 18.5147"
+        stroke="#111827" strokeWidth={1.4} strokeLinecap="round"
+      />
+      <Path
+        d="M15 16.25L14.6877 16.6404L15 16.8903L15.3123 16.6404L15 16.25ZM15.5 5C15.5 4.72386 15.2761 4.5 15 4.5C14.7239 4.5 14.5 4.72386 14.5 5L15 5L15.5 5ZM8.75 11.25L8.43765 11.6404L14.6877 16.6404L15 16.25L15.3123 15.8596L9.06235 10.8596L8.75 11.25ZM15 16.25L15.3123 16.6404L21.5623 11.6404L21.25 11.25L20.9377 10.8596L14.6877 15.8596L15 16.25ZM15 16.25L15.5 16.25L15.5 5L15 5L14.5 5L14.5 16.25L15 16.25Z"
+        fill="#111827"
+      />
     </Svg>
   );
 }
 
-function PostIcon() {
+// 531-323 "Subtract" — solid black circle with white + punched through
+function FigmaSubtractIcon({ size = 28 }) {
   return (
-    <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke={colors.white} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-      <Path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
-      <Polyline points="16 6 12 2 8 6" />
-      <Line x1={12} y1={2} x2={12} y2={15} />
+    <Svg width={size} height={size} viewBox="0 0 30 30" fill="none">
+      <Path
+        d="M15 0C23.2843 0 30 6.71573 30 15C30 23.2843 23.2843 30 15 30C6.71573 30 0 23.2843 0 15C0 6.71573 6.71573 0 15 0ZM15 6.16602C14.7241 6.16602 14.5004 6.39017 14.5 6.66602V14.5H6.66699C6.39085 14.5 6.16699 14.7239 6.16699 15C6.16699 15.2761 6.39085 15.5 6.66699 15.5H14.5V23.333C14.5 23.6091 14.7239 23.833 15 23.833C15.2761 23.833 15.5 23.6091 15.5 23.333V15.5H23.333C23.609 15.4998 23.833 15.276 23.833 15C23.833 14.724 23.609 14.5002 23.333 14.5H15.5V6.66602C15.4996 6.39017 15.2759 6.16602 15 6.16602Z"
+        fill="#111827"
+      />
     </Svg>
   );
 }
 
-function DownloadIcon() {
+// 531-313 "Download_circle_light" — share arrow (points up) + bottom arc tray
+function FigmaShareIcon({ size = 22 }) {
   return (
-    <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke={colors.white} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-      <Path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-      <Polyline points="7 10 12 15 17 10" />
-      <Line x1={12} y1={15} x2={12} y2={3} />
+    <Svg width={size} height={size} viewBox="0 0 30 30" fill="none">
+      <Path
+        d="M6.54815 18.5147C7.04668 20.3752 8.1452 22.0193 9.67334 23.1918C11.2015 24.3644 13.0738 25 15 25C16.9262 25 18.7985 24.3644 20.3267 23.1918C21.8548 22.0193 22.9533 20.3752 23.4519 18.5147"
+        stroke="#111827" strokeWidth={1.4} strokeLinecap="round"
+      />
+      <Path
+        d="M15 5L14.6877 4.60957L15 4.35969L15.3123 4.60957L15 5ZM15.5 16.25C15.5 16.5261 15.2761 16.75 15 16.75C14.7239 16.75 14.5 16.5261 14.5 16.25L15 16.25L15.5 16.25ZM8.75 10L8.43765 9.60957L14.6877 4.60957L15 5L15.3123 5.39043L9.06235 10.3904L8.75 10ZM15 5L15.3123 4.60957L21.5623 9.60957L21.25 10L20.9377 10.3904L14.6877 5.39043L15 5ZM15 5L15.5 5L15.5 16.25L15 16.25L14.5 16.25L14.5 5L15 5Z"
+        fill="#111827"
+      />
     </Svg>
   );
 }
@@ -349,15 +363,19 @@ export default function RoomResultScreen({ route, navigation }) {
             </View>
             <View style={styles.shopActions}>
               <TouchableOpacity style={styles.shopActionBtn} onPress={handleSaveToPhotos} disabled={saving}>
-                <DownloadIcon />
+                {saving
+                  ? <ActivityIndicator size="small" color="#111827" />
+                  : <FigmaLoadIcon size={22} />}
               </TouchableOpacity>
-              {resultUri && !posted && user && (
-                <TouchableOpacity style={styles.shopActionBtn} onPress={() => setShowPostModal(true)}>
-                  <PostIcon />
+              {resultUri && user && (
+                <TouchableOpacity style={[styles.shopActionBtn, styles.shopActionBtnPost]} onPress={() => setShowPostModal(true)} disabled={posting || posted}>
+                  {posting
+                    ? <ActivityIndicator size="small" color="#fff" />
+                    : <FigmaSubtractIcon size={28} />}
                 </TouchableOpacity>
               )}
               <TouchableOpacity style={styles.shopActionBtn} onPress={handleShare}>
-                <ShareIcon />
+                <FigmaShareIcon size={22} />
               </TouchableOpacity>
             </View>
           </View>
@@ -609,20 +627,27 @@ const styles = StyleSheet.create({
   shopSectionSub: {
     fontSize: 13,
     fontWeight: '400',
-    color: '#6B7280',
+    color: '#67ACE9',
     marginTop: 3,
   },
   shopActions: {
     flexDirection: 'row',
     gap: 6,
+    alignItems: 'center',
   },
   shopActionBtn: {
-    width: 34,
-    height: 34,
-    borderRadius: 17,
-    backgroundColor: 'rgba(0,0,0,0.06)',
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#F3F4F6',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  shopActionBtnPost: {
+    backgroundColor: 'transparent',
+    width: 32,
+    height: 32,
+    borderRadius: 16,
   },
   disclosure: {
     fontSize: 10,
