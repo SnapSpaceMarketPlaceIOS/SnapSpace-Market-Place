@@ -24,7 +24,7 @@ import {
   Share,
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
-import Svg, { Path, Line, Circle } from 'react-native-svg';
+import Svg, { Path, Line, Polyline, Circle } from 'react-native-svg';
 import { useFocusEffect } from '@react-navigation/native';
 import CardImage from '../components/CardImage';
 import { useAuth } from '../context/AuthContext';

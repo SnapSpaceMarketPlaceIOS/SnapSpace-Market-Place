@@ -26,6 +26,7 @@ import { useAuth } from '../context/AuthContext';
 import { getProductsForPrompt, getSourceLabel, getSourceColor } from '../services/affiliateProducts';
 import { saveUserDesign } from '../services/supabase';
 import * as FileSystem from 'expo-file-system/legacy';
+import * as Sharing from 'expo-sharing';
 
 const { width, height } = Dimensions.get('window');
 
@@ -203,8 +204,14 @@ export default function RoomResultScreen({ route, navigation }) {
   ).current;
 
   const handleShare = async () => {
+    // Share the prompt + image URL so recipients can view the generated design
     try {
-      await Share.share({ message: `Check out my AI room design on SnapSpace: "${prompt}"` });
+      const shareMsg = `Check out my AI room design on SnapSpace!\n\n"${prompt}"`;
+      if (resultUri) {
+        await Share.share({ message: shareMsg + `\n\n${resultUri}` });
+      } else {
+        await Share.share({ message: shareMsg });
+      }
     } catch (e) {}
   };
 
@@ -212,12 +219,26 @@ export default function RoomResultScreen({ route, navigation }) {
     if (!resultUri || saving) return;
     setSaving(true);
     try {
-      // Download to local file first — iOS share sheet shows "Save Image" for local files
-      const fileUri = FileSystem.cacheDirectory + 'snapspace_design_' + Date.now() + '.webp';
-      await FileSystem.downloadAsync(resultUri, fileUri);
-      await Share.share({ url: fileUri });
+      // Download to local cache, then open iOS share sheet (includes "Save Image" option)
+      const fileUri = FileSystem.cacheDirectory + 'snapspace_design_' + Date.now() + '.jpg';
+      const { status } = await FileSystem.downloadAsync(resultUri, fileUri);
+      if (status === 200) {
+        const canShare = await Sharing.isAvailableAsync();
+        if (canShare) {
+          await Sharing.shareAsync(fileUri, { mimeType: 'image/jpeg', dialogTitle: 'Save or Share Image' });
+        } else {
+          Alert.alert('Saved', 'Image saved to app cache.');
+        }
+      } else {
+        throw new Error('Download returned status ' + status);
+      }
     } catch (e) {
-      Alert.alert('Save Failed', 'Could not save the image. Please try again.');
+      // Fallback: share the remote URL directly if download fails
+      try {
+        await Share.share({ message: `My SnapSpace AI design: "${prompt}"\n\n${resultUri}` });
+      } catch {
+        Alert.alert('Could Not Save', 'Please screenshot the image to save it.');
+      }
     } finally {
       setSaving(false);
     }

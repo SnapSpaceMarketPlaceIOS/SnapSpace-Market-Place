@@ -860,6 +860,7 @@ export default function HomeScreen({ navigation, route }) {
   const handleDownload = async () => {
     if (!resultData?.resultUri) return;
     try {
+      // Try local download first → opens iOS share sheet with "Save Image"
       const file = await downloadResultImage();
       if (!file) return;
       const canShare = await Sharing.isAvailableAsync();
@@ -869,30 +870,47 @@ export default function HomeScreen({ navigation, route }) {
           dialogTitle: 'Save Image',
           UTI: file.ext === 'webp' ? 'org.webmproject.webp' : 'public.jpeg',
         });
-      } else {
-        Alert.alert('Not Available', 'Sharing is not available on this device.');
       }
     } catch (err) {
-      console.log('[Download] Error:', err);
-      Alert.alert('Save Failed', err.message || 'Could not save image. Please try again.');
+      // Fallback: share the remote URL so user can save from browser
+      console.log('[Download] Local download failed, sharing URL:', err.message);
+      try {
+        const prompt = resultData.prompt || 'My AI design';
+        await Share.share({
+          message: `My SnapSpace AI design: "${prompt}"\n\n${resultData.resultUri}`,
+        });
+      } catch {
+        Alert.alert('Could Not Save', 'Please screenshot the image to save it to your camera roll.');
+      }
     }
   };
 
   const handleShare = async () => {
     if (!resultData?.resultUri) return;
+    // Share the prompt + image URL — recipient gets a viewable link
+    const prompt = resultData.prompt || 'My AI design';
+    const shareText = `Check out my AI room design on SnapSpace!\n\n"${prompt}"\n\n${resultData.resultUri}`;
     try {
+      // Try to download and share the actual image file first
       const file = await downloadResultImage();
-      if (!file) return;
-      const canShare = await Sharing.isAvailableAsync();
-      if (canShare) {
-        await Sharing.shareAsync(file.localUri, {
-          mimeType: file.mime,
-          dialogTitle: 'Share your AI design',
-        });
+      if (file) {
+        const canShare = await Sharing.isAvailableAsync();
+        if (canShare) {
+          await Sharing.shareAsync(file.localUri, {
+            mimeType: file.mime,
+            dialogTitle: 'Share your AI design',
+          });
+          return;
+        }
       }
     } catch (err) {
+      console.log('[Share] File download failed, sharing URL:', err.message);
+    }
+    // Fallback: share text + URL directly
+    try {
+      await Share.share({ message: shareText });
+    } catch (err) {
       console.log('[Share] Error:', err);
-      Alert.alert('Share Failed', 'Could not share image. Please try again.');
     }
   };
 
