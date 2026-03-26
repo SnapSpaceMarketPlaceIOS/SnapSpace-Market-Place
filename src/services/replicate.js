@@ -10,24 +10,23 @@ const POLL_INTERVAL_MS = 3000;
 const MAX_POLLS = 80; // 3s × 80 = 4 min timeout
 
 /**
- * Upload image to Replicate Files API.
+ * Convert image to a data URI that Replicate can read.
  *
- * Root cause of all previous failures: iOS returns AVIF/HEIC files from the
- * photo library. The file URI points to the original AVIF, but expo-image-picker
- * with quality option already converts to JPEG in the base64 field.
+ * Strategy:
+ * 1. Use picker's base64 if available (expo-image-picker with quality < 1 → JPEG)
+ * 2. Fall back to reading file URI as base64
+ * 3. Detect format and build a proper data URI
  *
- * Strategy: use the picker's base64 (guaranteed JPEG) → write to a .jpg file
- * → upload via native FormData. If no base64, fall back to reading from URI.
+ * Uses data URI instead of Files API to eliminate upload/download intermediary
+ * and ensure the model receives exactly what we send.
  */
-async function uploadForReplicate(imageUri, base64Data) {
+async function imageToDataUri(imageUri, base64Data) {
   let b64;
 
   if (base64Data && base64Data.length > 100) {
-    // Use the picker's pre-converted JPEG base64 directly
-    console.log('[Replicate] Using picker base64 (guaranteed JPEG), length:', base64Data.length);
+    console.log('[Replicate] Using picker base64, length:', base64Data.length);
     b64 = base64Data;
   } else {
-    // Fallback: read from URI (may be AVIF/HEIC — risky but sometimes works)
     console.log('[Replicate] No picker base64, reading from URI...');
     b64 = await FileSystem.readAsStringAsync(imageUri, { encoding: 'base64' });
     console.log('[Replicate] Read base64 from URI, length:', b64.length);
@@ -37,24 +36,37 @@ async function uploadForReplicate(imageUri, base64Data) {
     throw new Error('No image data available');
   }
 
-  // Log format detection: JPEG base64 starts with /9j/, PNG with iVBOR, AVIF with AAAA
+  // Format detection: JPEG starts with /9j/, PNG with iVBOR
   const prefix = b64.substring(0, 8);
   const isJpeg = prefix.startsWith('/9j/');
-  console.log('[Replicate] Format check — prefix:', prefix, 'isJPEG:', isJpeg);
+  const isPng = prefix.startsWith('iVBOR');
+  console.log('[Replicate] Format — prefix:', prefix, 'JPEG:', isJpeg, 'PNG:', isPng);
 
-  // Write JPEG base64 to a real file in cache
+  if (!isJpeg && !isPng) {
+    // Not JPEG or PNG — likely HEIC/AVIF from iOS
+    // Try uploading via Files API as a fallback (Replicate may convert)
+    console.warn('[Replicate] Non-JPEG/PNG detected, attempting Files API upload...');
+    return uploadViaFilesApi(imageUri, b64);
+  }
+
+  const mime = isPng ? 'image/png' : 'image/jpeg';
+  console.log('[Replicate] Using data URI approach, mime:', mime);
+  return `data:${mime};base64,${b64}`;
+}
+
+/**
+ * Fallback: upload via Replicate Files API for non-JPEG/PNG images.
+ * Some formats may still fail on the model side.
+ */
+async function uploadViaFilesApi(imageUri, b64) {
   const tempPath = FileSystem.cacheDirectory + 'replicate_upload_' + Date.now() + '.jpg';
   await FileSystem.writeAsStringAsync(tempPath, b64, { encoding: 'base64' });
 
   const info = await FileSystem.getInfoAsync(tempPath);
-  console.log('[Replicate] Temp file size:', info.size, 'bytes');
-
   if (!info.exists || info.size < 100) {
     throw new Error('Failed to write temp image file');
   }
 
-  // Upload via native FormData
-  console.log('[Replicate] Uploading to Files API...');
   const form = new FormData();
   form.append('content', {
     uri: tempPath,
@@ -68,23 +80,14 @@ async function uploadForReplicate(imageUri, base64Data) {
     body: form,
   });
 
-  // Clean up
   FileSystem.deleteAsync(tempPath, { idempotent: true }).catch(() => {});
 
   const json = await res.json();
-  console.log('[Replicate] Upload status:', res.status, 'API size:', json?.size, 'local size:', info.size);
-
   if (!res.ok) {
     throw new Error(`Image upload failed (${res.status}): ${json?.detail || 'Unknown error'}`);
   }
-
   if (!json?.urls?.get) {
     throw new Error('Upload succeeded but no file URL returned');
-  }
-
-  // Verify sizes match
-  if (json.size && Math.abs(json.size - info.size) > 10) {
-    console.warn('[Replicate] SIZE MISMATCH — API:', json.size, 'vs local:', info.size);
   }
 
   return json.urls.get;
@@ -101,8 +104,9 @@ async function uploadForReplicate(imageUri, base64Data) {
 export async function generateInteriorDesign(imageUri, prompt, base64) {
   if (!TOKEN) throw new Error('Replicate API token is missing. Add EXPO_PUBLIC_REPLICATE_API_TOKEN to your .env file.');
 
-  const controlImage = await uploadForReplicate(imageUri, base64);
-  console.log('[Replicate] control_image URL:', controlImage);
+  const controlImage = await imageToDataUri(imageUri, base64);
+  const isDataUri = controlImage.startsWith('data:');
+  console.log('[Replicate] control_image:', isDataUri ? `data URI (${controlImage.length} chars)` : controlImage);
 
   const res = await fetch(`${API_URL}/predictions`, {
     method: 'POST',
@@ -153,7 +157,11 @@ async function pollUntilDone(id) {
     }
 
     if (prediction.status === 'failed' || prediction.status === 'canceled') {
-      throw new Error(prediction.error || 'AI generation failed. Please try again.');
+      const errMsg = prediction.error || '';
+      if (errMsg.includes('UnidentifiedImageError') || errMsg.includes('cannot identify image')) {
+        throw new Error('The image format is not supported. Please try a different photo from your library.');
+      }
+      throw new Error(errMsg || 'AI generation failed. Please try again.');
     }
   }
   throw new Error('AI generation timed out after 4 minutes. Please try again.');

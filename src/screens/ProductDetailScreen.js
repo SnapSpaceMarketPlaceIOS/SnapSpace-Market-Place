@@ -30,6 +30,7 @@ import {
   View,
   Text,
   ScrollView,
+  FlatList,
   StyleSheet,
   TouchableOpacity,
   Dimensions,
@@ -45,7 +46,7 @@ import { SellerName } from '../components/VerifiedBadge';
 import { shadow } from '../constants/tokens';
 
 const { width: SW, height: SH } = Dimensions.get('window');
-const IMAGE_H     = Math.round(SW * 0.75);  // 3:4 ratio off screen width — device-agnostic, never clips
+const IMAGE_H     = Math.round(SW * 1.0);   // full square — edges touch sides, tall hero
 const CARD_LIFT   = 24;   // px the white card overlaps the hero
 
 // ─── Design tokens (PDP-local, all values are token-aligned) ─────────────────
@@ -221,18 +222,48 @@ const LayersIcon  = () => <Svg width={18} height={18} viewBox="0 0 24 24" fill="
 const DropletIcon = () => <Svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke={T.blue} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round"><Path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" /></Svg>;
 const WrenchIcon  = () => <Svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke={T.blue} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round"><Path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" /></Svg>;
 
-// ─── S0: ProductHero ──────────────────────────────────────────────────────────
+// ─── S0: ProductHero (swipeable image carousel via FlatList) ─────────────────
 
-function ProductHero({ imageUrl, liked, onBack, onLike, onShare, topInset }) {
+function ProductHero({ images, imageUrl, liked, onBack, onLike, onShare, topInset }) {
+  const [activeIdx, setActiveIdx] = useState(0);
+  const heroImages = (images && images.length > 0) ? images : (imageUrl ? [imageUrl] : [null]);
+  const hasMultiple = heroImages.length > 1;
+
+  const onViewableChanged = useRef(({ viewableItems }) => {
+    if (viewableItems.length > 0) setActiveIdx(viewableItems[0].index ?? 0);
+  }).current;
+
+  const viewConfig = useRef({ viewAreaCoveragePercentThreshold: 50 }).current;
+
   return (
     <View style={hs.root}>
-      {/* Full image — contain shows 100% of product, no crop, no zoom */}
-      <CardImage
-        uri={imageUrl}
-        style={hs.img}
-        resizeMode="contain"
-        placeholderColor={T.heroBg}
+      <FlatList
+        data={heroImages}
+        keyExtractor={(_, i) => String(i)}
+        horizontal
+        pagingEnabled
+        showsHorizontalScrollIndicator={false}
+        onViewableItemsChanged={onViewableChanged}
+        viewabilityConfig={viewConfig}
+        renderItem={({ item: uri }) => (
+          <CardImage
+            uri={uri}
+            style={hs.img}
+            resizeMode="cover"
+            placeholderColor={T.heroBg}
+          />
+        )}
       />
+
+      {/* Page dots */}
+      {hasMultiple && (
+        <View style={hs.dots}>
+          {heroImages.map((_, i) => (
+            <View key={i} style={[hs.dot, i === activeIdx && hs.dotActive]} />
+          ))}
+        </View>
+      )}
+
       {/* Floating nav */}
       <View style={[hs.topBar, { paddingTop: topInset + 14 }]}>
         <TouchableOpacity style={hs.navBtn} onPress={onBack}
@@ -255,13 +286,14 @@ function ProductHero({ imageUrl, liked, onBack, onLike, onShare, topInset }) {
 }
 
 const hs = StyleSheet.create({
-  // Root = exact image frame — width 100%, height = 75% of screen width (3:4 device-agnostic)
-  root:     { width: '100%', height: IMAGE_H, backgroundColor: '#F0F2F5' },
-  // Image fills the frame fully — contain renders 100% of photo, no crop
-  img:      { width: '100%', height: '100%' },
-  topBar:   { position: 'absolute', top: 0, left: 0, right: 0, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: T.padH },
-  topRight: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  navBtn:   { width: 42, height: 42, borderRadius: 21, backgroundColor: 'rgba(255,255,255,0.92)', alignItems: 'center', justifyContent: 'center', ...shadow.medium },
+  root:      { width: SW, height: IMAGE_H, backgroundColor: '#F0F2F5' },
+  img:       { width: SW, height: IMAGE_H },
+  topBar:    { position: 'absolute', top: 0, left: 0, right: 0, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: T.padH },
+  topRight:  { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  navBtn:    { width: 42, height: 42, borderRadius: 21, backgroundColor: 'rgba(255,255,255,0.92)', alignItems: 'center', justifyContent: 'center', ...shadow.medium },
+  dots:      { position: 'absolute', bottom: 34, left: 0, right: 0, flexDirection: 'row', justifyContent: 'center', gap: 6 },
+  dot:       { width: 7, height: 7, borderRadius: 4, backgroundColor: 'rgba(0,0,0,0.2)' },
+  dotActive: { backgroundColor: '#111', width: 9, height: 9, borderRadius: 5 },
 });
 
 // ─── S1: ProductIdentity ──────────────────────────────────────────────────────
@@ -270,6 +302,7 @@ const hs = StyleSheet.create({
 function ProductIdentity({ brand, title, description, rating, reviewCount, inStock }) {
   const ratingVal   = typeof rating === 'number' ? rating : parseFloat(rating) || 4.0;
   const filledStars = Math.round(ratingVal);
+  const displayReviews = reviewCount ?? 0;
 
   return (
     <View style={id.wrap}>
@@ -298,7 +331,7 @@ function ProductIdentity({ brand, title, description, rating, reviewCount, inSto
           <StarIcon key={i} size={15} filled={i <= filledStars} />
         ))}
         <Text style={id.score}>{ratingVal.toFixed(1)}</Text>
-        <Text style={id.reviews}>({(reviewCount ?? 128).toLocaleString()} Reviews )</Text>
+        <Text style={id.reviews}>({displayReviews.toLocaleString()} {displayReviews === 1 ? 'Review' : 'Reviews'})</Text>
         <ChevRight size={12} color={T.txtSec} />
       </TouchableOpacity>
     </View>
@@ -306,62 +339,97 @@ function ProductIdentity({ brand, title, description, rating, reviewCount, inSto
 }
 
 const id = StyleSheet.create({
-  wrap:      { paddingHorizontal: T.padH, paddingTop: 22 },
+  wrap:      { paddingHorizontal: T.padH, paddingTop: 28 },
+  bestSeller:   { backgroundColor: '#FFF4E6', borderRadius: 6, paddingHorizontal: 10, paddingVertical: 5, alignSelf: 'flex-start', marginBottom: 10 },
+  bestSellerTxt:{ fontSize: 12, fontWeight: T.w700, color: '#B45309', lineHeight: 16 },
   title:     { fontSize: 22, fontWeight: T.w700, color: T.txtPri, lineHeight: 29, letterSpacing: -0.3 },
-  desc:      { fontSize: 14, fontWeight: T.w400, color: T.txtSec, lineHeight: 22, marginTop: 8 },
-  byRow:     { flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 10 },
+  desc:      { fontSize: 14, fontWeight: T.w400, color: T.txtSec, lineHeight: 22, marginTop: 10 },
+  byRow:     { flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 14 },
   byLine:    { fontSize: 14, fontWeight: T.w400, color: T.blue, lineHeight: 20 },
   stockPill: { flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: T.greenBg, borderRadius: T.rPill, paddingHorizontal: 7, paddingVertical: 3, borderWidth: 1, borderColor: T.green },
   dot:       { width: 5, height: 5, borderRadius: 3, backgroundColor: T.green },
   stockTxt:  { fontSize: 11, fontWeight: T.w600, color: T.green, lineHeight: 14 },
-  ratingRow: { flexDirection: 'row', alignItems: 'center', gap: 3, marginTop: 10 },
+  ratingRow: { flexDirection: 'row', alignItems: 'center', gap: 3, marginTop: 14 },
   score:     { fontSize: 14, fontWeight: T.w600, color: T.txtPri, lineHeight: 18, marginLeft: 3 },
   reviews:   { fontSize: 13, fontWeight: T.w400, color: T.txtSec, lineHeight: 18 },
 });
 
-// ─── S2: SnapSpace Verified Badge ─────────────────────────────────────────────
+// ─── S2: Best Seller Badge ────────────────────────────────────────────────────
 
-function SnapSpaceVerified() {
+function BestSellerBadge({ text }) {
+  if (!text) return null;
   return (
     <View style={vb.wrap}>
       <View style={vb.pill}>
-        <CheckBadgeIcon />
-        <Text style={vb.label}>This Item Is SnapSpace Verified</Text>
+        {/* Shipping truck icon — pure blue, no fill */}
+        <Svg width={16} height={16} viewBox="0 0 24 24" fill="none"
+          stroke={T.blue} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+          <Rect x={1} y={3} width={15} height={13} fill="none" />
+          <Polyline points="16 8 20 8 23 11 23 16 16 16 16 8" />
+          <Circle cx={5.5} cy={18.5} r={2.5} fill="none" />
+          <Circle cx={18.5} cy={18.5} r={2.5} fill="none" />
+        </Svg>
+        <Text style={vb.label}>{text}</Text>
       </View>
     </View>
   );
 }
 
 const vb = StyleSheet.create({
-  wrap: { paddingHorizontal: T.padH, marginTop: 14 },
-  // alignSelf: 'flex-start' shrinks the pill to content width — same span as the rating row
-  // borderRadius: 10 ≈ 5% corner radius on a ~40px tall element
-  pill: { flexDirection: 'row', alignItems: 'center', alignSelf: 'flex-start', backgroundColor: T.blue, borderRadius: 10, paddingVertical: 11, paddingHorizontal: 18, gap: 7 },
-  label: { fontSize: 13, fontWeight: T.w600, color: '#FFFFFF', lineHeight: 18 },
+  wrap: { paddingHorizontal: T.padH, marginTop: 24 },
+  pill: { flexDirection: 'row', alignItems: 'center', alignSelf: 'flex-start', backgroundColor: '#FFFFFF', borderRadius: 10, borderWidth: 1, borderColor: T.blue, paddingVertical: 8, paddingHorizontal: 14, gap: 6 },
+  label: { fontSize: 13, fontWeight: T.w600, color: T.blue, lineHeight: 18 },
 });
 
 // ─── S3: VariantSelector ──────────────────────────────────────────────────────
 
+// Detect variant type from data to show smart label
+function getVariantLabel(variants) {
+  if (!variants || variants.length === 0) return null;
+  const hasColor  = variants.some(v => v.color || v.swatchImage);
+  const hasSize   = variants.some(v => /inch|cm|size|small|medium|large/i.test(v.label));
+  const hasShape  = variants.some(v => /round|oval|square|rectangle/i.test(v.label));
+  if (hasColor && hasSize) return 'Color & Size';
+  if (hasColor) return 'Color';
+  if (hasSize)  return 'Size';
+  if (hasShape) return 'Shape';
+  return 'Style';
+}
+
 function VariantSelector({ variants, selectedId, onSelect }) {
+  if (!variants || variants.length === 0) return null;
+  const label = getVariantLabel(variants);
   return (
     <View style={va.wrap}>
-      <Text style={va.hint}>Color, Size, Shape, Etc...</Text>
+      <Text style={va.hint}>{label}</Text>
       <ScrollView horizontal showsHorizontalScrollIndicator={false}
         contentContainerStyle={va.scroll}>
-        {(variants ?? []).map((v) => {
+        {variants.map((v) => {
           const active = v.id === selectedId;
           return (
             <TouchableOpacity key={v.id}
-              style={[va.tile, active && va.tileOn]}
+              style={[va.tile, active ? va.tileOn : va.tileOff]}
               onPress={() => onSelect(v.id)}
-              activeOpacity={0.75}>
-              {/* Color preview square — only shown when color data exists */}
-              {v.color && (
-                <View style={[va.colorBlock, { backgroundColor: v.color }]} />
-              )}
-              <Text style={[va.tileLabel, active && va.tileLabelOn]}>
-                {v.label}
-              </Text>
+              activeOpacity={0.8}>
+              {/* Image area — fixed height, no overlap with label */}
+              <View style={va.imgArea}>
+                {v.swatchImage ? (
+                  <CardImage
+                    uri={v.swatchImage}
+                    style={va.swatchImg}
+                    resizeMode="contain"
+                    placeholderColor="#F0F2F5"
+                  />
+                ) : v.color ? (
+                  <View style={[va.colorBlock, { backgroundColor: v.color }]} />
+                ) : null}
+              </View>
+              {/* Label sits cleanly below image — no overlap */}
+              <View style={va.labelRow}>
+                <Text style={[va.tileLabel, active && va.tileLabelOn]} numberOfLines={2}>
+                  {v.label}
+                </Text>
+              </View>
             </TouchableOpacity>
           );
         })}
@@ -371,16 +439,69 @@ function VariantSelector({ variants, selectedId, onSelect }) {
 }
 
 const va = StyleSheet.create({
-  wrap:       { paddingTop: 18 },
-  hint:       { fontSize: 12, fontWeight: T.w400, color: T.txtSec, lineHeight: 16, paddingHorizontal: T.padH, marginBottom: 10 },
-  scroll:     { paddingHorizontal: T.padH, gap: 10 },
-  // Tile: tall rectangle, color block fills top portion, label at bottom
-  tile:       { width: 100, height: 96, borderRadius: T.rVariant, borderWidth: 1.5, borderColor: T.border, backgroundColor: T.surface, overflow: 'hidden', justifyContent: 'flex-end' },
-  tileOn:     { borderColor: T.blue, borderWidth: 1 },
-  // Color block fills top 58px of the tile
-  colorBlock: { position: 'absolute', top: 0, left: 0, right: 0, height: 58 },
-  tileLabel:  { fontSize: 12, fontWeight: T.w400, color: T.txtSec, textAlign: 'center', paddingBottom: 8, paddingTop: 4, paddingHorizontal: 4, backgroundColor: T.surface },
-  tileLabelOn:{ fontWeight: T.w600, color: T.txtPri },
+  wrap:       { paddingTop: 28 },
+  hint:       { fontSize: 13, fontWeight: T.w600, color: T.txtPri, lineHeight: 18, paddingHorizontal: T.padH, marginBottom: 12 },
+  scroll:     { paddingHorizontal: T.padH, gap: 12 },
+  tile:       { width: 120, borderRadius: T.rVariant, backgroundColor: '#FFFFFF', overflow: 'hidden', flexDirection: 'column' },
+  tileOff:    { borderWidth: 1, borderColor: T.border },
+  tileOn:     { borderWidth: 1, borderColor: T.blue },
+  imgArea:    { width: '100%', height: 88, backgroundColor: '#FFFFFF' },
+  swatchImg:  { width: '100%', height: '100%' },
+  colorBlock: { width: '100%', height: '100%' },
+  labelRow:   { paddingVertical: 8, paddingHorizontal: 6, minHeight: 36, justifyContent: 'center', backgroundColor: T.surface },
+  tileLabel:  { fontSize: 11, fontWeight: T.w400, color: T.txtSec, textAlign: 'center', lineHeight: 15 },
+  tileLabelOn:{ fontWeight: T.w700, color: T.txtPri },
+});
+
+// ─── S3b: SizeSelector ───────────────────────────────────────────────────────
+
+function SizeSelector({ sizes }) {
+  const [selectedIdx, setSelectedIdx] = useState(0);
+  if (!sizes || sizes.length === 0) return null;
+  return (
+    <View style={sz.wrap}>
+      <Text style={sz.label}>Size: <Text style={sz.labelBold}>{sizes[selectedIdx]?.label}</Text></Text>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={sz.scroll}>
+        {sizes.map((s, i) => {
+          const active = i === selectedIdx;
+          return (
+            <TouchableOpacity
+              key={s.id || i}
+              style={[sz.tile, active && sz.tileActive]}
+              onPress={() => setSelectedIdx(i)}
+              activeOpacity={0.75}
+            >
+              <Text style={[sz.sizeLabel, active && sz.sizeLabelActive]}>{s.label}</Text>
+              {s.price != null && (
+                <Text style={[sz.sizePrice, active && sz.sizePriceActive]}>${s.price.toFixed(2)}</Text>
+              )}
+              {s.compareAt != null && s.compareAt !== s.price && (
+                <Text style={sz.sizeCompare}>${s.compareAt.toFixed(2)}</Text>
+              )}
+              {s.inStock !== false && (
+                <Text style={sz.sizeStock}>In Stock</Text>
+              )}
+            </TouchableOpacity>
+          );
+        })}
+      </ScrollView>
+    </View>
+  );
+}
+
+const sz = StyleSheet.create({
+  wrap:            { paddingHorizontal: T.padH, marginTop: 24 },
+  label:           { fontSize: 14, fontWeight: T.w400, color: T.txtPri, marginBottom: 10 },
+  labelBold:       { fontWeight: T.w700 },
+  scroll:          { gap: 10 },
+  tile:            { borderWidth: 1, borderColor: T.border, borderRadius: T.rMd, paddingHorizontal: 16, paddingVertical: 10, minWidth: 120 },
+  tileActive:      { borderColor: T.blue, borderWidth: 1 },
+  sizeLabel:       { fontSize: 14, fontWeight: T.w600, color: T.txtPri, lineHeight: 20 },
+  sizeLabelActive: { color: T.txtPri },
+  sizePrice:       { fontSize: 13, fontWeight: T.w400, color: T.txtPri, lineHeight: 18, marginTop: 2 },
+  sizePriceActive: { fontWeight: T.w600 },
+  sizeCompare:     { fontSize: 12, fontWeight: T.w400, color: T.txtSec, textDecorationLine: 'line-through', lineHeight: 16 },
+  sizeStock:       { fontSize: 11, fontWeight: T.w600, color: T.green, marginTop: 3, lineHeight: 14 },
 });
 
 // ─── S4: ProductDescription ───────────────────────────────────────────────────
@@ -419,54 +540,27 @@ function FTCNote() {
 }
 
 const ftc = StyleSheet.create({
-  txt: { fontSize: 11, fontWeight: T.w400, color: T.txtMeta, fontStyle: 'italic', textAlign: 'center', marginTop: 14, marginHorizontal: T.padH },
+  txt: { fontSize: 11, fontWeight: T.w400, color: T.txtMeta, fontStyle: 'italic', textAlign: 'center', marginTop: 24, marginHorizontal: T.padH },
 });
 
 // ─── S6: PriceBlock ───────────────────────────────────────────────────────────
 
-function PriceBlock({ price, originalPrice, monthlyAmt, payments = 15, apr = 'X' }) {
-  const hasDiscount   = !!originalPrice;
-  const hasFinancing  = !!monthlyAmt;
+function PriceBlock({ price, originalPrice }) {
+  const hasDiscount = !!originalPrice;
   return (
     <View style={pr.wrap}>
-      {/* Left: current + strikethrough */}
-      <View style={pr.left}>
-        <Text style={pr.price}>{price}</Text>
-        {hasDiscount && (
-          <Text style={pr.original}>{originalPrice}</Text>
-        )}
-      </View>
-
-      {/* Divider + financing */}
-      {hasFinancing && (
-        <>
-          <View style={pr.vLine} />
-          <View style={pr.right}>
-            <Text style={pr.monthly}>
-              <Text style={pr.moAmt}>{monthlyAmt}</Text>
-              <Text style={pr.moLabel}>/mo </Text>
-              <Text style={pr.moNote}>in {payments} Payments starting at</Text>
-            </Text>
-            <Text style={pr.apr}>{apr}% APR  With After Pay</Text>
-          </View>
-        </>
+      <Text style={pr.price}>{price}</Text>
+      {hasDiscount && (
+        <Text style={pr.original}>{originalPrice}</Text>
       )}
     </View>
   );
 }
 
 const pr = StyleSheet.create({
-  wrap:     { flexDirection: 'row', alignItems: 'center', paddingHorizontal: T.padH, marginTop: 20 },
-  left:     { flexDirection: 'column' },
+  wrap:     { flexDirection: 'row', alignItems: 'center', gap: 14, paddingHorizontal: T.padH, marginTop: 24 },
   price:    { fontSize: 28, fontWeight: T.w800, color: T.blue, letterSpacing: -0.5, lineHeight: 34 },
-  original: { fontSize: 14, fontWeight: T.w400, color: T.txtSec, textDecorationLine: 'line-through', lineHeight: 18, marginTop: 2 },
-  vLine:    { width: 1, height: 44, backgroundColor: T.divider, marginHorizontal: 14 },
-  right:    { flex: 1, flexShrink: 1 },
-  monthly:  { fontSize: 13, color: T.txtPri, lineHeight: 19, flexWrap: 'wrap' },
-  moAmt:    { fontSize: 16, fontWeight: T.w700, color: T.blue },
-  moLabel:  { fontSize: 13, fontWeight: T.w400 },
-  moNote:   { fontSize: 13, fontWeight: T.w400, color: T.txtPri },
-  apr:      { fontSize: 12, fontWeight: T.w400, color: T.txtSec, marginTop: 2 },
+  original: { fontSize: 15, fontWeight: T.w400, color: T.txtSec, textDecorationLine: 'line-through', lineHeight: 20 },
 });
 
 // ─── S7: DeliveryBox ─────────────────────────────────────────────────────────
@@ -474,23 +568,20 @@ const pr = StyleSheet.create({
 function DeliveryBox({ date }) {
   return (
     <TouchableOpacity style={dv.box} activeOpacity={0.75}>
-      <View style={dv.left}>
-        <View style={dv.greenPill}>
-          <Text style={dv.greenTxt}>Free Fast Delivery</Text>
-        </View>
-        <Text style={dv.date}>Get it by {date}</Text>
+      <View style={dv.greenPill}>
+        <Text style={dv.greenTxt}>Free Fast Delivery</Text>
       </View>
-      <ChevRight size={16} color={T.blue} />
+      <Text style={dv.date}>Get it by {date}</Text>
+      <ChevRight size={14} color={T.blue} />
     </TouchableOpacity>
   );
 }
 
 const dv = StyleSheet.create({
-  box:      { marginHorizontal: T.padH, marginTop: 16, borderWidth: 0.75, borderColor: T.blue, borderRadius: T.rMd, paddingVertical: 14, paddingHorizontal: 16, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: T.surface },
-  left:     { flex: 1, gap: 5 },
-  greenPill:{ alignSelf: 'flex-start', backgroundColor: '#F0FDF4', borderRadius: T.rPill, paddingHorizontal: 10, paddingVertical: 4, borderWidth: 1, borderColor: T.green },
-  greenTxt: { fontSize: 12, fontWeight: T.w600, color: T.green, lineHeight: 16 },
-  date:     { fontSize: 14, fontWeight: T.w400, color: T.txtPri, lineHeight: 20 },
+  box:      { marginHorizontal: T.padH, marginTop: 14, borderWidth: 1, borderColor: T.blue, borderRadius: 30, paddingVertical: 8, paddingHorizontal: 14, flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: T.surface },
+  greenPill:{ backgroundColor: '#F0FDF4', borderRadius: T.rPill, paddingHorizontal: 10, paddingVertical: 4, borderWidth: 1, borderColor: T.green },
+  greenTxt: { fontSize: 11, fontWeight: T.w600, color: T.green, lineHeight: 15 },
+  date:     { flex: 1, fontSize: 13, fontWeight: T.w400, color: T.txtPri, lineHeight: 18 },
 });
 
 // ─── S8: QuantitySelector ────────────────────────────────────────────────────
@@ -524,18 +615,32 @@ function QuantitySelector({ qty, onDecrease, onIncrease }) {
 const qs = StyleSheet.create({
   // Single pill container — all three elements (−, count, +) live inside one rounded border
   wrap:      { flexDirection: 'row', alignItems: 'center', paddingHorizontal: T.padH, marginTop: 16 },
-  pill:      { flexDirection: 'row', alignItems: 'center', borderWidth: 1.5, borderColor: T.border, borderRadius: T.rPill, backgroundColor: T.surface, overflow: 'hidden' },
-  btn:       { width: 44, height: 44, alignItems: 'center', justifyContent: 'center' },
+  pill:      { flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: T.border, borderRadius: T.rPill, backgroundColor: T.surface, overflow: 'hidden' },
+  btn:       { width: 28, height: 28, alignItems: 'center', justifyContent: 'center' },
   btnDim:    { opacity: 0.32 },
-  divider:   { width: 1, height: 24, backgroundColor: T.border },
-  symbol:    { fontSize: 22, fontWeight: T.w400, color: T.txtPri, lineHeight: 26, marginTop: -2 },
+  divider:   { width: 1, height: 16, backgroundColor: T.border },
+  symbol:    { fontSize: 16, fontWeight: T.w400, color: T.txtPri, lineHeight: 20 },
   symbolDim: { color: T.txtMeta },
-  count:     { fontSize: 17, fontWeight: T.w600, color: T.txtPri, width: 48, textAlign: 'center', lineHeight: 24 },
+  count:     { fontSize: 14, fontWeight: T.w600, color: T.txtPri, width: 36, textAlign: 'center', lineHeight: 20 },
 });
 
 // ─── S9: ProductDetails ───────────────────────────────────────────────────────
 
 function ProductDetails({ details }) {
+  const [open, setOpen] = useState(false);
+  const rotation = useRef(new Animated.Value(0)).current;
+
+  const toggle = () => {
+    Animated.timing(rotation, {
+      toValue: open ? 0 : 1,
+      duration: 200,
+      useNativeDriver: true,
+    }).start();
+    setOpen(o => !o);
+  };
+
+  const rotate = rotation.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '180deg'] });
+
   const rows = details
     ? Object.entries(details)
     : [
@@ -547,24 +652,39 @@ function ProductDetails({ details }) {
         ['Delivery',   '2–4 weeks'],
         ['Warranty',   '2-year limited'],
       ];
+
   return (
     <View style={pdt.wrap}>
-      <Text style={pdt.sLabel}>PRODUCT DETAILS</Text>
-      <View style={pdt.card}>
-        {rows.map(([k, v], i) => (
-          <View key={k} style={[pdt.row, i === rows.length - 1 && pdt.rowLast]}>
-            <Text style={pdt.key}>{k}</Text>
-            <Text style={pdt.val}>{v}</Text>
-          </View>
-        ))}
-      </View>
+      <TouchableOpacity style={pdt.header} onPress={toggle} activeOpacity={0.7}>
+        <View style={pdt.headerLeft}>
+          <View style={pdt.headerAccent} />
+          <Text style={pdt.sLabel}>PRODUCT DETAILS</Text>
+        </View>
+        <Animated.View style={{ transform: [{ rotate }] }}>
+          <ChevRight size={16} color={T.txtSec} />
+        </Animated.View>
+      </TouchableOpacity>
+
+      {open && (
+        <View style={pdt.card}>
+          {rows.map(([k, v], i) => (
+            <View key={k} style={[pdt.row, i === rows.length - 1 && pdt.rowLast]}>
+              <Text style={pdt.key}>{k}</Text>
+              <Text style={pdt.val}>{v}</Text>
+            </View>
+          ))}
+        </View>
+      )}
     </View>
   );
 }
 
 const pdt = StyleSheet.create({
-  wrap:    { paddingHorizontal: T.padH, marginTop: 24 },
-  sLabel:  { fontSize: 10, fontWeight: T.w600, color: T.txtSec, letterSpacing: 1.0, textTransform: 'uppercase', lineHeight: 14 },
+  wrap:    { paddingHorizontal: T.padH, marginTop: 32 },
+  header:       { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 },
+  headerLeft:   { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  headerAccent: { width: 3, height: 14, borderRadius: 2, backgroundColor: T.blue },
+  sLabel:       { fontSize: 11, fontWeight: T.w700, color: T.txtSec, letterSpacing: 1.2, textTransform: 'uppercase' },
   card:    { backgroundColor: T.surface, borderRadius: T.rMd, borderWidth: 1, borderColor: T.border, marginTop: 12, overflow: 'hidden' },
   row:     { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', height: 52, paddingHorizontal: T.padH, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: T.divider },
   rowLast: { borderBottomWidth: 0 },
@@ -587,49 +707,71 @@ const DEF_FEATURES = [
 ];
 
 function KeyFeatures({ features }) {
+  const [open, setOpen] = useState(false);
+  const rotation = useRef(new Animated.Value(0)).current;
+
+  const toggle = () => {
+    Animated.timing(rotation, {
+      toValue: open ? 0 : 1,
+      duration: 200,
+      useNativeDriver: true,
+    }).start();
+    setOpen(o => !o);
+  };
+
+  const rotate = rotation.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '180deg'] });
+
   const items = features ?? DEF_FEATURES;
   return (
     <View style={kf.wrap}>
-      {/* Section header with blue left-accent */}
-      <View style={kf.headerRow}>
-        <View style={kf.headerAccent} />
-        <Text style={kf.sLabel}>KEY FEATURES</Text>
-      </View>
+      {/* Section header — tappable, chevron rotates */}
+      <TouchableOpacity style={kf.headerRow} onPress={toggle} activeOpacity={0.7}>
+        <View style={kf.headerLeft}>
+          <View style={kf.headerAccent} />
+          <Text style={kf.sLabel}>KEY FEATURES</Text>
+        </View>
+        <Animated.View style={{ transform: [{ rotate }] }}>
+          <ChevRight size={16} color={T.txtSec} />
+        </Animated.View>
+      </TouchableOpacity>
 
       {/* Single panel — all rows inside */}
-      <View style={kf.panel}>
-        {items.map((f, i) => (
-          <View key={i}>
-            <View style={kf.row}>
-              {/* Left: number + icon stacked */}
-              <View style={kf.leftCol}>
-                <Text style={kf.num}>{String(i + 1).padStart(2, '0')}</Text>
-                <View style={kf.iconCircle}>
-                  {f.Icon ? <f.Icon /> : null}
+      {open && (
+        <View style={kf.panel}>
+          {items.map((f, i) => (
+            <View key={i}>
+              <View style={kf.row}>
+                {/* Left: number + icon stacked */}
+                <View style={kf.leftCol}>
+                  <Text style={kf.num}>{String(i + 1).padStart(2, '0')}</Text>
+                  <View style={kf.iconCircle}>
+                    {f.Icon ? <f.Icon /> : null}
+                  </View>
+                </View>
+
+                {/* Right: title + benefit copy */}
+                <View style={kf.rightCol}>
+                  <Text style={kf.featureName}>{f.label}</Text>
+                  {!!f.sub && <Text style={kf.featureSub}>{f.sub}</Text>}
                 </View>
               </View>
 
-              {/* Right: title + benefit copy */}
-              <View style={kf.rightCol}>
-                <Text style={kf.featureName}>{f.label}</Text>
-                {!!f.sub && <Text style={kf.featureSub}>{f.sub}</Text>}
-              </View>
+              {/* Hairline divider — not after last row */}
+              {i < items.length - 1 && <View style={kf.divider} />}
             </View>
-
-            {/* Hairline divider — not after last row */}
-            {i < items.length - 1 && <View style={kf.divider} />}
-          </View>
-        ))}
-      </View>
+          ))}
+        </View>
+      )}
     </View>
   );
 }
 
 const kf = StyleSheet.create({
-  wrap:        { paddingHorizontal: T.padH, marginTop: 28 },
+  wrap:        { paddingHorizontal: T.padH, marginTop: 32 },
 
   // Header with blue left-accent bar
-  headerRow:   { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 14 },
+  headerRow:   { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 },
+  headerLeft:  { flexDirection: 'row', alignItems: 'center', gap: 8 },
   headerAccent:{ width: 3, height: 14, borderRadius: 2, backgroundColor: T.blue },
   sLabel:      { fontSize: 11, fontWeight: T.w700, color: T.txtSec, letterSpacing: 1.2, textTransform: 'uppercase' },
 
@@ -661,7 +803,7 @@ const TRUST = [
 
 function TrustBadges() {
   return (
-    <View style={{ marginTop: 24 }}>
+    <View style={{ marginTop: 32 }}>
       <ScrollView horizontal showsHorizontalScrollIndicator={false}
         contentContainerStyle={{ paddingHorizontal: T.padH, gap: 12 }}>
         {TRUST.map((b, i) => (
@@ -690,7 +832,7 @@ const tb = StyleSheet.create({
 function SimilarProducts({ products, onPress }) {
   if (!products?.length) return null;
   return (
-    <View style={{ marginTop: 28 }}>
+    <View style={{ marginTop: 32 }}>
       <Text style={sp.sLabel}>YOU MAY ALSO LIKE</Text>
       <ScrollView horizontal showsHorizontalScrollIndicator={false}
         contentContainerStyle={{ paddingHorizontal: T.padH, paddingTop: 12, gap: 12 }}>
@@ -748,7 +890,7 @@ function FromPostSection({ design }) {
 }
 
 const fp = StyleSheet.create({
-  wrap:      { marginHorizontal: T.padH, marginTop: 24, backgroundColor: '#F8F9FB', borderRadius: T.rMd, padding: 14 },
+  wrap:      { marginHorizontal: T.padH, marginTop: 32, backgroundColor: '#F8F9FB', borderRadius: T.rMd, padding: 14 },
   sLabel:    { fontSize: 10, fontWeight: T.w600, color: T.txtSec, letterSpacing: 1.0, textTransform: 'uppercase', marginBottom: 10 },
   row:       { flexDirection: 'row', alignItems: 'center', gap: 10 },
   avatar:    { width: 30, height: 30, borderRadius: 15, backgroundColor: T.blue, alignItems: 'center', justifyContent: 'center' },
@@ -788,27 +930,22 @@ const sth = StyleSheet.create({
 //   a fixed-height container. Neither label affects the other's layout.
 //   The outer View uses flex:1 so the button fills all horizontal space.
 
-function CTABar({ inCart, liked, onAddToCart, onWishlist, affiliateUrl, source, cartLabelOpacity, addedLabelOpacity, bottomInset }) {
-  const btnScale  = useRef(new Animated.Value(1)).current;
-  const wishScale = useRef(new Animated.Value(1)).current;
+function CTABar({ inCart, onAddToCart, affiliateUrl, source, cartLabelOpacity, addedLabelOpacity, bottomInset }) {
+  const [isPressed, setIsPressed] = useState(false);
+  const btnScale = useRef(new Animated.Value(1)).current;
 
   const handleCart = () => {
     Animated.sequence([
       Animated.timing(btnScale, { toValue: 0.97, duration: 90, useNativeDriver: true }),
-      Animated.spring(btnScale,  { toValue: 1, useNativeDriver: true, damping: 12, stiffness: 300 }),
+      Animated.spring(btnScale, { toValue: 1, useNativeDriver: true, damping: 12, stiffness: 300 }),
     ]).start();
     onAddToCart();
   };
 
-  const handleWish = () => {
-    Animated.sequence([
-      Animated.timing(wishScale, { toValue: 1.25, duration: 100, useNativeDriver: true }),
-      Animated.spring(wishScale,  { toValue: 1, useNativeDriver: true, damping: 10, stiffness: 300 }),
-    ]).start();
-    onWishlist();
-  };
-
   const pb = Math.max(bottomInset, 12);
+
+  // Color logic: pressed or inCart → blue bg + white text; default → white bg + blue text
+  const btnFilled = isPressed || inCart;
 
   return (
     <View style={[cta.bar, { paddingBottom: pb }]}>
@@ -824,44 +961,29 @@ function CTABar({ inCart, liked, onAddToCart, onWishlist, affiliateUrl, source, 
         </TouchableOpacity>
       )}
 
-      {/* Buttons row */}
-      <View style={cta.row}>
-
-        {/* Add to Cart */}
-        <Animated.View style={[cta.cartWrap, { transform: [{ scale: btnScale }] }]}>
-          <TouchableOpacity
-            style={[cta.cartBtn, inCart && cta.cartBtnGreen]}
-            onPress={handleCart}
-            activeOpacity={1}
-            accessibilityLabel={inCart ? 'View cart' : 'Add to cart'}>
-            {inCart ? <CheckIconWhite /> : <CartIconWhite />}
-            {/*
-              FIXED: both labels are position:'absolute' inside a height:22 container.
-              No label pushes the other — zero vertical displacement.
-            */}
-            <View style={cta.labelBox}>
-              <Animated.Text style={[cta.label, { opacity: cartLabelOpacity }]}>
-                {inCart ? 'View Cart' : 'Add to Cart'}
-              </Animated.Text>
-              <Animated.Text style={[cta.label, { opacity: addedLabelOpacity }]}>
-                Added!
-              </Animated.Text>
-            </View>
-          </TouchableOpacity>
-        </Animated.View>
-
-        {/* Wishlist heart */}
-        <Animated.View style={{ transform: [{ scale: wishScale }] }}>
-          <TouchableOpacity
-            style={[cta.wishBtn, liked && cta.wishBtnOn]}
-            onPress={handleWish}
-            activeOpacity={0.8}
-            accessibilityLabel={liked ? 'Remove from wishlist' : 'Save to wishlist'}>
-            <HeartIcon filled={liked} size={22} />
-          </TouchableOpacity>
-        </Animated.View>
-
-      </View>
+      {/* CTA button — full width pill */}
+      <Animated.View style={[cta.cartWrap, { transform: [{ scale: btnScale }] }]}>
+        <TouchableOpacity
+          style={[cta.cartBtn, btnFilled && cta.cartBtnFilled]}
+          onPress={handleCart}
+          onPressIn={() => setIsPressed(true)}
+          onPressOut={() => setIsPressed(false)}
+          activeOpacity={1}
+          accessibilityLabel={inCart ? 'View cart' : 'Add to cart'}>
+          {/*
+            Both labels are position:'absolute' inside a fixed-height container.
+            Neither label affects the other's layout — zero vertical displacement.
+          */}
+          <View style={cta.labelBox}>
+            <Animated.Text style={[cta.label, { opacity: cartLabelOpacity, color: btnFilled ? '#FFFFFF' : T.blue }]}>
+              {inCart ? 'View Cart' : 'Add to Cart'}
+            </Animated.Text>
+            <Animated.Text style={[cta.label, { opacity: addedLabelOpacity, color: btnFilled ? '#FFFFFF' : T.blue }]}>
+              Added!
+            </Animated.Text>
+          </View>
+        </TouchableOpacity>
+      </Animated.View>
     </View>
   );
 }
@@ -887,32 +1009,25 @@ const cta = StyleSheet.create({
   affiliateRow: { alignItems: 'center', marginBottom: 10 },
   affiliateTxt: { fontSize: 12, fontWeight: T.w500, color: T.txtSec, lineHeight: 16 },
 
-  // ── Buttons row ───────────────────────────────────────────────────────────
-  row: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-
-  // ── Add to Cart button ────────────────────────────────────────────────────
+  // ── Add to Cart button — full-width pill ─────────────────────────────────
   cartWrap:     { flex: 1 },
   cartBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: T.blue,
-    borderRadius: 16,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 9999,
+    borderWidth: 1.5,
+    borderColor: T.blue,
     height: 56,
-    gap: 10,
-    // Subtle inner shadow illusion with opacity — feels dimensional
-    shadowColor: T.blueDeep,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.30,
-    shadowRadius: 8,
-    elevation: 4,
   },
-  cartBtnGreen: { backgroundColor: T.green, shadowColor: T.green },
+  cartBtnFilled: {
+    backgroundColor: T.blue,
+  },
 
-  // ── Label box — FIXED width so icon + label centre as one unit ────────────
-  // Both animated labels stack absolutely inside — no layout shift ever
+  // ── Label box — both labels stack absolutely, zero displacement ───────────
   labelBox: {
-    width: 116,          // fixed: wide enough for "Add to Cart" at 16/700
+    width: 140,
     height: 22,
     position: 'relative',
   },
@@ -921,27 +1036,9 @@ const cta = StyleSheet.create({
     top: 0, left: 0, right: 0,
     fontSize: 16,
     fontWeight: T.w700,
-    color: '#FFFFFF',
     lineHeight: 22,
     textAlign: 'center',
     letterSpacing: 0.1,
-  },
-
-  // ── Wishlist / Heart button ───────────────────────────────────────────────
-  // Matches cart button height exactly; border-radius mirrors cart btn
-  wishBtn: {
-    width: 56,
-    height: 56,
-    borderRadius: 16,
-    backgroundColor: T.surface,
-    borderWidth: 1.5,
-    borderColor: 'rgba(0,0,0,0.10)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  wishBtnOn: {
-    borderColor: T.red,
-    backgroundColor: '#FFF1F2',
   },
 });
 
@@ -965,8 +1062,8 @@ export default function ProductDetailScreen({ route, navigation }) {
   // ── Product data (from route, with fallbacks) ─────────────────────────────
   const name         = product?.name         ?? 'Vento Sofa, Italian Leather';
   const brand        = product?.brand        ?? 'POLY & BARK';
-  const rawPrice     = product?.price        ?? 1599;
   const imageUrl     = product?.imageUrl     ?? null;
+  const images       = product?.images       ?? [];
   const affiliateUrl = product?.affiliateUrl ?? null;
   const source       = product?.source       ?? 'amazon';
   const description  = product?.description  ??
@@ -974,14 +1071,16 @@ export default function ProductDetailScreen({ route, navigation }) {
     'Built to last decades with a commitment to quality and sustainability.';
   const inStock      = product?.inStock      ?? true;
   const rating       = product?.rating       ?? 4.0;
-  const reviewCount  = product?.reviewCount  ?? 128;
+  const reviewCount  = product?.reviewCount  ?? 0;
+  const bestSellerBadge = product?.bestSellerBadge ?? null;
 
-  // Pricing
+  // Pricing — use salePrice if available, fallback to price
+  const rawPrice     = product?.salePrice    ?? product?.price ?? 1599;
+  const compareAt    = product?.compareAtPrice ?? product?.price ?? null;
+
+  // Pricing display
   const priceDisplay = fmtPrice(rawPrice);
-  const origRaw      = product?.originalPrice
-    ?? (rawPrice ? Math.round(rawPrice * 1.08) : null);
-  const origDisplay  = origRaw && origRaw !== rawPrice ? fmtPrice(origRaw) : null;
-  const monthlyAmt   = rawPrice ? `$${Math.round(rawPrice / 15)}` : null;
+  const origDisplay  = (compareAt && compareAt !== rawPrice) ? fmtPrice(compareAt) : null;
 
   // Product details table — enrich from product.details or build from product fields
   const details = product?.details ?? {
@@ -999,16 +1098,39 @@ export default function ProductDetailScreen({ route, navigation }) {
     ...(product?.source === 'amazon' ? { 'Also on': 'Amazon' } : {}),
   };
 
-  // Variants — from product data or sensible defaults
-  const variants = product?.variants ?? [
-    { id: '1', label: 'White',      color: '#F5F5F0' },
-    { id: '2', label: 'Dark Brown', color: '#3D2B1F' },
-    { id: '3', label: 'Black',      color: '#1C1C1E' },
-    { id: '4', label: 'Natural',    color: '#C8A87A' },
-  ];
+  // Variants — only show if real data exists (no generic fallbacks)
+  const variants = product?.variants ?? [];
+
+  const sizes = product?.sizes ?? null;
+
+  // Build key features from product.features (string[]) or use defaults
+  const productFeatures = product?.features
+    ? product.features.slice(0, 4).map((f, i) => {
+        const icons = [ShieldIcon, LayersIcon, DropletIcon, WrenchIcon];
+        // Split on ' — ' if present: left = label, right = sub
+        const parts = f.split(' — ');
+        return {
+          label: parts.length > 1 ? parts[0] : f,
+          sub: parts.length > 1 ? parts[1] : null,
+          Icon: icons[i % icons.length],
+        };
+      })
+    : null; // null → KeyFeatures uses DEF_FEATURES
+
+  // Active variant — drives hero image swap + full gallery per color
+  const activeVariant = variants.find(v => v.id === selectedVar);
+  const rawActiveImages = activeVariant?.images?.length > 0
+    ? activeVariant.images
+    : activeVariant?.mainImage
+      ? [activeVariant.mainImage, ...images.slice(1)]
+      : images;
+  // Deduplicate — remove any repeated URLs that cause same slide twice
+  const activeImages = rawActiveImages.filter((url, idx, arr) => arr.indexOf(url) === idx);
 
   const similarProducts = product?.similarProducts ?? getSimProducts(product);
-  const estDelivery     = deliveryDate(4);
+  const estDelivery     = product?.shipping?.estimatedDays
+    ? deliveryDate(parseInt(product.shipping.estimatedDays))
+    : deliveryDate(4);
 
   // ── Cart logic ────────────────────────────────────────────────────────────
   const cartKey = `${name}__${brand}`;
@@ -1064,8 +1186,9 @@ export default function ProductDetailScreen({ route, navigation }) {
         )}
         scrollEventThrottle={16}>
 
-        {/* S0: Hero image */}
+        {/* S0: Hero image carousel */}
         <ProductHero
+          images={activeImages}
           imageUrl={imageUrl}
           liked={liked}
           onBack={() => navigation?.goBack()}
@@ -1087,8 +1210,8 @@ export default function ProductDetailScreen({ route, navigation }) {
             inStock={inStock}
           />
 
-          {/* S2: SnapSpace Verified badge */}
-          <SnapSpaceVerified />
+          {/* S2: Best Seller badge */}
+          <BestSellerBadge text={bestSellerBadge} />
 
           {/* S3: Variant swatches */}
           <VariantSelector
@@ -1097,36 +1220,38 @@ export default function ProductDetailScreen({ route, navigation }) {
             onSelect={setSelectedVar}
           />
 
+          {/* S3b: Size selector (only if product has sizes) */}
+          {sizes && sizes.length > 0 && (
+            <SizeSelector sizes={sizes} />
+          )}
+
           {/* S5: FTC disclosure */}
           <FTCNote />
 
           {/* Thin separator */}
           <View style={rs.sep} />
 
-          {/* S6: Price + discount + AfterPay */}
+          {/* S6: Price + compare-at (centered below main price) */}
           <PriceBlock
             price={priceDisplay}
             originalPrice={origDisplay}
-            monthlyAmt={monthlyAmt}
-            payments={15}
-            apr="X"
           />
 
-          {/* S7: Delivery box */}
-          <DeliveryBox date={estDelivery} />
-
-          {/* S8: Quantity selector */}
+          {/* S8: Quantity selector — above delivery */}
           <QuantitySelector
             qty={qty}
             onDecrease={() => setQty(q => Math.max(1, q - 1))}
             onIncrease={() => setQty(q => q + 1)}
           />
 
+          {/* S7: Delivery box */}
+          <DeliveryBox date={estDelivery} />
+
           {/* S9: Product Details table */}
           <ProductDetails details={details} />
 
           {/* S10: Key Features grid */}
-          <KeyFeatures />
+          <KeyFeatures features={productFeatures} />
 
           {/* S11: Trust badges strip */}
           <TrustBadges />
@@ -1158,9 +1283,7 @@ export default function ProductDetailScreen({ route, navigation }) {
       {/* ── Fixed CTA bar (always visible at bottom) ──────────────────── */}
       <CTABar
         inCart={inCart}
-        liked={liked}
         onAddToCart={handleAddToCart}
-        onWishlist={() => setLiked(p => !p)}
         affiliateUrl={affiliateUrl}
         source={source}
         cartLabelOpacity={cartLabelOpacity}
@@ -1181,15 +1304,15 @@ const rs = StyleSheet.create({
   },
   card: {
     marginTop: -CARD_LIFT,
-    borderTopLeftRadius:  T.rCard,
-    borderTopRightRadius: T.rCard,
+    borderTopLeftRadius:  10,
+    borderTopRightRadius: 10,
     backgroundColor: T.surface,
-    minHeight: SH,          // prevent background bleed on short content
+    minHeight: SH,
   },
   sep: {
     height: 1,
     backgroundColor: T.divider,
     marginHorizontal: T.padH,
-    marginTop: 16,
+    marginTop: 24,
   },
 });

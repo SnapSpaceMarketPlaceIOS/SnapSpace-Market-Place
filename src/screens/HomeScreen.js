@@ -18,10 +18,8 @@ import {
   FlatList,
 } from 'react-native';
 import { BlurView } from 'expo-blur';
-import * as MediaLibrary from 'expo-media-library';
 import * as Sharing from 'expo-sharing';
-import * as FileSystem from 'expo-file-system';
-import { Share } from 'react-native';
+import * as FileSystem from 'expo-file-system/legacy';
 import * as ImagePicker from 'expo-image-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Svg, { Path, Circle, Line, Polyline, Rect, Ellipse, G } from 'react-native-svg';
@@ -406,16 +404,16 @@ function SendIcon() {
 
 function CameraSmallIcon() {
   return (
-    <Svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.75)" strokeWidth={1} strokeLinecap="round" strokeLinejoin="round">
+    <Svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.9)" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round">
       <Path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
       <Circle cx={12} cy={13} r={4} />
     </Svg>
   );
 }
 
-function GalleryIcon({ size = 18, color = 'rgba(255,255,255,0.75)' }) {
+function GalleryIcon({ size = 18, color = 'rgba(255,255,255,0.9)' }) {
   return (
-    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={1} strokeLinecap="round" strokeLinejoin="round">
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round">
       <Rect x={3} y={3} width={18} height={18} rx={2} ry={2} />
       <Circle cx={8.5} cy={8.5} r={1.5} />
       <Polyline points="21 15 16 10 5 21" />
@@ -647,6 +645,7 @@ export default function HomeScreen({ navigation, route }) {
 
   // Design Your Space state
   const [photo, setPhoto] = useState(null);
+  const [photoSource, setPhotoSource] = useState(null); // 'camera' | 'library'
   const [imageLayout, setImageLayout] = useState(null);
   const [generating, setGenerating] = useState(false);
   const [genStatus, setGenStatus] = useState('');
@@ -658,6 +657,11 @@ export default function HomeScreen({ navigation, route }) {
   // Loading bar animation
   const loadingProgress = useRef(new Animated.Value(0)).current;
   const loadingAnim = useRef(null);
+
+  // Sparkle loader animation
+  const sparkleRotate = useRef(new Animated.Value(0)).current;
+  const sparkleScale = useRef(new Animated.Value(1)).current;
+  const sparkleAnim = useRef(null);
 
   // Scroll-driven parallax
   const scrollY = useRef(new Animated.Value(0)).current;
@@ -713,6 +717,7 @@ export default function HomeScreen({ navigation, route }) {
     if (route?.params?.capturedPhoto) {
       const captured = route.params.capturedPhoto;
       setPhoto(captured);
+      setPhotoSource('camera');
       const isLandscape = (captured.width || 0) > (captured.height || 0);
       setImageLayout({ landscape: isLandscape });
       navigation.setParams({ capturedPhoto: undefined });
@@ -728,83 +733,156 @@ export default function HomeScreen({ navigation, route }) {
     }
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: false,
+      allowsEditing: true,
       quality: 0.8,
       base64: true,
     });
     if (result.canceled || !result.assets?.length) return;
     const asset = result.assets[0];
     setPhoto({ uri: asset.uri, base64: asset.base64, width: asset.width, height: asset.height });
+    setPhotoSource('library');
     setImageLayout({ landscape: (asset.width || 0) > (asset.height || 0) });
   };
 
-  // Start / stop loading bar animation
+  // Timed loading bar — crawls to 90% over ~60s, snaps to 100% on completion
   const startLoadingBar = useCallback(() => {
     loadingProgress.setValue(0);
-    loadingAnim.current = Animated.loop(
-      Animated.timing(loadingProgress, {
-        toValue: 1,
-        duration: 2000,
-        easing: Easing.inOut(Easing.ease),
-        useNativeDriver: false,
-      })
-    );
+    // Slow crawl to 0.9 over 60 seconds (ease out so it slows down as it gets closer)
+    loadingAnim.current = Animated.timing(loadingProgress, {
+      toValue: 0.9,
+      duration: 60000,
+      easing: Easing.out(Easing.cubic),
+      useNativeDriver: false,
+    });
     loadingAnim.current.start();
   }, [loadingProgress]);
 
-  const stopLoadingBar = useCallback(() => {
+  const stopLoadingBar = useCallback((success = true) => {
     if (loadingAnim.current) {
       loadingAnim.current.stop();
       loadingAnim.current = null;
     }
-    loadingProgress.setValue(0);
+    if (success) {
+      // Snap to 100% quickly
+      Animated.timing(loadingProgress, {
+        toValue: 1,
+        duration: 300,
+        easing: Easing.out(Easing.ease),
+        useNativeDriver: false,
+      }).start(() => {
+        // Reset after a beat
+        setTimeout(() => loadingProgress.setValue(0), 400);
+      });
+    } else {
+      loadingProgress.setValue(0);
+    }
   }, [loadingProgress]);
 
+  // Sparkle loader — start/stop with generating
+  useEffect(() => {
+    if (generating) {
+      sparkleRotate.setValue(0);
+      sparkleScale.setValue(0.8);
+      sparkleAnim.current = Animated.loop(
+        Animated.parallel([
+          Animated.timing(sparkleRotate, {
+            toValue: 1,
+            duration: 3000,
+            easing: Easing.linear,
+            useNativeDriver: true,
+          }),
+          Animated.sequence([
+            Animated.timing(sparkleScale, {
+              toValue: 1.15,
+              duration: 1500,
+              easing: Easing.inOut(Easing.ease),
+              useNativeDriver: true,
+            }),
+            Animated.timing(sparkleScale, {
+              toValue: 0.85,
+              duration: 1500,
+              easing: Easing.inOut(Easing.ease),
+              useNativeDriver: true,
+            }),
+          ]),
+        ])
+      );
+      sparkleAnim.current.start();
+    } else {
+      if (sparkleAnim.current) {
+        sparkleAnim.current.stop();
+        sparkleAnim.current = null;
+      }
+    }
+  }, [generating]);
+
   // ── Result actions ──────────────────────────────────────────────────────────
+
+  // Helper: download result image to local cache file
+  const downloadResultImage = async () => {
+    if (!resultData?.resultUri) return null;
+    // Replicate returns webp — download and save with correct extension
+    const isWebp = resultData.resultUri.includes('.webp') || resultData.resultUri.includes('output_format=webp');
+    const ext = isWebp ? 'webp' : 'jpg';
+    const mime = isWebp ? 'image/webp' : 'image/jpeg';
+    const fileName = `snapspace_${Date.now()}.${ext}`;
+    const localUri = `${FileSystem.cacheDirectory}${fileName}`;
+
+    const downloadResult = await FileSystem.downloadAsync(resultData.resultUri, localUri);
+    console.log('[Download] Status:', downloadResult.status, 'URI:', downloadResult.uri);
+
+    // Verify file exists and has content
+    const info = await FileSystem.getInfoAsync(localUri);
+    if (!info.exists || info.size < 100) {
+      throw new Error('Downloaded file is empty or missing');
+    }
+
+    return { localUri: downloadResult.uri, mime, ext };
+  };
+
   const handleDownload = async () => {
     if (!resultData?.resultUri) return;
     try {
-      const { status } = await MediaLibrary.requestPermissionsAsync();
-      if (status !== 'granted') {
-        Alert.alert('Permission Required', 'Allow photo library access in Settings to save images.');
-        return;
+      const file = await downloadResultImage();
+      if (!file) return;
+      const canShare = await Sharing.isAvailableAsync();
+      if (canShare) {
+        await Sharing.shareAsync(file.localUri, {
+          mimeType: file.mime,
+          dialogTitle: 'Save Image',
+          UTI: file.ext === 'webp' ? 'org.webmproject.webp' : 'public.jpeg',
+        });
+      } else {
+        Alert.alert('Not Available', 'Sharing is not available on this device.');
       }
-      const fileName = `snapspace_${Date.now()}.jpg`;
-      const localUri = `${FileSystem.cacheDirectory}${fileName}`;
-      await FileSystem.downloadAsync(resultData.resultUri, localUri);
-      await MediaLibrary.saveToLibraryAsync(localUri);
-      Alert.alert('Saved!', 'Design saved to your camera roll.');
     } catch (err) {
-      Alert.alert('Save Failed', 'Could not save image. Please try again.');
+      console.log('[Download] Error:', err);
+      Alert.alert('Save Failed', err.message || 'Could not save image. Please try again.');
     }
   };
 
   const handleShare = async () => {
     if (!resultData?.resultUri) return;
     try {
-      const fileName = `snapspace_${Date.now()}.jpg`;
-      const localUri = `${FileSystem.cacheDirectory}${fileName}`;
-      await FileSystem.downloadAsync(resultData.resultUri, localUri);
+      const file = await downloadResultImage();
+      if (!file) return;
       const canShare = await Sharing.isAvailableAsync();
       if (canShare) {
-        await Sharing.shareAsync(localUri, {
-          mimeType: 'image/jpeg',
+        await Sharing.shareAsync(file.localUri, {
+          mimeType: file.mime,
           dialogTitle: 'Share your AI design',
         });
-      } else {
-        await Share.share({
-          message: `Check out this AI-designed space I created with SnapSpace!\n${resultData.resultUri}`,
-        });
       }
-    } catch (_) {}
+    } catch (err) {
+      console.log('[Share] Error:', err);
+      Alert.alert('Share Failed', 'Could not share image. Please try again.');
+    }
   };
 
   const handlePost = (visibility) => {
-    // visibility: 'public' | 'private'
     setPosting(true);
     setShowPostSheet(false);
     // TODO: write to Supabase designs table with visibility flag
-    // For now simulate a brief save and confirm
     setTimeout(() => {
       setPosting(false);
       Alert.alert(
@@ -847,9 +925,10 @@ export default function HomeScreen({ navigation, route }) {
       });
       setShowResult(true);
       setPhoto(null);
+      setPhotoSource(null);
       setPrompt('');
     } catch (err) {
-      stopLoadingBar();
+      stopLoadingBar(false);
       setGenerating(false);
       setGenStatus('');
       Alert.alert('Generation Failed', err.message || 'Something went wrong. Please try again.');
@@ -937,20 +1016,66 @@ export default function HomeScreen({ navigation, route }) {
             </View>
           )}
 
-          {/* Generation status — shown during generation */}
+          {/* Generation status — custom sparkle loader */}
           {generating && (
             <View style={styles.heroCentered}>
-              <ActivityIndicator color="#fff" size="large" />
-              <Text style={[styles.heroSubtitle, { color: '#fff', marginTop: 16, fontSize: 17, fontWeight: '600' }]}>
-                {genStatus || 'Generating…'}
+              {/* Animated sparkle star */}
+              <Animated.View style={{
+                transform: [
+                  { rotate: sparkleRotate.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '360deg'] }) },
+                  { scale: sparkleScale },
+                ],
+              }}>
+                <Svg width={48} height={48} viewBox="0 0 48 48" fill="none">
+                  {/* Main 4-pointed star */}
+                  <Path d="M24 2 L28 18 L44 24 L28 30 L24 46 L20 30 L4 24 L20 18 Z" fill="#0B6DC3" opacity={0.9} />
+                  {/* Inner glow star */}
+                  <Path d="M24 10 L26 20 L36 24 L26 28 L24 38 L22 28 L12 24 L22 20 Z" fill="#67ACE9" opacity={0.7} />
+                  {/* Center dot */}
+                  <Circle cx={24} cy={24} r={3} fill="#fff" opacity={0.95} />
+                </Svg>
+              </Animated.View>
+              <Text style={styles.genStatusText}>
+                {genStatus || 'Designing your space…'}
               </Text>
             </View>
           )}
 
           {/* Input bar — pinned to bottom of hero */}
           <View style={styles.heroBottom}>
+            {/* Suggested prompt chips */}
+            {!generating && (
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                style={styles.promptChipsScroll}
+                contentContainerStyle={styles.promptChipsContent}
+              >
+                {[
+                  'Minimalist living room vibes',
+                  'Dark luxe bedroom aesthetic',
+                  'Cozy Scandinavian reading nook',
+                  'Japandi dining room refresh',
+                  'Boho chic accent chairs',
+                  'Mid-century modern home office',
+                  'Coastal bedroom with linen',
+                  'Industrial kitchen with marble',
+                  'Maximalist glam dining room',
+                  'Earthy biophilic living space',
+                ].map((chip) => (
+                  <TouchableOpacity
+                    key={chip}
+                    style={styles.promptChip}
+                    onPress={() => setPrompt(chip)}
+                    activeOpacity={0.7}
+                  >
+                    <Text style={styles.promptChipText}>{chip}</Text>
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
+            )}
             <View style={styles.inputBar}>
-              {/* Camera icon with attachment badge */}
+              {/* Camera icon — badge only when photo came from camera */}
               <View>
                 <TouchableOpacity
                   style={styles.inputIconBtn}
@@ -959,22 +1084,22 @@ export default function HomeScreen({ navigation, route }) {
                 >
                   <CameraSmallIcon />
                 </TouchableOpacity>
-                {photo && (
+                {photo && photoSource === 'camera' && (
                   <View style={styles.attachBadge}>
                     <CheckIcon size={8} color="#fff" />
                   </View>
                 )}
               </View>
-              {/* Gallery icon with attachment badge */}
+              {/* Gallery icon — badge only when photo came from library */}
               <View>
                 <TouchableOpacity
                   style={styles.inputIconBtn}
-                  onPress={photo ? () => { setPhoto(null); setImageLayout(null); } : handlePickFromLibrary}
+                  onPress={photo ? () => { setPhoto(null); setPhotoSource(null); setImageLayout(null); } : handlePickFromLibrary}
                   activeOpacity={0.6}
                 >
                   <GalleryIcon />
                 </TouchableOpacity>
-                {photo && (
+                {photo && photoSource === 'library' && (
                   <View style={styles.attachBadge}>
                     <CheckIcon size={8} color="#fff" />
                   </View>
@@ -986,10 +1111,10 @@ export default function HomeScreen({ navigation, route }) {
                 placeholderTextColor="rgba(255,255,255,0.45)"
                 value={prompt}
                 onChangeText={setPrompt}
-                returnKeyType="done"
+                returnKeyType="send"
                 editable={!generating}
-                multiline
                 maxLength={200}
+                onSubmitEditing={runGeneration}
               />
               <TouchableOpacity
                 style={[styles.inputSendBtn, (!prompt.trim() && !photo) && styles.inputSendBtnOff]}
@@ -1552,7 +1677,7 @@ export default function HomeScreen({ navigation, route }) {
                     <View style={resultStyles.productInfo}>
                       <Text style={resultStyles.productBrand}>{product.brand}</Text>
                       <Text style={resultStyles.productName} numberOfLines={2}>{product.name}</Text>
-                      <Text style={resultStyles.productPrice}>${product.price}</Text>
+                      <Text style={resultStyles.productPrice}>{product.priceDisplay || `$${product.price}`}</Text>
                     </View>
                     <ChevronRight color="#999" />
                   </TouchableOpacity>
@@ -1565,60 +1690,57 @@ export default function HomeScreen({ navigation, route }) {
               We may earn a commission when you buy through links on this app.
             </Text>
           </ScrollView>
-        </View>
-      </Modal>
 
-      {/* ── Post Visibility Sheet ───────────────────────────────────────── */}
-      <Modal
-        visible={showPostSheet}
-        animationType="slide"
-        transparent
-        onRequestClose={() => setShowPostSheet(false)}
-      >
-        <TouchableOpacity
-          style={resultStyles.sheetBackdrop}
-          activeOpacity={1}
-          onPress={() => setShowPostSheet(false)}
-        />
-        <View style={resultStyles.sheet}>
-          <View style={resultStyles.sheetHandle} />
-          <Text style={resultStyles.sheetTitle}>Post this design</Text>
-          <Text style={resultStyles.sheetSubtitle}>Choose who can see it</Text>
+          {/* ── Post Visibility Sheet (inside result modal) ──────────────── */}
+          {showPostSheet && (
+            <View style={StyleSheet.absoluteFill}>
+              <TouchableOpacity
+                style={resultStyles.sheetBackdrop}
+                activeOpacity={1}
+                onPress={() => setShowPostSheet(false)}
+              />
+              <View style={resultStyles.sheet}>
+                <View style={resultStyles.sheetHandle} />
+                <Text style={resultStyles.sheetTitle}>Post this design</Text>
+                <Text style={resultStyles.sheetSubtitle}>Choose who can see it</Text>
 
-          <TouchableOpacity
-            style={resultStyles.sheetOption}
-            onPress={() => handlePost('public')}
-            activeOpacity={0.7}
-          >
-            <View style={[resultStyles.sheetOptionIcon, { backgroundColor: '#EFF6FF' }]}>
-              <PostIcon size={20} color="#0B6DC3" />
-            </View>
-            <View style={resultStyles.sheetOptionText}>
-              <Text style={resultStyles.sheetOptionTitle}>Post publicly</Text>
-              <Text style={resultStyles.sheetOptionDesc}>Visible on Explore + your profile</Text>
-            </View>
-          </TouchableOpacity>
+                <TouchableOpacity
+                  style={resultStyles.sheetOption}
+                  onPress={() => handlePost('public')}
+                  activeOpacity={0.7}
+                >
+                  <View style={[resultStyles.sheetOptionIcon, { backgroundColor: '#EFF6FF' }]}>
+                    <PostIcon size={20} color="#0B6DC3" />
+                  </View>
+                  <View style={resultStyles.sheetOptionText}>
+                    <Text style={resultStyles.sheetOptionTitle}>Post publicly</Text>
+                    <Text style={resultStyles.sheetOptionDesc}>Visible on Explore + your profile</Text>
+                  </View>
+                </TouchableOpacity>
 
-          <TouchableOpacity
-            style={resultStyles.sheetOption}
-            onPress={() => handlePost('private')}
-            activeOpacity={0.7}
-          >
-            <View style={[resultStyles.sheetOptionIcon, { backgroundColor: '#F3F4F6' }]}>
-              <PostIcon size={20} color="#6B7280" />
-            </View>
-            <View style={resultStyles.sheetOptionText}>
-              <Text style={resultStyles.sheetOptionTitle}>Save privately</Text>
-              <Text style={resultStyles.sheetOptionDesc}>Only visible on your profile</Text>
-            </View>
-          </TouchableOpacity>
+                <TouchableOpacity
+                  style={resultStyles.sheetOption}
+                  onPress={() => handlePost('private')}
+                  activeOpacity={0.7}
+                >
+                  <View style={[resultStyles.sheetOptionIcon, { backgroundColor: '#F3F4F6' }]}>
+                    <PostIcon size={20} color="#6B7280" />
+                  </View>
+                  <View style={resultStyles.sheetOptionText}>
+                    <Text style={resultStyles.sheetOptionTitle}>Save privately</Text>
+                    <Text style={resultStyles.sheetOptionDesc}>Only visible on your profile</Text>
+                  </View>
+                </TouchableOpacity>
 
-          <TouchableOpacity
-            style={resultStyles.sheetCancel}
-            onPress={() => setShowPostSheet(false)}
-          >
-            <Text style={resultStyles.sheetCancelText}>Cancel</Text>
-          </TouchableOpacity>
+                <TouchableOpacity
+                  style={resultStyles.sheetCancel}
+                  onPress={() => setShowPostSheet(false)}
+                >
+                  <Text style={resultStyles.sheetCancelText}>Cancel</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          )}
         </View>
       </Modal>
     </View>
@@ -1695,11 +1817,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: space.lg,
-    marginTop: height * 0.28, // ~28% from top → centered vertically on screen
+    marginTop: height * 0.34, // ~34% from top → lower center on screen
   },
   heroSubtitle: {
     fontSize: 16,
-    color: '#0B6DC3',
+    fontWeight: '600',
+    color: '#FFFFFF',
     lineHeight: 22,
     marginTop: 6,
     textAlign: 'center',
@@ -1750,6 +1873,28 @@ const styles = StyleSheet.create({
   },
   photoRemoveX: { color: '#fff', fontSize: 11, fontWeight: '700' },
 
+  // Prompt chips
+  promptChipsScroll: {
+    marginBottom: 8,
+  },
+  promptChipsContent: {
+    paddingHorizontal: 0,
+    gap: 6,
+  },
+  promptChip: {
+    backgroundColor: 'rgba(255,255,255,0.18)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.3)',
+    borderRadius: 9999,
+    paddingVertical: 5,
+    paddingHorizontal: 12,
+  },
+  promptChipText: {
+    color: '#FFFFFF',
+    fontSize: 10,
+    fontWeight: '500',
+  },
+
   // Input bar — pinned to hero bottom via absolute positioning
   heroBottom: {
     position: 'absolute',
@@ -1760,15 +1905,15 @@ const styles = StyleSheet.create({
   inputBar: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(255,255,255,0.12)',
-    borderRadius: 26,
+    backgroundColor: 'rgba(255,255,255,0.22)',
+    borderRadius: 9999,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.18)',
+    borderColor: 'rgba(255,255,255,0.30)',
     paddingLeft: 8,
     paddingRight: 6,
-    paddingVertical: 6,
-    minHeight: 48,
-    maxHeight: 100,
+    paddingVertical: 4,
+    height: 44,
+    maxHeight: 44,
   },
   inputIconBtn: {
     width: 34, height: 34, borderRadius: 17,
@@ -1778,9 +1923,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 15,
     color: '#fff',
-    lineHeight: 20,
-    maxHeight: 80,
-    paddingVertical: 4,
+    paddingVertical: 0,
     paddingHorizontal: 6,
   },
   inputSendBtn: {
@@ -1792,7 +1935,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.15)',
   },
   headline: {
-    fontSize: 34,
+    fontSize: 38,
     fontWeight: fontWeight.xbold,
     color: '#FFFFFF',
     lineHeight: 40,
@@ -1803,6 +1946,17 @@ const styles = StyleSheet.create({
     textShadowRadius: 12,
   },
   headlineBold: { fontWeight: fontWeight.xbold },
+  genStatusText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+    marginTop: 20,
+    textAlign: 'center',
+    textShadowColor: 'rgba(0,0,0,0.4)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 6,
+    letterSpacing: 0.3,
+  },
 
 
   snapBanner: {
@@ -2644,7 +2798,7 @@ const styles = StyleSheet.create({
     width: 14,
     height: 14,
     borderRadius: 7,
-    backgroundColor: '#16A34A',
+    backgroundColor: '#0B6DC3',
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1.5,

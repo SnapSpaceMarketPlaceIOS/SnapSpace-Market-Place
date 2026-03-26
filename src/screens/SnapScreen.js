@@ -68,7 +68,7 @@ export default function SnapScreen({ navigation }) {
     }
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: false,
+      allowsEditing: true,
       quality: 0.8,
       base64: true,
     });
@@ -96,7 +96,10 @@ export default function SnapScreen({ navigation }) {
 
   return (
     <View style={s.container}>
-      <CameraView ref={cameraRef} style={s.camera} facing={facing} flash={flash ? 'on' : 'off'}>
+      <CameraView ref={cameraRef} style={s.camera} facing={facing} flash={flash ? 'on' : 'off'} />
+
+      {/* Overlay controls — absolute positioned over camera */}
+      <View style={s.overlay} pointerEvents="box-none">
         {/* Top controls */}
         <View style={s.topBar}>
           <View style={{ flex: 1 }} />
@@ -137,7 +140,7 @@ export default function SnapScreen({ navigation }) {
 
           <View style={{ width: 70 }} />
         </View>
-      </CameraView>
+      </View>
     </View>
   );
 }
@@ -145,6 +148,10 @@ export default function SnapScreen({ navigation }) {
 const s = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#000' },
   camera: { flex: 1 },
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: 'space-between',
+  },
   topBar: {
     flexDirection: 'row',
     justifyContent: 'space-between',
