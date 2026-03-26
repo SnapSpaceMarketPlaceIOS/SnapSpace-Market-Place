@@ -36,6 +36,7 @@ import { SELLERS } from '../data/sellers';
 import { searchProducts, getSourceColor, getProductsForPrompt } from '../services/affiliateProducts';
 import { generateInteriorDesign } from '../services/replicate';
 import { PRODUCT_CATALOG } from '../data/productCatalog';
+import { saveUserDesign } from '../services/supabase';
 
 const { width, height } = Dimensions.get('window');
 
@@ -879,19 +880,43 @@ export default function HomeScreen({ navigation, route }) {
     }
   };
 
-  const handlePost = (visibility) => {
+  const handlePost = async (visibility) => {
+    if (!user?.id || !resultData?.resultUri) return;
     setPosting(true);
     setShowPostSheet(false);
-    // TODO: write to Supabase designs table with visibility flag
-    setTimeout(() => {
-      setPosting(false);
+    try {
+      const styleTags = (resultData.products || []).flatMap(p => p.styles || p.styleTags || []).filter(Boolean);
+      const uniqueTags = [...new Set(styleTags)];
+      const productSummary = (resultData.products || []).map(p => ({
+        id: p.id,
+        name: p.name,
+        brand: p.brand,
+        price: p.priceValue ?? p.price,
+        imageUrl: p.imageUrl,
+        rating: p.rating,
+        reviewCount: p.reviewCount,
+        affiliateUrl: p.affiliateUrl,
+        source: p.source,
+      }));
+      await saveUserDesign(user.id, {
+        imageUrl: resultData.resultUri,
+        prompt: resultData.prompt || '',
+        styleTags: uniqueTags,
+        products: productSummary,
+        visibility,
+      });
       Alert.alert(
         visibility === 'public' ? 'Posted to Explore!' : 'Saved to Profile',
         visibility === 'public'
           ? 'Your design is now live on the Explore page.'
           : 'Your design has been saved privately to your profile.'
       );
-    }, 800);
+    } catch (e) {
+      console.warn('Post failed:', e);
+      Alert.alert('Post Failed', e.message || 'Could not save. Please try again.');
+    } finally {
+      setPosting(false);
+    }
   };
 
   const runGeneration = async () => {
@@ -1618,70 +1643,92 @@ export default function HomeScreen({ navigation, route }) {
                   ]}
                   resizeMode="cover"
                 />
-                {/* Action buttons — top left of image */}
-                <View style={resultStyles.imageActions}>
-                  <TouchableOpacity
-                    style={resultStyles.imageActionBtn}
-                    onPress={handleDownload}
-                    activeOpacity={0.75}
-                  >
-                    <DownloadIcon size={16} color="#fff" />
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={resultStyles.imageActionBtn}
-                    onPress={handleShare}
-                    activeOpacity={0.75}
-                  >
-                    <ShareIcon size={16} color="#fff" />
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={resultStyles.imageActionBtn}
-                    onPress={() => setShowPostSheet(true)}
-                    activeOpacity={0.75}
-                  >
-                    {posting
-                      ? <ActivityIndicator size="small" color="#fff" />
-                      : <PostIcon size={16} color="#fff" />
-                    }
-                  </TouchableOpacity>
-                </View>
+                {/* Action icons moved to SHOP YOUR ROOM header row */}
               </View>
             )}
 
             {/* Prompt used */}
-            <Text style={resultStyles.promptLabel}>Your prompt</Text>
-            <Text style={resultStyles.promptText}>{resultData?.prompt}</Text>
+            <Text style={resultStyles.promptLabel}>Your Prompt</Text>
+            <Text style={resultStyles.promptText} numberOfLines={2}>{resultData?.prompt}</Text>
 
-            {/* Matched products */}
+            {/* Matched products — horizontal cards */}
             {resultData?.products?.length > 0 && (
               <View style={resultStyles.productsSection}>
-                <Text style={resultStyles.productsTitle}>SHOP THE LOOK</Text>
-                <Text style={resultStyles.productsSubtitle}>
-                  Products matched to your design
-                </Text>
-                {resultData.products.map((product, idx) => (
-                  <TouchableOpacity
-                    key={product.id || idx}
-                    style={resultStyles.productCard}
-                    activeOpacity={0.7}
-                    onPress={() => {
-                      setShowResult(false);
-                      navigation?.navigate('ProductDetail', { product });
-                    }}
-                  >
-                    <CardImage
-                      uri={product.imageUrl}
-                      style={resultStyles.productImage}
-                      resizeMode="cover"
-                    />
-                    <View style={resultStyles.productInfo}>
-                      <Text style={resultStyles.productBrand}>{product.brand}</Text>
-                      <Text style={resultStyles.productName} numberOfLines={2}>{product.name}</Text>
-                      <Text style={resultStyles.productPrice}>{product.priceDisplay || `$${product.price}`}</Text>
-                    </View>
-                    <ChevronRight color="#999" />
-                  </TouchableOpacity>
-                ))}
+                <View style={resultStyles.shopHeaderRow}>
+                  <View>
+                    <Text style={resultStyles.productsTitle}>SHOP YOUR ROOM</Text>
+                    <Text style={resultStyles.productsSubtitle}>
+                      Products matched to your design
+                    </Text>
+                  </View>
+                  <View style={resultStyles.shopHeaderActions}>
+                    <TouchableOpacity style={resultStyles.shopHeaderBtn} onPress={handleDownload} activeOpacity={0.7}>
+                      <DownloadIcon size={18} color="#6B7280" />
+                    </TouchableOpacity>
+                    <TouchableOpacity style={resultStyles.shopHeaderBtn} onPress={() => setShowPostSheet(true)} activeOpacity={0.7}>
+                      {posting
+                        ? <ActivityIndicator size="small" color="#6B7280" />
+                        : <PostIcon size={18} color="#6B7280" />
+                      }
+                    </TouchableOpacity>
+                    <TouchableOpacity style={resultStyles.shopHeaderBtn} onPress={handleShare} activeOpacity={0.7}>
+                      <ShareIcon size={18} color="#6B7280" />
+                    </TouchableOpacity>
+                  </View>
+                </View>
+                <FlatList
+                  data={resultData.products}
+                  keyExtractor={(item, idx) => item.id || String(idx)}
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  contentContainerStyle={{ paddingRight: 20, gap: 10 }}
+                  renderItem={({ item: product }) => (
+                    <TouchableOpacity
+                      style={resultStyles.hCard}
+                      activeOpacity={0.7}
+                      onPress={() => {
+                        setShowResult(false);
+                        navigation?.navigate('ProductDetail', { product });
+                      }}
+                    >
+                      <CardImage
+                        uri={product.imageUrl}
+                        style={resultStyles.hCardImg}
+                        resizeMode="cover"
+                      />
+                      <View style={resultStyles.hCardBody}>
+                        <Text style={resultStyles.hCardName} numberOfLines={2}>{product.name}</Text>
+                        <Text style={resultStyles.hCardBrand}>{product.brand}</Text>
+                        {!!product.rating && (
+                          <View style={resultStyles.hCardRating}>
+                            {[1,2,3,4,5].map(i => (
+                              <Svg key={i} width={10} height={10} viewBox="0 0 24 24" fill={i <= Math.round(product.rating) ? '#67ACE9' : '#E5E7EB'} stroke="none">
+                                <Path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                              </Svg>
+                            ))}
+                            <Text style={resultStyles.hCardRatingText}>{product.rating.toFixed(1)}</Text>
+                            {!!product.reviewCount && (
+                              <Text style={resultStyles.hCardReviews}>({product.reviewCount.toLocaleString()})</Text>
+                            )}
+                          </View>
+                        )}
+                        <Text style={resultStyles.hCardPrice}>
+                          {typeof product.priceValue === 'number'
+                            ? `$${product.priceValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+                            : typeof product.price === 'number'
+                              ? `$${product.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+                              : product.priceLabel || String(product.price).replace(/^\$+/, '$')}
+                        </Text>
+                      </View>
+                      <TouchableOpacity style={resultStyles.hCardAdd} activeOpacity={0.7}>
+                        <Svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="#0B6DC3" strokeWidth={2.5}>
+                          <Line x1={12} y1={5} x2={12} y2={19} />
+                          <Line x1={5} y1={12} x2={19} y2={12} />
+                        </Svg>
+                      </TouchableOpacity>
+                    </TouchableOpacity>
+                  )}
+                />
               </View>
             )}
 
@@ -2363,7 +2410,7 @@ const styles = StyleSheet.create({
   },
   productStars: {
     fontSize: 11,
-    color: '#F5A623',
+    color: '#67ACE9',
     letterSpacing: 1,
   },
   productRatingText: {
@@ -2828,6 +2875,7 @@ const resultStyles = StyleSheet.create({
   },
   imageWrap: {
     position: 'relative',
+    paddingHorizontal: 16,
   },
   imageActions: {
     position: 'absolute',
@@ -2867,15 +2915,15 @@ const resultStyles = StyleSheet.create({
   },
   resultImage: {
     width: '100%',
-    borderRadius: 0,
+    borderRadius: 12,
   },
   promptLabel: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '600',
     color: '#9CA3AF',
     letterSpacing: 1,
     textTransform: 'uppercase',
-    marginTop: 20,
+    marginTop: 24,
     marginHorizontal: 20,
   },
   promptText: {
@@ -2887,8 +2935,28 @@ const resultStyles = StyleSheet.create({
     marginHorizontal: 20,
   },
   productsSection: {
-    marginTop: 28,
-    paddingHorizontal: 20,
+    marginTop: 24,
+    paddingLeft: 20,
+  },
+  shopHeaderRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    paddingRight: 20,
+    marginBottom: 16,
+  },
+  shopHeaderActions: {
+    flexDirection: 'row',
+    gap: 6,
+    alignItems: 'center',
+  },
+  shopHeaderBtn: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    backgroundColor: '#F3F4F6',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   productsTitle: {
     fontSize: 13,
@@ -2902,44 +2970,72 @@ const resultStyles = StyleSheet.create({
     fontWeight: '400',
     color: '#6B7280',
     marginTop: 4,
-    marginBottom: 16,
   },
-  productCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(0,0,0,0.06)',
-  },
-  productImage: {
-    width: 56,
-    height: 56,
+  // ── Horizontal product cards ──
+  hCard: {
+    width: 170,
+    backgroundColor: '#FFFFFF',
     borderRadius: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(0,0,0,0.06)',
+    overflow: 'hidden',
+  },
+  hCardImg: {
+    width: '100%',
+    height: 150,
     backgroundColor: '#F3F4F6',
   },
-  productInfo: {
-    flex: 1,
-    marginLeft: 12,
+  hCardBody: {
+    padding: 10,
+    paddingBottom: 36,
+    gap: 2,
   },
-  productBrand: {
-    fontSize: 11,
+  hCardName: {
+    fontSize: 13,
     fontWeight: '600',
-    color: '#9CA3AF',
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-  },
-  productName: {
-    fontSize: 14,
-    fontWeight: '500',
     color: '#111827',
-    lineHeight: 18,
-    marginTop: 2,
+    lineHeight: 17,
   },
-  productPrice: {
+  hCardBrand: {
+    fontSize: 11,
+    fontWeight: '400',
+    color: '#9CA3AF',
+    marginTop: 1,
+  },
+  hCardRating: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 1,
+    marginTop: 3,
+  },
+  hCardRatingText: {
+    fontSize: 10,
+    fontWeight: '600',
+    color: '#111827',
+    marginLeft: 2,
+  },
+  hCardReviews: {
+    fontSize: 10,
+    color: '#6B7280',
+  },
+  hCardPrice: {
     fontSize: 15,
     fontWeight: '700',
     color: '#0B6DC3',
-    marginTop: 3,
+    marginTop: 4,
+  },
+  hCardAdd: {
+    position: 'absolute',
+    bottom: 10,
+    right: 10,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    borderWidth: 1.5,
+    borderColor: '#0B6DC3',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#FFFFFF',
   },
   disclosure: {
     fontSize: 11,

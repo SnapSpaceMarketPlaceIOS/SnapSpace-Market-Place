@@ -158,7 +158,7 @@ function AmazonLogoMark() {
 function StarIconSmall({ filled = true, size = 11 }) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24"
-      fill={filled ? '#F5A623' : '#E5E7EB'} stroke={filled ? '#F5A623' : '#D1D5DB'} strokeWidth={1}>
+      fill={filled ? '#67ACE9' : '#E5E7EB'} stroke={filled ? '#67ACE9' : '#D1D5DB'} strokeWidth={1}>
       <Path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
     </Svg>
   );
@@ -696,113 +696,67 @@ export default function ExploreScreen({ navigation, route }) {
                 <Text style={styles.modalTitle}>{selectedCard.title.replace('...', '')}</Text>
                 <Text style={styles.modalDesc} numberOfLines={3}>{selectedCard.description}</Text>
 
-                {/* 3D: Like / Share / Shop The Look */}
-                <View style={styles.actionsRow}>
-                  {/* Like — logic unchanged */}
-                  <TouchableOpacity
-                    style={[
-                      styles.actionCircle,
-                      liked[selectedCard.id] && styles.actionCircleLiked,
-                    ]}
-                    onPress={() => toggleLiked(selectedCard.id)}
-                  >
-                    <HeartIcon filled={!!liked[selectedCard.id]} size={20} />
-                    <Text style={styles.actionCircleCount}>
-                      {liked[selectedCard.id] ? selectedCard.likes + 1 : selectedCard.likes}
-                    </Text>
-                  </TouchableOpacity>
-                  {/* Share — logic unchanged */}
-                  <TouchableOpacity style={[styles.actionCircle, { marginLeft: SP[2] }]}>
-                    <ShareIcon color={TC.textSecondary} size={20} />
-                    <Text style={styles.actionCircleCount}>{selectedCard.shares}</Text>
-                  </TouchableOpacity>
-                  {/* Shop The Look — routing unchanged */}
-                  <TouchableOpacity
-                    style={styles.shopBtn}
-                    onPress={() => {
-                      const card = selectedCard;
-                      setSelectedCard(null);
-                      navigation?.navigate('ShopTheLook', { design: card });
-                    }}
-                  >
-                    <Svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-                      <Path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
-                      <Line x1={3} y1={6} x2={21} y2={6} />
-                      <Path d="M16 10a4 4 0 0 1-8 0" />
-                    </Svg>
-                    <Text style={styles.shopBtnText}>Shop The Look</Text>
-                  </TouchableOpacity>
-                </View>
+                {/* 3D: SHOP ROOM — horizontal product cards */}
+                <Text style={styles.sectionLabel}>SHOP ROOM</Text>
 
-                {/* 3E: Products in this post */}
-                <Text style={styles.sectionLabel}>PRODUCTS IN THIS POST</Text>
-                {selectedCard.products.map((p, i) => (
-                  <TouchableOpacity
-                    key={i}
-                    style={styles.productRow}
-                    activeOpacity={0.7}
-                    onPress={() => {
-                      const card = selectedCard;
-                      setSelectedCard(null);
-                      navigation?.navigate('ProductDetail', { product: p, design: card });
-                    }}
-                  >
-                    <View style={styles.productImg}>
-                      {p.imageUrl ? (
-                        <CardImage
-                          uri={p.imageUrl}
-                          style={{ width: '100%', height: '100%' }}
-                          resizeMode="cover"
-                        />
-                      ) : (
-                        <ImagePlaceholderIcon />
-                      )}
-                    </View>
-                    <View style={styles.productInfo}>
-                      <Text style={styles.productName} numberOfLines={2}>{p.name}</Text>
-
-                      {/* Rating row */}
-                      {!!p.rating && (
-                        <View style={styles.productRatingRow}>
-                          {[1,2,3,4,5].map(i => (
-                            <StarIconSmall key={i} size={11} filled={i <= Math.round(p.rating)} />
-                          ))}
-                          <Text style={styles.productRatingScore}>{p.rating.toFixed(1)}</Text>
-                          {!!p.reviewCount && (
-                            <Text style={styles.productReviewCount}>
-                              ({p.reviewCount.toLocaleString()})
-                            </Text>
-                          )}
-                        </View>
-                      )}
-
-                      {/* Brand + source badge */}
-                      <View style={styles.productMetaRow}>
-                        <Text style={styles.productBrand}>{p.brand}</Text>
-                        {p.source === 'amazon' && (
-                          <View style={styles.productSourceBadge}>
-                            <AmazonLogoMark />
-                          </View>
+                <ScrollView
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  contentContainerStyle={{ gap: 10, paddingRight: 20, paddingBottom: 4 }}
+                >
+                  {selectedCard.products.map((p, i) => (
+                    <TouchableOpacity
+                      key={i}
+                      style={styles.hCard}
+                      activeOpacity={0.7}
+                      onPress={() => {
+                        const card = selectedCard;
+                        setSelectedCard(null);
+                        navigation?.navigate('ProductDetail', { product: p, design: card });
+                      }}
+                    >
+                      <View style={styles.hCardImgWrap}>
+                        {p.imageUrl ? (
+                          <CardImage
+                            uri={p.imageUrl}
+                            style={{ width: '100%', height: '100%' }}
+                            resizeMode="cover"
+                          />
+                        ) : (
+                          <ImagePlaceholderIcon />
                         )}
                       </View>
-
-                      {/* Free shipping indicator */}
-                      <Text style={styles.productShipping}>✓ Free Shipping</Text>
-                    </View>
-
-                    {/* Price + optional discount */}
-                    <View style={styles.productPriceCol}>
-                      <Text style={styles.productPrice}>
-                        {typeof p.price === 'number' ? `$${p.price.toLocaleString()}` : p.price}
-                      </Text>
-                      {!!p.originalPrice && (
-                        <Text style={styles.productOrigPrice}>
-                          ${p.originalPrice.toLocaleString()}
+                      <View style={styles.hCardBody}>
+                        <Text style={styles.hCardName} numberOfLines={2}>{p.name}</Text>
+                        <Text style={styles.hCardBrand}>{p.brand}</Text>
+                        {!!p.rating && (
+                          <View style={styles.hCardRating}>
+                            {[1,2,3,4,5].map(star => (
+                              <StarIconSmall key={star} size={10} filled={star <= Math.round(p.rating)} />
+                            ))}
+                            <Text style={styles.hCardRatingText}>{p.rating.toFixed(1)}</Text>
+                            {!!p.reviewCount && (
+                              <Text style={styles.hCardReviews}>({p.reviewCount.toLocaleString()})</Text>
+                            )}
+                          </View>
+                        )}
+                        <Text style={styles.hCardPrice}>
+                          {typeof p.priceValue === 'number'
+                            ? `$${p.priceValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+                            : typeof p.price === 'number'
+                              ? `$${p.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+                              : p.priceLabel || String(p.price).replace(/^\$+/, '$')}
                         </Text>
-                      )}
-                    </View>
-                  </TouchableOpacity>
-                ))}
+                      </View>
+                      <View style={styles.hCardAddBtn}>
+                        <Svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth={2.5}>
+                          <Line x1={12} y1={5} x2={12} y2={19} />
+                          <Line x1={5} y1={12} x2={19} y2={12} />
+                        </Svg>
+                      </View>
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
 
                 {/* FTC Disclosure */}
                 <Text style={styles.ftcDisclosure}>
@@ -1453,6 +1407,72 @@ const styles = StyleSheet.create({
     color: TC.textTertiary,
     textDecorationLine: 'line-through',
     textAlign: 'right',
+  },
+
+  // ── Horizontal product cards ──────────────────────────────────────────────
+  hCard: {
+    width: 170,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(0,0,0,0.06)',
+    overflow: 'hidden',
+  },
+  hCardImgWrap: {
+    width: '100%',
+    height: 150,
+    backgroundColor: TC.surface,
+    overflow: 'hidden',
+  },
+  hCardBody: {
+    padding: 10,
+    paddingBottom: 36,
+    gap: 2,
+  },
+  hCardName: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: TC.textPrimary,
+    lineHeight: 17,
+  },
+  hCardBrand: {
+    fontSize: 11,
+    fontWeight: '400',
+    color: TC.textTertiary,
+    marginTop: 1,
+  },
+  hCardRating: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 1,
+    marginTop: 3,
+  },
+  hCardRatingText: {
+    fontSize: 10,
+    fontWeight: '600',
+    color: TC.textPrimary,
+    marginLeft: 2,
+  },
+  hCardReviews: {
+    fontSize: 10,
+    color: TC.textSecondary,
+  },
+  hCardPrice: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: TC.primary,
+    marginTop: 4,
+  },
+  hCardAddBtn: {
+    position: 'absolute',
+    bottom: 10,
+    right: 10,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: TC.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 
   ftcDisclosure: {

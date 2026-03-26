@@ -28,6 +28,7 @@ import SharedScreen from './src/screens/SharedScreen';
 import ShopTheLookScreen from './src/screens/ShopTheLookScreen';
 import OrderHistoryScreen from './src/screens/OrderHistoryScreen';
 import PaymentMethodsScreen from './src/screens/PaymentMethodsScreen';
+import MySpacesScreen from './src/screens/MySpacesScreen';
 import HelpScreen from './src/screens/HelpScreen';
 import RestorePurchaseScreen from './src/screens/RestorePurchaseScreen';
 import RequestFeatureScreen from './src/screens/RequestFeatureScreen';
@@ -271,6 +272,7 @@ function RootNavigator() {
       <Stack.Screen name="Liked" component={LikedScreen} />
       <Stack.Screen name="Shared" component={SharedScreen} />
       <Stack.Screen name="OrderHistory" component={OrderHistoryScreen} />
+      <Stack.Screen name="MySpaces" component={MySpacesScreen} />
       <Stack.Screen name="PaymentMethods" component={PaymentMethodsScreen} />
       <Stack.Screen name="Help" component={HelpScreen} />
       <Stack.Screen name="RestorePurchase" component={RestorePurchaseScreen} />

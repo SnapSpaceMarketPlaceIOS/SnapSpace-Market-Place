@@ -204,6 +204,7 @@ function InfoIcon() {
 const FALLBACK_DESIGNS = DESIGNS.slice(0, 12);
 
 const ACCOUNT_ITEMS = [
+  { label: 'My Spaces',              icon: <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="#444" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round"><Path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z" /><Line x1={4} y1={22} x2={4} y2={15} /></Svg>,  screen: 'MySpaces' },
   { label: 'Saved Designs',          icon: <SavedIcon />, screen: 'Explore' },
   { label: 'Order History',          icon: <OrderIcon />, screen: 'OrderHistory' },
   { label: 'Payment Methods',        icon: <CardIcon />,  screen: 'PaymentMethods' },

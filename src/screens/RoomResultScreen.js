@@ -17,7 +17,7 @@ import {
 } from 'react-native';
 import CardImage from '../components/CardImage';
 import { LinearGradient } from 'expo-linear-gradient';
-import Svg, { Path, Circle, Line, Polyline, Rect } from 'react-native-svg';
+import Svg, { Path, Circle, Line, Polyline, Rect, G } from 'react-native-svg';
 import { colors } from '../constants/colors';
 import { space, radius, fontWeight, fontSize, uiColors, typeScale, shadow } from '../constants/tokens';
 import { Button, Badge, SectionHeader } from '../components/ds';
@@ -108,7 +108,7 @@ function AmazonLogoMark() {
 function StarIconSmall({ filled = true, size = 11 }) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24"
-      fill={filled ? '#F5A623' : '#E5E7EB'} stroke={filled ? '#F5A623' : '#D1D5DB'} strokeWidth={1}>
+      fill={filled ? '#67ACE9' : '#E5E7EB'} stroke={filled ? '#67ACE9' : '#D1D5DB'} strokeWidth={1}>
       <Path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
     </Svg>
   );
@@ -292,26 +292,17 @@ export default function RoomResultScreen({ route, navigation }) {
         )}
       </View>
 
-      {/* Top bar always visible */}
+      {/* Top bar — back only, action icons moved to sheet */}
       <View style={styles.topBar}>
         <TouchableOpacity style={styles.iconBtn} onPress={() => navigation?.goBack()}>
           <BackIcon />
         </TouchableOpacity>
-        <View style={styles.topBarRight}>
-          {resultUri && !posted && user && (
-            <TouchableOpacity style={styles.iconBtn} onPress={() => setShowPostModal(true)}>
-              <PostIcon />
-            </TouchableOpacity>
-          )}
-          {resultUri && (
-            <TouchableOpacity style={styles.iconBtn} onPress={handleSaveToPhotos} disabled={saving}>
-              <DownloadIcon />
-            </TouchableOpacity>
-          )}
-          <TouchableOpacity style={styles.iconBtn} onPress={handleShare}>
-            <ShareIcon />
-          </TouchableOpacity>
-        </View>
+        <TouchableOpacity style={styles.iconBtn} onPress={() => navigation?.goBack()}>
+          <Svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke={colors.white} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+            <Line x1={18} y1={6} x2={6} y2={18} />
+            <Line x1={6} y1={6} x2={18} y2={18} />
+          </Svg>
+        </TouchableOpacity>
       </View>
 
       {/* Prompt badge at bottom of image */}
@@ -335,87 +326,102 @@ export default function RoomResultScreen({ route, navigation }) {
         <View style={styles.handleArea} {...panResponder.panHandlers}>
           <View style={styles.sheetHandle} />
           <View style={styles.sheetPeek}>
-            <Text style={styles.sheetTitle}>Shop This Look</Text>
-            <Text style={styles.sheetSubtitle}>
-              {isExpanded ? 'Furniture matched to your design' : 'Swipe up to explore furniture'}
-            </Text>
+            <View style={styles.shopHeaderRow}>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.sheetTitle}>Your Prompt</Text>
+                <Text style={styles.promptText} numberOfLines={2}>{prompt}</Text>
+              </View>
+            </View>
           </View>
         </View>
 
-        {/* Scrollable product grid */}
+        {/* Scrollable content */}
         <ScrollView
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.productsGrid}
           scrollEnabled={isExpanded}
         >
-          {/* FTC Disclosure */}
-          <Text style={styles.disclosure}>We may earn a commission on purchases. Prices may vary.</Text>
+          {/* Section header with action icons */}
+          <View style={styles.shopSectionRow}>
+            <View>
+              <Text style={styles.shopSectionTitle}>SHOP YOUR ROOM</Text>
+              <Text style={styles.shopSectionSub}>Products matched to your design</Text>
+            </View>
+            <View style={styles.shopActions}>
+              <TouchableOpacity style={styles.shopActionBtn} onPress={handleSaveToPhotos} disabled={saving}>
+                <DownloadIcon />
+              </TouchableOpacity>
+              {resultUri && !posted && user && (
+                <TouchableOpacity style={styles.shopActionBtn} onPress={() => setShowPostModal(true)}>
+                  <PostIcon />
+                </TouchableOpacity>
+              )}
+              <TouchableOpacity style={styles.shopActionBtn} onPress={handleShare}>
+                <ShareIcon />
+              </TouchableOpacity>
+            </View>
+          </View>
 
-          {products.map((product) => {
-            const isAdded = addedItems[product.id];
-            const ratingVal = typeof product.rating === 'number' ? product.rating : parseFloat(product.rating) || 0;
-            return (
-              <TouchableOpacity
-                key={product.id}
-                style={styles.productRow}
-                activeOpacity={0.7}
-                onPress={() => handleBuyNow(product)}
-              >
-                {/* Thumbnail */}
-                <View style={styles.productImg}>
+          {/* Horizontal product cards */}
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{ paddingRight: 16, gap: 10, paddingBottom: 4 }}
+          >
+            {products.map((product) => {
+              const ratingVal = typeof product.rating === 'number' ? product.rating : parseFloat(product.rating) || 0;
+              return (
+                <TouchableOpacity
+                  key={product.id}
+                  style={styles.hCard}
+                  activeOpacity={0.7}
+                  onPress={() => navigation?.navigate('ProductDetail', { product })}
+                >
                   <CardImage
                     uri={product.imageUrl}
-                    style={{ width: '100%', height: '100%' }}
+                    style={styles.hCardImg}
                     resizeMode="cover"
                     placeholderColor="#2C3E50"
                   />
-                </View>
-
-                {/* Info */}
-                <View style={styles.productInfo}>
-                  <Text style={styles.productName} numberOfLines={2}>{product.name}</Text>
-
-                  {/* Stars */}
-                  {ratingVal > 0 && (
-                    <View style={styles.ratingRow}>
-                      {[1,2,3,4,5].map(i => (
-                        <StarIconSmall key={i} size={11} filled={i <= Math.round(ratingVal)} />
-                      ))}
-                      <Text style={styles.ratingScore}>{ratingVal.toFixed(1)}</Text>
-                      {!!product.reviewCount && (
-                        <Text style={styles.reviewCount}>({product.reviewCount.toLocaleString()})</Text>
-                      )}
-                    </View>
-                  )}
-
-                  {/* Brand + Amazon badge */}
-                  <View style={styles.metaRow}>
-                    <Text style={styles.productBrand}>{product.brand}</Text>
-                    {product.source === 'amazon' && (
-                      <View style={styles.sourceBadge}><AmazonLogoMark /></View>
+                  <View style={styles.hCardBody}>
+                    <Text style={styles.hCardName} numberOfLines={2}>{product.name}</Text>
+                    <Text style={styles.hCardBrand}>{product.brand}</Text>
+                    {ratingVal > 0 && (
+                      <View style={styles.hCardRating}>
+                        {[1,2,3,4,5].map(i => (
+                          <StarIconSmall key={i} size={10} filled={i <= Math.round(ratingVal)} />
+                        ))}
+                        <Text style={styles.hCardRatingText}>{ratingVal.toFixed(1)}</Text>
+                        {!!product.reviewCount && (
+                          <Text style={styles.hCardReviews}>({product.reviewCount.toLocaleString()})</Text>
+                        )}
+                      </View>
                     )}
+                    <Text style={styles.hCardPrice}>
+                      {typeof product.priceValue === 'number'
+                        ? `$${product.priceValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+                        : typeof product.price === 'number'
+                          ? `$${product.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+                          : product.priceLabel || String(product.price).replace(/^\$+/, '$')}
+                    </Text>
                   </View>
-
-                  {/* Free Shipping */}
-                  <Text style={styles.shippingText}>✓ Free Shipping</Text>
-                </View>
-
-                {/* Price + Add */}
-                <View style={styles.priceCol}>
-                  <Text style={styles.productPrice}>
-                    {typeof product.price === 'number' ? `$${product.price.toLocaleString()}` : product.price}
-                  </Text>
                   <TouchableOpacity
-                    style={[styles.addBtn, isAdded && styles.addBtnDone]}
-                    onPress={() => !isAdded && handleAddToCart(product)}
-                    disabled={isAdded}
+                    style={styles.hCardAdd}
+                    activeOpacity={0.7}
+                    onPress={() => handleAddToCart(product)}
                   >
-                    <Text style={styles.addBtnText}>{isAdded ? '✓' : '+ Add'}</Text>
+                    <Svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth={2.5}>
+                      <Line x1={12} y1={5} x2={12} y2={19} />
+                      <Line x1={5} y1={12} x2={19} y2={12} />
+                    </Svg>
                   </TouchableOpacity>
-                </View>
-              </TouchableOpacity>
-            );
-          })}
+                </TouchableOpacity>
+              );
+            })}
+          </ScrollView>
+
+          {/* FTC Disclosure */}
+          <Text style={styles.disclosure}>We may earn a commission on purchases. Prices may vary.</Text>
         </ScrollView>
       </Animated.View>
 
@@ -561,125 +567,135 @@ const styles = StyleSheet.create({
   sheetPeek: {
     marginBottom: 8,
   },
-  sheetTitle: {
-    fontSize: 20,
-    fontWeight: '800',
-    color: '#111',
+  shopHeaderRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
   },
-  sheetSubtitle: {
-    fontSize: 13,
-    color: '#888',
-    marginTop: 3,
+  sheetTitle: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#9CA3AF',
+    letterSpacing: 1,
+    textTransform: 'uppercase',
+  },
+  promptText: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#111',
+    lineHeight: 22,
+    marginTop: 4,
   },
   productsGrid: {
-    paddingHorizontal: 16,
+    paddingLeft: 16,
     paddingBottom: 40,
     paddingTop: 8,
+  },
+  shopSectionRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    paddingRight: 16,
+    marginBottom: 16,
+    marginTop: 8,
+  },
+  shopSectionTitle: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#9CA3AF',
+    letterSpacing: 1.5,
+    textTransform: 'uppercase',
+  },
+  shopSectionSub: {
+    fontSize: 13,
+    fontWeight: '400',
+    color: '#6B7280',
+    marginTop: 3,
+  },
+  shopActions: {
+    flexDirection: 'row',
+    gap: 6,
+  },
+  shopActionBtn: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    backgroundColor: 'rgba(0,0,0,0.06)',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   disclosure: {
     fontSize: 10,
     color: '#AAA',
     textAlign: 'center',
+    marginTop: 16,
     marginBottom: 10,
     fontStyle: 'italic',
+    paddingRight: 16,
   },
-  productRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(0,0,0,0.08)',
-  },
-  productImg: {
-    width: PRODUCT_IMG_SIZE,
-    height: PRODUCT_IMG_SIZE,
-    borderRadius: Math.round(PRODUCT_IMG_SIZE * 0.05),
-    backgroundColor: '#2C3E50',
+  // ── Horizontal product cards ──
+  hCard: {
+    width: 170,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(0,0,0,0.06)',
     overflow: 'hidden',
-    flexShrink: 0,
   },
-  productInfo: {
-    flex: 1,
-    gap: 3,
+  hCardImg: {
+    width: '100%',
+    height: 150,
+    backgroundColor: '#F3F4F6',
   },
-  productName: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: '#111',
-    lineHeight: 20,
-  },
-  ratingRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  hCardBody: {
+    padding: 10,
+    paddingBottom: 36,
     gap: 2,
-    marginTop: 2,
   },
-  ratingScore: {
-    fontSize: 11,
+  hCardName: {
+    fontSize: 13,
     fontWeight: '600',
     color: '#111',
-    marginLeft: 3,
-    lineHeight: 14,
+    lineHeight: 17,
   },
-  reviewCount: {
+  hCardBrand: {
     fontSize: 11,
-    fontWeight: '400',
-    color: '#6B7280',
-    lineHeight: 14,
-  },
-  metaRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-  },
-  productBrand: {
-    fontSize: 12,
     fontWeight: '400',
     color: '#9CA3AF',
-    lineHeight: 16,
+    marginTop: 1,
   },
-  sourceBadge: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 3,
-    borderWidth: 0.5,
-    borderColor: 'rgba(0,0,0,0.08)',
-    paddingHorizontal: 3,
-    paddingVertical: 2,
+  hCardRating: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 1,
+    marginTop: 3,
   },
-  shippingText: {
-    fontSize: 11,
-    fontWeight: '400',
-    color: '#16A34A',
-    lineHeight: 14,
+  hCardRatingText: {
+    fontSize: 10,
+    fontWeight: '600',
+    color: '#111',
+    marginLeft: 2,
   },
-  priceCol: {
-    alignItems: 'flex-end',
-    gap: 8,
-    flexShrink: 0,
+  hCardReviews: {
+    fontSize: 10,
+    color: '#6B7280',
   },
-  productPrice: {
-    fontSize: 16,
+  hCardPrice: {
+    fontSize: 15,
     fontWeight: '700',
     color: colors.bluePrimary,
-    textAlign: 'right',
-    lineHeight: 20,
+    marginTop: 4,
   },
-  addBtn: {
+  hCardAdd: {
+    position: 'absolute',
+    bottom: 10,
+    right: 10,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: colors.bluePrimary,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: colors.bluePrimary,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 10,
-  },
-  addBtnDone: {
-    backgroundColor: '#2ECC71',
-  },
-  addBtnText: {
-    color: '#fff',
-    fontSize: 12,
-    fontWeight: '700',
   },
   // ── Post Modal ────────────────────────────────────────────────────
   modalOverlay: {
