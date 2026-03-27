@@ -70,6 +70,8 @@ export function CartProvider({ children }) {
           affiliateUrl: product.affiliateUrl || null,
           source: product.source || null,
           asin: product.asin || null,
+          rating: product.rating || null,
+          reviewCount: product.reviewCount || null,
           quantity: 1,
         },
       ];

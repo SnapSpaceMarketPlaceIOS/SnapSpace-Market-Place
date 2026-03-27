@@ -24,7 +24,7 @@ import { Button, Badge, SectionHeader } from '../components/ds';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { getProductsForPrompt, getSourceLabel, getSourceColor } from '../services/affiliateProducts';
-import { saveUserDesign } from '../services/supabase';
+import { saveUserDesign, updateDesignVisibility } from '../services/supabase';
 import * as FileSystem from 'expo-file-system/legacy';
 
 const { width, height } = Dimensions.get('window');
@@ -146,6 +146,8 @@ export default function RoomResultScreen({ route, navigation }) {
   const [postVisibility, setPostVisibility] = useState('public');
   const [posting, setPosting] = useState(false);
   const [posted, setPosted] = useState(false);
+  const [autoSavedDesignId, setAutoSavedDesignId] = useState(null);
+  const autoSaveAttempted = useRef(false);
 
   useEffect(() => {
     // Use products passed from SnapScreen if available, otherwise match locally
@@ -158,6 +160,33 @@ export default function RoomResultScreen({ route, navigation }) {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [prompt, route.params]);
+
+  // ── Auto-save: persist every AI generation to Supabase immediately ──
+  // Saves as 'private' by default. The "Post" button upgrades visibility.
+  useEffect(() => {
+    if (!resultUri || !user?.id || autoSaveAttempted.current) return;
+    autoSaveAttempted.current = true;
+    const styleTags = products.flatMap(p => p.styles || []).filter(Boolean);
+    const uniqueTags = [...new Set(styleTags)];
+    const productSummary = products.map(p => ({
+      id: p.id, name: p.name, brand: p.brand,
+      price: p.priceValue ?? p.price, imageUrl: p.imageUrl,
+      rating: p.rating, reviewCount: p.reviewCount,
+      affiliateUrl: p.affiliateUrl, source: p.source,
+    }));
+    saveUserDesign(user.id, {
+      imageUrl: resultUri,
+      prompt,
+      styleTags: uniqueTags,
+      products: productSummary,
+      visibility: 'private',
+    })
+      .then(result => {
+        if (result?.designId) setAutoSavedDesignId(result.designId);
+        console.log('[AutoSave] Design persisted:', result?.designId);
+      })
+      .catch(err => console.warn('[AutoSave] Failed:', err.message));
+  }, [resultUri, user?.id, products, prompt]);
 
   // Animated value starts at collapsed position
   const sheetY = useRef(new Animated.Value(SHEET_COLLAPSED)).current;
@@ -243,16 +272,28 @@ export default function RoomResultScreen({ route, navigation }) {
     if (!resultUri || !user || posting) return;
     setPosting(true);
     try {
-      const styleTags = products.flatMap(p => p.styles || []).filter(Boolean);
-      const uniqueTags = [...new Set(styleTags)];
-      const productSummary = products.map(p => ({ id: p.id, name: p.name, price: p.priceValue ?? p.price }));
-      await saveUserDesign(user.id, {
-        imageUrl: resultUri,
-        prompt,
-        styleTags: uniqueTags,
-        products: productSummary,
-        visibility: postVisibility,
-      });
+      if (autoSavedDesignId) {
+        // Design was auto-saved — just update visibility
+        await updateDesignVisibility(autoSavedDesignId, postVisibility);
+      } else {
+        // Fallback: auto-save didn't complete yet — do a full save
+        const styleTags = products.flatMap(p => p.styles || []).filter(Boolean);
+        const uniqueTags = [...new Set(styleTags)];
+        const productSummary = products.map(p => ({
+          id: p.id, name: p.name, brand: p.brand,
+          price: p.priceValue ?? p.price, imageUrl: p.imageUrl,
+          rating: p.rating, reviewCount: p.reviewCount,
+          affiliateUrl: p.affiliateUrl, source: p.source,
+        }));
+        const result = await saveUserDesign(user.id, {
+          imageUrl: resultUri,
+          prompt,
+          styleTags: uniqueTags,
+          products: productSummary,
+          visibility: postVisibility,
+        });
+        if (result?.designId) setAutoSavedDesignId(result.designId);
+      }
       setShowPostModal(false);
       setPosted(true);
       Alert.alert('Posted!', `Your design has been saved to your profile${postVisibility === 'public' ? ' and is visible on Explore' : ''}.`);

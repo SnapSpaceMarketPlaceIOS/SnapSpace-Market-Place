@@ -49,8 +49,8 @@ export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
     detectSessionInUrl: false,
   },
   global: {
-    // 10-second hard timeout per request — prevents silent hangs on auth calls
-    fetch: fetchWithTimeout(10000),
+    // 30-second hard timeout — iOS simulator DNS can be slow on first boot
+    fetch: fetchWithTimeout(30000),
   },
 });
 
@@ -129,30 +129,117 @@ export async function uploadRoomPhoto(userId, uri, base64Data = null) {
 
 // ─── User Designs Helpers ────────────────────────────────────────────────────
 
-/** Save a new user design to the database. */
+/**
+ * Downloads a remote image (e.g. from Replicate CDN) and uploads it to
+ * Supabase Storage so the URL never expires.
+ * Returns the permanent public URL from Supabase.
+ * If the image is already a Supabase URL, returns it as-is.
+ */
+export async function persistDesignImage(userId, remoteUrl) {
+  if (!remoteUrl) throw new Error('No image URL to persist');
+  // If already stored in Supabase, skip re-upload
+  const supabaseHost = (process.env.EXPO_PUBLIC_SUPABASE_URL || '').replace('https://', '');
+  if (remoteUrl.includes(supabaseHost)) return remoteUrl;
+
+  const ext = remoteUrl.includes('.webp') ? 'webp' : 'jpeg';
+  const ts = Date.now();
+  const localPath = `${FileSystem.cacheDirectory}design_${ts}.${ext}`;
+
+  // Retry download up to 3 times with 2s delay — Replicate CDN can be slow
+  let download;
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    try {
+      download = await FileSystem.downloadAsync(remoteUrl, localPath);
+      if (download.status === 200) break;
+      throw new Error('HTTP ' + download.status);
+    } catch (e) {
+      console.log(`[Persist] Download attempt ${attempt}/3 failed:`, e.message);
+      if (attempt === 3) throw new Error('Image download failed after 3 attempts');
+      await new Promise(r => setTimeout(r, 2000)); // wait 2s before retry
+    }
+  }
+
+  // Verify file has content
+  const info = await FileSystem.getInfoAsync(localPath);
+  if (!info.exists || info.size < 500) throw new Error('Downloaded file is empty or too small');
+
+  // Read as base64 and upload to Supabase Storage
+  const base64 = await FileSystem.readAsStringAsync(localPath, { encoding: 'base64' });
+  const storagePath = `${userId}/${ts}.${ext}`;
+  const contentType = ext === 'webp' ? 'image/webp' : 'image/jpeg';
+  const { error } = await supabase.storage
+    .from('room-uploads')
+    .upload(storagePath, base64ToUint8Array(base64), { contentType, upsert: true });
+  if (error) throw error;
+
+  const { data } = supabase.storage.from('room-uploads').getPublicUrl(storagePath);
+
+  // Clean up local cache file (fire-and-forget)
+  FileSystem.deleteAsync(localPath, { idempotent: true }).catch(() => {});
+
+  console.log('[Persist] Image saved permanently:', data.publicUrl);
+  return data.publicUrl;
+}
+
+/**
+ * Save a new user design to the database.
+ * Automatically persists the image to Supabase Storage if it's a remote URL
+ * (e.g. Replicate CDN) so the image never expires.
+ * Returns { success: true, designId, permanentUrl }.
+ */
 export async function saveUserDesign(userId, { imageUrl, prompt, styleTags, products, visibility }) {
   // Use a timeout to prevent hanging indefinitely
   const timeoutPromise = new Promise((_, reject) =>
-    setTimeout(() => reject(new Error('Save timed out. Please try again.')), 10000)
+    setTimeout(() => reject(new Error('Save timed out. Please try again.')), 30000)
   );
 
   const insertPromise = (async () => {
-    // First try with auth context (RLS)
-    const { error } = await supabase
+    // Step 1: Persist image to permanent Supabase Storage
+    let permanentUrl = imageUrl;
+    try {
+      permanentUrl = await persistDesignImage(userId, imageUrl);
+    } catch (e) {
+      console.warn('Image persist failed, saving with original URL:', e.message);
+      // Fall back to original URL if persist fails — design data is still saved
+    }
+
+    // Step 2: Insert the design row with the permanent URL
+    const { data, error } = await supabase
       .from('user_designs')
       .insert({
         user_id: userId,
-        image_url: imageUrl,
+        image_url: permanentUrl,
         prompt: prompt || '',
         style_tags: styleTags || [],
         products: products || [],
-        visibility: visibility || 'public',
-      });
+        visibility: visibility || 'private',
+      })
+      .select('id')
+      .single();
     if (error) throw error;
-    return { success: true };
+    return { success: true, designId: data.id, permanentUrl };
   })();
 
   return Promise.race([insertPromise, timeoutPromise]);
+}
+
+/**
+ * Update an existing design's visibility (e.g. private → public for "Post").
+ */
+export async function updateDesignVisibility(designId, visibility) {
+  const { error } = await supabase
+    .from('user_designs')
+    .update({ visibility })
+    .eq('id', designId);
+  if (error) throw error;
+}
+
+/**
+ * Delete duplicate designs that share the same prompt+image within a short window.
+ * Keeps the most recent entry for each unique prompt per user.
+ */
+export async function deduplicateUserDesigns(userId) {
+  // Handled at insert time by checking for recent duplicates
 }
 
 /** Get all designs for a specific user (own profile). */

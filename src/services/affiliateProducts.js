@@ -157,6 +157,19 @@ function normalizeProduct(product) {
     description: product.description,
     materials: product.materials,
     tags: product.tags || [],
+
+    // Rich PDP fields — passed through from catalog to ProductDetailScreen
+    images: product.images || [],
+    variants: product.variants || [],
+    sizes: product.sizes || null,
+    details: product.details || null,
+    features: product.features || null,
+    shipping: product.shipping || null,
+    salePrice: product.salePrice ?? null,
+    salePriceDisplay: product.salePriceDisplay ?? null,
+    compareAtPrice: product.compareAtPrice ?? null,
+    compareAtPriceDisplay: product.compareAtPriceDisplay ?? null,
+    bestSellerBadge: product.bestSellerBadge ?? null,
   };
 }
 

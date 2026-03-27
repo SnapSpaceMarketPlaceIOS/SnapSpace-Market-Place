@@ -13,6 +13,7 @@ import {
   Alert,
   Share,
   Linking,
+  ActivityIndicator,
 } from 'react-native';
 import CardImage from '../components/CardImage';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -25,7 +26,7 @@ import { useAuth } from '../context/AuthContext';
 import AuthGate from '../components/AuthGate';
 import { useFocusEffect } from '@react-navigation/native';
 import { updateProfile, uploadAvatar, getUserDesigns } from '../services/supabase';
-import { DESIGNS } from '../data/designs';
+// DESIGNS import removed — profile only shows real user designs from Supabase
 import Skeleton from '../components/Skeleton';
 import PressableCard from '../components/PressableCard';
 import { VerifiedBadge } from '../components/VerifiedBadge';
@@ -200,8 +201,7 @@ function InfoIcon() {
 
 // ── Data ──────────────────────────────────────────────────────────────────────
 
-// Fallback to seed designs if DB query fails or returns empty
-const FALLBACK_DESIGNS = DESIGNS.slice(0, 12);
+// No static placeholder data — only show real user designs from Supabase
 
 const ACCOUNT_ITEMS = [
   { label: 'My Spaces',              icon: <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="#444" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round"><Path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z" /><Line x1={4} y1={22} x2={4} y2={15} /></Svg>,  screen: 'MySpaces' },
@@ -279,36 +279,44 @@ export default function ProfileScreen({ navigation }) {
   const [saving, setSaving] = useState(false);
   const [profile, setProfile] = useState(() => getInitialProfile(user));
   const [editDraft, setEditDraft] = useState(() => getInitialProfile(user));
-  const [myDesigns, setMyDesigns] = useState(FALLBACK_DESIGNS);
+  const [myDesigns, setMyDesigns] = useState([]);
+  const [designsLoading, setDesignsLoading] = useState(true);
 
   // Fetch user's own designs from Supabase
   useFocusEffect(
     useCallback(() => {
-      if (user?.id) {
-        getUserDesigns(user.id).then(designs => {
-          if (designs.length > 0) {
-            const normalized = designs.map(d => ({
-              id: `user-${d.id}`,
-              title: d.prompt || 'My Design',
-              user: user.username || user.name || 'Me',
-              initial: (user.name || 'M')[0],
-              verified: false,
-              imageUrl: d.image_url,
-              description: d.prompt,
-              prompt: d.prompt,
-              roomType: 'living-room',
-              styles: d.style_tags || [],
-              products: [],
-              tags: (d.style_tags || []).map(s => `#${s}`),
-              likes: d.likes || 0,
-              shares: 0,
-              visibility: d.visibility,
-              isUserDesign: true,
-            }));
-            setMyDesigns(normalized);
-          }
-        }).catch(() => {});
-      }
+      if (!user?.id) { setDesignsLoading(false); return; }
+      let cancelled = false;
+      setDesignsLoading(true);
+      getUserDesigns(user.id)
+        .then(designs => {
+          if (cancelled) return;
+          const normalized = designs.map(d => ({
+            id: `user-${d.id}`,
+            title: d.prompt || 'My Design',
+            user: user.username || user.name || 'Me',
+            initial: (user.name || 'M')[0],
+            verified: false,
+            imageUrl: d.image_url,
+            description: d.prompt,
+            prompt: d.prompt,
+            roomType: 'living-room',
+            styles: d.style_tags || [],
+            products: d.products || [],
+            tags: (d.style_tags || []).map(s => `#${s}`),
+            likes: d.likes || 0,
+            shares: 0,
+            visibility: d.visibility,
+            isUserDesign: true,
+          }));
+          setMyDesigns(normalized);
+        })
+        .catch(err => {
+          console.warn('Profile designs load failed:', err.message);
+          if (!cancelled) setMyDesigns([]);
+        })
+        .finally(() => { if (!cancelled) setDesignsLoading(false); });
+      return () => { cancelled = true; };
     }, [user?.id])
   );
 
@@ -459,27 +467,52 @@ export default function ProfileScreen({ navigation }) {
         </View>
         <View style={styles.tabBorder} />
 
-        {/* ── Designs Grid (only cards with images — no empty placeholders) ── */}
-        <View style={styles.grid}>
-          {(activeTab === 0
+        {/* ── Designs Grid ── */}
+        {designsLoading ? (
+          <View style={styles.emptyGrid}>
+            <ActivityIndicator size="large" color={C.primary} />
+          </View>
+        ) : (() => {
+          const filtered = (activeTab === 0
             ? myDesigns
             : activeTab === 1
               ? myDesigns.filter(d => liked[d.id])
               : myDesigns.filter(d => shared[d.id])
-          ).filter(d => !!d.imageUrl).map(design => (
-            <PressableCard
-              key={design.id}
-              style={styles.card}
-              animStyle={{ width: CARD_WIDTH }}
-              onPress={() => navigation.navigate('ShopTheLook', { design })}
-            >
-              <View style={styles.cardImg}>
-                <View style={styles.cardImgBg} />
-                <CardImage uri={design.imageUrl} style={styles.cardImgPhoto} resizeMode="cover" />
+          ).filter(d => !!d.imageUrl && !d.imageUrl.includes('replicate.delivery'));
+          if (filtered.length === 0) {
+            return (
+              <View style={styles.emptyGrid}>
+                <Text style={styles.emptyGridTitle}>
+                  {activeTab === 0 ? 'No snaps yet' : activeTab === 1 ? 'No liked designs' : 'No reposts yet'}
+                </Text>
+                <Text style={styles.emptyGridSub}>
+                  {activeTab === 0
+                    ? 'Generate a design from the Snap tab and post it to see it here.'
+                    : activeTab === 1
+                      ? 'Designs you like will appear here.'
+                      : 'Designs you repost will appear here.'}
+                </Text>
               </View>
-            </PressableCard>
-          ))}
-        </View>
+            );
+          }
+          return (
+            <View style={styles.grid}>
+              {filtered.map(design => (
+                <PressableCard
+                  key={design.id}
+                  style={styles.card}
+                  animStyle={{ width: CARD_WIDTH }}
+                  onPress={() => navigation.navigate('ShopTheLook', { design })}
+                >
+                  <View style={styles.cardImg}>
+                    <View style={styles.cardImgBg} />
+                    <CardImage uri={design.imageUrl} style={styles.cardImgPhoto} resizeMode="cover" />
+                  </View>
+                </PressableCard>
+              ))}
+            </View>
+          );
+        })()}
 
         {/* ── Supplier CTA: apply if consumer, dashboard if verified supplier ── */}
         {user?.is_verified_supplier ? (
@@ -1026,6 +1059,25 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     gap: space.xs,
     paddingHorizontal: space.xs,
+  },
+  emptyGrid: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 60,
+    paddingHorizontal: 40,
+  },
+  emptyGridTitle: {
+    fontSize: 17,
+    fontWeight: '700',
+    color: '#111827',
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  emptyGridSub: {
+    fontSize: 14,
+    color: '#9CA3AF',
+    textAlign: 'center',
+    lineHeight: 20,
   },
   // Post grid cards — shadow.low + border.subtle
   card: {

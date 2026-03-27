@@ -21,6 +21,7 @@ import { useOrderHistory } from '../context/OrderHistoryContext';
 import { useAuth } from '../context/AuthContext';
 import AuthGate from '../components/AuthGate';
 import { supabase } from '../services/supabase';
+import { PRODUCT_CATALOG } from '../data/productCatalog';
 
 const C  = theme.colors;
 const SP = theme.space;
@@ -34,17 +35,25 @@ const TY = theme.typography;
 function TrashIcon() {
   return (
     <Svg width={18} height={18} viewBox="0 0 24 24" fill="none"
-      stroke={C.destructive} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+      stroke={C.textTertiary} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
       <Polyline points="3 6 5 6 21 6" />
       <Path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
     </Svg>
   );
 }
 
+function StarIconSmall({ filled = true }) {
+  return (
+    <Svg width={12} height={12} viewBox="0 0 24 24" fill={filled ? '#67ACE9' : '#E5E7EB'} stroke="none">
+      <Path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+    </Svg>
+  );
+}
+
 function MinusIcon() {
   return (
-    <Svg width={16} height={16} viewBox="0 0 24 24" fill="none"
-      stroke={C.textPrimary} strokeWidth={2} strokeLinecap="round">
+    <Svg width={10} height={10} viewBox="0 0 24 24" fill="none"
+      stroke={C.textPrimary} strokeWidth={2.5} strokeLinecap="round">
       <Line x1={5} y1={12} x2={19} y2={12} />
     </Svg>
   );
@@ -52,8 +61,8 @@ function MinusIcon() {
 
 function PlusIcon() {
   return (
-    <Svg width={16} height={16} viewBox="0 0 24 24" fill="none"
-      stroke={C.textPrimary} strokeWidth={2} strokeLinecap="round">
+    <Svg width={10} height={10} viewBox="0 0 24 24" fill="none"
+      stroke={C.textPrimary} strokeWidth={2.5} strokeLinecap="round">
       <Line x1={12} y1={5} x2={12} y2={19} />
       <Line x1={5} y1={12} x2={19} y2={12} />
     </Svg>
@@ -141,7 +150,7 @@ function ChairIcon() {
 
 function VerifiedIcon() {
   return (
-    <Svg width={16} height={16} viewBox="0 0 24 24" fill="none">
+    <Svg width={12} height={12} viewBox="0 0 24 24" fill="none">
       <Circle cx={12} cy={12} r={10} fill={C.primary} />
       <Path d="M9 12l2 2 4-4" stroke="#fff" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" />
     </Svg>
@@ -364,6 +373,12 @@ export default function CartScreen({ navigation }) {
         {/* ── Section 2B: Cart Item Rows ─────────────────────────────── */}
         {items.map((item) => {
           const category = getCategoryInfo(item.name);
+          // Fall back to catalog for rating/reviewCount on items added before the fix
+          const catalogMatch = (!item.rating && PRODUCT_CATALOG)
+            ? PRODUCT_CATALOG.find(p => p.name === item.name && p.brand === item.brand)
+            : null;
+          const displayRating = item.rating ?? catalogMatch?.rating ?? null;
+          const displayReviewCount = item.reviewCount ?? catalogMatch?.reviewCount ?? null;
           return (
             <View key={item.key} style={styles.itemRow}>
 
@@ -372,13 +387,12 @@ export default function CartScreen({ navigation }) {
                 <CardImage uri={item.imageUrl} style={styles.itemImage} resizeMode="cover" />
               </View>
 
-              {/* Content column */}
+              {/* Content column — stacks top-to-bottom, synced to 100px image */}
               <View style={styles.itemContent}>
 
-                {/* Product name + Delete button (top-right) */}
+                {/* Row 1: Product name + Delete button */}
                 <View style={styles.itemTopRow}>
                   <Text style={styles.itemName} numberOfLines={2}>{item.name}</Text>
-                  {/* Delete — tap handler unchanged */}
                   <TouchableOpacity
                     style={styles.deleteBtn}
                     onPress={() => removeFromCart(item.key)}
@@ -388,26 +402,30 @@ export default function CartScreen({ navigation }) {
                   </TouchableOpacity>
                 </View>
 
-                {/* Seller row — verified icon + brand name in primary blue */}
+                {/* Row 2: Stars + rating + review count */}
+                {!!displayRating && (
+                  <View style={styles.ratingRow}>
+                    {[1,2,3,4,5].map(i => (
+                      <StarIconSmall key={i} filled={i <= Math.round(displayRating)} />
+                    ))}
+                    <Text style={styles.ratingScore}> {displayRating.toFixed(1)}</Text>
+                    {!!displayReviewCount && (
+                      <Text style={styles.ratingCount}> ({displayReviewCount.toLocaleString()})</Text>
+                    )}
+                  </View>
+                )}
+
+                {/* Row 3: Verified brand */}
                 <View style={styles.sellerRow}>
                   <VerifiedIcon />
                   <Text style={styles.sellerName}> {item.brand}</Text>
                 </View>
 
-                {/* Stock + Shipping row */}
-                <View style={styles.stockRow}>
-                  <View style={styles.inStockPill}>
-                    <Text style={styles.inStockText}>In Stock</Text>
-                  </View>
-                  <Text style={styles.shippingText}>  Ships in 3–5 days</Text>
-                </View>
-
-                {/* Price + Quantity stepper (right-aligned on same row) */}
+                {/* Row 4: Price + Quantity stepper */}
                 <View style={styles.priceQtyRow}>
                   <Text style={styles.price}>
                     ${(item.price * item.quantity).toLocaleString()}
                   </Text>
-                  {/* Stepper — updateQuantity logic unchanged */}
                   <View style={styles.qtyRow}>
                     <TouchableOpacity
                       style={styles.qtyBtn}
@@ -426,17 +444,6 @@ export default function CartScreen({ navigation }) {
                     </TouchableOpacity>
                   </View>
                 </View>
-
-                {/* Per-item Buy on Amazon link */}
-                {item.source === 'amazon' && item.affiliateUrl && (
-                  <TouchableOpacity
-                    onPress={() => Linking.openURL(item.affiliateUrl)}
-                    activeOpacity={0.7}
-                    style={styles.itemAmazonBtn}
-                  >
-                    <Text style={styles.itemAmazonBtnText}>Buy on Amazon →</Text>
-                  </TouchableOpacity>
-                )}
 
               </View>
             </View>
@@ -476,16 +483,12 @@ export default function CartScreen({ navigation }) {
             <Text style={styles.totalValue}>${total.toLocaleString()}</Text>
           </View>
 
-          {/* Trust signals — single green pill row with two items */}
+          {/* Trust signals — plain green text, no pill */}
           <View style={styles.trustRow}>
-            <View style={styles.trustItem}>
-              <Text style={styles.trustText}>✓  Free 30-day returns</Text>
-            </View>
-            <View style={styles.trustSeparator} />
-            <View style={styles.trustItem}>
-              <ShieldIcon />
-              <Text style={styles.trustText}> SSL secured</Text>
-            </View>
+            <Text style={styles.trustText}>✓  Free 30-Day Returns</Text>
+            <Text style={styles.trustTextMuted}>  ·  </Text>
+            <ShieldIcon color={C.primary} size={12} />
+            <Text style={styles.trustText}>  SSL Secured</Text>
           </View>
 
         </View>
@@ -509,14 +512,19 @@ export default function CartScreen({ navigation }) {
         >
           {checkingOut ? (
             <ActivityIndicator color="#fff" size="small" />
+          ) : allAmazon ? (
+            <View style={styles.checkoutBtnInnerCentered}>
+              <CheckoutCartIcon />
+              <Text style={styles.checkoutLabel}>  Buy on Amazon</Text>
+            </View>
           ) : (
             <View style={styles.checkoutBtnInner}>
               <View style={styles.checkoutLeft}>
                 <CheckoutCartIcon />
-                <Text style={styles.checkoutLabel}>  {allAmazon ? 'Buy on Amazon' : 'Checkout'}</Text>
+                <Text style={styles.checkoutLabel}>  Checkout</Text>
               </View>
               <View style={styles.checkoutDivider} />
-              <Text style={styles.checkoutPrice}>{allAmazon ? '›' : `$${total.toLocaleString()}`}</Text>
+              <Text style={styles.checkoutPrice}>${total.toLocaleString()}</Text>
             </View>
           )}
         </TouchableOpacity>
@@ -570,7 +578,7 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     ...typeScale.caption,
-    color: C.textSecondary,
+    color: C.primary,
     marginTop: 4,
   },
 
@@ -592,10 +600,10 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   itemImageWrap: {
-    width: 88,
-    height: 88,
-    borderRadius: R.lg,             // 16px
-    backgroundColor: C.surface,    // #F9FAFB — light gray, NOT dark navy
+    width: 112,
+    height: 112,
+    borderRadius: 6,                // 6px — sharp, crisp corners
+    backgroundColor: C.surface,
     overflow: 'hidden',
     alignItems: 'center',
     justifyContent: 'center',
@@ -615,7 +623,9 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   itemName: {
-    ...typeScale.headline,
+    fontSize: 14,
+    fontWeight: '500',
+    lineHeight: 19,
     color: C.textPrimary,
     flex: 1,
     marginRight: SP[1],
@@ -635,7 +645,9 @@ const styles = StyleSheet.create({
     marginTop: 6,
   },
   sellerName: {
-    ...typeScale.caption,
+    fontSize: 11,
+    fontWeight: '600',
+    lineHeight: 14,
     color: C.primary,
   },
   stockRow: {
@@ -655,14 +667,20 @@ const styles = StyleSheet.create({
     color: C.success,
     textTransform: undefined,
   },
-  itemAmazonBtn: {
-    marginTop: 8,
-    alignSelf: 'flex-start',
+  ratingRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 7,
+    gap: 1,
   },
-  itemAmazonBtnText: {
+  ratingScore: {
     ...typeScale.caption,
-    color: '#FF9900',
     fontWeight: '600',
+    color: C.textPrimary,
+  },
+  ratingCount: {
+    ...typeScale.caption,
+    color: C.textSecondary,
   },
   shippingText: {
     ...typeScale.caption,
@@ -672,34 +690,33 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: 8,
+    marginTop: 6,
   },
   price: {
-    ...typeScale.display,
-    fontWeight: '800',
+    ...typeScale.price,             // 16px / 700 — bold but compact
     color: C.textPrimary,
     fontVariant: ['tabular-nums'],
   },
   qtyRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    height: 36,
+    height: 28,
   },
   qtyBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: R.sm,             // 8px
+    width: 28,
+    height: 28,
+    borderRadius: 6,
     borderWidth: 1,
     borderColor: C.border,
-    backgroundColor: C.surface,    // #F9FAFB
+    backgroundColor: C.surface,
     alignItems: 'center',
     justifyContent: 'center',
   },
   qtyText: {
-    ...typeScale.headline,
+    fontSize: 13,
     fontWeight: '700',
     color: C.textPrimary,
-    minWidth: 32,
+    minWidth: 22,
     textAlign: 'center',
   },
 
@@ -773,30 +790,17 @@ const styles = StyleSheet.create({
   },
   trustRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: C.successBg,  // #DCFCE7
-    borderRadius: R.md,             // 12px
-    paddingVertical: 10,
-    paddingHorizontal: SP[3],       // 12px
     marginTop: SP[4],               // 16px
   },
-  trustItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-  },
-  trustSeparator: {
-    width: 1,
-    height: 16,
-    backgroundColor: C.success,
-    opacity: 0.3,
-    marginHorizontal: SP[2],
-  },
   trustText: {
-    ...typeScale.micro,
-    color: C.success,
-    textTransform: undefined,
+    ...typeScale.caption,
+    color: C.primary,
+    fontWeight: '500',
+  },
+  trustTextMuted: {
+    ...typeScale.caption,
+    color: C.textTertiary,
   },
 
   ftcDisclosure: {
@@ -815,7 +819,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     paddingHorizontal: SP[5],       // 20px
-    paddingBottom: 34,              // 20px + 14px safe area
+    paddingBottom: SP[3],           // 12px — matches paddingTop
     paddingTop: SP[3],              // 12px
     backgroundColor: C.bg,         // white — no gradient
     borderTopWidth: 1,
@@ -839,6 +843,12 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     width: '100%',
     paddingHorizontal: SP[5],       // 20px
+  },
+  checkoutBtnInnerCentered: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
   },
   checkoutLeft: {
     flexDirection: 'row',

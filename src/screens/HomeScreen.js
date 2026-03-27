@@ -16,11 +16,15 @@ import {
   Keyboard,
   Modal,
   FlatList,
+  Share,
+  Linking,
 } from 'react-native';
 import { BlurView } from 'expo-blur';
 // expo-sharing requires native module not in dev client — use RN Share instead
 import * as FileSystem from 'expo-file-system/legacy';
 import * as ImagePicker from 'expo-image-picker';
+let MediaLibrary = null;
+try { MediaLibrary = require('expo-media-library'); } catch {} // optional — needs dev client rebuild
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Svg, { Path, Circle, Line, Polyline, Rect, Ellipse, G } from 'react-native-svg';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -32,19 +36,20 @@ import CardImage from '../components/CardImage';
 import AutoImage from '../components/AutoImage';
 import { useAuth } from '../context/AuthContext';
 import { useLiked } from '../context/LikedContext';
+import { useCart } from '../context/CartContext';
 import { DESIGNS } from '../data/designs';
 import { SELLERS } from '../data/sellers';
 import { searchProducts, getSourceColor, getProductsForPrompt } from '../services/affiliateProducts';
 import { generateInteriorDesign } from '../services/replicate';
 import { PRODUCT_CATALOG } from '../data/productCatalog';
-import { saveUserDesign } from '../services/supabase';
+import { saveUserDesign, updateDesignVisibility } from '../services/supabase';
 
 const { width, height } = Dimensions.get('window');
 
 
 const CARD_W = width * 0.50;
 const COLL_CARD_W = (width - space.lg * 2 - space.sm) / 2;
-const STYLE_CARD_W = Math.floor((width - space.lg * 2 - space.sm * 2) / 3);
+const STYLE_CARD_W = Math.floor((width - space.lg * 2 - space.sm) / 2.3);
 const ARRIVAL_CARD_W = Math.round(width * 0.42);
 
 // Seller lookup map: handle → seller object
@@ -323,31 +328,44 @@ function RoomIcon({ roomKey, size = 28 }) {
 }
 
 // ── Style category chips with preview image ────────────────────────────────────
+// Local assets for curated styles (permanent, no CDN expiry)
+const STYLE_IMG_JAPANDI      = require('../assets/styles/Japandi.jpg');
+const STYLE_IMG_SCANDI       = require('../assets/styles/Scandanavian.jpg');
+const STYLE_IMG_MINIMALIST   = require('../assets/styles/Minimalist.avif');
+const STYLE_IMG_GLAM         = require('../assets/styles/Glam.jpg');
+const STYLE_IMG_MODERN       = require('../assets/styles/Modern.jpg');
+
 const STYLE_CATEGORIES = [
-  { key: 'japandi',     label: 'Japandi',     sub: 'Refined Calm',   size: 'tall',
+  { key: 'japandi',     label: 'Japandi',     sub: 'Refined Calm',
     bg: '#F0FDF4', text: '#166534', accent: '#16A34A',
-    imageUrl: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=600&q=85' },
-  { key: 'scandi',      label: 'Scandi',      sub: 'Pure & Airy',    size: 'short',
+    localImage: STYLE_IMG_JAPANDI,    nativeW: 658,  nativeH: 986 },
+  { key: 'scandi',      label: 'Scandi',      sub: 'Pure & Airy',
     bg: '#EFF6FF', text: '#1E40AF', accent: '#3B82F6',
-    imageUrl: 'https://images.unsplash.com/photo-1649083048381-520a5b3d91ff?w=600&q=85' },
-  { key: 'mid-century', label: 'Mid-Century', sub: 'Bold Heritage',  size: 'medium',
+    localImage: STYLE_IMG_SCANDI,     nativeW: 1367, nativeH: 2048 },
+  { key: 'minimalist',  label: 'Minimalist',  sub: 'Less Is More',
+    bg: '#F3F4F6', text: '#111827', accent: '#374151',
+    localImage: STYLE_IMG_MINIMALIST, nativeW: 2500, nativeH: 1667 },
+  { key: 'luxury',      label: 'Glam',        sub: 'Opulent Edge',
+    bg: '#F5F3FF', text: '#5B21B6', accent: '#7C3AED',
+    localImage: STYLE_IMG_GLAM,       nativeW: 736,  nativeH: 1031 },
+  { key: 'modern',      label: 'Modern',      sub: 'Clean & Current',
+    bg: '#F8FAFC', text: '#0F172A', accent: '#334155',
+    localImage: STYLE_IMG_MODERN,     nativeW: 900,  nativeH: 1124 },
+  { key: 'mid-century', label: 'Mid-Century', sub: 'Bold Heritage',
     bg: '#FFF7ED', text: '#9A3412', accent: '#EA580C',
     imageUrl: 'https://images.unsplash.com/photo-1541085929911-dea736e9287b?w=600&q=85' },
-  { key: 'dark-luxe',   label: 'Dark Luxe',   sub: 'Moody & Rich',   size: 'tall',
+  { key: 'dark-luxe',   label: 'Dark Luxe',   sub: 'Moody & Rich',
     bg: '#1E1B4B', text: '#C7D2FE', accent: '#818CF8',
     imageUrl: 'https://images.unsplash.com/photo-1668089677938-b52086753f77?w=600&q=85' },
-  { key: 'bohemian',    label: 'Boho',        sub: 'Free Spirit',    size: 'short',
+  { key: 'bohemian',    label: 'Boho',        sub: 'Free Spirit',
     bg: '#FEF3C7', text: '#92400E', accent: '#D97706',
     imageUrl: 'https://images.unsplash.com/photo-1632119580908-ae947d4c7691?w=600&q=85' },
-  { key: 'minimalist',  label: 'Minimalist',  sub: 'Less Is More',   size: 'medium',
-    bg: '#F3F4F6', text: '#111827', accent: '#374151',
-    imageUrl: 'https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=600&q=85' },
-  { key: 'luxury',      label: 'Glam',        sub: 'Opulent Edge',   size: 'tall',
-    bg: '#F5F3FF', text: '#5B21B6', accent: '#7C3AED',
-    imageUrl: 'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=600&q=85' },
-  { key: 'farmhouse',   label: 'Farmhouse',   sub: 'Warm & Rooted',  size: 'short',
+  { key: 'farmhouse',   label: 'Farmhouse',   sub: 'Warm & Rooted',
     bg: '#FAF6F0', text: '#713F12', accent: '#A16207',
     imageUrl: 'https://images.unsplash.com/photo-1764076327046-fe35f955cba1?w=600&q=85' },
+  { key: 'coastal',     label: 'Coastal',     sub: 'Breezy & Light',
+    bg: '#F0F9FF', text: '#0C4A6E', accent: '#0EA5E9',
+    imageUrl: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=600&q=85' },
 ];
 
 // Product counts per style (computed once at module load)
@@ -483,6 +501,59 @@ function ShareIcon({ size = 22 }) {
         fill="#111827"
       />
     </Svg>
+  );
+}
+
+// ── Add All to Cart button — press inverts blue↔white ────────────────────────
+function AddAllToCartButton({ products, onAddAll }) {
+  const [pressed, setPressed] = React.useState(false);
+  const scale = React.useRef(new Animated.Value(1)).current;
+
+  const handlePressIn = () => {
+    setPressed(true);
+    Animated.spring(scale, { toValue: 0.97, useNativeDriver: true, speed: 50, bounciness: 0 }).start();
+  };
+  const handlePressOut = () => {
+    Animated.spring(scale, { toValue: 1, useNativeDriver: true, speed: 40, bounciness: 4 }).start(() => {
+      setTimeout(() => setPressed(false), 180);
+    });
+  };
+
+  const iconColor = pressed ? '#0B6DC3' : '#fff';
+
+  return (
+    <Animated.View style={{ transform: [{ scale }], marginHorizontal: 20, marginTop: 16, marginBottom: 4 }}>
+      <TouchableOpacity
+        style={[
+          {
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'center',
+            borderRadius: 28,
+            paddingVertical: 15,
+            borderWidth: 2,
+          },
+          pressed
+            ? { backgroundColor: '#fff', borderColor: '#0B6DC3' }
+            : { backgroundColor: '#0B6DC3', borderColor: '#0B6DC3' },
+        ]}
+        activeOpacity={1}
+        onPressIn={handlePressIn}
+        onPressOut={handlePressOut}
+        onPress={() => onAddAll(products)}
+      >
+        <Svg width={18} height={18} viewBox="0 0 24 24" fill="none"
+          stroke={iconColor} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"
+          style={{ marginRight: 8 }}>
+          <Path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" />
+          <Line x1={3} y1={6} x2={21} y2={6} />
+          <Path d="M16 10a4 4 0 01-8 0" />
+        </Svg>
+        <Text style={{ color: iconColor, fontSize: 15, fontWeight: '700', letterSpacing: 0.3 }}>
+          Add All to Cart
+        </Text>
+      </TouchableOpacity>
+    </Animated.View>
   );
 }
 
@@ -656,6 +727,7 @@ const FIRST_VISIT_KEY = 'snapspace_home_visited';
 
 export default function HomeScreen({ navigation, route }) {
   const { user } = useAuth();
+  const { addToCart } = useCart();
   const { liked } = useLiked();
   const [prompt, setPrompt] = useState('');
   const [greeting, setGreeting] = useState(getGreeting());
@@ -671,15 +743,17 @@ export default function HomeScreen({ navigation, route }) {
   const [showResult, setShowResult] = useState(false);
   const [showPostSheet, setShowPostSheet] = useState(false);
   const [posting, setPosting] = useState(false);
+  const [autoSavedDesignId, setAutoSavedDesignId] = useState(null);
 
   // Loading bar animation
   const loadingProgress = useRef(new Animated.Value(0)).current;
   const loadingAnim = useRef(null);
 
-  // Sparkle loader animation
-  const sparkleRotate = useRef(new Animated.Value(0)).current;
-  const sparkleScale = useRef(new Animated.Value(1)).current;
-  const sparkleAnim = useRef(null);
+  // Camera lens loader animation
+  const lensRotate  = useRef(new Animated.Value(0)).current;  // outer barrel rotation
+  const lensScale   = useRef(new Animated.Value(1)).current;  // aperture breathe
+  const lensDot     = useRef(new Animated.Value(0.5)).current; // center dot pulse
+  const lensAnim    = useRef(null);
 
   // Scroll-driven parallax
   const scrollY = useRef(new Animated.Value(0)).current;
@@ -762,16 +836,33 @@ export default function HomeScreen({ navigation, route }) {
     setImageLayout({ landscape: (asset.width || 0) > (asset.height || 0) });
   };
 
-  // Timed loading bar — crawls to 90% over ~60s, snaps to 100% on completion
+  // Timed loading bar — 3-phase crawl matching real Replicate generation time
   const startLoadingBar = useCallback(() => {
     loadingProgress.setValue(0);
-    // Slow crawl to 0.9 over 60 seconds (ease out so it slows down as it gets closer)
-    loadingAnim.current = Animated.timing(loadingProgress, {
-      toValue: 0.9,
-      duration: 60000,
-      easing: Easing.out(Easing.cubic),
-      useNativeDriver: false,
-    });
+    // Phase 1: 0→35% in 8s  — model warms up, request sent
+    // Phase 2: 35→75% in 22s — AI actively generating the image
+    // Phase 3: 75→90% in 25s — finalizing, post-processing (slowest)
+    // Total honest crawl: ~55s. Snaps to 100% on completion.
+    loadingAnim.current = Animated.sequence([
+      Animated.timing(loadingProgress, {
+        toValue: 0.35,
+        duration: 8000,
+        easing: Easing.out(Easing.quad),
+        useNativeDriver: false,
+      }),
+      Animated.timing(loadingProgress, {
+        toValue: 0.75,
+        duration: 22000,
+        easing: Easing.inOut(Easing.ease),
+        useNativeDriver: false,
+      }),
+      Animated.timing(loadingProgress, {
+        toValue: 0.90,
+        duration: 25000,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: false,
+      }),
+    ]);
     loadingAnim.current.start();
   }, [loadingProgress]);
 
@@ -796,40 +887,58 @@ export default function HomeScreen({ navigation, route }) {
     }
   }, [loadingProgress]);
 
-  // Sparkle loader — start/stop with generating
+  // Camera lens loader — start/stop with generating
   useEffect(() => {
     if (generating) {
-      sparkleRotate.setValue(0);
-      sparkleScale.setValue(0.8);
-      sparkleAnim.current = Animated.loop(
+      lensRotate.setValue(0);
+      lensScale.setValue(1);
+      lensDot.setValue(0.5);
+      lensAnim.current = Animated.loop(
         Animated.parallel([
-          Animated.timing(sparkleRotate, {
+          // Outer barrel: full rotation every 4s
+          Animated.timing(lensRotate, {
             toValue: 1,
-            duration: 3000,
+            duration: 4000,
             easing: Easing.linear,
             useNativeDriver: true,
           }),
+          // Aperture blades: breathe open → close
           Animated.sequence([
-            Animated.timing(sparkleScale, {
-              toValue: 1.15,
-              duration: 1500,
+            Animated.timing(lensScale, {
+              toValue: 1.1,
+              duration: 1400,
               easing: Easing.inOut(Easing.ease),
               useNativeDriver: true,
             }),
-            Animated.timing(sparkleScale, {
-              toValue: 0.85,
-              duration: 1500,
+            Animated.timing(lensScale, {
+              toValue: 0.88,
+              duration: 1400,
+              easing: Easing.inOut(Easing.ease),
+              useNativeDriver: true,
+            }),
+          ]),
+          // Center dot: glow pulse
+          Animated.sequence([
+            Animated.timing(lensDot, {
+              toValue: 1,
+              duration: 900,
+              easing: Easing.inOut(Easing.ease),
+              useNativeDriver: true,
+            }),
+            Animated.timing(lensDot, {
+              toValue: 0.25,
+              duration: 900,
               easing: Easing.inOut(Easing.ease),
               useNativeDriver: true,
             }),
           ]),
         ])
       );
-      sparkleAnim.current.start();
+      lensAnim.current.start();
     } else {
-      if (sparkleAnim.current) {
-        sparkleAnim.current.stop();
-        sparkleAnim.current = null;
+      if (lensAnim.current) {
+        lensAnim.current.stop();
+        lensAnim.current = null;
       }
     }
   }, [generating]);
@@ -861,20 +970,31 @@ export default function HomeScreen({ navigation, route }) {
   const handleDownload = async () => {
     if (!resultData?.resultUri) return;
     try {
-      // Try local download → opens iOS share sheet with "Save Image"
+      // Step 1: Download image to local cache
       const file = await downloadResultImage();
-      if (!file) return;
+      if (!file?.localUri) throw new Error('Download returned no file');
+
+      // Step 2: Try direct save to camera roll (requires expo-media-library in dev client)
+      if (MediaLibrary) {
+        const { status } = await MediaLibrary.requestPermissionsAsync();
+        if (status === 'granted') {
+          const asset = await MediaLibrary.saveToLibraryAsync(file.localUri);
+          Alert.alert('Saved!', 'Image saved to your photo library.');
+          return;
+        }
+      }
+
+      // Fallback: open iOS share sheet with local file — user can tap "Save Image"
       await Share.share({ url: file.localUri });
     } catch (err) {
-      // Fallback: share the remote URL so user can save from browser
-      console.log('[Download] Local download failed, sharing URL:', err.message);
+      console.log('[Download] Failed:', err.message);
+      // Last resort: share the remote URL
       try {
-        const prompt = resultData.prompt || 'My AI design';
-        await Share.share({
-          message: `My SnapSpace AI design: "${prompt}"\n\n${resultData.resultUri}`,
-        });
+        await Share.share({ url: resultData.resultUri });
       } catch {
-        Alert.alert('Could Not Save', 'Please screenshot the image to save it to your camera roll.');
+        Linking.openURL(resultData.resultUri).catch(() =>
+          Alert.alert('Could Not Save', 'Please screenshot the image to save it to your camera roll.')
+        );
       }
     }
   };
@@ -882,20 +1002,11 @@ export default function HomeScreen({ navigation, route }) {
   const handleShare = async () => {
     if (!resultData?.resultUri) return;
     const prompt = resultData.prompt || 'My AI design';
-    const shareText = `Check out my AI room design on SnapSpace!\n\n"${prompt}"\n\n${resultData.resultUri}`;
     try {
-      // Try to download and share the actual image file
-      const file = await downloadResultImage();
-      if (file) {
-        await Share.share({ url: file.localUri });
-        return;
-      }
-    } catch (err) {
-      console.log('[Share] File download failed, sharing URL:', err.message);
-    }
-    // Fallback: share text + URL directly
-    try {
-      await Share.share({ message: shareText });
+      await Share.share({
+        message: `Check out my AI room design on SnapSpace!\n\n"${prompt}"`,
+        url: resultData.resultUri,
+      });
     } catch (err) {
       console.log('[Share] Error:', err);
     }
@@ -906,26 +1017,28 @@ export default function HomeScreen({ navigation, route }) {
     setPosting(true);
     setShowPostSheet(false);
     try {
-      const styleTags = (resultData.products || []).flatMap(p => p.styles || p.styleTags || []).filter(Boolean);
-      const uniqueTags = [...new Set(styleTags)];
-      const productSummary = (resultData.products || []).map(p => ({
-        id: p.id,
-        name: p.name,
-        brand: p.brand,
-        price: p.priceValue ?? p.price,
-        imageUrl: p.imageUrl,
-        rating: p.rating,
-        reviewCount: p.reviewCount,
-        affiliateUrl: p.affiliateUrl,
-        source: p.source,
-      }));
-      await saveUserDesign(user.id, {
-        imageUrl: resultData.resultUri,
-        prompt: resultData.prompt || '',
-        styleTags: uniqueTags,
-        products: productSummary,
-        visibility,
-      });
+      if (autoSavedDesignId) {
+        // Design was already auto-saved — just update visibility
+        await updateDesignVisibility(autoSavedDesignId, visibility);
+      } else {
+        // Fallback: auto-save didn't finish yet — do a full save
+        const styleTags = (resultData.products || []).flatMap(p => p.styles || p.styleTags || []).filter(Boolean);
+        const uniqueTags = [...new Set(styleTags)];
+        const productSummary = (resultData.products || []).map(p => ({
+          id: p.id, name: p.name, brand: p.brand,
+          price: p.priceValue ?? p.price, imageUrl: p.imageUrl,
+          rating: p.rating, reviewCount: p.reviewCount,
+          affiliateUrl: p.affiliateUrl, source: p.source,
+        }));
+        const result = await saveUserDesign(user.id, {
+          imageUrl: resultData.resultUri,
+          prompt: resultData.prompt || '',
+          styleTags: uniqueTags,
+          products: productSummary,
+          visibility,
+        });
+        if (result?.designId) setAutoSavedDesignId(result.designId);
+      }
       Alert.alert(
         visibility === 'public' ? 'Posted to Explore!' : 'Saved to Profile',
         visibility === 'public'
@@ -973,6 +1086,30 @@ export default function HomeScreen({ navigation, route }) {
       setPhoto(null);
       setPhotoSource(null);
       setPrompt('');
+
+      // ── Auto-save: persist every generation to Supabase immediately ──
+      if (user?.id) {
+        const styleTags = matchedProducts.flatMap(p => p.styles || p.styleTags || []).filter(Boolean);
+        const uniqueTags = [...new Set(styleTags)];
+        const productSummary = matchedProducts.map(p => ({
+          id: p.id, name: p.name, brand: p.brand,
+          price: p.priceValue ?? p.price, imageUrl: p.imageUrl,
+          rating: p.rating, reviewCount: p.reviewCount,
+          affiliateUrl: p.affiliateUrl, source: p.source,
+        }));
+        saveUserDesign(user.id, {
+          imageUrl: resultUrl,
+          prompt: designPrompt,
+          styleTags: uniqueTags,
+          products: productSummary,
+          visibility: 'private',
+        })
+          .then(result => {
+            if (result?.designId) setAutoSavedDesignId(result.designId);
+            console.log('[AutoSave] Design persisted:', result?.designId);
+          })
+          .catch(err => console.warn('[AutoSave] Failed:', err.message));
+      }
     } catch (err) {
       stopLoadingBar(false);
       setGenerating(false);
@@ -1062,25 +1199,60 @@ export default function HomeScreen({ navigation, route }) {
             </View>
           )}
 
-          {/* Generation status — custom sparkle loader */}
+          {/* Generation status — camera lens loader */}
           {generating && (
             <View style={styles.heroCentered}>
-              {/* Animated sparkle star */}
-              <Animated.View style={{
-                transform: [
-                  { rotate: sparkleRotate.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '360deg'] }) },
-                  { scale: sparkleScale },
-                ],
-              }}>
-                <Svg width={48} height={48} viewBox="0 0 48 48" fill="none">
-                  {/* Main 4-pointed star */}
-                  <Path d="M24 2 L28 18 L44 24 L28 30 L24 46 L20 30 L4 24 L20 18 Z" fill="#0B6DC3" opacity={0.9} />
-                  {/* Inner glow star */}
-                  <Path d="M24 10 L26 20 L36 24 L26 28 L24 38 L22 28 L12 24 L22 20 Z" fill="#67ACE9" opacity={0.7} />
-                  {/* Center dot */}
-                  <Circle cx={24} cy={24} r={3} fill="#fff" opacity={0.95} />
+              <View style={{ width: 100, height: 100, alignItems: 'center', justifyContent: 'center' }}>
+
+                {/* Layer 1: outer barrel — dashed ring, slow CW rotation */}
+                <Animated.View style={{
+                  position: 'absolute',
+                  transform: [{ rotate: lensRotate.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '360deg'] }) }],
+                }}>
+                  <Svg width={100} height={100} viewBox="0 0 100 100">
+                    <Circle cx={50} cy={50} r={46} stroke="#67ACE9" strokeWidth={1.5}
+                      fill="none" strokeDasharray="5 7" strokeLinecap="round" />
+                  </Svg>
+                </Animated.View>
+
+                {/* Layer 2: middle ring — solid, slow CCW rotation */}
+                <Animated.View style={{
+                  position: 'absolute',
+                  transform: [{ rotate: lensRotate.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '-200deg'] }) }],
+                }}>
+                  <Svg width={100} height={100} viewBox="0 0 100 100">
+                    <Circle cx={50} cy={50} r={34} stroke="#0B6DC3" strokeWidth={1}
+                      fill="none" opacity={0.65} strokeDasharray="10 5" strokeLinecap="round" />
+                  </Svg>
+                </Animated.View>
+
+                {/* Layer 3: inner ring — static */}
+                <Svg width={100} height={100} viewBox="0 0 100 100" style={{ position: 'absolute' }}>
+                  <Circle cx={50} cy={50} r={22} stroke="#67ACE9" strokeWidth={0.8} fill="none" opacity={0.4} />
                 </Svg>
-              </Animated.View>
+
+                {/* Layer 4: aperture blades — 6 ellipses breathe with lensScale */}
+                <Animated.View style={{ position: 'absolute', transform: [{ scale: lensScale }] }}>
+                  <Svg width={100} height={100} viewBox="0 0 100 100">
+                    {[0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330].map((angle, i) => (
+                      <G key={i} rotation={angle} origin="50, 50">
+                        <Circle cx={50} cy={33} r={2.5} fill="#fff" opacity={0.88} />
+                      </G>
+                    ))}
+                    {/* Inner glass fill */}
+                    <Circle cx={50} cy={50} r={12} fill="rgba(11,109,195,0.2)" />
+                  </Svg>
+                </Animated.View>
+
+                {/* Layer 5: center dot — glows with lensDot */}
+                <Animated.View style={{ position: 'absolute', opacity: lensDot }}>
+                  <Svg width={100} height={100} viewBox="0 0 100 100">
+                    <Circle cx={50} cy={50} r={9} fill="rgba(255,255,255,0.12)" />
+                    <Circle cx={50} cy={50} r={4} fill="#fff" />
+                  </Svg>
+                </Animated.View>
+
+              </View>
               <Text style={styles.genStatusText}>
                 {genStatus || 'Designing your space…'}
               </Text>
@@ -1168,7 +1340,15 @@ export default function HomeScreen({ navigation, route }) {
                 onPress={runGeneration}
                 disabled={generating}
               >
-                {generating ? <ActivityIndicator color="#fff" size="small" /> : <SendIcon />}
+                {generating ? (
+                  <Animated.View style={{ transform: [{ rotate: lensRotate.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '360deg'] }) }] }}>
+                    <Svg width={20} height={20} viewBox="0 0 24 24">
+                      <Circle cx={12} cy={12} r={10} stroke="#fff" strokeWidth={1.8} fill="none" strokeDasharray="6 4" strokeLinecap="round" />
+                      <Circle cx={12} cy={12} r={5}  stroke="rgba(255,255,255,0.55)" strokeWidth={1} fill="none" />
+                      <Circle cx={12} cy={12} r={2}  fill="#fff" />
+                    </Svg>
+                  </Animated.View>
+                ) : <SendIcon />}
               </TouchableOpacity>
             </View>
             {/* Loading progress bar */}
@@ -1349,12 +1529,19 @@ export default function HomeScreen({ navigation, route }) {
                   })}
                 >
                   <View style={styles.styleCardImgWrap}>
-                    <CardImage
-                      uri={cat.imageUrl}
-                      style={StyleSheet.absoluteFill}
-                      placeholderColor="#C8D4E8"
-                      resizeMode="cover"
-                    />
+                    {cat.localImage ? (
+                      <Image
+                        source={cat.localImage}
+                        resizeMode="contain"
+                        style={StyleSheet.absoluteFill}
+                      />
+                    ) : cat.imageUrl ? (
+                      <Image
+                        source={{ uri: cat.imageUrl }}
+                        resizeMode="cover"
+                        style={StyleSheet.absoluteFill}
+                      />
+                    ) : null}
                   </View>
                   <View style={styles.styleCardInfoBox}>
                     <Text style={styles.styleCardLabel} numberOfLines={1}>{cat.label}</Text>
@@ -1741,6 +1928,17 @@ export default function HomeScreen({ navigation, route }) {
                   )}
                 />
               </View>
+            )}
+
+            {/* Add All to Cart */}
+            {resultData?.products?.length > 0 && (
+              <AddAllToCartButton
+                products={resultData.products}
+                onAddAll={(products) => {
+                  products.forEach(p => addToCart(p));
+                  Alert.alert('Added to Cart', `${products.length} items added to your cart.`);
+                }}
+              />
             )}
 
             {/* FTC disclosure */}
@@ -2450,6 +2648,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 6,
     borderTopRightRadius: 6,
     overflow: 'hidden',
+    backgroundColor: '#FFFFFF',
   },
   styleCardInfoBox: {
     paddingHorizontal: 8,
@@ -2872,16 +3071,17 @@ const styles = StyleSheet.create({
 
   // ── Loading progress bar ───────────────────────────────────────────────────
   loadingBarTrack: {
-    height: 3,
-    backgroundColor: 'rgba(255,255,255,0.15)',
-    borderRadius: 1.5,
-    marginTop: 8,
+    height: 2,
+    backgroundColor: 'rgba(255,255,255,0.18)',
+    borderRadius: 1,
+    marginTop: 10,
+    marginHorizontal: 2,
     overflow: 'hidden',
   },
   loadingBarFill: {
-    height: 3,
-    backgroundColor: '#0B6DC3',
-    borderRadius: 1.5,
+    height: 2,
+    backgroundColor: '#67ACE9',
+    borderRadius: 1,
   },
 });
 
@@ -3067,7 +3267,7 @@ const resultStyles = StyleSheet.create({
     color: '#9CA3AF',
     fontStyle: 'italic',
     textAlign: 'center',
-    marginTop: 24,
+    marginTop: 16,
     marginHorizontal: 20,
   },
   // Post sheet

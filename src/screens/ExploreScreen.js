@@ -20,7 +20,6 @@ import Svg, { Circle, Line, Path, Rect, Polyline } from 'react-native-svg';
 import { fontSize, fontWeight, letterSpacing, space, radius, shadow, typeScale } from '../constants/tokens';
 import theme from '../constants/theme';
 import { useLiked } from '../context/LikedContext';
-import { DESIGNS } from '../data/designs';
 import { PRODUCT_CATALOG } from '../data/productCatalog';
 import { getPublicDesigns } from '../services/supabase';
 import PressableCard from '../components/PressableCard';
@@ -412,7 +411,7 @@ export default function ExploreScreen({ navigation, route }) {
           likes: d.likes || 0,
           shares: 0,
           isUserDesign: true,
-        }));
+        })).filter(d => !!d.imageUrl && !d.imageUrl.includes('replicate.delivery'));
         setCommunityDesigns(normalized);
       }).catch(() => {});
     }, [])
@@ -427,7 +426,7 @@ export default function ExploreScreen({ navigation, route }) {
     );
   };
 
-  const baseDesigns = overrideDesigns || [...communityDesigns, ...DESIGNS];
+  const baseDesigns = overrideDesigns || [...communityDesigns];
 
   const filteredDesigns = useMemo(
     () => searchAndFilter(baseDesigns, search, activeCategory, activeRoomFilter, activeStyleFilter),

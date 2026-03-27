@@ -102,7 +102,7 @@ export function AuthProvider({ children }) {
       },
     });
     const timeout = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error('Connection timed out. Check your network and try again.')), 15000)
+      setTimeout(() => reject(new Error('Connection timed out. Check your network and try again.')), 35000)
     );
     const { data, error } = await Promise.race([authCall, timeout]);
     if (error) throw new Error(error.message);
@@ -128,7 +128,7 @@ export function AuthProvider({ children }) {
       password,
     });
     const timeout = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error('Connection timed out. Check your network and try again.')), 15000)
+      setTimeout(() => reject(new Error('Connection timed out. Check your network and try again.')), 35000)
     );
     const { error } = await Promise.race([authCall, timeout]);
     if (error) {
