@@ -40,7 +40,7 @@ import { useCart } from '../context/CartContext';
 import { DESIGNS } from '../data/designs';
 import { SELLERS } from '../data/sellers';
 import { searchProducts, getSourceColor, getProductsForPrompt } from '../services/affiliateProducts';
-import { generateInteriorDesign } from '../services/replicate';
+import { generateInteriorDesign, buildFinalPrompt } from '../services/replicate';
 import { PRODUCT_CATALOG } from '../data/productCatalog';
 import { saveUserDesign, updateDesignVisibility } from '../services/supabase';
 
@@ -579,21 +579,32 @@ const VISUAL_WORDS = [
   'boucle','velvet','leather','linen','rattan','marble','glass','wood',
   'walnut','oak','brass','gold','curved','round','oval','modular',
   'cream','beige','white','gray','black','camel','sage','green',
+  'navy','teal','brown','natural','woven','jute','ceramic','metal',
+  'chrome','copper','mid-century','modern','rustic','industrial',
+  'tufted','channel','sectional','l-shaped','swirl','abstract',
+  'geometric','wavy','herringbone','bamboo','travertine',
 ];
 
 function extractVisualHints(name) {
   const lower = name.toLowerCase();
-  return VISUAL_WORDS.filter(w => lower.includes(w)).slice(0, 2).join(' ');
+  return VISUAL_WORDS.filter(w => lower.includes(w)).slice(0, 3).join(' ');
 }
 
 function buildEnrichedPrompt(userPrompt, products) {
-  const pieces = products.slice(0, 5).map(p => {
+  // Build detailed product hints for the AI prompt.
+  // Each hint includes material, color, and shape descriptors extracted from
+  // the product name, giving the AI a clear picture of what to render.
+  // e.g. "one cream boucle modular sofa, one walnut oval coffee table, one cream swirl area rug"
+  const pieces = products.slice(0, 6).map(p => {
     const label = FURNITURE_LABELS[p.category] || p.category.replace(/-/g, ' ');
     const hints = extractVisualHints(p.name);
-    return hints ? `${hints} ${label}` : label;
+    return hints ? `one ${hints} ${label}` : `one ${label}`;
   });
-  const list = pieces.length > 0 ? `, with ${pieces.join(', ')}` : '';
-  return `${userPrompt}${list}, fully furnished interior, warm soft lighting`;
+  const productHints = pieces.length > 0 ? pieces.join(', ') : null;
+
+  // Use the centralized prompt builder from replicate.js
+  // This adds architecture preservation + quality suffix automatically
+  return buildFinalPrompt(userPrompt, productHints);
 }
 
 function ChevronRight({ color = '#fff' }) {
@@ -720,6 +731,59 @@ function getFirstName(user) {
   return full.split(' ')[0] || null;
 }
 
+// ─── Contextual loading messages ─────────────────────────────────────────────
+
+function getLoadingMessages(promptText) {
+  const p = (promptText || '').toLowerCase();
+
+  // Extract style, mood, and room keywords from the prompt
+  const styles = ['scandinavian','scandi','japandi','minimalist','modern','mid-century','bohemian','boho',
+    'industrial','coastal','farmhouse','rustic','art deco','glam','luxury','contemporary','transitional',
+    'mediterranean','wabi-sabi','dark luxe','biophilic','french country','maximalist','nordic'];
+  const moods = ['cozy','warm','serene','elegant','bold','dramatic','airy','bright','moody','vibrant',
+    'calm','refined','inviting','sophisticated','luxurious','eclectic','organic','earthy','sleek','chic'];
+  const rooms = ['living room','bedroom','kitchen','dining room','office','bathroom','reading nook',
+    'nursery','entryway','studio','lounge','den','patio','balcony','sunroom','home office','loft'];
+
+  const style = styles.find(s => p.includes(s)) || '';
+  const mood = moods.find(m => p.includes(m)) || '';
+  const room = rooms.find(r => p.includes(r)) || 'space';
+
+  // Style-specific design language
+  const styleVerbs = {
+    scandinavian: ['Nordic simplicity','natural textures','hygge warmth'],
+    scandi: ['Nordic simplicity','natural textures','hygge warmth'],
+    japandi: ['wabi-sabi harmony','zen minimalism','organic balance'],
+    minimalist: ['clean silhouettes','intentional restraint','breathing room'],
+    modern: ['contemporary lines','refined finishes','sculptural forms'],
+    'mid-century': ['retro elegance','organic curves','timeless character'],
+    bohemian: ['layered patterns','eclectic warmth','global accents'],
+    boho: ['layered patterns','eclectic warmth','global accents'],
+    industrial: ['raw materials','urban edge','exposed character'],
+    coastal: ['ocean-inspired tones','breezy textures','natural light'],
+    farmhouse: ['rustic warmth','vintage charm','handcrafted details'],
+    'dark luxe': ['moody atmosphere','rich depth','dramatic contrast'],
+    glam: ['opulent finishes','statement pieces','refined luxury'],
+    luxury: ['opulent finishes','curated elegance','bespoke details'],
+  };
+
+  const designDetails = styleVerbs[style] || ['curated details','considered proportions','refined materials'];
+
+  // Build tailored messages
+  const messages = [
+    `Designing your ${room}…`,
+    mood ? `Infusing ${mood} energy into every detail…` : `Shaping the perfect atmosphere…`,
+    style ? `Channeling ${style.charAt(0).toUpperCase() + style.slice(1)} design principles…` : `Balancing form and function…`,
+    `Layering ${designDetails[0]} with intention…`,
+    `Perfecting ${designDetails[1]}…`,
+    `Curating ${designDetails[2]}…`,
+    `Harmonizing color, light, and texture…`,
+    `Adding the finishing touches…`,
+  ];
+
+  return messages;
+}
+
 // ─── Constants ────────────────────────────────────────────────────────────────
 const FIRST_VISIT_KEY = 'snapspace_home_visited';
 
@@ -739,6 +803,9 @@ export default function HomeScreen({ navigation, route }) {
   const [imageLayout, setImageLayout] = useState(null);
   const [generating, setGenerating] = useState(false);
   const [genStatus, setGenStatus] = useState('');
+  const [loadingMsgIndex, setLoadingMsgIndex] = useState(0);
+  const [loadingMessages, setLoadingMessages] = useState([]);
+  const loadingMsgOpacity = useRef(new Animated.Value(1)).current;
   const [resultData, setResultData] = useState(null); // { imageUri, resultUri, prompt, products }
   const [showResult, setShowResult] = useState(false);
   const [showPostSheet, setShowPostSheet] = useState(false);
@@ -839,30 +906,14 @@ export default function HomeScreen({ navigation, route }) {
   // Timed loading bar — 3-phase crawl matching real Replicate generation time
   const startLoadingBar = useCallback(() => {
     loadingProgress.setValue(0);
-    // Phase 1: 0→35% in 8s  — model warms up, request sent
-    // Phase 2: 35→75% in 22s — AI actively generating the image
-    // Phase 3: 75→90% in 25s — finalizing, post-processing (slowest)
-    // Total honest crawl: ~55s. Snaps to 100% on completion.
-    loadingAnim.current = Animated.sequence([
-      Animated.timing(loadingProgress, {
-        toValue: 0.35,
-        duration: 8000,
-        easing: Easing.out(Easing.quad),
-        useNativeDriver: false,
-      }),
-      Animated.timing(loadingProgress, {
-        toValue: 0.75,
-        duration: 22000,
-        easing: Easing.inOut(Easing.ease),
-        useNativeDriver: false,
-      }),
-      Animated.timing(loadingProgress, {
-        toValue: 0.90,
-        duration: 25000,
-        easing: Easing.out(Easing.cubic),
-        useNativeDriver: false,
-      }),
-    ]);
+    // Linear 0→95% over 75 seconds at constant speed.
+    // Snaps to 100% when generation completes.
+    loadingAnim.current = Animated.timing(loadingProgress, {
+      toValue: 0.95,
+      duration: 75000,
+      easing: Easing.linear,
+      useNativeDriver: false,
+    });
     loadingAnim.current.start();
   }, [loadingProgress]);
 
@@ -943,6 +994,29 @@ export default function HomeScreen({ navigation, route }) {
     }
   }, [generating]);
 
+  // Rotating loading messages — cycle every 3s with fade
+  useEffect(() => {
+    if (!generating || loadingMessages.length === 0) return;
+    const interval = setInterval(() => {
+      // Fade out
+      Animated.timing(loadingMsgOpacity, {
+        toValue: 0,
+        duration: 300,
+        useNativeDriver: true,
+      }).start(() => {
+        // Advance to next message
+        setLoadingMsgIndex(prev => (prev + 1) % loadingMessages.length);
+        // Fade in
+        Animated.timing(loadingMsgOpacity, {
+          toValue: 1,
+          duration: 400,
+          useNativeDriver: true,
+        }).start();
+      });
+    }, 3000);
+    return () => clearInterval(interval);
+  }, [generating, loadingMessages]);
+
   // ── Result actions ──────────────────────────────────────────────────────────
 
   // Helper: download result image to local cache file
@@ -975,14 +1049,20 @@ export default function HomeScreen({ navigation, route }) {
       if (!file?.localUri) throw new Error('Download returned no file');
 
       // Step 2: Try direct save to camera roll (requires expo-media-library in dev client)
+      let saved = false;
       if (MediaLibrary) {
-        const { status } = await MediaLibrary.requestPermissionsAsync();
-        if (status === 'granted') {
-          const asset = await MediaLibrary.saveToLibraryAsync(file.localUri);
-          Alert.alert('Saved!', 'Image saved to your photo library.');
-          return;
+        try {
+          const { status } = await MediaLibrary.requestPermissionsAsync();
+          if (status === 'granted') {
+            await MediaLibrary.saveToLibraryAsync(file.localUri);
+            Alert.alert('Saved!', 'Image saved to your photo library.');
+            saved = true;
+          }
+        } catch (e) {
+          console.log('[Download] MediaLibrary native module not available:', e.message);
         }
       }
+      if (saved) return;
 
       // Fallback: open iOS share sheet with local file — user can tap "Save Image"
       await Share.share({ url: file.localUri });
@@ -1065,10 +1145,15 @@ export default function HomeScreen({ navigation, route }) {
     const designPrompt = prompt.trim();
     const savedPhoto = { ...photo };
     Keyboard.dismiss();
+    // Initialize rotating loading messages tailored to the prompt
+    const msgs = getLoadingMessages(designPrompt);
+    setLoadingMessages(msgs);
+    setLoadingMsgIndex(0);
+    loadingMsgOpacity.setValue(1);
     setGenerating(true);
     startLoadingBar();
     try {
-      setGenStatus('Curating products…');
+      setGenStatus('');
       const matchedProducts = getProductsForPrompt(designPrompt, 6);
       setGenStatus('Generating your design…');
       const enrichedPrompt = buildEnrichedPrompt(designPrompt, matchedProducts);
@@ -1253,9 +1338,9 @@ export default function HomeScreen({ navigation, route }) {
                 </Animated.View>
 
               </View>
-              <Text style={styles.genStatusText}>
-                {genStatus || 'Designing your space…'}
-              </Text>
+              <Animated.Text style={[styles.genStatusText, { opacity: loadingMsgOpacity }]}>
+                {loadingMessages[loadingMsgIndex] || genStatus || 'Designing your space…'}
+              </Animated.Text>
             </View>
           )}
 
@@ -2211,8 +2296,8 @@ const styles = StyleSheet.create({
   headlineBold: { fontWeight: fontWeight.xbold },
   genStatusText: {
     color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
+    fontSize: 14,
+    fontWeight: '400',
     marginTop: 20,
     textAlign: 'center',
     textShadowColor: 'rgba(0,0,0,0.4)',

@@ -411,9 +411,10 @@ export default function ExploreScreen({ navigation, route }) {
           likes: d.likes || 0,
           shares: 0,
           isUserDesign: true,
-        })).filter(d => !!d.imageUrl && !d.imageUrl.includes('replicate.delivery'));
+        })).filter(d => !!d.imageUrl);
+        console.log('[Explore] Loaded', normalized.length, 'community designs');
         setCommunityDesigns(normalized);
-      }).catch(() => {});
+      }).catch(err => console.warn('[Explore] Failed to load community designs:', err.message));
     }, [])
   );
 

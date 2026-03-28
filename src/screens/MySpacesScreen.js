@@ -222,9 +222,7 @@ export default function MySpacesScreen({ navigation }) {
       (async () => {
         try {
           const data = await getUserDesigns(user.id);
-          // Filter out expired Replicate CDN URLs — only show permanently stored images
-          const valid = data.filter(d => d.image_url && !d.image_url.includes('replicate.delivery'));
-          if (!cancelled) setDesigns(valid);
+          if (!cancelled) setDesigns(data.filter(d => !!d.image_url));
         } catch (e) {
           console.warn('MySpaces load failed:', e.message);
         } finally {

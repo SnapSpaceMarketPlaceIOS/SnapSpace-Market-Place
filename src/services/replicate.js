@@ -9,27 +9,65 @@ const MODEL_VERSION = '9a8db105db745f8b11ad3afe5c8bd892428b2a43ade0b67edc4e0ccd5
 const POLL_INTERVAL_MS = 3000;
 const MAX_POLLS = 80; // 3s × 80 = 4 min timeout
 
+// ── Architecture preservation prefix ─────────────────────────────────────────
+// This is prepended to every prompt to ensure the model preserves the room's
+// physical structure (walls, doors, windows, ceiling, floor plan).
+const ARCHITECTURE_GUARD = [
+  'Redesign ONLY the interior furniture, decor, and soft furnishings in this room.',
+  'CRITICALLY IMPORTANT: Every wall, door, doorway, window, ceiling, floor plan,',
+  'molding, radiator, vent, and built-in fixture must remain EXACTLY as they appear',
+  'in the original photo. Do not add new doors or windows. Do not remove existing',
+  'doors or windows. Do not change wall positions or room layout. The room shell',
+  'is sacred and untouchable — only furniture and decor inside the room changes.',
+].join(' ');
+
+// Quality suffix appended to every prompt for photorealistic output
+const QUALITY_SUFFIX = [
+  'Professional interior design photography,',
+  'natural warm lighting, photorealistic, high resolution,',
+  'editorial quality, beautifully staged room,',
+  'interior design magazine cover shot.',
+].join(' ');
+
+/**
+ * Build the final prompt sent to the AI model.
+ *
+ * Structure:
+ *   [Architecture guard] + [User's design intent] + [Product hints] + [Quality suffix]
+ *
+ * @param {string} userPrompt    - The user's raw prompt ("Cozy Scandinavian reading nook")
+ * @param {string} [productHints] - Optional furniture descriptions from catalog matching
+ * @returns {string} The full enriched prompt
+ */
+export function buildFinalPrompt(userPrompt, productHints) {
+  const parts = [ARCHITECTURE_GUARD];
+
+  // User's design intent
+  parts.push(`Design style: ${userPrompt || 'modern minimalist interior design'}.`);
+
+  // Product catalog hints (when available)
+  // These descriptions tell the AI exactly what furniture to place,
+  // creating visual alignment between the generated image and shop cards.
+  if (productHints) {
+    parts.push(`Furnish the room with exactly these items: ${productHints}.`);
+    parts.push('Place only the furniture described above — do not add extra items beyond what is listed.');
+  }
+
+  parts.push(QUALITY_SUFFIX);
+
+  return parts.join(' ');
+}
+
 /**
  * Convert image to a data URI that Replicate can read.
- *
- * Strategy:
- * 1. Use picker's base64 if available (expo-image-picker with quality < 1 → JPEG)
- * 2. Fall back to reading file URI as base64
- * 3. Detect format and build a proper data URI
- *
- * Uses data URI instead of Files API to eliminate upload/download intermediary
- * and ensure the model receives exactly what we send.
  */
 async function imageToDataUri(imageUri, base64Data) {
   let b64;
 
   if (base64Data && base64Data.length > 100) {
-    console.log('[Replicate] Using picker base64, length:', base64Data.length);
     b64 = base64Data;
   } else {
-    console.log('[Replicate] No picker base64, reading from URI...');
     b64 = await FileSystem.readAsStringAsync(imageUri, { encoding: 'base64' });
-    console.log('[Replicate] Read base64 from URI, length:', b64.length);
   }
 
   if (!b64 || b64.length < 100) {
@@ -40,23 +78,18 @@ async function imageToDataUri(imageUri, base64Data) {
   const prefix = b64.substring(0, 8);
   const isJpeg = prefix.startsWith('/9j/');
   const isPng = prefix.startsWith('iVBOR');
-  console.log('[Replicate] Format — prefix:', prefix, 'JPEG:', isJpeg, 'PNG:', isPng);
 
   if (!isJpeg && !isPng) {
-    // Not JPEG or PNG — likely HEIC/AVIF from iOS
-    // Try uploading via Files API as a fallback (Replicate may convert)
     console.warn('[Replicate] Non-JPEG/PNG detected, attempting Files API upload...');
     return uploadViaFilesApi(imageUri, b64);
   }
 
   const mime = isPng ? 'image/png' : 'image/jpeg';
-  console.log('[Replicate] Using data URI approach, mime:', mime);
   return `data:${mime};base64,${b64}`;
 }
 
 /**
  * Fallback: upload via Replicate Files API for non-JPEG/PNG images.
- * Some formats may still fail on the model side.
  */
 async function uploadViaFilesApi(imageUri, b64) {
   const tempPath = FileSystem.cacheDirectory + 'replicate_upload_' + Date.now() + '.jpg';
@@ -96,8 +129,14 @@ async function uploadViaFilesApi(imageUri, b64) {
 /**
  * Generates a redesigned interior image using Flux ControlNet.
  *
+ * Key parameter tuning:
+ * - control_strength: 0.65 — preserves room geometry (walls/doors/windows)
+ *   while allowing furniture changes. Higher = more original photo preserved.
+ * - guidance_scale: 4.0 — how closely the model follows the text prompt.
+ * - steps: 28 — generation quality steps.
+ *
  * @param {string} imageUri  - Local file URI from expo-image-picker / expo-camera
- * @param {string} prompt    - Design style prompt
+ * @param {string} prompt    - The FULL enriched prompt (use buildFinalPrompt())
  * @param {string} [base64]  - Optional JPEG base64 from the image picker
  * @returns {Promise<string>} URL of the AI-generated room image
  */
@@ -107,6 +146,7 @@ export async function generateInteriorDesign(imageUri, prompt, base64) {
   const controlImage = await imageToDataUri(imageUri, base64);
   const isDataUri = controlImage.startsWith('data:');
   console.log('[Replicate] control_image:', isDataUri ? `data URI (${controlImage.length} chars)` : controlImage);
+  console.log('[Replicate] Prompt:', prompt.substring(0, 200) + '...');
 
   const res = await fetch(`${API_URL}/predictions`, {
     method: 'POST',
@@ -118,13 +158,24 @@ export async function generateInteriorDesign(imageUri, prompt, base64) {
       version: MODEL_VERSION,
       input: {
         control_image: controlImage,
-        prompt: `${prompt || 'modern minimalist interior design'}, beautifully furnished interior, professional interior photography, high resolution, staged room, warm soft lighting, interior design magazine quality`,
-        negative_prompt: 'lowres, watermark, text, banner, logo, deformed, blurry, out of focus, empty room, bare walls, no furniture, bare floor, people, person, human, outdoor, exterior, cartoon, anime, sketch, overexposed, underexposed, ugly',
+        prompt: prompt,
+        negative_prompt: [
+          'lowres, watermark, text, banner, logo, deformed, blurry, out of focus,',
+          'empty room, bare walls, no furniture, bare floor,',
+          'people, person, human, hands, fingers,',
+          'outdoor, exterior, cartoon, anime, sketch,',
+          'overexposed, underexposed, ugly,',
+          'changed room layout, different floor plan, missing doors, missing windows,',
+          'altered walls, removed doors, added walls, structural changes,',
+        ].join(' '),
         control_type: 'depth',
         guidance_scale: 4.0,
         steps: 28,
         seed: Math.floor(Math.random() * 999999999),
-        control_strength: 0.6,
+        // control_strength: 0.75 — high preservation of room architecture.
+        // 0.5 = balanced, 0.7 = very faithful, 0.8+ = minimal changes.
+        // We use 0.75 to strictly keep walls/doors/windows intact while swapping furniture.
+        control_strength: 0.75,
         output_format: 'webp',
         output_quality: 95,
       },

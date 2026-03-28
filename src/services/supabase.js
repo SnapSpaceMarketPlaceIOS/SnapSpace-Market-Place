@@ -135,11 +135,33 @@ export async function uploadRoomPhoto(userId, uri, base64Data = null) {
  * Returns the permanent public URL from Supabase.
  * If the image is already a Supabase URL, returns it as-is.
  */
+// Ensure the room-uploads storage bucket exists (auto-create on first use)
+let _bucketChecked = false;
+async function ensureBucket() {
+  if (_bucketChecked) return;
+  try {
+    const { error } = await supabase.storage.createBucket('room-uploads', {
+      public: true,
+      fileSizeLimit: 10485760, // 10 MB
+    });
+    // error code 'Duplicate' means it already exists — that's fine
+    if (error && !error.message?.includes('already exists') && error.statusCode !== '409') {
+      console.log('[Bucket] Create note:', error.message);
+    }
+  } catch (e) {
+    console.log('[Bucket] Auto-create skipped:', e.message);
+  }
+  _bucketChecked = true;
+}
+
 export async function persistDesignImage(userId, remoteUrl) {
   if (!remoteUrl) throw new Error('No image URL to persist');
   // If already stored in Supabase, skip re-upload
   const supabaseHost = (process.env.EXPO_PUBLIC_SUPABASE_URL || '').replace('https://', '');
   if (remoteUrl.includes(supabaseHost)) return remoteUrl;
+
+  // Ensure storage bucket exists before uploading
+  await ensureBucket();
 
   const ext = remoteUrl.includes('.webp') ? 'webp' : 'jpeg';
   const ts = Date.now();
@@ -244,24 +266,42 @@ export async function deduplicateUserDesigns(userId) {
 
 /** Get all designs for a specific user (own profile). */
 export async function getUserDesigns(userId) {
-  const { data, error } = await supabase
+  const timeout = new Promise((_, reject) =>
+    setTimeout(() => reject(new Error('getUserDesigns timed out')), 10000)
+  );
+  const query = supabase
     .from('user_designs')
     .select('*')
     .eq('user_id', userId)
     .order('created_at', { ascending: false });
+
+  const { data, error } = await Promise.race([query, timeout]);
   if (error) throw error;
   return data || [];
 }
 
 /** Get public designs for the Explore feed. */
 export async function getPublicDesigns(limit = 20, offset = 0) {
+  // First try with profiles join (richer data)
   const { data, error } = await supabase
     .from('user_designs')
     .select('*, author:profiles!user_designs_user_id_fkey(id, full_name, username, avatar_url, is_verified_supplier)')
     .eq('visibility', 'public')
     .order('created_at', { ascending: false })
     .range(offset, offset + limit - 1);
-  if (error) throw error;
+
+  // If join fails (RLS, missing FK), fall back to plain query
+  if (error) {
+    console.log('[PublicDesigns] Join failed, falling back:', error.message);
+    const { data: plain, error: plainErr } = await supabase
+      .from('user_designs')
+      .select('*')
+      .eq('visibility', 'public')
+      .order('created_at', { ascending: false })
+      .range(offset, offset + limit - 1);
+    if (plainErr) throw plainErr;
+    return plain || [];
+  }
   return data || [];
 }
 

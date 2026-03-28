@@ -1,8 +1,10 @@
 import { PRODUCT_CATALOG } from '../data/productCatalog';
 import { STYLE_AFFINITY } from '../data/styleMap';
 
-// Max products per category in a single result set (prevents showing 6 sofas)
-const MAX_PER_CATEGORY = 2;
+// Max products per category in a single result set.
+// Limit to 1 per category to match what's actually in the AI-generated image —
+// a room typically has 1 sofa, 1 coffee table, 1 rug, etc.
+const MAX_PER_CATEGORY = 1;
 
 // How many top candidates per category to randomize among
 // Higher = more variety between generations (at slight cost to relevance)

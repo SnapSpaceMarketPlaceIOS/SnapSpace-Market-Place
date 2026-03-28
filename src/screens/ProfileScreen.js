@@ -478,7 +478,7 @@ export default function ProfileScreen({ navigation }) {
             : activeTab === 1
               ? myDesigns.filter(d => liked[d.id])
               : myDesigns.filter(d => shared[d.id])
-          ).filter(d => !!d.imageUrl && !d.imageUrl.includes('replicate.delivery'));
+          ).filter(d => !!d.imageUrl);
           if (filtered.length === 0) {
             return (
               <View style={styles.emptyGrid}>
