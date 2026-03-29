@@ -132,19 +132,30 @@ export function searchProducts({ keywords = '', roomType = null, style = null, l
 /**
  * Normalizes a product from the catalog into the shape expected by the UI.
  * Ensures backward compatibility with existing screens (name, brand, price string).
+ *
+ * Price strategy:
+ *   priceValue  — always the CURRENT selling price (salePrice ?? price) as a NUMBER
+ *   price       — human-readable display string of the current selling price
+ *   listPrice   — original/list price as a NUMBER (before discount)
+ *   compareAtPrice — same as listPrice when discounted, null when not
  */
 function normalizeProduct(product) {
+  // Current selling price = sale price if available, otherwise list price
+  const currentPrice = product.salePrice ?? product.price;
+  const currentPriceDisplay = product.salePriceDisplay ?? product.priceDisplay;
+
   return {
     // Legacy fields (ShopTheLookScreen, CartContext compatibility)
     name: product.name,
     brand: `${product.brand}`,
-    price: product.priceDisplay,
+    price: currentPriceDisplay,
 
     // Extended fields (new screens)
     id: product.id,
     asin: product.asin || null,
-    priceValue: product.price,
-    priceLabel: product.priceDisplay,
+    priceValue: currentPrice,
+    listPrice: product.price,
+    priceLabel: currentPriceDisplay,
     imageUrl: product.imageUrl,
     affiliateUrl: product.affiliateUrl,
     source: product.source,

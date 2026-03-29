@@ -505,7 +505,8 @@ function ShareIcon({ size = 22 }) {
 }
 
 // ── Add All to Cart button — press inverts blue↔white ────────────────────────
-function AddAllToCartButton({ products, onAddAll }) {
+function AddAllToCartButton({ products, onAddAll, onViewCart }) {
+  const [added, setAdded] = React.useState(false);
   const [pressed, setPressed] = React.useState(false);
   const scale = React.useRef(new Animated.Value(1)).current;
 
@@ -540,17 +541,32 @@ function AddAllToCartButton({ products, onAddAll }) {
         activeOpacity={1}
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
-        onPress={() => onAddAll(products)}
+        onPress={() => {
+          if (added) {
+            onViewCart?.();
+          } else {
+            onAddAll(products);
+            setAdded(true);
+          }
+        }}
       >
-        <Svg width={18} height={18} viewBox="0 0 24 24" fill="none"
-          stroke={iconColor} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"
-          style={{ marginRight: 8 }}>
-          <Path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" />
-          <Line x1={3} y1={6} x2={21} y2={6} />
-          <Path d="M16 10a4 4 0 01-8 0" />
-        </Svg>
+        {added ? (
+          <Svg width={18} height={18} viewBox="0 0 24 24" fill="none"
+            stroke={iconColor} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"
+            style={{ marginRight: 8 }}>
+            <Polyline points="20 6 9 17 4 12" />
+          </Svg>
+        ) : (
+          <Svg width={18} height={18} viewBox="0 0 24 24" fill="none"
+            stroke={iconColor} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"
+            style={{ marginRight: 8 }}>
+            <Path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" />
+            <Line x1={3} y1={6} x2={21} y2={6} />
+            <Path d="M16 10a4 4 0 01-8 0" />
+          </Svg>
+        )}
         <Text style={{ color: iconColor, fontSize: 15, fontWeight: '700', letterSpacing: 0.3 }}>
-          Add All to Cart
+          {added ? 'View Cart' : 'Add All to Cart'}
         </Text>
       </TouchableOpacity>
     </Animated.View>
@@ -791,7 +807,7 @@ const FIRST_VISIT_KEY = 'snapspace_home_visited';
 
 export default function HomeScreen({ navigation, route }) {
   const { user } = useAuth();
-  const { addToCart } = useCart();
+  const { addToCart, items: cartItems } = useCart();
   const { liked } = useLiked();
   const [prompt, setPrompt] = useState('');
   const [greeting, setGreeting] = useState(getGreeting());
@@ -1191,6 +1207,11 @@ export default function HomeScreen({ navigation, route }) {
         })
           .then(result => {
             if (result?.designId) setAutoSavedDesignId(result.designId);
+            // Swap resultUri to the permanent Supabase Storage URL so the Replicate
+            // CDN URL (which expires in ~24h) is never held in state after this point.
+            if (result?.permanentUrl) {
+              setResultData(prev => prev ? { ...prev, resultUri: result.permanentUrl } : prev);
+            }
             console.log('[AutoSave] Design persisted:', result?.designId);
           })
           .catch(err => console.warn('[AutoSave] Failed:', err.message));
@@ -2003,12 +2024,32 @@ export default function HomeScreen({ navigation, route }) {
                               : product.priceLabel || String(product.price).replace(/^\$+/, '$')}
                         </Text>
                       </View>
-                      <TouchableOpacity style={resultStyles.hCardAdd} activeOpacity={0.7}>
-                        <Svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="#0B6DC3" strokeWidth={2.5}>
-                          <Line x1={12} y1={5} x2={12} y2={19} />
-                          <Line x1={5} y1={12} x2={19} y2={12} />
-                        </Svg>
-                      </TouchableOpacity>
+                      {(() => {
+                        const cartKey = `${product.name}__${product.brand}`;
+                        const inCart = cartItems.some(i => i.key === cartKey);
+                        return (
+                          <TouchableOpacity
+                            style={[resultStyles.hCardAdd, inCart && resultStyles.hCardAddDone]}
+                            activeOpacity={0.7}
+                            onPress={() => {
+                              if (!inCart) {
+                                addToCart({ ...product, price: product.priceValue ?? product.price });
+                              }
+                            }}
+                          >
+                            {inCart ? (
+                              <Svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
+                                <Polyline points="20 6 9 17 4 12" />
+                              </Svg>
+                            ) : (
+                              <Svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="#0B6DC3" strokeWidth={2.5}>
+                                <Line x1={12} y1={5} x2={12} y2={19} />
+                                <Line x1={5} y1={12} x2={19} y2={12} />
+                              </Svg>
+                            )}
+                          </TouchableOpacity>
+                        );
+                      })()}
                     </TouchableOpacity>
                   )}
                 />
@@ -2020,8 +2061,11 @@ export default function HomeScreen({ navigation, route }) {
               <AddAllToCartButton
                 products={resultData.products}
                 onAddAll={(products) => {
-                  products.forEach(p => addToCart(p));
-                  Alert.alert('Added to Cart', `${products.length} items added to your cart.`);
+                  products.forEach(p => addToCart({ ...p, price: p.priceValue ?? p.price }));
+                }}
+                onViewCart={() => {
+                  setShowResult(false);
+                  navigation?.navigate('Cart');
                 }}
               />
             )}
@@ -3345,6 +3389,10 @@ const resultStyles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#FFFFFF',
+  },
+  hCardAddDone: {
+    backgroundColor: '#0B6DC3',
+    borderColor: '#0B6DC3',
   },
   disclosure: {
     fontSize: 11,

@@ -420,6 +420,13 @@ function VariantSelector({ variants, selectedId, onSelect }) {
                     resizeMode="contain"
                     placeholderColor="#F0F2F5"
                   />
+                ) : v.mainImage ? (
+                  <CardImage
+                    uri={v.mainImage}
+                    style={va.swatchImg}
+                    resizeMode="cover"
+                    placeholderColor="#F0F2F5"
+                  />
                 ) : v.color ? (
                   <View style={[va.colorBlock, { backgroundColor: v.color }]} />
                 ) : null}
@@ -1053,7 +1060,7 @@ export default function ProductDetailScreen({ route, navigation }) {
   // ── Local state ──────────────────────────────────────────────────────────
   const [liked,       setLiked]      = useState(false);
   const [qty,         setQty]        = useState(1);
-  const [selectedVar, setSelectedVar]= useState('1');
+  const [selectedVar, setSelectedVar]= useState(product?.variants?.[0]?.id ?? '1');
 
   const scrollY           = useRef(new Animated.Value(0)).current;
   const cartLabelOpacity  = useRef(new Animated.Value(1)).current;
@@ -1074,13 +1081,11 @@ export default function ProductDetailScreen({ route, navigation }) {
   const reviewCount  = product?.reviewCount  ?? 0;
   const bestSellerBadge = product?.bestSellerBadge ?? null;
 
-  // Pricing — use salePrice if available, fallback to price
-  const rawPrice     = product?.salePrice    ?? product?.price ?? 1599;
-  const compareAt    = product?.compareAtPrice ?? product?.price ?? null;
-
-  // Pricing display
-  const priceDisplay = fmtPrice(rawPrice);
-  const origDisplay  = (compareAt && compareAt !== rawPrice) ? fmtPrice(compareAt) : null;
+  // Pricing — use priceValue (always the current selling price number from normalizeProduct)
+  // Fallback chain: priceValue → salePrice → numeric parse of price string → 0
+  const rawPrice     = product?.priceValue ?? product?.salePrice
+    ?? (typeof product?.price === 'number' ? product.price : parseFloat(String(product?.price).replace(/[^0-9.]/g, '')) || 0);
+  const compareAt    = product?.compareAtPrice ?? product?.listPrice ?? null;
 
   // Product details table — enrich from product.details or build from product fields
   const details = product?.details ?? {
@@ -1117,7 +1122,7 @@ export default function ProductDetailScreen({ route, navigation }) {
       })
     : null; // null → KeyFeatures uses DEF_FEATURES
 
-  // Active variant — drives hero image swap + full gallery per color
+  // Active variant — drives hero image swap, price, affiliate URL per selection
   const activeVariant = variants.find(v => v.id === selectedVar);
   const rawActiveImages = activeVariant?.images?.length > 0
     ? activeVariant.images
@@ -1126,6 +1131,17 @@ export default function ProductDetailScreen({ route, navigation }) {
       : images;
   // Deduplicate — remove any repeated URLs that cause same slide twice
   const activeImages = rawActiveImages.filter((url, idx, arr) => arr.indexOf(url) === idx);
+
+  // Variant-aware price: if variant has its own price, use it
+  const variantPrice = activeVariant?.price ?? null;
+  const displayPrice = variantPrice ?? rawPrice;
+  const activeAffiliateUrl = activeVariant?.affiliateUrl ?? affiliateUrl;
+  const activeAsin = activeVariant?.asin ?? product?.asin ?? null;
+  const activeImageUrl = activeVariant?.mainImage ?? imageUrl;
+
+  // Pricing display — uses variant-aware price
+  const priceDisplay = fmtPrice(displayPrice);
+  const origDisplay  = (compareAt && compareAt !== displayPrice) ? fmtPrice(compareAt) : null;
 
   const similarProducts = product?.similarProducts ?? getSimProducts(product);
   const estDelivery     = product?.shipping?.estimatedDays
@@ -1142,13 +1158,13 @@ export default function ProductDetailScreen({ route, navigation }) {
       return;
     }
     addToCart({
-      name,
+      name: activeVariant ? `${name} — ${activeVariant.label}` : name,
       brand,
-      price: rawPrice,
-      imageUrl: product?.imageUrl ?? null,
-      affiliateUrl: product?.affiliateUrl ?? null,
+      price: displayPrice,
+      imageUrl: activeImageUrl,
+      affiliateUrl: activeAffiliateUrl,
       source: product?.source ?? 'amazon',
-      asin: product?.asin ?? null,
+      asin: activeAsin,
     });
     Animated.parallel([
       Animated.timing(cartLabelOpacity,  { toValue: 0, duration: 150, useNativeDriver: true }),
@@ -1284,7 +1300,7 @@ export default function ProductDetailScreen({ route, navigation }) {
       <CTABar
         inCart={inCart}
         onAddToCart={handleAddToCart}
-        affiliateUrl={affiliateUrl}
+        affiliateUrl={activeAffiliateUrl}
         source={source}
         cartLabelOpacity={cartLabelOpacity}
         addedLabelOpacity={addedLabelOpacity}
