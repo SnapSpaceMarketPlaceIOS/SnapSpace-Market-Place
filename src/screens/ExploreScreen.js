@@ -179,13 +179,15 @@ function UploadIcon() {
 const CATEGORIES = ['All', 'Living Room', 'Bedroom', 'Kitchen', 'Office', 'Dining'];
 
 // Product catalog category pills
-const PRODUCT_CATEGORIES = ['All', 'Sofas', 'Tables', 'Rugs', 'Wall Art', 'Mirrors'];
+const PRODUCT_CATEGORIES = ['All', 'Sofas', 'Seating', 'Tables', 'TV Stands', 'Rugs', 'Wall Art', 'Mirrors'];
 const PRODUCT_CAT_MAP = {
-  'Sofas':    ['sofa'],
-  'Tables':   ['coffee-table', 'dining-table', 'side-table'],
-  'Rugs':     ['rug'],
-  'Wall Art': ['wall-art'],
-  'Mirrors':  ['mirror'],
+  'Sofas':     ['sofa'],
+  'Seating':   ['accent-chair', 'dining-chair', 'desk-chair', 'bar-stool'],
+  'Tables':    ['coffee-table', 'dining-table', 'side-table'],
+  'TV Stands': ['tv-stand'],
+  'Rugs':      ['rug'],
+  'Wall Art':  ['wall-art'],
+  'Mirrors':   ['mirror'],
 };
 
 const POST_TAGS = [
@@ -406,7 +408,7 @@ export default function ExploreScreen({ navigation, route }) {
           prompt: d.prompt,
           roomType: 'living-room',
           styles: d.style_tags || [],
-          products: [],
+          products: d.products || [],
           tags: (d.style_tags || []).map(s => `#${s}`),
           likes: d.likes || 0,
           shares: 0,
@@ -617,8 +619,10 @@ export default function ExploreScreen({ navigation, route }) {
                     design={design}
                     cardRadius={cardRadius}
                     onPress={() => {
-                      const enrichedProducts = getProductsForDesign(design, 4);
-                      const enriched = { ...design, products: enrichedProducts.length ? enrichedProducts : design.products };
+                      // Use saved products from DB; only re-compute if none were saved
+                      const savedProducts = design.products || [];
+                      const enrichedProducts = savedProducts.length ? savedProducts : getProductsForDesign(design, 4);
+                      const enriched = { ...design, products: enrichedProducts };
                       setSelectedCard(enriched);
                     }}
                   />

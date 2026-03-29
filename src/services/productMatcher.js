@@ -179,7 +179,7 @@ function diversify(sorted, limit) {
     'floor-lamp', 'table-lamp', 'pendant-light', 'chandelier',
     'rug', 'throw-pillow', 'throw-blanket',
     'mirror', 'wall-art', 'planter', 'vase',
-    'bookshelf', 'dresser',
+    'bookshelf', 'dresser', 'tv-stand',
   ];
 
   const categoryCounts = {};
