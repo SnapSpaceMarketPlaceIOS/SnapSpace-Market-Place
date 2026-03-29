@@ -180,6 +180,7 @@ function diversify(sorted, limit) {
     'rug', 'throw-pillow', 'throw-blanket',
     'mirror', 'wall-art', 'planter', 'vase',
     'bookshelf', 'dresser', 'tv-stand',
+    'kitchen-island',
   ];
 
   const categoryCounts = {};

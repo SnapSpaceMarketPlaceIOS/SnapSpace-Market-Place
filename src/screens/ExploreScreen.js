@@ -179,15 +179,19 @@ function UploadIcon() {
 const CATEGORIES = ['All', 'Living Room', 'Bedroom', 'Kitchen', 'Office', 'Dining'];
 
 // Product catalog category pills
-const PRODUCT_CATEGORIES = ['All', 'Sofas', 'Seating', 'Tables', 'TV Stands', 'Rugs', 'Wall Art', 'Mirrors'];
+const PRODUCT_CATEGORIES = ['All', 'Sofas', 'Seating', 'Beds', 'Coffee Tables', 'Table/Chairs', 'Kitchen', 'TV Stands', 'Lighting', 'Rugs', 'Wall Art', 'Mirrors'];
 const PRODUCT_CAT_MAP = {
-  'Sofas':     ['sofa'],
-  'Seating':   ['accent-chair', 'dining-chair', 'desk-chair', 'bar-stool'],
-  'Tables':    ['coffee-table', 'dining-table', 'side-table'],
-  'TV Stands': ['tv-stand'],
-  'Rugs':      ['rug'],
-  'Wall Art':  ['wall-art'],
-  'Mirrors':   ['mirror'],
+  'Sofas':          ['sofa'],
+  'Seating':        ['accent-chair', 'dining-chair', 'desk-chair', 'bar-stool'],
+  'Beds':           ['bed'],
+  'Coffee Tables':  ['coffee-table', 'side-table'],
+  'Table/Chairs':   ['dining-table', 'dining-chair'],
+  'Kitchen':        ['kitchen-island'],
+  'TV Stands':      ['tv-stand'],
+  'Lighting':       ['table-lamp', 'floor-lamp', 'pendant-light', 'chandelier'],
+  'Rugs':           ['rug'],
+  'Wall Art':       ['wall-art'],
+  'Mirrors':        ['mirror'],
 };
 
 const POST_TAGS = [
