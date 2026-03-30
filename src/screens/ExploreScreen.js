@@ -179,12 +179,13 @@ function UploadIcon() {
 const CATEGORIES = ['All', 'Living Room', 'Bedroom', 'Kitchen', 'Office', 'Dining'];
 
 // Product catalog category pills
-const PRODUCT_CATEGORIES = ['All', 'Sofas', 'Seating', 'Beds', 'Nightstands', 'Coffee Tables', 'Side Tables', 'Table/Chairs', 'Kitchen', 'TV Stands', 'Lighting', 'Rugs', 'Wall Art', 'Mirrors'];
+const PRODUCT_CATEGORIES = ['All', 'Sofas', 'Seating', 'Beds', 'Nightstands', 'Dressers', 'Coffee Tables', 'Side Tables', 'Table/Chairs', 'Kitchen', 'TV Stands', 'Lighting', 'Rugs', 'Wall Art', 'Mirrors'];
 const PRODUCT_CAT_MAP = {
   'Sofas':          ['sofa'],
   'Seating':        ['accent-chair', 'dining-chair', 'desk-chair', 'bar-stool'],
   'Beds':           ['bed'],
   'Nightstands':    ['nightstand'],
+  'Dressers':       ['dresser'],
   'Coffee Tables':  ['coffee-table'],
   'Side Tables':    ['side-table'],
   'Table/Chairs':   ['dining-table', 'dining-chair'],
