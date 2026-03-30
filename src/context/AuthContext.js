@@ -94,6 +94,9 @@ export function AuthProvider({ children }) {
    * Throws an Error with a user-friendly message on failure.
    */
   const signUp = async (fullName, email, password) => {
+    if (!process.env.EXPO_PUBLIC_SUPABASE_URL) {
+      throw new Error('App is not configured. Please contact support.');
+    }
     const authCall = supabase.auth.signUp({
       email: email.trim().toLowerCase(),
       password,
@@ -102,7 +105,7 @@ export function AuthProvider({ children }) {
       },
     });
     const timeout = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error('Connection timed out. Check your network and try again.')), 35000)
+      setTimeout(() => reject(new Error('Unable to reach the server. Check your internet connection and try again.')), 15000)
     );
     const { data, error } = await Promise.race([authCall, timeout]);
     if (error) throw new Error(error.message);
@@ -128,7 +131,7 @@ export function AuthProvider({ children }) {
       password,
     });
     const timeout = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error('Connection timed out. Check your network and try again.')), 35000)
+      setTimeout(() => reject(new Error('Unable to reach the server. Check your internet connection and try again.')), 15000)
     );
     const { error } = await Promise.race([authCall, timeout]);
     if (error) {

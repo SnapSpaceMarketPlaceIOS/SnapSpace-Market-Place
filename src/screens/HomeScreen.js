@@ -41,8 +41,10 @@ import { DESIGNS } from '../data/designs';
 import { SELLERS } from '../data/sellers';
 import { searchProducts, getSourceColor, getProductsForPrompt } from '../services/affiliateProducts';
 import { generateInteriorDesign, buildFinalPrompt } from '../services/replicate';
+import { generateWithFalAI, isFalAIConfigured } from '../services/falai';
+import { analyzeRoomImage, rematchFromVision } from '../services/visionMatcher';
 import { PRODUCT_CATALOG } from '../data/productCatalog';
-import { saveUserDesign, updateDesignVisibility } from '../services/supabase';
+import { saveUserDesign, updateDesignVisibility, uploadRoomPhoto } from '../services/supabase';
 
 const { width, height } = Dimensions.get('window');
 
@@ -586,41 +588,193 @@ const PROMPT_SUGGESTIONS = [
 
 const FURNITURE_LABELS = {
   'sofa': 'sofa', 'accent-chair': 'accent chair', 'coffee-table': 'coffee table',
-  'rug': 'area rug', 'wall-art': 'wall art', 'mirror': 'floor mirror',
+  'rug': 'area rug', 'wall-art': 'wall art', 'mirror': 'mirror',
   'bookshelf': 'bookshelf', 'floor-lamp': 'floor lamp', 'bed': 'bed',
   'pendant-light': 'pendant light', 'nightstand': 'nightstand', 'dresser': 'dresser',
+  'side-table': 'side table', 'dining-table': 'dining table', 'dining-chair': 'dining chair',
+  'desk': 'desk', 'desk-chair': 'desk chair', 'bar-stool': 'bar stool',
+  'table-lamp': 'table lamp', 'chandelier': 'chandelier', 'tv-stand': 'TV stand',
+  'throw-pillow': 'throw pillow', 'throw-blanket': 'throw blanket',
+  'planter': 'planter', 'vase': 'vase', 'curtains': 'curtains',
+  'kitchen-island': 'kitchen island',
 };
 
-const VISUAL_WORDS = [
-  'boucle','velvet','leather','linen','rattan','marble','glass','wood',
-  'walnut','oak','brass','gold','curved','round','oval','modular',
-  'cream','beige','white','gray','black','camel','sage','green',
-  'navy','teal','brown','natural','woven','jute','ceramic','metal',
-  'chrome','copper','mid-century','modern','rustic','industrial',
-  'tufted','channel','sectional','l-shaped','swirl','abstract',
-  'geometric','wavy','herringbone','bamboo','travertine',
+// ── Visual dominance — large furniture gets detailed descriptions, small items get brief ones
+const HIGH_DOMINANCE = ['sofa', 'bed', 'dining-table', 'desk', 'kitchen-island'];
+const MED_DOMINANCE  = ['coffee-table', 'accent-chair', 'rug', 'dining-chair', 'bookshelf', 'dresser', 'tv-stand'];
+// Everything else = low dominance (mirror, lamp, vase, planter, wall-art, etc.)
+
+// Color words to extract from product names/descriptions for palette building
+const COLOR_WORDS = [
+  'cream','beige','white','ivory','off-white','eggshell','snow',
+  'gray','grey','charcoal','slate','silver',
+  'black','ebony','onyx','matte black',
+  'brown','walnut','oak','espresso','mahogany','chestnut','cognac','camel','tan','taupe',
+  'green','sage','olive','emerald','forest','moss','hunter',
+  'blue','navy','teal','cerulean','cobalt','indigo',
+  'gold','brass','copper','bronze','rose gold',
+  'natural','wood','warm','neutral',
 ];
 
-function extractVisualHints(name) {
-  const lower = name.toLowerCase();
-  return VISUAL_WORDS.filter(w => lower.includes(w)).slice(0, 3).join(' ');
+// Shape/form words that define a product's silhouette — the #1 visual identifier
+const SHAPE_WORDS = [
+  'curved','round','oval','rectangular','square','triangular',
+  'sectional','l-shaped','u-shaped','half-moon','crescent',
+  'modular','tufted','channel','wingback','slipper','barrel',
+  'arched','tapered','fluted','pedestal','slab','floating',
+  'low-profile','slim','oversized','compact','wide','narrow',
+  'sculptural','organic','geometric','abstract','herringbone','wavy',
+  'straight','angular','boxy','streamlined',
+];
+
+// Material/texture words
+const TEXTURE_WORDS = [
+  'boucle','velvet','leather','linen','rattan','marble','glass','wood',
+  'walnut','oak','brass','gold','ceramic','metal','chrome','copper',
+  'woven','jute','bamboo','travertine','teak','concrete','iron',
+  'upholstered','lacquered','matte','polished','microfiber','fabric',
+  'tempered glass','solid wood','engineered wood','stainless steel',
+];
+
+/**
+ * Extract words from a word list that appear in the given text.
+ */
+function extractWords(text, wordList) {
+  if (!text) return [];
+  const lower = text.toLowerCase();
+  // Check multi-word phrases first (e.g. "matte black", "tempered glass")
+  return wordList.filter(w => lower.includes(w));
+}
+
+/**
+ * Extract dimensions from product.details if available.
+ * Returns e.g. "82 inches wide" or null.
+ */
+function extractDimensions(product) {
+  const dims = product.details?.Dimensions || product.details?.Size || '';
+  if (!dims) return null;
+  // Extract width from common formats: 82"W, 82" W, 82"x34", etc.
+  const wMatch = dims.match(/(\d+(?:\.\d+)?)[""]\s*[Ww×x]/);
+  if (wMatch) return `${Math.round(parseFloat(wMatch[1]))} inches wide`;
+  // Just first dimension
+  const firstNum = dims.match(/(\d+(?:\.\d+)?)[""]/);
+  if (firstNum) return `${Math.round(parseFloat(firstNum[1]))} inches`;
+  return null;
+}
+
+/**
+ * Extract the most descriptive visual clause from the product description.
+ * Looks for clauses that contain shape/form/material info.
+ */
+function extractDescriptiveClause(description) {
+  if (!description) return null;
+  // Split on sentence boundaries
+  const clauses = description.split(/[.!—–]/).map(c => c.trim().toLowerCase()).filter(c => c.length > 15 && c.length < 80);
+  // Prefer clauses with shape/form words
+  for (const clause of clauses) {
+    const hasShape = SHAPE_WORDS.some(w => clause.includes(w));
+    const hasTexture = TEXTURE_WORDS.some(w => clause.includes(w));
+    if (hasShape && hasTexture) return clause;
+  }
+  // Fall back to first clause with any visual info
+  for (const clause of clauses) {
+    if (SHAPE_WORDS.some(w => clause.includes(w)) || TEXTURE_WORDS.some(w => clause.includes(w))) {
+      return clause;
+    }
+  }
+  return null;
+}
+
+/**
+ * Build an ultra-specific visual description for one product.
+ *
+ * Strategy: color + material + shape + size + label + descriptive clause
+ * High-dominance items (sofa, bed) get full detail (~25-30 words).
+ * Low-dominance items (vase, planter) get brief detail (~8-12 words).
+ *
+ * Example outputs:
+ *   HIGH: "cream boucle curved half-moon 103-inch sectional sofa with metal legs and tuxedo silhouette"
+ *   MED:  "dark walnut rectangular low-profile coffee table, 42 inches wide, slab-style"
+ *   LOW:  "arched matte black floor lamp"
+ */
+function buildProductHint(product) {
+  const label = FURNITURE_LABELS[product.category] || product.category.replace(/-/g, ' ');
+  const allText = [product.name, product.description, ...(product.features || [])].join(' ');
+
+  // Extract visual characteristics
+  const colors = extractWords(allText, COLOR_WORDS);
+  const shapes = extractWords(allText, SHAPE_WORDS);
+  const textures = extractWords(product.name + ' ' + (product.materials || []).join(' '), TEXTURE_WORDS);
+  const dims = extractDimensions(product);
+
+  // Determine detail level by visual dominance
+  const isHigh = HIGH_DOMINANCE.includes(product.category);
+  const isMed = MED_DOMINANCE.includes(product.category);
+
+  if (isHigh) {
+    // Full detail: color + texture + shape + size + label + descriptive clause
+    const descriptors = [...new Set([...colors.slice(0, 2), ...textures.slice(0, 2), ...shapes.slice(0, 3)])];
+    const prefix = descriptors.length > 0 ? descriptors.join(' ') + ' ' : '';
+    let hint = `${prefix}${label}`;
+    if (dims) hint += `, ${dims}`;
+    // Add descriptive clause from description for shape detail
+    const clause = extractDescriptiveClause(product.description);
+    if (clause) hint += `, ${clause}`;
+    return hint;
+  }
+
+  if (isMed) {
+    // Medium detail: color + texture + shape + label + size
+    const descriptors = [...new Set([...colors.slice(0, 1), ...textures.slice(0, 2), ...shapes.slice(0, 2)])];
+    const prefix = descriptors.length > 0 ? descriptors.join(' ') + ' ' : '';
+    let hint = `${prefix}${label}`;
+    if (dims) hint += `, ${dims}`;
+    return hint;
+  }
+
+  // Low dominance: just color + material + label
+  const descriptors = [...new Set([...colors.slice(0, 1), ...textures.slice(0, 1)])];
+  const prefix = descriptors.length > 0 ? descriptors.join(' ') + ' ' : '';
+  return `${prefix}${label}`;
+}
+
+/**
+ * Extract the dominant color palette from a set of products.
+ * Returns a short string like "cream, warm walnut, beige, matte black".
+ */
+function extractColorPalette(products) {
+  const allColors = [];
+  for (const p of products) {
+    const allText = [p.name, p.description].join(' ');
+    const colors = extractWords(allText, COLOR_WORDS);
+    allColors.push(...colors);
+  }
+  // Count frequency, return top 4 unique colors
+  const freq = {};
+  for (const c of allColors) freq[c] = (freq[c] || 0) + 1;
+  const sorted = Object.entries(freq).sort((a, b) => b[1] - a[1]);
+  return sorted.slice(0, 4).map(([c]) => c).join(', ');
 }
 
 function buildEnrichedPrompt(userPrompt, products) {
-  // Build detailed product hints for the AI prompt.
-  // Each hint includes material, color, and shape descriptors extracted from
-  // the product name, giving the AI a clear picture of what to render.
-  // e.g. "one cream boucle modular sofa, one walnut oval coffee table, one cream swirl area rug"
-  const pieces = products.slice(0, 6).map(p => {
-    const label = FURNITURE_LABELS[p.category] || p.category.replace(/-/g, ' ');
-    const hints = extractVisualHints(p.name);
-    return hints ? `one ${hints} ${label}` : `one ${label}`;
+  // Take top 4 products by visual dominance for detailed hints.
+  // Fewer products = more words per product = tighter AI alignment.
+  // Sort: high dominance first, then medium, then low.
+  const sorted = [...products].sort((a, b) => {
+    const rank = (p) => HIGH_DOMINANCE.includes(p.category) ? 0 : MED_DOMINANCE.includes(p.category) ? 1 : 2;
+    return rank(a) - rank(b);
   });
-  const productHints = pieces.length > 0 ? pieces.join(', ') : null;
+  const topProducts = sorted.slice(0, 4);
+
+  // Build per-product descriptions
+  const pieces = topProducts.map(p => buildProductHint(p));
+  const productHints = pieces.length > 0 ? pieces.join('; ') : null;
+
+  // Extract color palette from ALL matched products (not just top 4)
+  const palette = extractColorPalette(products);
 
   // Use the centralized prompt builder from replicate.js
-  // This adds architecture preservation + quality suffix automatically
-  return buildFinalPrompt(userPrompt, productHints);
+  return buildFinalPrompt(userPrompt, productHints, palette);
 }
 
 function ChevronRight({ color = '#fff' }) {
@@ -1173,7 +1327,57 @@ export default function HomeScreen({ navigation, route }) {
       const matchedProducts = getProductsForPrompt(designPrompt, 6);
       setGenStatus('Generating your design…');
       const enrichedPrompt = buildEnrichedPrompt(designPrompt, matchedProducts);
-      const resultUrl = await generateInteriorDesign(savedPhoto.uri, enrichedPrompt, savedPhoto.base64);
+      // Two-pass pipeline: Pass 1 (depth-controlled) → Pass 2 (product reference refinement)
+      // Products are passed so the AI can see actual product photos and match furniture visually.
+      // ── Phase 2 / Phase 1 generation ─────────────────────────────────────
+      // Phase 2 (fal.ai): AI sees product photos via IP-Adapter + depth ControlNet
+      //   → generates furniture that LOOKS like catalog items (~90% match)
+      // Phase 1 fallback (Replicate xlabs): text-prompt + depth ControlNet only
+      //   → good quality room, vision re-match handles product alignment (~65%)
+      let resultUrl;
+      if (isFalAIConfigured()) {
+        setGenStatus('Generating your design…');
+        console.log('[Pipeline] fal.ai Flux img2img');
+        resultUrl = await generateWithFalAI(
+          savedPhoto.uri,
+          savedPhoto.base64,
+          enrichedPrompt,
+          matchedProducts,
+          designPrompt,
+          null,
+        );
+        console.log('[Pipeline] fal.ai complete:', resultUrl);
+      } else {
+        setGenStatus('Generating your design…');
+        console.log('[Pipeline] Phase 1 fallback: Replicate xlabs (fal.ai key not set)');
+        resultUrl = await generateInteriorDesign(
+          savedPhoto.uri,
+          enrichedPrompt,
+          savedPhoto.base64,
+          matchedProducts,
+          designPrompt,
+        );
+        console.log('[Pipeline] Replicate complete:', resultUrl);
+      }
+
+      // ── Vision Re-Match (runs after EITHER model) ────────────────────────
+      // Claude Sonnet 4.6 analyzes the generated room image to identify exactly
+      // what furniture was drawn, then re-matches products from the catalog based
+      // on what's ACTUALLY visible — not what we hoped the AI would draw.
+      setGenStatus('Matching products to your space…');
+      let finalProducts = matchedProducts;
+      try {
+        const parsedPrompt = require('../utils/promptParser').parseDesignPrompt(designPrompt);
+        const visionResult = await analyzeRoomImage(resultUrl);
+        if (visionResult?.items?.length > 0) {
+          const roomType = visionResult.roomType || parsedPrompt.roomType || 'living-room';
+          finalProducts = rematchFromVision(visionResult.items, roomType, matchedProducts, 6);
+        }
+      } catch (visionErr) {
+        // Vision re-match is non-critical — never block the user on failure
+        console.warn('[Vision] Re-match skipped:', visionErr.message);
+      }
+
       stopLoadingBar();
       setGenerating(false);
       setGenStatus('');
@@ -1181,7 +1385,7 @@ export default function HomeScreen({ navigation, route }) {
         imageUri: savedPhoto.uri,
         resultUri: resultUrl,
         prompt: designPrompt,
-        products: matchedProducts,
+        products: finalProducts,
       });
       setShowResult(true);
       setPhoto(null);
@@ -1189,10 +1393,13 @@ export default function HomeScreen({ navigation, route }) {
       setPrompt('');
 
       // ── Auto-save: persist every generation to Supabase immediately ──
+      // Use finalProducts (vision re-matched) — same set shown in the result modal.
+      // Previously used matchedProducts (pre-vision), causing the saved post to show
+      // different products than what the user saw in the generation result.
       if (user?.id) {
-        const styleTags = matchedProducts.flatMap(p => p.styles || p.styleTags || []).filter(Boolean);
+        const styleTags = finalProducts.flatMap(p => p.styles || p.styleTags || []).filter(Boolean);
         const uniqueTags = [...new Set(styleTags)];
-        const productSummary = matchedProducts.map(p => ({
+        const productSummary = finalProducts.map(p => ({
           id: p.id, name: p.name, brand: p.brand,
           price: p.priceValue ?? p.price, imageUrl: p.imageUrl,
           rating: p.rating, reviewCount: p.reviewCount,

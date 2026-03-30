@@ -29,15 +29,19 @@ function base64ToUint8Array(base64) {
   return bytes;
 }
 
-// Wraps fetch with an AbortController timeout so Supabase requests never
-// hang indefinitely inside the iOS simulator / React Native runtime.
+// Wraps fetch with a hard timeout. AbortController alone is unreliable in
+// React Native (Hermes doesn't always honor the abort signal), so we race
+// the real fetch against a rejecting promise to guarantee a fast failure.
 function fetchWithTimeout(ms) {
   return (url, options = {}) => {
     const controller = new AbortController();
-    const id = setTimeout(() => controller.abort(), ms);
-    return fetch(url, { ...options, signal: controller.signal }).finally(() =>
-      clearTimeout(id)
+    const timer = setTimeout(() => controller.abort(), ms);
+    const fetchPromise = fetch(url, { ...options, signal: controller.signal })
+      .finally(() => clearTimeout(timer));
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('Network request timed out')), ms)
     );
+    return Promise.race([fetchPromise, timeoutPromise]);
   };
 }
 
@@ -49,8 +53,8 @@ export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
     detectSessionInUrl: false,
   },
   global: {
-    // 30-second hard timeout — iOS simulator DNS can be slow on first boot
-    fetch: fetchWithTimeout(30000),
+    // 12-second hard timeout — fast failure for paused/unreachable Supabase projects
+    fetch: fetchWithTimeout(12000),
   },
 });
 
