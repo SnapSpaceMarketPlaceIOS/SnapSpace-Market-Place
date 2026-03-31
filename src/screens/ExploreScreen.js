@@ -179,10 +179,11 @@ function UploadIcon() {
 const CATEGORIES = ['All', 'Living Room', 'Bedroom', 'Kitchen', 'Office', 'Dining'];
 
 // Product catalog category pills
-const PRODUCT_CATEGORIES = ['All', 'Sofas', 'Seating', 'Bar Stools', 'Beds', 'Nightstands', 'Dressers', 'Desks', 'Desk Chairs', 'Bookshelves', 'Coffee Tables', 'Side Tables', 'Table/Chairs', 'Kitchen', 'TV Stands', 'Throw Pillows', 'Throw Blankets', 'Planters', 'Vases', 'Pendant Lights', 'Chandeliers', 'Lighting', 'Rugs', 'Wall Art', 'Mirrors'];
+const PRODUCT_CATEGORIES = ['All', 'Sofas', 'Seating', 'Dining Chairs', 'Bar Stools', 'Beds', 'Nightstands', 'Dressers', 'Desks', 'Desk Chairs', 'Bookshelves', 'Coffee Tables', 'Side Tables', 'Table/Chairs', 'Kitchen', 'TV Stands', 'Throw Pillows', 'Throw Blankets', 'Planters', 'Vases', 'Pendant Lights', 'Chandeliers', 'Lighting', 'Rugs', 'Wall Art', 'Mirrors'];
 const PRODUCT_CAT_MAP = {
   'Sofas':           ['sofa'],
-  'Seating':         ['accent-chair', 'dining-chair', 'bar-stool'],
+  'Seating':         ['accent-chair'],
+  'Dining Chairs':   ['dining-chair'],
   'Beds':            ['bed'],
   'Nightstands':     ['nightstand'],
   'Dressers':        ['dresser'],
