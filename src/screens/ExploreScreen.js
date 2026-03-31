@@ -179,28 +179,29 @@ function UploadIcon() {
 const CATEGORIES = ['All', 'Living Room', 'Bedroom', 'Kitchen', 'Office', 'Dining'];
 
 // Product catalog category pills
-const PRODUCT_CATEGORIES = ['All', 'Sofas', 'Seating', 'Beds', 'Nightstands', 'Dressers', 'Desks', 'Desk Chairs', 'Bookshelves', 'Coffee Tables', 'Side Tables', 'Table/Chairs', 'Kitchen', 'TV Stands', 'Throw Pillows', 'Pendant Lights', 'Chandeliers', 'Lighting', 'Rugs', 'Wall Art', 'Mirrors'];
+const PRODUCT_CATEGORIES = ['All', 'Sofas', 'Seating', 'Beds', 'Nightstands', 'Dressers', 'Desks', 'Desk Chairs', 'Bookshelves', 'Coffee Tables', 'Side Tables', 'Table/Chairs', 'Kitchen', 'TV Stands', 'Throw Pillows', 'Throw Blankets', 'Pendant Lights', 'Chandeliers', 'Lighting', 'Rugs', 'Wall Art', 'Mirrors'];
 const PRODUCT_CAT_MAP = {
-  'Sofas':          ['sofa'],
-  'Seating':        ['accent-chair', 'dining-chair', 'bar-stool'],
-  'Beds':           ['bed'],
-  'Nightstands':    ['nightstand'],
-  'Dressers':       ['dresser'],
-  'Desks':          ['desk'],
-  'Desk Chairs':    ['desk-chair'],
-  'Bookshelves':    ['bookshelf'],
-  'Coffee Tables':  ['coffee-table'],
-  'Side Tables':    ['side-table'],
-  'Table/Chairs':   ['dining-table', 'dining-chair'],
-  'Kitchen':        ['kitchen-island'],
-  'TV Stands':      ['tv-stand'],
-  'Throw Pillows':  ['throw-pillow'],
-  'Pendant Lights': ['pendant-light'],
-  'Chandeliers':    ['chandelier'],
-  'Lighting':       ['table-lamp', 'floor-lamp', 'pendant-light', 'chandelier'],
-  'Rugs':           ['rug'],
-  'Wall Art':       ['wall-art'],
-  'Mirrors':        ['mirror'],
+  'Sofas':           ['sofa'],
+  'Seating':         ['accent-chair', 'dining-chair', 'bar-stool'],
+  'Beds':            ['bed'],
+  'Nightstands':     ['nightstand'],
+  'Dressers':        ['dresser'],
+  'Desks':           ['desk'],
+  'Desk Chairs':     ['desk-chair'],
+  'Bookshelves':     ['bookshelf'],
+  'Coffee Tables':   ['coffee-table'],
+  'Side Tables':     ['side-table'],
+  'Table/Chairs':    ['dining-table', 'dining-chair'],
+  'Kitchen':         ['kitchen-island'],
+  'TV Stands':       ['tv-stand'],
+  'Throw Pillows':   ['throw-pillow'],
+  'Throw Blankets':  ['throw-blanket'],
+  'Pendant Lights':  ['pendant-light'],
+  'Chandeliers':     ['chandelier'],
+  'Lighting':        ['table-lamp', 'floor-lamp', 'pendant-light', 'chandelier'],
+  'Rugs':            ['rug'],
+  'Wall Art':        ['wall-art'],
+  'Mirrors':         ['mirror'],
 };
 
 const POST_TAGS = [
