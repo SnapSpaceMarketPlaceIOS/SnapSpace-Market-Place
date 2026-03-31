@@ -94,6 +94,9 @@ export function AuthProvider({ children }) {
    * Throws an Error with a user-friendly message on failure.
    */
   const signUp = async (fullName, email, password) => {
+    if (!process.env.EXPO_PUBLIC_SUPABASE_URL) {
+      throw new Error('App is not configured. Please contact support.');
+    }
     const { data, error } = await supabase.auth.signUp({
       email: email.trim().toLowerCase(),
       password,
