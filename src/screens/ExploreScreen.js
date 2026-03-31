@@ -179,7 +179,7 @@ function UploadIcon() {
 const CATEGORIES = ['All', 'Living Room', 'Bedroom', 'Kitchen', 'Office', 'Dining'];
 
 // Product catalog category pills
-const PRODUCT_CATEGORIES = ['All', 'Sofas', 'Seating', 'Beds', 'Nightstands', 'Dressers', 'Desks', 'Desk Chairs', 'Bookshelves', 'Coffee Tables', 'Side Tables', 'Table/Chairs', 'Kitchen', 'TV Stands', 'Pendant Lights', 'Chandeliers', 'Lighting', 'Rugs', 'Wall Art', 'Mirrors'];
+const PRODUCT_CATEGORIES = ['All', 'Sofas', 'Seating', 'Beds', 'Nightstands', 'Dressers', 'Desks', 'Desk Chairs', 'Bookshelves', 'Coffee Tables', 'Side Tables', 'Table/Chairs', 'Kitchen', 'TV Stands', 'Throw Pillows', 'Pendant Lights', 'Chandeliers', 'Lighting', 'Rugs', 'Wall Art', 'Mirrors'];
 const PRODUCT_CAT_MAP = {
   'Sofas':          ['sofa'],
   'Seating':        ['accent-chair', 'dining-chair', 'bar-stool'],
@@ -194,6 +194,7 @@ const PRODUCT_CAT_MAP = {
   'Table/Chairs':   ['dining-table', 'dining-chair'],
   'Kitchen':        ['kitchen-island'],
   'TV Stands':      ['tv-stand'],
+  'Throw Pillows':  ['throw-pillow'],
   'Pendant Lights': ['pendant-light'],
   'Chandeliers':    ['chandelier'],
   'Lighting':       ['table-lamp', 'floor-lamp', 'pendant-light', 'chandelier'],
