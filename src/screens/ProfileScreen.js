@@ -30,6 +30,7 @@ import { updateProfile, uploadAvatar, getUserDesigns } from '../services/supabas
 import Skeleton from '../components/Skeleton';
 import PressableCard from '../components/PressableCard';
 import { VerifiedBadge } from '../components/VerifiedBadge';
+import TabScreenFade from '../components/TabScreenFade';
 
 const { width } = Dimensions.get('window');
 // 4px padding each side + 4px gap between cards (tight photo grid)
@@ -387,7 +388,7 @@ export default function ProfileScreen({ navigation }) {
   const tabs = ['My Snaps', 'Liked', 'Repost'];
 
   return (
-    <View style={styles.container}>
+    <TabScreenFade style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false} bounces={true}>
 
         {/* ── Banner ── */}
@@ -834,7 +835,7 @@ export default function ProfileScreen({ navigation }) {
           </KeyboardAvoidingView>
         </View>
       </Modal>
-    </View>
+    </TabScreenFade>
   );
 }
 

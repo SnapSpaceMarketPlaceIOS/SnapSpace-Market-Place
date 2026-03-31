@@ -22,6 +22,7 @@ import { useAuth } from '../context/AuthContext';
 import AuthGate from '../components/AuthGate';
 import { supabase } from '../services/supabase';
 import { PRODUCT_CATALOG } from '../data/productCatalog';
+import TabScreenFade from '../components/TabScreenFade';
 
 const C  = theme.colors;
 const SP = theme.space;
@@ -353,7 +354,7 @@ export default function CartScreen({ navigation }) {
 
   // ── Main render ───────────────────────────────────────────────────────────────
   return (
-    <View style={styles.container}>
+    <TabScreenFade style={styles.container}>
 
       {/* ── Section 2A: Header ────────────────────────────────────── */}
       <View style={styles.headerSection}>
@@ -530,7 +531,7 @@ export default function CartScreen({ navigation }) {
         </TouchableOpacity>
       </View>
 
-    </View>
+    </TabScreenFade>
   );
 }
 

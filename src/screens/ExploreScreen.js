@@ -25,6 +25,7 @@ import { getPublicDesigns } from '../services/supabase';
 import PressableCard from '../components/PressableCard';
 import { SellerName } from '../components/VerifiedBadge';
 import { getProductsForDesign } from '../services/affiliateProducts';
+import TabScreenFade from '../components/TabScreenFade';
 
 const TC = theme.colors;
 const TY = theme.typography;
@@ -355,6 +356,18 @@ export default function ExploreScreen({ navigation, route }) {
   const [communityDesigns, setCommunityDesigns] = useState([]);
   const consumedParamsRef = useRef(null);
 
+  // Tab-switch content animation — opacity fade only (GPU composited, no layout cost)
+  const contentOpacity = useRef(new Animated.Value(1)).current;
+  useEffect(() => {
+    contentOpacity.setValue(0);
+    Animated.timing(contentOpacity, {
+      toValue: 1,
+      duration: 150,
+      easing: Easing.out(Easing.ease),
+      useNativeDriver: true,
+    }).start();
+  }, [activeTab]);
+
   // Apply params on every focus (handles tab-switch AND fresh navigation)
   useFocusEffect(
     useCallback(() => {
@@ -465,7 +478,7 @@ export default function ExploreScreen({ navigation, route }) {
   }, [activeProdCat, search]);
 
   return (
-    <View style={styles.container}>
+    <TabScreenFade style={styles.container}>
       <SafeAreaView style={styles.safeArea}>
         <ScrollView
           showsVerticalScrollIndicator={false}
@@ -551,6 +564,9 @@ export default function ExploreScreen({ navigation, route }) {
             </TouchableOpacity>
           </View>
           <View style={styles.tabBorder} />
+
+          {/* ── Animated content — fades + rises on tab switch ── */}
+          <Animated.View style={{ opacity: contentOpacity }}>
 
           {/* ── Active Filter Banner ── */}
           {hasActiveFilter && (
@@ -645,6 +661,7 @@ export default function ExploreScreen({ navigation, route }) {
           )}
 
           <View style={{ height: space.lg }} />
+          </Animated.View>
         </ScrollView>
       </SafeAreaView>
 
@@ -909,7 +926,7 @@ export default function ExploreScreen({ navigation, route }) {
           </View>
         </View>
       </Modal>
-    </View>
+    </TabScreenFade>
   );
 }
 
@@ -924,7 +941,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    paddingTop: space.base,
+    paddingTop: space.md,
     paddingBottom: space['2xl'],
   },
 
@@ -940,8 +957,8 @@ const styles = StyleSheet.create({
     ...typeScale.caption,
     color: TC.primary,
     opacity: 0.9,
-    marginTop: space.xs,
-    marginBottom: space.base,
+    marginTop: 2,
+    marginBottom: space.md,
     paddingHorizontal: space.lg,
   },
 
@@ -951,7 +968,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: space.sm,
     paddingHorizontal: space.lg,
-    marginBottom: space.base,
+    marginBottom: space.md,
   },
   searchWrap: {
     flex: 1,
@@ -961,7 +978,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(0,0,0,0.04)',
     borderRadius: 9999,
-    height: 48,
+    height: 40,
     paddingLeft: space.md,
     paddingRight: space.xs,
     gap: space.sm,
@@ -1025,13 +1042,13 @@ const styles = StyleSheet.create({
     borderBottomColor: '#0B6DC3',
   },
   tabLabel: {
-    fontSize: 14,
-    fontWeight: '500',
+    fontSize: 12,
+    fontWeight: '300',
     color: 'rgba(0,0,0,0.45)',
   },
   tabLabelActive: {
-    fontSize: 14,
-    fontWeight: '600',
+    fontSize: 13,
+    fontWeight: '500',
     color: '#0B6DC3',
   },
   tabBorder: {
@@ -1045,14 +1062,14 @@ const styles = StyleSheet.create({
   modeToggleRow: {
     flexDirection: 'row',
     marginHorizontal: space.lg,
-    marginBottom: space.sm,
+    marginBottom: space.xs,
     backgroundColor: '#F1F5F9',
     borderRadius: radius.full,
     padding: 3,
   },
   modeToggleBtn: {
     flex: 1,
-    height: 36,
+    height: 33,
     borderRadius: radius.full,
     alignItems: 'center',
     justifyContent: 'center',
@@ -1067,11 +1084,14 @@ const styles = StyleSheet.create({
   },
   modeToggleLabel: {
     ...typeScale.button,
+    fontSize: 12,
+    fontWeight: '300',
     color: 'rgba(0,0,0,0.45)',
   },
   modeToggleLabelActive: {
+    fontSize: 13,
+    fontWeight: '500',
     color: TC.primary,
-    fontWeight: '700',
   },
 
   // Grid

@@ -43,6 +43,7 @@ import { searchProducts, getSourceColor, getProductsForPrompt } from '../service
 import { generateInteriorDesign, buildFinalPrompt } from '../services/replicate';
 import { PRODUCT_CATALOG } from '../data/productCatalog';
 import { saveUserDesign, updateDesignVisibility } from '../services/supabase';
+import TabScreenFade from '../components/TabScreenFade';
 
 const { width, height } = Dimensions.get('window');
 
@@ -1244,7 +1245,7 @@ export default function HomeScreen({ navigation, route }) {
   // ── Render ──────────────────────────────────────────────────────────────────
 
   return (
-    <View style={styles.container}>
+    <TabScreenFade style={styles.container}>
       {/* Static hero background */}
       <Image
         source={require('../../assets/snap-bg.jpg')}
@@ -2135,7 +2136,7 @@ export default function HomeScreen({ navigation, route }) {
           )}
         </View>
       </Modal>
-    </View>
+    </TabScreenFade>
   );
 }
 
