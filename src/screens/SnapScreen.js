@@ -12,6 +12,7 @@ import Svg, { Path, Circle, Line, Polyline, Rect } from 'react-native-svg';
 import { palette } from '../constants/tokens';
 import { useAuth } from '../context/AuthContext';
 import AuthGate from '../components/AuthGate';
+import TabScreenFade from '../components/TabScreenFade';
 
 // ─── Icons ───────────────────────────────────────────────────────────────────
 
@@ -95,7 +96,7 @@ export default function SnapScreen({ navigation }) {
   }
 
   return (
-    <View style={s.container}>
+    <TabScreenFade style={s.container}>
       <CameraView ref={cameraRef} style={s.camera} facing={facing} flash={flash ? 'on' : 'off'} />
 
       {/* Overlay controls — absolute positioned over camera */}
@@ -141,7 +142,7 @@ export default function SnapScreen({ navigation }) {
           <View style={{ width: 70 }} />
         </View>
       </View>
-    </View>
+    </TabScreenFade>
   );
 }
 

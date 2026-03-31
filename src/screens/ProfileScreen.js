@@ -30,6 +30,7 @@ import { updateProfile, uploadAvatar, getUserDesigns } from '../services/supabas
 import Skeleton from '../components/Skeleton';
 import PressableCard from '../components/PressableCard';
 import { VerifiedBadge } from '../components/VerifiedBadge';
+import TabScreenFade from '../components/TabScreenFade';
 
 const { width } = Dimensions.get('window');
 // 4px padding each side + 4px gap between cards (tight photo grid)
@@ -384,10 +385,10 @@ export default function ProfileScreen({ navigation }) {
     }
   };
 
-  const tabs = ['My Snaps', 'Liked', 'Repost'];
+  const tabs = ['My Snaps', 'Liked'];
 
   return (
-    <View style={styles.container}>
+    <TabScreenFade style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false} bounces={true}>
 
         {/* ── Banner ── */}
@@ -483,14 +484,12 @@ export default function ProfileScreen({ navigation }) {
             return (
               <View style={styles.emptyGrid}>
                 <Text style={styles.emptyGridTitle}>
-                  {activeTab === 0 ? 'No snaps yet' : activeTab === 1 ? 'No liked designs' : 'No reposts yet'}
+                  {activeTab === 0 ? 'No snaps yet' : 'No liked designs'}
                 </Text>
                 <Text style={styles.emptyGridSub}>
                   {activeTab === 0
                     ? 'Generate a design from the Snap tab and post it to see it here.'
-                    : activeTab === 1
-                      ? 'Designs you like will appear here.'
-                      : 'Designs you repost will appear here.'}
+                    : 'Designs you like will appear here.'}
                 </Text>
               </View>
             );
@@ -834,7 +833,7 @@ export default function ProfileScreen({ navigation }) {
           </KeyboardAvoidingView>
         </View>
       </Modal>
-    </View>
+    </TabScreenFade>
   );
 }
 
