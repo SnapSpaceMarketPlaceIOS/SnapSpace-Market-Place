@@ -179,7 +179,7 @@ function UploadIcon() {
 const CATEGORIES = ['All', 'Living Room', 'Bedroom', 'Kitchen', 'Office', 'Dining'];
 
 // Product catalog category pills
-const PRODUCT_CATEGORIES = ['All', 'Sofas', 'Seating', 'Beds', 'Nightstands', 'Dressers', 'Desks', 'Desk Chairs', 'Bookshelves', 'Coffee Tables', 'Side Tables', 'Table/Chairs', 'Kitchen', 'TV Stands', 'Lighting', 'Rugs', 'Wall Art', 'Mirrors'];
+const PRODUCT_CATEGORIES = ['All', 'Sofas', 'Seating', 'Beds', 'Nightstands', 'Dressers', 'Desks', 'Desk Chairs', 'Bookshelves', 'Coffee Tables', 'Side Tables', 'Table/Chairs', 'Kitchen', 'TV Stands', 'Pendant Lights', 'Lighting', 'Rugs', 'Wall Art', 'Mirrors'];
 const PRODUCT_CAT_MAP = {
   'Sofas':          ['sofa'],
   'Seating':        ['accent-chair', 'dining-chair', 'bar-stool'],
@@ -194,6 +194,7 @@ const PRODUCT_CAT_MAP = {
   'Table/Chairs':   ['dining-table', 'dining-chair'],
   'Kitchen':        ['kitchen-island'],
   'TV Stands':      ['tv-stand'],
+  'Pendant Lights': ['pendant-light'],
   'Lighting':       ['table-lamp', 'floor-lamp', 'pendant-light', 'chandelier'],
   'Rugs':           ['rug'],
   'Wall Art':       ['wall-art'],
