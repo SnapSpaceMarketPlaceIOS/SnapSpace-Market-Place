@@ -29,28 +29,12 @@ function base64ToUint8Array(base64) {
   return bytes;
 }
 
-// Wraps fetch with an AbortController timeout so Supabase requests never
-// hang indefinitely inside the iOS simulator / React Native runtime.
-function fetchWithTimeout(ms) {
-  return (url, options = {}) => {
-    const controller = new AbortController();
-    const id = setTimeout(() => controller.abort(), ms);
-    return fetch(url, { ...options, signal: controller.signal }).finally(() =>
-      clearTimeout(id)
-    );
-  };
-}
-
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   auth: {
     storage: AsyncStorage,
     persistSession: true,
     autoRefreshToken: true,
     detectSessionInUrl: false,
-  },
-  global: {
-    // 30-second hard timeout — iOS simulator DNS can be slow on first boot
-    fetch: fetchWithTimeout(30000),
   },
 });
 

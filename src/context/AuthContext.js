@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import * as AppleAuthentication from 'expo-apple-authentication';
-import { supabase, fetchProfile, clearStoredSession } from '../services/supabase';
+import { supabase, fetchProfile } from '../services/supabase';
 import { registerForPushNotifications } from '../services/notifications';
 
 const AuthContext = createContext();
@@ -94,17 +94,16 @@ export function AuthProvider({ children }) {
    * Throws an Error with a user-friendly message on failure.
    */
   const signUp = async (fullName, email, password) => {
-    const authCall = supabase.auth.signUp({
+    if (!process.env.EXPO_PUBLIC_SUPABASE_URL) {
+      throw new Error('App is not configured. Please contact support.');
+    }
+    const { data, error } = await supabase.auth.signUp({
       email: email.trim().toLowerCase(),
       password,
       options: {
         data: { full_name: fullName.trim() },
       },
     });
-    const timeout = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error('Connection timed out. Check your network and try again.')), 35000)
-    );
-    const { data, error } = await Promise.race([authCall, timeout]);
     if (error) throw new Error(error.message);
     // If Supabase requires email confirmation, session will be null here.
     // The user must verify their email before they can sign in.
@@ -116,21 +115,10 @@ export function AuthProvider({ children }) {
    * Throws an Error with a user-friendly message on failure.
    */
   const signIn = async (email, password) => {
-    // Clear any stale/corrupted session from AsyncStorage before signing in.
-    // Without this, signInWithPassword can hang indefinitely trying to refresh
-    // an invalid cached token (e.g. after a crash with bad env vars).
-    await clearStoredSession();
-
-    // Race the auth call against a 15s timeout so the spinner never hangs
-    // silently (e.g. flaky network, Supabase cold start).
-    const authCall = supabase.auth.signInWithPassword({
+    const { error } = await supabase.auth.signInWithPassword({
       email: email.trim().toLowerCase(),
       password,
     });
-    const timeout = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error('Connection timed out. Check your network and try again.')), 35000)
-    );
-    const { error } = await Promise.race([authCall, timeout]);
     if (error) {
       if (error.message.includes('Email not confirmed')) {
         throw new Error('Please verify your email before signing in. Check your inbox for a verification link.');
