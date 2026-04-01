@@ -40,9 +40,11 @@ import { useCart } from '../context/CartContext';
 import { DESIGNS } from '../data/designs';
 import { SELLERS } from '../data/sellers';
 import { searchProducts, getSourceColor, getProductsForPrompt } from '../services/affiliateProducts';
-import { generateInteriorDesign, buildFinalPrompt } from '../services/replicate';
+import { generateInteriorDesign, buildFinalPrompt, generateWithProductRefs } from '../services/replicate';
+import { analyzeRoomImage, rematchFromVision } from '../services/visionMatcher';
 import { PRODUCT_CATALOG } from '../data/productCatalog';
-import { saveUserDesign, updateDesignVisibility } from '../services/supabase';
+import { saveUserDesign, updateDesignVisibility, uploadRoomPhoto } from '../services/supabase';
+import { generateWithProducts, getUserQuota } from '../services/productAwareGeneration';
 import TabScreenFade from '../components/TabScreenFade';
 
 const { width, height } = Dimensions.get('window');
@@ -829,6 +831,14 @@ export default function HomeScreen({ navigation, route }) {
   const [posting, setPosting] = useState(false);
   const [autoSavedDesignId, setAutoSavedDesignId] = useState(null);
 
+  // ── Generation quota (free tier: 3/month) ──────────────────────────────────
+  const [userQuota, setUserQuota] = useState({
+    canGenerate: true,
+    generationsRemaining: 3,
+    tier: 'free',
+    quotaResetDate: null,
+  });
+
   // Loading bar animation
   const loadingProgress = useRef(new Animated.Value(0)).current;
   const loadingAnim = useRef(null);
@@ -1171,10 +1181,116 @@ export default function HomeScreen({ navigation, route }) {
     startLoadingBar();
     try {
       setGenStatus('');
-      const matchedProducts = getProductsForPrompt(designPrompt, 6);
-      setGenStatus('Generating your design…');
-      const enrichedPrompt = buildEnrichedPrompt(designPrompt, matchedProducts);
-      const resultUrl = await generateInteriorDesign(savedPhoto.uri, enrichedPrompt, savedPhoto.base64);
+
+      // ── Pre-match products from local catalog (before any generation call) ──
+      setGenStatus('Finding products for your space…');
+      const matchedProducts = getProductsForPrompt(designPrompt, 4);
+
+      // ── Quota check (free tier: 3 generations/month) ───────────────────────
+      if (!userQuota.canGenerate) {
+        stopLoadingBar(false);
+        setGenerating(false);
+        const resetDate = userQuota.quotaResetDate
+          ? new Date(userQuota.quotaResetDate).toLocaleDateString('en-US', { month: 'long', day: 'numeric' })
+          : 'next month';
+        Alert.alert(
+          'Monthly Limit Reached',
+          `You've used all 3 free generations this month. Resets ${resetDate}.\n\nUpgrade to Premium for unlimited generations.`,
+          [
+            { text: 'Maybe Later', style: 'cancel' },
+            { text: 'Upgrade', onPress: () => navigation.navigate('Premium') },
+          ]
+        );
+        return;
+      }
+
+      // ── Route: premium tier → edge function pipeline (v3) ─────────────────
+      //          free tier   → edge function pipeline (v2, Pass 1 only)
+      // Both fall back to local replicate.js + visionMatcher.js on error.
+      // ──────────────────────────────────────────────────────────────────────
+      let resultUrl;
+      let finalProducts;
+
+      if (user?.id) {
+        // Upload room photo to Supabase Storage first (edge function needs a public URL)
+        setGenStatus('Preparing your room…');
+        let roomPhotoUrl = null;
+        try {
+          roomPhotoUrl = await uploadRoomPhoto(user.id, savedPhoto.uri, savedPhoto.base64);
+        } catch (uploadErr) {
+          console.warn('[Gen] Room photo upload failed, using local pipeline:', uploadErr.message);
+        }
+
+        if (roomPhotoUrl) {
+          // ── Edge function pipeline ────────────────────────────────────────
+          setGenStatus('Generating your design…');
+          try {
+            const genResult = await generateWithProducts({
+              roomPhotoUrl,
+              prompt: designPrompt,
+              userId: user.id,
+              tier: userQuota.tier,
+              products: matchedProducts,
+              onStatus: (msg) => setGenStatus(msg),
+            });
+
+            resultUrl     = genResult.imageUrl;
+            finalProducts = genResult.products;
+
+            // Refresh quota after successful generation
+            getUserQuota(user.id).then(q => setUserQuota(q)).catch(() => {});
+
+            console.log(
+              `[Gen] Pipeline v${genResult.pipeline} complete | ` +
+              `cost=$${genResult.costUsd?.toFixed(4)} | ` +
+              `passes=${genResult.passesCompleted}`
+            );
+          } catch (edgeFnErr) {
+            if (edgeFnErr.code === 'QUOTA_EXCEEDED') {
+              stopLoadingBar(false);
+              setGenerating(false);
+              Alert.alert('Monthly Limit Reached', edgeFnErr.message, [
+                { text: 'OK', style: 'cancel' },
+                { text: 'Upgrade', onPress: () => navigation.navigate('Premium') },
+              ]);
+              return;
+            }
+            // Any other error — fall through to local pipeline
+            console.warn('[Gen] Edge function failed, using local pipeline:', edgeFnErr.message);
+            roomPhotoUrl = null;  // signal to use local pipeline below
+          }
+        }
+
+        if (!roomPhotoUrl) {
+          // ── Local fallback: try to get a public URL for flux-2-max ─────────
+          setGenStatus('Generating your design…');
+          let localPublicUrl = null;
+          try {
+            const { uploadImageGetUrl } = await import('../services/replicate');
+            localPublicUrl = await uploadImageGetUrl(savedPhoto.uri, savedPhoto.base64);
+          } catch (uploadErr) {
+            console.warn('[Gen] Could not upload photo for flux-2-max fallback:', uploadErr.message);
+          }
+
+          if (localPublicUrl) {
+            // Use flux-2-max with product references (same model as edge function)
+            resultUrl = await generateWithProductRefs(localPublicUrl, designPrompt, matchedProducts);
+            finalProducts = matchedProducts;
+          } else {
+            // Last resort: xlabs local pipeline (no public URL available)
+            const enrichedPrompt = buildEnrichedPrompt(designPrompt, matchedProducts);
+            resultUrl = await generateInteriorDesign(savedPhoto.uri, enrichedPrompt, savedPhoto.base64);
+            finalProducts = matchedProducts;
+          }
+        }
+      } else {
+        // Not signed in — use xlabs local pipeline (can't upload photo without auth)
+        setGenStatus('Generating your design…');
+        const enrichedPrompt = buildEnrichedPrompt(designPrompt, matchedProducts);
+        resultUrl = await generateInteriorDesign(savedPhoto.uri, enrichedPrompt, savedPhoto.base64);
+        finalProducts = matchedProducts;
+      }
+
       stopLoadingBar();
       setGenerating(false);
       setGenStatus('');
@@ -1182,7 +1298,7 @@ export default function HomeScreen({ navigation, route }) {
         imageUri: savedPhoto.uri,
         resultUri: resultUrl,
         prompt: designPrompt,
-        products: matchedProducts,
+        products: finalProducts,
       });
       setShowResult(true);
       setPhoto(null);
@@ -1191,9 +1307,9 @@ export default function HomeScreen({ navigation, route }) {
 
       // ── Auto-save: persist every generation to Supabase immediately ──
       if (user?.id) {
-        const styleTags = matchedProducts.flatMap(p => p.styles || p.styleTags || []).filter(Boolean);
+        const styleTags = finalProducts.flatMap(p => p.styles || p.styleTags || []).filter(Boolean);
         const uniqueTags = [...new Set(styleTags)];
-        const productSummary = matchedProducts.map(p => ({
+        const productSummary = finalProducts.map(p => ({
           id: p.id, name: p.name, brand: p.brand,
           price: p.priceValue ?? p.price, imageUrl: p.imageUrl,
           rating: p.rating, reviewCount: p.reviewCount,
@@ -1236,6 +1352,14 @@ export default function HomeScreen({ navigation, route }) {
       }
     })();
   }, [user]);
+
+  // Fetch generation quota when user signs in
+  useEffect(() => {
+    if (!user?.id) return;
+    getUserQuota(user.id)
+      .then(quota => setUserQuota(quota))
+      .catch(err => console.warn('[Quota] Fetch failed:', err.message));
+  }, [user?.id]);
 
   const firstName = getFirstName(user);
   const greetingLine = firstName

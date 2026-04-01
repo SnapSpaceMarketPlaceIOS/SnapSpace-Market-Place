@@ -348,6 +348,115 @@ export async function generateInteriorDesign(imageUri, prompt, base64, products,
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// flux-2-max: Single-call product-reference room generation
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Build the flux-2-max prompt for product-reference room editing.
+ *
+ * Tells the model to treat image 1 as the room to preserve and images 2+ as
+ * product references to swap in. Product categories are mapped to image indices.
+ *
+ * Exported so callers (e.g. HomeScreen local fallback) can use the same prompt
+ * structure as the edge function.
+ *
+ * @param {string}   userPrompt - The user's raw design prompt
+ * @param {object[]} products   - Array of products with a category field
+ * @returns {string} Structured prompt for flux-2-max
+ */
+export function buildFlux2MaxPrompt(userPrompt, products) {
+  // Build per-product placement instructions (image 2, 3, 4, 5)
+  const placements = [];
+  (products || []).slice(0, 4).forEach((p, i) => {
+    const category = (p.category || p.name || 'furniture piece')
+      .replace(/-/g, ' ')
+      .toLowerCase();
+    placements.push(`${category} → image ${i + 2}`);
+  });
+
+  const placementStr = placements.length > 0
+    ? `Only replace furniture to match the references: [${placements.join(', ')}].`
+    : "Replace furniture with pieces that match the room's style.";
+
+  return [
+    'This is a scene edit, not a new generation.',
+    'Keep image 1 room exactly — same walls, floor, ceiling, lighting, camera angle, and spatial layout.',
+    'Do not change room architecture.',
+    placementStr,
+    userPrompt,
+    QUALITY_SUFFIX,
+  ].join(' ');
+}
+
+/**
+ * Generate a product-aware room redesign using a single flux-2-max call.
+ *
+ * Takes a public room photo URL (not a local URI — must already be uploaded to
+ * Supabase Storage or Replicate CDN) and up to 4 product reference images.
+ * Builds input_images = [roomPhotoUrl, product1.imageUrl, product2.imageUrl, ...]
+ * and calls flux-2-max with the structured scene-edit prompt.
+ *
+ * Used as the local fallback pipeline when the Supabase edge function is
+ * unavailable but the room photo is already uploaded.
+ *
+ * @param {string}   roomPhotoUrl - Public URL of the user's room photo
+ * @param {string}   userPrompt   - The user's raw design prompt
+ * @param {object[]} products     - Matched products (each with an imageUrl field)
+ * @returns {Promise<string>}     - URL of the generated room image
+ */
+export async function generateWithProductRefs(roomPhotoUrl, userPrompt, products) {
+  if (!TOKEN) throw new Error('Replicate API token is missing. Add EXPO_PUBLIC_REPLICATE_API_TOKEN to your .env file.');
+  if (!roomPhotoUrl) throw new Error('generateWithProductRefs requires a public room photo URL.');
+
+  // Build input_images: room photo first, then up to 4 product images
+  const productImages = (products || [])
+    .filter(p => p.imageUrl)
+    .slice(0, 4)
+    .map(p => p.imageUrl);
+
+  const inputImages = [roomPhotoUrl, ...productImages];
+
+  const generationPrompt = buildFlux2MaxPrompt(userPrompt || 'Modern minimalist interior design.', products || []);
+
+  console.log('[flux-2-max] Prompt:', generationPrompt.substring(0, 200) + '...');
+  console.log('[flux-2-max] input_images:', inputImages.length, '(1 room +', productImages.length, 'products)');
+
+  const res = await fetch(`${API_URL}/models/black-forest-labs/flux-2-max/predictions`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${TOKEN}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      input: {
+        prompt:           generationPrompt,
+        input_images:     inputImages,
+        aspect_ratio:     'match_input_image',
+        resolution:       '1 MP',
+        output_format:    'webp',
+        output_quality:   95,
+        safety_tolerance: 5,
+        seed:             Math.floor(Math.random() * 999999999),
+      },
+    }),
+  });
+
+  const prediction = await res.json();
+  if (!res.ok) {
+    throw new Error(
+      `flux-2-max submit failed (${res.status}): ${prediction?.detail || prediction?.error || 'Unknown error'}`
+    );
+  }
+
+  if (prediction.status === 'succeeded') {
+    const output = prediction.output;
+    return typeof output === 'string' ? output : (Array.isArray(output) ? output[0] : output);
+  }
+
+  return pollUntilDone(prediction.id);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Polling
 // ─────────────────────────────────────────────────────────────────────────────
 async function pollUntilDone(id) {

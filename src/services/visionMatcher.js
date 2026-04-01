@@ -79,16 +79,23 @@ function getColorSynonyms(colorStr) {
 // ── OPPOSITE color families — used to apply mismatch penalty ─────────────────
 // If the vision says "cream" and the product is clearly "rust/red/terracotta", penalize hard.
 const COLOR_OPPOSITES = {
-  'cream':     ['rust', 'terracotta', 'red', 'orange', 'pink', 'purple', 'teal', 'blue', 'green', 'black'],
-  'ivory':     ['rust', 'terracotta', 'red', 'orange', 'charcoal', 'black', 'navy'],
-  'white':     ['rust', 'terracotta', 'red', 'orange', 'charcoal', 'black', 'navy', 'dark'],
-  'beige':     ['rust', 'terracotta', 'red', 'orange', 'black', 'navy', 'charcoal'],
-  'black':     ['white', 'ivory', 'cream', 'beige', 'light', 'blond'],
-  'walnut':    ['white', 'ivory', 'cream', 'light', 'blond', 'natural'],
+  // Light/neutral vs dark — a cream sofa is NOT a gray sofa
+  'cream':     ['rust', 'terracotta', 'red', 'orange', 'pink', 'purple', 'teal', 'blue', 'green', 'black', 'charcoal', 'gray', 'grey', 'dark', 'walnut', 'espresso', 'navy'],
+  'ivory':     ['rust', 'terracotta', 'red', 'orange', 'charcoal', 'black', 'navy', 'gray', 'grey', 'dark', 'walnut', 'espresso'],
+  'white':     ['rust', 'terracotta', 'red', 'orange', 'charcoal', 'black', 'navy', 'dark', 'gray', 'grey', 'walnut', 'espresso'],
+  'beige':     ['rust', 'terracotta', 'red', 'orange', 'black', 'navy', 'charcoal', 'gray', 'grey', 'dark'],
+  // Dark vs light — a walnut dresser is NOT a white dresser
+  'black':     ['white', 'ivory', 'cream', 'beige', 'light', 'blond', 'natural', 'oak', 'birch'],
+  'charcoal':  ['white', 'ivory', 'cream', 'beige', 'light', 'blond', 'natural', 'oak', 'birch', 'gold'],
+  'walnut':    ['white', 'ivory', 'cream', 'light', 'blond', 'natural', 'oak', 'birch'],
+  'espresso':  ['white', 'ivory', 'cream', 'light', 'blond', 'natural', 'oak', 'birch'],
   'cognac':    ['white', 'ivory', 'cream', 'gray', 'black', 'blue', 'green'],
-  'navy':      ['cream', 'ivory', 'beige', 'rust', 'terracotta', 'orange'],
-  'gray':      ['rust', 'terracotta', 'red', 'orange', 'gold'],
+  // Cool/muted vs warm/vibrant
+  'navy':      ['cream', 'ivory', 'beige', 'rust', 'terracotta', 'orange', 'gold'],
+  'gray':      ['rust', 'terracotta', 'red', 'orange', 'gold', 'cream', 'ivory', 'white', 'beige'],
+  'grey':      ['rust', 'terracotta', 'red', 'orange', 'gold', 'cream', 'ivory', 'white', 'beige'],
   'green':     ['rust', 'terracotta', 'red', 'orange', 'pink'],
+  'sage':      ['rust', 'terracotta', 'red', 'orange', 'pink', 'navy', 'black'],
 };
 
 function getColorMismatchPenalty(visionColor, product) {
