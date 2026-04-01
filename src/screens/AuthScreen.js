@@ -119,19 +119,27 @@ export default function AuthScreen({ navigation }) {
     return Object.keys(e).length === 0;
   };
 
+  const withTimeout = (promise, ms = 10000) =>
+    Promise.race([
+      promise,
+      new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('Request timed out. Check your connection and try again.')), ms)
+      ),
+    ]);
+
   const handleAuth = async () => {
     if (!validate()) return;
     setLoading(true);
     try {
       if (isSignUp) {
-        const result = await signUp(name, email, password);
+        const result = await withTimeout(signUp(name, email, password));
         if (result.needsEmailVerification) {
           navigation.replace('VerifyEmailSent', { email });
         } else {
           navigation.reset({ index: 0, routes: [{ name: 'Main' }] });
         }
       } else {
-        await signIn(email, password);
+        await withTimeout(signIn(email, password));
         // Use reset instead of goBack — goBack silently fails if Auth was
         // the first screen (cold start), leaving the spinner stuck forever.
         navigation.reset({ index: 0, routes: [{ name: 'Main' }] });
@@ -150,7 +158,7 @@ export default function AuthScreen({ navigation }) {
     }
     setLoading(true);
     try {
-      await resetPassword(email);
+      await withTimeout(resetPassword(email));
       Alert.alert(
         'Check your inbox',
         `A password reset link has been sent to ${email}.`,
