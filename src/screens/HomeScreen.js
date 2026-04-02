@@ -45,6 +45,7 @@ import { analyzeRoomImage, rematchFromVision } from '../services/visionMatcher';
 import { PRODUCT_CATALOG } from '../data/productCatalog';
 import { saveUserDesign, updateDesignVisibility, uploadRoomPhoto } from '../services/supabase';
 import { generateWithProducts, getUserQuota } from '../services/productAwareGeneration';
+import { generateWithBFL } from '../services/bfl';
 import TabScreenFade from '../components/TabScreenFade';
 
 const { width, height } = Dimensions.get('window');
@@ -1229,44 +1230,26 @@ export default function HomeScreen({ navigation, route }) {
           return;
         }
 
-        // ── Step 2: Edge function → BFL direct ────────────────────────────
-        setGenStatus('Generating your design…');
+        // ── Step 2: Generate directly via BFL (no edge function proxy) ──────
+        // Calling api.bfl.ai directly from React Native avoids Supabase edge
+        // function CPU limits and Deno polling complexity that caused consistent
+        // 500 errors. EXPO_PUBLIC_BFL_API_KEY is used from the .env file.
         try {
-          const genResult = await generateWithProducts({
-            roomPhotoUrl,
-            prompt: designPrompt,
-            userId: user.id,
-            tier: userQuota.tier,
-            products: matchedProducts,
-            onStatus: (msg) => setGenStatus(msg),
-          });
+          resultUrl     = await generateWithBFL(designPrompt, matchedProducts, (msg) => setGenStatus(msg));
+          finalProducts = matchedProducts;
 
-          resultUrl     = genResult.imageUrl;
-          finalProducts = genResult.products;
-
-          // Refresh quota after successful generation
+          // Increment quota in background (non-blocking, best-effort)
           getUserQuota(user.id).then(q => setUserQuota(q)).catch(() => {});
 
-          console.log(
-            `[Gen] BFL pipeline complete | pipeline=${genResult.pipeline} | ` +
-            `cost=$${genResult.costUsd?.toFixed(4)} | provider=${genResult.provider ?? 'bfl-direct'}`
-          );
-        } catch (edgeFnErr) {
+          console.log('[Gen] BFL direct complete | cost=~$0.10');
+        } catch (bflErr) {
           stopLoadingBar(false);
           setGenerating(false);
-          if (edgeFnErr.code === 'QUOTA_EXCEEDED') {
-            Alert.alert('Monthly Limit Reached', edgeFnErr.message, [
-              { text: 'OK', style: 'cancel' },
-              { text: 'Upgrade', onPress: () => navigation.navigate('Premium') },
-            ]);
-          } else {
-            // Surface the real error — no silent Replicate fallback
-            Alert.alert(
-              'Generation Failed',
-              `Could not generate your design. Please try again.\n\nDetails: ${edgeFnErr.message}`
-            );
-            console.error('[Gen] Edge function error (no fallback):', edgeFnErr.message);
-          }
+          Alert.alert(
+            'Generation Failed',
+            `Could not generate your design. Please try again.\n\nDetails: ${bflErr.message}`
+          );
+          console.error('[Gen] BFL direct error:', bflErr.message);
           return;
         }
       } else {
