@@ -365,8 +365,25 @@ async function runBFL(
     console.log(`[bfl] Poll ${i + 1}/${MAX_POLLS} | status=${status}`);
 
     if (status === "Ready") {
-      const imageUrl = polled.result?.sample;
-      if (!imageUrl) throw new Error("BFL returned Ready but no image URL in result.sample");
+      // Log the full result structure — BFL regional endpoints (api.us2.bfl.ai etc.)
+      // sometimes return the URL as result.sample (object) or directly as result (string).
+      // We handle all known formats so a field-name mismatch can't crash after billing.
+      console.log(`[bfl] Ready | result=${JSON.stringify(polled.result).substring(0, 300)}`);
+
+      const imageUrl =
+        polled.result?.sample                                        // Standard: { result: { sample: "url" } }
+        || polled.result?.url                                        // Alt:      { result: { url: "url" } }
+        || polled.result?.image                                      // Alt:      { result: { image: "url" } }
+        || (typeof polled.result === "string" ? polled.result : null) // Alt:      { result: "url" }
+        || polled.sample                                             // Top-level fallback
+        || polled.url;                                              // Top-level fallback
+
+      if (!imageUrl) {
+        throw new Error(
+          `BFL returned Ready but image URL not found in any known field. ` +
+          `result=${JSON.stringify(polled.result).substring(0, 300)}`
+        );
+      }
       return imageUrl;
     }
     if (status === "Error") {

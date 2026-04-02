@@ -1206,91 +1206,79 @@ export default function HomeScreen({ navigation, route }) {
 
       // ── Route: premium tier → edge function pipeline (v3) ─────────────────
       //          free tier   → edge function pipeline (v2, Pass 1 only)
-      // Both fall back to local replicate.js + visionMatcher.js on error.
+      // Replicate fallback removed — BFL direct is the only pipeline.
+      // If the edge function fails, the user sees a clear error instead of
+      // a silent fallback that double-bills through Replicate.
       // ──────────────────────────────────────────────────────────────────────
       let resultUrl;
       let finalProducts;
 
       if (user?.id) {
-        // Upload room photo to Supabase Storage first (edge function needs a public URL)
+        // ── Step 1: Upload room photo to Supabase Storage ─────────────────
         setGenStatus('Preparing your room…');
         let roomPhotoUrl = null;
         try {
           roomPhotoUrl = await uploadRoomPhoto(user.id, savedPhoto.uri, savedPhoto.base64);
         } catch (uploadErr) {
-          console.warn('[Gen] Room photo upload failed, using local pipeline:', uploadErr.message);
+          stopLoadingBar(false);
+          setGenerating(false);
+          Alert.alert(
+            'Upload Failed',
+            'Could not upload your room photo. Please check your connection and try again.'
+          );
+          return;
         }
 
-        if (roomPhotoUrl) {
-          // ── Edge function pipeline ────────────────────────────────────────
-          setGenStatus('Generating your design…');
-          try {
-            const genResult = await generateWithProducts({
-              roomPhotoUrl,
-              prompt: designPrompt,
-              userId: user.id,
-              tier: userQuota.tier,
-              products: matchedProducts,
-              onStatus: (msg) => setGenStatus(msg),
-            });
+        // ── Step 2: Edge function → BFL direct ────────────────────────────
+        setGenStatus('Generating your design…');
+        try {
+          const genResult = await generateWithProducts({
+            roomPhotoUrl,
+            prompt: designPrompt,
+            userId: user.id,
+            tier: userQuota.tier,
+            products: matchedProducts,
+            onStatus: (msg) => setGenStatus(msg),
+          });
 
-            resultUrl     = genResult.imageUrl;
-            finalProducts = genResult.products;
+          resultUrl     = genResult.imageUrl;
+          finalProducts = genResult.products;
 
-            // Refresh quota after successful generation
-            getUserQuota(user.id).then(q => setUserQuota(q)).catch(() => {});
+          // Refresh quota after successful generation
+          getUserQuota(user.id).then(q => setUserQuota(q)).catch(() => {});
 
-            console.log(
-              `[Gen] Pipeline v${genResult.pipeline} complete | ` +
-              `cost=$${genResult.costUsd?.toFixed(4)} | ` +
-              `passes=${genResult.passesCompleted}`
-            );
-          } catch (edgeFnErr) {
-            if (edgeFnErr.code === 'QUOTA_EXCEEDED') {
-              stopLoadingBar(false);
-              setGenerating(false);
-              Alert.alert('Monthly Limit Reached', edgeFnErr.message, [
-                { text: 'OK', style: 'cancel' },
-                { text: 'Upgrade', onPress: () => navigation.navigate('Premium') },
-              ]);
-              return;
-            }
-            // Any other error — fall through to local pipeline
-            console.warn('[Gen] Edge function failed, using local pipeline:', edgeFnErr.message);
-            roomPhotoUrl = null;  // signal to use local pipeline below
-          }
-        }
-
-        if (!roomPhotoUrl) {
-          // ── Local fallback: try to get a public URL for flux-2-max ─────────
-          setGenStatus('Generating your design…');
-          let localPublicUrl = null;
-          try {
-            setGenStatus('Uploading your room photo…');
-            const { uploadImageGetUrl } = await import('../services/replicate');
-            localPublicUrl = await uploadImageGetUrl(savedPhoto.uri, savedPhoto.base64);
-            setGenStatus('Generating your design…');
-          } catch (uploadErr) {
-            console.warn('[Gen] Could not upload photo for flux-2-max fallback:', uploadErr.message);
-          }
-
-          if (localPublicUrl) {
-            // Use flux-2-max with product references (same model as edge function)
-            resultUrl = await generateWithProductRefs(localPublicUrl, designPrompt, matchedProducts);
-            finalProducts = matchedProducts;
+          console.log(
+            `[Gen] BFL pipeline complete | pipeline=${genResult.pipeline} | ` +
+            `cost=$${genResult.costUsd?.toFixed(4)} | provider=${genResult.provider ?? 'bfl-direct'}`
+          );
+        } catch (edgeFnErr) {
+          stopLoadingBar(false);
+          setGenerating(false);
+          if (edgeFnErr.code === 'QUOTA_EXCEEDED') {
+            Alert.alert('Monthly Limit Reached', edgeFnErr.message, [
+              { text: 'OK', style: 'cancel' },
+              { text: 'Upgrade', onPress: () => navigation.navigate('Premium') },
+            ]);
           } else {
-            // Last resort: xlabs local pipeline (no public URL available)
-            const enrichedPrompt = buildEnrichedPrompt(designPrompt, matchedProducts);
-            resultUrl = await generateInteriorDesign(savedPhoto.uri, enrichedPrompt, savedPhoto.base64);
-            finalProducts = matchedProducts;
+            // Surface the real error — no silent Replicate fallback
+            Alert.alert(
+              'Generation Failed',
+              `Could not generate your design. Please try again.\n\nDetails: ${edgeFnErr.message}`
+            );
+            console.error('[Gen] Edge function error (no fallback):', edgeFnErr.message);
           }
+          return;
         }
       } else {
-        // Not signed in — use xlabs local pipeline (can't upload photo without auth)
-        setGenStatus('Generating your design…');
-        const enrichedPrompt = buildEnrichedPrompt(designPrompt, matchedProducts);
-        resultUrl = await generateInteriorDesign(savedPhoto.uri, enrichedPrompt, savedPhoto.base64);
-        finalProducts = matchedProducts;
+        // Not signed in — require sign-in, no generation without auth
+        stopLoadingBar(false);
+        setGenerating(false);
+        Alert.alert(
+          'Sign In Required',
+          'Please sign in to generate AI designs.',
+          [{ text: 'OK' }]
+        );
+        return;
       }
 
       stopLoadingBar();
