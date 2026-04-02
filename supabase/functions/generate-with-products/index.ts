@@ -222,42 +222,72 @@ Deno.serve(async (req: Request) => {
     console.log(`[gen] Generation complete | url=${generatedImageUrl.substring(0, 80)}...`);
   } catch (e: any) {
     console.error("[gen] Generation failed:", e.message);
-    await logGeneration(supabase, { user_id, prompt, room_image_url: room_photo_url, products: normalizedProducts, style_tags: styleTags });
+    // Log the failure (non-blocking — don't let a DB error mask the real error)
+    try {
+      await logGeneration(supabase, { user_id, prompt, room_image_url: room_photo_url, products: normalizedProducts, style_tags: styleTags });
+    } catch (logErr: any) {
+      console.warn("[gen] Failed to log generation error:", logErr.message);
+    }
     return errorResponse(`Generation failed: ${e.message}`, 500);
   }
 
-  // ────────────────────────────────────────────────────────────────────────────
-  // STEP 3: Log + Step 4: Increment quota
-  // ────────────────────────────────────────────────────────────────────────────
+  // ── BFL/Replicate succeeded. Build the response immediately. ──────────────
+  // CRITICAL: All post-generation DB operations are wrapped in individual
+  // try/catch blocks. In Deno's ESM environment, an unhandled throw here
+  // would return a 500 to the client — causing the HomeScreen to fire the
+  // local Replicate fallback and double-bill the user. Never let DB ops
+  // block or crash the response after a successful generation.
+  // ─────────────────────────────────────────────────────────────────────────
+
   const duration = Date.now() - startTime;
   console.log(`[gen] Done | duration=${duration}ms | provider=${useBFL ? "BFL" : "Replicate"} | cost=$${COST_BFL_USD}`);
 
-  await logGeneration(supabase, {
-    user_id,
-    prompt,
-    room_image_url: room_photo_url,
-    products:       normalizedProducts.slice(0, 6),
-    style_tags:     styleTags,
-  });
+  // ── STEP 3: Log generation (non-fatal) ───────────────────────────────────
+  try {
+    await logGeneration(supabase, {
+      user_id,
+      prompt,
+      room_image_url: room_photo_url,
+      products:       normalizedProducts.slice(0, 6),
+      style_tags:     styleTags,
+    });
+  } catch (logErr: any) {
+    // Never block the response — generation already completed and cost was incurred
+    console.warn("[gen] Generation log threw (non-fatal):", logErr.message);
+  }
 
-  await supabase.rpc("increment_generation_count", { p_user_id: user_id });
+  // ── STEP 4: Increment quota (non-fatal) ──────────────────────────────────
+  try {
+    const { error: quotaErr } = await supabase.rpc("increment_generation_count", { p_user_id: user_id });
+    if (quotaErr) console.warn("[gen] Quota increment failed (non-fatal):", quotaErr.message);
+  } catch (quotaThrow: any) {
+    // Deno ESM supabase-js may throw on network errors instead of returning {error}
+    console.warn("[gen] Quota increment threw (non-fatal):", quotaThrow.message);
+  }
 
-  // ── Step 5: Return result ─────────────────────────────────────────────────
+  // ── STEP 5: Return result ─────────────────────────────────────────────────
   // Always put the BFL reference products FIRST — they are literally rendered
   // into the room image. The client pins them to the top of the product list.
-  const refIds = new Set(topProducts.map((p: any) => p.id));
-  const supplementary = normalizedProducts.filter((p: any) => !refIds.has(p.id)).slice(0, 4);
-  const orderedProducts = [...topProducts, ...supplementary];
+  let orderedProducts: any[] = [];
+  try {
+    const refIds = new Set(topProducts.map((p: any) => p.id));
+    const supplementary = normalizedProducts.filter((p: any) => !refIds.has(p.id)).slice(0, 4);
+    orderedProducts = [...topProducts, ...supplementary];
+  } catch (sortErr: any) {
+    console.warn("[gen] Product ordering threw (non-fatal):", sortErr.message);
+    orderedProducts = normalizedProducts.slice(0, 6);
+  }
 
   return successResponse({
     image_url:        generatedImageUrl,
     products:         orderedProducts,
-    reference_count:  topProducts.length,   // how many products are in the image
+    reference_count:  topProducts.length,
     tier,
     cost_usd:         COST_BFL_USD,
     duration_ms:      duration,
     pipeline:         "v5-bfl",
     provider:         useBFL ? "bfl-direct" : "replicate-fallback",
+    passes_completed: 1,
   });
 });
 
