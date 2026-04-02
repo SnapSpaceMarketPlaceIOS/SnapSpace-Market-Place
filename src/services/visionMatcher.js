@@ -3,7 +3,9 @@ import { STYLE_AFFINITY } from '../data/styleMap';
 
 const ANTHROPIC_API_URL = 'https://api.anthropic.com/v1/messages';
 const ANTHROPIC_API_KEY = process.env.EXPO_PUBLIC_ANTHROPIC_API_KEY;
-const VISION_MODEL = 'claude-sonnet-4-6';
+// Haiku is 12× cheaper than Sonnet ($0.001 vs $0.013 per call) and
+// performs identically for furniture identification tasks.
+const VISION_MODEL = 'claude-haiku-4-5';
 
 // ── Vision prompt ─────────────────────────────────────────────────────────────
 // Structured so Claude returns clean JSON we can parse directly.

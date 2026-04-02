@@ -6,10 +6,10 @@ import { STYLE_AFFINITY, ROOM_FURNITURE } from '../data/styleMap';
 // a room typically has 1 sofa, 1 coffee table, 1 rug, etc.
 const MAX_PER_CATEGORY = 1;
 
-// How many top candidates per category to randomize among.
-// Keep at 2 for tight style coherence — higher values let wrong-style
-// products (e.g. farmhouse bean bag) beat right-style products (modern sofa).
-const RANDOM_POOL_SIZE = 2;
+// How many top candidates per category to consider.
+// Set to 1 to always pick the highest-scored product — eliminates randomness
+// that caused different (wrong) products to display on each generation run.
+const RANDOM_POOL_SIZE = 1;
 
 // Categories that are ONLY appropriate for specific room types.
 // If a product's category is in this map, it can only appear for those rooms.
@@ -92,10 +92,9 @@ export function matchProducts(parsedPrompt, limit = 6, catalog = PRODUCT_CATALOG
 
   const scored = candidates.map((product) => {
     const score = scoreProduct(product, roomType, styles, materials, furnitureCategories, moods, promptTokens);
-    // Add ±8% random noise so high-scoring products rotate between generations.
-    // Without this, the same top-N products win every time on an identical prompt.
-    const noise = (Math.random() - 0.5) * Math.max(score, 5) * 0.16;
-    return { ...product, _score: score + noise };
+    // No random noise — deterministic scoring so the best-matched products
+    // always win for a given prompt, giving consistent product display every run.
+    return { ...product, _score: score };
   });
 
   scored.sort((a, b) => b._score - a._score);

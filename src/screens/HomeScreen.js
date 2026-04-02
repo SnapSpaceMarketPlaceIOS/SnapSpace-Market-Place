@@ -1266,8 +1266,10 @@ export default function HomeScreen({ navigation, route }) {
           setGenStatus('Generating your design…');
           let localPublicUrl = null;
           try {
+            setGenStatus('Uploading your room photo…');
             const { uploadImageGetUrl } = await import('../services/replicate');
             localPublicUrl = await uploadImageGetUrl(savedPhoto.uri, savedPhoto.base64);
+            setGenStatus('Generating your design…');
           } catch (uploadErr) {
             console.warn('[Gen] Could not upload photo for flux-2-max fallback:', uploadErr.message);
           }
@@ -1292,13 +1294,40 @@ export default function HomeScreen({ navigation, route }) {
       }
 
       stopLoadingBar();
+
+      // ── Vision matching: analyze the generated room and re-match products ────
+      // Keep the loading state active (generating=true) so the blur overlay
+      // stays while Claude analyzes the render and finds exact catalog matches.
+      let finalMatchedProducts = finalProducts;
+      try {
+        setGenStatus('Matching products to your room…');
+        const visionResult = await analyzeRoomImage(resultUrl);
+        if (visionResult?.items?.length > 0) {
+          const visionRoomType = visionResult.roomType || 'living-room';
+          const visionProducts = rematchFromVision(
+            visionResult.items,
+            visionRoomType,
+            finalProducts, // fallback if vision can't fill a category slot
+            6,
+          );
+          if (visionProducts.length > 0) {
+            finalMatchedProducts = visionProducts;
+            console.log('[Gen] Vision re-matched', visionProducts.length, 'products to rendered room');
+          }
+        } else {
+          console.log('[Gen] Vision unavailable — using pre-matched products');
+        }
+      } catch (visionErr) {
+        console.warn('[Gen] Vision matching failed, using pre-matched products:', visionErr.message);
+      }
+
       setGenerating(false);
       setGenStatus('');
       setResultData({
         imageUri: savedPhoto.uri,
         resultUri: resultUrl,
         prompt: designPrompt,
-        products: finalProducts,
+        products: finalMatchedProducts,
       });
       setShowResult(true);
       setPhoto(null);
@@ -1307,9 +1336,9 @@ export default function HomeScreen({ navigation, route }) {
 
       // ── Auto-save: persist every generation to Supabase immediately ──
       if (user?.id) {
-        const styleTags = finalProducts.flatMap(p => p.styles || p.styleTags || []).filter(Boolean);
+        const styleTags = finalMatchedProducts.flatMap(p => p.styles || p.styleTags || []).filter(Boolean);
         const uniqueTags = [...new Set(styleTags)];
-        const productSummary = finalProducts.map(p => ({
+        const productSummary = finalMatchedProducts.map(p => ({
           id: p.id, name: p.name, brand: p.brand,
           price: p.priceValue ?? p.price, imageUrl: p.imageUrl,
           rating: p.rating, reviewCount: p.reviewCount,

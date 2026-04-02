@@ -281,7 +281,9 @@ export default function AuthScreen({ navigation }) {
                 setLoading(true);
                 try {
                   await signInWithApple();
-                  navigation.goBack();
+                  // Use reset (not goBack) — goBack silently fails when Auth
+                  // is the first/only screen in the stack (cold start or deep link).
+                  navigation.reset({ index: 0, routes: [{ name: 'Main' }] });
                 } catch (err) {
                   if (err.code !== 'ERR_REQUEST_CANCELED') {
                     Alert.alert('Apple Sign-In Failed', err.message);
