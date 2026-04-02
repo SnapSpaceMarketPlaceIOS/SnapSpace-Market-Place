@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as SecureStore from 'expo-secure-store';
 import * as FileSystem from 'expo-file-system';
 
 // Add your Supabase Project URL and Anon Key to the .env file.
@@ -29,9 +30,60 @@ function base64ToUint8Array(base64) {
   return bytes;
 }
 
+// SecureStore has a 2048-byte value limit per key, so large sessions (JWTs)
+// are chunked automatically here. Falls back to AsyncStorage if SecureStore
+// is unavailable (e.g. simulator without Secure Enclave support).
+const CHUNK_SIZE = 1800; // bytes per SecureStore entry
+
+const SecureStoreAdapter = {
+  async getItem(key) {
+    try {
+      const count = await SecureStore.getItemAsync(`${key}__chunks`);
+      if (count === null) return null;
+      const n = parseInt(count, 10);
+      const parts = await Promise.all(
+        Array.from({ length: n }, (_, i) => SecureStore.getItemAsync(`${key}__${i}`))
+      );
+      return parts.join('');
+    } catch {
+      // Fall back to AsyncStorage
+      return AsyncStorage.getItem(key);
+    }
+  },
+  async setItem(key, value) {
+    try {
+      const chunks = [];
+      for (let i = 0; i < value.length; i += CHUNK_SIZE) {
+        chunks.push(value.slice(i, i + CHUNK_SIZE));
+      }
+      await SecureStore.setItemAsync(`${key}__chunks`, String(chunks.length));
+      await Promise.all(
+        chunks.map((chunk, i) => SecureStore.setItemAsync(`${key}__${i}`, chunk))
+      );
+    } catch {
+      // Fall back to AsyncStorage
+      return AsyncStorage.setItem(key, value);
+    }
+  },
+  async removeItem(key) {
+    try {
+      const count = await SecureStore.getItemAsync(`${key}__chunks`);
+      if (count !== null) {
+        const n = parseInt(count, 10);
+        await SecureStore.deleteItemAsync(`${key}__chunks`);
+        await Promise.all(
+          Array.from({ length: n }, (_, i) => SecureStore.deleteItemAsync(`${key}__${i}`))
+        );
+      }
+    } catch {
+      return AsyncStorage.removeItem(key);
+    }
+  },
+};
+
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   auth: {
-    storage: AsyncStorage,
+    storage: SecureStoreAdapter,
     persistSession: true,
     autoRefreshToken: true,
     detectSessionInUrl: false,
