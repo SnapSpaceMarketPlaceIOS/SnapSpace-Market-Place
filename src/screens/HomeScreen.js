@@ -1295,31 +1295,11 @@ export default function HomeScreen({ navigation, route }) {
 
       stopLoadingBar();
 
-      // ── Vision matching: analyze the generated room and re-match products ────
-      // Keep the loading state active (generating=true) so the blur overlay
-      // stays while Claude analyzes the render and finds exact catalog matches.
-      let finalMatchedProducts = finalProducts;
-      try {
-        setGenStatus('Matching products to your room…');
-        const visionResult = await analyzeRoomImage(resultUrl);
-        if (visionResult?.items?.length > 0) {
-          const visionRoomType = visionResult.roomType || 'living-room';
-          const visionProducts = rematchFromVision(
-            visionResult.items,
-            visionRoomType,
-            finalProducts, // fallback if vision can't fill a category slot
-            6,
-          );
-          if (visionProducts.length > 0) {
-            finalMatchedProducts = visionProducts;
-            console.log('[Gen] Vision re-matched', visionProducts.length, 'products to rendered room');
-          }
-        } else {
-          console.log('[Gen] Vision unavailable — using pre-matched products');
-        }
-      } catch (visionErr) {
-        console.warn('[Gen] Vision matching failed, using pre-matched products:', visionErr.message);
-      }
+      // ── Use the generation pipeline's matched products directly ─────────────
+      // The edge function returns the exact products used as BFL reference images.
+      // Those products ARE in the rendered room — no vision override needed.
+      // Vision matching was replacing these with wrong products, so it's removed.
+      const finalMatchedProducts = finalProducts;
 
       setGenerating(false);
       setGenStatus('');

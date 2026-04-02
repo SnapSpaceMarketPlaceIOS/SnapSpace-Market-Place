@@ -256,9 +256,16 @@ Deno.serve(async (req: Request) => {
   await supabase.rpc("increment_generation_count", { p_user_id: user_id });
 
   // ── Step 5: Return result ─────────────────────────────────────────────────
+  // Always put the BFL reference products FIRST — they are literally rendered
+  // into the room image. The client pins them to the top of the product list.
+  const refIds = new Set(topProducts.map((p: any) => p.id));
+  const supplementary = normalizedProducts.filter((p: any) => !refIds.has(p.id)).slice(0, 4);
+  const orderedProducts = [...topProducts, ...supplementary];
+
   return successResponse({
     image_url:        generatedImageUrl,
-    products:         normalizedProducts.slice(0, 6),
+    products:         orderedProducts,
+    reference_count:  topProducts.length,   // how many products are in the image
     tier,
     cost_usd:         COST_BFL_USD,
     duration_ms:      duration,
