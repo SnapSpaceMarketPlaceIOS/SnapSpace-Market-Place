@@ -199,7 +199,7 @@ Deno.serve(async (req: Request) => {
   let generatedImageUrl: string;
   try {
     if (useBFL) {
-      generatedImageUrl = await runBFL(bflKey!, generationPrompt, room_photo_url);
+      generatedImageUrl = await runBFL(bflKey!, generationPrompt);
     } else {
       // Replicate fallback (if no BFL key configured)
       const replicatePrompt = buildDepthPrompt(prompt, normalizedProducts.slice(0, 4));
@@ -270,63 +270,40 @@ Deno.serve(async (req: Request) => {
 
 // ── BFL Direct API (api.bfl.ai) ───────────────────────────────────────────────
 //
-// Uses flux-pro-1.0-depth: takes the room photo as a depth control image,
-// preserving walls/windows/floor layout while replacing furniture + style.
-// Auth:     X-Key header
-// Polling:  use polling_url from the submit response (may be on a regional subdomain)
+// Model: flux-pro-1.1-ultra — BFL's best text-to-image model.
+// Confirmed working: 200 submit → polling_url → Ready → image URL.
+//
+// Auth:     X-Key header (NOT Bearer token)
+// Polling:  MUST use polling_url from submit response — it routes to a regional
+//           subdomain (e.g. api.us2.bfl.ai) which differs from api.bfl.ai
 // Statuses: "Queued" | "Processing" | "Ready" | "Error" | "Content Moderated"
 
 async function runBFL(
   apiKey: string,
   prompt: string,
-  roomPhotoUrl: string,
 ): Promise<string> {
-  // ── Try depth model first (preserves room structure) ──────────────────────
-  let endpoint = `${BFL_BASE_URL}/${BFL_MODEL_DEPTH}`;
+  const endpoint = `${BFL_BASE_URL}/${BFL_MODEL_ULTRA}`;
   console.log(`[bfl] POST ${endpoint}`);
 
-  // Fetch room photo and base64-encode it for the depth control_image param
-  let controlImageB64: string;
-  try {
-    controlImageB64 = await fetchAsBase64(roomPhotoUrl);
-  } catch (fetchErr: any) {
-    throw new Error(`BFL: could not fetch room photo for depth model: ${fetchErr.message}`);
-  }
-
-  let submitRes = await fetch(endpoint, {
+  const submitRes = await fetch(endpoint, {
     method: "POST",
-    headers: { "X-Key": apiKey, "Content-Type": "application/json", "Accept": "application/json" },
+    headers: {
+      "X-Key":        apiKey,
+      "Content-Type": "application/json",
+      "Accept":       "application/json",
+    },
     body: JSON.stringify({
       prompt,
-      control_image:    controlImageB64,
+      aspect_ratio:     "1:1",
       output_format:    "jpeg",
       safety_tolerance: 6,
       seed:             Math.floor(Math.random() * 999999999),
     }),
   });
 
-  // ── If depth model fails for any reason, fall back to flux-pro-1.1-ultra ──
   if (!submitRes.ok) {
-    const depthErr = await submitRes.text();
-    console.warn(`[bfl] Depth model failed (${submitRes.status}), trying ultra: ${depthErr.substring(0, 200)}`);
-
-    endpoint = `${BFL_BASE_URL}/${BFL_MODEL_ULTRA}`;
-    submitRes = await fetch(endpoint, {
-      method: "POST",
-      headers: { "X-Key": apiKey, "Content-Type": "application/json", "Accept": "application/json" },
-      body: JSON.stringify({
-        prompt,
-        aspect_ratio:     "1:1",
-        output_format:    "jpeg",
-        safety_tolerance: 6,
-        seed:             Math.floor(Math.random() * 999999999),
-      }),
-    });
-
-    if (!submitRes.ok) {
-      const err = await submitRes.text();
-      throw new Error(`BFL submit failed on both models (${submitRes.status}): ${err.substring(0, 300)}`);
-    }
+    const err = await submitRes.text();
+    throw new Error(`BFL submit failed (${submitRes.status}): ${err.substring(0, 300)}`);
   }
 
   const submitted = await submitRes.json();
