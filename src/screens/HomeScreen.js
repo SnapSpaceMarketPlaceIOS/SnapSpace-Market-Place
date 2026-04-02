@@ -1235,7 +1235,9 @@ export default function HomeScreen({ navigation, route }) {
         // function CPU limits and Deno polling complexity that caused consistent
         // 500 errors. EXPO_PUBLIC_BFL_API_KEY is used from the .env file.
         try {
-          resultUrl     = await generateWithBFL(designPrompt, matchedProducts, (msg) => setGenStatus(msg));
+          // Pass roomPhotoUrl so flux-kontext-pro can transform the user's
+          // actual room instead of generating a brand-new generic room.
+          resultUrl     = await generateWithBFL(designPrompt, matchedProducts, (msg) => setGenStatus(msg), roomPhotoUrl);
           finalProducts = matchedProducts;
 
           // Increment quota in background (non-blocking, best-effort)
