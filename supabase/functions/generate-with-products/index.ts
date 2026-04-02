@@ -36,18 +36,17 @@ const CORS = {
 };
 
 // ── BFL API config ────────────────────────────────────────────────────────────
-const BFL_BASE_URL        = "https://api.bfl.ml/v1";
-const BFL_MODEL_ENDPOINT  = "flux-pro-2-max";   // FLUX.2 [MAX] direct endpoint
+// IMPORTANT: Correct domain is api.bfl.ai (NOT api.bfl.ml which is unreachable).
+// flux-pro-2-max is a Replicate-exclusive name. On BFL direct we use:
+//   flux-pro-1.0-depth → preserves room spatial structure via depth control
+//   (walls, windows, floor layout stay intact while furniture/style changes)
+const BFL_BASE_URL     = "https://api.bfl.ai/v1";
+const BFL_MODEL_DEPTH  = "flux-pro-1.0-depth";   // room structure preservation
+const BFL_MODEL_ULTRA  = "flux-pro-1.1-ultra";   // fallback if depth fails
 
-// ── Output dimensions (optimized for mobile — still sharp, fewer MP = lower cost)
-const OUTPUT_WIDTH  = 896;
-const OUTPUT_HEIGHT = 896;
-
-// ── Max product reference images to send (2 = best cost/quality ratio)
-const MAX_PRODUCT_REFS = 2;
-
-// ── Cost estimate (BFL direct, optimized image sizes)
-const COST_BFL_USD = 0.11;
+// ── Cost estimate (BFL direct — $0.07/MP input+output)
+// control_image (depth) ~0.59MP + output 0.80MP = ~1.39MP × $0.07 ≈ $0.10
+const COST_BFL_USD = 0.10;
 
 // ── Polling config ────────────────────────────────────────────────────────────
 const POLL_INTERVAL_MS = 3000;
@@ -55,43 +54,38 @@ const MAX_POLLS        = 80;   // 80 × 3s = 4-min timeout
 
 // ── Quality suffix appended to every prompt ──────────────────────────────────
 const QUALITY_SUFFIX =
-  "8k interior design photography, natural lighting, photorealistic, editorial, Architectural Digest.";
+  "8k interior design photography, natural lighting, photorealistic, editorial quality, Architectural Digest.";
 
 // ── Prompt builder ────────────────────────────────────────────────────────────
-function buildFlux2MaxPrompt(userPrompt: string, products: any[]): string {
-  const placements: string[] = [];
-  products.slice(0, MAX_PRODUCT_REFS).forEach((p, i) => {
-    const category = (p.category || p.name || "furniture piece")
-      .replace(/-/g, " ")
-      .toLowerCase();
-    placements.push(`${category} → image ${i + 2}`);
-  });
-
-  const placementStr = placements.length > 0
-    ? `Only replace furniture to match the references: [${placements.join(", ")}].`
-    : "Replace furniture with pieces that match the room's style.";
+function buildDepthPrompt(userPrompt: string, products: any[]): string {
+  const furnitureList = products
+    .slice(0, 4)
+    .map((p) => {
+      const cat = (p.category || "furniture").replace(/-/g, " ");
+      const style = (p.styles?.[0] || "");
+      return style ? `${style} ${cat}` : cat;
+    })
+    .filter(Boolean)
+    .join(", ");
 
   return [
-    "This is a scene edit, not a new generation.",
-    "Keep image 1 room exactly — same walls, floor, ceiling, lighting, camera angle, and spatial layout.",
-    "Do not change room architecture.",
-    placementStr,
     userPrompt,
+    furnitureList ? `Feature these furniture pieces: ${furnitureList}.` : "",
+    "Preserve the exact room architecture, walls, windows, floor, ceiling, and camera angle.",
+    "Replace all furniture and decor with beautiful, stylish pieces.",
     QUALITY_SUFFIX,
-  ].join(" ");
+  ].filter(Boolean).join(" ");
 }
 
-// ── Shrink Amazon/Wayfair image URLs to 300px thumbnails ─────────────────────
-// This cuts input megapixels by ~85% (640px→300px = 0.41MP→0.09MP per image).
-// The model needs the product's visual identity — high resolution is wasted.
-function optimizeProductImageUrl(url: string): string {
-  if (!url) return url;
-  return url
-    .replace(/_AC_SL\d+_/g,  "_AC_SL300_")   // Amazon SL size codes
-    .replace(/_AC_UL\d+_/g,  "_AC_UL300_")   // Amazon UL size codes
-    .replace(/_SL\d+_\./g,   "_SL300_.")      // bare SL codes
-    .replace(/_UL\d+_\./g,   "_UL300_.")      // bare UL codes
-    .replace(/\?.*$/,        "");             // strip query params
+// ── Fetch an image URL and return base64 string (no data-URL prefix) ─────────
+async function fetchAsBase64(url: string): Promise<string> {
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`Image fetch failed (${res.status}): ${url}`);
+  const buf = await res.arrayBuffer();
+  const bytes = new Uint8Array(buf);
+  let binary = "";
+  for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
+  return btoa(binary);
 }
 
 // ── Main handler ──────────────────────────────────────────────────────────────
@@ -193,36 +187,29 @@ Deno.serve(async (req: Request) => {
     image_url: p.image_url || p.imageUrl || null,
   }));
 
-  // Top 2 products only — reduces input megapixels, cuts cost further
+  // Reference products = first N products with images (sent to BFL, pinned in response)
   const topProducts = normalizedProducts
-    .filter((p) => p.image_url)
-    .slice(0, MAX_PRODUCT_REFS);
+    .filter((p: any) => p.image_url)
+    .slice(0, 2);
 
-  // Optimize product image URLs to 300px thumbnails (0.09MP each vs 0.41MP)
-  const productImageUrls = topProducts.map((p) =>
-    optimizeProductImageUrl(p.image_url as string)
-  );
+  const generationPrompt = buildDepthPrompt(prompt, normalizedProducts.slice(0, 4));
 
-  const inputImages = [room_photo_url, ...productImageUrls];
-  const generationPrompt = buildFlux2MaxPrompt(prompt, topProducts);
-
-  console.log(`[gen] input_images: ${inputImages.length} (1 room + ${productImageUrls.length} product refs)`);
-  console.log(`[gen] Output: ${OUTPUT_WIDTH}×${OUTPUT_HEIGHT} (${((OUTPUT_WIDTH * OUTPUT_HEIGHT) / 1_000_000).toFixed(2)} MP)`);
   console.log(`[gen] Estimated cost: ~$${COST_BFL_USD}`);
 
   let generatedImageUrl: string;
   try {
     if (useBFL) {
-      generatedImageUrl = await runBFL(bflKey!, generationPrompt, inputImages);
+      generatedImageUrl = await runBFL(bflKey!, generationPrompt, room_photo_url);
     } else {
       // Replicate fallback (if no BFL key configured)
+      const replicatePrompt = buildDepthPrompt(prompt, normalizedProducts.slice(0, 4));
       generatedImageUrl = await runReplicate(
         replicateToken!,
         "black-forest-labs/flux-2-max",
         null,
         {
-          prompt:          generationPrompt,
-          input_images:    inputImages,
+          prompt:          replicatePrompt,
+          input_images:    [room_photo_url],
           aspect_ratio:    "match_input_image",
           resolution:      "1 MP",
           output_format:   "webp",
@@ -281,64 +268,93 @@ Deno.serve(async (req: Request) => {
 // Polling: GET /v1/get_result?id={id}
 // Status values: "Queued" | "Content Moderated" | "Request Moderated" | "Ready" | "Error"
 
+// ── BFL Direct API (api.bfl.ai) ───────────────────────────────────────────────
+//
+// Uses flux-pro-1.0-depth: takes the room photo as a depth control image,
+// preserving walls/windows/floor layout while replacing furniture + style.
+// Auth:     X-Key header
+// Polling:  use polling_url from the submit response (may be on a regional subdomain)
+// Statuses: "Queued" | "Processing" | "Ready" | "Error" | "Content Moderated"
+
 async function runBFL(
   apiKey: string,
   prompt: string,
-  inputImages: string[],
+  roomPhotoUrl: string,
 ): Promise<string> {
-  const endpoint = `${BFL_BASE_URL}/${BFL_MODEL_ENDPOINT}`;
-
+  // ── Try depth model first (preserves room structure) ──────────────────────
+  let endpoint = `${BFL_BASE_URL}/${BFL_MODEL_DEPTH}`;
   console.log(`[bfl] POST ${endpoint}`);
 
-  const submitRes = await fetch(endpoint, {
+  // Fetch room photo and base64-encode it for the depth control_image param
+  let controlImageB64: string;
+  try {
+    controlImageB64 = await fetchAsBase64(roomPhotoUrl);
+  } catch (fetchErr: any) {
+    throw new Error(`BFL: could not fetch room photo for depth model: ${fetchErr.message}`);
+  }
+
+  let submitRes = await fetch(endpoint, {
     method: "POST",
-    headers: {
-      "X-Key":        apiKey,
-      "Content-Type": "application/json",
-      "Accept":       "application/json",
-    },
+    headers: { "X-Key": apiKey, "Content-Type": "application/json", "Accept": "application/json" },
     body: JSON.stringify({
       prompt,
-      width:            OUTPUT_WIDTH,
-      height:           OUTPUT_HEIGHT,
-      input_images:     inputImages,
+      control_image:    controlImageB64,
       output_format:    "jpeg",
       safety_tolerance: 6,
       seed:             Math.floor(Math.random() * 999999999),
     }),
   });
 
+  // ── If depth model fails for any reason, fall back to flux-pro-1.1-ultra ──
   if (!submitRes.ok) {
-    const err = await submitRes.text();
-    throw new Error(`BFL submit failed (${submitRes.status}): ${err.substring(0, 300)}`);
+    const depthErr = await submitRes.text();
+    console.warn(`[bfl] Depth model failed (${submitRes.status}), trying ultra: ${depthErr.substring(0, 200)}`);
+
+    endpoint = `${BFL_BASE_URL}/${BFL_MODEL_ULTRA}`;
+    submitRes = await fetch(endpoint, {
+      method: "POST",
+      headers: { "X-Key": apiKey, "Content-Type": "application/json", "Accept": "application/json" },
+      body: JSON.stringify({
+        prompt,
+        aspect_ratio:     "1:1",
+        output_format:    "jpeg",
+        safety_tolerance: 6,
+        seed:             Math.floor(Math.random() * 999999999),
+      }),
+    });
+
+    if (!submitRes.ok) {
+      const err = await submitRes.text();
+      throw new Error(`BFL submit failed on both models (${submitRes.status}): ${err.substring(0, 300)}`);
+    }
   }
 
   const submitted = await submitRes.json();
   const predictionId = submitted.id;
+  // BFL returns a regional polling_url — always use it instead of constructing manually
+  const pollingUrl = submitted.polling_url || `${BFL_BASE_URL}/get_result?id=${predictionId}`;
 
   if (!predictionId) {
     throw new Error(`BFL did not return a prediction ID. Response: ${JSON.stringify(submitted).substring(0, 200)}`);
   }
 
-  console.log(`[bfl] Prediction submitted | id=${predictionId}`);
+  console.log(`[bfl] Submitted | id=${predictionId} | polling=${pollingUrl}`);
 
-  // Poll until ready
+  // Poll using the URL provided in the response
   for (let i = 0; i < MAX_POLLS; i++) {
     await sleep(POLL_INTERVAL_MS);
 
-    const pollRes = await fetch(
-      `${BFL_BASE_URL}/get_result?id=${predictionId}`,
-      { headers: { "X-Key": apiKey, "Accept": "application/json" } }
-    );
+    const pollRes = await fetch(pollingUrl, {
+      headers: { "X-Key": apiKey, "Accept": "application/json" },
+    });
 
     if (!pollRes.ok) {
-      console.warn(`[bfl] Poll failed (${pollRes.status}) — retrying...`);
+      console.warn(`[bfl] Poll ${i + 1} failed (${pollRes.status}) — retrying...`);
       continue;
     }
 
     const polled = await pollRes.json();
     const status = polled.status;
-
     console.log(`[bfl] Poll ${i + 1}/${MAX_POLLS} | status=${status}`);
 
     if (status === "Ready") {
@@ -346,15 +362,12 @@ async function runBFL(
       if (!imageUrl) throw new Error("BFL returned Ready but no image URL in result.sample");
       return imageUrl;
     }
-
     if (status === "Error") {
       throw new Error(`BFL generation error: ${JSON.stringify(polled).substring(0, 200)}`);
     }
-
     if (status === "Content Moderated" || status === "Request Moderated") {
       throw new Error("BFL content moderation triggered — try a different prompt or room photo.");
     }
-
     // "Queued" or "Processing" — keep polling
   }
 
