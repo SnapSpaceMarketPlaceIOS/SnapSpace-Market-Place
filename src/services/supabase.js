@@ -33,20 +33,39 @@ function base64ToUint8Array(base64) {
 // SecureStore has a 2048-byte value limit per key, so large sessions (JWTs)
 // are chunked automatically here. Falls back to AsyncStorage if SecureStore
 // is unavailable (e.g. simulator without Secure Enclave support).
+//
+// IMPORTANT: On iOS simulators with missing keychain entitlements (e.g. iOS 26.x
+// beta dev builds), SecureStore calls can HANG instead of throwing. A 2-second
+// timeout races every SecureStore operation so we always fall back to
+// AsyncStorage quickly rather than freezing the auth flow forever.
 const CHUNK_SIZE = 1800; // bytes per SecureStore entry
+const SS_TIMEOUT = 2000; // ms before we give up on SecureStore and use AsyncStorage
+
+/** Race a SecureStore promise against a 2-second timeout. Returns the result
+ *  or throws if SecureStore hangs or fails. */
+function ssWithTimeout(promise) {
+  return Promise.race([
+    promise,
+    new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('SecureStore timeout')), SS_TIMEOUT)
+    ),
+  ]);
+}
 
 const SecureStoreAdapter = {
   async getItem(key) {
     try {
-      const count = await SecureStore.getItemAsync(`${key}__chunks`);
-      if (count === null) return null;
+      const count = await ssWithTimeout(SecureStore.getItemAsync(`${key}__chunks`));
+      // If no chunked entry exists in SecureStore, check AsyncStorage directly —
+      // the value may have been written there by a previous fallback setItem.
+      if (count === null) return AsyncStorage.getItem(key);
       const n = parseInt(count, 10);
-      const parts = await Promise.all(
-        Array.from({ length: n }, (_, i) => SecureStore.getItemAsync(`${key}__${i}`))
+      const parts = await ssWithTimeout(
+        Promise.all(Array.from({ length: n }, (_, i) => SecureStore.getItemAsync(`${key}__${i}`)))
       );
       return parts.join('');
     } catch {
-      // Fall back to AsyncStorage
+      // SecureStore hung, threw, or timed out — fall back to AsyncStorage
       return AsyncStorage.getItem(key);
     }
   },
@@ -56,28 +75,30 @@ const SecureStoreAdapter = {
       for (let i = 0; i < value.length; i += CHUNK_SIZE) {
         chunks.push(value.slice(i, i + CHUNK_SIZE));
       }
-      await SecureStore.setItemAsync(`${key}__chunks`, String(chunks.length));
-      await Promise.all(
-        chunks.map((chunk, i) => SecureStore.setItemAsync(`${key}__${i}`, chunk))
+      await ssWithTimeout(SecureStore.setItemAsync(`${key}__chunks`, String(chunks.length)));
+      await ssWithTimeout(
+        Promise.all(chunks.map((chunk, i) => SecureStore.setItemAsync(`${key}__${i}`, chunk)))
       );
     } catch {
-      // Fall back to AsyncStorage
+      // SecureStore hung, threw, or timed out — fall back to AsyncStorage
       return AsyncStorage.setItem(key, value);
     }
   },
   async removeItem(key) {
     try {
-      const count = await SecureStore.getItemAsync(`${key}__chunks`);
+      const count = await ssWithTimeout(SecureStore.getItemAsync(`${key}__chunks`));
       if (count !== null) {
         const n = parseInt(count, 10);
-        await SecureStore.deleteItemAsync(`${key}__chunks`);
-        await Promise.all(
-          Array.from({ length: n }, (_, i) => SecureStore.deleteItemAsync(`${key}__${i}`))
+        await ssWithTimeout(SecureStore.deleteItemAsync(`${key}__chunks`));
+        await ssWithTimeout(
+          Promise.all(Array.from({ length: n }, (_, i) => SecureStore.deleteItemAsync(`${key}__${i}`)))
         );
       }
     } catch {
       return AsyncStorage.removeItem(key);
     }
+    // Also clean up any AsyncStorage fallback entry for this key
+    AsyncStorage.removeItem(key).catch(() => {});
   },
 };
 
@@ -203,26 +224,29 @@ export async function persistDesignImage(userId, remoteUrl) {
   const ts = Date.now();
   const localPath = `${FileSystem.cacheDirectory}design_${ts}.${ext}`;
 
-  // Retry download up to 3 times with 2s delay — Replicate CDN can be slow
-  let download;
+  // Download image using fetch (FileSystem.downloadAsync deprecated in Expo 55)
+  // Retry up to 3 times — BFL/FAL CDNs can be briefly slow after generation
+  let base64;
   for (let attempt = 1; attempt <= 3; attempt++) {
     try {
-      download = await FileSystem.downloadAsync(remoteUrl, localPath);
-      if (download.status === 200) break;
-      throw new Error('HTTP ' + download.status);
+      const res = await fetch(remoteUrl);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const buffer = await res.arrayBuffer();
+      const bytes  = new Uint8Array(buffer);
+      let binary   = '';
+      const CHUNK  = 8192;
+      for (let i = 0; i < bytes.length; i += CHUNK) {
+        binary += String.fromCharCode(...bytes.subarray(i, i + CHUNK));
+      }
+      base64 = btoa(binary);
+      if (base64.length > 100) break;
+      throw new Error('Downloaded content too small');
     } catch (e) {
       console.log(`[Persist] Download attempt ${attempt}/3 failed:`, e.message);
       if (attempt === 3) throw new Error('Image download failed after 3 attempts');
-      await new Promise(r => setTimeout(r, 2000)); // wait 2s before retry
+      await new Promise(r => setTimeout(r, 2000));
     }
   }
-
-  // Verify file has content
-  const info = await FileSystem.getInfoAsync(localPath);
-  if (!info.exists || info.size < 500) throw new Error('Downloaded file is empty or too small');
-
-  // Read as base64 and upload to Supabase Storage
-  const base64 = await FileSystem.readAsStringAsync(localPath, { encoding: 'base64' });
   const storagePath = `${userId}/${ts}.${ext}`;
   const contentType = ext === 'webp' ? 'image/webp' : 'image/jpeg';
   const { error } = await supabase.storage

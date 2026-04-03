@@ -40,11 +40,12 @@ import { useCart } from '../context/CartContext';
 import { DESIGNS } from '../data/designs';
 import { SELLERS } from '../data/sellers';
 import { searchProducts, getSourceColor, getProductsForPrompt } from '../services/affiliateProducts';
-import { generateInteriorDesign, buildFinalPrompt, generateWithProductRefs } from '../services/replicate';
+import { generateInteriorDesign, buildFinalPrompt, generateWithProductRefs, generateWithProductPanel } from '../services/replicate';
+import { createProductPanel } from '../utils/createProductPanel';
 import { analyzeRoomImage, rematchFromVision } from '../services/visionMatcher';
 import { PRODUCT_CATALOG } from '../data/productCatalog';
 import { saveUserDesign, updateDesignVisibility, uploadRoomPhoto } from '../services/supabase';
-import { generateWithProducts, getUserQuota } from '../services/productAwareGeneration';
+import { getUserQuota } from '../services/productAwareGeneration';
 import { generateWithBFL } from '../services/bfl';
 import TabScreenFade from '../components/TabScreenFade';
 
@@ -1230,28 +1231,88 @@ export default function HomeScreen({ navigation, route }) {
           return;
         }
 
-        // ── Step 2: Generate directly via BFL (no edge function proxy) ──────
-        // Calling api.bfl.ai directly from React Native avoids Supabase edge
-        // function CPU limits and Deno polling complexity that caused consistent
-        // 500 errors. EXPO_PUBLIC_BFL_API_KEY is used from the .env file.
-        try {
-          // Pass roomPhotoUrl so flux-kontext-pro can transform the user's
-          // actual room instead of generating a brand-new generic room.
-          resultUrl     = await generateWithBFL(designPrompt, matchedProducts, (msg) => setGenStatus(msg), roomPhotoUrl);
-          finalProducts = matchedProducts;
+        // ── Step 2: BFL Generation with Product Image References ──────────
+        //
+        // BFL flux-kontext-pro now sends catalog product images via
+        // experimental input_image_2/3/4 parameters so the AI can VISUALLY
+        // SEE what each product looks like before rendering.
+        //
+        // Products passed in = products shown in "Shop Your Room".
+        // If BFL silently ignores the params, products are still
+        // text-matched (same as before — no regression).
+        //
+        // Cost: ~$0.04/generation (same as before)
+        //
 
-          // Increment quota in background (non-blocking, best-effort)
+        try {
+          // ── Primary: Replicate flux-2-max (visual product matching) ─────
+          // Sends room photo + catalog product images so the AI visually
+          // sees exactly what each product looks like before rendering.
+          // Products shown in "Shop Your Room" ARE the products in the photo.
+          // Cost: ~$0.10–0.20/generation
+          let replicateSucceeded = false;
+          try {
+            console.log('[Gen] Replicate flux-2-max | visual product refs | cost=~$0.10-0.20');
+
+            // ── Try panel approach: 2 images instead of 4 → ~50% less GPU compute ──
+            // Creates a 512×512 2×2 product grid via edge function, then sends
+            // [room, panel] to flux-2-max instead of [room, p1, p2, p3].
+            // Target cost: ~$0.15/gen vs $0.31 with individual images.
+            let usedPanel = false;
+            try {
+              setGenStatus('Preparing product panel…');
+              const panelUrl = await createProductPanel(matchedProducts, user.id);
+              if (panelUrl) {
+                console.log('[Gen] Panel ready — using 2-image input (room + 2×2 panel)');
+                setGenStatus('Analyzing your room…');
+                resultUrl = await generateWithProductPanel(roomPhotoUrl, designPrompt, matchedProducts, panelUrl);
+                usedPanel = true;
+                console.log('[Gen] Panel generation complete');
+              }
+            } catch (panelErr) {
+              console.warn(`[Gen] Panel approach failed (${panelErr.message}) — falling back to individual refs`);
+            }
+
+            // ── Fallback: individual product images (original 4-image approach) ──
+            if (!usedPanel) {
+              console.log('[Gen] Using individual product refs (room + 4 product images)');
+              setGenStatus('Analyzing your room…');
+              resultUrl = await generateWithProductRefs(roomPhotoUrl, designPrompt, matchedProducts);
+            }
+
+            finalProducts = matchedProducts;
+            replicateSucceeded = true;
+            console.log('[Gen] Replicate complete | url=' + resultUrl.substring(0, 80));
+          } catch (repErr) {
+            console.warn(`[Gen] Replicate failed (${repErr.message}) — falling back to BFL`);
+          }
+
+          // ── Fallback: BFL kontext (room photo, product names in prompt) ──
+          // No visual product references — products matched by text only.
+          // Cost: ~$0.04/generation
+          if (!replicateSucceeded) {
+            console.log('[Gen] BFL kontext fallback | cost=~$0.04');
+            resultUrl = await generateWithBFL(
+              designPrompt,
+              matchedProducts,
+              (msg) => setGenStatus(msg),
+              roomPhotoUrl,
+            );
+            finalProducts = matchedProducts;
+            console.log('[Gen] BFL complete');
+          }
+
+          // Refresh quota in background (non-blocking)
           getUserQuota(user.id).then(q => setUserQuota(q)).catch(() => {});
 
-          console.log('[Gen] BFL direct complete | cost=~$0.10');
-        } catch (bflErr) {
+        } catch (genErr) {
           stopLoadingBar(false);
           setGenerating(false);
           Alert.alert(
             'Generation Failed',
-            `Could not generate your design. Please try again.\n\nDetails: ${bflErr.message}`
+            `Could not generate your design. Please try again.\n\nDetails: ${genErr.message}`
           );
-          console.error('[Gen] BFL direct error:', bflErr.message);
+          console.error('[Gen] Generation error:', genErr.message);
           return;
         }
       } else {

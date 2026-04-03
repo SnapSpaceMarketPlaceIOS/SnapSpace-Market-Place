@@ -404,15 +404,33 @@ export function buildFlux2MaxPrompt(userPrompt, products) {
  * @param {object[]} products     - Matched products (each with an imageUrl field)
  * @returns {Promise<string>}     - URL of the generated room image
  */
+/**
+ * Amazon product images default to 1500×1500px (_AC_SL1500_ = 2.25 MP each).
+ * Sending 3 at full size = ~6.75 MP of input, which dominates GPU billing.
+ * Swap to 300×300px (_AC_SL300_ = 0.09 MP) — the AI still sees color/shape,
+ * just at lower fidelity. Saves ~6.5 MP of input → ~30-40% cost reduction.
+ */
+function shrinkProductImageUrl(url) {
+  if (typeof url !== 'string') return url;
+  return url
+    .replace(/_AC_SL\d+_/g,  '_AC_SL300_')   // _AC_SL1500_ → _AC_SL300_
+    .replace(/_AC_UL\d+_/g,  '_AC_SL300_')   // _AC_UL640_ → _AC_SL300_
+    .replace(/_SX\d+_/g,     '_AC_SL300_')   // _SX450_ → _AC_SL300_
+    .replace(/_SR\d+,\d+_/g, '_AC_SL300_');  // _SR600,315_ → _AC_SL300_
+}
+
 export async function generateWithProductRefs(roomPhotoUrl, userPrompt, products) {
   if (!TOKEN) throw new Error('Replicate API token is missing. Add EXPO_PUBLIC_REPLICATE_API_TOKEN to your .env file.');
   if (!roomPhotoUrl) throw new Error('generateWithProductRefs requires a public room photo URL.');
 
-  // Build input_images: room photo first, then up to 4 product images
+  // Build input_images: room photo first, then up to 4 product images.
+  // Minimum 4 products always — user requirement.
+  // Shrink Amazon URLs to 300px — AI still recognises style/color at this size
+  // but input MP drops from ~2.25 MP → 0.09 MP per image (~96% reduction).
   const productImages = (products || [])
     .filter(p => p.imageUrl)
     .slice(0, 4)
-    .map(p => p.imageUrl);
+    .map(p => shrinkProductImageUrl(p.imageUrl));
 
   const inputImages = [roomPhotoUrl, ...productImages];
 
@@ -420,6 +438,9 @@ export async function generateWithProductRefs(roomPhotoUrl, userPrompt, products
 
   console.log('[flux-2-max] Prompt:', generationPrompt.substring(0, 200) + '...');
   console.log('[flux-2-max] input_images:', inputImages.length, '(1 room +', productImages.length, 'products)');
+  productImages.forEach((url, i) =>
+    console.log(`[flux-2-max] Product ${i + 1}: ${url.substring(0, 80)}`)
+  );
 
   const res = await fetch(`${API_URL}/models/black-forest-labs/flux-2-max/predictions`, {
     method: 'POST',
@@ -432,9 +453,9 @@ export async function generateWithProductRefs(roomPhotoUrl, userPrompt, products
         prompt:           generationPrompt,
         input_images:     inputImages,
         aspect_ratio:     'match_input_image',
-        resolution:       '1 MP',
+        resolution:       '0.5 MP',   // ~30% less GPU time vs 1 MP — adequate for mobile
         output_format:    'webp',
-        output_quality:   95,
+        output_quality:   90,
         safety_tolerance: 5,
         seed:             Math.floor(Math.random() * 999999999),
       },
@@ -445,6 +466,112 @@ export async function generateWithProductRefs(roomPhotoUrl, userPrompt, products
   if (!res.ok) {
     throw new Error(
       `flux-2-max submit failed (${res.status}): ${prediction?.detail || prediction?.error || 'Unknown error'}`
+    );
+  }
+
+  if (prediction.status === 'succeeded') {
+    const output = prediction.output;
+    return typeof output === 'string' ? output : (Array.isArray(output) ? output[0] : output);
+  }
+
+  return pollUntilDone(prediction.id);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// flux-2-max: Panel-based generation (2 images: room + 2×2 product grid)
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Build the flux-2-max prompt when product references are in a 2×2 panel.
+ *
+ * The panel (image 2) contains a 2×2 grid:
+ *   top-left:     product 1 category
+ *   top-right:    product 2 category
+ *   bottom-left:  product 3 category (if present)
+ *   bottom-right: product 4 category (if present)
+ *
+ * @param {string}   userPrompt - User's raw design prompt
+ * @param {object[]} products   - Products with category fields
+ * @returns {string} Structured prompt for flux-2-max panel input
+ */
+export function buildPanelPrompt(userPrompt, products) {
+  const cats = (products || []).slice(0, 4).map(p =>
+    (p.category || 'furniture').replace(/-/g, ' ').toLowerCase()
+  );
+
+  const posLabels = ['top-left', 'top-right', 'bottom-left', 'bottom-right'];
+  const gridDesc  = cats
+    .map((cat, i) => `${posLabels[i]}: ${cat}`)
+    .join(', ');
+
+  const refLine = cats.length > 0
+    ? `Image 2 is a 2×2 product reference grid (${gridDesc}). Place these EXACT products into the room — match their color, shape, and style precisely.`
+    : 'Replace furniture with pieces that complement the room style.';
+
+  return [
+    'This is a scene edit, not a new generation.',
+    'Keep image 1 room exactly — same walls, floor, ceiling, lighting, camera angle, and spatial layout.',
+    'Do not change room architecture.',
+    refLine,
+    userPrompt,
+    QUALITY_SUFFIX,
+  ].join(' ');
+}
+
+/**
+ * Generate a product-aware room redesign using a 2-image input.
+ *
+ * Sends [roomPhotoUrl, panelUrl] — 2 images instead of 4 — to reduce GPU
+ * attention compute by ~40-50%. The panelUrl is a 512×512 composite of up to
+ * 4 product reference images in a 2×2 grid (created by the composite-products
+ * edge function via createProductPanel.js).
+ *
+ * Target cost: ~$0.15/gen vs $0.31 with 4 individual images.
+ *
+ * Falls back to generateWithProductRefs() in HomeScreen if panelUrl is null.
+ *
+ * @param {string}   roomPhotoUrl - Public URL of the user's room photo
+ * @param {string}   userPrompt   - User's raw design prompt
+ * @param {object[]} products     - Matched products (for prompt building)
+ * @param {string}   panelUrl     - Public URL of the 2×2 product panel
+ * @returns {Promise<string>}     - URL of the generated room image
+ */
+export async function generateWithProductPanel(roomPhotoUrl, userPrompt, products, panelUrl) {
+  if (!TOKEN) throw new Error('Replicate API token is missing. Add EXPO_PUBLIC_REPLICATE_API_TOKEN to your .env file.');
+  if (!roomPhotoUrl) throw new Error('generateWithProductPanel requires a public room photo URL.');
+  if (!panelUrl)     throw new Error('generateWithProductPanel requires a product panel URL.');
+
+  const inputImages        = [roomPhotoUrl, panelUrl];
+  const generationPrompt   = buildPanelPrompt(userPrompt || 'Modern minimalist interior design.', products || []);
+
+  console.log('[flux-2-max panel] Prompt:', generationPrompt.substring(0, 200) + '...');
+  console.log('[flux-2-max panel] input_images: 2 (room + 2×2 product panel)');
+  console.log('[flux-2-max panel] Panel URL:', panelUrl.substring(0, 80));
+
+  const res = await fetch(`${API_URL}/models/black-forest-labs/flux-2-max/predictions`, {
+    method: 'POST',
+    headers: {
+      Authorization:  `Bearer ${TOKEN}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      input: {
+        prompt:           generationPrompt,
+        input_images:     inputImages,
+        aspect_ratio:     'match_input_image',
+        resolution:       '0.5 MP',
+        output_format:    'webp',
+        output_quality:   90,
+        safety_tolerance: 5,
+        seed:             Math.floor(Math.random() * 999999999),
+      },
+    }),
+  });
+
+  const prediction = await res.json();
+  if (!res.ok) {
+    throw new Error(
+      `flux-2-max panel submit failed (${res.status}): ${prediction?.detail || prediction?.error || 'Unknown error'}`
     );
   }
 
