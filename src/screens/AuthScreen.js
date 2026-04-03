@@ -109,6 +109,17 @@ export default function AuthScreen({ navigation }) {
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
 
+  // Safety net — force-clear the spinner after 20s so it can never get stuck.
+  const loadingTimerRef = React.useRef(null);
+  const safeSetLoading = (val) => {
+    if (val) {
+      loadingTimerRef.current = setTimeout(() => setLoading(false), 20000);
+    } else {
+      clearTimeout(loadingTimerRef.current);
+    }
+    setLoading(val);
+  };
+
   const validate = () => {
     const e = {};
     if (isSignUp && !name.trim()) e.name = 'Full name is required.';
@@ -121,7 +132,7 @@ export default function AuthScreen({ navigation }) {
 
   const handleAuth = async () => {
     if (!validate()) return;
-    setLoading(true);
+    safeSetLoading(true);
     try {
       if (isSignUp) {
         const result = await signUp(name, email, password);
@@ -137,9 +148,9 @@ export default function AuthScreen({ navigation }) {
         navigation.reset({ index: 0, routes: [{ name: 'Main' }] });
       }
     } catch (err) {
-      Alert.alert('Error', err.message);
+      Alert.alert('Sign In Failed', err.message);
     } finally {
-      setLoading(false);
+      safeSetLoading(false);
     }
   };
 
@@ -148,7 +159,7 @@ export default function AuthScreen({ navigation }) {
       Alert.alert('Enter your email', 'Type your email address above and tap "Forgot password?" again.');
       return;
     }
-    setLoading(true);
+    safeSetLoading(true);
     try {
       await resetPassword(email);
       Alert.alert(
@@ -158,7 +169,7 @@ export default function AuthScreen({ navigation }) {
     } catch (err) {
       Alert.alert('Error', err.message);
     } finally {
-      setLoading(false);
+      safeSetLoading(false);
     }
   };
 
@@ -278,7 +289,7 @@ export default function AuthScreen({ navigation }) {
               cornerRadius={14}
               style={styles.appleBtn}
               onPress={async () => {
-                setLoading(true);
+                safeSetLoading(true);
                 try {
                   await signInWithApple();
                   // Use reset (not goBack) — goBack silently fails when Auth
@@ -289,7 +300,7 @@ export default function AuthScreen({ navigation }) {
                     Alert.alert('Apple Sign-In Failed', err.message);
                   }
                 } finally {
-                  setLoading(false);
+                  safeSetLoading(false);
                 }
               }}
             />

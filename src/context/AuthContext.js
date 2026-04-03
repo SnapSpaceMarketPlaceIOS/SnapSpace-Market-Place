@@ -161,19 +161,18 @@ export function AuthProvider({ children }) {
    * Throws an Error with a user-friendly message on failure.
    */
   const signIn = async (email, password) => {
-    // Retry up to 3 times — iOS simulators (esp. beta runtimes) can stall on
-    // the first outbound TLS connection. Each attempt gets a 30s window.
+    // Each attempt gets an 8s window; retry once on failure (16s max total).
     const { data, error } = await withRetry(
       () => withTimeout(
         supabase.auth.signInWithPassword({
           email: email.trim().toLowerCase(),
           password,
         }),
-        30000,
-        'Connection timed out. Please check your internet connection and try again.',
+        8000,
+        'Connection timed out. Please check your internet and try again.',
       ),
-      3,
-      1000,
+      2,
+      500,
     );
 
     if (error) {
