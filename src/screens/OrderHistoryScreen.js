@@ -6,8 +6,8 @@ import {
   StyleSheet,
   TouchableOpacity,
   Dimensions,
-  Image,
 } from 'react-native';
+import CardImage from '../components/CardImage';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path, Circle, Polyline, Line, Rect, G } from 'react-native-svg';
 import { colors as C } from '../constants/theme';
@@ -84,7 +84,7 @@ function formatDate(isoString) {
 }
 
 const STATUS_CONFIG = {
-  Confirmed:  { bg: '#EFF6FF', text: '#1D4ED8', dot: '#3B82F6' },
+  Confirmed:  { bg: '#EFF6FF', text: '#0B6DC3', dot: '#3B82F6' },
   Processing: { bg: '#FFF7ED', text: '#C2410C', dot: '#F97316' },
   Shipped:    { bg: '#F5F3FF', text: '#6D28D9', dot: '#8B5CF6' },
   Delivered:  { bg: '#F0FDF4', text: '#15803D', dot: '#22C55E' },
@@ -142,15 +142,7 @@ function OrderCard({ order }) {
           {order.items.map((item, idx) => (
             <View key={item.key || idx} style={styles.itemRow}>
               <View style={[styles.itemThumb, { backgroundColor: getThumbColor(item.name) }]}>
-                {item.imageUrl ? (
-                  <Image
-                    source={{ uri: item.imageUrl }}
-                    style={styles.itemThumbPhoto}
-                    resizeMode="cover"
-                  />
-                ) : (
-                  <SofaSmallIcon />
-                )}
+                <CardImage uri={item.imageUrl} style={styles.itemThumbPhoto} resizeMode="cover" />
               </View>
               <View style={styles.itemInfo}>
                 <Text style={styles.itemName} numberOfLines={1}>{item.name}</Text>

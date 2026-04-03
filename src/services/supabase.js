@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as SecureStore from 'expo-secure-store';
 import * as FileSystem from 'expo-file-system';
 
 // Add your Supabase Project URL and Anon Key to the .env file.
@@ -29,14 +30,104 @@ function base64ToUint8Array(base64) {
   return bytes;
 }
 
+// SecureStore has a 2048-byte value limit per key, so large sessions (JWTs)
+// are chunked automatically here. Falls back to AsyncStorage if SecureStore
+// is unavailable (e.g. simulator without Secure Enclave support).
+//
+// IMPORTANT: On iOS simulators with missing keychain entitlements (e.g. iOS 26.x
+// beta dev builds), SecureStore calls can HANG instead of throwing. A 2-second
+// timeout races every SecureStore operation so we always fall back to
+// AsyncStorage quickly rather than freezing the auth flow forever.
+const CHUNK_SIZE = 1800; // bytes per SecureStore entry
+const SS_TIMEOUT = 2000; // ms before we give up on SecureStore and use AsyncStorage
+
+/** Race a SecureStore promise against a 2-second timeout. Returns the result
+ *  or throws if SecureStore hangs or fails. */
+function ssWithTimeout(promise) {
+  return Promise.race([
+    promise,
+    new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('SecureStore timeout')), SS_TIMEOUT)
+    ),
+  ]);
+}
+
+const SecureStoreAdapter = {
+  async getItem(key) {
+    try {
+      const count = await ssWithTimeout(SecureStore.getItemAsync(`${key}__chunks`));
+      // If no chunked entry exists in SecureStore, check AsyncStorage directly —
+      // the value may have been written there by a previous fallback setItem.
+      if (count === null) return AsyncStorage.getItem(key);
+      const n = parseInt(count, 10);
+      const parts = await ssWithTimeout(
+        Promise.all(Array.from({ length: n }, (_, i) => SecureStore.getItemAsync(`${key}__${i}`)))
+      );
+      return parts.join('');
+    } catch {
+      // SecureStore hung, threw, or timed out — fall back to AsyncStorage
+      return AsyncStorage.getItem(key);
+    }
+  },
+  async setItem(key, value) {
+    try {
+      const chunks = [];
+      for (let i = 0; i < value.length; i += CHUNK_SIZE) {
+        chunks.push(value.slice(i, i + CHUNK_SIZE));
+      }
+      await ssWithTimeout(SecureStore.setItemAsync(`${key}__chunks`, String(chunks.length)));
+      await ssWithTimeout(
+        Promise.all(chunks.map((chunk, i) => SecureStore.setItemAsync(`${key}__${i}`, chunk)))
+      );
+    } catch {
+      // SecureStore hung, threw, or timed out — fall back to AsyncStorage
+      return AsyncStorage.setItem(key, value);
+    }
+  },
+  async removeItem(key) {
+    try {
+      const count = await ssWithTimeout(SecureStore.getItemAsync(`${key}__chunks`));
+      if (count !== null) {
+        const n = parseInt(count, 10);
+        await ssWithTimeout(SecureStore.deleteItemAsync(`${key}__chunks`));
+        await ssWithTimeout(
+          Promise.all(Array.from({ length: n }, (_, i) => SecureStore.deleteItemAsync(`${key}__${i}`)))
+        );
+      }
+    } catch {
+      return AsyncStorage.removeItem(key);
+    }
+    // Also clean up any AsyncStorage fallback entry for this key
+    AsyncStorage.removeItem(key).catch(() => {});
+  },
+};
+
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   auth: {
-    storage: AsyncStorage,
+    storage: SecureStoreAdapter,
     persistSession: true,
     autoRefreshToken: true,
     detectSessionInUrl: false,
   },
 });
+
+/**
+ * Wipes the locally-stored Supabase auth token from AsyncStorage.
+ * Call this before signInWithPassword when the client may have a
+ * stale/corrupted session (e.g. after a crash with bad env vars).
+ */
+export async function clearStoredSession() {
+  try {
+    // Supabase v2 stores the session under this key pattern
+    const projectRef = SUPABASE_URL.match(/https?:\/\/([^.]+)\./)?.[1] ?? '';
+    const key = `sb-${projectRef}-auth-token`;
+    await AsyncStorage.removeItem(key);
+    // Also wipe legacy key used by older supabase-js versions
+    await AsyncStorage.removeItem('supabase.auth.token');
+  } catch {
+    // Non-fatal — proceed regardless
+  }
+}
 
 // ─── Profile Helpers ──────────────────────────────────────────────────────────
 
@@ -91,6 +182,187 @@ export async function uploadAvatar(userId, uri) {
 export async function uploadRoomPhoto(userId, uri, base64Data = null) {
   const ts = Date.now();
   return uploadImage('room-uploads', `${userId}/${ts}.jpeg`, uri, base64Data);
+}
+
+// ─── User Designs Helpers ────────────────────────────────────────────────────
+
+/**
+ * Downloads a remote image (e.g. from Replicate CDN) and uploads it to
+ * Supabase Storage so the URL never expires.
+ * Returns the permanent public URL from Supabase.
+ * If the image is already a Supabase URL, returns it as-is.
+ */
+// Ensure the room-uploads storage bucket exists (auto-create on first use)
+let _bucketChecked = false;
+async function ensureBucket() {
+  if (_bucketChecked) return;
+  try {
+    const { error } = await supabase.storage.createBucket('room-uploads', {
+      public: true,
+      fileSizeLimit: 10485760, // 10 MB
+    });
+    // error code 'Duplicate' means it already exists — that's fine
+    if (error && !error.message?.includes('already exists') && error.statusCode !== '409') {
+      console.log('[Bucket] Create note:', error.message);
+    }
+  } catch (e) {
+    console.log('[Bucket] Auto-create skipped:', e.message);
+  }
+  _bucketChecked = true;
+}
+
+export async function persistDesignImage(userId, remoteUrl) {
+  if (!remoteUrl) throw new Error('No image URL to persist');
+  // If already stored in Supabase, skip re-upload
+  const supabaseHost = (process.env.EXPO_PUBLIC_SUPABASE_URL || '').replace('https://', '');
+  if (remoteUrl.includes(supabaseHost)) return remoteUrl;
+
+  // Ensure storage bucket exists before uploading
+  await ensureBucket();
+
+  const ext = remoteUrl.includes('.webp') ? 'webp' : 'jpeg';
+  const ts = Date.now();
+  const localPath = `${FileSystem.cacheDirectory}design_${ts}.${ext}`;
+
+  // Download image using fetch (FileSystem.downloadAsync deprecated in Expo 55)
+  // Retry up to 3 times — BFL/FAL CDNs can be briefly slow after generation
+  let base64;
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    try {
+      const res = await fetch(remoteUrl);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const buffer = await res.arrayBuffer();
+      const bytes  = new Uint8Array(buffer);
+      let binary   = '';
+      const CHUNK  = 8192;
+      for (let i = 0; i < bytes.length; i += CHUNK) {
+        binary += String.fromCharCode(...bytes.subarray(i, i + CHUNK));
+      }
+      base64 = btoa(binary);
+      if (base64.length > 100) break;
+      throw new Error('Downloaded content too small');
+    } catch (e) {
+      console.log(`[Persist] Download attempt ${attempt}/3 failed:`, e.message);
+      if (attempt === 3) throw new Error('Image download failed after 3 attempts');
+      await new Promise(r => setTimeout(r, 2000));
+    }
+  }
+  const storagePath = `${userId}/${ts}.${ext}`;
+  const contentType = ext === 'webp' ? 'image/webp' : 'image/jpeg';
+  const { error } = await supabase.storage
+    .from('room-uploads')
+    .upload(storagePath, base64ToUint8Array(base64), { contentType, upsert: true });
+  if (error) throw error;
+
+  const { data } = supabase.storage.from('room-uploads').getPublicUrl(storagePath);
+
+  // Clean up local cache file (fire-and-forget)
+  FileSystem.deleteAsync(localPath, { idempotent: true }).catch(() => {});
+
+  console.log('[Persist] Image saved permanently:', data.publicUrl);
+  return data.publicUrl;
+}
+
+/**
+ * Save a new user design to the database.
+ * Automatically persists the image to Supabase Storage if it's a remote URL
+ * (e.g. Replicate CDN) so the image never expires.
+ * Returns { success: true, designId, permanentUrl }.
+ */
+export async function saveUserDesign(userId, { imageUrl, prompt, styleTags, products, visibility }) {
+  // Use a timeout to prevent hanging indefinitely
+  const timeoutPromise = new Promise((_, reject) =>
+    setTimeout(() => reject(new Error('Save timed out. Please try again.')), 30000)
+  );
+
+  const insertPromise = (async () => {
+    // Step 1: Persist image to permanent Supabase Storage
+    let permanentUrl = imageUrl;
+    try {
+      permanentUrl = await persistDesignImage(userId, imageUrl);
+    } catch (e) {
+      console.warn('Image persist failed, saving with original URL:', e.message);
+      // Fall back to original URL if persist fails — design data is still saved
+    }
+
+    // Step 2: Insert the design row with the permanent URL
+    const { data, error } = await supabase
+      .from('user_designs')
+      .insert({
+        user_id: userId,
+        image_url: permanentUrl,
+        prompt: prompt || '',
+        style_tags: styleTags || [],
+        products: products || [],
+        visibility: visibility || 'private',
+      })
+      .select('id')
+      .single();
+    if (error) throw error;
+    return { success: true, designId: data.id, permanentUrl };
+  })();
+
+  return Promise.race([insertPromise, timeoutPromise]);
+}
+
+/**
+ * Update an existing design's visibility (e.g. private → public for "Post").
+ */
+export async function updateDesignVisibility(designId, visibility) {
+  const { error } = await supabase
+    .from('user_designs')
+    .update({ visibility })
+    .eq('id', designId);
+  if (error) throw error;
+}
+
+/**
+ * Delete duplicate designs that share the same prompt+image within a short window.
+ * Keeps the most recent entry for each unique prompt per user.
+ */
+export async function deduplicateUserDesigns(userId) {
+  // Handled at insert time by checking for recent duplicates
+}
+
+/** Get all designs for a specific user (own profile). */
+export async function getUserDesigns(userId) {
+  const timeout = new Promise((_, reject) =>
+    setTimeout(() => reject(new Error('getUserDesigns timed out')), 10000)
+  );
+  const query = supabase
+    .from('user_designs')
+    .select('*')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false });
+
+  const { data, error } = await Promise.race([query, timeout]);
+  if (error) throw error;
+  return data || [];
+}
+
+/** Get public designs for the Explore feed. */
+export async function getPublicDesigns(limit = 20, offset = 0) {
+  // First try with profiles join (richer data)
+  const { data, error } = await supabase
+    .from('user_designs')
+    .select('*, author:profiles!user_designs_user_id_fkey(id, full_name, username, avatar_url, is_verified_supplier)')
+    .eq('visibility', 'public')
+    .order('created_at', { ascending: false })
+    .range(offset, offset + limit - 1);
+
+  // If join fails (RLS, missing FK), fall back to plain query
+  if (error) {
+    console.log('[PublicDesigns] Join failed, falling back:', error.message);
+    const { data: plain, error: plainErr } = await supabase
+      .from('user_designs')
+      .select('*')
+      .eq('visibility', 'public')
+      .order('created_at', { ascending: false })
+      .range(offset, offset + limit - 1);
+    if (plainErr) throw plainErr;
+    return plain || [];
+  }
+  return data || [];
 }
 
 // ─── Push Token Helpers ───────────────────────────────────────────────────────

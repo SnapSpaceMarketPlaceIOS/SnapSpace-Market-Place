@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import {
   View,
   Text,
@@ -10,58 +10,66 @@ import {
   Easing,
   ScrollView,
   Image,
+  ActivityIndicator,
+  Alert,
+  Platform,
+  Keyboard,
+  Modal,
+  FlatList,
+  Share,
+  Linking,
 } from 'react-native';
+import { BlurView } from 'expo-blur';
+// expo-sharing requires native module not in dev client — use RN Share instead
+import * as FileSystem from 'expo-file-system/legacy';
+import * as ImagePicker from 'expo-image-picker';
+let MediaLibrary = null;
+try { MediaLibrary = require('expo-media-library'); } catch {} // optional — needs dev client rebuild
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Svg, { Path, Circle, Line, Polyline, Rect, Ellipse, G } from 'react-native-svg';
 import { LinearGradient } from 'expo-linear-gradient';
-import { fontSize, fontWeight, letterSpacing, palette, space, radius, shadow, typeScale } from '../constants/tokens';
+import { fontSize, fontWeight, letterSpacing, palette, space, radius, shadow, typeScale, roomChipColors } from '../constants/tokens';
 import { colors as C } from '../constants/theme';
 import SectionHeader from '../components/ds/SectionHeader';
 import Badge, { HeartCountPill } from '../components/ds/Badge';
 import CardImage from '../components/CardImage';
+import AutoImage from '../components/AutoImage';
 import { useAuth } from '../context/AuthContext';
 import { useLiked } from '../context/LikedContext';
+import { useCart } from '../context/CartContext';
 import { DESIGNS } from '../data/designs';
-import { searchProducts, getSourceColor } from '../services/affiliateProducts';
+import { SELLERS } from '../data/sellers';
+import { searchProducts, getSourceColor, getProductsForPrompt } from '../services/affiliateProducts';
+import { generateInteriorDesign, buildFinalPrompt, generateWithProductRefs, generateWithProductPanel } from '../services/replicate';
+import { createProductPanel } from '../utils/createProductPanel';
+import { analyzeRoomImage, rematchFromVision } from '../services/visionMatcher';
+import { PRODUCT_CATALOG } from '../data/productCatalog';
+import { saveUserDesign, updateDesignVisibility, uploadRoomPhoto } from '../services/supabase';
+import { getUserQuota } from '../services/productAwareGeneration';
+import { generateWithBFL } from '../services/bfl';
+import TabScreenFade from '../components/TabScreenFade';
 
 const { width, height } = Dimensions.get('window');
 
-const PARALLAX_BUDGET = 300;
-const PARALLAX_FACTOR = 0.2;
-const HERO_ROTATE_INTERVAL = 7000;
-const HERO_FADE_DURATION   = 1800;
 
 const CARD_W = width * 0.50;
 const COLL_CARD_W = (width - space.lg * 2 - space.sm) / 2;
-const STYLE_CARD_W = Math.floor((width - space.lg * 2 - space.sm * 2) / 3);
+const STYLE_CARD_W = Math.floor((width - space.lg * 2 - space.sm) / 2.3);
+const ARRIVAL_CARD_W = Math.round(width * 0.42);
 
-const HERO_IMAGES = [
-  'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1600&q=90&fit=crop',  // minimalist living room, white sofa
-  'https://images.unsplash.com/photo-1616046229478-9901c5536a45?w=1600&q=90&fit=crop',  // minimalist bedroom, wooden headboard
-  'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=1600&q=90&fit=crop',     // green velvet sofa living room
-  'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=1600&q=90&fit=crop',     // open-concept living room (replaces exterior pool shot)
-  'https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?w=1600&q=90&fit=crop',  // modern dark kitchen
-  'https://images.unsplash.com/photo-1565538810643-b5bdb714032a?w=1600&q=90&fit=crop',  // round coffee table living room
-  'https://images.unsplash.com/photo-1598928506311-c55ded91a20c?w=1600&q=90&fit=crop',  // bright luxury living room (replaces commercial office)
-  'https://images.unsplash.com/photo-1540518614846-7eded433c457?w=1600&q=90&fit=crop',  // white bedding bedroom
-  'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=1600&q=90&fit=crop',  // architectural bedroom, warm lighting
-  'https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?w=1600&q=90&fit=crop',  // warm-toned living room
-  'https://images.unsplash.com/photo-1618219908412-a29a1bb7b86e?w=1600&q=90&fit=crop',  // minimal bedroom/bathroom
-  'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1600&q=90&fit=crop',     // warm bedroom, wood furniture
-  'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=1600&q=90&fit=crop',  // living room, yellow accent chair (replaces dog kitchen)
-  'https://images.unsplash.com/photo-1615874694520-474822394e73?w=1600&q=90&fit=crop',  // living room with bookshelves & fireplace (replaces MacBook shot)
-  'https://images.unsplash.com/photo-1513694203232-719a280e022f?w=1600&q=90&fit=crop',  // cozy living room, warm ambient lighting
-];
+// Seller lookup map: handle → seller object
+const SELLER_MAP = SELLERS.reduce((acc, s) => { acc[s.handle] = s; return acc; }, {});
+
 
 // ── Room type quick-nav ────────────────────────────────────────────────────────
 const ROOM_TYPES = [
-  { key: 'living-room', label: 'Living',   bg: '#E8F0FA' },
-  { key: 'bedroom',     label: 'Bedroom',  bg: '#EEF1FD' },
-  { key: 'kitchen',     label: 'Kitchen',  bg: '#FDF4EC' },
-  { key: 'dining-room', label: 'Dining',   bg: '#ECFAF3' },
-  { key: 'office',      label: 'Office',   bg: '#E8F0FA' },
-  { key: 'outdoor',     label: 'Outdoor',  bg: '#EAF6EE' },
-  { key: 'bathroom',    label: 'Bathroom', bg: '#F3EEFF' },
+  { key: 'living-room', label: 'Living',   bg: roomChipColors['living-room'] },
+  { key: 'bedroom',     label: 'Bedroom',  bg: roomChipColors['bedroom'] },
+  { key: 'kitchen',     label: 'Kitchen',  bg: roomChipColors['kitchen'] },
+  { key: 'dining-room', label: 'Dining',   bg: roomChipColors['dining-room'] },
+  { key: 'office',      label: 'Office',   bg: roomChipColors['office'] },
+  { key: 'outdoor',     label: 'Outdoor',  bg: roomChipColors['outdoor'] },
+  { key: 'bathroom',    label: 'Bathroom', bg: roomChipColors['bathroom'] },
   { key: 'entryway',    label: 'Entryway', bg: '#FFF8EC' },
   { key: 'kids-room',   label: 'Kids',     bg: '#FFF0F5' },
   { key: 'nursery',     label: 'Nursery',  bg: '#EBFAF9' },
@@ -77,6 +85,12 @@ const ROOM_ICON_PURPLE    = '#7B5EA7';
 const ROOM_ICON_GOLD      = '#C4934A';
 const ROOM_ICON_ROSE      = '#D94F7A';
 const ROOM_ICON_TEAL      = '#2DADA0';
+
+// ── Star rating helper ─────────────────────────────────────────────────────────
+function renderStars(rating) {
+  const filled = Math.round(rating || 0);
+  return '★'.repeat(filled) + '☆'.repeat(5 - filled);
+}
 
 function RoomIcon({ roomKey, size = 28 }) {
   const P = ROOM_ICON_PRIMARY;
@@ -319,30 +333,43 @@ function RoomIcon({ roomKey, size = 28 }) {
 }
 
 // ── Style category chips with preview image ────────────────────────────────────
+// Local assets for curated styles (permanent, no CDN expiry)
+const STYLE_IMG_JAPANDI      = require('../assets/styles/Japandi.jpg');
+const STYLE_IMG_SCANDI       = require('../assets/styles/Scandanavian.jpg');
+const STYLE_IMG_MINIMALIST   = require('../assets/styles/Minimalist.avif');
+const STYLE_IMG_GLAM         = require('../assets/styles/Glam.jpg');
+const STYLE_IMG_MODERN       = require('../assets/styles/Modern.jpg');
+
 const STYLE_CATEGORIES = [
-  { key: 'japandi',     label: 'Japandi',     sub: 'Refined Calm',   size: 'tall',
+  { key: 'japandi',     label: 'Japandi',     sub: 'Refined Calm',
     bg: '#F0FDF4', text: '#166534', accent: '#16A34A',
-    imageUrl: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=600&q=85' },
-  { key: 'scandi',      label: 'Scandi',      sub: 'Pure & Airy',    size: 'short',
+    localImage: STYLE_IMG_JAPANDI,    nativeW: 658,  nativeH: 986 },
+  { key: 'scandi',      label: 'Scandi',      sub: 'Pure & Airy',
     bg: '#EFF6FF', text: '#1E40AF', accent: '#3B82F6',
-    imageUrl: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=600&q=85' },
-  { key: 'mid-century', label: 'Mid-Century', sub: 'Bold Heritage',  size: 'medium',
+    localImage: STYLE_IMG_SCANDI,     nativeW: 1367, nativeH: 2048 },
+  { key: 'minimalist',  label: 'Minimalist',  sub: 'Less Is More',
+    bg: '#F3F4F6', text: '#111827', accent: '#374151',
+    localImage: STYLE_IMG_MINIMALIST, nativeW: 2500, nativeH: 1667 },
+  { key: 'luxury',      label: 'Glam',        sub: 'Opulent Edge',
+    bg: '#F5F3FF', text: '#5B21B6', accent: '#7C3AED',
+    localImage: STYLE_IMG_GLAM,       nativeW: 736,  nativeH: 1031 },
+  { key: 'modern',      label: 'Modern',      sub: 'Clean & Current',
+    bg: '#F8FAFC', text: '#0F172A', accent: '#334155',
+    localImage: STYLE_IMG_MODERN,     nativeW: 900,  nativeH: 1124 },
+  { key: 'mid-century', label: 'Mid-Century', sub: 'Bold Heritage',
     bg: '#FFF7ED', text: '#9A3412', accent: '#EA580C',
-    imageUrl: 'https://images.unsplash.com/photo-1618221195710-2d01d1e0a0a0?w=600&q=85' },
-  { key: 'dark-luxe',   label: 'Dark Luxe',   sub: 'Moody & Rich',   size: 'tall',
+    imageUrl: 'https://images.unsplash.com/photo-1541085929911-dea736e9287b?w=600&q=85' },
+  { key: 'dark-luxe',   label: 'Dark Luxe',   sub: 'Moody & Rich',
     bg: '#1E1B4B', text: '#C7D2FE', accent: '#818CF8',
-    imageUrl: 'https://images.unsplash.com/photo-1522771739844-ee4e8089f9e0?w=600&q=85' },
-  { key: 'bohemian',    label: 'Boho',        sub: 'Free Spirit',    size: 'short',
+    imageUrl: 'https://images.unsplash.com/photo-1668089677938-b52086753f77?w=600&q=85' },
+  { key: 'bohemian',    label: 'Boho',        sub: 'Free Spirit',
     bg: '#FEF3C7', text: '#92400E', accent: '#D97706',
     imageUrl: 'https://images.unsplash.com/photo-1632119580908-ae947d4c7691?w=600&q=85' },
-  { key: 'minimalist',  label: 'Minimalist',  sub: 'Less Is More',   size: 'medium',
-    bg: '#F3F4F6', text: '#111827', accent: '#374151',
-    imageUrl: 'https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=600&q=85' },
-  { key: 'luxury',      label: 'Glam',        sub: 'Opulent Edge',   size: 'tall',
-    bg: '#F5F3FF', text: '#5B21B6', accent: '#7C3AED',
-    imageUrl: 'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=600&q=85' },
-  { key: 'farmhouse',   label: 'Farmhouse',   sub: 'Warm & Rooted',  size: 'short',
+  { key: 'farmhouse',   label: 'Farmhouse',   sub: 'Warm & Rooted',
     bg: '#FAF6F0', text: '#713F12', accent: '#A16207',
+    imageUrl: 'https://images.unsplash.com/photo-1764076327046-fe35f955cba1?w=600&q=85' },
+  { key: 'coastal',     label: 'Coastal',     sub: 'Breezy & Light',
+    bg: '#F0F9FF', text: '#0C4A6E', accent: '#0EA5E9',
     imageUrl: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=600&q=85' },
 ];
 
@@ -354,29 +381,8 @@ const STYLE_PRODUCT_COUNTS = Object.fromEntries(
   ])
 );
 
-// ── Curated editorial collections ─────────────────────────────────────────────
-const CURATED_COLLECTIONS = [
-  {
-    id: 'summer-refresh', title: 'Summer\nRefresh', subtitle: '12 rooms',
-    imageUrl: 'https://images.unsplash.com/photo-1628744876490-19b035ecf9c3?w=800&q=80',
-    styles: ['minimalist', 'scandi', 'biophilic'],
-  },
-  {
-    id: 'dark-moody', title: 'Dark &\nMoody', subtitle: '8 rooms',
-    imageUrl: 'https://images.unsplash.com/photo-1638541420159-cadd0634f08f?w=800&q=80',
-    styles: ['dark-luxe', 'luxury'],
-  },
-  {
-    id: 'coastal-calm', title: 'Coastal\nCalm', subtitle: '10 rooms',
-    imageUrl: 'https://images.unsplash.com/photo-1679862342541-e408d4f3ab80?w=800&q=80',
-    styles: ['minimalist', 'scandi'],
-  },
-  {
-    id: 'japandi-zen', title: 'Japandi\nZen', subtitle: '9 rooms',
-    imageUrl: 'https://images.unsplash.com/photo-1628744876497-eb30460be9f6?w=800&q=80',
-    styles: ['japandi', 'wabi-sabi'],
-  },
-];
+// ── New Arrivals — first 4 products from catalog ───────────────────────────────
+const NEW_ARRIVAL_PRODUCTS = PRODUCT_CATALOG.slice(0, 4);
 
 // ── Style label display map ────────────────────────────────────────────────────
 const STYLE_LABEL_MAP = {
@@ -423,11 +429,203 @@ function SendIcon() {
 
 function CameraSmallIcon() {
   return (
-    <Svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+    <Svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.9)" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round">
       <Path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
       <Circle cx={12} cy={13} r={4} />
     </Svg>
   );
+}
+
+function GalleryIcon({ size = 18, color = 'rgba(255,255,255,0.9)' }) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round">
+      <Rect x={3} y={3} width={18} height={18} rx={2} ry={2} />
+      <Circle cx={8.5} cy={8.5} r={1.5} />
+      <Polyline points="21 15 16 10 5 21" />
+    </Svg>
+  );
+}
+
+function CheckIcon({ size = 10, color = '#fff' }) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={3.5} strokeLinecap="round" strokeLinejoin="round">
+      <Polyline points="20 6 9 17 4 12" />
+    </Svg>
+  );
+}
+
+function CloseIcon({ size = 20, color = '#fff' }) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+      <Line x1={18} y1={6} x2={6} y2={18} />
+      <Line x1={6} y1={6} x2={18} y2={18} />
+    </Svg>
+  );
+}
+
+// ── Figma-exact action icons (nodes 531-309, 531-323, 531-313) ────────────────
+
+// 531-309 "Load_circle_light" — download (arrow down + arc tray)
+function DownloadIcon({ size = 22 }) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 30 30" fill="none">
+      <Path
+        d="M6.54815 18.5147C7.04668 20.3752 8.1452 22.0193 9.67334 23.1918C11.2015 24.3644 13.0738 25 15 25C16.9262 25 18.7985 24.3644 20.3267 23.1918C21.8548 22.0193 22.9533 20.3752 23.4519 18.5147"
+        stroke="#111827" strokeWidth={1.4} strokeLinecap="round"
+      />
+      <Path
+        d="M15 16.25L14.6877 16.6404L15 16.8903L15.3123 16.6404L15 16.25ZM15.5 5C15.5 4.72386 15.2761 4.5 15 4.5C14.7239 4.5 14.5 4.72386 14.5 5L15 5L15.5 5ZM8.75 11.25L8.43765 11.6404L14.6877 16.6404L15 16.25L15.3123 15.8596L9.06235 10.8596L8.75 11.25ZM15 16.25L15.3123 16.6404L21.5623 11.6404L21.25 11.25L20.9377 10.8596L14.6877 15.8596L15 16.25ZM15 16.25L15.5 16.25L15.5 5L15 5L14.5 5L14.5 16.25L15 16.25Z"
+        fill="#111827"
+      />
+    </Svg>
+  );
+}
+
+// 531-323 "Subtract" — solid black circle with white + punched through
+function PostIcon({ size = 28 }) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 30 30" fill="none">
+      <Path
+        d="M15 0C23.2843 0 30 6.71573 30 15C30 23.2843 23.2843 30 15 30C6.71573 30 0 23.2843 0 15C0 6.71573 6.71573 0 15 0ZM15 6.16602C14.7241 6.16602 14.5004 6.39017 14.5 6.66602V14.5H6.66699C6.39085 14.5 6.16699 14.7239 6.16699 15C6.16699 15.2761 6.39085 15.5 6.66699 15.5H14.5V23.333C14.5 23.6091 14.7239 23.833 15 23.833C15.2761 23.833 15.5 23.6091 15.5 23.333V15.5H23.333C23.609 15.4998 23.833 15.276 23.833 15C23.833 14.724 23.609 14.5002 23.333 14.5H15.5V6.66602C15.4996 6.39017 15.2759 6.16602 15 6.16602Z"
+        fill="#111827"
+      />
+    </Svg>
+  );
+}
+
+// 531-313 "Download_circle_light" — share (arrow up + arc tray)
+function ShareIcon({ size = 22 }) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 30 30" fill="none">
+      <Path
+        d="M6.54815 18.5147C7.04668 20.3752 8.1452 22.0193 9.67334 23.1918C11.2015 24.3644 13.0738 25 15 25C16.9262 25 18.7985 24.3644 20.3267 23.1918C21.8548 22.0193 22.9533 20.3752 23.4519 18.5147"
+        stroke="#111827" strokeWidth={1.4} strokeLinecap="round"
+      />
+      <Path
+        d="M15 5L14.6877 4.60957L15 4.35969L15.3123 4.60957L15 5ZM15.5 16.25C15.5 16.5261 15.2761 16.75 15 16.75C14.7239 16.75 14.5 16.5261 14.5 16.25L15 16.25L15.5 16.25ZM8.75 10L8.43765 9.60957L14.6877 4.60957L15 5L15.3123 5.39043L9.06235 10.3904L8.75 10ZM15 5L15.3123 4.60957L21.5623 9.60957L21.25 10L20.9377 10.3904L14.6877 5.39043L15 5ZM15 5L15.5 5L15.5 16.25L15 16.25L14.5 16.25L14.5 5L15 5Z"
+        fill="#111827"
+      />
+    </Svg>
+  );
+}
+
+// ── Add All to Cart button — press inverts blue↔white ────────────────────────
+function AddAllToCartButton({ products, onAddAll, onViewCart }) {
+  const [added, setAdded] = React.useState(false);
+  const [pressed, setPressed] = React.useState(false);
+  const scale = React.useRef(new Animated.Value(1)).current;
+
+  const handlePressIn = () => {
+    setPressed(true);
+    Animated.spring(scale, { toValue: 0.97, useNativeDriver: true, speed: 50, bounciness: 0 }).start();
+  };
+  const handlePressOut = () => {
+    Animated.spring(scale, { toValue: 1, useNativeDriver: true, speed: 40, bounciness: 4 }).start(() => {
+      setTimeout(() => setPressed(false), 180);
+    });
+  };
+
+  const iconColor = pressed ? '#0B6DC3' : '#fff';
+
+  return (
+    <Animated.View style={{ transform: [{ scale }], marginHorizontal: 20, marginTop: 16, marginBottom: 4 }}>
+      <TouchableOpacity
+        style={[
+          {
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'center',
+            borderRadius: 28,
+            paddingVertical: 15,
+            borderWidth: 2,
+          },
+          pressed
+            ? { backgroundColor: '#fff', borderColor: '#0B6DC3' }
+            : { backgroundColor: '#0B6DC3', borderColor: '#0B6DC3' },
+        ]}
+        activeOpacity={1}
+        onPressIn={handlePressIn}
+        onPressOut={handlePressOut}
+        onPress={() => {
+          if (added) {
+            onViewCart?.();
+          } else {
+            onAddAll(products);
+            setAdded(true);
+          }
+        }}
+      >
+        {added ? (
+          <Svg width={18} height={18} viewBox="0 0 24 24" fill="none"
+            stroke={iconColor} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"
+            style={{ marginRight: 8 }}>
+            <Polyline points="20 6 9 17 4 12" />
+          </Svg>
+        ) : (
+          <Svg width={18} height={18} viewBox="0 0 24 24" fill="none"
+            stroke={iconColor} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"
+            style={{ marginRight: 8 }}>
+            <Path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" />
+            <Line x1={3} y1={6} x2={21} y2={6} />
+            <Path d="M16 10a4 4 0 01-8 0" />
+          </Svg>
+        )}
+        <Text style={{ color: iconColor, fontSize: 15, fontWeight: '700', letterSpacing: 0.3 }}>
+          {added ? 'View Cart' : 'Add All to Cart'}
+        </Text>
+      </TouchableOpacity>
+    </Animated.View>
+  );
+}
+
+// ── AI generation helpers ─────────────────────────────────────────────────────
+
+const PROMPT_SUGGESTIONS = [
+  'Modern minimalist',
+  'Japandi',
+  'Dark luxe',
+  'Coastal',
+  'Boho eclectic',
+  'Scandi cozy',
+];
+
+const FURNITURE_LABELS = {
+  'sofa': 'sofa', 'accent-chair': 'accent chair', 'coffee-table': 'coffee table',
+  'rug': 'area rug', 'wall-art': 'wall art', 'mirror': 'floor mirror',
+  'bookshelf': 'bookshelf', 'floor-lamp': 'floor lamp', 'bed': 'bed',
+  'pendant-light': 'pendant light', 'nightstand': 'nightstand', 'dresser': 'dresser',
+};
+
+const VISUAL_WORDS = [
+  'boucle','velvet','leather','linen','rattan','marble','glass','wood',
+  'walnut','oak','brass','gold','curved','round','oval','modular',
+  'cream','beige','white','gray','black','camel','sage','green',
+  'navy','teal','brown','natural','woven','jute','ceramic','metal',
+  'chrome','copper','mid-century','modern','rustic','industrial',
+  'tufted','channel','sectional','l-shaped','swirl','abstract',
+  'geometric','wavy','herringbone','bamboo','travertine',
+];
+
+function extractVisualHints(name) {
+  const lower = name.toLowerCase();
+  return VISUAL_WORDS.filter(w => lower.includes(w)).slice(0, 3).join(' ');
+}
+
+function buildEnrichedPrompt(userPrompt, products) {
+  // Build detailed product hints for the AI prompt.
+  // Each hint includes material, color, and shape descriptors extracted from
+  // the product name, giving the AI a clear picture of what to render.
+  // e.g. "one cream boucle modular sofa, one walnut oval coffee table, one cream swirl area rug"
+  const pieces = products.slice(0, 6).map(p => {
+    const label = FURNITURE_LABELS[p.category] || p.category.replace(/-/g, ' ');
+    const hints = extractVisualHints(p.name);
+    return hints ? `one ${hints} ${label}` : `one ${label}`;
+  });
+  const productHints = pieces.length > 0 ? pieces.join(', ') : null;
+
+  // Use the centralized prompt builder from replicate.js
+  // This adds architecture preservation + quality suffix automatically
+  return buildFinalPrompt(userPrompt, productHints);
 }
 
 function ChevronRight({ color = '#fff' }) {
@@ -478,41 +676,35 @@ function TagIcon({ size = 13, color = '#F59E0B' }) {
   );
 }
 
-// Amazon logo badge — white pill with "amazon" text + orange smile arrow
-function AmazonLogoBadge() {
+function StarIcon({ size = 12, color = '#F59E0B' }) {
   return (
-    <View style={{
-      backgroundColor: '#FFFFFF',
-      paddingHorizontal: 5,
-      paddingTop: 3,
-      paddingBottom: 4,
-      borderRadius: 6,
-      alignItems: 'center',
-      justifyContent: 'center',
-    }}>
-      {/* "amazon" wordmark */}
-      <Text style={{
-        fontSize: 7,
-        fontWeight: '800',
-        color: '#1A1A1A',
-        letterSpacing: -0.2,
-        lineHeight: 8,
-        fontStyle: 'italic',
-      }}>amazon</Text>
-      {/* Orange smile arrow */}
-      <Svg width={20} height={4} viewBox="0 0 40 7">
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill={color} stroke={color} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
+      <Path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+    </Svg>
+  );
+}
+
+// ─── Amazon Logo Badge ────────────────────────────────────────────────────────
+
+function AmazonBadge() {
+  return (
+    <View style={amazonBadgeStyle.wrap}>
+      <Text style={amazonBadgeStyle.wordmark}>amazon</Text>
+      <Svg width={44} height={9} viewBox="0 0 44 9">
+        {/* Smile arrow from 'a' to 'z' */}
         <Path
-          d="M2 2 Q20 10 38 2"
-          fill="none"
+          d="M2 3.5 Q22 9.5 42 3.5"
           stroke="#FF9900"
-          strokeWidth="2.2"
+          strokeWidth={2.5}
+          fill="none"
           strokeLinecap="round"
         />
+        {/* Arrowhead */}
         <Path
-          d="M34 1 L38 2 L36 5"
-          fill="none"
+          d="M38.5 1.5 L42 3.5 L38.5 6"
           stroke="#FF9900"
-          strokeWidth="2.2"
+          strokeWidth={2}
+          fill="none"
           strokeLinecap="round"
           strokeLinejoin="round"
         />
@@ -520,6 +712,29 @@ function AmazonLogoBadge() {
     </View>
   );
 }
+
+const amazonBadgeStyle = StyleSheet.create({
+  wrap: {
+    backgroundColor: '#fff',
+    borderRadius: radius.sm,
+    paddingHorizontal: 8,
+    paddingTop: 5,
+    paddingBottom: 4,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.12,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  wordmark: {
+    fontSize: 11,
+    fontWeight: '800',
+    color: '#232F3E',
+    letterSpacing: -0.3,
+    lineHeight: 13,
+  },
+});
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -537,32 +752,107 @@ function getFirstName(user) {
   return full.split(' ')[0] || null;
 }
 
+// ─── Contextual loading messages ─────────────────────────────────────────────
+
+function getLoadingMessages(promptText) {
+  const p = (promptText || '').toLowerCase();
+
+  // Extract style, mood, and room keywords from the prompt
+  const styles = ['scandinavian','scandi','japandi','minimalist','modern','mid-century','bohemian','boho',
+    'industrial','coastal','farmhouse','rustic','art deco','glam','luxury','contemporary','transitional',
+    'mediterranean','wabi-sabi','dark luxe','biophilic','french country','maximalist','nordic'];
+  const moods = ['cozy','warm','serene','elegant','bold','dramatic','airy','bright','moody','vibrant',
+    'calm','refined','inviting','sophisticated','luxurious','eclectic','organic','earthy','sleek','chic'];
+  const rooms = ['living room','bedroom','kitchen','dining room','office','bathroom','reading nook',
+    'nursery','entryway','studio','lounge','den','patio','balcony','sunroom','home office','loft'];
+
+  const style = styles.find(s => p.includes(s)) || '';
+  const mood = moods.find(m => p.includes(m)) || '';
+  const room = rooms.find(r => p.includes(r)) || 'space';
+
+  // Style-specific design language
+  const styleVerbs = {
+    scandinavian: ['Nordic simplicity','natural textures','hygge warmth'],
+    scandi: ['Nordic simplicity','natural textures','hygge warmth'],
+    japandi: ['wabi-sabi harmony','zen minimalism','organic balance'],
+    minimalist: ['clean silhouettes','intentional restraint','breathing room'],
+    modern: ['contemporary lines','refined finishes','sculptural forms'],
+    'mid-century': ['retro elegance','organic curves','timeless character'],
+    bohemian: ['layered patterns','eclectic warmth','global accents'],
+    boho: ['layered patterns','eclectic warmth','global accents'],
+    industrial: ['raw materials','urban edge','exposed character'],
+    coastal: ['ocean-inspired tones','breezy textures','natural light'],
+    farmhouse: ['rustic warmth','vintage charm','handcrafted details'],
+    'dark luxe': ['moody atmosphere','rich depth','dramatic contrast'],
+    glam: ['opulent finishes','statement pieces','refined luxury'],
+    luxury: ['opulent finishes','curated elegance','bespoke details'],
+  };
+
+  const designDetails = styleVerbs[style] || ['curated details','considered proportions','refined materials'];
+
+  // Build tailored messages
+  const messages = [
+    `Designing your ${room}…`,
+    mood ? `Infusing ${mood} energy into every detail…` : `Shaping the perfect atmosphere…`,
+    style ? `Channeling ${style.charAt(0).toUpperCase() + style.slice(1)} design principles…` : `Balancing form and function…`,
+    `Layering ${designDetails[0]} with intention…`,
+    `Perfecting ${designDetails[1]}…`,
+    `Curating ${designDetails[2]}…`,
+    `Harmonizing color, light, and texture…`,
+    `Adding the finishing touches…`,
+  ];
+
+  return messages;
+}
+
 // ─── Constants ────────────────────────────────────────────────────────────────
 const FIRST_VISIT_KEY = 'snapspace_home_visited';
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
-export default function HomeScreen({ navigation }) {
+export default function HomeScreen({ navigation, route }) {
   const { user } = useAuth();
+  const { addToCart, items: cartItems } = useCart();
   const { liked } = useLiked();
   const [prompt, setPrompt] = useState('');
   const [greeting, setGreeting] = useState(getGreeting());
   const [recentlyViewed, setRecentlyViewed] = useState([]);
 
-  // Ping-pong hero slots
-  const [slotA, setSlotA] = useState(HERO_IMAGES[0]);
-  const [slotB, setSlotB] = useState(HERO_IMAGES[1]);
-  const nextIdxRef  = useRef(2);
-  const aIsLiveRef  = useRef(true);
-  const opacityA    = useRef(new Animated.Value(1)).current;
-  const opacityB    = useRef(new Animated.Value(0)).current;
-  const cycleTimer  = useRef(null);
+  // Design Your Space state
+  const [photo, setPhoto] = useState(null);
+  const [photoSource, setPhotoSource] = useState(null); // 'camera' | 'library'
+  const [imageLayout, setImageLayout] = useState(null);
+  const [generating, setGenerating] = useState(false);
+  const [genStatus, setGenStatus] = useState('');
+  const [loadingMsgIndex, setLoadingMsgIndex] = useState(0);
+  const [loadingMessages, setLoadingMessages] = useState([]);
+  const loadingMsgOpacity = useRef(new Animated.Value(1)).current;
+  const [resultData, setResultData] = useState(null); // { imageUri, resultUri, prompt, products }
+  const [showResult, setShowResult] = useState(false);
+  const [showPostSheet, setShowPostSheet] = useState(false);
+  const [posting, setPosting] = useState(false);
+  const [autoSavedDesignId, setAutoSavedDesignId] = useState(null);
+
+  // ── Generation quota (free tier: 3/month) ──────────────────────────────────
+  const [userQuota, setUserQuota] = useState({
+    canGenerate: true,
+    generationsRemaining: 3,
+    tier: 'free',
+    quotaResetDate: null,
+  });
+
+  // Loading bar animation
+  const loadingProgress = useRef(new Animated.Value(0)).current;
+  const loadingAnim = useRef(null);
+
+  // Camera lens loader animation
+  const lensRotate  = useRef(new Animated.Value(0)).current;  // outer barrel rotation
+  const lensScale   = useRef(new Animated.Value(1)).current;  // aperture breathe
+  const lensDot     = useRef(new Animated.Value(0.5)).current; // center dot pulse
+  const lensAnim    = useRef(null);
 
   // Scroll-driven parallax
   const scrollY = useRef(new Animated.Value(0)).current;
-
-  // Ken Burns
-  const kenBurnsScale = useRef(new Animated.Value(1)).current;
 
   // ── Personalization ─────────────────────────────────────────────────────────
 
@@ -610,51 +900,489 @@ export default function HomeScreen({ navigation }) {
     });
   }, []);
 
-  // Ken Burns loop
+  // Receive photo captured from Snap tab
   useEffect(() => {
-    let stopped = false;
-    const loop = () => {
-      kenBurnsScale.setValue(1);
-      Animated.timing(kenBurnsScale, {
-        toValue: 1.08,
-        duration: (HERO_ROTATE_INTERVAL + HERO_FADE_DURATION) * 1.5,
-        easing: Easing.inOut(Easing.sin),
-        useNativeDriver: true,
-      }).start(({ finished }) => { if (finished && !stopped) loop(); });
-    };
-    loop();
-    return () => { stopped = true; kenBurnsScale.stopAnimation(); };
-  }, []);
+    if (route?.params?.capturedPhoto) {
+      const captured = route.params.capturedPhoto;
+      setPhoto(captured);
+      setPhotoSource('camera');
+      const isLandscape = (captured.width || 0) > (captured.height || 0);
+      setImageLayout({ landscape: isLandscape });
+      navigation.setParams({ capturedPhoto: undefined });
+    }
+  }, [route?.params?.capturedPhoto]);
 
-  // Ping-pong crossfade
-  useEffect(() => {
-    const L = HERO_IMAGES.length;
-    let stopped = false;
-    const runCycle = () => {
-      if (stopped) return;
-      const aLive = aIsLiveRef.current;
-      const liveOp = aLive ? opacityA : opacityB;
-      const idleOp = aLive ? opacityB : opacityA;
-      Animated.parallel([
-        Animated.timing(liveOp, { toValue: 0, duration: HERO_FADE_DURATION, easing: Easing.inOut(Easing.sin), useNativeDriver: true }),
-        Animated.timing(idleOp, { toValue: 1, duration: HERO_FADE_DURATION, easing: Easing.inOut(Easing.sin), useNativeDriver: true }),
-      ]).start(({ finished }) => {
-        if (!finished || stopped) return;
-        aIsLiveRef.current = !aLive;
-        const next = HERO_IMAGES[nextIdxRef.current % L];
-        nextIdxRef.current = (nextIdxRef.current + 1) % L;
-        if (aLive) { setSlotA(next); } else { setSlotB(next); }
-        cycleTimer.current = setTimeout(runCycle, HERO_ROTATE_INTERVAL);
+  const handlePickFromLibrary = async () => {
+    if (generating) return;
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Permission Required', 'Please allow access to your photo library in Settings.');
+      return;
+    }
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      quality: 0.8,
+      base64: true,
+    });
+    if (result.canceled || !result.assets?.length) return;
+    const asset = result.assets[0];
+    setPhoto({ uri: asset.uri, base64: asset.base64, width: asset.width, height: asset.height });
+    setPhotoSource('library');
+    setImageLayout({ landscape: (asset.width || 0) > (asset.height || 0) });
+  };
+
+  // Timed loading bar — 3-phase crawl matching real Replicate generation time
+  const startLoadingBar = useCallback(() => {
+    loadingProgress.setValue(0);
+    // Linear 0→95% over 75 seconds at constant speed.
+    // Snaps to 100% when generation completes.
+    loadingAnim.current = Animated.timing(loadingProgress, {
+      toValue: 0.95,
+      duration: 75000,
+      easing: Easing.linear,
+      useNativeDriver: false,
+    });
+    loadingAnim.current.start();
+  }, [loadingProgress]);
+
+  const stopLoadingBar = useCallback((success = true) => {
+    if (loadingAnim.current) {
+      loadingAnim.current.stop();
+      loadingAnim.current = null;
+    }
+    if (success) {
+      // Snap to 100% quickly
+      Animated.timing(loadingProgress, {
+        toValue: 1,
+        duration: 300,
+        easing: Easing.out(Easing.ease),
+        useNativeDriver: false,
+      }).start(() => {
+        // Reset after a beat
+        setTimeout(() => loadingProgress.setValue(0), 400);
       });
-    };
-    cycleTimer.current = setTimeout(runCycle, HERO_ROTATE_INTERVAL);
-    return () => {
-      stopped = true;
-      clearTimeout(cycleTimer.current);
-      opacityA.stopAnimation();
-      opacityB.stopAnimation();
-    };
-  }, []);
+    } else {
+      loadingProgress.setValue(0);
+    }
+  }, [loadingProgress]);
+
+  // Camera lens loader — start/stop with generating
+  useEffect(() => {
+    if (generating) {
+      lensRotate.setValue(0);
+      lensScale.setValue(1);
+      lensDot.setValue(0.5);
+      lensAnim.current = Animated.loop(
+        Animated.parallel([
+          // Outer barrel: full rotation every 4s
+          Animated.timing(lensRotate, {
+            toValue: 1,
+            duration: 4000,
+            easing: Easing.linear,
+            useNativeDriver: true,
+          }),
+          // Aperture blades: breathe open → close
+          Animated.sequence([
+            Animated.timing(lensScale, {
+              toValue: 1.1,
+              duration: 1400,
+              easing: Easing.inOut(Easing.ease),
+              useNativeDriver: true,
+            }),
+            Animated.timing(lensScale, {
+              toValue: 0.88,
+              duration: 1400,
+              easing: Easing.inOut(Easing.ease),
+              useNativeDriver: true,
+            }),
+          ]),
+          // Center dot: glow pulse
+          Animated.sequence([
+            Animated.timing(lensDot, {
+              toValue: 1,
+              duration: 900,
+              easing: Easing.inOut(Easing.ease),
+              useNativeDriver: true,
+            }),
+            Animated.timing(lensDot, {
+              toValue: 0.25,
+              duration: 900,
+              easing: Easing.inOut(Easing.ease),
+              useNativeDriver: true,
+            }),
+          ]),
+        ])
+      );
+      lensAnim.current.start();
+    } else {
+      if (lensAnim.current) {
+        lensAnim.current.stop();
+        lensAnim.current = null;
+      }
+    }
+  }, [generating]);
+
+  // Rotating loading messages — cycle every 3s with fade
+  useEffect(() => {
+    if (!generating || loadingMessages.length === 0) return;
+    const interval = setInterval(() => {
+      // Fade out
+      Animated.timing(loadingMsgOpacity, {
+        toValue: 0,
+        duration: 300,
+        useNativeDriver: true,
+      }).start(() => {
+        // Advance to next message
+        setLoadingMsgIndex(prev => (prev + 1) % loadingMessages.length);
+        // Fade in
+        Animated.timing(loadingMsgOpacity, {
+          toValue: 1,
+          duration: 400,
+          useNativeDriver: true,
+        }).start();
+      });
+    }, 3000);
+    return () => clearInterval(interval);
+  }, [generating, loadingMessages]);
+
+  // ── Result actions ──────────────────────────────────────────────────────────
+
+  // Helper: download result image to local cache file
+  const downloadResultImage = async () => {
+    if (!resultData?.resultUri) return null;
+    // Replicate returns webp — download and save with correct extension
+    const isWebp = resultData.resultUri.includes('.webp') || resultData.resultUri.includes('output_format=webp');
+    const ext = isWebp ? 'webp' : 'jpg';
+    const mime = isWebp ? 'image/webp' : 'image/jpeg';
+    const fileName = `snapspace_${Date.now()}.${ext}`;
+    const localUri = `${FileSystem.cacheDirectory}${fileName}`;
+
+    const downloadResult = await FileSystem.downloadAsync(resultData.resultUri, localUri);
+    console.log('[Download] Status:', downloadResult.status, 'URI:', downloadResult.uri);
+
+    // Verify file exists and has content
+    const info = await FileSystem.getInfoAsync(localUri);
+    if (!info.exists || info.size < 100) {
+      throw new Error('Downloaded file is empty or missing');
+    }
+
+    return { localUri: downloadResult.uri, mime, ext };
+  };
+
+  const handleDownload = async () => {
+    if (!resultData?.resultUri) return;
+    try {
+      // Step 1: Download image to local cache
+      const file = await downloadResultImage();
+      if (!file?.localUri) throw new Error('Download returned no file');
+
+      // Step 2: Try direct save to camera roll (requires expo-media-library in dev client)
+      let saved = false;
+      if (MediaLibrary) {
+        try {
+          const { status } = await MediaLibrary.requestPermissionsAsync();
+          if (status === 'granted') {
+            await MediaLibrary.saveToLibraryAsync(file.localUri);
+            Alert.alert('Saved!', 'Image saved to your photo library.');
+            saved = true;
+          }
+        } catch (e) {
+          console.log('[Download] MediaLibrary native module not available:', e.message);
+        }
+      }
+      if (saved) return;
+
+      // Fallback: open iOS share sheet with local file — user can tap "Save Image"
+      await Share.share({ url: file.localUri });
+    } catch (err) {
+      console.log('[Download] Failed:', err.message);
+      // Last resort: share the remote URL
+      try {
+        await Share.share({ url: resultData.resultUri });
+      } catch {
+        Linking.openURL(resultData.resultUri).catch(() =>
+          Alert.alert('Could Not Save', 'Please screenshot the image to save it to your camera roll.')
+        );
+      }
+    }
+  };
+
+  const handleShare = async () => {
+    if (!resultData?.resultUri) return;
+    const prompt = resultData.prompt || 'My AI design';
+    try {
+      await Share.share({
+        message: `Check out my AI room design on SnapSpace!\n\n"${prompt}"`,
+        url: resultData.resultUri,
+      });
+    } catch (err) {
+      console.log('[Share] Error:', err);
+    }
+  };
+
+  const handlePost = async (visibility) => {
+    if (!user?.id || !resultData?.resultUri) return;
+    setPosting(true);
+    setShowPostSheet(false);
+    try {
+      if (autoSavedDesignId) {
+        // Design was already auto-saved — just update visibility
+        await updateDesignVisibility(autoSavedDesignId, visibility);
+      } else {
+        // Fallback: auto-save didn't finish yet — do a full save
+        const styleTags = (resultData.products || []).flatMap(p => p.styles || p.styleTags || []).filter(Boolean);
+        const uniqueTags = [...new Set(styleTags)];
+        const productSummary = (resultData.products || []).map(p => ({
+          id: p.id, name: p.name, brand: p.brand,
+          price: p.priceValue ?? p.price, imageUrl: p.imageUrl,
+          rating: p.rating, reviewCount: p.reviewCount,
+          affiliateUrl: p.affiliateUrl, source: p.source,
+        }));
+        const result = await saveUserDesign(user.id, {
+          imageUrl: resultData.resultUri,
+          prompt: resultData.prompt || '',
+          styleTags: uniqueTags,
+          products: productSummary,
+          visibility,
+        });
+        if (result?.designId) setAutoSavedDesignId(result.designId);
+      }
+      Alert.alert(
+        visibility === 'public' ? 'Posted to Explore!' : 'Saved to Profile',
+        visibility === 'public'
+          ? 'Your design is now live on the Explore page.'
+          : 'Your design has been saved privately to your profile.'
+      );
+    } catch (e) {
+      console.warn('Post failed:', e);
+      Alert.alert('Post Failed', e.message || 'Could not save. Please try again.');
+    } finally {
+      setPosting(false);
+    }
+  };
+
+  const runGeneration = async () => {
+    if (!photo) {
+      Alert.alert('Add a Room Photo', 'Tap the camera icon to snap your room, or pick from your library.');
+      return;
+    }
+    if (!prompt.trim()) {
+      Alert.alert('Describe Your Style', 'Add a style description so the AI knows what to create.');
+      return;
+    }
+    const designPrompt = prompt.trim();
+    const savedPhoto = { ...photo };
+    Keyboard.dismiss();
+    // Initialize rotating loading messages tailored to the prompt
+    const msgs = getLoadingMessages(designPrompt);
+    setLoadingMessages(msgs);
+    setLoadingMsgIndex(0);
+    loadingMsgOpacity.setValue(1);
+    setGenerating(true);
+    startLoadingBar();
+    try {
+      setGenStatus('');
+
+      // ── Pre-match products from local catalog (before any generation call) ──
+      setGenStatus('Finding products for your space…');
+      const matchedProducts = getProductsForPrompt(designPrompt, 4);
+
+      // ── Quota check (free tier: 3 generations/month) ───────────────────────
+      if (!userQuota.canGenerate) {
+        stopLoadingBar(false);
+        setGenerating(false);
+        const resetDate = userQuota.quotaResetDate
+          ? new Date(userQuota.quotaResetDate).toLocaleDateString('en-US', { month: 'long', day: 'numeric' })
+          : 'next month';
+        Alert.alert(
+          'Monthly Limit Reached',
+          `You've used all 3 free generations this month. Resets ${resetDate}.\n\nUpgrade to Premium for unlimited generations.`,
+          [
+            { text: 'Maybe Later', style: 'cancel' },
+            { text: 'Upgrade', onPress: () => navigation.navigate('Premium') },
+          ]
+        );
+        return;
+      }
+
+      // ── Route: premium tier → edge function pipeline (v3) ─────────────────
+      //          free tier   → edge function pipeline (v2, Pass 1 only)
+      // Replicate fallback removed — BFL direct is the only pipeline.
+      // If the edge function fails, the user sees a clear error instead of
+      // a silent fallback that double-bills through Replicate.
+      // ──────────────────────────────────────────────────────────────────────
+      let resultUrl;
+      let finalProducts;
+
+      if (user?.id) {
+        // ── Step 1: Upload room photo to Supabase Storage ─────────────────
+        setGenStatus('Preparing your room…');
+        let roomPhotoUrl = null;
+        try {
+          roomPhotoUrl = await uploadRoomPhoto(user.id, savedPhoto.uri, savedPhoto.base64);
+        } catch (uploadErr) {
+          stopLoadingBar(false);
+          setGenerating(false);
+          Alert.alert(
+            'Upload Failed',
+            'Could not upload your room photo. Please check your connection and try again.'
+          );
+          return;
+        }
+
+        // ── Step 2: BFL Generation with Product Image References ──────────
+        //
+        // BFL flux-kontext-pro now sends catalog product images via
+        // experimental input_image_2/3/4 parameters so the AI can VISUALLY
+        // SEE what each product looks like before rendering.
+        //
+        // Products passed in = products shown in "Shop Your Room".
+        // If BFL silently ignores the params, products are still
+        // text-matched (same as before — no regression).
+        //
+        // Cost: ~$0.04/generation (same as before)
+        //
+
+        try {
+          // ── Primary: Replicate flux-2-max (visual product matching) ─────
+          // Sends room photo + catalog product images so the AI visually
+          // sees exactly what each product looks like before rendering.
+          // Products shown in "Shop Your Room" ARE the products in the photo.
+          // Cost: ~$0.10–0.20/generation
+          let replicateSucceeded = false;
+          try {
+            console.log('[Gen] Replicate flux-2-max | visual product refs | cost=~$0.10-0.20');
+
+            // ── Try panel approach: 2 images instead of 4 → ~50% less GPU compute ──
+            // Creates a 512×512 2×2 product grid via edge function, then sends
+            // [room, panel] to flux-2-max instead of [room, p1, p2, p3].
+            // Target cost: ~$0.15/gen vs $0.31 with individual images.
+            let usedPanel = false;
+            try {
+              setGenStatus('Preparing product panel…');
+              const panelUrl = await createProductPanel(matchedProducts, user.id);
+              if (panelUrl) {
+                console.log('[Gen] Panel ready — using 2-image input (room + 2×2 panel)');
+                setGenStatus('Analyzing your room…');
+                resultUrl = await generateWithProductPanel(roomPhotoUrl, designPrompt, matchedProducts, panelUrl);
+                usedPanel = true;
+                console.log('[Gen] Panel generation complete');
+              }
+            } catch (panelErr) {
+              console.warn(`[Gen] Panel approach failed (${panelErr.message}) — falling back to individual refs`);
+            }
+
+            // ── Fallback: individual product images (original 4-image approach) ──
+            if (!usedPanel) {
+              console.log('[Gen] Using individual product refs (room + 4 product images)');
+              setGenStatus('Analyzing your room…');
+              resultUrl = await generateWithProductRefs(roomPhotoUrl, designPrompt, matchedProducts);
+            }
+
+            finalProducts = matchedProducts;
+            replicateSucceeded = true;
+            console.log('[Gen] Replicate complete | url=' + resultUrl.substring(0, 80));
+          } catch (repErr) {
+            console.warn(`[Gen] Replicate failed (${repErr.message}) — falling back to BFL`);
+          }
+
+          // ── Fallback: BFL kontext (room photo, product names in prompt) ──
+          // No visual product references — products matched by text only.
+          // Cost: ~$0.04/generation
+          if (!replicateSucceeded) {
+            console.log('[Gen] BFL kontext fallback | cost=~$0.04');
+            resultUrl = await generateWithBFL(
+              designPrompt,
+              matchedProducts,
+              (msg) => setGenStatus(msg),
+              roomPhotoUrl,
+            );
+            finalProducts = matchedProducts;
+            console.log('[Gen] BFL complete');
+          }
+
+          // Refresh quota in background (non-blocking)
+          getUserQuota(user.id).then(q => setUserQuota(q)).catch(() => {});
+
+        } catch (genErr) {
+          stopLoadingBar(false);
+          setGenerating(false);
+          Alert.alert(
+            'Generation Failed',
+            `Could not generate your design. Please try again.\n\nDetails: ${genErr.message}`
+          );
+          console.error('[Gen] Generation error:', genErr.message);
+          return;
+        }
+      } else {
+        // Not signed in — require sign-in, no generation without auth
+        stopLoadingBar(false);
+        setGenerating(false);
+        Alert.alert(
+          'Sign In Required',
+          'Please sign in to generate AI designs.',
+          [{ text: 'OK' }]
+        );
+        return;
+      }
+
+      stopLoadingBar();
+
+      // ── Use the generation pipeline's matched products directly ─────────────
+      // The edge function returns the exact products used as BFL reference images.
+      // Those products ARE in the rendered room — no vision override needed.
+      // Vision matching was replacing these with wrong products, so it's removed.
+      const finalMatchedProducts = finalProducts;
+
+      setGenerating(false);
+      setGenStatus('');
+      setResultData({
+        imageUri: savedPhoto.uri,
+        resultUri: resultUrl,
+        prompt: designPrompt,
+        products: finalMatchedProducts,
+      });
+      setShowResult(true);
+      setPhoto(null);
+      setPhotoSource(null);
+      setPrompt('');
+
+      // ── Auto-save: persist every generation to Supabase immediately ──
+      if (user?.id) {
+        const styleTags = finalMatchedProducts.flatMap(p => p.styles || p.styleTags || []).filter(Boolean);
+        const uniqueTags = [...new Set(styleTags)];
+        const productSummary = finalMatchedProducts.map(p => ({
+          id: p.id, name: p.name, brand: p.brand,
+          price: p.priceValue ?? p.price, imageUrl: p.imageUrl,
+          rating: p.rating, reviewCount: p.reviewCount,
+          affiliateUrl: p.affiliateUrl, source: p.source,
+        }));
+        saveUserDesign(user.id, {
+          imageUrl: resultUrl,
+          prompt: designPrompt,
+          styleTags: uniqueTags,
+          products: productSummary,
+          visibility: 'private',
+        })
+          .then(result => {
+            if (result?.designId) setAutoSavedDesignId(result.designId);
+            // Swap resultUri to the permanent Supabase Storage URL so the Replicate
+            // CDN URL (which expires in ~24h) is never held in state after this point.
+            if (result?.permanentUrl) {
+              setResultData(prev => prev ? { ...prev, resultUri: result.permanentUrl } : prev);
+            }
+            console.log('[AutoSave] Design persisted:', result?.designId);
+          })
+          .catch(err => console.warn('[AutoSave] Failed:', err.message));
+      }
+    } catch (err) {
+      stopLoadingBar(false);
+      setGenerating(false);
+      setGenStatus('');
+      Alert.alert('Generation Failed', err.message || 'Something went wrong. Please try again.');
+    }
+  };
 
   // First-visit auth redirect
   useEffect(() => {
@@ -668,12 +1396,13 @@ export default function HomeScreen({ navigation }) {
     })();
   }, [user]);
 
-  // Parallax
-  const imageTranslateY = scrollY.interpolate({
-    inputRange: [0, PARALLAX_BUDGET / PARALLAX_FACTOR],
-    outputRange: [0, -PARALLAX_BUDGET],
-    extrapolate: 'extend',
-  });
+  // Fetch generation quota when user signs in
+  useEffect(() => {
+    if (!user?.id) return;
+    getUserQuota(user.id)
+      .then(quota => setUserQuota(quota))
+      .catch(err => console.warn('[Quota] Fetch failed:', err.message));
+  }, [user?.id]);
 
   const firstName = getFirstName(user);
   const greetingLine = firstName
@@ -683,16 +1412,11 @@ export default function HomeScreen({ navigation }) {
   // ── Render ──────────────────────────────────────────────────────────────────
 
   return (
-    <View style={styles.container}>
-      {/* Hero background images */}
-      <Animated.Image
-        source={{ uri: slotA }}
-        style={[styles.bgImage, { transform: [{ translateY: imageTranslateY }, { scale: kenBurnsScale }], opacity: opacityA }]}
-        resizeMode="cover"
-      />
-      <Animated.Image
-        source={{ uri: slotB }}
-        style={[styles.bgImage, { transform: [{ translateY: imageTranslateY }, { scale: kenBurnsScale }], opacity: opacityB }]}
+    <TabScreenFade style={styles.container}>
+      {/* Static hero background */}
+      <Image
+        source={require('../../assets/snap-bg.jpg')}
+        style={styles.bgImage}
         resizeMode="cover"
       />
       <View style={styles.heroTint} pointerEvents="none" />
@@ -706,14 +1430,11 @@ export default function HomeScreen({ navigation }) {
         )}
         scrollEventThrottle={16}
         showsVerticalScrollIndicator={false}
-        bounces
+        bounces={false}
       >
-        {/* ── Hero overlay ────────────────────────────────────────────── */}
-        <LinearGradient
-          colors={['rgba(0,0,0,0.55)', 'rgba(0,0,0,0.10)', 'rgba(0,0,0,0.20)', 'rgba(0,0,0,0.72)']}
-          locations={[0, 0.25, 0.55, 1]}
-          style={styles.overlay}
-        >
+        {/* ── Hero section — fills visible screen ─────────────────────── */}
+        <View style={styles.overlay}>
+          {/* Top bar: logo + icons */}
           <View style={styles.topBar}>
             <View style={styles.logoRow}>
               <Text style={styles.logo}>SnapSpace</Text>
@@ -737,68 +1458,191 @@ export default function HomeScreen({ navigation }) {
             </View>
           </View>
 
-          <View style={styles.contentBlock}>
-            <View style={styles.heroSection}>
-              <Text style={styles.greetingEyebrow}>{greetingLine}</Text>
-              <Text style={styles.headline}>
-                {"Let's Snap\n"}
-                <Text style={styles.headlineBold}>Your Space.</Text>
+          {/* Blur overlay when generating */}
+          {generating && (
+            <BlurView intensity={40} tint="dark" style={StyleSheet.absoluteFill} />
+          )}
+
+          {/* Centered headline + subtitle — hidden during generation */}
+          {!generating && (
+            <View style={styles.heroCentered}>
+              <Text style={styles.headline}>Design Your Space</Text>
+              <Text style={styles.heroSubtitle}>
+                Describe your style, then add your room photo
               </Text>
             </View>
+          )}
 
-            <View style={styles.searchBar}>
-              <LinearGradient
-                colors={['rgba(255,255,255,0.28)', 'rgba(255,255,255,0.0)']}
-                style={styles.searchBarHighlight}
-                pointerEvents="none"
-              />
+          {/* Generation status — camera lens loader */}
+          {generating && (
+            <View style={styles.heroCentered}>
+              <View style={{ width: 100, height: 100, alignItems: 'center', justifyContent: 'center' }}>
+
+                {/* Layer 1: outer barrel — dashed ring, slow CW rotation */}
+                <Animated.View style={{
+                  position: 'absolute',
+                  transform: [{ rotate: lensRotate.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '360deg'] }) }],
+                }}>
+                  <Svg width={100} height={100} viewBox="0 0 100 100">
+                    <Circle cx={50} cy={50} r={46} stroke="#67ACE9" strokeWidth={1.5}
+                      fill="none" strokeDasharray="5 7" strokeLinecap="round" />
+                  </Svg>
+                </Animated.View>
+
+                {/* Layer 2: middle ring — solid, slow CCW rotation */}
+                <Animated.View style={{
+                  position: 'absolute',
+                  transform: [{ rotate: lensRotate.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '-200deg'] }) }],
+                }}>
+                  <Svg width={100} height={100} viewBox="0 0 100 100">
+                    <Circle cx={50} cy={50} r={34} stroke="#0B6DC3" strokeWidth={1}
+                      fill="none" opacity={0.65} strokeDasharray="10 5" strokeLinecap="round" />
+                  </Svg>
+                </Animated.View>
+
+                {/* Layer 3: inner ring — static */}
+                <Svg width={100} height={100} viewBox="0 0 100 100" style={{ position: 'absolute' }}>
+                  <Circle cx={50} cy={50} r={22} stroke="#67ACE9" strokeWidth={0.8} fill="none" opacity={0.4} />
+                </Svg>
+
+                {/* Layer 4: aperture blades — 6 ellipses breathe with lensScale */}
+                <Animated.View style={{ position: 'absolute', transform: [{ scale: lensScale }] }}>
+                  <Svg width={100} height={100} viewBox="0 0 100 100">
+                    {[0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330].map((angle, i) => (
+                      <G key={i} rotation={angle} origin="50, 50">
+                        <Circle cx={50} cy={33} r={2.5} fill="#fff" opacity={0.88} />
+                      </G>
+                    ))}
+                    {/* Inner glass fill */}
+                    <Circle cx={50} cy={50} r={12} fill="rgba(11,109,195,0.2)" />
+                  </Svg>
+                </Animated.View>
+
+                {/* Layer 5: center dot — glows with lensDot */}
+                <Animated.View style={{ position: 'absolute', opacity: lensDot }}>
+                  <Svg width={100} height={100} viewBox="0 0 100 100">
+                    <Circle cx={50} cy={50} r={9} fill="rgba(255,255,255,0.12)" />
+                    <Circle cx={50} cy={50} r={4} fill="#fff" />
+                  </Svg>
+                </Animated.View>
+
+              </View>
+              <Animated.Text style={[styles.genStatusText, { opacity: loadingMsgOpacity }]}>
+                {loadingMessages[loadingMsgIndex] || genStatus || 'Designing your space…'}
+              </Animated.Text>
+            </View>
+          )}
+
+          {/* Input bar — pinned to bottom of hero */}
+          <View style={styles.heroBottom}>
+            {/* Suggested prompt chips */}
+            {!generating && (
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                style={styles.promptChipsScroll}
+                contentContainerStyle={styles.promptChipsContent}
+              >
+                {[
+                  'Minimalist living room vibes',
+                  'Dark luxe bedroom aesthetic',
+                  'Cozy Scandinavian reading nook',
+                  'Japandi dining room refresh',
+                  'Boho chic accent chairs',
+                  'Mid-century modern home office',
+                  'Coastal bedroom with linen',
+                  'Industrial kitchen with marble',
+                  'Maximalist glam dining room',
+                  'Earthy biophilic living space',
+                ].map((chip) => (
+                  <TouchableOpacity
+                    key={chip}
+                    style={styles.promptChip}
+                    onPress={() => setPrompt(chip)}
+                    activeOpacity={0.7}
+                  >
+                    <Text style={styles.promptChipText}>{chip}</Text>
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
+            )}
+            <View style={styles.inputBar}>
+              {/* Camera icon — badge only when photo came from camera */}
+              <View>
+                <TouchableOpacity
+                  style={styles.inputIconBtn}
+                  onPress={() => navigation?.navigate('Snap')}
+                  activeOpacity={0.6}
+                >
+                  <CameraSmallIcon />
+                </TouchableOpacity>
+                {photo && photoSource === 'camera' && (
+                  <View style={styles.attachBadge}>
+                    <CheckIcon size={8} color="#fff" />
+                  </View>
+                )}
+              </View>
+              {/* Gallery icon — badge only when photo came from library */}
+              <View>
+                <TouchableOpacity
+                  style={styles.inputIconBtn}
+                  onPress={photo ? () => { setPhoto(null); setPhotoSource(null); setImageLayout(null); } : handlePickFromLibrary}
+                  activeOpacity={0.6}
+                >
+                  <GalleryIcon />
+                </TouchableOpacity>
+                {photo && photoSource === 'library' && (
+                  <View style={styles.attachBadge}>
+                    <CheckIcon size={8} color="#fff" />
+                  </View>
+                )}
+              </View>
               <TextInput
-                style={styles.searchInput}
-                placeholder="Describe your dream space..."
-                placeholderTextColor="rgba(255,255,255,0.55)"
+                style={styles.inputText}
+                placeholder={photo ? "Photo attached — describe your style..." : "Describe your style..."}
+                placeholderTextColor="rgba(255,255,255,0.45)"
                 value={prompt}
                 onChangeText={setPrompt}
-                returnKeyType="search"
+                returnKeyType="send"
+                editable={!generating}
+                maxLength={200}
+                onSubmitEditing={runGeneration}
               />
               <TouchableOpacity
-                style={styles.searchSendBtn}
+                style={[styles.inputSendBtn, (!prompt.trim() && !photo) && styles.inputSendBtnOff]}
                 activeOpacity={0.8}
-                onPress={() => {
-                  if (prompt.trim()) {
-                    navigation?.navigate('Explore', {
-                      filterQuery: prompt.trim(),
-                      title: prompt.trim(),
-                    });
-                    setPrompt('');
-                  } else {
-                    navigation?.navigate('Explore');
-                  }
-                }}
+                onPress={runGeneration}
+                disabled={generating}
               >
-                <SendIcon />
+                {generating ? (
+                  <Animated.View style={{ transform: [{ rotate: lensRotate.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '360deg'] }) }] }}>
+                    <Svg width={20} height={20} viewBox="0 0 24 24">
+                      <Circle cx={12} cy={12} r={10} stroke="#fff" strokeWidth={1.8} fill="none" strokeDasharray="6 4" strokeLinecap="round" />
+                      <Circle cx={12} cy={12} r={5}  stroke="rgba(255,255,255,0.55)" strokeWidth={1} fill="none" />
+                      <Circle cx={12} cy={12} r={2}  fill="#fff" />
+                    </Svg>
+                  </Animated.View>
+                ) : <SendIcon />}
               </TouchableOpacity>
             </View>
-
-            <TouchableOpacity
-              style={styles.snapBanner}
-              onPress={() => navigation?.navigate('Snap')}
-              activeOpacity={0.88}
-            >
-              <View style={styles.snapBannerLeft}>
-                <View style={styles.snapIconBox}>
-                  <CameraSmallIcon />
-                </View>
-                <View style={styles.snapBannerText}>
-                  <Text style={styles.snapBannerTitle}>Photograph a Room</Text>
-                  <Text style={styles.snapBannerSub}>Point, snap, and let AI do the rest</Text>
-                </View>
+            {/* Loading progress bar */}
+            {generating && (
+              <View style={styles.loadingBarTrack}>
+                <Animated.View
+                  style={[
+                    styles.loadingBarFill,
+                    {
+                      width: loadingProgress.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: ['0%', '100%'],
+                      }),
+                    },
+                  ]}
+                />
               </View>
-              <View style={styles.snapChevron}>
-                <ChevronRight />
-              </View>
-            </TouchableOpacity>
+            )}
           </View>
-        </LinearGradient>
+        </View>
 
         {/* ════════════════════════════════════════════════════════════════
             BELOW-FOLD CONTENT
@@ -807,46 +1651,6 @@ export default function HomeScreen({ navigation }) {
 
         {/* ── 1. Style DNA + Room Type Quick-Nav ──────────────────────── */}
         <View style={styles.peeledCard}>
-
-          {/* Style DNA strip */}
-          <SectionHeader
-            noTopMargin
-            title={userStyleDNA.length > 0 ? 'YOUR STYLE DNA' : 'DISCOVER YOUR STYLE'}
-            icon={<SparkleIcon size={13} color={C.primary} />}
-            actionLabel={userStyleDNA.length > 0 ? 'Edit →' : 'Explore →'}
-            onAction={() => navigation?.navigate('Explore')}
-          />
-
-          {userStyleDNA.length > 0 ? (
-            <View style={styles.dnaChipsRow}>
-              {userStyleDNA.map(style => {
-                const cat = STYLE_CATEGORIES.find(c => c.key === style);
-                return (
-                  <View key={style} style={[styles.dnaChip, { backgroundColor: cat?.bg || '#F3F4F6' }]}>
-                    <Text style={[styles.dnaChipText, { color: cat?.accent || '#374151' }]}>
-                      {STYLE_LABEL_MAP[style] || style}
-                    </Text>
-                  </View>
-                );
-              })}
-              <Text style={styles.dnaNote}>
-                Based on {likedCount} liked space{likedCount !== 1 ? 's' : ''}
-              </Text>
-            </View>
-          ) : (
-            <TouchableOpacity
-              style={styles.discoverBtn}
-              activeOpacity={0.8}
-              onPress={() => navigation?.navigate('Explore')}
-            >
-              <Text style={styles.discoverBtnText}>
-                Like spaces to build your style profile
-              </Text>
-              <View style={styles.discoverBtnArrow}>
-                <PaperPlaneIcon size={18} color="#FFFFFF" />
-              </View>
-            </TouchableOpacity>
-          )}
 
           {/* Room Type Quick-Nav */}
           <View style={styles.roomNavWrap}>
@@ -909,67 +1713,61 @@ export default function HomeScreen({ navigation }) {
               <TouchableOpacity
                 key={design.id}
                 style={styles.forYouCard}
-                activeOpacity={0.82}
+                activeOpacity={0.88}
                 onPress={() => navigation?.navigate('ShopTheLook', { design })}
               >
-    <CardImage uri={design.imageUrl} style={styles.forYouCardImg} />
-    <LinearGradient
-      colors={['rgba(0,0,0,0.18)', 'transparent', 'rgba(0,0,0,0.72)']}
-      locations={[0, 0.4, 1]}
-      style={StyleSheet.absoluteFill}
-    />
-                {/* Style badge top-left — outline ghost style */}
-                {design.styles?.[0] && (
-                  <Badge
-                    variant="outline"
-                    label={STYLE_LABEL_MAP[design.styles[0]] || design.styles[0]}
-                    style={styles.forYouStyleTag}
-                  />
-                )}
-                {/* Title — clean bottom area */}
-                <Text style={styles.forYouCardTitle} numberOfLines={2}>
-                  {design.title.replace('...', '')}
-                </Text>
+                {/* Photo */}
+                <View style={styles.forYouImgWrap}>
+                  <CardImage uri={design.imageUrl} style={styles.forYouCardImg} />
+                  <View style={styles.forYouImgOverlay} />
+                </View>
+
+                {/* Info box below image */}
+                <View style={styles.forYouInfoBox}>
+                  <Text style={styles.forYouInfoCreator} numberOfLines={1}>
+                    {SELLER_MAP[design.user]?.displayName || design.user}
+                  </Text>
+                  <Text style={styles.forYouCardTitle} numberOfLines={2}>
+                    {design.title.replace('...', '')}
+                  </Text>
+                </View>
               </TouchableOpacity>
             ))}
           </ScrollView>
         </View>
 
-        {/* ── 3. Curated Collections ──────────────────────────────────── */}
+        {/* ── 3. New Arrivals ──────────────────────────────────────────── */}
         <View style={styles.section}>
           <SectionHeader
             noTopMargin
-            title="CURATED COLLECTIONS"
+            title="NEW ARRIVALS"
             actionLabel="See all"
-            onAction={() => navigation?.navigate('AllCollections')}
+            onAction={() => navigation?.navigate('Explore', {
+              filterTag: 'new',
+              title: 'New Arrivals',
+            })}
           />
           <View style={styles.collectionsGrid}>
-            {CURATED_COLLECTIONS.slice(0, 4).map(col => (
+            {NEW_ARRIVAL_PRODUCTS.map(product => (
               <TouchableOpacity
-                key={col.id}
-                style={styles.collectionCard}
+                key={product.id}
+                style={styles.newArrivalCard}
                 activeOpacity={0.85}
-                onPress={() => navigation?.navigate('Browse', {
-                  mode: 'collection',
-                  title: col.title.replace('\n', ' '),
-                  subtitle: col.subtitle,
-                  collection: col,
-                  heroImage: col.imageUrl,
-                })}
+                onPress={() => navigation?.navigate('ProductDetail', { product })}
               >
-                <CardImage uri={col.imageUrl} style={styles.collectionCardImg} placeholderColor="#D0D7E3" />
-                <LinearGradient
-                  colors={['transparent', 'rgba(0,0,0,0.75)']}
-                  locations={[0.3, 1]}
-                  style={StyleSheet.absoluteFill}
-                />
-                <View style={styles.collectionCardContent}>
-                  <Text style={styles.collectionCardTitle}>{col.title}</Text>
-                  <View style={styles.collectionCardFooter}>
-                    <Text style={styles.collectionCardSub}>{col.subtitle}</Text>
-                    <View style={styles.collectionExploreBtn}>
-                      <Text style={styles.collectionExploreBtnText}>Explore</Text>
-                    </View>
+                <CardImage uri={product.imageUrl} style={styles.newArrivalCardImg} placeholderColor="#D0D7E3" />
+                <View style={styles.newArrivalCardInfo}>
+                  <Text style={styles.newArrivalCardName} numberOfLines={2}>{product.name}</Text>
+                  <View style={styles.productRatingRow}>
+                    <Text style={styles.productStars}>{renderStars(product.rating)}</Text>
+                    <Text style={styles.productRatingText}>
+                      {product.rating ? ` ${product.rating}` : ''}
+                      {product.reviewCount > 0 ? ` (${product.reviewCount.toLocaleString()})` : ' · New'}
+                    </Text>
+                  </View>
+                  <View style={styles.newArrivalCardFooter}>
+                    <Text style={styles.newArrivalCardBrand}>{product.brand}</Text>
+                    <Text style={styles.newArrivalCardPrice}>{product.priceDisplay}</Text>
                   </View>
                 </View>
               </TouchableOpacity>
@@ -997,26 +1795,31 @@ export default function HomeScreen({ navigation }) {
               return (
                 <TouchableOpacity
                   key={cat.key}
-                  style={styles.styleChipCard}
-                  activeOpacity={0.8}
+                  style={styles.styleCard}
+                  activeOpacity={0.85}
                   onPress={() => navigation?.navigate('Explore', {
                     filterStyle: cat.key,
                     title: cat.label,
                   })}
                 >
-                  <CardImage uri={cat.imageUrl} style={StyleSheet.absoluteFill} placeholderColor="#C8D4E8" />
-                  <LinearGradient
-                    colors={['transparent', 'rgba(0,0,0,0.72)']}
-                    locations={[0.3, 1]}
-                    style={StyleSheet.absoluteFill}
-                  />
-                  <View style={styles.styleChipOverlay}>
-                    <View style={styles.styleChipLabelPill}>
-                      <Text style={styles.styleChipLabel}>{cat.label}</Text>
-                    </View>
-                    {count > 0 && (
-                      <Text style={styles.styleChipCount}>+{count} products</Text>
-                    )}
+                  <View style={styles.styleCardImgWrap}>
+                    {cat.localImage ? (
+                      <Image
+                        source={cat.localImage}
+                        resizeMode="contain"
+                        style={StyleSheet.absoluteFill}
+                      />
+                    ) : cat.imageUrl ? (
+                      <Image
+                        source={{ uri: cat.imageUrl }}
+                        resizeMode="cover"
+                        style={StyleSheet.absoluteFill}
+                      />
+                    ) : null}
+                  </View>
+                  <View style={styles.styleCardInfoBox}>
+                    <Text style={styles.styleCardLabel} numberOfLines={1}>{cat.label}</Text>
+                    <Text style={styles.styleCardSub} numberOfLines={1}>{cat.sub}</Text>
                   </View>
                 </TouchableOpacity>
               );
@@ -1039,29 +1842,22 @@ export default function HomeScreen({ navigation }) {
             {TRENDING_DESIGNS.slice(0, 4).map(design => (
               <TouchableOpacity
                 key={design.id}
-                style={styles.collectionCard}
+                style={styles.newArrivalCard}
                 activeOpacity={0.85}
                 onPress={() => navigation?.navigate('ShopTheLook', { design })}
               >
-                <CardImage uri={design.imageUrl} style={styles.collectionCardImg} placeholderColor="#D0D7E3" />
-                <LinearGradient
-                  colors={['transparent', 'rgba(0,0,0,0.75)']}
-                  locations={[0.3, 1]}
-                  style={StyleSheet.absoluteFill}
-                />
-                <View style={styles.collectionCardContent}>
-                  <Text style={styles.collectionCardTitle} numberOfLines={2}>
+                <CardImage uri={design.imageUrl} style={styles.newArrivalCardImg} placeholderColor="#D0D7E3" />
+                <View style={styles.newArrivalCardInfo}>
+                  <Text style={styles.newArrivalCardName} numberOfLines={2}>
                     {design.title.replace('...', '')}
                   </Text>
-                  <View style={styles.collectionCardFooter}>
-                    <Text style={styles.collectionCardSub}>
+                  <View style={styles.newArrivalCardFooter}>
+                    <Text style={styles.newArrivalCardBrand}>
                       {design.styles?.[0]
                         ? (STYLE_LABEL_MAP[design.styles[0]] || design.styles[0])
                         : `♥ ${design.likes}`}
                     </Text>
-                    <View style={styles.collectionExploreBtn}>
-                      <Text style={styles.collectionExploreBtnText}>View Look</Text>
-                    </View>
+                    <Text style={styles.trendingViewLook}>View Look</Text>
                   </View>
                 </View>
               </TouchableOpacity>
@@ -1072,64 +1868,95 @@ export default function HomeScreen({ navigation }) {
         {/* ── 6. Deal of the Day — premium editorial treatment ────────── */}
         {dealProduct && (
           <View style={styles.dealSection}>
+            {/* Section eyebrow */}
+            <View style={styles.dealEyebrowRow}>
+              <View style={styles.dealEyebrowLine} />
+              <Text style={styles.dealEyebrow}>Today's Highlight</Text>
+              <View style={styles.dealEyebrowLine} />
+            </View>
 
             <TouchableOpacity
-              activeOpacity={0.93}
+              activeOpacity={0.95}
               onPress={() => navigation?.navigate('ProductDetail', { product: dealProduct })}
+              style={styles.dealCard}
             >
-              <View style={styles.dealCard}>
-
-                {/* Full-width product image */}
-                <View style={styles.dealImgWrap}>
-                  <CardImage uri={dealProduct.imageUrl} style={styles.dealImg} placeholderColor="#E8EDF5" />
-                  {/* DEAL OF THE DAY — top left */}
-                  <View style={styles.dealBadgePos}>
-                    <View style={styles.dealBadge}>
-                      <TagIcon size={10} color="#C9A84C" />
-                      <Text style={styles.dealBadgeText}>DEAL OF THE DAY</Text>
-                    </View>
-                  </View>
-                  {/* LIMITED TIME — top right */}
-                  <View style={styles.dealLimitedPos}>
-                    <View style={styles.dealLimitedPill}>
-                      <Text style={styles.dealLimitedText}>LIMITED TIME</Text>
-                    </View>
+              {/* ── Hero image (full-width, top) ── */}
+              <View style={styles.dealImgWrap}>
+                <CardImage
+                  uri={dealProduct.imageUrl}
+                  style={styles.dealImg}
+                  placeholderColor="#E8EDF5"
+                  resizeMode="cover"
+                />
+                {/* Overlaid badge on the image — Deal of the Day only */}
+                <View style={styles.dealOverlayRow}>
+                  <View style={styles.dealBadge}>
+                    <TagIcon size={9} color="#fff" />
+                    <Text style={styles.dealBadgeText}>DEAL OF THE DAY</Text>
                   </View>
                 </View>
+              </View>
 
-                {/* Info block */}
-                <View style={styles.dealInfo}>
-                  <Text style={styles.dealProductName} numberOfLines={2}>
-                    {dealProduct.name}
+              {/* ── Info area (below image) ── */}
+              <View style={styles.dealInfoArea}>
+                {/* Brand */}
+                {dealProduct.brand && (
+                  <Text style={styles.dealBrand}>{dealProduct.brand.toUpperCase()}</Text>
+                )}
+
+                {/* Product name */}
+                <Text style={styles.dealProductName} numberOfLines={2}>
+                  {dealProduct.name}
+                </Text>
+
+                {/* Short description */}
+                {dealProduct.description && (
+                  <Text style={styles.dealDescription} numberOfLines={2}>
+                    {dealProduct.description}
                   </Text>
+                )}
 
-                  {dealProduct.brand ? (
-                    <Text style={styles.dealBrand}>{dealProduct.brand}</Text>
-                  ) : null}
-
+                {/* Rating row */}
+                {dealProduct.rating && (
                   <View style={styles.dealRatingRow}>
-                    <Svg width={13} height={13} viewBox="0 0 24 24" fill="#F1C40F" stroke="#F1C40F" strokeWidth={1.5}>
-                      <Path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                    </Svg>
-                    <Text style={styles.dealRatingText}>
-                      {dealProduct.rating ?? '4.5'}
-                    </Text>
-                    <Text style={styles.dealReviewCount}>
-                      ({dealProduct.reviewCount ? dealProduct.reviewCount.toLocaleString() : '0'} reviews)
-                    </Text>
+                    {[1,2,3,4,5].map(i => (
+                      <StarIcon
+                        key={i}
+                        size={13}
+                        color={i <= Math.round(dealProduct.rating) ? '#F59E0B' : '#E5E7EB'}
+                      />
+                    ))}
+                    <Text style={styles.dealRatingScore}>{dealProduct.rating.toFixed(1)}</Text>
+                    {dealProduct.reviewCount && (
+                      <Text style={styles.dealReviewCount}>
+                        ({dealProduct.reviewCount.toLocaleString()} reviews)
+                      </Text>
+                    )}
+                    {dealProduct.source && (
+                      <Text style={styles.dealSourceTag}>
+                        {dealProduct.source === 'amazon' ? 'via Amazon' : dealProduct.source}
+                      </Text>
+                    )}
                   </View>
+                )}
 
-                  <Text style={styles.dealPrice}>{dealProduct.price}</Text>
+                {/* Price row */}
+                <View style={styles.dealPriceRow}>
+                  <Text style={styles.dealPrice}>
+                    {typeof dealProduct.price === 'number'
+                      ? `$${dealProduct.price.toLocaleString()}`
+                      : dealProduct.price}
+                  </Text>
+                  {dealProduct.priceDisplay && dealProduct.priceDisplay !== dealProduct.price && (
+                    <Text style={styles.dealPriceOrig}>{dealProduct.priceDisplay}</Text>
+                  )}
                 </View>
 
-                {/* CTA */}
-                <TouchableOpacity
-                  style={styles.dealShopBtn}
-                  activeOpacity={0.82}
-                  onPress={() => navigation?.navigate('ProductDetail', { product: dealProduct })}
-                >
+                {/* CTA button */}
+                <View style={styles.dealShopBtn}>
                   <Text style={styles.dealShopBtnText}>Shop Now</Text>
-                </TouchableOpacity>
+                  <ChevronRight color="#fff" />
+                </View>
               </View>
             </TouchableOpacity>
           </View>
@@ -1149,35 +1976,32 @@ export default function HomeScreen({ navigation }) {
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.hScrollNewArrivals}
+            contentContainerStyle={styles.hScroll}
           >
             {NEW_ARRIVALS.map(design => (
               <TouchableOpacity
                 key={design.id}
-                style={styles.portraitCard}
-                activeOpacity={0.82}
+                style={styles.arrivalCard}
+                activeOpacity={0.88}
                 onPress={() => navigation?.navigate('ShopTheLook', { design })}
               >
-                <View style={styles.portraitCardImgWrap}>
-                  <CardImage uri={design.imageUrl} style={styles.portraitCardImg} />
-                  <LinearGradient
-                    colors={['transparent', 'rgba(0,0,0,0.52)']}
-                    locations={[0.35, 1]}
-                    style={StyleSheet.absoluteFill}
-                  />
+                {/* Photo + badge overlaid on top-right */}
+                <View style={styles.arrivalImgWrap}>
+                  <CardImage uri={design.imageUrl} style={styles.arrivalImg} />
+                  <View style={styles.arrivalNewBadge}>
+                    <Text style={styles.arrivalNewBadgeText}>NEW</Text>
+                  </View>
                 </View>
-                {/* Badge peeks off top-right corner of the image */}
-                <View style={styles.newArrivalBadge}>
-                  <Text style={styles.newArrivalBadgeText}>NEW</Text>
+
+                {/* Info box below image */}
+                <View style={styles.arrivalInfoBox}>
+                  <Text style={styles.arrivalInfoCreator} numberOfLines={1}>
+                    {SELLER_MAP[design.user]?.displayName || design.user}
+                  </Text>
+                  <Text style={styles.arrivalInfoTitle} numberOfLines={2}>
+                    {design.title.replace('...', '')}
+                  </Text>
                 </View>
-                <Text style={styles.portraitCardTitle} numberOfLines={1}>
-                  {design.title.replace('...', '')}
-                </Text>
-                <Text style={styles.portraitCardTag}>
-                  {design.styles?.[0]
-                    ? (STYLE_LABEL_MAP[design.styles[0]] || design.styles[0])
-                    : design.user}
-                </Text>
               </TouchableOpacity>
             ))}
           </ScrollView>
@@ -1230,29 +2054,34 @@ export default function HomeScreen({ navigation }) {
               <TouchableOpacity
                 key={product.id || i}
                 style={styles.featuredProductCard}
-                activeOpacity={0.85}
+                activeOpacity={0.88}
                 onPress={() => navigation?.navigate('ProductDetail', { product })}
               >
-                {/* Image with source badge */}
+                {/* ── Image area ── */}
                 <View style={styles.featuredProductImgWrap}>
                   <CardImage uri={product.imageUrl} style={styles.featuredProductImg} placeholderColor="#E8EDF5" />
-                  <View style={styles.productSourceBadgePos}>
-                    {product.source === 'amazon'
-                      ? <AmazonLogoBadge />
-                      : <Badge variant="source" label={product.source} color={getSourceColor(product.source)} />
-                    }
-                  </View>
                 </View>
-                {/* Info box below the image */}
-                <View style={styles.featuredProductInfo}>
+
+                {/* ── Info below image ── */}
+                <View style={styles.featuredProductBody}>
                   <Text style={styles.featuredProductName} numberOfLines={2}>
                     {product.name}
                   </Text>
-                  <Text style={styles.featuredProductPrice}>
-                    {typeof product.priceValue === 'number'
-                      ? `$${product.priceValue.toLocaleString()}`
-                      : product.price}
-                  </Text>
+                  <View style={styles.productRatingRow}>
+                    <Text style={styles.productStars}>{renderStars(product.rating)}</Text>
+                    <Text style={styles.productRatingText}>
+                      {product.rating ? ` ${product.rating}` : ''}
+                      {product.reviewCount > 0 ? ` (${product.reviewCount.toLocaleString()})` : ' · New'}
+                    </Text>
+                  </View>
+                  <View style={styles.featuredProductRow}>
+                    <Text style={styles.featuredProductPrice}>
+                      {typeof product.priceValue === 'number'
+                        ? `$${product.priceValue.toLocaleString()}`
+                        : product.price}
+                    </Text>
+                    <Text style={styles.featuredShopLink}>Shop Now</Text>
+                  </View>
                 </View>
               </TouchableOpacity>
             ))}
@@ -1260,7 +2089,221 @@ export default function HomeScreen({ navigation }) {
         </View>
 
       </Animated.ScrollView>
-    </View>
+
+      {/* ── Result Popup Modal ─────────────────────────────────────────── */}
+      <Modal
+        visible={showResult}
+        animationType="slide"
+        transparent={false}
+        onRequestClose={() => setShowResult(false)}
+      >
+        <View style={resultStyles.container}>
+          {/* Close button — top right */}
+          <TouchableOpacity
+            style={resultStyles.closeBtn}
+            onPress={() => setShowResult(false)}
+            activeOpacity={0.7}
+          >
+            <CloseIcon size={18} color="#fff" />
+          </TouchableOpacity>
+
+          <ScrollView
+            style={resultStyles.scroll}
+            contentContainerStyle={resultStyles.scrollContent}
+            showsVerticalScrollIndicator={false}
+          >
+            {/* Generated image — natural aspect ratio, no cropping */}
+            {resultData?.resultUri && (
+              <View style={resultStyles.imageWrap}>
+                <AutoImage uri={resultData.resultUri} borderRadius={12} />
+              </View>
+            )}
+
+            {/* Prompt used */}
+            <Text style={resultStyles.promptLabel}>Your Prompt</Text>
+            <Text style={resultStyles.promptText} numberOfLines={2}>{resultData?.prompt}</Text>
+
+            {/* Matched products — horizontal cards */}
+            {resultData?.products?.length > 0 && (
+              <View style={resultStyles.productsSection}>
+                <View style={resultStyles.shopHeaderRow}>
+                  <View>
+                    <Text style={resultStyles.productsTitle}>SHOP YOUR ROOM</Text>
+                    <Text style={resultStyles.productsSubtitle}>
+                      Products matched to your design
+                    </Text>
+                  </View>
+                  <View style={resultStyles.shopHeaderActions}>
+                    <TouchableOpacity style={resultStyles.shopHeaderBtn} onPress={handleDownload} activeOpacity={0.7}>
+                      <DownloadIcon size={22} />
+                    </TouchableOpacity>
+                    <TouchableOpacity style={resultStyles.shopHeaderBtnPost} onPress={() => setShowPostSheet(true)} activeOpacity={0.7}>
+                      {posting
+                        ? <ActivityIndicator size="small" color="#fff" />
+                        : <PostIcon size={28} />
+                      }
+                    </TouchableOpacity>
+                    <TouchableOpacity style={resultStyles.shopHeaderBtn} onPress={handleShare} activeOpacity={0.7}>
+                      <ShareIcon size={22} />
+                    </TouchableOpacity>
+                  </View>
+                </View>
+                <FlatList
+                  data={resultData.products}
+                  keyExtractor={(item, idx) => item.id || String(idx)}
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  contentContainerStyle={{ paddingRight: 20, gap: 10 }}
+                  renderItem={({ item: product }) => (
+                    <TouchableOpacity
+                      style={resultStyles.hCard}
+                      activeOpacity={0.7}
+                      onPress={() => {
+                        setShowResult(false);
+                        navigation?.navigate('ProductDetail', { product });
+                      }}
+                    >
+                      <CardImage
+                        uri={product.imageUrl}
+                        style={resultStyles.hCardImg}
+                        resizeMode="cover"
+                      />
+                      <View style={resultStyles.hCardBody}>
+                        <Text style={resultStyles.hCardName} numberOfLines={2}>{product.name}</Text>
+                        <Text style={resultStyles.hCardBrand}>{product.brand}</Text>
+                        {!!product.rating && (
+                          <View style={resultStyles.hCardRating}>
+                            {[1,2,3,4,5].map(i => (
+                              <Svg key={i} width={10} height={10} viewBox="0 0 24 24" fill={i <= Math.round(product.rating) ? '#67ACE9' : '#E5E7EB'} stroke="none">
+                                <Path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                              </Svg>
+                            ))}
+                            <Text style={resultStyles.hCardRatingText}>{product.rating.toFixed(1)}</Text>
+                            {!!product.reviewCount && (
+                              <Text style={resultStyles.hCardReviews}>({product.reviewCount.toLocaleString()})</Text>
+                            )}
+                          </View>
+                        )}
+                        <Text style={resultStyles.hCardPrice}>
+                          {typeof product.priceValue === 'number'
+                            ? `$${product.priceValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+                            : typeof product.price === 'number'
+                              ? `$${product.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+                              : product.priceLabel || String(product.price).replace(/^\$+/, '$')}
+                        </Text>
+                      </View>
+                      {(() => {
+                        const cartKey = `${product.name}__${product.brand}`;
+                        const inCart = cartItems.some(i => i.key === cartKey);
+                        return (
+                          <TouchableOpacity
+                            style={[resultStyles.hCardAdd, inCart && resultStyles.hCardAddDone]}
+                            activeOpacity={0.7}
+                            onPress={() => {
+                              if (!inCart) {
+                                addToCart({ ...product, price: product.priceValue ?? product.price });
+                              }
+                            }}
+                          >
+                            {inCart ? (
+                              <Svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
+                                <Polyline points="20 6 9 17 4 12" />
+                              </Svg>
+                            ) : (
+                              <Svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="#0B6DC3" strokeWidth={2.5}>
+                                <Line x1={12} y1={5} x2={12} y2={19} />
+                                <Line x1={5} y1={12} x2={19} y2={12} />
+                              </Svg>
+                            )}
+                          </TouchableOpacity>
+                        );
+                      })()}
+                    </TouchableOpacity>
+                  )}
+                />
+              </View>
+            )}
+
+            {/* Add All to Cart */}
+            {resultData?.products?.length > 0 && (
+              <AddAllToCartButton
+                products={resultData.products}
+                onAddAll={(products) => {
+                  products.forEach(p => addToCart({ ...p, price: p.priceValue ?? p.price }));
+                }}
+                onViewCart={() => {
+                  setShowResult(false);
+                  navigation?.navigate('Cart');
+                }}
+              />
+            )}
+
+            {/* FTC disclosure */}
+            <Text style={resultStyles.disclosure}>
+              We may earn a commission when you buy through links on this app.
+            </Text>
+          </ScrollView>
+
+          {/* ── Post Visibility Sheet (inside result modal) ──────────────── */}
+          {showPostSheet && (
+            <View style={StyleSheet.absoluteFill}>
+              <TouchableOpacity
+                style={resultStyles.sheetBackdrop}
+                activeOpacity={1}
+                onPress={() => setShowPostSheet(false)}
+              />
+              <View style={resultStyles.sheet}>
+                <View style={resultStyles.sheetHandle} />
+                <Text style={resultStyles.sheetTitle}>Post this design</Text>
+                <Text style={resultStyles.sheetSubtitle}>Choose who can see it</Text>
+
+                <TouchableOpacity
+                  style={resultStyles.sheetOption}
+                  onPress={() => handlePost('public')}
+                  activeOpacity={0.7}
+                >
+                  <View style={[resultStyles.sheetOptionIcon, { backgroundColor: '#EFF6FF' }]}>
+                    <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="#0B6DC3" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+                      <Circle cx={12} cy={12} r={10} />
+                      <Line x1={2} y1={12} x2={22} y2={12} />
+                      <Path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+                    </Svg>
+                  </View>
+                  <View style={resultStyles.sheetOptionText}>
+                    <Text style={resultStyles.sheetOptionTitle}>Post publicly</Text>
+                    <Text style={resultStyles.sheetOptionDesc}>Visible on Explore + your profile</Text>
+                  </View>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={resultStyles.sheetOption}
+                  onPress={() => handlePost('private')}
+                  activeOpacity={0.7}
+                >
+                  <View style={[resultStyles.sheetOptionIcon, { backgroundColor: '#F3F4F6' }]}>
+                    <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="#6B7280" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+                      <Rect x={3} y={11} width={18} height={11} rx={2} ry={2} />
+                      <Path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                    </Svg>
+                  </View>
+                  <View style={resultStyles.sheetOptionText}>
+                    <Text style={resultStyles.sheetOptionTitle}>Save privately</Text>
+                    <Text style={resultStyles.sheetOptionDesc}>Only visible on your profile</Text>
+                  </View>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={resultStyles.sheetCancel}
+                  onPress={() => setShowPostSheet(false)}
+                >
+                  <Text style={resultStyles.sheetCancelText}>Cancel</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          )}
+        </View>
+      </Modal>
+    </TabScreenFade>
   );
 }
 
@@ -1270,31 +2313,30 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     overflow: 'hidden',
+    backgroundColor: '#035DA8', // dark fallback — no white flash at bottom
   },
   bgImage: {
-    position: 'absolute',
-    width: width * 1.12,
-    left: -(width * 0.06),
-    height: (height + PARALLAX_BUDGET * 2) * 1.12,
-    top: -PARALLAX_BUDGET,
+    ...StyleSheet.absoluteFillObject,
+    width: width,
+    height: height,
   },
   heroTint: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0,0,0,0.15)',
+    backgroundColor: 'rgba(0,0,0,0.35)',
   },
   scrollContent: {
     flexGrow: 1,
+    paddingBottom: 24,
   },
   overlay: {
-    height: height,
-    paddingTop: space['5xl'],
-    justifyContent: 'center',
+    height: height - 88, // exactly fill visible content area above tab bar
+    paddingTop: 60,
   },
 
   // ── Top bar ──────────────────────────────────────────────────────────────────
   topBar: {
     position: 'absolute',
-    top: space['5xl'],
+    top: 60,
     left: 0,
     right: 0,
     flexDirection: 'row',
@@ -1330,70 +2372,152 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255,255,255,0.2)',
   },
 
-  // ── Hero content block ───────────────────────────────────────────────────────
-  contentBlock: {
+  // ── Hero centered content ───────────────────────────────────────────────────
+  heroCentered: {
+    alignItems: 'center',
+    justifyContent: 'center',
     paddingHorizontal: space.lg,
-    gap: space.base,
+    marginTop: height * 0.34, // ~34% from top → lower center on screen
   },
-  heroSection: { marginBottom: space.sm },
-  greetingEyebrow: {
-    fontSize: fontSize.xs,
-    fontWeight: fontWeight.bold,
+  heroSubtitle: {
+    fontSize: 16,
+    fontWeight: '600',
     color: '#FFFFFF',
-    letterSpacing: letterSpacing.wider,
-    opacity: 0.7,
-    textTransform: 'uppercase',
-    marginBottom: space.sm,
+    lineHeight: 22,
+    marginTop: 6,
+    textAlign: 'center',
+  },
+
+  // Floating pills — scattered organically
+  floatingPills: {
+    flex: 1,
+    justifyContent: 'center',
+    paddingVertical: 16,
+    gap: 10,
+  },
+  floatingPill: {
+    paddingHorizontal: 16,
+    paddingVertical: 9,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255,255,255,0.18)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.22)',
+  },
+  floatingPillOn: { backgroundColor: '#0B6DC3', borderColor: '#0B6DC3' },
+  floatingPillText: { fontSize: 13, fontWeight: '500', color: 'rgba(255,255,255,0.85)' },
+  floatingPillTextOn: { color: '#fff', fontWeight: '600' },
+
+  // Photo preview
+  photoPreviewWrap: {
+    borderRadius: 14,
+    overflow: 'hidden',
+    marginHorizontal: space.lg,
+    marginBottom: 12,
+  },
+  photoPreview: { width: '100%' },
+  photoLandscape: { height: 160 },
+  photoPortrait: { height: 220 },
+  photoOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,0,0,0.55)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
+  },
+  photoOverlayText: { color: '#fff', fontSize: 13, fontWeight: '600' },
+  photoRemoveBtn: {
+    position: 'absolute', top: 8, right: 8,
+    width: 26, height: 26, borderRadius: 13,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    alignItems: 'center', justifyContent: 'center',
+  },
+  photoRemoveX: { color: '#fff', fontSize: 11, fontWeight: '700' },
+
+  // Prompt chips
+  promptChipsScroll: {
+    marginBottom: 8,
+  },
+  promptChipsContent: {
+    paddingHorizontal: 0,
+    gap: 6,
+  },
+  promptChip: {
+    backgroundColor: 'rgba(255,255,255,0.18)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.3)',
+    borderRadius: 9999,
+    paddingVertical: 5,
+    paddingHorizontal: 12,
+  },
+  promptChipText: {
+    color: '#FFFFFF',
+    fontSize: 10,
+    fontWeight: '500',
+  },
+
+  // Input bar — pinned to hero bottom via absolute positioning
+  heroBottom: {
+    position: 'absolute',
+    bottom: 56,
+    left: 16,
+    right: 16,
+  },
+  inputBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255,255,255,0.22)',
+    borderRadius: 9999,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.30)',
+    paddingLeft: 8,
+    paddingRight: 6,
+    paddingVertical: 4,
+    height: 44,
+    maxHeight: 44,
+  },
+  inputIconBtn: {
+    width: 34, height: 34, borderRadius: 17,
+    alignItems: 'center', justifyContent: 'center',
+  },
+  inputText: {
+    flex: 1,
+    fontSize: 15,
+    color: '#fff',
+    paddingVertical: 0,
+    paddingHorizontal: 6,
+  },
+  inputSendBtn: {
+    width: 34, height: 34, borderRadius: 17,
+    backgroundColor: '#0B6DC3',
+    alignItems: 'center', justifyContent: 'center',
+  },
+  inputSendBtnOff: {
+    backgroundColor: 'rgba(255,255,255,0.15)',
   },
   headline: {
     fontSize: 38,
     fontWeight: fontWeight.xbold,
     color: '#FFFFFF',
-    lineHeight: 44,
+    lineHeight: 40,
     letterSpacing: letterSpacing.tight,
+    textAlign: 'center',
     textShadowColor: 'rgba(0,0,0,0.3)',
     textShadowOffset: { width: 0, height: 2 },
     textShadowRadius: 12,
   },
   headlineBold: { fontWeight: fontWeight.xbold },
-
-  searchBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'rgba(255,255,255,0.13)',
-    borderRadius: 999,
-    overflow: 'hidden',
-    paddingLeft: space.lg,
-    paddingRight: space.xs,
-    paddingVertical: space.xs,
-    height: space['5xl'],
-    shadowColor: '#fff',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.12,
-    shadowRadius: 12,
-  },
-  searchBarHighlight: {
-    position: 'absolute',
-    top: 0, left: 0, right: 0,
-    height: '50%',
-    borderTopLeftRadius: 999,
-    borderTopRightRadius: 999,
-  },
-  searchInput: {
-    flex: 1,
-    fontSize: fontSize.base,
+  genStatusText: {
     color: '#fff',
-    paddingVertical: space.sm,
+    fontSize: 14,
+    fontWeight: '400',
+    marginTop: 20,
+    textAlign: 'center',
+    textShadowColor: 'rgba(0,0,0,0.4)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 6,
+    letterSpacing: 0.3,
   },
-  searchSendBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: radius.full,
-    backgroundColor: C.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: space.xs,
-  },
+
 
   snapBanner: {
     backgroundColor: 'rgba(0,0,0,0.6)',
@@ -1629,43 +2753,58 @@ const styles = StyleSheet.create({
     paddingHorizontal: space.lg,
     gap: space.sm,
   },
-  hScrollNewArrivals: {
-    paddingHorizontal: space.lg,
-    paddingTop: 14,
-    gap: space.sm,
-  },
 
   // ── For You cards (50% screen width) ─────────────────────────────────────────
   forYouCard: {
-    width: CARD_W,
-    height: CARD_W * 1.0,
-    borderRadius: radius.sm,
+    width: ARRIVAL_CARD_W,
+    borderRadius: 6,
+    backgroundColor: '#fff',
+    ...shadow.low,
+  },
+  forYouImgWrap: {
+    width: '100%',
+    height: ARRIVAL_CARD_W,
+    borderTopLeftRadius: 6,
+    borderTopRightRadius: 6,
     overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: 'rgba(0,0,0,0.06)',
   },
   forYouCardImg: {
     width: '100%',
     height: '100%',
   },
+  forYouImgOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,0,0,0.20)',
+  },
   forYouStyleTag: {
     position: 'absolute',
-    top: 8,
-    left: 8,
+    top: 10,
+    left: 10,
+  },
+  forYouInfoBox: {
+    paddingHorizontal: 10,
+    paddingTop: 8,
+    paddingBottom: 10,
+    borderTopWidth: 1,
+    borderColor: 'rgba(0,0,0,0.06)',
+    gap: 2,
+  },
+  forYouInfoCreator: {
+    fontSize: 10,
+    fontWeight: '600',
+    color: palette.primaryBlue,
+    letterSpacing: 0.1,
+  },
+  forYouCardTitle: {
+    ...typeScale.caption,
+    fontWeight: fontWeight.semibold,
+    color: palette.textPrimary,
+    lineHeight: 16,
   },
   forYouLikePosition: {
     position: 'absolute',
     top: 8,
     right: 8,
-  },
-  forYouCardTitle: {
-    position: 'absolute',
-    bottom: 10,
-    left: 10,
-    right: 10,
-    color: '#fff',
-    ...typeScale.headline,
-    letterSpacing: -0.2,
   },
   forYouLikePill: {
     backgroundColor: 'transparent',
@@ -1684,45 +2823,10 @@ const styles = StyleSheet.create({
   collectionCard: {
     width: COLL_CARD_W,
     height: 178,
-    borderRadius: radius.sm,
+    borderRadius: 4,
     overflow: 'hidden',
     borderWidth: 1,
     borderColor: 'rgba(0,0,0,0.06)',
-  },
-
-  // ── Featured Products cards (image top, info box bottom) ────────────────────
-  featuredProductCard: {
-    width: COLL_CARD_W,
-    borderRadius: radius.md,
-    overflow: 'hidden',
-    backgroundColor: '#fff',
-    borderWidth: 1,
-    borderColor: 'rgba(0,0,0,0.07)',
-    ...shadow.low,
-  },
-  featuredProductImgWrap: {
-    width: '100%',
-    height: 148,
-  },
-  featuredProductImg: {
-    width: '100%',
-    height: '100%',
-  },
-  featuredProductInfo: {
-    paddingHorizontal: space.sm,
-    paddingTop: space.xs + 2,
-    paddingBottom: space.sm,
-    gap: 3,
-  },
-  featuredProductName: {
-    ...typeScale.caption,
-    color: palette.textPrimary,
-    fontWeight: '600',
-    lineHeight: 16,
-  },
-  featuredProductPrice: {
-    ...typeScale.price,
-    color: palette.textPrimary,
   },
   collectionCardImg: {
     width: '100%',
@@ -1764,43 +2868,103 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     letterSpacing: 0.2,
   },
-
-  // ── Shop By Style cards ──────────────────────────────────────────────────────
-  styleChipCard: {
-    width: STYLE_CARD_W,
-    height: STYLE_CARD_W,
-    borderRadius: radius.sm,
+  // ── New Arrivals product cards (split: image top, info bottom) ────────────────
+  newArrivalCard: {
+    width: COLL_CARD_W,
+    borderRadius: 6,
     overflow: 'hidden',
+    backgroundColor: '#fff',
     borderWidth: 1,
-    borderColor: 'rgba(0,0,0,0.06)',
+    borderColor: 'rgba(0,0,0,0.07)',
+    ...shadow.low,
   },
-  styleChipOverlay: {
-    position: 'absolute',
-    bottom: 8,
-    left: 6,
-    right: 6,
+  newArrivalCardImg: {
+    width: '100%',
+    height: 150,
+  },
+  newArrivalCardInfo: {
+    paddingHorizontal: space.sm,
+    paddingTop: 8,
+    paddingBottom: 10,
     gap: 4,
   },
-  styleChipLabelPill: {
-    alignSelf: 'flex-start',
-    backgroundColor: 'transparent',
-    borderWidth: 1.5,
-    borderColor: 'rgba(255,255,255,0.85)',
-    borderRadius: radius.sm,
-    paddingHorizontal: 7,
-    paddingVertical: 3,
+  newArrivalCardName: {
+    ...typeScale.caption,
+    color: palette.textPrimary,
+    fontWeight: '600',
+    lineHeight: 16,
   },
-  styleChipLabel: {
-    fontSize: 10,
+  newArrivalCardFooter: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: 2,
+  },
+  newArrivalCardBrand: {
+    ...typeScale.caption,
+    color: palette.textSecondary,
+    flex: 1,
+  },
+  newArrivalCardPrice: {
+    ...typeScale.caption,
+    color: palette.primaryBlue,
+    fontWeight: '700',
+  },
+  trendingViewLook: {
+    ...typeScale.caption,
+    color: palette.primaryBlue,
+    fontWeight: '600',
+  },
+  productRatingRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 2,
+    marginBottom: 2,
+  },
+  productStars: {
+    fontSize: 11,
+    color: '#67ACE9',
+    letterSpacing: 1,
+  },
+  productRatingText: {
+    fontSize: 11,
+    color: palette.textSecondary,
+    fontWeight: '400',
+  },
+
+  // ── Shop By Style cards ──────────────────────────────────────────────────────
+  styleCard: {
+    width: STYLE_CARD_W,
+    borderRadius: 6,
+    backgroundColor: '#fff',
+    ...shadow.low,
+  },
+  styleCardImgWrap: {
+    width: '100%',
+    height: STYLE_CARD_W,
+    borderTopLeftRadius: 6,
+    borderTopRightRadius: 6,
+    overflow: 'hidden',
+    backgroundColor: '#FFFFFF',
+  },
+  styleCardInfoBox: {
+    paddingHorizontal: 8,
+    paddingTop: 7,
+    paddingBottom: 9,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(0,0,0,0.06)',
+    gap: 2,
+  },
+  styleCardLabel: {
+    fontSize: 12,
     fontWeight: fontWeight.bold,
-    color: '#FFFFFF',
-    letterSpacing: 0.2,
-  },
-  styleChipCount: {
-    fontSize: 9,
-    fontWeight: '500',
-    color: 'rgba(255,255,255,0.78)',
+    color: palette.textPrimary,
     letterSpacing: 0.1,
+  },
+  styleCardSub: {
+    fontSize: 10,
+    fontWeight: '400',
+    color: palette.primaryBlue,
   },
 
   // ── Trending cards ───────────────────────────────────────────────────────────
@@ -1843,7 +3007,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: space.lg,
     paddingTop: space.xl,
     paddingBottom: space.xl,
-    backgroundColor: '#FAFAF8',
+    backgroundColor: palette.background,
     borderTopWidth: 1,
     borderTopColor: 'rgba(0,0,0,0.06)',
   },
@@ -1865,181 +3029,199 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
     color: 'rgba(0,0,0,0.38)',
   },
+  // Card: white bg, gray border, same 20 radius
   dealCard: {
-    borderRadius: radius.xl,
+    borderRadius: 10,
     overflow: 'hidden',
     backgroundColor: '#FFFFFF',
     borderWidth: 1,
-    borderColor: '#E2E6EA',
-    paddingBottom: space.base,
+    borderColor: 'rgba(0,0,0,0.09)',
     ...shadow.medium,
   },
+  // Full-width hero image at top
   dealImgWrap: {
     width: '100%',
-    height: 200,
-    overflow: 'hidden',
-    marginBottom: space.base,
+    height: 210,
+    backgroundColor: '#F0F2F5',
+    position: 'relative',
   },
   dealImg: {
     width: '100%',
     height: '100%',
   },
-  // DEAL OF THE DAY — top left of image
-  dealBadgePos: {
+  // Badge overlaid on top of image (Deal of the Day only)
+  dealOverlayRow: {
     position: 'absolute',
-    top: space.sm,
-    left: space.sm,
+    top: 14,
+    left: 14,
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   dealBadge: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 5,
-    backgroundColor: 'rgba(10,16,32,0.70)',
-    paddingHorizontal: 10,
-    paddingVertical: 5,
+    backgroundColor: palette.primaryBlue,
+    paddingHorizontal: 11,
+    paddingVertical: 6,
     borderRadius: radius.full,
-    borderWidth: 1,
-    borderColor: 'rgba(201,168,76,0.5)',
   },
   dealBadgeText: {
-    color: '#C9A84C',
+    color: '#FFFFFF',
     fontSize: 9,
     fontWeight: fontWeight.bold,
     letterSpacing: 1.2,
     textTransform: 'uppercase',
   },
-  // LIMITED TIME — top right of image
-  dealLimitedPos: {
-    position: 'absolute',
-    top: space.sm,
-    right: space.sm,
-  },
-  dealLimitedPill: {
-    backgroundColor: '#C0392B',
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: radius.full,
-  },
-  dealLimitedText: {
-    fontSize: 9,
-    fontWeight: fontWeight.bold,
-    letterSpacing: 1.0,
-    color: '#FFFFFF',
-    textTransform: 'uppercase',
-  },
-  // Info block — generous spacing between each row
-  dealInfo: {
-    paddingHorizontal: space.lg,
-    paddingTop: space.base,
-    paddingBottom: space.sm,
-    gap: 10,
-  },
-  dealProductName: {
-    fontSize: 16,
-    fontWeight: fontWeight.bold,
-    color: '#0F172A',
-    lineHeight: 22,
-    letterSpacing: -0.2,
+  // Info area below image
+  dealInfoArea: {
+    paddingHorizontal: 18,
+    paddingTop: 18,
+    paddingBottom: 20,
+    gap: 8,
   },
   dealBrand: {
-    fontSize: 12,
-    fontWeight: fontWeight.medium,
-    color: '#9CA3AF',
-    letterSpacing: 0.2,
-    marginTop: -4,
+    fontSize: 10,
+    fontWeight: fontWeight.bold,
+    letterSpacing: 1.4,
+    color: palette.primaryBlue,
+    textTransform: 'uppercase',
+  },
+  dealProductName: {
+    fontSize: 17,
+    fontWeight: fontWeight.bold,
+    color: palette.textPrimary,
+    lineHeight: 23,
+    letterSpacing: -0.2,
+  },
+  dealDescription: {
+    fontSize: 13,
+    fontWeight: fontWeight.regular,
+    color: palette.textSecondary,
+    lineHeight: 19,
+    marginTop: 1,
   },
   dealRatingRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
+    gap: 3,
+    marginTop: 2,
   },
-  dealRatingText: {
+  dealRatingScore: {
     fontSize: 13,
     fontWeight: fontWeight.semibold,
-    color: '#0F172A',
+    color: palette.textPrimary,
+    marginLeft: 3,
   },
   dealReviewCount: {
     fontSize: 12,
     fontWeight: fontWeight.regular,
-    color: '#9CA3AF',
+    color: palette.textSecondary,
+  },
+  dealSourceTag: {
+    fontSize: 11,
+    fontWeight: fontWeight.medium,
+    color: palette.textTertiary,
+    marginLeft: 4,
+  },
+  dealPriceRow: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    gap: 8,
+    marginTop: 4,
   },
   dealPrice: {
     fontSize: 28,
     fontWeight: fontWeight.xbold,
-    color: '#0F172A',
-    letterSpacing: -1,
-    marginTop: 2,
+    color: palette.textPrimary,
+    letterSpacing: -0.5,
+  },
+  dealPriceOrig: {
+    fontSize: 14,
+    fontWeight: fontWeight.regular,
+    color: palette.textSecondary,
+    textDecorationLine: 'line-through',
   },
   dealShopBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    marginHorizontal: space.lg,
-    backgroundColor: '#0B6DC3',
-    paddingVertical: 13,
-    borderRadius: radius.md,
-    gap: 6,
+    alignSelf: 'stretch',
+    backgroundColor: palette.primaryBlue,
+    paddingVertical: 16,
+    borderRadius: radius.button,
+    gap: 5,
+    marginTop: 8,
   },
   dealShopBtnText: {
     fontSize: 15,
-    fontWeight: fontWeight.bold,
+    fontWeight: fontWeight.semibold,
     color: '#FFFFFF',
     letterSpacing: 0.1,
   },
 
-  // ── Portrait cards (New Arrivals) ────────────────────────────────────────────
-  portraitCard: {
-    width: STYLE_CARD_W,
-    position: 'relative',
+  // ── New Arrivals cards ────────────────────────────────────────────────────────
+  arrivalCard: {
+    width: ARRIVAL_CARD_W,
+    borderRadius: radius.md,
+    backgroundColor: '#fff',
+    ...shadow.low,
   },
-  portraitCardImgWrap: {
-    width: STYLE_CARD_W,
-    height: STYLE_CARD_W,
-    borderRadius: radius.sm,
-    overflow: 'hidden',
-    marginBottom: space.xs,
-    borderWidth: 1,
-    borderColor: 'rgba(0,0,0,0.06)',
-  },
-  portraitCardImg: { width: '100%', height: '100%' },
-  newBadgePos: {
+  arrivalNewBadge: {
     position: 'absolute',
-    top: 6,
-    left: 6,
+    top: 10,
+    right: 10,
+    zIndex: 10,
+    backgroundColor: palette.primaryBlue,
+    borderRadius: radius.sm,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    shadowColor: palette.primaryBlue,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.35,
+    shadowRadius: 4,
+    elevation: 4,
   },
+  arrivalNewBadgeText: {
+    fontSize: 10,
+    fontWeight: '800',
+    color: '#fff',
+    letterSpacing: 1.2,
+  },
+  arrivalImgWrap: {
+    width: '100%',
+    height: ARRIVAL_CARD_W,
+    borderTopLeftRadius: radius.md,
+    borderTopRightRadius: radius.md,
+    overflow: 'hidden',
+  },
+  arrivalImg: { width: '100%', height: '100%' },
+  arrivalInfoBox: {
+    paddingHorizontal: 10,
+    paddingTop: 8,
+    paddingBottom: 10,
+    borderTopWidth: 1,
+    borderColor: 'rgba(0,0,0,0.06)',
+    gap: 2,
+  },
+  arrivalInfoCreator: {
+    fontSize: 10,
+    fontWeight: '600',
+    color: palette.primaryBlue,
+    letterSpacing: 0.1,
+  },
+  arrivalInfoTitle: {
+    ...typeScale.caption,
+    fontWeight: fontWeight.semibold,
+    color: palette.textPrimary,
+    lineHeight: 16,
+  },
+
+  // legacy — kept for other sections that still reference these
   portraitItemsBadgePos: {
     position: 'absolute',
     bottom: 6,
     right: 6,
-  },
-  portraitCardTitle: {
-    ...typeScale.body,
-    fontWeight: '600',
-    color: C.textPrimary,
-    marginBottom: 1,
-  },
-  portraitCardTag: {
-    fontSize: 10,
-    fontWeight: '400',
-    color: C.textSecondary,
-  },
-  newArrivalBadge: {
-    position: 'absolute',
-    top: -10,
-    right: -8,
-    backgroundColor: '#0B6DC3',
-    borderRadius: 8,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderWidth: 1.5,
-    borderColor: '#FFFFFF',
-    zIndex: 10,
-  },
-  newArrivalBadgeText: {
-    fontSize: 9,
-    fontWeight: '800',
-    color: '#FFFFFF',
-    letterSpacing: 0.5,
   },
 
   // ── Recently Viewed cards ────────────────────────────────────────────────────
@@ -2090,6 +3272,56 @@ const styles = StyleSheet.create({
     top: 6,
     right: 6,
   },
+
+  // ── Featured Products card (below-image layout) ───────────────────────────
+  featuredProductCard: {
+    width: COLL_CARD_W,
+    borderRadius: 6,
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: 'rgba(0,0,0,0.07)',
+    overflow: 'hidden',
+    ...shadow.low,
+  },
+  featuredProductImgWrap: {
+    width: '100%',
+    height: 142,
+    overflow: 'hidden',
+  },
+  featuredProductImg: {
+    width: '100%',
+    height: '100%',
+  },
+  featuredSourceBadgePos: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+  },
+  featuredProductBody: {
+    padding: 10,
+    gap: 8,
+  },
+  featuredProductName: {
+    ...typeScale.caption,
+    fontWeight: fontWeight.semibold,
+    color: palette.textPrimary,
+    lineHeight: 17,
+  },
+  featuredProductRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  featuredProductPrice: {
+    ...typeScale.price,
+    color: palette.textPrimary,
+  },
+  featuredShopLink: {
+    ...typeScale.caption,
+    color: palette.primaryBlue,
+    fontWeight: '600',
+  },
+
   quickAddBtn: {
     position: 'absolute',
     bottom: 6,
@@ -2118,4 +3350,299 @@ const styles = StyleSheet.create({
   },
 
   // ── Get Inspired CTA ─────────────────────────────────────────────────────────
+
+  // ── Photo attachment badge ──────────────────────────────────────────────────
+  attachBadge: {
+    position: 'absolute',
+    top: 2,
+    right: 2,
+    width: 14,
+    height: 14,
+    borderRadius: 7,
+    backgroundColor: '#0B6DC3',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1.5,
+    borderColor: 'rgba(0,0,0,0.3)',
+  },
+
+  // ── Loading progress bar ───────────────────────────────────────────────────
+  loadingBarTrack: {
+    height: 2,
+    backgroundColor: 'rgba(255,255,255,0.18)',
+    borderRadius: 1,
+    marginTop: 10,
+    marginHorizontal: 2,
+    overflow: 'hidden',
+  },
+  loadingBarFill: {
+    height: 2,
+    backgroundColor: '#67ACE9',
+    borderRadius: 1,
+  },
+});
+
+// ── Result Modal Styles ─────────────────────────────────────────────────────
+const resultStyles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+  imageWrap: {
+    position: 'relative',
+    paddingHorizontal: 16,
+  },
+  imageActions: {
+    position: 'absolute',
+    top: 16,
+    left: 16,
+    flexDirection: 'row',
+    gap: 8,
+  },
+  imageActionBtn: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.15)',
+  },
+  closeBtn: {
+    position: 'absolute',
+    top: 56,
+    right: 20,
+    zIndex: 10,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(0,0,0,0.06)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  scroll: {
+    flex: 1,
+  },
+  scrollContent: {
+    paddingTop: 56,
+    paddingBottom: 40,
+  },
+  resultImage: {
+    width: '100%',
+    borderRadius: 12,
+  },
+  promptLabel: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: '#9CA3AF',
+    letterSpacing: 1,
+    textTransform: 'uppercase',
+    marginTop: 24,
+    marginHorizontal: 20,
+  },
+  promptText: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#111827',
+    lineHeight: 22,
+    marginTop: 6,
+    marginHorizontal: 20,
+  },
+  productsSection: {
+    marginTop: 24,
+    paddingLeft: 20,
+  },
+  shopHeaderRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    paddingRight: 20,
+    marginBottom: 16,
+  },
+  shopHeaderActions: {
+    flexDirection: 'row',
+    gap: 6,
+    alignItems: 'center',
+  },
+  shopHeaderBtn: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#F3F4F6',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  shopHeaderBtnPost: {
+    width: 32,
+    height: 32,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  productsTitle: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#9CA3AF',
+    letterSpacing: 1.5,
+    textTransform: 'uppercase',
+  },
+  productsSubtitle: {
+    fontSize: 14,
+    fontWeight: '400',
+    color: '#67ACE9',
+    marginTop: 4,
+  },
+  // ── Horizontal product cards ──
+  hCard: {
+    width: 170,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(0,0,0,0.06)',
+    overflow: 'hidden',
+  },
+  hCardImg: {
+    width: '100%',
+    height: 150,
+    backgroundColor: '#F3F4F6',
+  },
+  hCardBody: {
+    padding: 10,
+    paddingBottom: 36,
+    gap: 2,
+  },
+  hCardName: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#111827',
+    lineHeight: 17,
+  },
+  hCardBrand: {
+    fontSize: 11,
+    fontWeight: '400',
+    color: '#9CA3AF',
+    marginTop: 1,
+  },
+  hCardRating: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 1,
+    marginTop: 3,
+  },
+  hCardRatingText: {
+    fontSize: 10,
+    fontWeight: '600',
+    color: '#111827',
+    marginLeft: 2,
+  },
+  hCardReviews: {
+    fontSize: 10,
+    color: '#6B7280',
+  },
+  hCardPrice: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#0B6DC3',
+    marginTop: 4,
+  },
+  hCardAdd: {
+    position: 'absolute',
+    bottom: 10,
+    right: 10,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    borderWidth: 1.5,
+    borderColor: '#0B6DC3',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#FFFFFF',
+  },
+  hCardAddDone: {
+    backgroundColor: '#0B6DC3',
+    borderColor: '#0B6DC3',
+  },
+  disclosure: {
+    fontSize: 11,
+    fontWeight: '400',
+    color: '#9CA3AF',
+    fontStyle: 'italic',
+    textAlign: 'center',
+    marginTop: 16,
+    marginHorizontal: 20,
+  },
+  // Post sheet
+  sheetBackdrop: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.45)',
+  },
+  sheet: {
+    backgroundColor: '#fff',
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    paddingHorizontal: 20,
+    paddingTop: 12,
+    paddingBottom: 40,
+  },
+  sheetHandle: {
+    width: 36,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: 'rgba(0,0,0,0.12)',
+    alignSelf: 'center',
+    marginBottom: 20,
+  },
+  sheetTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#111827',
+    textAlign: 'center',
+  },
+  sheetSubtitle: {
+    fontSize: 14,
+    fontWeight: '400',
+    color: '#6B7280',
+    textAlign: 'center',
+    marginTop: 4,
+    marginBottom: 24,
+  },
+  sheetOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 14,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(0,0,0,0.06)',
+  },
+  sheetOptionIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 14,
+  },
+  sheetOptionText: { flex: 1 },
+  sheetOptionTitle: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#111827',
+  },
+  sheetOptionDesc: {
+    fontSize: 13,
+    fontWeight: '400',
+    color: '#6B7280',
+    marginTop: 2,
+  },
+  sheetCancel: {
+    marginTop: 16,
+    paddingVertical: 14,
+    alignItems: 'center',
+    borderRadius: 12,
+    backgroundColor: 'rgba(0,0,0,0.04)',
+  },
+  sheetCancelText: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#6B7280',
+  },
 });

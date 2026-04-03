@@ -10,11 +10,12 @@ import {
   TextInput,
   KeyboardAvoidingView,
   Platform,
-  Image,
   Alert,
   Share,
   Linking,
+  ActivityIndicator,
 } from 'react-native';
+import CardImage from '../components/CardImage';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path, Circle, Line, Polyline, Rect } from 'react-native-svg';
 import { colors as C } from '../constants/theme';
@@ -22,11 +23,14 @@ import { fontSize, fontWeight, letterSpacing, space, radius, shadow, typeScale }
 import { useLiked } from '../context/LikedContext';
 import { useShared } from '../context/SharedContext';
 import { useAuth } from '../context/AuthContext';
-import { updateProfile, uploadAvatar } from '../services/supabase';
-import { DESIGNS } from '../data/designs';
+import AuthGate from '../components/AuthGate';
+import { useFocusEffect } from '@react-navigation/native';
+import { updateProfile, uploadAvatar, getUserDesigns } from '../services/supabase';
+// DESIGNS import removed — profile only shows real user designs from Supabase
 import Skeleton from '../components/Skeleton';
 import PressableCard from '../components/PressableCard';
 import { VerifiedBadge } from '../components/VerifiedBadge';
+import TabScreenFade from '../components/TabScreenFade';
 
 const { width } = Dimensions.get('window');
 // 4px padding each side + 4px gap between cards (tight photo grid)
@@ -198,9 +202,10 @@ function InfoIcon() {
 
 // ── Data ──────────────────────────────────────────────────────────────────────
 
-const MY_DESIGNS = DESIGNS.slice(0, 12);
+// No static placeholder data — only show real user designs from Supabase
 
 const ACCOUNT_ITEMS = [
+  { label: 'My Spaces',              icon: <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="#444" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round"><Path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z" /><Line x1={4} y1={22} x2={4} y2={15} /></Svg>,  screen: 'MySpaces' },
   { label: 'Saved Designs',          icon: <SavedIcon />, screen: 'Explore' },
   { label: 'Order History',          icon: <OrderIcon />, screen: 'OrderHistory' },
   { label: 'Payment Methods',        icon: <CardIcon />,  screen: 'PaymentMethods' },
@@ -275,6 +280,46 @@ export default function ProfileScreen({ navigation }) {
   const [saving, setSaving] = useState(false);
   const [profile, setProfile] = useState(() => getInitialProfile(user));
   const [editDraft, setEditDraft] = useState(() => getInitialProfile(user));
+  const [myDesigns, setMyDesigns] = useState([]);
+  const [designsLoading, setDesignsLoading] = useState(true);
+
+  // Fetch user's own designs from Supabase
+  useFocusEffect(
+    useCallback(() => {
+      if (!user?.id) { setDesignsLoading(false); return; }
+      let cancelled = false;
+      setDesignsLoading(true);
+      getUserDesigns(user.id)
+        .then(designs => {
+          if (cancelled) return;
+          const normalized = designs.map(d => ({
+            id: `user-${d.id}`,
+            title: d.prompt || 'My Design',
+            user: user.username || user.name || 'Me',
+            initial: (user.name || 'M')[0],
+            verified: false,
+            imageUrl: d.image_url,
+            description: d.prompt,
+            prompt: d.prompt,
+            roomType: 'living-room',
+            styles: d.style_tags || [],
+            products: d.products || [],
+            tags: (d.style_tags || []).map(s => `#${s}`),
+            likes: d.likes || 0,
+            shares: 0,
+            visibility: d.visibility,
+            isUserDesign: true,
+          }));
+          setMyDesigns(normalized);
+        })
+        .catch(err => {
+          console.warn('Profile designs load failed:', err.message);
+          if (!cancelled) setMyDesigns([]);
+        })
+        .finally(() => { if (!cancelled) setDesignsLoading(false); });
+      return () => { cancelled = true; };
+    }, [user?.id])
+  );
 
   const openEditProfile = useCallback(() => {
     setEditDraft(profile);
@@ -284,13 +329,11 @@ export default function ProfileScreen({ navigation }) {
   // Guest gate — must come AFTER all hooks
   if (!user) {
     return (
-      <View style={{ flex: 1, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center', padding: 32 }}>
-        <Text style={{ fontSize: 22, fontWeight: '800', color: '#111', marginBottom: 8, textAlign: 'center' }}>Your profile awaits</Text>
-        <Text style={{ fontSize: 14, color: '#6B7280', textAlign: 'center', marginBottom: 28, lineHeight: 21 }}>Sign in to access your profile, saved designs, and order history.</Text>
-        <TouchableOpacity onPress={() => navigation.navigate('Auth')} style={{ backgroundColor: '#0B6DC3', borderRadius: 14, paddingVertical: 14, paddingHorizontal: 40 }}>
-          <Text style={{ color: '#fff', fontWeight: '700', fontSize: 15 }}>Sign In / Sign Up</Text>
-        </TouchableOpacity>
-      </View>
+      <AuthGate
+        title="Your profile awaits"
+        subtitle="Sign in to access your profile, saved designs, and order history."
+        navigation={navigation}
+      />
     );
   }
 
@@ -342,19 +385,15 @@ export default function ProfileScreen({ navigation }) {
     }
   };
 
-  const tabs = ['My Snaps', 'Liked', 'Repost'];
+  const tabs = ['My Snaps', 'Liked'];
 
   return (
-    <View style={styles.container}>
+    <TabScreenFade style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false} bounces={true}>
 
         {/* ── Banner ── */}
         <View style={styles.banner}>
-          {profile.bannerUri ? (
-            <Image source={{ uri: profile.bannerUri }} style={styles.bannerImage} resizeMode="cover" />
-          ) : (
-            <View style={styles.bannerGradient} />
-          )}
+          <CardImage uri={profile.bannerUri} style={styles.bannerImage} resizeMode="cover" />
           <SafeAreaView style={styles.navRow}>
             <View style={{ width: space['2xl'] + space.xs }} />
             <TouchableOpacity style={styles.navBtn} onPress={() => setShowSettings(true)}>
@@ -371,7 +410,7 @@ export default function ProfileScreen({ navigation }) {
               <View style={styles.avatar}>
                 <View style={styles.avatarInner}>
                   {profile.avatarUri ? (
-                    <Image source={{ uri: profile.avatarUri }} style={styles.avatarImage} resizeMode="cover" />
+                    <CardImage uri={profile.avatarUri} style={styles.avatarImage} resizeMode="cover" />
                   ) : (
                     <Text style={styles.avatarInitial}>{(profile.displayName || 'S').charAt(0).toUpperCase()}</Text>
                   )}
@@ -430,59 +469,49 @@ export default function ProfileScreen({ navigation }) {
         <View style={styles.tabBorder} />
 
         {/* ── Designs Grid ── */}
-        <View style={styles.grid}>
-          {(activeTab === 0
-            ? MY_DESIGNS
+        {designsLoading ? (
+          <View style={styles.emptyGrid}>
+            <ActivityIndicator size="large" color={C.primary} />
+          </View>
+        ) : (() => {
+          const filtered = (activeTab === 0
+            ? myDesigns
             : activeTab === 1
-              ? MY_DESIGNS.filter(d => liked[d.id])
-              : MY_DESIGNS.filter(d => shared[d.id])
-          ).map(design => (
-            <PressableCard
-              key={design.id}
-              style={styles.card}
-              animStyle={{ width: CARD_WIDTH }}
-              onPress={() => navigation.navigate('ShopTheLook', { design })}
-            >
-              <View style={styles.cardImg}>
-                <View style={styles.cardImgBg} />
-                {design.imageUrl ? (
-                  <Image
-                    source={{ uri: design.imageUrl }}
-                    style={styles.cardImgPhoto}
-                    resizeMode="cover"
-                  />
-                ) : null}
-                <View style={styles.cardActions}>
-                  <TouchableOpacity
-                    style={styles.cardActionBtn}
-                    onPress={() => toggleLiked(design.id)}
-                    hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-                  >
-                    <HeartIcon filled={!!liked[design.id]} />
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={styles.cardActionBtn}
-                    hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-                    onPress={async () => {
-                      try {
-                        const result = await Share.share({
-                          message: 'Check out this room design on SnapSpace!',
-                        });
-                        if (result.action === Share.sharedAction) {
-                          addShared(design.id);
-                        }
-                      } catch {
-                        // share cancelled or error — no action needed
-                      }
-                    }}
-                  >
-                    <ShareIcon />
-                  </TouchableOpacity>
-                </View>
+              ? myDesigns.filter(d => liked[d.id])
+              : myDesigns.filter(d => shared[d.id])
+          ).filter(d => !!d.imageUrl);
+          if (filtered.length === 0) {
+            return (
+              <View style={styles.emptyGrid}>
+                <Text style={styles.emptyGridTitle}>
+                  {activeTab === 0 ? 'No snaps yet' : 'No liked designs'}
+                </Text>
+                <Text style={styles.emptyGridSub}>
+                  {activeTab === 0
+                    ? 'Generate a design from the Snap tab and post it to see it here.'
+                    : 'Designs you like will appear here.'}
+                </Text>
               </View>
-            </PressableCard>
-          ))}
-        </View>
+            );
+          }
+          return (
+            <View style={styles.grid}>
+              {filtered.map(design => (
+                <PressableCard
+                  key={design.id}
+                  style={styles.card}
+                  animStyle={{ width: CARD_WIDTH }}
+                  onPress={() => navigation.navigate('ShopTheLook', { design })}
+                >
+                  <View style={styles.cardImg}>
+                    <View style={styles.cardImgBg} />
+                    <CardImage uri={design.imageUrl} style={styles.cardImgPhoto} resizeMode="cover" />
+                  </View>
+                </PressableCard>
+              ))}
+            </View>
+          );
+        })()}
 
         {/* ── Supplier CTA: apply if consumer, dashboard if verified supplier ── */}
         {user?.is_verified_supplier ? (
@@ -511,7 +540,7 @@ export default function ProfileScreen({ navigation }) {
           <View style={styles.supplierCta}>
             <View style={styles.supplierCtaLeft}>
               <View style={styles.supplierCtaBadge}>
-                <Svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="#1D4ED8" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round">
+                <Svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="#0B6DC3" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round">
                   <Path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.77 5.82 21 7 14.14 2 9.27l6.91-1.01L12 2z" />
                 </Svg>
               </View>
@@ -592,11 +621,11 @@ export default function ProfileScreen({ navigation }) {
                     >
                       <View style={styles.settingsLeft}>
                         <View style={[styles.settingsIconWrap, { backgroundColor: '#EEF2FF' }]}>
-                          <Svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="#1D4ED8" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                          <Svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="#0B6DC3" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
                             <Path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
                           </Svg>
                         </View>
-                        <Text style={[styles.settingsLabel, { color: '#1D4ED8' }]}>Supplier Applications</Text>
+                        <Text style={[styles.settingsLabel, { color: '#0B6DC3' }]}>Supplier Applications</Text>
                       </View>
                       <ChevronRight />
                     </TouchableOpacity>
@@ -740,7 +769,7 @@ export default function ProfileScreen({ navigation }) {
                 <TouchableOpacity style={styles.photoOptionRow} onPress={() => pickImage('avatar')} activeOpacity={0.7}>
                   <View style={styles.photoOptionPreview}>
                     {editDraft.avatarUri ? (
-                      <Image source={{ uri: editDraft.avatarUri }} style={styles.photoOptionPreviewImage} resizeMode="cover" />
+                      <CardImage uri={editDraft.avatarUri} style={styles.photoOptionPreviewImage} resizeMode="cover" />
                     ) : (
                       <Text style={styles.photoOptionPlaceholder}>{(editDraft.displayName || 'S').charAt(0).toUpperCase()}</Text>
                     )}
@@ -751,7 +780,7 @@ export default function ProfileScreen({ navigation }) {
                 <Text style={styles.editProfileLabel}>Banner photo</Text>
                 <TouchableOpacity style={styles.bannerOptionRow} onPress={() => pickImage('banner')} activeOpacity={0.7}>
                   {editDraft.bannerUri ? (
-                    <Image source={{ uri: editDraft.bannerUri }} style={styles.bannerOptionPreview} resizeMode="cover" />
+                    <CardImage uri={editDraft.bannerUri} style={styles.bannerOptionPreview} resizeMode="cover" />
                   ) : (
                     <View style={styles.bannerOptionPlaceholder}>
                       <Text style={styles.bannerOptionPlaceholderText}>Tap to add banner</Text>
@@ -804,7 +833,7 @@ export default function ProfileScreen({ navigation }) {
           </KeyboardAvoidingView>
         </View>
       </Modal>
-    </View>
+    </TabScreenFade>
   );
 }
 
@@ -1029,6 +1058,25 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     gap: space.xs,
     paddingHorizontal: space.xs,
+  },
+  emptyGrid: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 60,
+    paddingHorizontal: 40,
+  },
+  emptyGridTitle: {
+    fontSize: 17,
+    fontWeight: '700',
+    color: '#111827',
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  emptyGridSub: {
+    fontSize: 14,
+    color: '#9CA3AF',
+    textAlign: 'center',
+    lineHeight: 20,
   },
   // Post grid cards — shadow.low + border.subtle
   card: {
@@ -1338,7 +1386,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginHorizontal: space.lg,
     marginTop: space.xl,
-    backgroundColor: '#1D4ED8',
+    backgroundColor: '#0B6DC3',
     borderRadius: radius.lg,
     paddingVertical: space.md,
     paddingHorizontal: space.lg,
@@ -1393,7 +1441,7 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: radius.full,
-    backgroundColor: '#DBEAFE',
+    backgroundColor: 'rgba(103,172,233,0.18)',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -1410,7 +1458,7 @@ const styles = StyleSheet.create({
     color: '#3B82F6',
   },
   supplierCtaBtn: {
-    backgroundColor: '#1D4ED8',
+    backgroundColor: '#0B6DC3',
     borderRadius: radius.sm,
     paddingVertical: 8,
     paddingHorizontal: 16,

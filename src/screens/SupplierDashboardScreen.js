@@ -24,7 +24,7 @@ import { VerifiedBadge } from '../components/VerifiedBadge';
 import { Supplier } from '../services/api';
 
 const BLUE = '#0B6DC3';
-const BLUE_DARK = '#1D4ED8';
+const BLUE_DARK = '#0B6DC3';
 const GREEN = '#16A34A';
 
 // ── Icons ─────────────────────────────────────────────────────────────────────

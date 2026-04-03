@@ -4,13 +4,19 @@ import * as Device from 'expo-device';
 import { savePushToken } from './supabase';
 
 // Controls how notifications appear when the app is in the foreground.
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: true,
-    shouldSetBadge: true,
-  }),
-});
+// Wrapped in try-catch: on simulator dev builds without the aps-environment
+// entitlement, this triggers a native Keychain access that throws.
+try {
+  Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+      shouldShowAlert: true,
+      shouldPlaySound: true,
+      shouldSetBadge: true,
+    }),
+  });
+} catch {
+  // Non-fatal on simulator — push notifications won't work but app runs fine
+}
 
 /**
  * Requests push notification permission and registers the device.
@@ -23,36 +29,41 @@ Notifications.setNotificationHandler({
 export async function registerForPushNotifications(userId) {
   if (!Device.isDevice) return null;
 
-  const { status: existing } = await Notifications.getPermissionsAsync();
-  let finalStatus = existing;
+  try {
+    const { status: existing } = await Notifications.getPermissionsAsync();
+    let finalStatus = existing;
 
-  if (existing !== 'granted') {
-    const { status } = await Notifications.requestPermissionsAsync();
-    finalStatus = status;
-  }
-
-  if (finalStatus !== 'granted') return null;
-
-  const { data: token } = await Notifications.getExpoPushTokenAsync();
-
-  if (Platform.OS === 'android') {
-    await Notifications.setNotificationChannelAsync('default', {
-      name: 'SnapSpace',
-      importance: Notifications.AndroidImportance.MAX,
-      vibrationPattern: [0, 250, 250, 250],
-      lightColor: '#0B6DC3',
-    });
-  }
-
-  if (userId && token) {
-    try {
-      await savePushToken(userId, token);
-    } catch {
-      // Non-fatal — don't block the user if token save fails
+    if (existing !== 'granted') {
+      const { status } = await Notifications.requestPermissionsAsync();
+      finalStatus = status;
     }
-  }
 
-  return token;
+    if (finalStatus !== 'granted') return null;
+
+    const { data: token } = await Notifications.getExpoPushTokenAsync();
+
+    if (Platform.OS === 'android') {
+      await Notifications.setNotificationChannelAsync('default', {
+        name: 'SnapSpace',
+        importance: Notifications.AndroidImportance.MAX,
+        vibrationPattern: [0, 250, 250, 250],
+        lightColor: '#0B6DC3',
+      });
+    }
+
+    if (userId && token) {
+      try {
+        await savePushToken(userId, token);
+      } catch {
+        // Non-fatal — don't block the user if token save fails
+      }
+    }
+
+    return token;
+  } catch {
+    // Keychain / entitlement errors on simulator dev builds are non-fatal
+    return null;
+  }
 }
 
 /**

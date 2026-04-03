@@ -1,328 +1,191 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
-  TextInput,
-  ActivityIndicator,
   Alert,
-  Platform,
 } from 'react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
-import Svg, { Path, Circle, Polyline, Line } from 'react-native-svg';
-import { colors } from '../constants/colors';
-import { palette, fontSize, fontWeight, space, radius, shadow } from '../constants/tokens';
-import { Button, Badge, SectionHeader } from '../components/ds';
+import * as ImagePicker from 'expo-image-picker';
+import Svg, { Path, Circle, Line, Polyline, Rect } from 'react-native-svg';
+import { palette } from '../constants/tokens';
 import { useAuth } from '../context/AuthContext';
-import { uploadRoomPhoto } from '../services/supabase';
-import { generateInteriorDesign } from '../services/replicate';
-import { getProductsForPrompt } from '../services/affiliateProducts';
+import AuthGate from '../components/AuthGate';
+import TabScreenFade from '../components/TabScreenFade';
 
-function FlashIcon({ off }) {
-  return (
-    <Svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke={colors.white} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-      <Polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
-      {off && <Line x1={2} y1={2} x2={22} y2={22} />}
-    </Svg>
-  );
-}
+// ─── Icons ───────────────────────────────────────────────────────────────────
 
-function FlipIcon() {
+function XIcon({ size = 16, color = '#fff' }) {
   return (
-    <Svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke={colors.white} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-      <Path d="M21 2v6h-6" />
-      <Path d="M3 12a9 9 0 0 1 15-6.7L21 8" />
-      <Path d="M3 22v-6h6" />
-      <Path d="M21 12a9 9 0 0 1-15 6.7L3 16" />
-    </Svg>
-  );
-}
-
-function SparkIcon() {
-  return (
-    <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke={colors.white} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-      <Polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
-    </Svg>
-  );
-}
-
-function XIcon() {
-  return (
-    <Svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke={colors.white} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
       <Line x1={18} y1={6} x2={6} y2={18} />
       <Line x1={6} y1={6} x2={18} y2={18} />
     </Svg>
   );
 }
 
+function GalleryIcon({ size = 22, color = '#fff' }) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+      <Rect x={3} y={3} width={18} height={18} rx={2} ry={2} />
+      <Circle cx={8.5} cy={8.5} r={1.5} />
+      <Polyline points="21 15 16 10 5 21" />
+    </Svg>
+  );
+}
+
+// ─── SnapScreen ───────────────────────────────────────────────────────────────
+
 export default function SnapScreen({ navigation }) {
   const { user } = useAuth();
   const [permission, requestPermission] = useCameraPermissions();
   const [facing, setFacing] = useState('back');
   const [flash, setFlash] = useState(false);
-  const [prompt, setPrompt] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [statusText, setStatusText] = useState('');
   const cameraRef = useRef(null);
 
-  // Must be logged in to use the AI generation feature
+  // ── Auth gate ──
   if (!user) {
     return (
-      <View style={styles.permissionContainer}>
-        <Svg width={48} height={48} viewBox="0 0 24 24" fill="none" stroke={colors.bluePrimary} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
-          <Path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
-          <Circle cx={12} cy={13} r={4} />
-        </Svg>
-        <Text style={styles.permissionTitle}>Sign in to Use Snap</Text>
-        <Text style={styles.permissionText}>
-          Create a free account to snap your room and generate AI-powered interior designs.
-        </Text>
-        <TouchableOpacity style={styles.permissionBtn} onPress={() => navigation.navigate('Auth')}>
-          <Text style={styles.permissionBtnText}>Sign In / Sign Up</Text>
-        </TouchableOpacity>
-      </View>
-    );
-  }
-
-  if (!permission) {
-    return <View style={styles.container} />;
-  }
-
-  if (!permission.granted) {
-    return (
-      <View style={styles.permissionContainer}>
-        <Svg width={48} height={48} viewBox="0 0 24 24" fill="none" stroke={colors.bluePrimary} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
-          <Path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
-          <Circle cx={12} cy={13} r={4} />
-        </Svg>
-        <Text style={styles.permissionTitle}>Camera Access Required</Text>
-        <Text style={styles.permissionText}>
-          SnapSpace needs camera access to capture your room and generate AI designs.
-        </Text>
-        <TouchableOpacity style={styles.permissionBtn} onPress={requestPermission}>
-          <Text style={styles.permissionBtnText}>Grant Access</Text>
-        </TouchableOpacity>
-      </View>
+      <AuthGate
+        title="Design with AI"
+        subtitle="Snap your room and get AI-powered redesigns with shoppable products."
+        navigation={navigation}
+      />
     );
   }
 
   const handleCapture = async () => {
-    if (!cameraRef.current || loading) return;
-    setLoading(true);
-    setStatusText('Capturing photo…');
-    try {
-      // base64:true gives us the data inline — no FileSystem read needed
-      const photo = await cameraRef.current.takePictureAsync({ quality: 0.7, base64: true });
-
-      setStatusText('Uploading photo…');
-      const imageUrl = await uploadRoomPhoto(user?.id || 'anonymous', photo.uri, photo.base64);
-
-      const designPrompt = prompt || 'Modern minimalist redesign';
-
-      setStatusText('Generating your design… (this takes ~30s)');
-      const resultUrl = await generateInteriorDesign(imageUrl, designPrompt);
-
-      setStatusText('Finding matching products…');
-      const matchedProducts = getProductsForPrompt(designPrompt, 6);
-
-      setLoading(false);
-      setStatusText('');
-      navigation?.navigate('RoomResult', {
-        imageUri: photo.uri,
-        resultUri: resultUrl,
-        prompt: designPrompt,
-        products: matchedProducts,
-      });
-    } catch (err) {
-      setLoading(false);
-      setStatusText('');
-      Alert.alert('Generation Failed', err.message || 'Something went wrong. Please try again.');
-    }
+    if (!cameraRef.current) return;
+    const photo = await cameraRef.current.takePictureAsync({ quality: 0.8, base64: true });
+    navigation.navigate('Home', { capturedPhoto: photo });
   };
 
+  const handlePickFromLibrary = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Permission Required', 'Please allow access to your photo library in Settings.');
+      return;
+    }
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      quality: 0.8,
+      base64: true,
+    });
+    if (result.canceled || !result.assets?.length) return;
+    const asset = result.assets[0];
+    navigation.navigate('Home', {
+      capturedPhoto: { uri: asset.uri, base64: asset.base64, width: asset.width, height: asset.height },
+    });
+  };
+
+  if (!permission) return <View style={s.container} />;
+
+  if (!permission.granted) {
+    return (
+      <View style={[s.container, { justifyContent: 'center', alignItems: 'center', gap: 16 }]}>
+        <Text style={{ color: '#fff', fontSize: 16, textAlign: 'center', paddingHorizontal: 32 }}>
+          Camera access is required to snap your room.
+        </Text>
+        <TouchableOpacity style={s.permBtn} onPress={requestPermission}>
+          <Text style={{ color: '#fff', fontWeight: '700' }}>Grant Access</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
   return (
-    <View style={styles.container}>
-      <CameraView
-        ref={cameraRef}
-        style={styles.camera}
-        facing={facing}
-        flash={flash ? 'on' : 'off'}
-      >
+    <TabScreenFade style={s.container}>
+      <CameraView ref={cameraRef} style={s.camera} facing={facing} flash={flash ? 'on' : 'off'} />
+
+      {/* Overlay controls — absolute positioned over camera */}
+      <View style={s.overlay} pointerEvents="box-none">
         {/* Top controls */}
-        <View style={styles.topControls}>
-          <TouchableOpacity style={styles.controlBtn} onPress={() => navigation?.goBack()}>
-            <XIcon />
-          </TouchableOpacity>
-          <View style={styles.topRight}>
-            <TouchableOpacity style={styles.controlBtn} onPress={() => setFlash(!flash)}>
-              <FlashIcon off={!flash} />
+        <View style={s.topBar}>
+          <View style={{ flex: 1 }} />
+          <View style={{ flexDirection: 'row', gap: 10 }}>
+            <TouchableOpacity style={s.btn} onPress={() => setFlash(!flash)}>
+              <Svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                <Polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+                {!flash && <Line x1={2} y1={2} x2={22} y2={22} />}
+              </Svg>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.controlBtn} onPress={() => setFacing(facing === 'back' ? 'front' : 'back')}>
-              <FlipIcon />
+            <TouchableOpacity style={s.btn} onPress={() => setFacing(f => f === 'back' ? 'front' : 'back')}>
+              <Svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                <Path d="M21 2v6h-6" /><Path d="M3 12a9 9 0 0 1 15-6.7L21 8" />
+                <Path d="M3 22v-6h6" /><Path d="M21 12a9 9 0 0 1-15 6.7L3 16" />
+              </Svg>
             </TouchableOpacity>
           </View>
         </View>
 
         {/* Corner guides */}
-        <View style={styles.guideContainer}>
-          <View style={[styles.corner, styles.cornerTL]} />
-          <View style={[styles.corner, styles.cornerTR]} />
-          <View style={[styles.corner, styles.cornerBL]} />
-          <View style={[styles.corner, styles.cornerBR]} />
+        <View style={s.guides}>
+          <View style={[s.corner, { top: 0, left: 0, borderTopWidth: 2, borderLeftWidth: 2 }]} />
+          <View style={[s.corner, { top: 0, right: 0, borderTopWidth: 2, borderRightWidth: 2 }]} />
+          <View style={[s.corner, { bottom: 0, left: 0, borderBottomWidth: 2, borderLeftWidth: 2 }]} />
+          <View style={[s.corner, { bottom: 0, right: 0, borderBottomWidth: 2, borderRightWidth: 2 }]} />
         </View>
 
-        {/* Bottom overlay */}
-        <View style={styles.bottomOverlay}>
-          <View style={styles.promptWrap}>
-            <SparkIcon />
-            <TextInput
-              style={styles.promptInput}
-              placeholder="Modern minimalist with warm tones..."
-              placeholderTextColor="rgba(255,255,255,0.5)"
-              value={prompt}
-              onChangeText={setPrompt}
-            />
-          </View>
-
-          <TouchableOpacity
-            style={[styles.generateBtn, loading && styles.generateBtnDisabled]}
-            onPress={handleCapture}
-            disabled={loading}
-            activeOpacity={0.8}
-          >
-            {loading ? (
-              <>
-                <ActivityIndicator color={colors.white} size="small" />
-                {!!statusText && <Text style={styles.statusText}>{statusText}</Text>}
-              </>
-            ) : (
-              <>
-                <SparkIcon />
-                <Text style={styles.generateText}>Generate with AI</Text>
-              </>
-            )}
+        {/* Shutter + gallery */}
+        <View style={s.bottomBar}>
+          <TouchableOpacity style={s.galleryBtn} onPress={handlePickFromLibrary} activeOpacity={0.7}>
+            <GalleryIcon size={26} />
+            <Text style={s.galleryLabel}>Library</Text>
           </TouchableOpacity>
+
+          <TouchableOpacity style={s.shutter} onPress={handleCapture} activeOpacity={0.8}>
+            <View style={s.shutterInner} />
+          </TouchableOpacity>
+
+          <View style={{ width: 70 }} />
         </View>
-      </CameraView>
-    </View>
+      </View>
+    </TabScreenFade>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: palette.textPrimary,
+const s = StyleSheet.create({
+  container: { flex: 1, backgroundColor: '#000' },
+  camera: { flex: 1 },
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: 'space-between',
   },
-  camera: {
-    flex: 1,
-  },
-  permissionContainer: {
-    flex: 1,
-    backgroundColor: palette.background,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: space['3xl'],
-  },
-  permissionTitle: {
-    fontSize: fontSize.lg,
-    fontWeight: fontWeight.bold,
-    color: palette.textPrimary,
-    marginTop: space.lg,
-    marginBottom: space.sm,
-  },
-  permissionText: {
-    fontSize: fontSize.sm,
-    color: palette.textSecondary,
-    textAlign: 'center',
-    lineHeight: fontSize.sm * 1.5,
-    marginBottom: space['2xl'],
-  },
-  permissionBtn: {
-    backgroundColor: palette.primaryBlue,
-    paddingHorizontal: space['2xl'],
-    paddingVertical: space.md,
-    borderRadius: radius.md,
-  },
-  permissionBtnText: {
-    color: palette.textWhite,
-    fontSize: fontSize.base,
-    fontWeight: fontWeight.bold,
-  },
-  topControls: {
+  topBar: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingTop: space['5xl'] + space.xs,
-    paddingHorizontal: space.lg,
+    paddingTop: 56,
+    paddingHorizontal: 20,
   },
-  topRight: {
-    flexDirection: 'row',
-    gap: space.sm + 2,
+  btn: {
+    width: 44, height: 44, borderRadius: 22,
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    alignItems: 'center', justifyContent: 'center',
   },
-  controlBtn: {
-    width: 44,
-    height: 44,
-    borderRadius: radius.full,
-    backgroundColor: 'rgba(0,0,0,0.35)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  guideContainer: {
-    flex: 1,
-    margin: space['3xl'],
-  },
-  corner: {
-    position: 'absolute',
-    width: 30,
-    height: 30,
-    borderColor: 'rgba(255,255,255,0.5)',
-  },
-  cornerTL: { top: 0, left: 0, borderTopWidth: 2, borderLeftWidth: 2 },
-  cornerTR: { top: 0, right: 0, borderTopWidth: 2, borderRightWidth: 2 },
-  cornerBL: { bottom: 0, left: 0, borderBottomWidth: 2, borderLeftWidth: 2 },
-  cornerBR: { bottom: 0, right: 0, borderBottomWidth: 2, borderRightWidth: 2 },
-  bottomOverlay: {
-    paddingHorizontal: space.lg,
-    paddingBottom: space['3xl'],
-    gap: space.md + 2,
-  },
-  promptWrap: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.15)',
-    borderRadius: radius.lg,
-    paddingHorizontal: space.base,
-    height: 50,
-    gap: space.sm + 2,
-  },
-  promptInput: {
-    flex: 1,
-    color: palette.textWhite,
-    fontSize: fontSize.sm,
-  },
-  generateBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+  permBtn: {
     backgroundColor: palette.primaryBlue,
-    borderRadius: radius.lg,
-    height: 54,
-    gap: space.sm + 2,
+    paddingHorizontal: 28, paddingVertical: 14, borderRadius: 12,
   },
-  generateBtnDisabled: {
-    opacity: 0.7,
+  guides: { flex: 1, margin: 40 },
+  corner: {
+    position: 'absolute', width: 28, height: 28,
+    borderColor: 'rgba(255,255,255,0.7)',
   },
-  generateText: {
-    color: palette.textWhite,
-    fontSize: fontSize.md,
-    fontWeight: fontWeight.bold,
+  bottomBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingBottom: 52,
+    paddingHorizontal: 32,
   },
-  statusText: {
-    color: 'rgba(255,255,255,0.85)',
-    fontSize: fontSize.sm,
-    fontWeight: fontWeight.medium,
-    marginLeft: space.sm,
+  galleryBtn: { width: 70, alignItems: 'center', gap: 4 },
+  galleryLabel: { color: 'rgba(255,255,255,0.8)', fontSize: 11, fontWeight: '500' },
+  shutter: {
+    width: 72, height: 72, borderRadius: 36,
+    borderWidth: 4, borderColor: '#fff',
+    alignItems: 'center', justifyContent: 'center',
   },
+  shutterInner: { width: 56, height: 56, borderRadius: 28, backgroundColor: '#fff' },
 });

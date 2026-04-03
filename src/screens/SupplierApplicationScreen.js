@@ -21,7 +21,7 @@ import { colors } from '../constants/colors';
 import { Button, Badge, SectionHeader } from '../components/ds';
 
 const BLUE = '#0B6DC3';
-const BLUE_DARK = '#1D4ED8';
+const BLUE_DARK = '#0B6DC3';
 const BG = '#F8FAFF';
 
 // ── Icons ─────────────────────────────────────────────────────────────────────

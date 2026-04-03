@@ -22,8 +22,8 @@ export const palette = {
   surfaceMuted: '#F1F5F9',
 
   // Hero gradient
-  heroStart: colors.heroStart,       // #0D1E35
-  heroEnd: colors.heroEnd,           // #1E5AB0
+  heroStart: colors.heroStart,       // #035DA8
+  heroEnd: colors.heroEnd,           // #035DA8
 
   // Semantic
   success: '#16A34A',
@@ -47,8 +47,8 @@ export const palette = {
 // Screens that do `import { colors as C } from '../constants/theme'` get this
 // via theme.js's re-export shim.
 export const uiColors = {
-  primary:        '#1D4ED8', // Buttons, links, active states, icons
-  primaryLight:   '#DBEAFE', // Button hover states, tag backgrounds
+  primary:        '#0B6DC3', // Buttons, links, active states, icons
+  primaryLight:   'rgba(103,172,233,0.18)', // Button hover states, tag backgrounds
   bg:             '#FFFFFF', // All screen backgrounds
   surface:        '#F9FAFB', // Cards, drawers, input backgrounds
   surface2:       '#F3F4F6', // Secondary cards, dividers
@@ -492,6 +492,17 @@ export const motion = {
 };
 
 // ── Default export: everything as a single object ─────────────────────────────
+// ── Room Chip Backgrounds — used by HomeScreen room-type nav ──────────────────
+export const roomChipColors = {
+  'living-room': '#E8F0FA',
+  'bedroom':     '#EEF1FD',
+  'kitchen':     '#FDF4EC',
+  'dining-room': '#ECFAF3',
+  'office':      '#E8F0FA',
+  'outdoor':     '#EAF6EE',
+  'bathroom':    '#F3EEFF',
+};
+
 const tokens = {
   palette,
   uiColors,

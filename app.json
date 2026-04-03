@@ -24,7 +24,14 @@
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
-      }
+      },
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO"
+      ],
+      "package": "com.anthonyrivera.snapspace"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -43,6 +50,14 @@
         "expo-image-picker",
         {
           "photosPermission": "Allow SnapSpace to access your photos so you can set a profile and banner image."
+        }
+      ],
+      [
+        "expo-media-library",
+        {
+          "photosPermission": "Allow SnapSpace to save generated room designs to your photo library.",
+          "savePhotosPermission": "Allow SnapSpace to save images to your photo library.",
+          "isAccessMediaLocationEnabled": false
         }
       ],
       "expo-secure-store",

@@ -16,7 +16,7 @@ import { Button, Badge, SectionHeader } from '../components/ds';
 import { Supplier } from '../services/api';
 
 const BLUE = '#0B6DC3';
-const BLUE_DARK = '#1D4ED8';
+const BLUE_DARK = '#0B6DC3';
 
 // ── Icons ─────────────────────────────────────────────────────────────────────
 
@@ -98,7 +98,7 @@ function ConfettiDot({ delay, x, color }) {
   );
 }
 
-const CONFETTI_COLORS = ['#1D4ED8', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899'];
+const CONFETTI_COLORS = ['#0B6DC3', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899'];
 const CONFETTI_DOTS = Array.from({ length: 18 }, (_, i) => ({
   x: (i * 18) % 300 + Math.floor(i / 16) * 12,
   delay: i * 60,

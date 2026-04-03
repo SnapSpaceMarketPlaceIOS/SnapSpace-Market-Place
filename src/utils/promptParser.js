@@ -31,7 +31,14 @@ export function parseDesignPrompt(promptText) {
   const moods = detectMoods(text);
   const furnitureCategories = ROOM_FURNITURE[roomType] || ROOM_FURNITURE['living-room'];
 
-  return { roomType, styles, materials, moods, furnitureCategories };
+  // Tokenize the raw prompt into clean lowercase words for tag matching.
+  // This lets the product matcher compare tags against the user's exact wording.
+  const promptTokens = text
+    .replace(/[^a-z0-9\s-]/g, ' ')
+    .split(/\s+/)
+    .filter(w => w.length >= 3);
+
+  return { roomType, styles, materials, moods, furnitureCategories, promptTokens };
 }
 
 function detectRoomType(text) {
@@ -87,6 +94,7 @@ function getDefaults() {
     materials: [],
     moods: [],
     furnitureCategories: ROOM_FURNITURE['living-room'],
+    promptTokens: [],
   };
 }
 

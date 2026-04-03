@@ -6,7 +6,6 @@ import {
   StyleSheet,
   TouchableOpacity,
   Dimensions,
-  Image,
 } from 'react-native';
 import CardImage from '../components/CardImage';
 import { SafeAreaView } from 'react-native-safe-area-context';

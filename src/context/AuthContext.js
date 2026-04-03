@@ -1,13 +1,43 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import * as AppleAuthentication from 'expo-apple-authentication';
 import { supabase, fetchProfile } from '../services/supabase';
 import { registerForPushNotifications } from '../services/notifications';
 
 const AuthContext = createContext();
 
+// Wraps a promise with a timeout — rejects if the promise doesn't
+// resolve within `ms` milliseconds.
+function withTimeout(promise, ms, message) {
+  return Promise.race([
+    promise,
+    new Promise((_, reject) =>
+      setTimeout(() => reject(new Error(message)), ms)
+    ),
+  ]);
+}
+
+// Retries an async fn up to `attempts` times with a delay between retries.
+// On iOS simulators (esp. beta runtimes) the first network call can stall;
+// retrying immediately after a timeout usually succeeds.
+async function withRetry(fn, attempts = 3, delayMs = 500) {
+  let lastErr;
+  for (let i = 0; i < attempts; i++) {
+    try {
+      return await fn();
+    } catch (err) {
+      lastErr = err;
+      if (i < attempts - 1) await new Promise(r => setTimeout(r, delayMs));
+    }
+  }
+  throw lastErr;
+}
+
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  // Ref so auth state callbacks always see the current loading value
+  // without stale closure issues.
+  const loadingRef = useRef(true);
 
   // Build a merged user object from Supabase session + profiles row
   const buildUser = (session, profile) => ({
@@ -51,8 +81,11 @@ export function AuthProvider({ children }) {
         // Network or config error — proceed as guest
       } finally {
         clearTimeout(timer);
-        if (!settled && mounted) setLoading(false);
-        settled = true;
+        if (!settled && mounted) {
+          settled = true;
+          loadingRef.current = false;
+          setLoading(false);
+        }
       }
     };
 
@@ -76,7 +109,11 @@ export function AuthProvider({ children }) {
         } else {
           setUser(null);
         }
-        if (loading) setLoading(false);
+        // Use ref to avoid stale closure — always clear loading after any auth event
+        if (loadingRef.current) {
+          loadingRef.current = false;
+          setLoading(false);
+        }
       }
     );
 
@@ -94,13 +131,22 @@ export function AuthProvider({ children }) {
    * Throws an Error with a user-friendly message on failure.
    */
   const signUp = async (fullName, email, password) => {
-    const { data, error } = await supabase.auth.signUp({
-      email: email.trim().toLowerCase(),
-      password,
-      options: {
-        data: { full_name: fullName.trim() },
-      },
-    });
+    if (!process.env.EXPO_PUBLIC_SUPABASE_URL) {
+      throw new Error('App is not configured. Please contact support.');
+    }
+    const { data, error } = await withRetry(
+      () => withTimeout(
+        supabase.auth.signUp({
+          email: email.trim().toLowerCase(),
+          password,
+          options: { data: { full_name: fullName.trim() } },
+        }),
+        30000,
+        'Connection timed out. Please check your internet connection and try again.',
+      ),
+      3,
+      1000,
+    );
     if (error) throw new Error(error.message);
     // If Supabase requires email confirmation, session will be null here.
     // The user must verify their email before they can sign in.
@@ -109,13 +155,27 @@ export function AuthProvider({ children }) {
 
   /**
    * Sign in with email and password.
+   * - Times out after 15s to prevent an infinite spinner on slow networks.
+   * - Eagerly sets user state after the Supabase call resolves so that
+   *   any screen rendered after navigation.reset() immediately has a user.
    * Throws an Error with a user-friendly message on failure.
    */
   const signIn = async (email, password) => {
-    const { error } = await supabase.auth.signInWithPassword({
-      email: email.trim().toLowerCase(),
-      password,
-    });
+    // Retry up to 3 times — iOS simulators (esp. beta runtimes) can stall on
+    // the first outbound TLS connection. Each attempt gets a 30s window.
+    const { data, error } = await withRetry(
+      () => withTimeout(
+        supabase.auth.signInWithPassword({
+          email: email.trim().toLowerCase(),
+          password,
+        }),
+        30000,
+        'Connection timed out. Please check your internet connection and try again.',
+      ),
+      3,
+      1000,
+    );
+
     if (error) {
       if (error.message.includes('Email not confirmed')) {
         throw new Error('Please verify your email before signing in. Check your inbox for a verification link.');
@@ -124,6 +184,17 @@ export function AuthProvider({ children }) {
         throw new Error('Incorrect email or password. Please try again.');
       }
       throw new Error(error.message);
+    }
+
+    // Eagerly populate user state so screens rendered after navigation.reset()
+    // see a populated user immediately — don't wait for onAuthStateChange.
+    if (data?.session) {
+      try {
+        const profile = await fetchProfile(data.session.user.id);
+        setUser(buildUser(data.session, profile));
+      } catch {
+        setUser(buildUser(data.session, null));
+      }
     }
   };
 

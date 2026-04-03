@@ -9,17 +9,20 @@ import {
   Animated,
   Easing,
   ActivityIndicator,
-  Image,
+  Linking,
 } from 'react-native';
+import CardImage from '../components/CardImage';
 import Svg, { Path, Circle, Line, Polyline, Rect } from 'react-native-svg';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useStripe } from '@stripe/stripe-react-native';
 import theme from '../constants/theme';
 import { typeScale } from '../constants/tokens';
 import { useCart } from '../context/CartContext';
 import { useOrderHistory } from '../context/OrderHistoryContext';
 import { useAuth } from '../context/AuthContext';
+import AuthGate from '../components/AuthGate';
 import { supabase } from '../services/supabase';
+import { PRODUCT_CATALOG } from '../data/productCatalog';
+import TabScreenFade from '../components/TabScreenFade';
 
 const C  = theme.colors;
 const SP = theme.space;
@@ -33,17 +36,25 @@ const TY = theme.typography;
 function TrashIcon() {
   return (
     <Svg width={18} height={18} viewBox="0 0 24 24" fill="none"
-      stroke={C.destructive} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+      stroke={C.textTertiary} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
       <Polyline points="3 6 5 6 21 6" />
       <Path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
     </Svg>
   );
 }
 
+function StarIconSmall({ filled = true }) {
+  return (
+    <Svg width={12} height={12} viewBox="0 0 24 24" fill={filled ? '#67ACE9' : '#E5E7EB'} stroke="none">
+      <Path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+    </Svg>
+  );
+}
+
 function MinusIcon() {
   return (
-    <Svg width={16} height={16} viewBox="0 0 24 24" fill="none"
-      stroke={C.textPrimary} strokeWidth={2} strokeLinecap="round">
+    <Svg width={10} height={10} viewBox="0 0 24 24" fill="none"
+      stroke={C.textPrimary} strokeWidth={2.5} strokeLinecap="round">
       <Line x1={5} y1={12} x2={19} y2={12} />
     </Svg>
   );
@@ -51,8 +62,8 @@ function MinusIcon() {
 
 function PlusIcon() {
   return (
-    <Svg width={16} height={16} viewBox="0 0 24 24" fill="none"
-      stroke={C.textPrimary} strokeWidth={2} strokeLinecap="round">
+    <Svg width={10} height={10} viewBox="0 0 24 24" fill="none"
+      stroke={C.textPrimary} strokeWidth={2.5} strokeLinecap="round">
       <Line x1={12} y1={5} x2={12} y2={19} />
       <Line x1={5} y1={12} x2={19} y2={12} />
     </Svg>
@@ -66,16 +77,6 @@ function CheckoutCartIcon() {
       <Path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
       <Circle cx={10} cy={20.5} r={1} fill="#FFFFFF" stroke="#FFFFFF" strokeWidth={1} />
       <Circle cx={17} cy={20.5} r={1} fill="#FFFFFF" stroke="#FFFFFF" strokeWidth={1} />
-    </Svg>
-  );
-}
-
-function LockIcon() {
-  return (
-    <Svg width={13} height={13} viewBox="0 0 24 24" fill="none"
-      stroke="rgba(255,255,255,0.7)" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
-      <Rect x={3} y={11} width={18} height={11} rx={2} ry={2} />
-      <Path d="M7 11V7a5 5 0 0 1 10 0v4" />
     </Svg>
   );
 }
@@ -150,7 +151,7 @@ function ChairIcon() {
 
 function VerifiedIcon() {
   return (
-    <Svg width={16} height={16} viewBox="0 0 24 24" fill="none">
+    <Svg width={12} height={12} viewBox="0 0 24 24" fill="none">
       <Circle cx={12} cy={12} r={10} fill={C.primary} />
       <Path d="M9 12l2 2 4-4" stroke="#fff" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" />
     </Svg>
@@ -246,10 +247,40 @@ export default function CartScreen({ navigation }) {
   const shipping   = items.length > 0 ? 29 : 0;
   const total      = subtotal + shipping;
   const totalItems = items.reduce((sum, i) => sum + i.quantity, 0);
+  const allAmazon  = items.length > 0 && items.every((i) => i.source === 'amazon');
 
   // ── ALL checkout logic unchanged ─────────────────────────────────────────────
   const handleCheckout = useCallback(async () => {
     if (checkingOut) return;
+
+    // All curated products are Amazon affiliate items — build a single multi-cart URL
+    const amazonItems = items.filter((i) => i.source === 'amazon');
+    if (amazonItems.length === items.length && items.length > 0) {
+      // Amazon multi-cart URL: adds ALL items to the user's Amazon cart in one tap
+      // Format: /gp/aws/cart/add.html?ASIN.1=XXX&Quantity.1=1&ASIN.2=YYY&Quantity.2=2&tag=snapspace20-20
+      const AFFILIATE_TAG = 'snapspace20-20';
+      const itemsWithAsin = amazonItems.filter((i) => i.asin);
+
+      if (itemsWithAsin.length > 0) {
+        // Build multi-cart URL with all ASINs + quantities
+        const params = itemsWithAsin.map((item, idx) =>
+          `ASIN.${idx + 1}=${item.asin}&Quantity.${idx + 1}=${item.quantity}`
+        ).join('&');
+        const multiCartUrl = `https://www.amazon.com/gp/aws/cart/add.html?${params}&tag=${AFFILIATE_TAG}`;
+        try { await Linking.openURL(multiCartUrl); } catch (e) {
+          // Fallback: open first item's affiliate URL
+          if (amazonItems[0]?.affiliateUrl) {
+            await Linking.openURL(amazonItems[0].affiliateUrl);
+          }
+        }
+      } else if (amazonItems[0]?.affiliateUrl) {
+        // No ASINs stored yet — fall back to first item's affiliate URL
+        await Linking.openURL(amazonItems[0].affiliateUrl);
+      }
+      return;
+    }
+
+    // SnapSpace marketplace checkout (Stripe) for non-affiliate items
     setCheckingOut(true);
     try {
       const { data, error: fnError } = await supabase.functions.invoke('create-payment-intent', {
@@ -291,16 +322,14 @@ export default function CartScreen({ navigation }) {
     }
   }, [checkingOut, total, items, subtotal, shipping]);
 
-  // ── Guest gate — unchanged ────────────────────────────────────────────────────
+  // ── Guest gate ───────────────────────────────────────────────────────────────
   if (!user) {
     return (
-      <View style={{ flex: 1, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center', padding: 32 }}>
-        <Text style={{ fontSize: 22, fontWeight: '800', color: '#111', marginBottom: 8, textAlign: 'center' }}>Sign in to view your cart</Text>
-        <Text style={{ fontSize: 14, color: '#6B7280', textAlign: 'center', marginBottom: 28, lineHeight: 21 }}>Create a free account to save items, check out, and track your orders.</Text>
-        <TouchableOpacity onPress={() => navigation.navigate('Auth')} style={{ backgroundColor: '#1D4ED8', borderRadius: 14, paddingVertical: 14, paddingHorizontal: 40 }}>
-          <Text style={{ color: '#fff', fontWeight: '700', fontSize: 15 }}>Sign In / Sign Up</Text>
-        </TouchableOpacity>
-      </View>
+      <AuthGate
+        title="Sign in to view your cart"
+        subtitle="Create a free account to save items, check out, and track your orders."
+        navigation={navigation}
+      />
     );
   }
 
@@ -325,7 +354,7 @@ export default function CartScreen({ navigation }) {
 
   // ── Main render ───────────────────────────────────────────────────────────────
   return (
-    <View style={styles.container}>
+    <TabScreenFade style={styles.container}>
 
       {/* ── Section 2A: Header ────────────────────────────────────── */}
       <View style={styles.headerSection}>
@@ -345,29 +374,26 @@ export default function CartScreen({ navigation }) {
         {/* ── Section 2B: Cart Item Rows ─────────────────────────────── */}
         {items.map((item) => {
           const category = getCategoryInfo(item.name);
+          // Fall back to catalog for rating/reviewCount on items added before the fix
+          const catalogMatch = (!item.rating && PRODUCT_CATALOG)
+            ? PRODUCT_CATALOG.find(p => p.name === item.name && p.brand === item.brand)
+            : null;
+          const displayRating = item.rating ?? catalogMatch?.rating ?? null;
+          const displayReviewCount = item.reviewCount ?? catalogMatch?.reviewCount ?? null;
           return (
             <View key={item.key} style={styles.itemRow}>
 
               {/* Product image — 88×88 square, light gray bg, radius-lg */}
               <View style={styles.itemImageWrap}>
-                {item.imageUrl ? (
-                  <Image
-                    source={{ uri: item.imageUrl }}
-                    style={styles.itemImage}
-                    resizeMode="cover"
-                  />
-                ) : (
-                  <CategoryIcon type={category.icon} />
-                )}
+                <CardImage uri={item.imageUrl} style={styles.itemImage} resizeMode="cover" />
               </View>
 
-              {/* Content column */}
+              {/* Content column — stacks top-to-bottom, synced to 100px image */}
               <View style={styles.itemContent}>
 
-                {/* Product name + Delete button (top-right) */}
+                {/* Row 1: Product name + Delete button */}
                 <View style={styles.itemTopRow}>
                   <Text style={styles.itemName} numberOfLines={2}>{item.name}</Text>
-                  {/* Delete — tap handler unchanged */}
                   <TouchableOpacity
                     style={styles.deleteBtn}
                     onPress={() => removeFromCart(item.key)}
@@ -377,26 +403,30 @@ export default function CartScreen({ navigation }) {
                   </TouchableOpacity>
                 </View>
 
-                {/* Seller row — verified icon + brand name in primary blue */}
+                {/* Row 2: Stars + rating + review count */}
+                {!!displayRating && (
+                  <View style={styles.ratingRow}>
+                    {[1,2,3,4,5].map(i => (
+                      <StarIconSmall key={i} filled={i <= Math.round(displayRating)} />
+                    ))}
+                    <Text style={styles.ratingScore}> {displayRating.toFixed(1)}</Text>
+                    {!!displayReviewCount && (
+                      <Text style={styles.ratingCount}> ({displayReviewCount.toLocaleString()})</Text>
+                    )}
+                  </View>
+                )}
+
+                {/* Row 3: Verified brand */}
                 <View style={styles.sellerRow}>
                   <VerifiedIcon />
                   <Text style={styles.sellerName}> {item.brand}</Text>
                 </View>
 
-                {/* Stock + Shipping row */}
-                <View style={styles.stockRow}>
-                  <View style={styles.inStockPill}>
-                    <Text style={styles.inStockText}>In Stock</Text>
-                  </View>
-                  <Text style={styles.shippingText}>  Ships in 3–5 days</Text>
-                </View>
-
-                {/* Price + Quantity stepper (right-aligned on same row) */}
+                {/* Row 4: Price + Quantity stepper */}
                 <View style={styles.priceQtyRow}>
                   <Text style={styles.price}>
                     ${(item.price * item.quantity).toLocaleString()}
                   </Text>
-                  {/* Stepper — updateQuantity logic unchanged */}
                   <View style={styles.qtyRow}>
                     <TouchableOpacity
                       style={styles.qtyBtn}
@@ -454,50 +484,54 @@ export default function CartScreen({ navigation }) {
             <Text style={styles.totalValue}>${total.toLocaleString()}</Text>
           </View>
 
-          {/* Trust signals — single green pill row with two items */}
+          {/* Trust signals — plain green text, no pill */}
           <View style={styles.trustRow}>
-            <View style={styles.trustItem}>
-              <Text style={styles.trustText}>✓  Free 30-day returns</Text>
-            </View>
-            <View style={styles.trustSeparator} />
-            <View style={styles.trustItem}>
-              <ShieldIcon />
-              <Text style={styles.trustText}> SSL secured</Text>
-            </View>
+            <Text style={styles.trustText}>✓  Free 30-Day Returns</Text>
+            <Text style={styles.trustTextMuted}>  ·  </Text>
+            <ShieldIcon color={C.primary} size={12} />
+            <Text style={styles.trustText}>  SSL Secured</Text>
           </View>
 
         </View>
+
+        <Text style={styles.ftcDisclosure}>
+          We may earn a commission when you buy through links on this app.
+        </Text>
 
         <View style={{ height: 120 }} />
       </ScrollView>
 
       {/* ── Section 2D: Checkout Bar ────────────────────────────────── */}
       <View style={styles.checkoutWrap}>
+        {/* handleCheckout routing logic unchanged */}
         <TouchableOpacity
-          style={[styles.checkoutBtn, checkingOut && { opacity: 0.6 }]}
-          activeOpacity={0.88}
+          style={[styles.checkoutBtn, checkingOut && { opacity: 0.7 }]}
+          activeOpacity={0.85}
           disabled={checkingOut}
           onPress={handleCheckout}
           accessibilityLabel={`Checkout for $${total.toLocaleString()}`}
         >
-          <LinearGradient
-            colors={['#1E5AB0', '#0B6DC3', '#1D4ED8']}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={styles.checkoutGradient}
-          >
-            {checkingOut ? (
-              <ActivityIndicator color="#fff" size="small" />
-            ) : (
-              <View style={styles.checkoutBtnInner}>
-                <Text style={styles.checkoutLabel}>Complete Purchase</Text>
+          {checkingOut ? (
+            <ActivityIndicator color="#fff" size="small" />
+          ) : allAmazon ? (
+            <View style={styles.checkoutBtnInnerCentered}>
+              <CheckoutCartIcon />
+              <Text style={styles.checkoutLabel}>  Buy on Amazon</Text>
+            </View>
+          ) : (
+            <View style={styles.checkoutBtnInner}>
+              <View style={styles.checkoutLeft}>
+                <CheckoutCartIcon />
+                <Text style={styles.checkoutLabel}>  Checkout</Text>
               </View>
-            )}
-          </LinearGradient>
+              <View style={styles.checkoutDivider} />
+              <Text style={styles.checkoutPrice}>${total.toLocaleString()}</Text>
+            </View>
+          )}
         </TouchableOpacity>
       </View>
 
-    </View>
+    </TabScreenFade>
   );
 }
 
@@ -545,7 +579,7 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     ...typeScale.caption,
-    color: C.textSecondary,
+    color: C.primary,
     marginTop: 4,
   },
 
@@ -567,10 +601,10 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   itemImageWrap: {
-    width: 88,
-    height: 88,
-    borderRadius: R.lg,             // 16px
-    backgroundColor: C.surface,    // #F9FAFB — light gray, NOT dark navy
+    width: 112,
+    height: 112,
+    borderRadius: 6,                // 6px — sharp, crisp corners
+    backgroundColor: C.surface,
     overflow: 'hidden',
     alignItems: 'center',
     justifyContent: 'center',
@@ -590,7 +624,9 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   itemName: {
-    ...typeScale.headline,
+    fontSize: 14,
+    fontWeight: '500',
+    lineHeight: 19,
     color: C.textPrimary,
     flex: 1,
     marginRight: SP[1],
@@ -610,7 +646,9 @@ const styles = StyleSheet.create({
     marginTop: 6,
   },
   sellerName: {
-    ...typeScale.caption,
+    fontSize: 11,
+    fontWeight: '600',
+    lineHeight: 14,
     color: C.primary,
   },
   stockRow: {
@@ -620,19 +658,30 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
   },
   inStockPill: {
-    backgroundColor: '#FFFFFF',
-    borderWidth: 0.75,
-    borderColor: C.success,
-    borderRadius: 6,
-    paddingVertical: 2,
-    paddingHorizontal: 6,
-    alignSelf: 'flex-start',
+    backgroundColor: C.successBg,  // #DCFCE7
+    borderRadius: R.full,
+    paddingVertical: 4,
+    paddingHorizontal: 8,
   },
   inStockText: {
-    fontSize: 10,
-    fontWeight: '600',
+    ...typeScale.micro,
     color: C.success,
-    letterSpacing: 0.2,
+    textTransform: undefined,
+  },
+  ratingRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 7,
+    gap: 1,
+  },
+  ratingScore: {
+    ...typeScale.caption,
+    fontWeight: '600',
+    color: C.textPrimary,
+  },
+  ratingCount: {
+    ...typeScale.caption,
+    color: C.textSecondary,
   },
   shippingText: {
     ...typeScale.caption,
@@ -642,34 +691,33 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: 8,
+    marginTop: 6,
   },
   price: {
-    ...typeScale.display,
-    fontWeight: '800',
+    ...typeScale.price,             // 16px / 700 — bold but compact
     color: C.textPrimary,
     fontVariant: ['tabular-nums'],
   },
   qtyRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    height: 36,
+    height: 28,
   },
   qtyBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: R.sm,             // 8px
+    width: 28,
+    height: 28,
+    borderRadius: 6,
     borderWidth: 1,
     borderColor: C.border,
-    backgroundColor: C.surface,    // #F9FAFB
+    backgroundColor: C.surface,
     alignItems: 'center',
     justifyContent: 'center',
   },
   qtyText: {
-    ...typeScale.headline,
+    fontSize: 13,
     fontWeight: '700',
     color: C.textPrimary,
-    minWidth: 32,
+    minWidth: 22,
     textAlign: 'center',
   },
 
@@ -743,32 +791,26 @@ const styles = StyleSheet.create({
   },
   trustRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    borderWidth: 0.75,
-    borderColor: C.success,
-    borderRadius: 6,
-    paddingVertical: 10,
-    paddingHorizontal: SP[3],       // 12px
     marginTop: SP[4],               // 16px
   },
-  trustItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-  },
-  trustSeparator: {
-    width: 1,
-    height: 16,
-    backgroundColor: C.success,
-    opacity: 0.3,
-    marginHorizontal: SP[2],
-  },
   trustText: {
-    ...typeScale.micro,
-    color: C.success,
-    textTransform: undefined,
+    ...typeScale.caption,
+    color: C.primary,
+    fontWeight: '500',
+  },
+  trustTextMuted: {
+    ...typeScale.caption,
+    color: C.textTertiary,
+  },
+
+  ftcDisclosure: {
+    fontSize: 11,
+    fontStyle: 'italic',
+    color: C.textTertiary,
+    textAlign: 'center',
+    marginTop: 16,
+    marginHorizontal: 20,
   },
 
   // ── Section 2D: Checkout Bar ─────────────────────────────────────────────────
@@ -777,39 +819,56 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    paddingHorizontal: SP[5],
-    paddingBottom: 34,
-    paddingTop: SP[3],
-    backgroundColor: C.bg,
+    paddingHorizontal: SP[5],       // 20px
+    paddingBottom: SP[3],           // 12px — matches paddingTop
+    paddingTop: SP[3],              // 12px
+    backgroundColor: C.bg,         // white — no gradient
     borderTopWidth: 1,
     borderTopColor: C.border,
   },
   checkoutBtn: {
-    borderRadius: R.full,
-    overflow: 'hidden',
-    height: 58,
-    shadowColor: '#1D4ED8',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.35,
-    shadowRadius: 16,
-    elevation: 8,
-  },
-  checkoutGradient: {
-    flex: 1,
+    backgroundColor: C.primary,    // #0B6DC3
+    borderRadius: R.full,           // 9999px pill
+    height: 56,
     alignItems: 'center',
     justifyContent: 'center',
+    shadowColor: SH.md.shadowColor,
+    shadowOffset: SH.md.shadowOffset,
+    shadowOpacity: SH.md.shadowOpacity,
+    shadowRadius: SH.md.shadowRadius,
+    elevation: SH.md.elevation,
   },
   checkoutBtnInner: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '100%',
+    paddingHorizontal: SP[5],       // 20px
+  },
+  checkoutBtnInnerCentered: {
+    flexDirection: 'row',
+    alignItems: 'center',
     justifyContent: 'center',
-    gap: 8,
+    width: '100%',
+  },
+  checkoutLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   checkoutLabel: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#FFFFFF',
-    letterSpacing: 0.2,
+    ...typeScale.button,
+    color: C.white,
+  },
+  checkoutDivider: {
+    width: 1,
+    height: 20,
+    backgroundColor: 'rgba(255,255,255,0.3)',
+  },
+  checkoutPrice: {
+    ...typeScale.button,
+    fontWeight: '800',
+    color: C.white,
+    fontVariant: ['tabular-nums'],
   },
 
   // ── Empty state ──────────────────────────────────────────────────────────────

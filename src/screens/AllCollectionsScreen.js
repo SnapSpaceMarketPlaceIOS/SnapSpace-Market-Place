@@ -5,16 +5,15 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Image,
-  Dimensions,
 } from 'react-native';
+import CardImage from '../components/CardImage';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Path, Polyline } from 'react-native-svg';
-import { space, radius, shadow, typeScale, fontWeight, letterSpacing, palette } from '../constants/tokens';
-import { colors as C } from '../constants/theme';
+import { space, radius, shadow, typeScale, fontWeight, letterSpacing } from '../constants/tokens';
+import { colors } from '../constants/colors';
+import { Badge } from '../components/ds';
 
-const { width } = Dimensions.get('window');
+// ── Collections data ──────────────────────────────────────────────────────────
 
 const CURATED_COLLECTIONS = [
   {
@@ -23,7 +22,7 @@ const CURATED_COLLECTIONS = [
     subtitle: '12 rooms · Bright & airy living',
     imageUrl: 'https://images.unsplash.com/photo-1628744876490-19b035ecf9c3?w=900&q=80',
     styles: ['minimalist', 'scandi', 'biophilic'],
-    accent: '#16A34A',
+    tag: 'MINIMALIST',
   },
   {
     id: 'dark-moody',
@@ -31,7 +30,7 @@ const CURATED_COLLECTIONS = [
     subtitle: '8 rooms · Dramatic, rich interiors',
     imageUrl: 'https://images.unsplash.com/photo-1638541420159-cadd0634f08f?w=900&q=80',
     styles: ['dark-luxe', 'luxury'],
-    accent: '#7C3AED',
+    tag: 'DARK LUXE',
   },
   {
     id: 'coastal-calm',
@@ -39,7 +38,7 @@ const CURATED_COLLECTIONS = [
     subtitle: '10 rooms · Breezy & serene',
     imageUrl: 'https://images.unsplash.com/photo-1679862342541-e408d4f3ab80?w=900&q=80',
     styles: ['minimalist', 'scandi'],
-    accent: '#0B6DC3',
+    tag: 'COASTAL',
   },
   {
     id: 'japandi-zen',
@@ -47,7 +46,7 @@ const CURATED_COLLECTIONS = [
     subtitle: '9 rooms · Refined simplicity',
     imageUrl: 'https://images.unsplash.com/photo-1628744876497-eb30460be9f6?w=900&q=80',
     styles: ['japandi', 'wabi-sabi'],
-    accent: '#B45309',
+    tag: 'JAPANDI',
   },
   {
     id: 'boho-eclectic',
@@ -55,7 +54,7 @@ const CURATED_COLLECTIONS = [
     subtitle: '7 rooms · Free-spirited layers',
     imageUrl: 'https://images.unsplash.com/photo-1632119580908-ae947d4c7691?w=900&q=80',
     styles: ['bohemian'],
-    accent: '#D97706',
+    tag: 'BOHO',
   },
   {
     id: 'mid-century-modern',
@@ -63,7 +62,7 @@ const CURATED_COLLECTIONS = [
     subtitle: '11 rooms · Iconic & timeless',
     imageUrl: 'https://images.unsplash.com/photo-1618221195710-2d01d1e0a0a0?w=900&q=80',
     styles: ['mid-century'],
-    accent: '#EA580C',
+    tag: 'MID-CENTURY',
   },
   {
     id: 'farmhouse-living',
@@ -71,7 +70,7 @@ const CURATED_COLLECTIONS = [
     subtitle: '6 rooms · Warm, rooted comfort',
     imageUrl: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=900&q=80',
     styles: ['farmhouse', 'rustic'],
-    accent: '#A16207',
+    tag: 'FARMHOUSE',
   },
   {
     id: 'glam-luxe',
@@ -79,228 +78,197 @@ const CURATED_COLLECTIONS = [
     subtitle: '5 rooms · Opulent statement spaces',
     imageUrl: 'https://images.unsplash.com/photo-1615529182904-14819c35db37?w=900&q=80',
     styles: ['luxury', 'glam'],
-    accent: '#9333EA',
+    tag: 'LUXURY',
   },
 ];
 
+// ── Icons ─────────────────────────────────────────────────────────────────────
+
 function BackIcon() {
   return (
-    <Svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke={C.textPrimary} strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round">
+    <Svg width={20} height={20} viewBox="0 0 24 24" fill="none"
+      stroke="#111827" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round">
       <Path d="M19 12H5" />
       <Polyline points="12 19 5 12 12 5" />
     </Svg>
   );
 }
 
-function ArrowRightIcon({ color = '#fff' }) {
-  return (
-    <Svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round">
-      <Path d="M5 12h14" />
-      <Polyline points="12 5 19 12 12 19" />
-    </Svg>
-  );
-}
+// ── Screen ────────────────────────────────────────────────────────────────────
 
 export default function AllCollectionsScreen({ navigation }) {
   return (
     <View style={styles.root}>
-      {/* Header */}
-      <SafeAreaView edges={['top']} style={styles.headerSafe}>
-        <View style={styles.header}>
-          <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()} activeOpacity={0.7}>
-            <BackIcon />
-          </TouchableOpacity>
-          <View style={styles.headerTitleWrap}>
-            <Text style={styles.headerTitle}>Collections</Text>
-          </View>
-          <View style={styles.backBtn} pointerEvents="none" />
-        </View>
-      </SafeAreaView>
-
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false} bounces>
-        {/* Hero intro */}
-        <LinearGradient
-          colors={[palette.heroStart, palette.heroEnd]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={styles.introBanner}
+      <SafeAreaView edges={['top']} style={styles.safeArea}>
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+          bounces
         >
-          <Text style={styles.introEyebrow}>CURATED FOR YOU</Text>
-          <Text style={styles.introTitle}>Explore Collections</Text>
-          <Text style={styles.introSub}>Handpicked room themes, styles, and product sets</Text>
-        </LinearGradient>
-
-        {/* Collections list */}
-        <View style={styles.listContainer}>
-          {CURATED_COLLECTIONS.map((col, i) => (
+          {/* ── Header — matches Explore page pattern ─────────────────── */}
+          <View style={styles.headerRow}>
             <TouchableOpacity
-              key={col.id}
-              style={styles.collectionRow}
-              activeOpacity={0.88}
-              onPress={() =>
-                navigation.navigate('Browse', {
-                  mode: 'collection',
-                  title: col.title,
-                  subtitle: col.subtitle,
-                  collection: col,
-                  heroImage: col.imageUrl,
-                })
-              }
+              style={styles.backBtn}
+              onPress={() => navigation.goBack()}
+              activeOpacity={0.7}
             >
-              <Image source={{ uri: col.imageUrl }} style={styles.rowImage} resizeMode="cover" />
-              <LinearGradient
-                colors={['rgba(0,0,0,0.10)', 'rgba(0,0,0,0.68)']}
-                locations={[0.2, 1]}
-                style={StyleSheet.absoluteFill}
-              />
-              {/* Accent top-left line */}
-              <View style={[styles.accentLine, { backgroundColor: col.accent }]} />
-              <View style={styles.rowContent}>
-                <View style={styles.rowTextWrap}>
-                  <Text style={styles.rowTitle}>{col.title}</Text>
-                  <Text style={styles.rowSubtitle}>{col.subtitle}</Text>
-                </View>
-                <View style={styles.rowArrow}>
-                  <ArrowRightIcon />
-                </View>
-              </View>
+              <BackIcon />
             </TouchableOpacity>
-          ))}
-        </View>
+          </View>
 
-        <View style={styles.bottomSpacer} />
-      </ScrollView>
+          <Text style={styles.eyebrow}>CURATED FOR YOU</Text>
+          <Text style={styles.pageTitle}>Explore Collections</Text>
+          <Text style={styles.pageSub}>Handpicked room themes, styles, and product sets</Text>
+
+          {/* ── Collections list ──────────────────────────────────────── */}
+          <View style={styles.listContainer}>
+            {CURATED_COLLECTIONS.map((col) => (
+              <TouchableOpacity
+                key={col.id}
+                style={styles.card}
+                activeOpacity={0.88}
+                onPress={() =>
+                  navigation.navigate('Browse', {
+                    mode: 'collection',
+                    title: col.title,
+                    subtitle: col.subtitle,
+                    collection: col,
+                    heroImage: col.imageUrl,
+                  })
+                }
+              >
+                {/* Photo — clean, no overlay */}
+                <View style={styles.photoWrap}>
+                  <CardImage
+                    uri={col.imageUrl}
+                    style={styles.photo}
+                    resizeMode="cover"
+                    placeholderColor="#D0D7E3"
+                  />
+                </View>
+
+                {/* Content below photo */}
+                <View style={styles.cardBody}>
+                  <Text style={styles.cardTitle}>{col.title}</Text>
+                  <Text style={styles.cardSubtitle}>{col.subtitle}</Text>
+                  <Badge variant="source" label={col.tag} color={colors.bluePrimary} style={styles.badge} />
+                </View>
+              </TouchableOpacity>
+            ))}
+          </View>
+
+          <View style={styles.bottomSpacer} />
+        </ScrollView>
+      </SafeAreaView>
     </View>
   );
 }
+
+// ── Styles ────────────────────────────────────────────────────────────────────
 
 const styles = StyleSheet.create({
   root: {
     flex: 1,
     backgroundColor: '#FFFFFF',
   },
-  headerSafe: {
-    backgroundColor: '#FFFFFF',
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(0,0,0,0.06)',
-    zIndex: 10,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: space.base,
-    paddingVertical: 12,
-  },
-  backBtn: {
-    width: 44,
-    height: 44,
-    borderRadius: radius.full,
-    backgroundColor: 'rgba(0,0,0,0.04)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  headerTitleWrap: {
+  safeArea: {
     flex: 1,
-    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
   },
-  headerTitle: {
-    ...typeScale.title,
-    color: C.textPrimary,
-    letterSpacing: letterSpacing.tight,
-  },
-
   scrollContent: {
     flexGrow: 1,
   },
 
-  introBanner: {
+  // ── Header ─────────────────────────────────────────────────────────────────
+  headerRow: {
     paddingHorizontal: space.lg,
-    paddingTop: space.xl,
-    paddingBottom: space['2xl'],
+    paddingTop: space.base,
+    paddingBottom: space.sm,
   },
-  introEyebrow: {
+  backBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: radius.full,
+    backgroundColor: 'rgba(0,0,0,0.05)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  eyebrow: {
     fontSize: 11,
-    fontWeight: fontWeight.bold,
-    color: 'rgba(255,255,255,0.65)',
-    letterSpacing: 2,
+    fontWeight: '700',
+    color: '#9CA3AF',
+    letterSpacing: 1.5,
     textTransform: 'uppercase',
-    marginBottom: 6,
+    paddingHorizontal: space.lg,
+    marginBottom: 4,
   },
-  introTitle: {
+  pageTitle: {
     fontSize: 28,
-    fontWeight: fontWeight.xbold,
-    color: '#FFFFFF',
+    fontWeight: '800',
+    color: colors.bluePrimary,
     letterSpacing: letterSpacing.tight,
+    paddingHorizontal: space.lg,
     marginBottom: 6,
   },
-  introSub: {
+  pageSub: {
     ...typeScale.body,
-    color: 'rgba(255,255,255,0.72)',
+    color: '#6B7280',
+    paddingHorizontal: space.lg,
+    marginBottom: space.xl,
   },
 
+  // ── List ───────────────────────────────────────────────────────────────────
   listContainer: {
     paddingHorizontal: space.lg,
-    paddingTop: space.lg,
-    gap: space.sm,
+    gap: space.md,
   },
 
-  collectionRow: {
-    height: 130,
+  // ── Card ───────────────────────────────────────────────────────────────────
+  card: {
     borderRadius: radius.xl,
     overflow: 'hidden',
+    backgroundColor: '#FFFFFF',
     borderWidth: 1,
     borderColor: 'rgba(0,0,0,0.06)',
+    shadowColor: shadow.low.shadowColor,
+    shadowOffset: shadow.low.shadowOffset,
+    shadowOpacity: shadow.low.shadowOpacity,
+    shadowRadius: shadow.low.shadowRadius,
+    elevation: shadow.low.elevation,
   },
-  rowImage: {
+
+  // Photo — top half of card, clean with no overlay
+  photoWrap: {
+    width: '100%',
+    height: 180,
+    overflow: 'hidden',
+  },
+  photo: {
     width: '100%',
     height: '100%',
   },
-  accentLine: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    width: 4,
-    height: '100%',
-  },
-  rowContent: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+
+  // Content area — white, below photo
+  cardBody: {
     paddingHorizontal: space.base,
-    paddingBottom: 14,
+    paddingTop: space.md,
+    paddingBottom: space.base,
+    gap: 4,
+    backgroundColor: '#FFFFFF',
   },
-  rowTextWrap: {
-    flex: 1,
-    paddingRight: space.sm,
-  },
-  rowTitle: {
+  cardTitle: {
     fontSize: 17,
-    fontWeight: fontWeight.bold,
-    color: '#FFFFFF',
+    fontWeight: '700',
+    color: '#111827',
     letterSpacing: letterSpacing.tight,
-    marginBottom: 3,
-    textShadowColor: 'rgba(0,0,0,0.3)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 6,
   },
-  rowSubtitle: {
+  cardSubtitle: {
     ...typeScale.caption,
-    color: 'rgba(255,255,255,0.75)',
+    color: '#6B7280',
+    marginBottom: 4,
   },
-  rowArrow: {
-    width: 36,
-    height: 36,
-    borderRadius: radius.full,
-    backgroundColor: 'rgba(255,255,255,0.18)',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.3)',
-    alignItems: 'center',
-    justifyContent: 'center',
+  badge: {
+    alignSelf: 'flex-start',
   },
 
   bottomSpacer: {

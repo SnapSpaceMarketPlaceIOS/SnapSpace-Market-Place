@@ -1,6 +1,7 @@
 import { parseDesignPrompt } from '../utils/promptParser';
 import { matchProducts, matchProductsForDesign } from './productMatcher';
-import { getProductsByIds } from '../data/productCatalog';
+import { PRODUCT_CATALOG, getProductsByIds } from '../data/productCatalog';
+import curatedProducts from '../data/curatedProducts';
 import { uiColors } from '../constants/tokens';
 
 /**
@@ -10,6 +11,72 @@ import { uiColors } from '../constants/tokens';
  * Phase 1 (current): Returns curated local catalog products.
  * Phase 2 (after PA-API unlock): Will call amazonApi.js for live results.
  */
+
+// ── Curated catalog field mappings ──────────────────────────────────────────
+
+// Maps curatedProducts.category → PRODUCT_CATALOG category values
+const CATEGORY_MAP = {
+  'tables-storage': 'coffee-table',
+  'sofas-chairs':   'sofa',
+  'rugs':           'rug',
+  'wall-art-mirrors': 'wall-art',
+};
+
+// Maps curatedProducts.style (Title Case) → PRODUCT_CATALOG style values
+// IMPORTANT: must match keys in STYLE_AFFINITY (styleMap.js) exactly
+const STYLE_MAP = {
+  'Japandi':   'japandi',
+  'Modern':    'contemporary',   // 'modern' is not in STYLE_AFFINITY — use 'contemporary'
+  'Rustic':    'rustic',
+  'Dark Luxe': 'dark-luxe',
+  'Coastal':   'coastal',
+};
+
+/**
+ * Converts a curatedProducts entry into the PRODUCT_CATALOG shape so it
+ * can flow through the same matcher / normalizer pipeline.
+ */
+function normalizeCuratedProduct(p) {
+  const isMirror = /mirror/i.test(p.name);
+  const category = isMirror ? 'mirror' : (CATEGORY_MAP[p.category] || p.category);
+  const style    = STYLE_MAP[p.style] || p.style.toLowerCase();
+
+  return {
+    id:           p.id,
+    asin:         p.asin,
+    name:         p.name,
+    brand:        p.brand,
+    price:        p.price,
+    priceDisplay: p.priceDisplay,
+    imageUrl:     p.image,
+    category,
+    roomType:     [p.room],
+    styles:       [style],
+    materials:    [],
+    tags:         p.tags || [],
+    source:       'amazon',
+    affiliateUrl: p.affiliateUrl,
+    rating:       4.3,
+    reviewCount:  0,
+    description:  '',
+  };
+}
+
+// Lazy-built combined catalog: PRODUCT_CATALOG + curatedProducts (PA-API fallback)
+// Set to null to force rebuild on next call (e.g. after style map changes)
+let _combinedCatalog = null;
+export function resetCatalogCache() { _combinedCatalog = null; }
+function getCombinedCatalog() {
+  if (!_combinedCatalog) {
+    const curatedNormalized = curatedProducts.map(normalizeCuratedProduct);
+    // Merge: curated items first (higher priority in ties), then base catalog
+    // Deduplicate by id so future PA-API items won't collide
+    const baseIds = new Set(PRODUCT_CATALOG.map((p) => p.id));
+    const uniqueCurated = curatedNormalized.filter((p) => !baseIds.has(p.id));
+    _combinedCatalog = [...uniqueCurated, ...PRODUCT_CATALOG];
+  }
+  return _combinedCatalog;
+}
 
 /**
  * Get products matched to a free-text AI design prompt.
@@ -21,7 +88,7 @@ import { uiColors } from '../constants/tokens';
  */
 export function getProductsForPrompt(promptText, limit = 6) {
   const parsed = parseDesignPrompt(promptText);
-  const products = matchProducts(parsed, limit);
+  const products = matchProducts(parsed, limit, getCombinedCatalog());
   return products.map(normalizeProduct);
 }
 
@@ -40,7 +107,7 @@ export function getProductsForDesign(design, limit = 4) {
     if (explicit.length >= limit) return explicit.slice(0, limit).map(normalizeProduct);
   }
   // Fall back to algorithm matching
-  const products = matchProductsForDesign(design, limit);
+  const products = matchProductsForDesign(design, limit, getCombinedCatalog());
   return products.map(normalizeProduct);
 }
 
@@ -58,33 +125,62 @@ export function searchProducts({ keywords = '', roomType = null, style = null, l
   const parsed = parseDesignPrompt(
     [keywords, roomType, style].filter(Boolean).join(' ')
   );
-  const products = matchProducts(parsed, limit);
+  const products = matchProducts(parsed, limit, getCombinedCatalog());
   return products.map(normalizeProduct);
 }
 
 /**
  * Normalizes a product from the catalog into the shape expected by the UI.
  * Ensures backward compatibility with existing screens (name, brand, price string).
+ *
+ * Price strategy:
+ *   priceValue  — always the CURRENT selling price (salePrice ?? price) as a NUMBER
+ *   price       — human-readable display string of the current selling price
+ *   listPrice   — original/list price as a NUMBER (before discount)
+ *   compareAtPrice — same as listPrice when discounted, null when not
  */
 function normalizeProduct(product) {
+  // Current selling price = sale price if available, otherwise list price
+  const currentPrice = product.salePrice ?? product.price;
+  const currentPriceDisplay = product.salePriceDisplay ?? product.priceDisplay;
+
   return {
     // Legacy fields (ShopTheLookScreen, CartContext compatibility)
     name: product.name,
     brand: `${product.brand}`,
-    price: product.priceDisplay,
+    price: currentPriceDisplay,
 
     // Extended fields (new screens)
     id: product.id,
-    priceValue: product.price,
+    asin: product.asin || null,
+    priceValue: currentPrice,
+    listPrice: product.price,
+    priceLabel: currentPriceDisplay,
     imageUrl: product.imageUrl,
     affiliateUrl: product.affiliateUrl,
     source: product.source,
     category: product.category,
     styles: product.styles,
+    styleTags: product.styles,
+    roomType: Array.isArray(product.roomType) ? product.roomType[0] : product.roomType,
     rating: product.rating,
     reviewCount: product.reviewCount,
     description: product.description,
     materials: product.materials,
+    tags: product.tags || [],
+
+    // Rich PDP fields — passed through from catalog to ProductDetailScreen
+    images: product.images || [],
+    variants: product.variants || [],
+    sizes: product.sizes || null,
+    details: product.details || null,
+    features: product.features || null,
+    shipping: product.shipping || null,
+    salePrice: product.salePrice ?? null,
+    salePriceDisplay: product.salePriceDisplay ?? null,
+    compareAtPrice: product.compareAtPrice ?? null,
+    compareAtPriceDisplay: product.compareAtPriceDisplay ?? null,
+    bestSellerBadge: product.bestSellerBadge ?? null,
   };
 }
 
@@ -110,7 +206,7 @@ export function getSourceColor(source) {
     case 'amazon':  return uiColors.amazon;   // #FF9900 from tokens
     case 'wayfair': return '#7B2D8B';
     case 'houzz':   return '#4DBC15';
-    default:        return uiColors.primary;  // #1D4ED8 from tokens
+    default:        return uiColors.primary;  // #0B6DC3 from tokens
   }
 }
 
