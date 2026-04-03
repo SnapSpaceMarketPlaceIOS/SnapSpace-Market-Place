@@ -29,7 +29,7 @@ export function SubscriptionProvider({ children }) {
   });
 
   // ── Dev toggle ──────────────────────────────────────────────────────────
-  const [devForcePaywall, setDevForcePaywall] = useState(__DEV__ ? true : false);
+  const [devForcePaywall, setDevForcePaywall] = useState(false);
 
   const shouldShowPaywall = devForcePaywall || !subscription.canGenerate;
 
