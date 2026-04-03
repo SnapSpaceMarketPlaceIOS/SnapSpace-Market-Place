@@ -76,7 +76,8 @@
           "merchantIdentifier": "merchant.com.anthonyrivera.snapspace",
           "enableGooglePay": false
         }
-      ]
+      ],
+      "expo-iap"
     ]
   }
 }
