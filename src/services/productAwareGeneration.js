@@ -43,9 +43,9 @@ export async function getUserQuota(userId) {
       // Default: allow generation (fail open so quota issues don't block users)
       return {
         tier: 'free',
-        quotaLimit: 3,
+        quotaLimit: 5,
         generationsUsed: 0,
-        generationsRemaining: 3,
+        generationsRemaining: 5,
         canGenerate: true,
         quotaResetDate: null,
       };
@@ -62,7 +62,7 @@ export async function getUserQuota(userId) {
     };
   } catch (err) {
     console.warn('[ProductAwareGen] Quota check failed:', err.message);
-    return { canGenerate: true, tier: 'free', generationsRemaining: 3 };
+    return { canGenerate: true, tier: 'free', generationsRemaining: 5 };
   }
 }
 

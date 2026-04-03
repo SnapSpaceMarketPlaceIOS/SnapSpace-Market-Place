@@ -205,6 +205,7 @@ function InfoIcon() {
 // No static placeholder data — only show real user designs from Supabase
 
 const ACCOUNT_ITEMS = [
+  { label: 'Subscription',           icon: <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="#444" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round"><Path d="M2 4l3 12h14l3-12-6 7-4-9-4 9-6-7z" /><Path d="M5 16h14v2H5z" /></Svg>, screen: 'Paywall' },
   { label: 'My Spaces',              icon: <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="#444" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round"><Path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z" /><Line x1={4} y1={22} x2={4} y2={15} /></Svg>,  screen: 'MySpaces' },
   { label: 'Saved Designs',          icon: <SavedIcon />, screen: 'Explore' },
   { label: 'Order History',          icon: <OrderIcon />, screen: 'OrderHistory' },

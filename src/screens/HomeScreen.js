@@ -46,6 +46,7 @@ import { analyzeRoomImage, rematchFromVision } from '../services/visionMatcher';
 import { PRODUCT_CATALOG } from '../data/productCatalog';
 import { saveUserDesign, updateDesignVisibility, uploadRoomPhoto } from '../services/supabase';
 import { getUserQuota } from '../services/productAwareGeneration';
+import { useSubscription } from '../context/SubscriptionContext';
 import { generateWithBFL } from '../services/bfl';
 import TabScreenFade from '../components/TabScreenFade';
 
@@ -812,6 +813,7 @@ const FIRST_VISIT_KEY = 'snapspace_home_visited';
 
 export default function HomeScreen({ navigation, route }) {
   const { user } = useAuth();
+  const { subscription, shouldShowPaywall, refreshQuota, recordGeneration } = useSubscription();
   const { addToCart, items: cartItems } = useCart();
   const { liked } = useLiked();
   const [prompt, setPrompt] = useState('');
@@ -833,13 +835,7 @@ export default function HomeScreen({ navigation, route }) {
   const [posting, setPosting] = useState(false);
   const [autoSavedDesignId, setAutoSavedDesignId] = useState(null);
 
-  // ── Generation quota (free tier: 3/month) ──────────────────────────────────
-  const [userQuota, setUserQuota] = useState({
-    canGenerate: true,
-    generationsRemaining: 3,
-    tier: 'free',
-    quotaResetDate: null,
-  });
+  // ── Generation quota (managed by SubscriptionContext) ────────────────────
 
   // Loading bar animation
   const loadingProgress = useRef(new Animated.Value(0)).current;
@@ -1188,21 +1184,11 @@ export default function HomeScreen({ navigation, route }) {
       setGenStatus('Finding products for your space…');
       const matchedProducts = getProductsForPrompt(designPrompt, 4);
 
-      // ── Quota check (free tier: 3 generations/month) ───────────────────────
-      if (!userQuota.canGenerate) {
+      // ── Quota check (SubscriptionContext) ────────────────────────────────
+      if (shouldShowPaywall || !subscription.canGenerate) {
         stopLoadingBar(false);
         setGenerating(false);
-        const resetDate = userQuota.quotaResetDate
-          ? new Date(userQuota.quotaResetDate).toLocaleDateString('en-US', { month: 'long', day: 'numeric' })
-          : 'next month';
-        Alert.alert(
-          'Monthly Limit Reached',
-          `You've used all 3 free generations this month. Resets ${resetDate}.\n\nUpgrade to Premium for unlimited generations.`,
-          [
-            { text: 'Maybe Later', style: 'cancel' },
-            { text: 'Upgrade', onPress: () => navigation.navigate('Premium') },
-          ]
-        );
+        navigation.navigate('Paywall');
         return;
       }
 
@@ -1302,8 +1288,9 @@ export default function HomeScreen({ navigation, route }) {
             console.log('[Gen] BFL complete');
           }
 
-          // Refresh quota in background (non-blocking)
-          getUserQuota(user.id).then(q => setUserQuota(q)).catch(() => {});
+          // Record generation + refresh quota in background
+          recordGeneration();
+          refreshQuota();
 
         } catch (genErr) {
           stopLoadingBar(false);
@@ -1396,13 +1383,7 @@ export default function HomeScreen({ navigation, route }) {
     })();
   }, [user]);
 
-  // Fetch generation quota when user signs in
-  useEffect(() => {
-    if (!user?.id) return;
-    getUserQuota(user.id)
-      .then(quota => setUserQuota(quota))
-      .catch(err => console.warn('[Quota] Fetch failed:', err.message));
-  }, [user?.id]);
+  // Generation quota now managed by SubscriptionContext
 
   const firstName = getFirstName(user);
   const greetingLine = firstName

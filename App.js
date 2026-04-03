@@ -8,6 +8,7 @@ import { SharedProvider } from './src/context/SharedContext';
 import { CartProvider, useCart } from './src/context/CartContext';
 import { OrderHistoryProvider } from './src/context/OrderHistoryContext';
 import { AuthProvider, useAuth } from './src/context/AuthContext';
+import { SubscriptionProvider } from './src/context/SubscriptionContext';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Svg, { Path, Circle, Polyline, Line } from 'react-native-svg';
@@ -45,6 +46,7 @@ import SupplierOnboardingScreen from './src/screens/SupplierOnboardingScreen';
 import SupplierDashboardScreen from './src/screens/SupplierDashboardScreen';
 import BrowseScreen from './src/screens/BrowseScreen';
 import AllCollectionsScreen from './src/screens/AllCollectionsScreen';
+import PaywallScreen from './src/screens/PaywallScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -289,6 +291,7 @@ function RootNavigator() {
       <Stack.Screen name="SupplierDashboard" component={SupplierDashboardScreen} />
       <Stack.Screen name="Browse" component={BrowseScreen} />
       <Stack.Screen name="AllCollections" component={AllCollectionsScreen} />
+      <Stack.Screen name="Paywall" component={PaywallScreen} options={{ presentation: 'modal' }} />
     </Stack.Navigator>
   );
 }
@@ -298,6 +301,7 @@ export default function App() {
     <StripeProvider publishableKey={process.env.EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY}>
       <SafeAreaProvider>
         <AuthProvider>
+          <SubscriptionProvider>
           <CartProvider>
             <OrderHistoryProvider>
               <LikedProvider>
@@ -309,6 +313,7 @@ export default function App() {
               </LikedProvider>
             </OrderHistoryProvider>
           </CartProvider>
+          </SubscriptionProvider>
         </AuthProvider>
       </SafeAreaProvider>
     </StripeProvider>
