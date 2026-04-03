@@ -3,10 +3,10 @@ import { useAuth } from './AuthContext';
 
 // ── Tier definitions ────────────────────────────────────────────────────────
 export const TIERS = {
-  free:    { id: 'free',    name: 'Free',    price: 0,     priceLabel: 'Free',     gens: 5,  monthly: false },
-  basic:   { id: 'basic',   name: 'Basic',   price: 6.99,  priceLabel: '$6.99/mo', gens: 25, monthly: true, productId: 'snapspace_basic_monthly' },
-  pro:     { id: 'pro',     name: 'Pro',     price: 12.99, priceLabel: '$12.99/mo',gens: 50, monthly: true, productId: 'snapspace_pro_monthly',   popular: true },
-  premium: { id: 'premium', name: 'Premium', price: 19.99, priceLabel: '$19.99/mo',gens: 75, monthly: true, productId: 'snapspace_premium_monthly' },
+  free:    { id: 'free',    name: 'Free',    price: 0,     priceLabel: 'Free',      gens: 5,  displayLabel: '5',         monthly: false },
+  basic:   { id: 'basic',   name: 'Basic',   price: 6.99,  priceLabel: '$6.99/mo',  gens: 25, displayLabel: '25',        monthly: true, productId: 'snapspace_basic_monthly' },
+  pro:     { id: 'pro',     name: 'Pro',     price: 12.99, priceLabel: '$12.99/mo', gens: 50, displayLabel: '50',        monthly: true, productId: 'snapspace_pro_monthly',   popular: true },
+  premium: { id: 'premium', name: 'Premium', price: 19.99, priceLabel: '$19.99/mo', gens: 75, displayLabel: 'Unlimited', monthly: true, productId: 'snapspace_premium_monthly' },
 };
 
 export const PAID_TIERS = [TIERS.basic, TIERS.pro, TIERS.premium];
