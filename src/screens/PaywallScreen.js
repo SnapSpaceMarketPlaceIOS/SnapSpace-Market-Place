@@ -122,11 +122,10 @@ function TierCard({ tier, selected, onSelect }) {
 // ── Screen ────────────────────────────────────────────────────────────────────
 
 export default function PaywallScreen({ navigation }) {
-  const { subscription, purchaseSubscription, restorePurchases } = useSubscription();
+  const { subscription, purchaseSubscription } = useSubscription();
 
   const [selectedTier, setSelectedTier] = useState('premium');
   const [purchasing, setPurchasing] = useState(false);
-  const [restoring, setRestoring] = useState(false);
 
   const selected = PAID_TIERS.find(t => t.id === selectedTier);
   const usedCount = subscription.generationsUsed;
@@ -148,25 +147,7 @@ export default function PaywallScreen({ navigation }) {
     }
   };
 
-  const handleRestore = async () => {
-    setRestoring(true);
-    try {
-      const result = await restorePurchases();
-      if (result?.restored > 0) {
-        Alert.alert('Restored', 'Your subscription has been restored.', [
-          { text: 'OK', onPress: () => navigation.goBack() },
-        ]);
-      } else {
-        Alert.alert('Nothing to Restore', 'No previous subscriptions found for this account.');
-      }
-    } catch (e) {
-      Alert.alert('Restore Failed', e.message);
-    } finally {
-      setRestoring(false);
-    }
-  };
-
-  return (
+return (
     <SafeAreaView style={styles.root} edges={['top', 'bottom']}>
 
       {/* ── Wordmark header ───────────────────────────────────────── */}
@@ -195,7 +176,7 @@ export default function PaywallScreen({ navigation }) {
         </View>
       </View>
 
-      {/* ── Tier cards ────────────────────────────────────────────── */}
+      {/* ── Tier cards + legal (scrollable) ──────────────────────── */}
       <ScrollView
         style={styles.scroll}
         contentContainerStyle={styles.scrollContent}
@@ -210,29 +191,32 @@ export default function PaywallScreen({ navigation }) {
             onSelect={setSelectedTier}
           />
         ))}
-        {/* breathing room above sticky bar */}
-        <View style={{ height: 24 }} />
-      </ScrollView>
 
-      {/* ── Sticky bottom bar ─────────────────────────────────────── */}
-      <View style={styles.stickyBar}>
-        <Text style={styles.finePrint}>
-          Payment will be charged to your Apple ID account at confirmation of purchase.
-          Subscription automatically renews unless cancelled at least 24 hours before the
-          end of the current period. You can manage or cancel your subscription in your
-          device's Settings {'>'} Apple ID {'>'} Subscriptions.
-        </Text>
-
-        <View style={styles.legalLinks}>
-          <TouchableOpacity onPress={() => navigation.navigate('TermsOfUse')}>
-            <Text style={styles.legalLink}>Terms of Use</Text>
-          </TouchableOpacity>
-          <Text style={styles.legalDot}>·</Text>
-          <TouchableOpacity onPress={() => navigation.navigate('PrivacyPolicy')}>
-            <Text style={styles.legalLink}>Privacy Policy</Text>
-          </TouchableOpacity>
+        {/* ── Fine print + legal links scroll with cards ─────────── */}
+        <View style={styles.legalSection}>
+          <Text style={styles.finePrint}>
+            Payment will be charged to your Apple ID account at confirmation of purchase.
+            Subscription automatically renews unless cancelled at least 24 hours before the
+            end of the current period. You can manage or cancel your subscription in your
+            device's Settings {'>'} Apple ID {'>'} Subscriptions.
+          </Text>
+          <View style={styles.legalLinks}>
+            <TouchableOpacity onPress={() => navigation.navigate('TermsOfUse')}>
+              <Text style={styles.legalLink}>Terms of Use</Text>
+            </TouchableOpacity>
+            <Text style={styles.legalDot}>·</Text>
+            <TouchableOpacity onPress={() => navigation.navigate('PrivacyPolicy')}>
+              <Text style={styles.legalLink}>Privacy Policy</Text>
+            </TouchableOpacity>
+          </View>
         </View>
 
+        {/* breathing room above sticky CTA */}
+        <View style={{ height: 16 }} />
+      </ScrollView>
+
+      {/* ── Sticky CTA only ───────────────────────────────────────── */}
+      <View style={styles.stickyBar}>
         <TouchableOpacity
           onPress={handleSubscribe}
           disabled={purchasing}
@@ -243,16 +227,6 @@ export default function PaywallScreen({ navigation }) {
             {purchasing
               ? 'Processing…'
               : `Subscribe to ${selected?.name ?? 'Pro'} — ${selected?.priceLabel ?? '$12.99/mo'}`}
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          onPress={handleRestore}
-          disabled={restoring}
-          style={styles.restoreBtn}
-        >
-          <Text style={styles.restoreText}>
-            {restoring ? 'Restoring…' : 'Restore Purchases'}
           </Text>
         </TouchableOpacity>
       </View>
@@ -458,14 +432,11 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
 
-  // ── Sticky bottom bar
-  stickyBar: {
-    paddingHorizontal: layout.screenPaddingH,
-    paddingTop: space.md,
-    paddingBottom: space.sm,
-    borderTopWidth: 1,
-    borderTopColor: '#F3F4F6',
-    backgroundColor: '#fff',
+  // ── Legal section (scrolls with content)
+  legalSection: {
+    marginTop: space.xl,
+    paddingHorizontal: 4,
+    gap: 10,
   },
   finePrint: {
     fontSize: 11,
@@ -473,14 +444,12 @@ const styles = StyleSheet.create({
     color: '#9CA3AF',
     textAlign: 'center',
     lineHeight: 16,
-    marginBottom: 8,
   },
   legalLinks: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
     gap: 6,
-    marginBottom: 14,
   },
   legalLink: {
     fontSize: 12,
@@ -491,13 +460,22 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#9CA3AF',
   },
+
+  // ── Sticky CTA bar (button only)
+  stickyBar: {
+    paddingHorizontal: layout.screenPaddingH,
+    paddingTop: space.md,
+    paddingBottom: space.md,
+    borderTopWidth: 1,
+    borderTopColor: '#F3F4F6',
+    backgroundColor: '#fff',
+  },
   cta: {
     backgroundColor: BLUE,
     borderRadius: 28,
     height: 56,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 12,
   },
   ctaDisabled: {
     opacity: 0.6,
@@ -507,14 +485,5 @@ const styles = StyleSheet.create({
     fontWeight: fontWeight.bold,
     color: '#fff',
     letterSpacing: -0.2,
-  },
-  restoreBtn: {
-    alignSelf: 'center',
-    paddingVertical: 6,
-  },
-  restoreText: {
-    fontSize: 13,
-    fontWeight: fontWeight.medium,
-    color: '#6B7280',
   },
 });
