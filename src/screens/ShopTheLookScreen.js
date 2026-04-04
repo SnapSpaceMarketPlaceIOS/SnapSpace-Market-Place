@@ -390,8 +390,10 @@ const s = StyleSheet.create({
     marginTop: 4,
   },
   promptBody: {
-    ...typeScale.headline,
-    color: C.textPrimary,
+    fontSize: 13,
+    fontWeight: '400',
+    color: C.textSecondary,
+    lineHeight: 18,
     marginHorizontal: space.lg,
     marginBottom: 6,
   },

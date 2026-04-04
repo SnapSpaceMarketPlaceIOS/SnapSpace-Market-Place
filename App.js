@@ -47,6 +47,7 @@ import SupplierDashboardScreen from './src/screens/SupplierDashboardScreen';
 import BrowseScreen from './src/screens/BrowseScreen';
 import AllCollectionsScreen from './src/screens/AllCollectionsScreen';
 import PaywallScreen from './src/screens/PaywallScreen';
+import FollowListScreen from './src/screens/FollowListScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -292,6 +293,7 @@ function RootNavigator() {
       <Stack.Screen name="Browse" component={BrowseScreen} />
       <Stack.Screen name="AllCollections" component={AllCollectionsScreen} />
       <Stack.Screen name="Paywall" component={PaywallScreen} options={{ presentation: 'modal' }} />
+      <Stack.Screen name="FollowList" component={FollowListScreen} />
     </Stack.Navigator>
   );
 }

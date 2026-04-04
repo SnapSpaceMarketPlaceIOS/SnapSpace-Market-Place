@@ -25,7 +25,7 @@ import { useShared } from '../context/SharedContext';
 import { useAuth } from '../context/AuthContext';
 import AuthGate from '../components/AuthGate';
 import { useFocusEffect } from '@react-navigation/native';
-import { updateProfile, uploadAvatar, getUserDesigns } from '../services/supabase';
+import { updateProfile, uploadAvatar, getUserDesigns, getMyStats } from '../services/supabase';
 // DESIGNS import removed — profile only shows real user designs from Supabase
 import Skeleton from '../components/Skeleton';
 import PressableCard from '../components/PressableCard';
@@ -283,6 +283,17 @@ export default function ProfileScreen({ navigation }) {
   const [editDraft, setEditDraft] = useState(() => getInitialProfile(user));
   const [myDesigns, setMyDesigns] = useState([]);
   const [designsLoading, setDesignsLoading] = useState(true);
+  const [socialStats, setSocialStats] = useState({ followers: 0, following: 0, designs: 0 });
+
+  // Fetch real follower/following/design counts
+  useFocusEffect(
+    useCallback(() => {
+      if (!user?.id) return;
+      getMyStats(user.id)
+        .then(stats => { if (stats) setSocialStats(stats); })
+        .catch(() => {}); // fail silently — counts stay at 0
+    }, [user?.id])
+  );
 
   // Fetch user's own designs from Supabase
   useFocusEffect(
@@ -437,14 +448,20 @@ export default function ProfileScreen({ navigation }) {
           {/* Bio */}
           <Text style={styles.bio}>{profile.bio}</Text>
 
-          {/* Followers / Following — simple inline stats */}
+          {/* Followers / Following — live counts, tappable */}
           <View style={styles.followRow}>
-            <TouchableOpacity style={styles.followItem}>
-              <Text style={styles.followValue}>1.4K</Text>
+            <TouchableOpacity
+              style={styles.followItem}
+              onPress={() => navigation.navigate('FollowList', { userId: user.id, initialTab: 'followers', name: profile.displayName })}
+            >
+              <Text style={styles.followValue}>{socialStats.followers >= 1000 ? (socialStats.followers / 1000).toFixed(1).replace('.0','') + 'K' : socialStats.followers}</Text>
               <Text style={styles.followLabel}> Followers</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={[styles.followItem, { marginLeft: space.lg }]}>
-              <Text style={styles.followValue}>284</Text>
+            <TouchableOpacity
+              style={[styles.followItem, { marginLeft: space.lg }]}
+              onPress={() => navigation.navigate('FollowList', { userId: user.id, initialTab: 'following', name: profile.displayName })}
+            >
+              <Text style={styles.followValue}>{socialStats.following >= 1000 ? (socialStats.following / 1000).toFixed(1).replace('.0','') + 'K' : socialStats.following}</Text>
               <Text style={styles.followLabel}> Following</Text>
             </TouchableOpacity>
           </View>

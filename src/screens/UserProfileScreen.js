@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -6,14 +6,22 @@ import {
   StyleSheet,
   TouchableOpacity,
   Dimensions,
+  ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path, Circle, Line, Polyline, LinearGradient, Defs, Stop } from 'react-native-svg';
 import { colors as C } from '../constants/theme';
-import { typeScale, radius } from '../constants/tokens';
+import { typeScale, radius, space } from '../constants/tokens';
 import { VerifiedBadge } from '../components/VerifiedBadge';
-import { DESIGNS } from '../data/designs';
 import CardImage from '../components/CardImage';
+import { useAuth } from '../context/AuthContext';
+import {
+  getUserProfileData,
+  getUserPublicDesigns,
+  checkIsFollowing,
+  followUser,
+  unfollowUser,
+} from '../services/supabase';
 
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = (width - 48) / 2;
@@ -198,25 +206,96 @@ const FALLBACK_USER = {
   avatarColor: C.primary,
 };
 
-function getPostsForUser(rawUsername) {
-  const byHandle = DESIGNS.filter(d => d.seller === rawUsername);
-  if (byHandle.length >= 6) return byHandle;
-  return DESIGNS.slice(0, 9);
+function formatCount(n) {
+  if (n >= 1000) return (n / 1000).toFixed(n >= 10000 ? 0 : 1).replace('.0', '') + 'K';
+  return String(n);
 }
 
 // ── Component ─────────────────────────────────────────────────────────────────
 
 export default function UserProfileScreen({ navigation, route }) {
   const rawUsername = route?.params?.username ?? '';
-  const user = USER_DATA[rawUsername] ?? { ...FALLBACK_USER, username: `@${rawUsername}` };
+  const { user: currentUser } = useAuth();
 
-  const [following, setFollowing] = useState(false);
+  const [profile, setProfile] = useState(null);
+  const [designs, setDesigns] = useState([]);
+  const [profileLoading, setProfileLoading] = useState(true);
+  const [designsLoading, setDesignsLoading] = useState(true);
+  const [isFollowing, setIsFollowing] = useState(false);
+  const [followLoading, setFollowLoading] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
   const [liked, setLiked] = useState({});
 
-  const posts = useMemo(() => getPostsForUser(rawUsername), [rawUsername]);
+  const tabs = ['Posts'];
 
-  const tabs = ['Posts', 'Saved'];
+  // Load profile + follow state
+  useEffect(() => {
+    if (!rawUsername) return;
+    setProfileLoading(true);
+
+    getUserProfileData(rawUsername)
+      .then(data => {
+        setProfile(data);
+        // Check follow state if signed in and not viewing own profile
+        if (currentUser?.id && data?.id && currentUser.id !== data.id) {
+          return checkIsFollowing(currentUser.id, data.id).then(setIsFollowing);
+        }
+      })
+      .catch(err => console.warn('[UserProfile] load failed:', err.message))
+      .finally(() => setProfileLoading(false));
+  }, [rawUsername, currentUser?.id]);
+
+  // Load public designs
+  useEffect(() => {
+    if (!profile?.id) return;
+    setDesignsLoading(true);
+    getUserPublicDesigns(profile.id, 12, 0)
+      .then(rows => {
+        setDesigns(rows.map(d => ({
+          id: d.id,
+          imageUrl: d.image_url,
+          prompt: d.prompt,
+          styleTags: d.style_tags,
+          products: d.products,
+          likes: d.likes,
+          title: d.prompt || 'Untitled',
+        })));
+      })
+      .catch(err => console.warn('[UserProfile] designs failed:', err.message))
+      .finally(() => setDesignsLoading(false));
+  }, [profile?.id]);
+
+  const handleFollow = useCallback(async () => {
+    if (!currentUser?.id || !profile?.id) return;
+    setFollowLoading(true);
+    try {
+      if (isFollowing) {
+        await unfollowUser(currentUser.id, profile.id);
+        setIsFollowing(false);
+        setProfile(p => p ? { ...p, follower_count: Math.max(0, (p.follower_count || 0) - 1) } : p);
+      } else {
+        await followUser(currentUser.id, profile.id);
+        setIsFollowing(true);
+        setProfile(p => p ? { ...p, follower_count: (p.follower_count || 0) + 1 } : p);
+      }
+    } catch (e) {
+      console.warn('[Follow]', e.message);
+    } finally {
+      setFollowLoading(false);
+    }
+  }, [currentUser?.id, profile?.id, isFollowing]);
+
+  const isOwnProfile = currentUser?.id && profile?.id && currentUser.id === profile.id;
+  const avatarColor = '#035DA8';
+  const initial = (profile?.full_name || profile?.username || rawUsername || '?').charAt(0).toUpperCase();
+
+  if (profileLoading) {
+    return (
+      <View style={[styles.container, { alignItems: 'center', justifyContent: 'center' }]}>
+        <ActivityIndicator size="large" color={C.primary} />
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -224,11 +303,9 @@ export default function UserProfileScreen({ navigation, route }) {
 
         {/* ── Banner ── */}
         <View style={styles.banner}>
-          <View style={[styles.bannerGradient, { backgroundColor: user.avatarColor }]}>
+          <View style={[styles.bannerGradient, { backgroundColor: avatarColor }]}>
             <View style={styles.bannerOverlay} />
           </View>
-
-          {/* Nav row overlaid on banner */}
           <SafeAreaView style={styles.navRow}>
             <TouchableOpacity style={styles.navBtn} onPress={() => navigation?.goBack()}>
               <BackIcon />
@@ -239,101 +316,77 @@ export default function UserProfileScreen({ navigation, route }) {
           </SafeAreaView>
         </View>
 
-        {/* ── Avatar + Header info ── */}
+        {/* ── Avatar + Header ── */}
         <View style={styles.profileHeader}>
           <View style={styles.avatarRow}>
-            {/* Avatar */}
             <View style={[styles.avatar, { borderColor: '#fff' }]}>
-              <View style={[styles.avatarInner, { backgroundColor: user.avatarColor }]}>
-                <Text style={styles.avatarInitial}>
-                  {user.name.charAt(0).toUpperCase()}
-                </Text>
+              <View style={[styles.avatarInner, { backgroundColor: avatarColor }]}>
+                <Text style={styles.avatarInitial}>{initial}</Text>
               </View>
             </View>
 
-            {/* Follow / Message */}
-            <View style={styles.headerActions}>
-              <TouchableOpacity
-                style={[styles.followBtn, following && styles.followingBtn]}
-                onPress={() => setFollowing(f => !f)}
-              >
-                <Text style={[styles.followBtnText, following && styles.followingBtnText]}>
-                  {following ? 'Following' : 'Follow'}
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.messageBtn}>
-                <Text style={styles.messageBtnText}>Message</Text>
-              </TouchableOpacity>
-            </View>
+            {/* Follow button — hidden for own profile */}
+            {!isOwnProfile && (
+              <View style={styles.headerActions}>
+                <TouchableOpacity
+                  style={[styles.followBtn, isFollowing && styles.followingBtn]}
+                  onPress={handleFollow}
+                  disabled={followLoading || !currentUser}
+                >
+                  {followLoading
+                    ? <ActivityIndicator size="small" color={isFollowing ? C.primary : '#fff'} />
+                    : <Text style={[styles.followBtnText, isFollowing && styles.followingBtnText]}>
+                        {isFollowing ? 'Following' : 'Follow'}
+                      </Text>
+                  }
+                </TouchableOpacity>
+              </View>
+            )}
           </View>
 
-          {/* Name + verified badge + username */}
+          {/* Name + verified badge */}
           <View style={styles.nameRow}>
-            <Text style={styles.displayName}>{user.name}</Text>
-            {user.verified && (
+            <Text style={styles.displayName}>{profile?.full_name || rawUsername}</Text>
+            {profile?.is_verified_supplier && (
               <View style={{ marginLeft: 6, marginTop: 2 }}>
                 <VerifiedBadge size="md" />
               </View>
             )}
           </View>
-          <Text style={styles.username}>{user.username}</Text>
+          <Text style={styles.username}>@{profile?.username || rawUsername}</Text>
 
-          {/* Bio */}
-          <Text style={styles.bio}>{user.bio}</Text>
+          {profile?.bio ? <Text style={styles.bio}>{profile.bio}</Text> : null}
 
-          {/* Location */}
-          <Text style={styles.location}>📍 {user.location}</Text>
-
-          {/* Specialty tags */}
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            style={styles.tagsScroll}
-            contentContainerStyle={{ gap: 7 }}
-          >
-            {user.specialties.map(tag => (
-              <View key={tag} style={styles.specialtyTag}>
-                <Text style={styles.specialtyTagText}>{tag}</Text>
-              </View>
-            ))}
-          </ScrollView>
-
-          {/* Stats */}
+          {/* Stats — tappable follower/following counts */}
           <View style={styles.statsRow}>
             <View style={styles.statItem}>
-              <Text style={styles.statValue}>{user.posts}</Text>
+              <Text style={styles.statValue}>{formatCount(profile?.design_count || 0)}</Text>
               <Text style={styles.statLabel}>Posts</Text>
             </View>
             <View style={styles.statDivider} />
-            <View style={styles.statItem}>
-              <Text style={styles.statValue}>{user.followers}</Text>
+            <TouchableOpacity
+              style={styles.statItem}
+              onPress={() => profile?.id && navigation?.navigate('FollowList', { userId: profile.id, initialTab: 'followers', name: profile?.full_name || rawUsername })}
+            >
+              <Text style={styles.statValue}>{formatCount(profile?.follower_count || 0)}</Text>
               <Text style={styles.statLabel}>Followers</Text>
-            </View>
+            </TouchableOpacity>
             <View style={styles.statDivider} />
-            <View style={styles.statItem}>
-              <Text style={styles.statValue}>{user.following}</Text>
+            <TouchableOpacity
+              style={styles.statItem}
+              onPress={() => profile?.id && navigation?.navigate('FollowList', { userId: profile.id, initialTab: 'following', name: profile?.full_name || rawUsername })}
+            >
+              <Text style={styles.statValue}>{formatCount(profile?.following_count || 0)}</Text>
               <Text style={styles.statLabel}>Following</Text>
-            </View>
-            <View style={styles.statDivider} />
-            <View style={styles.statItem}>
-              <Text style={styles.statValue}>{user.totalLikes}</Text>
-              <Text style={styles.statLabel}>Likes</Text>
-            </View>
+            </TouchableOpacity>
           </View>
         </View>
 
-        {/* ── Tabs ── */}
+        {/* ── Tab bar ── */}
         <View style={styles.tabsRow}>
           {tabs.map((tab, i) => (
-            <TouchableOpacity
-              key={tab}
-              style={styles.tab}
-              onPress={() => setActiveTab(i)}
-              activeOpacity={0.7}
-            >
-              <Text style={[styles.tabLabel, activeTab === i && styles.tabLabelActive]}>
-                {tab}
-              </Text>
+            <TouchableOpacity key={tab} style={styles.tab} onPress={() => setActiveTab(i)} activeOpacity={0.7}>
+              <Text style={[styles.tabLabel, activeTab === i && styles.tabLabelActive]}>{tab}</Text>
               {activeTab === i && <View style={styles.tabUnderline} />}
             </TouchableOpacity>
           ))}
@@ -341,35 +394,39 @@ export default function UserProfileScreen({ navigation, route }) {
         <View style={styles.tabBorder} />
 
         {/* ── Posts Grid ── */}
-        <View style={styles.grid}>
-          {posts.map(post => (
-            <TouchableOpacity
-              key={post.id}
-              style={styles.card}
-              activeOpacity={0.88}
-              onPress={() => navigation?.navigate('ShopTheLook', { design: post })}
-            >
-              <View style={styles.cardImg}>
-                <CardImage uri={post.imageUrl} style={styles.cardPhoto} resizeMode="cover" />
-                <View style={styles.cardActions}>
-                  <TouchableOpacity
-                    style={styles.cardActionBtn}
-                    onPress={() => setLiked(p => ({ ...p, [post.id]: !p[post.id] }))}
-                    hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-                  >
-                    <HeartIcon filled={!!liked[post.id]} size={12} />
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={styles.cardActionBtn}
-                    hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-                  >
-                    <ShareIcon size={12} />
-                  </TouchableOpacity>
+        {designsLoading ? (
+          <View style={{ padding: 40, alignItems: 'center' }}>
+            <ActivityIndicator size="large" color={C.primary} />
+          </View>
+        ) : designs.length === 0 ? (
+          <View style={{ padding: 40, alignItems: 'center' }}>
+            <Text style={{ color: C.textSecondary, fontSize: 14 }}>No public posts yet</Text>
+          </View>
+        ) : (
+          <View style={styles.grid}>
+            {designs.map(post => (
+              <TouchableOpacity
+                key={post.id}
+                style={styles.card}
+                activeOpacity={0.88}
+                onPress={() => navigation?.navigate('ShopTheLook', { design: post })}
+              >
+                <View style={styles.cardImg}>
+                  <CardImage uri={post.imageUrl} style={styles.cardPhoto} resizeMode="cover" />
+                  <View style={styles.cardActions}>
+                    <TouchableOpacity
+                      style={styles.cardActionBtn}
+                      onPress={() => setLiked(p => ({ ...p, [post.id]: !p[post.id] }))}
+                      hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                    >
+                      <HeartIcon filled={!!liked[post.id]} size={12} />
+                    </TouchableOpacity>
+                  </View>
                 </View>
-              </View>
-            </TouchableOpacity>
-          ))}
-        </View>
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
 
         <View style={{ height: 40 }} />
       </ScrollView>

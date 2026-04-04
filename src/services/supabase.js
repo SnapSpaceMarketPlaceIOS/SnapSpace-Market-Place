@@ -638,3 +638,89 @@ export async function adminSuspendSupplier(targetUserId, adminId, reason) {
   if (error) throw error;
   return data;
 }
+
+// ─── Social: Follow / Unfollow ────────────────────────────────────────────────
+
+export async function followUser(followerId, followingId) {
+  const { error } = await supabase.rpc('follow_user', {
+    p_follower_id: followerId,
+    p_following_id: followingId,
+  });
+  if (error) throw error;
+}
+
+export async function unfollowUser(followerId, followingId) {
+  const { error } = await supabase.rpc('unfollow_user', {
+    p_follower_id: followerId,
+    p_following_id: followingId,
+  });
+  if (error) throw error;
+}
+
+export async function checkIsFollowing(followerId, followingId) {
+  const { data, error } = await supabase.rpc('is_following', {
+    p_follower_id: followerId,
+    p_following_id: followingId,
+  });
+  if (error) return false;
+  return !!data;
+}
+
+// ─── Social: Likes ────────────────────────────────────────────────────────────
+
+export async function toggleLike(userId, designId) {
+  const { data, error } = await supabase.rpc('toggle_like', {
+    p_user_id: userId,
+    p_design_id: designId,
+  });
+  if (error) throw error;
+  return data; // { liked: boolean, count: number }
+}
+
+// ─── Social: Profiles ────────────────────────────────────────────────────────
+
+export async function getUserProfileData(username) {
+  const { data, error } = await supabase.rpc('get_user_profile_data', {
+    p_username: username,
+  });
+  if (error) throw error;
+  return data; // { id, full_name, username, bio, avatar_url, is_verified_supplier, follower_count, following_count, design_count }
+}
+
+export async function getMyStats(userId) {
+  const { data, error } = await supabase.rpc('get_my_stats', {
+    p_user_id: userId,
+  });
+  if (error) throw error;
+  return data; // { followers, following, designs }
+}
+
+export async function getFollowers(userId, limit = 50, offset = 0) {
+  const { data, error } = await supabase.rpc('get_followers', {
+    p_user_id: userId,
+    p_limit: limit,
+    p_offset: offset,
+  });
+  if (error) throw error;
+  return data || [];
+}
+
+export async function getFollowing(userId, limit = 50, offset = 0) {
+  const { data, error } = await supabase.rpc('get_following', {
+    p_user_id: userId,
+    p_limit: limit,
+    p_offset: offset,
+  });
+  if (error) throw error;
+  return data || [];
+}
+
+export async function getUserPublicDesigns(userId, limit = 12, offset = 0) {
+  const { data, error } = await supabase.rpc('get_user_public_designs', {
+    p_user_id: userId,
+    p_limit: limit,
+    p_offset: offset,
+  });
+  if (error) throw error;
+  return data || [];
+}
