@@ -166,8 +166,8 @@ return (
 
       <Text style={styles.subtitle}>Shop and Design your room with AI</Text>
 
-      {/* ── Progress bar ──────────────────────────────────────────── */}
-      <View style={styles.progressSection}>
+      {/* ── Progress bar card ─────────────────────────────────────── */}
+      <View style={styles.progressCard}>
         <View style={styles.progressLabelRow}>
           <Text style={styles.progressLabel}>Free generations used</Text>
           <Text style={styles.progressCount}>{usedCount}/{totalFree}</Text>
@@ -297,15 +297,24 @@ const styles = StyleSheet.create({
     marginBottom: space.lg,
   },
 
-  // ── Progress
-  progressSection: {
-    paddingHorizontal: layout.screenPaddingH,
+  // ── Progress card
+  progressCard: {
+    marginHorizontal: layout.screenPaddingH,
     marginBottom: space.lg,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    backgroundColor: '#F3F4F6',
+    borderRadius: 14,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.07,
+    shadowRadius: 6,
+    elevation: 2,
   },
   progressLabelRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 6,
+    marginBottom: 8,
   },
   progressLabel: {
     fontSize: 13,
@@ -314,13 +323,13 @@ const styles = StyleSheet.create({
   },
   progressCount: {
     fontSize: 13,
-    fontWeight: fontWeight.semibold,
+    fontWeight: fontWeight.bold,
     color: '#111827',
   },
   progressTrack: {
     height: 4,
     borderRadius: 2,
-    backgroundColor: '#F3F4F6',
+    backgroundColor: '#D1D5DB',
     overflow: 'hidden',
   },
   progressFill: {
@@ -422,7 +431,7 @@ const styles = StyleSheet.create({
   },
   genCount: {
     fontSize: 32,
-    fontWeight: fontWeight.xbold,
+    fontWeight: fontWeight.semibold,
     color: BLUE,
     lineHeight: 38,
   },
