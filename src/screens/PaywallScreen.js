@@ -306,9 +306,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#F3F4F6',
     borderRadius: 16,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 5 },
-    shadowOpacity: 0.14,
-    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.13,
+    shadowRadius: 6,
     elevation: 4,
   },
   progressLabelRow: {
