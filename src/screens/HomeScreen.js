@@ -1287,8 +1287,8 @@ export default function HomeScreen({ navigation, route }) {
             console.log('[Gen] BFL complete');
           }
 
-          // Record generation + refresh quota in background
-          recordGeneration();
+          // Record generation in DB, then refresh quota from server
+          await recordGeneration();
           refreshQuota();
 
         } catch (genErr) {

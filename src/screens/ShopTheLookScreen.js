@@ -130,6 +130,8 @@ export default function ShopTheLookScreen({ route, navigation }) {
   const [products, setProducts] = useState(design.products || []);
 
   useEffect(() => {
+    // Only re-match if no persisted products were saved with this design
+    if (design.products && design.products.length > 0) return;
     const matched = getProductsForDesign(design, 6);
     if (matched.length > 0) setProducts(matched);
   }, [design]);

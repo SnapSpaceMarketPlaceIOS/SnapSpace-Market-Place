@@ -1,7 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as SecureStore from 'expo-secure-store';
-import * as FileSystem from 'expo-file-system';
+import * as FileSystem from 'expo-file-system/legacy';
 
 // Add your Supabase Project URL and Anon Key to the .env file.
 // Find them in: Supabase Dashboard → Project Settings → API

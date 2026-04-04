@@ -11,6 +11,7 @@ import {
 } from 'expo-iap';
 import { useAuth } from './AuthContext';
 import { validateReceipt, fetchQuota } from '../services/subscriptionService';
+import { supabase } from '../services/supabase';
 
 // ── Tier definitions ────────────────────────────────────────────────────────
 export const TIERS = {
@@ -140,8 +141,9 @@ export function SubscriptionProvider({ children }) {
     }
   }, [user?.id]);
 
-  // ── Record a generation locally (optimistic) ────────────────────────────
-  const recordGeneration = useCallback(() => {
+  // ── Record a generation (optimistic + persist to DB) ─────────────────────
+  const recordGeneration = useCallback(async () => {
+    // Optimistic UI update immediately
     setSubscription(prev => {
       if (prev.quotaLimit === -1) return prev; // unlimited — no change
       const used      = prev.generationsUsed + 1;
@@ -153,7 +155,16 @@ export function SubscriptionProvider({ children }) {
         canGenerate:          remaining > 0,
       };
     });
-  }, []);
+
+    // Persist to database so refreshQuota doesn't overwrite back to 0
+    if (user?.id) {
+      try {
+        await supabase.rpc('increment_generation_count', { p_user_id: user.id });
+      } catch (e) {
+        console.warn('[Subscription] increment_generation_count failed:', e.message);
+      }
+    }
+  }, [user?.id]);
 
   // ── Purchase subscription ───────────────────────────────────────────────
   const purchaseSubscription = useCallback(async (productId) => {
