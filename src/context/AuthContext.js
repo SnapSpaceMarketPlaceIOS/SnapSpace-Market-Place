@@ -161,18 +161,18 @@ export function AuthProvider({ children }) {
    * Throws an Error with a user-friendly message on failure.
    */
   const signIn = async (email, password) => {
-    // Each attempt gets an 8s window; retry once on failure (16s max total).
+    // Each attempt gets a 20s window; retry up to 3x on failure (60s max total).
     const { data, error } = await withRetry(
       () => withTimeout(
         supabase.auth.signInWithPassword({
           email: email.trim().toLowerCase(),
           password,
         }),
-        8000,
+        20000,
         'Connection timed out. Please check your internet and try again.',
       ),
-      2,
-      500,
+      3,
+      1000,
     );
 
     if (error) {
