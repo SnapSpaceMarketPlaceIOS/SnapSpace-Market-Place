@@ -21,7 +21,6 @@ import AutoImage from '../components/AutoImage';
 import Svg, { Path, Circle, Polyline, Line } from 'react-native-svg';
 import { colors } from '../constants/colors';
 import { colors as C } from '../constants/theme';
-import { LinearGradient } from 'expo-linear-gradient';
 import { space, radius, shadow, typeScale, letterSpacing } from '../constants/tokens';
 import { useCart } from '../context/CartContext';
 import { getProductsForDesign } from '../services/affiliateProducts';
@@ -211,8 +210,9 @@ export default function ShopTheLookScreen({ route, navigation }) {
           </TouchableOpacity>
         </TouchableOpacity>
 
-        {/* ── Title + Description ──────────────────────────────────── */}
-        <Text style={s.title}>{displayTitle}</Text>
+        {/* ── Prompt label + text ──────────────────────────────────── */}
+        <Text style={s.promptLabel}>Your Prompt</Text>
+        <Text style={s.promptBody}>{displayTitle}</Text>
         {!!displayDesc && displayDesc !== displayTitle && (
           <Text style={s.desc} numberOfLines={3}>{displayDesc}</Text>
         )}
@@ -270,11 +270,6 @@ export default function ShopTheLookScreen({ route, navigation }) {
 
       {/* ── Sticky Bottom Bar ──────────────────────────────────────── */}
       <View style={s.bottomBar}>
-        <LinearGradient
-          colors={['rgba(255,255,255,0)', '#FFFFFF']}
-          style={s.bottomBarFade}
-          pointerEvents="none"
-        />
         <View style={s.bottomInfo}>
           <Text style={s.bottomLabel}>{products.length} item{products.length !== 1 ? 's' : ''}</Text>
           <Text style={s.bottomTotal}>
@@ -387,8 +382,15 @@ const s = StyleSheet.create({
   },
 
   // ── Title + Description ──
-  title: {
-    ...typeScale.title,
+  promptLabel: {
+    ...typeScale.subheadline,
+    color: C.textTertiary,
+    marginHorizontal: space.lg,
+    marginBottom: 4,
+    marginTop: 4,
+  },
+  promptBody: {
+    ...typeScale.headline,
     color: C.textPrimary,
     marginHorizontal: space.lg,
     marginBottom: 6,
@@ -524,7 +526,7 @@ const s = StyleSheet.create({
     justifyContent: 'center',
   },
   hCardAddBtnDone: {
-    backgroundColor: '#34C759',
+    backgroundColor: '#67ACE9',
   },
 
   // ── Bottom bar ──
@@ -546,13 +548,6 @@ const s = StyleSheet.create({
     shadowOpacity: 0.03,
     shadowRadius: 8,
     elevation: 4,
-  },
-  bottomBarFade: {
-    position: 'absolute',
-    top: -24,
-    left: 0,
-    right: 0,
-    height: 24,
   },
   bottomInfo: { flex: 1 },
   bottomLabel: {
@@ -578,7 +573,7 @@ const s = StyleSheet.create({
     ...shadow.medium,
   },
   addAllBtnDone: {
-    backgroundColor: '#34C759',
+    backgroundColor: '#67ACE9',
   },
   addAllBtnText: {
     fontSize: 15,

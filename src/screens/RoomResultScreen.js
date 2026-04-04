@@ -656,10 +656,10 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
   },
   promptText: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#111',
-    lineHeight: 22,
+    fontSize: 14,
+    fontWeight: '400',
+    color: '#374151',
+    lineHeight: 20,
     marginTop: 4,
   },
   productsGrid: {
