@@ -139,7 +139,7 @@ export default function RoomResultScreen({ route, navigation }) {
   const { addToCart } = useCart();
   const { user } = useAuth();
   const prompt = route?.params?.prompt || 'Modern minimalist redesign';
-  const resultUri = route?.params?.resultUri || null;
+  const [resultUri, setResultUri] = useState(route?.params?.resultUri || null);
   const passedProducts = route?.params?.products || null;
   const [saving, setSaving] = useState(false);
   const [showPostModal, setShowPostModal] = useState(false);
@@ -183,6 +183,7 @@ export default function RoomResultScreen({ route, navigation }) {
     })
       .then(result => {
         if (result?.designId) setAutoSavedDesignId(result.designId);
+        if (result?.permanentUrl) setResultUri(result.permanentUrl);
         console.log('[AutoSave] Design persisted:', result?.designId);
       })
       .catch(err => console.warn('[AutoSave] Failed:', err.message));

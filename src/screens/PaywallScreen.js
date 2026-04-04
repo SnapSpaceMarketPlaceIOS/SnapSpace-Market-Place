@@ -335,7 +335,11 @@ const styles = StyleSheet.create({
   progressFill: {
     height: 4,
     borderRadius: 2,
-    backgroundColor: BLUE,
+    backgroundColor: '#67ACE9',
+    shadowColor: '#67ACE9',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.5,
+    shadowRadius: 4,
   },
 
   // ── Scroll

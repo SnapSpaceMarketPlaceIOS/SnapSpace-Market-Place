@@ -277,15 +277,24 @@ export async function saveUserDesign(userId, { imageUrl, prompt, styleTags, prod
 
   const insertPromise = (async () => {
     // Step 1: Persist image to permanent Supabase Storage
+    // Retry once on failure before falling back to temp URL
     let permanentUrl = imageUrl;
-    try {
-      permanentUrl = await persistDesignImage(userId, imageUrl);
-    } catch (e) {
-      console.warn('Image persist failed, saving with original URL:', e.message);
-      // Fall back to original URL if persist fails — design data is still saved
+    let persistFailed = false;
+    for (let retry = 0; retry < 2; retry++) {
+      try {
+        permanentUrl = await persistDesignImage(userId, imageUrl);
+        break; // success
+      } catch (e) {
+        console.warn(`[Persist] Attempt ${retry + 1}/2 failed:`, e.message);
+        if (retry === 0) await new Promise(r => setTimeout(r, 3000));
+        else persistFailed = true;
+      }
     }
 
     // Step 2: Insert the design row with the permanent URL
+    if (persistFailed) {
+      console.warn('[Persist] Saving with temp URL — image may expire. Original:', imageUrl);
+    }
     const { data, error } = await supabase
       .from('user_designs')
       .insert({
@@ -295,6 +304,7 @@ export async function saveUserDesign(userId, { imageUrl, prompt, styleTags, prod
         style_tags: styleTags || [],
         products: products || [],
         visibility: visibility || 'private',
+        ...(persistFailed ? { needs_persist: true } : {}),
       })
       .select('id')
       .single();
