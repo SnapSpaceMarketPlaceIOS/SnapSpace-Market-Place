@@ -122,10 +122,11 @@ function TierCard({ tier, selected, onSelect }) {
 // ── Screen ────────────────────────────────────────────────────────────────────
 
 export default function PaywallScreen({ navigation }) {
-  const { subscription, purchaseSubscription } = useSubscription();
+  const { subscription, purchaseSubscription, restorePurchases } = useSubscription();
 
   const [selectedTier, setSelectedTier] = useState('premium');
   const [purchasing, setPurchasing] = useState(false);
+  const [restoring, setRestoring] = useState(false);
 
   const selected = PAID_TIERS.find(t => t.id === selectedTier);
   const usedCount = subscription.generationsUsed;
@@ -207,6 +208,28 @@ return (
             <Text style={styles.legalDot}>·</Text>
             <TouchableOpacity onPress={() => navigation.navigate('PrivacyPolicy')}>
               <Text style={styles.legalLink}>Privacy Policy</Text>
+            </TouchableOpacity>
+            <Text style={styles.legalDot}>·</Text>
+            <TouchableOpacity
+              onPress={async () => {
+                setRestoring(true);
+                try {
+                  const result = await restorePurchases();
+                  if (result?.restored > 0) {
+                    Alert.alert('Restored', 'Your subscription has been restored.');
+                    navigation.goBack();
+                  } else {
+                    Alert.alert('Nothing to Restore', 'No active subscriptions found for this account.');
+                  }
+                } catch (e) {
+                  Alert.alert('Restore Failed', e.message);
+                } finally {
+                  setRestoring(false);
+                }
+              }}
+              disabled={restoring}
+            >
+              <Text style={styles.legalLink}>{restoring ? 'Restoring…' : 'Restore Purchases'}</Text>
             </TouchableOpacity>
           </View>
         </View>

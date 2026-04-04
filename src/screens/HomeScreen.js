@@ -45,7 +45,6 @@ import { createProductPanel } from '../utils/createProductPanel';
 import { analyzeRoomImage, rematchFromVision } from '../services/visionMatcher';
 import { PRODUCT_CATALOG } from '../data/productCatalog';
 import { saveUserDesign, updateDesignVisibility, uploadRoomPhoto } from '../services/supabase';
-import { getUserQuota } from '../services/productAwareGeneration';
 import { useSubscription } from '../context/SubscriptionContext';
 import { generateWithBFL } from '../services/bfl';
 import TabScreenFade from '../components/TabScreenFade';

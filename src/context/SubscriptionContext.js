@@ -17,7 +17,7 @@ export const TIERS = {
   free:    { id: 'free',    name: 'Free',    price: 0,     priceLabel: 'Free',      gens: 5,  displayLabel: '5',         monthly: false },
   basic:   { id: 'basic',   name: 'Basic',   price: 6.99,  priceLabel: '$6.99/mo',  gens: 25, displayLabel: '25',        monthly: true, productId: 'snapspace_basic_monthly' },
   pro:     { id: 'pro',     name: 'Pro',     price: 12.99, priceLabel: '$12.99/mo', gens: 50, displayLabel: '50',        monthly: true, productId: 'snapspace_pro_monthly',   popular: true },
-  premium: { id: 'premium', name: 'Premium', price: 19.99, priceLabel: '$19.99/mo', gens: 75, displayLabel: 'Unlimited', monthly: true, productId: 'snapspace_premium_monthly' },
+  premium: { id: 'premium', name: 'Premium', price: 19.99, priceLabel: '$19.99/mo', gens: -1, displayLabel: 'Unlimited', monthly: true, productId: 'snapspace_premium_monthly' },
 };
 
 export const PAID_TIERS = [TIERS.basic, TIERS.pro, TIERS.premium];
@@ -165,9 +165,9 @@ export function SubscriptionProvider({ children }) {
         setSubscription(prev => ({
           ...prev,
           tier:                 tier.id,
-          quotaLimit:           tier.gens,
+          quotaLimit:           tier.gens === -1 ? -1 : tier.gens,
           generationsUsed:      0,
-          generationsRemaining: tier.id === 'premium' ? 999 : tier.gens,
+          generationsRemaining: tier.gens === -1 ? 999 : tier.gens,
           canGenerate:          true,
           subscriptionStatus:   'active',
           subscriptionExpiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
