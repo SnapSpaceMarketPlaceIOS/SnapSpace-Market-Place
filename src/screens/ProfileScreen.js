@@ -294,6 +294,7 @@ export default function ProfileScreen({ navigation }) {
           if (cancelled) return;
           const normalized = designs.map(d => ({
             id: `user-${d.id}`,
+            user_id: user.id,
             title: d.prompt || 'My Design',
             user: user.username || user.name || 'Me',
             initial: (user.name || 'M')[0],

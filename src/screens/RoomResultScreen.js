@@ -11,86 +11,39 @@ import {
   Image,
   ActivityIndicator,
   Animated,
-  PanResponder,
-  Linking,
+  Pressable,
   Modal,
 } from 'react-native';
 import CardImage from '../components/CardImage';
-import { LinearGradient } from 'expo-linear-gradient';
-import Svg, { Path, Circle, Line, Polyline, Rect, G } from 'react-native-svg';
+import AutoImage from '../components/AutoImage';
+import Svg, { Path, Circle, Polyline, Line } from 'react-native-svg';
 import { colors } from '../constants/colors';
-import { space, radius, fontWeight, fontSize, uiColors, typeScale, shadow } from '../constants/tokens';
-import { Button, Badge, SectionHeader } from '../components/ds';
+import { colors as C } from '../constants/theme';
+import { space, radius, shadow, typeScale, letterSpacing } from '../constants/tokens';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
-import { getProductsForPrompt, getSourceLabel, getSourceColor } from '../services/affiliateProducts';
+import { useLiked } from '../context/LikedContext';
+import { getProductsForPrompt, getRecommendedProducts } from '../services/affiliateProducts';
+import { parseDesignPrompt } from '../utils/promptParser';
 import { saveUserDesign, updateDesignVisibility } from '../services/supabase';
 import * as FileSystem from 'expo-file-system/legacy';
 
-const { width, height } = Dimensions.get('window');
+const { width } = Dimensions.get('window');
+const IMG_RADIUS = Math.round((width - space.lg * 2) * 0.025);
 
-// Sheet snap positions (distance from top of screen)
-const PEEK_HEIGHT = 90;           // how much peeks up from bottom when collapsed
-const SHEET_COLLAPSED = height - PEEK_HEIGHT;
-const SHEET_EXPANDED = height * 0.08; // near top of screen
+// ── Icons ───────────────────────────────────────────────────────────────────────
 
 function BackIcon() {
   return (
-    <Svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke={colors.white} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+    <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="#111" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round">
       <Polyline points="15 18 9 12 15 6" />
     </Svg>
   );
 }
 
-// ── Figma-exact action icons (node IDs 531-309, 531-323, 531-313) ──────────────
-
-// 531-309 "Load_circle_light" — download arrow (points down) + bottom arc tray
-function FigmaLoadIcon({ size = 22 }) {
+function CartNavIcon() {
   return (
-    <Svg width={size} height={size} viewBox="0 0 30 30" fill="none">
-      <Path
-        d="M6.54815 18.5147C7.04668 20.3752 8.1452 22.0193 9.67334 23.1918C11.2015 24.3644 13.0738 25 15 25C16.9262 25 18.7985 24.3644 20.3267 23.1918C21.8548 22.0193 22.9533 20.3752 23.4519 18.5147"
-        stroke="#111827" strokeWidth={1.4} strokeLinecap="round"
-      />
-      <Path
-        d="M15 16.25L14.6877 16.6404L15 16.8903L15.3123 16.6404L15 16.25ZM15.5 5C15.5 4.72386 15.2761 4.5 15 4.5C14.7239 4.5 14.5 4.72386 14.5 5L15 5L15.5 5ZM8.75 11.25L8.43765 11.6404L14.6877 16.6404L15 16.25L15.3123 15.8596L9.06235 10.8596L8.75 11.25ZM15 16.25L15.3123 16.6404L21.5623 11.6404L21.25 11.25L20.9377 10.8596L14.6877 15.8596L15 16.25ZM15 16.25L15.5 16.25L15.5 5L15 5L14.5 5L14.5 16.25L15 16.25Z"
-        fill="#111827"
-      />
-    </Svg>
-  );
-}
-
-// 531-323 "Subtract" — solid black circle with white + punched through
-function FigmaSubtractIcon({ size = 28 }) {
-  return (
-    <Svg width={size} height={size} viewBox="0 0 30 30" fill="none">
-      <Path
-        d="M15 0C23.2843 0 30 6.71573 30 15C30 23.2843 23.2843 30 15 30C6.71573 30 0 23.2843 0 15C0 6.71573 6.71573 0 15 0ZM15 6.16602C14.7241 6.16602 14.5004 6.39017 14.5 6.66602V14.5H6.66699C6.39085 14.5 6.16699 14.7239 6.16699 15C6.16699 15.2761 6.39085 15.5 6.66699 15.5H14.5V23.333C14.5 23.6091 14.7239 23.833 15 23.833C15.2761 23.833 15.5 23.6091 15.5 23.333V15.5H23.333C23.609 15.4998 23.833 15.276 23.833 15C23.833 14.724 23.609 14.5002 23.333 14.5H15.5V6.66602C15.4996 6.39017 15.2759 6.16602 15 6.16602Z"
-        fill="#111827"
-      />
-    </Svg>
-  );
-}
-
-// 531-313 "Download_circle_light" — share arrow (points up) + bottom arc tray
-function FigmaShareIcon({ size = 22 }) {
-  return (
-    <Svg width={size} height={size} viewBox="0 0 30 30" fill="none">
-      <Path
-        d="M6.54815 18.5147C7.04668 20.3752 8.1452 22.0193 9.67334 23.1918C11.2015 24.3644 13.0738 25 15 25C16.9262 25 18.7985 24.3644 20.3267 23.1918C21.8548 22.0193 22.9533 20.3752 23.4519 18.5147"
-        stroke="#111827" strokeWidth={1.4} strokeLinecap="round"
-      />
-      <Path
-        d="M15 5L14.6877 4.60957L15 4.35969L15.3123 4.60957L15 5ZM15.5 16.25C15.5 16.5261 15.2761 16.75 15 16.75C14.7239 16.75 14.5 16.5261 14.5 16.25L15 16.25L15.5 16.25ZM8.75 10L8.43765 9.60957L14.6877 4.60957L15 5L15.3123 5.39043L9.06235 10.3904L8.75 10ZM15 5L15.3123 4.60957L21.5623 9.60957L21.25 10L20.9377 10.3904L14.6877 5.39043L15 5ZM15 5L15.5 5L15.5 16.25L15 16.25L14.5 16.25L14.5 5L15 5Z"
-        fill="#111827"
-      />
-    </Svg>
-  );
-}
-
-function CartIcon() {
-  return (
-    <Svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke={colors.white} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+    <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="#111" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
       <Circle cx={9} cy={21} r={1} />
       <Circle cx={20} cy={21} r={1} />
       <Path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
@@ -98,28 +51,26 @@ function CartIcon() {
   );
 }
 
-function SofaIcon() {
+function CartWhiteIcon() {
   return (
-    <Svg width={24} height={24} viewBox="0 0 24 24" fill="none" stroke={colors.white} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
-      <Path d="M20 9V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v3" />
-      <Path d="M2 11v5a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-5a2 2 0 0 0-4 0v2H6v-2a2 2 0 0 0-4 0z" />
+    <Svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+      <Circle cx={9} cy={21} r={1} />
+      <Circle cx={20} cy={21} r={1} />
+      <Path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
     </Svg>
   );
 }
 
-function AmazonLogoMark() {
+function PlusSmallIcon() {
   return (
-    <View style={{ alignItems: 'flex-start' }}>
-      <Text style={{ fontSize: 6, fontWeight: '800', color: '#232F3E', letterSpacing: -0.2, lineHeight: 8 }}>amazon</Text>
-      <Svg width={18} height={4} viewBox="0 0 36 6" style={{ marginTop: 0 }}>
-        <Path d="M1 3 Q18 7 34 3" stroke="#FF9900" strokeWidth="2.5" fill="none" strokeLinecap="round" />
-        <Path d="M30.5 1 L34 3.2 L30.5 5.2" stroke="#FF9900" strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-      </Svg>
-    </View>
+    <Svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth={2.5} strokeLinecap="round">
+      <Line x1={12} y1={5} x2={12} y2={19} />
+      <Line x1={5} y1={12} x2={19} y2={12} />
+    </Svg>
   );
 }
 
-function StarIconSmall({ filled = true, size = 11 }) {
+function StarIconSmall({ filled = true, size = 10 }) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24"
       fill={filled ? '#67ACE9' : '#E5E7EB'} stroke={filled ? '#67ACE9' : '#D1D5DB'} strokeWidth={1}>
@@ -128,19 +79,117 @@ function StarIconSmall({ filled = true, size = 11 }) {
   );
 }
 
-const PRODUCT_IMG_SIZE = 88;
+// Arc-style download icon (arrow down + curved tray)
+function DownloadIcon({ color = '#9CA3AF' }) {
+  return (
+    <Svg width={18} height={18} viewBox="0 0 30 30" fill="none">
+      <Path
+        d="M6.54815 18.5147C7.04668 20.3752 8.1452 22.0193 9.67334 23.1918C11.2015 24.3644 13.0738 25 15 25C16.9262 25 18.7985 24.3644 20.3267 23.1918C21.8548 22.0193 22.9533 20.3752 23.4519 18.5147"
+        stroke={color} strokeWidth={1.6} strokeLinecap="round"
+      />
+      <Path
+        d="M15 16.25L14.6877 16.6404L15 16.8903L15.3123 16.6404L15 16.25ZM15.5 5C15.5 4.72386 15.2761 4.5 15 4.5C14.7239 4.5 14.5 4.72386 14.5 5L15 5L15.5 5ZM8.75 11.25L8.43765 11.6404L14.6877 16.6404L15 16.25L15.3123 15.8596L9.06235 10.8596L8.75 11.25ZM15 16.25L15.3123 16.6404L21.5623 11.6404L21.25 11.25L20.9377 10.8596L14.6877 15.8596L15 16.25ZM15 16.25L15.5 16.25L15.5 5L15 5L14.5 5L14.5 16.25L15 16.25Z"
+        fill={color}
+      />
+    </Svg>
+  );
+}
+
+// Arc-style share icon (arrow up + curved tray)
+function ShareIcon({ color = '#9CA3AF' }) {
+  return (
+    <Svg width={18} height={18} viewBox="0 0 30 30" fill="none">
+      <Path
+        d="M6.54815 18.5147C7.04668 20.3752 8.1452 22.0193 9.67334 23.1918C11.2015 24.3644 13.0738 25 15 25C16.9262 25 18.7985 24.3644 20.3267 23.1918C21.8548 22.0193 22.9533 20.3752 23.4519 18.5147"
+        stroke={color} strokeWidth={1.6} strokeLinecap="round"
+      />
+      <Path
+        d="M15 5L14.6877 4.60957L15 4.35969L15.3123 4.60957L15 5ZM15.5 16.25C15.5 16.5261 15.2761 16.75 15 16.75C14.7239 16.75 14.5 16.5261 14.5 16.25L15 16.25L15.5 16.25ZM8.75 10L8.43765 9.60957L14.6877 4.60957L15 5L15.3123 5.39043L9.06235 10.3904L8.75 10ZM15 5L15.3123 4.60957L21.5623 9.60957L21.25 10L20.9377 10.3904L14.6877 5.39043L15 5ZM15 5L15.5 5L15.5 16.25L15 16.25L14.5 16.25L14.5 5L15 5Z"
+        fill={color}
+      />
+    </Svg>
+  );
+}
+
+// Post icon — solid circle with + punched through; color changes grey → blue on activation
+function PostIcon({ color = '#9CA3AF' }) {
+  return (
+    <Svg width={28} height={28} viewBox="0 0 30 30" fill="none">
+      <Path
+        d="M15 0C23.2843 0 30 6.71573 30 15C30 23.2843 23.2843 30 15 30C6.71573 30 0 23.2843 0 15C0 6.71573 6.71573 0 15 0ZM15 6.16602C14.7241 6.16602 14.5004 6.39017 14.5 6.66602V14.5H6.66699C6.39085 14.5 6.16699 14.7239 6.16699 15C6.16699 15.2761 6.39085 15.5 6.66699 15.5H14.5V23.333C14.5 23.6091 14.7239 23.833 15 23.833C15.2761 23.833 15.5 23.6091 15.5 23.333V15.5H23.333C23.609 15.4998 23.833 15.276 23.833 15C23.833 14.724 23.609 14.5002 23.333 14.5H15.5V6.66602C15.4996 6.39017 15.2759 6.16602 15 6.16602Z"
+        fill={color}
+      />
+    </Svg>
+  );
+}
+
+// Spring-bounce animated icon button — same feel as bottom tab bar
+function AnimatedIconBtn({ onPress, style, children, disabled }) {
+  const scale = useRef(new Animated.Value(1)).current;
+  const handlePressIn = useCallback(() => {
+    Animated.spring(scale, { toValue: 0.88, useNativeDriver: true, speed: 50, bounciness: 4 }).start();
+  }, [scale]);
+  const handlePressOut = useCallback(() => {
+    Animated.spring(scale, { toValue: 1, useNativeDriver: true, speed: 20, bounciness: 10 }).start();
+  }, [scale]);
+  return (
+    <Pressable onPress={onPress} onPressIn={handlePressIn} onPressOut={handlePressOut} disabled={disabled}>
+      <Animated.View style={[style, { transform: [{ scale }] }]}>
+        {children}
+      </Animated.View>
+    </Pressable>
+  );
+}
+
+// ── Product Card (identical to ShopTheLookScreen) ────────────────────────────
+
+function ProductCard({ product, inCart, onAddToCart, onPress }) {
+  const priceVal = product.priceValue ?? product.price;
+  const priceStr = typeof priceVal === 'number'
+    ? `$${priceVal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+    : product.priceLabel || String(priceVal).replace(/^\$+/, '$');
+  const ratingVal = typeof product.rating === 'number' ? product.rating : parseFloat(product.rating) || 0;
+
+  return (
+    <TouchableOpacity style={s.hCard} activeOpacity={0.7} onPress={onPress}>
+      <CardImage uri={product.imageUrl} style={s.hCardImg} resizeMode="cover" placeholderColor="#D0D7E3" />
+      <View style={s.hCardBody}>
+        <Text style={s.hCardName} numberOfLines={2}>{product.name}</Text>
+        <Text style={s.hCardBrand} numberOfLines={1}>{product.brand}</Text>
+        {ratingVal > 0 && (
+          <View style={s.hCardRating}>
+            {[1,2,3,4,5].map(i => (
+              <StarIconSmall key={i} size={10} filled={i <= Math.round(ratingVal)} />
+            ))}
+            <Text style={s.hCardRatingText}>{ratingVal.toFixed(1)}</Text>
+            {!!product.reviewCount && (
+              <Text style={s.hCardReviews}>({product.reviewCount.toLocaleString()})</Text>
+            )}
+          </View>
+        )}
+        <Text style={s.hCardPrice}>{priceStr}</Text>
+      </View>
+      <TouchableOpacity
+        style={[s.hCardAddBtn, inCart && s.hCardAddBtnDone]}
+        activeOpacity={0.8}
+        onPress={() => !inCart && onAddToCart(product)}
+      >
+        {inCart
+          ? <Svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round">
+              <Polyline points="20 6 9 17 4 12" />
+            </Svg>
+          : <PlusSmallIcon />}
+      </TouchableOpacity>
+    </TouchableOpacity>
+  );
+}
+
+// ── Main Screen ──────────────────────────────────────────────────────────────
 
 export default function RoomResultScreen({ route, navigation }) {
-  const [addedItems, setAddedItems] = useState({});
-  const [imageLoading, setImageLoading] = useState(true);
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [addedKeys, setAddedKeys] = useState({});
   const [products, setProducts] = useState([]);
-
-  const { addToCart } = useCart();
-  const { user } = useAuth();
-  const prompt = route?.params?.prompt || 'Modern minimalist redesign';
-  const resultUri = route?.params?.resultUri || null;
-  const passedProducts = route?.params?.products || null;
+  const [recommended, setRecommended] = useState([]);
   const [saving, setSaving] = useState(false);
   const [showPostModal, setShowPostModal] = useState(false);
   const [postVisibility, setPostVisibility] = useState('public');
@@ -149,8 +198,20 @@ export default function RoomResultScreen({ route, navigation }) {
   const [autoSavedDesignId, setAutoSavedDesignId] = useState(null);
   const autoSaveAttempted = useRef(false);
 
+  // Icon active states — grey by default, stay blue after first tap
+  const [downloadActive, setDownloadActive] = useState(false);
+  const [postActive, setPostActive] = useState(false);
+  const [shareActive, setShareActive] = useState(false);
+
+  const { addToCart, items } = useCart();
+  const { user } = useAuth();
+  const { liked } = useLiked();
+
+  const prompt = route?.params?.prompt || 'Modern minimalist redesign';
+  const [resultUri, setResultUri] = useState(route?.params?.resultUri || null);
+
+  // ── Load products ──
   useEffect(() => {
-    // Use products passed from SnapScreen if available, otherwise match locally
     const routeProducts = route?.params?.products;
     if (routeProducts && routeProducts.length > 0) {
       setProducts(routeProducts);
@@ -158,11 +219,23 @@ export default function RoomResultScreen({ route, navigation }) {
       const matched = getProductsForPrompt(prompt, 6);
       setProducts(matched);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [prompt, route.params]);
 
-  // ── Auto-save: persist every AI generation to Supabase immediately ──
-  // Saves as 'private' by default. The "Post" button upgrades visibility.
+  // ── "You Might Also Like" ──
+  useEffect(() => {
+    if (products.length === 0) return;
+    const parsed = parseDesignPrompt(prompt);
+    const recoDesign = {
+      roomType: parsed.roomType || 'living-room',
+      styles: parsed.styles || [],
+      materials: parsed.materials || [],
+    };
+    const excludeIds = products.map(p => p.id).filter(Boolean);
+    const recs = getRecommendedProducts(recoDesign, excludeIds, liked, 6);
+    setRecommended(recs);
+  }, [products, prompt, liked]);
+
+  // ── Auto-save every generation to Supabase (private by default) ──
   useEffect(() => {
     if (!resultUri || !user?.id || autoSaveAttempted.current) return;
     autoSaveAttempted.current = true;
@@ -175,89 +248,68 @@ export default function RoomResultScreen({ route, navigation }) {
       affiliateUrl: p.affiliateUrl, source: p.source,
     }));
     saveUserDesign(user.id, {
-      imageUrl: resultUri,
-      prompt,
-      styleTags: uniqueTags,
-      products: productSummary,
-      visibility: 'private',
+      imageUrl: resultUri, prompt, styleTags: uniqueTags,
+      products: productSummary, visibility: 'private',
     })
       .then(result => {
         if (result?.designId) setAutoSavedDesignId(result.designId);
-        console.log('[AutoSave] Design persisted:', result?.designId);
+        if (result?.permanentUrl) setResultUri(result.permanentUrl);
       })
       .catch(err => console.warn('[AutoSave] Failed:', err.message));
   }, [resultUri, user?.id, products, prompt]);
 
-  // Animated value starts at collapsed position
-  const sheetY = useRef(new Animated.Value(SHEET_COLLAPSED)).current;
-  const lastY = useRef(SHEET_COLLAPSED);
-
-  const snapTo = useCallback((toValue) => {
-    lastY.current = toValue;
-    setIsExpanded(toValue === SHEET_EXPANDED);
-    Animated.spring(sheetY, {
-      toValue,
-      useNativeDriver: true,
-      bounciness: 4,
-      speed: 14,
-    }).start();
-  }, [sheetY]);
-
-  const panResponder = useRef(
-    PanResponder.create({
-      onStartShouldSetPanResponder: () => true,
-      onMoveShouldSetPanResponder: (_, { dy }) => Math.abs(dy) > 5,
-      onPanResponderGrant: () => {
-        sheetY.setOffset(lastY.current);
-        sheetY.setValue(0);
-      },
-      onPanResponderMove: (_, { dy }) => {
-        const newVal = lastY.current + dy;
-        if (newVal >= SHEET_EXPANDED && newVal <= SHEET_COLLAPSED) {
-          sheetY.setValue(dy);
-        }
-      },
-      onPanResponderRelease: (_, { dy, vy }) => {
-        sheetY.flattenOffset();
-        const currentPos = lastY.current + dy;
-        const midpoint = (SHEET_COLLAPSED + SHEET_EXPANDED) / 2;
-
-        if (vy < -0.5 || currentPos < midpoint) {
-          snapTo(SHEET_EXPANDED);
-        } else {
-          snapTo(SHEET_COLLAPSED);
-        }
-      },
-    })
-  ).current;
-
-  const handleShare = async () => {
-    // Share the prompt + image URL so recipients can view the generated design
-    try {
-      const shareMsg = `Check out my AI room design on SnapSpace!\n\n"${prompt}"`;
-      if (resultUri) {
-        await Share.share({ message: shareMsg + `\n\n${resultUri}` });
-      } else {
-        await Share.share({ message: shareMsg });
-      }
-    } catch (e) {}
+  // ── Computed ──
+  const isInCart = (product) => {
+    const key = `${product.name}__${product.brand}`;
+    return addedKeys[key] || items.some(item => item.key === key);
   };
 
-  const handleSaveToPhotos = async () => {
+  const allInCart = products.length > 0 && products.every(p => isInCart(p));
+
+  const totalPrice = products.reduce((sum, p) => {
+    const num = typeof (p.priceValue ?? p.price) === 'number'
+      ? (p.priceValue ?? p.price)
+      : parseFloat(String(p.price).replace(/[^0-9.]/g, '')) || 0;
+    return sum + num;
+  }, 0);
+
+  const styleTags = [...new Set(products.flatMap(p => p.styles || []).filter(Boolean))];
+
+  // ── Handlers ──
+  const handleAddToCart = (product) => {
+    const key = `${product.name}__${product.brand}`;
+    addToCart({ ...product, price: product.priceValue ?? product.price });
+    setAddedKeys(prev => ({ ...prev, [key]: true }));
+  };
+
+  const handleAddAll = () => {
+    let added = 0;
+    products.forEach(p => { if (!isInCart(p)) { handleAddToCart(p); added++; } });
+    if (added > 0) Alert.alert('Added to Cart', `${added} item${added > 1 ? 's' : ''} added to your cart.`);
+    else Alert.alert('Already in Cart', 'All products are already in your cart.');
+  };
+
+  const handleShare = async () => {
+    setShareActive(true);
+    try {
+      const msg = `Check out my AI room design on SnapSpace!\n\n"${prompt}"`;
+      await Share.share(resultUri ? { message: msg, url: resultUri } : { message: msg });
+    } catch {}
+  };
+
+  const handleDownload = async () => {
     if (!resultUri || saving) return;
+    setDownloadActive(true);
     setSaving(true);
     try {
-      // Download to local cache, then open iOS share sheet (includes "Save Image" option)
       const fileUri = FileSystem.cacheDirectory + 'snapspace_design_' + Date.now() + '.jpg';
       const { status } = await FileSystem.downloadAsync(resultUri, fileUri);
       if (status === 200) {
-        // Use RN Share with file URL — opens native share sheet with "Save Image"
         await Share.share({ url: fileUri });
       } else {
         throw new Error('Download returned status ' + status);
       }
-    } catch (e) {
-      // Fallback: share the remote URL directly if download fails
+    } catch {
       try {
         await Share.share({ message: `My SnapSpace AI design: "${prompt}"\n\n${resultUri}` });
       } catch {
@@ -268,15 +320,18 @@ export default function RoomResultScreen({ route, navigation }) {
     }
   };
 
+  const handlePost = () => {
+    setPostActive(true);
+    setShowPostModal(true);
+  };
+
   const handlePostToProfile = async () => {
     if (!resultUri || !user || posting) return;
     setPosting(true);
     try {
       if (autoSavedDesignId) {
-        // Design was auto-saved — just update visibility
         await updateDesignVisibility(autoSavedDesignId, postVisibility);
       } else {
-        // Fallback: auto-save didn't complete yet — do a full save
         const styleTags = products.flatMap(p => p.styles || []).filter(Boolean);
         const uniqueTags = [...new Set(styleTags)];
         const productSummary = products.map(p => ({
@@ -286,11 +341,8 @@ export default function RoomResultScreen({ route, navigation }) {
           affiliateUrl: p.affiliateUrl, source: p.source,
         }));
         const result = await saveUserDesign(user.id, {
-          imageUrl: resultUri,
-          prompt,
-          styleTags: uniqueTags,
-          products: productSummary,
-          visibility: postVisibility,
+          imageUrl: resultUri, prompt, styleTags: uniqueTags,
+          products: productSummary, visibility: postVisibility,
         });
         if (result?.designId) setAutoSavedDesignId(result.designId);
       }
@@ -304,239 +356,193 @@ export default function RoomResultScreen({ route, navigation }) {
     }
   };
 
-  const handleAddToCart = (product) => {
-    // Pass priceValue (number) as price so CartContext subtotal math works
-    addToCart({ ...product, price: product.priceValue ?? product.price });
-    setAddedItems((prev) => ({ ...prev, [product.id]: true }));
-    Alert.alert('Added to Cart', `${product.name} has been added to your cart.`);
-  };
-
-  const handleBuyNow = async (product) => {
-    if (product.affiliateUrl) {
-      const supported = await Linking.canOpenURL(product.affiliateUrl);
-      if (supported) {
-        await Linking.openURL(product.affiliateUrl);
-      }
-    }
-  };
-
-  // Dim overlay fades in as sheet expands
-  const overlayOpacity = sheetY.interpolate({
-    inputRange: [SHEET_EXPANDED, SHEET_COLLAPSED],
-    outputRange: [0.45, 0],
-    extrapolate: 'clamp',
-  });
-
   return (
-    <View style={styles.container}>
-      {/* Full-screen AI image behind everything */}
-      <View style={StyleSheet.absoluteFill}>
-        {resultUri ? (
-          <>
-            <Image
-              source={{ uri: resultUri }}
-              style={StyleSheet.absoluteFill}
-              resizeMode="cover"
-              onLoadEnd={() => setImageLoading(false)}
-            />
-            {imageLoading && (
-              <View style={styles.imageLoadingOverlay}>
-                <ActivityIndicator size="large" color={colors.white} />
-              </View>
+    <View style={s.container}>
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={s.scrollContent}>
+
+        {/* ── Header ───────────────────────────────────────────────── */}
+        <View style={s.header}>
+          <TouchableOpacity style={s.headerBtn} onPress={() => navigation.goBack()}>
+            <BackIcon />
+          </TouchableOpacity>
+          <Text style={s.headerTitle}>Room Result</Text>
+          <TouchableOpacity style={s.headerBtn} onPress={() => navigation.navigate('Main', { screen: 'Cart' })}>
+            <CartNavIcon />
+          </TouchableOpacity>
+        </View>
+
+        {/* ── Image ────────────────────────────────────────────────── */}
+        <View style={s.imageWrap}>
+          {resultUri
+            ? <AutoImage uri={resultUri} borderRadius={IMG_RADIUS} />
+            : <View style={s.imagePlaceholder}><ActivityIndicator color="#0B6DC3" /></View>}
+        </View>
+
+        {/* ── Actions row ──────────────────────────────────────────── */}
+        <View style={s.actionsRow}>
+          <View style={s.actionsInfo}>
+            <Text style={s.actionsTitle}>Your Design</Text>
+            <Text style={s.actionsSub}>Share or post to profile</Text>
+          </View>
+          <View style={s.actionBtns}>
+            <AnimatedIconBtn
+              onPress={handleDownload}
+              disabled={saving}
+              style={[s.iconCircleBtn, downloadActive && s.iconCircleBtnActive]}
+            >
+              {saving
+                ? <ActivityIndicator size="small" color={downloadActive ? '#0B6DC3' : '#9CA3AF'} />
+                : <DownloadIcon color={downloadActive ? '#0B6DC3' : '#9CA3AF'} />}
+            </AnimatedIconBtn>
+
+            {user && (
+              <AnimatedIconBtn
+                onPress={handlePost}
+                disabled={posting}
+                style={s.postIconBtn}
+              >
+                {posting
+                  ? <ActivityIndicator size="small" color={postActive ? '#0B6DC3' : '#9CA3AF'} />
+                  : <PostIcon color={postActive ? '#0B6DC3' : '#9CA3AF'} />}
+              </AnimatedIconBtn>
             )}
-          </>
-        ) : (
-          <LinearGradient
-            colors={[colors.heroStart, colors.heroEnd, '#1A4A8A']}
-            style={StyleSheet.absoluteFill}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-          >
-            <View style={styles.imagePlaceholder}>
-              <Svg width={48} height={48} viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round">
-                <Polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
-              </Svg>
-              <Text style={styles.placeholderText}>AI Generated Design</Text>
-              <Text style={styles.placeholderSubtext}>{prompt}</Text>
-            </View>
-          </LinearGradient>
-        )}
-      </View>
 
-      {/* Top bar — back only, action icons moved to sheet */}
-      <View style={styles.topBar}>
-        <TouchableOpacity style={styles.iconBtn} onPress={() => navigation?.goBack()}>
-          <BackIcon />
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.iconBtn} onPress={() => navigation?.goBack()}>
-          <Svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke={colors.white} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-            <Line x1={18} y1={6} x2={6} y2={18} />
-            <Line x1={6} y1={6} x2={18} y2={18} />
-          </Svg>
-        </TouchableOpacity>
-      </View>
-
-      {/* Prompt badge at bottom of image */}
-      {resultUri && !isExpanded && (
-        <View style={styles.promptBadge}>
-          <Text style={styles.promptBadgeText} numberOfLines={1}>{prompt}</Text>
+            <AnimatedIconBtn
+              onPress={handleShare}
+              style={[s.iconCircleBtn, shareActive && s.iconCircleBtnActive]}
+            >
+              <ShareIcon color={shareActive ? '#0B6DC3' : '#9CA3AF'} />
+            </AnimatedIconBtn>
+          </View>
         </View>
-      )}
 
-      {/* Dim overlay when sheet is expanded */}
-      <Animated.View
-        pointerEvents="none"
-        style={[StyleSheet.absoluteFill, { backgroundColor: '#000', opacity: overlayOpacity }]}
-      />
+        {/* ── YOUR PROMPT ──────────────────────────────────────────── */}
+        <Text style={s.promptLabel}>Your Prompt</Text>
+        <Text style={s.promptBody}>{prompt}</Text>
 
-      {/* Draggable Bottom Sheet */}
-      <Animated.View
-        style={[styles.sheet, { transform: [{ translateY: sheetY }] }]}
-      >
-        {/* Drag handle area */}
-        <View style={styles.handleArea} {...panResponder.panHandlers}>
-          <View style={styles.sheetHandle} />
-          <View style={styles.sheetPeek}>
-            <View style={styles.shopHeaderRow}>
-              <View style={{ flex: 1 }}>
-                <Text style={styles.sheetTitle}>Your Prompt</Text>
-                <Text style={styles.promptText} numberOfLines={2}>{prompt}</Text>
+        {/* ── Divider ──────────────────────────────────────────────── */}
+        <View style={s.divider} />
+
+        {/* ── SHOP ROOM ────────────────────────────────────────────── */}
+        {products.length > 0 && (
+          <View style={s.productsSection}>
+            <Text style={s.sectionLabel}>SHOP ROOM</Text>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={s.hList}
+            >
+              {products.map((product, index) => (
+                <ProductCard
+                  key={product.id || index}
+                  product={product}
+                  inCart={isInCart(product)}
+                  onAddToCart={handleAddToCart}
+                  onPress={() => navigation.navigate('ProductDetail', { product })}
+                />
+              ))}
+            </ScrollView>
+          </View>
+        )}
+
+        {/* ── YOU MIGHT ALSO LIKE ──────────────────────────────────── */}
+        {recommended.length > 0 && (
+          <View style={s.productsSection}>
+            <View style={[s.divider, { marginTop: space.xl, marginLeft: 0 }]} />
+            <Text style={s.sectionLabel}>YOU MIGHT ALSO LIKE</Text>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={s.hList}
+            >
+              {recommended.map((product, index) => (
+                <ProductCard
+                  key={product.id || `rec-${index}`}
+                  product={product}
+                  inCart={isInCart(product)}
+                  onAddToCart={handleAddToCart}
+                  onPress={() => navigation.navigate('ProductDetail', { product })}
+                />
+              ))}
+            </ScrollView>
+          </View>
+        )}
+
+        {/* ── Tags ─────────────────────────────────────────────────── */}
+        {styleTags.length > 0 && (
+          <>
+            <View style={[s.divider, { marginTop: space.xl }]} />
+            <View style={s.tagsSection}>
+              <Text style={s.sectionLabel}>TAGS</Text>
+              <View style={s.tagsWrap}>
+                {styleTags.map(tag => (
+                  <View key={tag} style={s.tag}>
+                    <Text style={s.tagText}>#{tag}</Text>
+                  </View>
+                ))}
               </View>
             </View>
-          </View>
+          </>
+        )}
+
+        <View style={{ height: 120 }} />
+      </ScrollView>
+
+      {/* ── Sticky Bottom Bar ──────────────────────────────────────── */}
+      <View style={s.bottomBar}>
+        <View style={s.bottomInfo}>
+          <Text style={s.bottomLabel}>{products.length} item{products.length !== 1 ? 's' : ''}</Text>
+          <Text style={s.bottomTotal}>
+            Total: {totalPrice.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2 })}
+          </Text>
         </View>
-
-        {/* Scrollable content */}
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.productsGrid}
-          scrollEnabled={isExpanded}
+        <TouchableOpacity
+          style={[s.addAllBtn, allInCart && s.addAllBtnDone]}
+          activeOpacity={0.85}
+          onPress={handleAddAll}
         >
-          {/* Section header with action icons */}
-          <View style={styles.shopSectionRow}>
-            <View>
-              <Text style={styles.shopSectionTitle}>SHOP YOUR ROOM</Text>
-              <Text style={styles.shopSectionSub}>Products matched to your design</Text>
-            </View>
-            <View style={styles.shopActions}>
-              <TouchableOpacity style={styles.shopActionBtn} onPress={handleSaveToPhotos} disabled={saving}>
-                {saving
-                  ? <ActivityIndicator size="small" color="#111827" />
-                  : <FigmaLoadIcon size={22} />}
-              </TouchableOpacity>
-              {resultUri && user && (
-                <TouchableOpacity style={[styles.shopActionBtn, styles.shopActionBtnPost]} onPress={() => setShowPostModal(true)} disabled={posting || posted}>
-                  {posting
-                    ? <ActivityIndicator size="small" color="#fff" />
-                    : <FigmaSubtractIcon size={28} />}
-                </TouchableOpacity>
-              )}
-              <TouchableOpacity style={styles.shopActionBtn} onPress={handleShare}>
-                <FigmaShareIcon size={22} />
-              </TouchableOpacity>
-            </View>
-          </View>
+          {!allInCart && <CartWhiteIcon />}
+          <Text style={s.addAllBtnText}>{allInCart ? '✓ All Added' : 'Add All to Cart'}</Text>
+        </TouchableOpacity>
+      </View>
 
-          {/* Horizontal product cards */}
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={{ paddingRight: 16, gap: 10, paddingBottom: 4 }}
-          >
-            {products.map((product) => {
-              const ratingVal = typeof product.rating === 'number' ? product.rating : parseFloat(product.rating) || 0;
-              return (
-                <TouchableOpacity
-                  key={product.id}
-                  style={styles.hCard}
-                  activeOpacity={0.7}
-                  onPress={() => navigation?.navigate('ProductDetail', { product })}
-                >
-                  <CardImage
-                    uri={product.imageUrl}
-                    style={styles.hCardImg}
-                    resizeMode="cover"
-                    placeholderColor="#2C3E50"
-                  />
-                  <View style={styles.hCardBody}>
-                    <Text style={styles.hCardName} numberOfLines={2}>{product.name}</Text>
-                    <Text style={styles.hCardBrand}>{product.brand}</Text>
-                    {ratingVal > 0 && (
-                      <View style={styles.hCardRating}>
-                        {[1,2,3,4,5].map(i => (
-                          <StarIconSmall key={i} size={10} filled={i <= Math.round(ratingVal)} />
-                        ))}
-                        <Text style={styles.hCardRatingText}>{ratingVal.toFixed(1)}</Text>
-                        {!!product.reviewCount && (
-                          <Text style={styles.hCardReviews}>({product.reviewCount.toLocaleString()})</Text>
-                        )}
-                      </View>
-                    )}
-                    <Text style={styles.hCardPrice}>
-                      {typeof product.priceValue === 'number'
-                        ? `$${product.priceValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
-                        : typeof product.price === 'number'
-                          ? `$${product.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
-                          : product.priceLabel || String(product.price).replace(/^\$+/, '$')}
-                    </Text>
-                  </View>
-                  <TouchableOpacity
-                    style={styles.hCardAdd}
-                    activeOpacity={0.7}
-                    onPress={() => handleAddToCart(product)}
-                  >
-                    <Svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth={2.5}>
-                      <Line x1={12} y1={5} x2={12} y2={19} />
-                      <Line x1={5} y1={12} x2={19} y2={12} />
-                    </Svg>
-                  </TouchableOpacity>
-                </TouchableOpacity>
-              );
-            })}
-          </ScrollView>
-
-          {/* FTC Disclosure */}
-          <Text style={styles.disclosure}>We may earn a commission on purchases. Prices may vary.</Text>
-        </ScrollView>
-      </Animated.View>
-
-      {/* Post to Profile Modal */}
+      {/* ── Post to Profile Modal ─────────────────────────────────── */}
       <Modal visible={showPostModal} transparent animationType="fade">
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalCard}>
-            <Text style={styles.modalTitle}>Post to Profile</Text>
-            <Text style={styles.modalSubtitle}>Share your AI design with the community</Text>
+        <View style={s.modalOverlay}>
+          <View style={s.modalCard}>
+            <Text style={s.modalTitle}>Post to Profile</Text>
+            <Text style={s.modalSubtitle}>Share your AI design with the community</Text>
 
             {resultUri && (
-              <Image source={{ uri: resultUri }} style={styles.modalPreview} resizeMode="contain" />
+              <Image source={{ uri: resultUri }} style={s.modalPreview} resizeMode="contain" />
             )}
 
-            <Text style={styles.modalLabel}>Visibility</Text>
-            <View style={styles.toggleRow}>
+            <Text style={s.modalLabel}>Visibility</Text>
+            <View style={s.toggleRow}>
               <TouchableOpacity
-                style={[styles.toggleBtn, postVisibility === 'public' && styles.toggleBtnActive]}
+                style={[s.toggleBtn, postVisibility === 'public' && s.toggleBtnActive]}
                 onPress={() => setPostVisibility('public')}
               >
-                <Text style={[styles.toggleText, postVisibility === 'public' && styles.toggleTextActive]}>Public</Text>
+                <Text style={[s.toggleText, postVisibility === 'public' && s.toggleTextActive]}>Public</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={[styles.toggleBtn, postVisibility === 'private' && styles.toggleBtnActive]}
+                style={[s.toggleBtn, postVisibility === 'private' && s.toggleBtnActive]}
                 onPress={() => setPostVisibility('private')}
               >
-                <Text style={[styles.toggleText, postVisibility === 'private' && styles.toggleTextActive]}>Private</Text>
+                <Text style={[s.toggleText, postVisibility === 'private' && s.toggleTextActive]}>Private</Text>
               </TouchableOpacity>
             </View>
 
             <TouchableOpacity
-              style={[styles.postBtn, posting && { opacity: 0.6 }]}
+              style={[s.postBtn, posting && { opacity: 0.6 }]}
               onPress={handlePostToProfile}
               disabled={posting}
             >
-              <Text style={styles.postBtnText}>{posting ? 'Posting...' : 'Post to Profile'}</Text>
+              <Text style={s.postBtnText}>{posting ? 'Posting...' : 'Post to Profile'}</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity onPress={() => setShowPostModal(false)} style={styles.cancelBtn}>
-              <Text style={styles.cancelBtnText}>Cancel</Text>
+            <TouchableOpacity onPress={() => setShowPostModal(false)} style={s.cancelBtn}>
+              <Text style={s.cancelBtnText}>Cancel</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -545,176 +551,161 @@ export default function RoomResultScreen({ route, navigation }) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#000',
-  },
-  imageLoadingOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  topBar: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
+// ── Styles ───────────────────────────────────────────────────────────────────
+
+const s = StyleSheet.create({
+  container: { flex: 1, backgroundColor: '#FFFFFF' },
+  scrollContent: { paddingTop: space['5xl'], paddingBottom: space['2xl'] },
+
+  // ── Header ──
+  header: {
     flexDirection: 'row',
+    alignItems: 'center',
     justifyContent: 'space-between',
-    paddingTop: 56,
-    paddingHorizontal: 20,
-    zIndex: 10,
+    paddingHorizontal: space.lg,
+    marginBottom: space.lg,
   },
-  topBarRight: {
-    flexDirection: 'row',
-    gap: 10,
-  },
-  iconBtn: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: 'rgba(0,0,0,0.35)',
+  headerBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: radius.full,
+    backgroundColor: C.surface,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  headerTitle: {
+    fontSize: 17,
+    fontWeight: '700',
+    color: C.textPrimary,
+    letterSpacing: letterSpacing.tight,
+  },
+
+  // ── Image ──
+  imageWrap: {
+    paddingHorizontal: space.lg,
+    marginBottom: space.base,
   },
   imagePlaceholder: {
-    flex: 1,
+    width: '100%',
+    aspectRatio: 4 / 3,
+    borderRadius: IMG_RADIUS,
+    backgroundColor: C.surface,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  placeholderText: {
-    color: 'rgba(255,255,255,0.5)',
-    fontSize: 18,
-    fontWeight: '700',
-    marginTop: 14,
-  },
-  placeholderSubtext: {
-    color: 'rgba(255,255,255,0.3)',
-    fontSize: 13,
-    marginTop: 6,
-    paddingHorizontal: 32,
-    textAlign: 'center',
-  },
-  promptBadge: {
-    position: 'absolute',
-    bottom: PEEK_HEIGHT + 16,
-    left: 16,
-    right: 16,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    borderRadius: 12,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-  },
-  promptBadgeText: {
-    color: '#fff',
-    fontSize: 13,
-    fontWeight: '500',
-  },
-  sheet: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    height: height - SHEET_EXPANDED + 40,
-    backgroundColor: '#fff',
-    borderTopLeftRadius: 28,
-    borderTopRightRadius: 28,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: -4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 16,
-    elevation: 20,
-  },
-  handleArea: {
-    paddingTop: 12,
-    paddingBottom: 4,
-    paddingHorizontal: 20,
-  },
-  sheetHandle: {
-    width: 40,
-    height: 4,
-    borderRadius: 2,
-    backgroundColor: '#DDD',
-    alignSelf: 'center',
-    marginBottom: 14,
-  },
-  sheetPeek: {
-    marginBottom: 8,
-  },
-  shopHeaderRow: {
+
+  // ── Actions row (mirrors user row in ShopTheLookScreen) ──
+  actionsRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
+    alignItems: 'center',
+    gap: 8,
+    marginHorizontal: space.lg,
+    paddingTop: space.base,
+    paddingBottom: space.md,
+    borderTopWidth: 1,
+    borderTopColor: C.border,
+    borderBottomWidth: 1,
+    borderBottomColor: C.border,
+    marginBottom: space.base,
   },
-  sheetTitle: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#9CA3AF',
-    letterSpacing: 1,
-    textTransform: 'uppercase',
+  actionsInfo: { flex: 1 },
+  actionsTitle: {
+    ...typeScale.headline,
+    color: C.textPrimary,
   },
-  promptText: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#111',
-    lineHeight: 22,
+  actionsSub: {
+    ...typeScale.caption,
+    color: C.textSecondary,
+    marginTop: 2,
+  },
+  actionBtns: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  iconCircleBtn: {
+    width: 36,
+    height: 36,
+    borderRadius: radius.full,
+    borderWidth: 1,
+    borderColor: '#9CA3AF',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#FFFFFF',
+  },
+  iconCircleBtnActive: {
+    borderColor: '#0B6DC3',
+  },
+  postIconBtn: {
+    width: 36,
+    height: 36,
+    borderRadius: radius.full,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'transparent',
+  },
+
+  // ── Prompt ──
+  promptLabel: {
+    ...typeScale.subheadline,
+    color: C.textTertiary,
+    marginHorizontal: space.lg,
+    marginBottom: 4,
     marginTop: 4,
   },
-  productsGrid: {
-    paddingLeft: 16,
-    paddingBottom: 40,
-    paddingTop: 8,
-  },
-  shopSectionRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    paddingRight: 16,
-    marginBottom: 16,
-    marginTop: 8,
-  },
-  shopSectionTitle: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: '#9CA3AF',
-    letterSpacing: 1.5,
-    textTransform: 'uppercase',
-  },
-  shopSectionSub: {
+  promptBody: {
     fontSize: 13,
     fontWeight: '400',
     color: '#67ACE9',
-    marginTop: 3,
+    lineHeight: 18,
+    marginHorizontal: space.lg,
+    marginBottom: 6,
   },
-  shopActions: {
+
+  // ── Divider ──
+  divider: {
+    height: 1,
+    backgroundColor: C.border,
+    marginHorizontal: space.lg,
+    marginBottom: space.base,
+  },
+
+  // ── Products section ──
+  productsSection: {
+    paddingLeft: space.lg,
+  },
+  sectionLabel: {
+    ...typeScale.subheadline,
+    color: C.textTertiary,
+    marginBottom: space.md,
+  },
+  hList: {
+    gap: 10,
+    paddingRight: space.lg,
+    paddingBottom: 4,
+  },
+
+  // ── Tags ──
+  tagsSection: {
+    paddingHorizontal: space.lg,
+    marginTop: space.base,
+  },
+  tagsWrap: {
     flexDirection: 'row',
-    gap: 6,
-    alignItems: 'center',
+    flexWrap: 'wrap',
+    gap: 8,
   },
-  shopActionBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: '#F3F4F6',
-    alignItems: 'center',
-    justifyContent: 'center',
+  tag: {
+    backgroundColor: C.surface2,
+    borderRadius: radius.sm,
+    paddingHorizontal: space.md,
+    paddingVertical: space.xs,
   },
-  shopActionBtnPost: {
-    backgroundColor: 'transparent',
-    width: 32,
-    height: 32,
-    borderRadius: 16,
+  tagText: {
+    ...typeScale.caption,
+    color: C.textSecondary,
   },
-  disclosure: {
-    fontSize: 10,
-    color: '#AAA',
-    textAlign: 'center',
-    marginTop: 16,
-    marginBottom: 10,
-    fontStyle: 'italic',
-    paddingRight: 16,
-  },
+
   // ── Horizontal product cards ──
   hCard: {
     width: 170,
@@ -731,19 +722,19 @@ const styles = StyleSheet.create({
   },
   hCardBody: {
     padding: 10,
-    paddingBottom: 36,
+    paddingBottom: 38,
     gap: 2,
   },
   hCardName: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#111',
+    color: C.textPrimary,
     lineHeight: 17,
   },
   hCardBrand: {
     fontSize: 11,
     fontWeight: '400',
-    color: '#9CA3AF',
+    color: C.textTertiary,
     marginTop: 1,
   },
   hCardRating: {
@@ -755,31 +746,87 @@ const styles = StyleSheet.create({
   hCardRatingText: {
     fontSize: 10,
     fontWeight: '600',
-    color: '#111',
+    color: C.textPrimary,
     marginLeft: 2,
   },
   hCardReviews: {
     fontSize: 10,
-    color: '#6B7280',
+    color: C.textSecondary,
   },
   hCardPrice: {
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: '700',
-    color: colors.bluePrimary,
+    color: C.primary,
     marginTop: 4,
   },
-  hCardAdd: {
+  hCardAddBtn: {
     position: 'absolute',
     bottom: 10,
     right: 10,
     width: 28,
     height: 28,
     borderRadius: 14,
-    backgroundColor: colors.bluePrimary,
+    backgroundColor: C.primary,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  // ── Post Modal ────────────────────────────────────────────────────
+  hCardAddBtnDone: {
+    backgroundColor: '#67ACE9',
+  },
+
+  // ── Bottom bar ──
+  bottomBar: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: space.lg,
+    paddingBottom: 34,
+    paddingTop: space.md,
+    backgroundColor: '#FFFFFF',
+    borderTopWidth: 1,
+    borderTopColor: C.border,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -1 },
+    shadowOpacity: 0.03,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  bottomInfo: { flex: 1 },
+  bottomLabel: {
+    ...typeScale.caption,
+    fontWeight: '500',
+    color: C.textTertiary,
+  },
+  bottomTotal: {
+    ...typeScale.title,
+    color: C.textPrimary,
+    letterSpacing: letterSpacing.tight,
+    marginTop: 2,
+  },
+  addAllBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: C.primary,
+    borderRadius: radius.button,
+    height: 52,
+    paddingHorizontal: space.lg,
+    gap: space.sm,
+    ...shadow.medium,
+  },
+  addAllBtnDone: {
+    backgroundColor: '#67ACE9',
+  },
+  addAllBtnText: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#fff',
+  },
+
+  // ── Post Modal ──
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.6)',
