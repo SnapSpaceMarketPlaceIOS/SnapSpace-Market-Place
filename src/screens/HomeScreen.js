@@ -1329,7 +1329,12 @@ export default function HomeScreen({ navigation, route }) {
         prompt: designPrompt,
         products: finalMatchedProducts,
       });
-      setShowResult(true);
+      // Navigate to the full RoomResult screen instead of showing inline modal
+      navigation.navigate('RoomResult', {
+        prompt: designPrompt,
+        resultUri: resultUrl,
+        products: finalMatchedProducts,
+      });
       setPhoto(null);
       setPhotoSource(null);
       setPrompt('');
@@ -1524,16 +1529,16 @@ export default function HomeScreen({ navigation, route }) {
                 contentContainerStyle={styles.promptChipsContent}
               >
                 {[
-                  'Minimalist living room vibes',
-                  'Dark luxe bedroom aesthetic',
-                  'Cozy Scandinavian reading nook',
-                  'Japandi dining room refresh',
-                  'Boho chic accent chairs',
-                  'Mid-century modern home office',
-                  'Coastal bedroom with linen',
-                  'Industrial kitchen with marble',
-                  'Maximalist glam dining room',
-                  'Earthy biophilic living space',
+                  'All-white minimalist living room, linen sofa, oak coffee table, floor lamp',
+                  'Dark luxe bedroom, charcoal walls, velvet platform bed, brass nightstands',
+                  'Japandi dining room, walnut table, rattan chairs, warm pendant lighting',
+                  'Scandinavian reading nook, cream boucle chair, wood shelving, arc lamp',
+                  'Mid-century home office, walnut desk, leather chair, warm ambient lighting',
+                  'Coastal bedroom, white linen bedding, rattan headboard, sea-grass rug',
+                  'Industrial kitchen, matte black fixtures, marble countertops, open shelving',
+                  'Biophilic living room, terracotta tones, clay sofa, hanging plants, jute rug',
+                  'Glam dining room, jewel-toned velvet chairs, gold chandelier, mirrored sideboard',
+                  'Boho bedroom, rust walls, layered textile bedding, macramé wall art',
                 ].map((chip) => (
                   <TouchableOpacity
                     key={chip}
@@ -1667,95 +1672,7 @@ export default function HomeScreen({ navigation, route }) {
           </View>
         </View>
 
-        {/* ── 2. For You ──────────────────────────────────────────────── */}
-        <View style={[styles.section, styles.sectionAlt]}>
-          <SectionHeader
-            noTopMargin
-            title={userStyleDNA.length > 0 ? 'PICKED FOR YOU' : 'TOP SPACES'}
-            icon={<SparkleIcon size={13} color={C.primary} />}
-            actionLabel="See all"
-            onAction={() => navigation?.navigate('Explore', {
-              designs: forYouDesigns,
-              title: userStyleDNA.length > 0 ? 'Picked For You' : 'Top Spaces',
-            })}
-          />
-          {userStyleDNA.length > 0 && (
-            <Text style={styles.sectionSub}>
-              Based on your {userStyleDNA.map(s => STYLE_LABEL_MAP[s] || s).join(', ')} taste
-            </Text>
-          )}
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.hScroll}
-          >
-            {forYouDesigns.map(design => (
-              <TouchableOpacity
-                key={design.id}
-                style={styles.forYouCard}
-                activeOpacity={0.88}
-                onPress={() => navigation?.navigate('ShopTheLook', { design })}
-              >
-                {/* Photo */}
-                <View style={styles.forYouImgWrap}>
-                  <CardImage uri={design.imageUrl} style={styles.forYouCardImg} />
-                  <View style={styles.forYouImgOverlay} />
-                </View>
-
-                {/* Info box below image */}
-                <View style={styles.forYouInfoBox}>
-                  <Text style={styles.forYouInfoCreator} numberOfLines={1}>
-                    {SELLER_MAP[design.user]?.displayName || design.user}
-                  </Text>
-                  <Text style={styles.forYouCardTitle} numberOfLines={2}>
-                    {design.title.replace('...', '')}
-                  </Text>
-                </View>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
-        </View>
-
-        {/* ── 3. New Arrivals ──────────────────────────────────────────── */}
-        <View style={styles.section}>
-          <SectionHeader
-            noTopMargin
-            title="NEW ARRIVALS"
-            actionLabel="See all"
-            onAction={() => navigation?.navigate('Explore', {
-              filterTag: 'new',
-              title: 'New Arrivals',
-            })}
-          />
-          <View style={styles.collectionsGrid}>
-            {NEW_ARRIVAL_PRODUCTS.map(product => (
-              <TouchableOpacity
-                key={product.id}
-                style={styles.newArrivalCard}
-                activeOpacity={0.85}
-                onPress={() => navigation?.navigate('ProductDetail', { product })}
-              >
-                <CardImage uri={product.imageUrl} style={styles.newArrivalCardImg} placeholderColor="#D0D7E3" />
-                <View style={styles.newArrivalCardInfo}>
-                  <Text style={styles.newArrivalCardName} numberOfLines={2}>{product.name}</Text>
-                  <View style={styles.productRatingRow}>
-                    <Text style={styles.productStars}>{renderStars(product.rating)}</Text>
-                    <Text style={styles.productRatingText}>
-                      {product.rating ? ` ${product.rating}` : ''}
-                      {product.reviewCount > 0 ? ` (${product.reviewCount.toLocaleString()})` : ' · New'}
-                    </Text>
-                  </View>
-                  <View style={styles.newArrivalCardFooter}>
-                    <Text style={styles.newArrivalCardBrand}>{product.brand}</Text>
-                    <Text style={styles.newArrivalCardPrice}>{product.priceDisplay}</Text>
-                  </View>
-                </View>
-              </TouchableOpacity>
-            ))}
-          </View>
-        </View>
-
-        {/* ── 4. Shop By Style ────────────────────────────────────────── */}
+        {/* ── 2. Shop By Style ────────────────────────────────────────── */}
         <View style={[styles.section, styles.sectionAlt]}>
           <SectionHeader
             noTopMargin
@@ -1807,45 +1724,7 @@ export default function HomeScreen({ navigation, route }) {
           </ScrollView>
         </View>
 
-        {/* ── 5. Trending This Week ────────────────────────────────────── */}
-        <View style={styles.section}>
-          <SectionHeader
-            noTopMargin
-            title="TRENDING THIS WEEK"
-            actionLabel="See all"
-            onAction={() => navigation?.navigate('Explore', {
-              designs: TRENDING_DESIGNS,
-              title: 'Trending This Week',
-            })}
-          />
-          <View style={styles.collectionsGrid}>
-            {TRENDING_DESIGNS.slice(0, 4).map(design => (
-              <TouchableOpacity
-                key={design.id}
-                style={styles.newArrivalCard}
-                activeOpacity={0.85}
-                onPress={() => navigation?.navigate('ShopTheLook', { design })}
-              >
-                <CardImage uri={design.imageUrl} style={styles.newArrivalCardImg} placeholderColor="#D0D7E3" />
-                <View style={styles.newArrivalCardInfo}>
-                  <Text style={styles.newArrivalCardName} numberOfLines={2}>
-                    {design.title.replace('...', '')}
-                  </Text>
-                  <View style={styles.newArrivalCardFooter}>
-                    <Text style={styles.newArrivalCardBrand}>
-                      {design.styles?.[0]
-                        ? (STYLE_LABEL_MAP[design.styles[0]] || design.styles[0])
-                        : `♥ ${design.likes}`}
-                    </Text>
-                    <Text style={styles.trendingViewLook}>View Look</Text>
-                  </View>
-                </View>
-              </TouchableOpacity>
-            ))}
-          </View>
-        </View>
-
-        {/* ── 6. Deal of the Day — premium editorial treatment ────────── */}
+        {/* ── 3. Deal of the Day — premium editorial treatment ────────── */}
         {dealProduct && (
           <View style={styles.dealSection}>
             {/* Section eyebrow */}
@@ -1942,52 +1821,7 @@ export default function HomeScreen({ navigation, route }) {
           </View>
         )}
 
-        {/* ── 7. New Arrivals (portrait cards) ────────────────────────── */}
-        <View style={[styles.section, styles.sectionAlt]}>
-          <SectionHeader
-            noTopMargin
-            title="NEW ARRIVALS"
-            actionLabel="See all"
-            onAction={() => navigation?.navigate('Explore', {
-              designs: NEW_ARRIVALS,
-              title: 'New Arrivals',
-            })}
-          />
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.hScroll}
-          >
-            {NEW_ARRIVALS.map(design => (
-              <TouchableOpacity
-                key={design.id}
-                style={styles.arrivalCard}
-                activeOpacity={0.88}
-                onPress={() => navigation?.navigate('ShopTheLook', { design })}
-              >
-                {/* Photo + badge overlaid on top-right */}
-                <View style={styles.arrivalImgWrap}>
-                  <CardImage uri={design.imageUrl} style={styles.arrivalImg} />
-                  <View style={styles.arrivalNewBadge}>
-                    <Text style={styles.arrivalNewBadgeText}>NEW</Text>
-                  </View>
-                </View>
-
-                {/* Info box below image */}
-                <View style={styles.arrivalInfoBox}>
-                  <Text style={styles.arrivalInfoCreator} numberOfLines={1}>
-                    {SELLER_MAP[design.user]?.displayName || design.user}
-                  </Text>
-                  <Text style={styles.arrivalInfoTitle} numberOfLines={2}>
-                    {design.title.replace('...', '')}
-                  </Text>
-                </View>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
-        </View>
-
-        {/* ── 8. Recently Viewed (only if history exists) ─────────────── */}
+        {/* ── 4. Recently Viewed (only if history exists) ─────────────── */}
         {recentlyViewed.length > 0 && (
           <View style={styles.section}>
             <SectionHeader
@@ -2016,7 +1850,7 @@ export default function HomeScreen({ navigation, route }) {
           </View>
         )}
 
-        {/* ── 9. Featured Products ─────────────────────────────────────── */}
+        {/* ── 5. Featured Products ─────────────────────────────────────── */}
         <View style={styles.section}>
           <SectionHeader
             noTopMargin

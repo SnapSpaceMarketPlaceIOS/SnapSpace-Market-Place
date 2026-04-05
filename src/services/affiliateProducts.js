@@ -253,3 +253,66 @@ export function getProductsByDesign(designId) {
   // This will be wired to the DB when live; for now uses catalog matching
   return [];
 }
+
+// ── "You Might Also Like" recommendation engine ──────────────────────────────
+
+// Accent/decor categories targeted for recommendations.
+// These complement primary furniture without duplicating SHOP ROOM items.
+const ACCENT_CATEGORIES = new Set([
+  'rug', 'throw-pillow', 'throw-blanket', 'vase', 'planter',
+  'wall-art', 'curtains', 'mirror', 'lamp', 'floor-lamp',
+  'table-lamp', 'pendant-light', 'accent-chair', 'side-table',
+]);
+
+/**
+ * Get "You Might Also Like" accent recommendations for a design.
+ *
+ * Layer 1 — Style + room matching:
+ *   Uses the same productMatcher scoring engine but restricted to accent/decor
+ *   categories only. Primary furniture (sofa, bed, dining-table, etc.) is
+ *   excluded so this section always shows complementary pieces.
+ *
+ * Layer 2 — Liked history signal:
+ *   likedDesignIds is { [id]: boolean } from LikedContext. Active users
+ *   (3+ liked designs) get a wider diversity pass (8 slots instead of 6).
+ *   Full style-aware personalization will activate when design styles are
+ *   stored alongside liked IDs in a future session.
+ *
+ * Layer 3 — Diversity enforcement:
+ *   matchProducts already enforces 1-per-category; the accent-filtered catalog
+ *   guarantees category variety across rug / lighting / textiles / decor / mirror.
+ *
+ * @param {object}   design          - Current design (has .styles, .roomType)
+ * @param {string[]} excludeIds      - Product IDs already shown in SHOP ROOM
+ * @param {object}   likedDesignIds  - { [id]: boolean } from LikedContext
+ * @param {number}   limit           - Max results (default 6)
+ * @returns {object[]}               - Normalized, diversified accent products
+ */
+export function getRecommendedProducts(design, excludeIds = [], likedDesignIds = {}, limit = 6) {
+  const catalog = getCombinedCatalog();
+  const excludeSet = new Set(excludeIds);
+
+  // Layer 2: active users get a slightly wider pool → more diversity
+  const likedCount = Object.values(likedDesignIds).filter(Boolean).length;
+  const fetchLimit = likedCount >= 3 ? Math.min(limit + 2, 8) : limit;
+
+  // Layer 1: restrict to accent/decor, excluding SHOP ROOM products
+  const accentCatalog = catalog.filter(
+    (p) => ACCENT_CATEGORIES.has(p.category) && !excludeSet.has(p.id)
+  );
+
+  if (accentCatalog.length === 0) return [];
+
+  const parsedPrompt = {
+    roomType: design.roomType || 'living-room',
+    styles: design.styles || [],
+    materials: design.materials || [],
+    moods: [],
+    furnitureCategories: [],
+    promptTokens: [],
+  };
+
+  // Layer 3: same scoring engine → naturally diverse across accent categories
+  const products = matchProducts(parsedPrompt, fetchLimit, accentCatalog);
+  return products.slice(0, limit).map(normalizeProduct);
+}

@@ -336,16 +336,11 @@ export async function deduplicateUserDesigns(userId) {
 
 /** Get all designs for a specific user (own profile). */
 export async function getUserDesigns(userId) {
-  const timeout = new Promise((_, reject) =>
-    setTimeout(() => reject(new Error('getUserDesigns timed out')), 10000)
-  );
-  const query = supabase
+  const { data, error } = await supabase
     .from('user_designs')
     .select('*')
     .eq('user_id', userId)
     .order('created_at', { ascending: false });
-
-  const { data, error } = await Promise.race([query, timeout]);
   if (error) throw error;
   return data || [];
 }

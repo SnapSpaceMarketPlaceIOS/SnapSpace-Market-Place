@@ -945,7 +945,7 @@ export default function ExploreScreen({ navigation, route }) {
                       const savedProducts = design.products || [];
                       const enrichedProducts = savedProducts.length ? savedProducts : getProductsForDesign(design, 4);
                       const enriched = { ...design, products: enrichedProducts };
-                      setSelectedCard(enriched);
+                      navigation.navigate('ShopTheLook', { design: enriched });
                     }}
                   />
                 </View>

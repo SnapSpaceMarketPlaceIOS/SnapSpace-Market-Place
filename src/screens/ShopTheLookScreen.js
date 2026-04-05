@@ -6,7 +6,7 @@
  *   → divider → SHOP ROOM horizontal cards → FTC → Tags
  *   → sticky Add All to Cart bottom bar
  */
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   View,
   Text,
@@ -15,15 +15,22 @@ import {
   TouchableOpacity,
   Dimensions,
   Alert,
+  Share,
+  ActivityIndicator,
+  Animated,
+  Pressable,
 } from 'react-native';
+import * as FileSystem from 'expo-file-system';
 import CardImage from '../components/CardImage';
 import AutoImage from '../components/AutoImage';
-import Svg, { Path, Circle, Polyline, Line } from 'react-native-svg';
+import Svg, { Path, Circle, Polyline, Line, G } from 'react-native-svg';
 import { colors } from '../constants/colors';
 import { colors as C } from '../constants/theme';
 import { space, radius, shadow, typeScale, letterSpacing } from '../constants/tokens';
 import { useCart } from '../context/CartContext';
-import { getProductsForDesign } from '../services/affiliateProducts';
+import { useLiked } from '../context/LikedContext';
+import { useAuth } from '../context/AuthContext';
+import { getProductsForDesign, getRecommendedProducts } from '../services/affiliateProducts';
 
 const { width } = Dimensions.get('window');
 const IMG_RADIUS = Math.round((width - space.lg * 2) * 0.025);
@@ -64,6 +71,89 @@ function CartWhiteIcon() {
       <Circle cx={20} cy={21} r={1} />
       <Path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
     </Svg>
+  );
+}
+
+// Arc-style download icon (arrow down + curved tray) — matches RoomResultScreen Figma spec
+function DownloadIcon({ color = '#9CA3AF' }) {
+  return (
+    <Svg width={18} height={18} viewBox="0 0 30 30" fill="none">
+      <Path
+        d="M6.54815 18.5147C7.04668 20.3752 8.1452 22.0193 9.67334 23.1918C11.2015 24.3644 13.0738 25 15 25C16.9262 25 18.7985 24.3644 20.3267 23.1918C21.8548 22.0193 22.9533 20.3752 23.4519 18.5147"
+        stroke={color} strokeWidth={1.6} strokeLinecap="round"
+      />
+      <Path
+        d="M15 16.25L14.6877 16.6404L15 16.8903L15.3123 16.6404L15 16.25ZM15.5 5C15.5 4.72386 15.2761 4.5 15 4.5C14.7239 4.5 14.5 4.72386 14.5 5L15 5L15.5 5ZM8.75 11.25L8.43765 11.6404L14.6877 16.6404L15 16.25L15.3123 15.8596L9.06235 10.8596L8.75 11.25ZM15 16.25L15.3123 16.6404L21.5623 11.6404L21.25 11.25L20.9377 10.8596L14.6877 15.8596L15 16.25ZM15 16.25L15.5 16.25L15.5 5L15 5L14.5 5L14.5 16.25L15 16.25Z"
+        fill={color}
+      />
+    </Svg>
+  );
+}
+
+// Arc-style share icon (arrow up + curved tray) — matches RoomResultScreen Figma spec
+function ShareIcon({ color = '#9CA3AF' }) {
+  return (
+    <Svg width={18} height={18} viewBox="0 0 30 30" fill="none">
+      <Path
+        d="M6.54815 18.5147C7.04668 20.3752 8.1452 22.0193 9.67334 23.1918C11.2015 24.3644 13.0738 25 15 25C16.9262 25 18.7985 24.3644 20.3267 23.1918C21.8548 22.0193 22.9533 20.3752 23.4519 18.5147"
+        stroke={color} strokeWidth={1.6} strokeLinecap="round"
+      />
+      <Path
+        d="M15 5L14.6877 4.60957L15 4.35969L15.3123 4.60957L15 5ZM15.5 16.25C15.5 16.5261 15.2761 16.75 15 16.75C14.7239 16.75 14.5 16.5261 14.5 16.25L15 16.25L15.5 16.25ZM8.75 10L8.43765 9.60957L14.6877 4.60957L15 5L15.3123 5.39043L9.06235 10.3904L8.75 10ZM15 5L15.3123 4.60957L21.5623 9.60957L21.25 10L20.9377 10.3904L14.6877 5.39043L15 5ZM15 5L15.5 5L15.5 16.25L15 16.25L14.5 16.25L14.5 5L15 5Z"
+        fill={color}
+      />
+    </Svg>
+  );
+}
+
+// Mini camera-lens loader — matches the generation loading animation
+function MiniLensLoader({ color = '#0B6DC3', size = 24 }) {
+  const spin = useRef(new Animated.Value(0)).current;
+  useEffect(() => {
+    const loop = Animated.loop(
+      Animated.timing(spin, { toValue: 1, duration: 1800, useNativeDriver: true })
+    );
+    loop.start();
+    return () => loop.stop();
+  }, [spin]);
+  const rotate = spin.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '360deg'] });
+  const counterRotate = spin.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '-200deg'] });
+  return (
+    <View style={{ width: size, height: size, alignItems: 'center', justifyContent: 'center' }}>
+      <Animated.View style={{ position: 'absolute', transform: [{ rotate }] }}>
+        <Svg width={size} height={size} viewBox="0 0 30 30">
+          <Circle cx={15} cy={15} r={13} stroke={color} strokeWidth={1.2}
+            fill="none" strokeDasharray="3 4" strokeLinecap="round" />
+        </Svg>
+      </Animated.View>
+      <Animated.View style={{ position: 'absolute', transform: [{ rotate: counterRotate }] }}>
+        <Svg width={size} height={size} viewBox="0 0 30 30">
+          <Circle cx={15} cy={15} r={9} stroke={color} strokeWidth={0.8}
+            fill="none" opacity={0.6} strokeDasharray="4 3" strokeLinecap="round" />
+        </Svg>
+      </Animated.View>
+      <Svg width={size} height={size} viewBox="0 0 30 30" style={{ position: 'absolute' }}>
+        <Circle cx={15} cy={15} r={3} fill={color} opacity={0.5} />
+      </Svg>
+    </View>
+  );
+}
+
+// Animated icon button — same spring bounce as the bottom tab bar
+function AnimatedIconBtn({ onPress, color, children, style }) {
+  const scale = useRef(new Animated.Value(1)).current;
+  const handlePressIn = useCallback(() => {
+    Animated.spring(scale, { toValue: 0.88, useNativeDriver: true, speed: 50, bounciness: 4 }).start();
+  }, [scale]);
+  const handlePressOut = useCallback(() => {
+    Animated.spring(scale, { toValue: 1, useNativeDriver: true, speed: 20, bounciness: 10 }).start();
+  }, [scale]);
+  return (
+    <Pressable onPress={onPress} onPressIn={handlePressIn} onPressOut={handlePressOut}>
+      <Animated.View style={[style, { transform: [{ scale }] }]}>
+        {children}
+      </Animated.View>
+    </Pressable>
   );
 }
 
@@ -125,8 +215,50 @@ function ProductCard({ product, inCart, onAddToCart, onPress }) {
 export default function ShopTheLookScreen({ route, navigation }) {
   const { design } = route.params;
   const { addToCart, items } = useCart();
+  const { liked } = useLiked();
+  const { user } = useAuth();
   const [addedKeys, setAddedKeys] = useState({});
   const [products, setProducts] = useState(design.products || []);
+  const [recommended, setRecommended] = useState([]);
+  const [saving, setSaving] = useState(false);
+  const [shareActive, setShareActive] = useState(false);
+  const [downloadActive, setDownloadActive] = useState(false);
+
+  const isOwnPost = user && (
+    design.user_id === user.id ||
+    (user.username && design.user === user.username) ||
+    (user.name && design.user === user.name) ||
+    design.isUserDesign === true
+  );
+
+  const handleShare = async () => {
+    setShareActive(true);
+    try {
+      const msg = design.prompt
+        ? `Check out this SnapSpace design: "${design.prompt}"`
+        : 'Check out this SnapSpace design!';
+      await Share.share({ message: msg, url: design.imageUrl || '' });
+    } catch {}
+  };
+
+  const handleDownload = async () => {
+    if (!design.imageUrl || saving) return;
+    setDownloadActive(true);
+    setSaving(true);
+    try {
+      const fileUri = FileSystem.cacheDirectory + 'snapspace_' + Date.now() + '.jpg';
+      const { status } = await FileSystem.downloadAsync(design.imageUrl, fileUri);
+      if (status === 200) {
+        await Share.share({ url: fileUri });
+      } else {
+        await Share.share({ message: design.imageUrl });
+      }
+    } catch {
+      Alert.alert('Error', 'Could not download the image. Please try again.');
+    } finally {
+      setSaving(false);
+    }
+  };
 
   useEffect(() => {
     // Only re-match if no persisted products were saved with this design
@@ -134,6 +266,13 @@ export default function ShopTheLookScreen({ route, navigation }) {
     const matched = getProductsForDesign(design, 6);
     if (matched.length > 0) setProducts(matched);
   }, [design]);
+
+  // "You Might Also Like" — runs after primary products are resolved
+  useEffect(() => {
+    const shopRoomIds = products.map((p) => p.id).filter(Boolean);
+    const recs = getRecommendedProducts(design, shopRoomIds, liked, 6);
+    setRecommended(recs);
+  }, [products, design, liked]);
 
   const isInCart = (product) => {
     const key = `${product.name}__${product.brand}`;
@@ -205,9 +344,28 @@ export default function ShopTheLookScreen({ route, navigation }) {
             <Text style={s.username} numberOfLines={1}>@{displayUser}</Text>
             <Text style={s.userSub}>Tap to view profile</Text>
           </View>
-          <TouchableOpacity style={s.followBtn} activeOpacity={0.8}>
-            <Text style={s.followBtnText}>Follow</Text>
-          </TouchableOpacity>
+          <View style={s.userActions}>
+            <AnimatedIconBtn
+              onPress={handleShare}
+              style={[s.shareBtn, shareActive && s.shareBtnActive]}
+            >
+              <ShareIcon color={shareActive ? '#0B6DC3' : '#9CA3AF'} />
+            </AnimatedIconBtn>
+            {isOwnPost ? (
+              <AnimatedIconBtn
+                onPress={handleDownload}
+                style={[s.shareBtn, downloadActive && s.shareBtnActive]}
+              >
+                {saving
+                  ? <MiniLensLoader color={downloadActive ? '#0B6DC3' : '#9CA3AF'} />
+                  : <DownloadIcon color={downloadActive ? '#0B6DC3' : '#9CA3AF'} />}
+              </AnimatedIconBtn>
+            ) : (
+              <TouchableOpacity style={s.followBtn} activeOpacity={0.8}>
+                <Text style={s.followBtnText}>Follow</Text>
+              </TouchableOpacity>
+            )}
+          </View>
         </TouchableOpacity>
 
         {/* ── Prompt label + text ──────────────────────────────────── */}
@@ -241,9 +399,35 @@ export default function ShopTheLookScreen({ route, navigation }) {
               ))}
             </ScrollView>
 
-            {/* FTC Disclosure */}
-            <Text style={s.ftc}>We may earn a commission when you buy through links on this app.</Text>
           </View>
+        )}
+
+        {/* ── YOU MIGHT ALSO LIKE ──────────────────────────────────── */}
+        {recommended.length > 0 && (
+          <View style={s.productsSection}>
+            <View style={[s.divider, { marginTop: space.xl, marginLeft: 0 }]} />
+            <Text style={s.sectionLabel}>YOU MIGHT ALSO LIKE</Text>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={s.hList}
+            >
+              {recommended.map((product, index) => (
+                <ProductCard
+                  key={product.id || `rec-${index}`}
+                  product={product}
+                  inCart={isInCart(product)}
+                  onAddToCart={handleAddToCart}
+                  onPress={() => navigation.navigate('ProductDetail', { product, design })}
+                />
+              ))}
+            </ScrollView>
+          </View>
+        )}
+
+        {/* ── Divider before Tags ──────────────────────────────────── */}
+        {design.tags && design.tags.length > 0 && (
+          <View style={[s.divider, { marginTop: space.xl }]} />
         )}
 
         {/* ── Tags ─────────────────────────────────────────────────── */}
@@ -270,19 +454,23 @@ export default function ShopTheLookScreen({ route, navigation }) {
 
       {/* ── Sticky Bottom Bar ──────────────────────────────────────── */}
       <View style={s.bottomBar}>
-        <View style={s.bottomInfo}>
-          <Text style={s.bottomLabel}>{products.length} item{products.length !== 1 ? 's' : ''}</Text>
-          <Text style={s.bottomTotal}>
-            Total: {totalPrice.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2 })}
-          </Text>
-        </View>
         <TouchableOpacity
-          style={[s.addAllBtn, allInCart && s.addAllBtnDone]}
+          style={[s.addAllPill, allInCart && s.addAllPillDone]}
           activeOpacity={0.85}
           onPress={handleAddAll}
         >
-          {!allInCart && <CartWhiteIcon />}
-          <Text style={s.addAllBtnText}>{allInCart ? '✓ All Added' : 'Add All to Cart'}</Text>
+          <View style={s.pillLeft}>
+            <View style={s.pillMeta}>
+              <Text style={s.pillCount}>{products.length} item{products.length !== 1 ? 's' : ''}</Text>
+              <Text style={s.pillPrice}>
+                {totalPrice.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2 })}
+              </Text>
+            </View>
+          </View>
+          <View style={s.pillRight}>
+            {allInCart ? <Text style={s.pillCheck}>✓</Text> : <CartWhiteIcon />}
+            <Text style={s.pillAction}>{allInCart ? 'All Added' : 'Add All to Cart'}</Text>
+          </View>
         </TouchableOpacity>
       </View>
     </View>
@@ -368,6 +556,24 @@ const s = StyleSheet.create({
     color: C.textSecondary,
     marginTop: 2,
   },
+  userActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  shareBtn: {
+    width: 36,
+    height: 36,
+    borderRadius: radius.full,
+    borderWidth: 1,
+    borderColor: '#9CA3AF',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#FFFFFF',
+  },
+  shareBtnActive: {
+    borderColor: '#0B6DC3',
+  },
   followBtn: {
     backgroundColor: C.primary,
     borderRadius: radius.full,
@@ -392,7 +598,7 @@ const s = StyleSheet.create({
   promptBody: {
     fontSize: 13,
     fontWeight: '400',
-    color: C.textSecondary,
+    color: '#67ACE9',
     lineHeight: 18,
     marginHorizontal: space.lg,
     marginBottom: 6,
@@ -439,7 +645,7 @@ const s = StyleSheet.create({
   // ── Tags ──
   tagsSection: {
     paddingHorizontal: space.lg,
-    marginTop: space.lg,
+    marginTop: space.base,
   },
   tagsWrap: {
     flexDirection: 'row',
@@ -537,8 +743,6 @@ const s = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    flexDirection: 'row',
-    alignItems: 'center',
     paddingHorizontal: space.lg,
     paddingBottom: 34,
     paddingTop: space.md,
@@ -551,33 +755,50 @@ const s = StyleSheet.create({
     shadowRadius: 8,
     elevation: 4,
   },
-  bottomInfo: { flex: 1 },
-  bottomLabel: {
-    ...typeScale.caption,
-    fontWeight: '500',
-    color: C.textTertiary,
-  },
-  bottomTotal: {
-    ...typeScale.title,
-    color: C.textPrimary,
-    letterSpacing: letterSpacing.tight,
-    marginTop: 2,
-  },
-  addAllBtn: {
+  addAllPill: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'space-between',
     backgroundColor: C.primary,
-    borderRadius: radius.button,
-    height: 52,
+    borderRadius: 999,
+    height: 56,
     paddingHorizontal: space.lg,
-    gap: space.sm,
     ...shadow.medium,
   },
-  addAllBtnDone: {
+  addAllPillDone: {
     backgroundColor: '#67ACE9',
   },
-  addAllBtnText: {
+  pillLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: space.sm,
+  },
+  pillRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  pillCheck: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#fff',
+  },
+  pillMeta: {
+    flexDirection: 'column',
+  },
+  pillCount: {
+    fontSize: 11,
+    fontWeight: '500',
+    color: 'rgba(255,255,255,0.75)',
+    lineHeight: 14,
+  },
+  pillPrice: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#fff',
+    lineHeight: 18,
+  },
+  pillAction: {
     fontSize: 15,
     fontWeight: '700',
     color: '#fff',

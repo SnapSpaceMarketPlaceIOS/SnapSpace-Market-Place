@@ -33,8 +33,8 @@ import { VerifiedBadge } from '../components/VerifiedBadge';
 import TabScreenFade from '../components/TabScreenFade';
 
 const { width } = Dimensions.get('window');
-// 4px padding each side + 4px gap between cards (tight photo grid)
-const CARD_WIDTH = (width - 4 * 2 - 4) / 2;
+// 2px padding each side + 3px gap between cards — tight photo grid
+const CARD_WIDTH = (width - 2 * 2 - 3) / 2;
 const BANNER_HEIGHT = 210;
 
 // ── Icons ─────────────────────────────────────────────────────────────────────
@@ -306,6 +306,7 @@ export default function ProfileScreen({ navigation }) {
           if (cancelled) return;
           const normalized = designs.map(d => ({
             id: `user-${d.id}`,
+            user_id: user.id,
             title: d.prompt || 'My Design',
             user: user.username || user.name || 'Me',
             initial: (user.name || 'M')[0],
@@ -326,7 +327,7 @@ export default function ProfileScreen({ navigation }) {
         })
         .catch(err => {
           console.warn('Profile designs load failed:', err.message);
-          if (!cancelled) setMyDesigns([]);
+          // Don't clear existing designs on a failed refresh — keep whatever was loaded before
         })
         .finally(() => { if (!cancelled) setDesignsLoading(false); });
       return () => { cancelled = true; };
@@ -1074,8 +1075,9 @@ const styles = StyleSheet.create({
   grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: space.xs,
-    paddingHorizontal: space.xs,
+    rowGap: 3,
+    columnGap: 3,
+    paddingHorizontal: 2,
   },
   emptyGrid: {
     alignItems: 'center',
@@ -1096,24 +1098,17 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 20,
   },
-  // Post grid cards — shadow.low + border.subtle
+  // Post grid cards — clean image tiles matching Explore product grid style
   card: {
     width: '100%',
-    borderRadius: radius.md,
+    borderRadius: 8,
     overflow: 'hidden',
-    backgroundColor: '#FFFFFF',
-    borderWidth: 1,
-    borderColor: 'rgba(0,0,0,0.04)',
-    shadowColor: shadow.low.shadowColor,
-    shadowOffset: shadow.low.shadowOffset,
-    shadowOpacity: shadow.low.shadowOpacity,
-    shadowRadius: shadow.low.shadowRadius,
-    elevation: shadow.low.elevation,
+    backgroundColor: '#ECEEF2',
   },
   cardImg: {
     width: '100%',
     aspectRatio: 1,
-    borderRadius: radius.md,
+    borderRadius: 8,
     overflow: 'hidden',
   },
   cardImgBg: {
