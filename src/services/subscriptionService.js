@@ -24,6 +24,19 @@ export const PRODUCT_TIER_MAP = {
   [PRODUCT_IDS.PREMIUM]: { tier: 'premium', quotaLimit: -1,  displayLabel: 'Unlimited' },
 };
 
+// ── Token product IDs (consumable IAP) ──────────────────────────────────────
+
+export const TOKEN_PRODUCT_IDS = {
+  TOKENS_4:   'snapspace_tokens_4',
+  TOKENS_10:  'snapspace_tokens_10',
+  TOKENS_20:  'snapspace_tokens_20',
+  TOKENS_40:  'snapspace_tokens_40',
+  TOKENS_100: 'snapspace_tokens_100',
+  TOKENS_200: 'snapspace_tokens_200',
+};
+
+export const ALL_TOKEN_PRODUCT_IDS = Object.values(TOKEN_PRODUCT_IDS);
+
 // ── Server-side receipt validation ───────────────────────────────────────────
 
 /**
@@ -55,7 +68,19 @@ export async function validateReceipt(jwsRepresentation, userId) {
   }
 
   const data = await res.json();
+
+  // Token purchase response
+  if (data.type === 'tokens') {
+    return {
+      type:         'tokens',
+      tokensAdded:  data.tokens_added,
+      newBalance:   data.new_balance,
+    };
+  }
+
+  // Subscription purchase response
   return {
+    type:                   'subscription',
     tier:                   data.tier,
     quotaLimit:             data.quota_limit,
     generationsRemaining:   data.generations_remaining,
@@ -122,4 +147,61 @@ export function formatGenerationsRemaining(tier, remaining) {
   if (tier === 'premium') return 'Unlimited';
   if (isPaidTier(tier))   return `${remaining} left this month`;
   return `${remaining} free left`;
+}
+
+// ── Token balance ────────────────────────────────────────────────────────────
+
+/**
+ * Fetch current token balance from Supabase.
+ * @param {string} userId
+ * @returns {Promise<{ balance, totalPurchased, totalUsed, totalGifted }>}
+ */
+export async function fetchTokenBalance(userId) {
+  const { supabase } = await import('./supabase');
+  const { data, error } = await supabase
+    .rpc('get_token_balance', { p_user_id: userId });
+
+  if (error || !data?.[0]) {
+    return { balance: 0, totalPurchased: 0, totalUsed: 0, totalGifted: 0 };
+  }
+
+  const t = data[0];
+  return {
+    balance:        t.balance,
+    totalPurchased: t.total_purchased,
+    totalUsed:      t.total_used,
+    totalGifted:    t.total_gifted,
+  };
+}
+
+// ── Referral helpers ─────────────────────────────────────────────────────────
+
+/**
+ * Apply a referral code for a newly signed-up user.
+ * Creates a pending referral that completes when the referred user
+ * makes their first generation or verifies email.
+ *
+ * @param {string} userId       — the referred (new) user's ID
+ * @param {string} referralCode — 6-char code from the referrer
+ */
+export async function applyReferralCode(userId, referralCode) {
+  const { supabase } = await import('./supabase');
+  const { error } = await supabase
+    .rpc('apply_referral', { p_referred_id: userId, p_referral_code: referralCode });
+
+  if (error) throw new Error(error.message);
+}
+
+/**
+ * Get or generate the current user's referral code.
+ * @param {string} userId
+ * @returns {Promise<string>} — 6-char referral code
+ */
+export async function getReferralCode(userId) {
+  const { supabase } = await import('./supabase');
+  const { data, error } = await supabase
+    .rpc('generate_referral_code', { p_user_id: userId });
+
+  if (error) throw new Error(error.message);
+  return data;
 }

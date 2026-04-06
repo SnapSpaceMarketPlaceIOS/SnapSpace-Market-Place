@@ -37,12 +37,23 @@ const CORS_HEADERS = {
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
 };
 
-// ── Product → tier mapping ───────────────────────────────────────────────────
+// ── Product → tier mapping (subscriptions) ──────────────────────────────────
 
 const PRODUCT_MAP: Record<string, { tier: string; quotaLimit: number }> = {
   'snapspace_basic_monthly':   { tier: 'basic',   quotaLimit: 25 },
   'snapspace_pro_monthly':     { tier: 'pro',     quotaLimit: 50 },
   'snapspace_premium_monthly': { tier: 'premium', quotaLimit: -1 },
+};
+
+// ── Product → token count mapping (consumables) ─────────────────────────────
+
+const TOKEN_PRODUCT_MAP: Record<string, number> = {
+  'snapspace_tokens_4':   4,
+  'snapspace_tokens_10':  10,
+  'snapspace_tokens_20':  20,
+  'snapspace_tokens_40':  40,
+  'snapspace_tokens_100': 100,
+  'snapspace_tokens_200': 200,
 };
 
 // ── JWS Decoder ─────────────────────────────────────────────────────────────
@@ -144,17 +155,74 @@ Deno.serve(async (req: Request) => {
       ? new Date(expiresDateMs).toISOString()
       : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(); // fallback: +30 days
 
-    // ── Validate product ID ────────────────────────────────────────
-    if (!PRODUCT_MAP[productId]) {
+    // ── Route: subscription or token purchase ───────────────────────
+    const isSubscription = !!PRODUCT_MAP[productId];
+    const isToken        = !!TOKEN_PRODUCT_MAP[productId];
+
+    if (!isSubscription && !isToken) {
       return new Response(JSON.stringify({ error: `Unknown productId: ${productId}` }), {
         status: 400,
         headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' },
       });
     }
 
-    // ── Call activate_subscription() RPC ──────────────────────────
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
 
+    // ── TOKEN PURCHASE FLOW ──────────────────────────────────────
+    if (isToken) {
+      const tokenCount = TOKEN_PRODUCT_MAP[productId];
+
+      // Idempotency: check if this transactionId was already processed
+      const { data: existingTx } = await supabase
+        .from('token_transactions')
+        .select('id')
+        .eq('reference_id', transactionId)
+        .limit(1);
+
+      if (existingTx && existingTx.length > 0) {
+        // Already processed — return current balance without double-crediting
+        const { data: balData } = await supabase.rpc('get_token_balance', { p_user_id: userId });
+        const bal = balData?.[0]?.balance ?? 0;
+        return new Response(JSON.stringify({
+          success: true, type: 'tokens',
+          tokens_added: tokenCount, new_balance: bal,
+          transaction_id: transactionId, environment,
+        }), {
+          status: 200,
+          headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' },
+        });
+      }
+
+      // Credit tokens
+      const { data: addData, error: addError } = await supabase.rpc('add_tokens', {
+        p_user_id:      userId,
+        p_amount:       tokenCount,
+        p_type:         'purchase',
+        p_reference_id: transactionId,
+        p_product_id:   productId,
+      });
+
+      if (addError) {
+        console.error('[validate-apple-receipt] add_tokens error:', addError);
+        return new Response(JSON.stringify({ error: addError.message }), {
+          status: 500,
+          headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' },
+        });
+      }
+
+      const newBalance = addData?.[0]?.new_balance ?? tokenCount;
+
+      return new Response(JSON.stringify({
+        success: true, type: 'tokens',
+        tokens_added: tokenCount, new_balance: newBalance,
+        transaction_id: transactionId, environment,
+      }), {
+        status: 200,
+        headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' },
+      });
+    }
+
+    // ── SUBSCRIPTION PURCHASE FLOW (existing) ────────────────────
     const { data, error: rpcError } = await supabase.rpc('activate_subscription', {
       p_user_id:                 userId,
       p_product_id:              productId,
@@ -177,6 +245,7 @@ Deno.serve(async (req: Request) => {
 
     return new Response(JSON.stringify({
       success:                  true,
+      type:                     'subscription',
       tier:                     result.tier,
       quota_limit:              result.quota_limit,
       generations_remaining:    result.generations_remaining,

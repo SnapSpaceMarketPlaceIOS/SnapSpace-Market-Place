@@ -8,9 +8,11 @@ import {
   purchaseUpdatedListener,
   finishTransaction,
   getAvailablePurchases,
+  fetchProducts,
+  requestPurchase,
 } from 'expo-iap';
 import { useAuth } from './AuthContext';
-import { validateReceipt, fetchQuota } from '../services/subscriptionService';
+import { validateReceipt, fetchQuota, fetchTokenBalance } from '../services/subscriptionService';
 import { supabase } from '../services/supabase';
 
 // ── Tier definitions ────────────────────────────────────────────────────────
@@ -24,6 +26,18 @@ export const TIERS = {
 export const PAID_TIERS = [TIERS.basic, TIERS.pro, TIERS.premium];
 
 const ALL_PRODUCT_IDS = PAID_TIERS.map(t => t.productId);
+
+// ── Token packages (consumable IAP) ───────────────────────────────────────
+export const TOKEN_PACKAGES = [
+  { id: 'snapspace_tokens_4',   tokens: 4,   price: '$0.99',  priceNum: 0.99  },
+  { id: 'snapspace_tokens_10',  tokens: 10,  price: '$2.49',  priceNum: 2.49  },
+  { id: 'snapspace_tokens_20',  tokens: 20,  price: '$4.99',  priceNum: 4.99  },
+  { id: 'snapspace_tokens_40',  tokens: 40,  price: '$9.99',  priceNum: 9.99  },
+  { id: 'snapspace_tokens_100', tokens: 100, price: '$24.99', priceNum: 24.99 },
+  { id: 'snapspace_tokens_200', tokens: 200, price: '$49.99', priceNum: 49.99 },
+];
+
+const ALL_TOKEN_PRODUCT_IDS = TOKEN_PACKAGES.map(p => p.id);
 
 // ── Default free-tier state ─────────────────────────────────────────────────
 const DEFAULT_SUBSCRIPTION = {
@@ -46,11 +60,13 @@ export function SubscriptionProvider({ children }) {
   const [subscription, setSubscription] = useState(DEFAULT_SUBSCRIPTION);
   const [iapReady, setIapReady] = useState(false);
   const [products, setProducts] = useState([]);
+  const [tokenBalance, setTokenBalance] = useState(0);
+  const [tokenProducts, setTokenProducts] = useState([]);
 
   // Dev toggle — force-show paywall for UI iteration (off by default)
   const [devForcePaywall, setDevForcePaywall] = useState(false);
 
-  const shouldShowPaywall = devForcePaywall || !subscription.canGenerate;
+  const shouldShowPaywall = devForcePaywall || (!subscription.canGenerate && tokenBalance <= 0);
 
   const purchaseUpdateSub = useRef(null);
   const purchaseErrorSub  = useRef(null);
@@ -65,11 +81,25 @@ export function SubscriptionProvider({ children }) {
         if (!mounted) return;
 
         // Load product metadata from StoreKit / App Store
-        const subs = await getSubscriptions({ skus: ALL_PRODUCT_IDS });
-        if (mounted) {
-          setProducts(subs);
-          setIapReady(true);
+        let subs = [];
+        try {
+          subs = await getSubscriptions({ skus: ALL_PRODUCT_IDS });
+        } catch {
+          // Fallback to new API if getSubscriptions is not available
+          try { subs = await fetchProducts({ skus: ALL_PRODUCT_IDS, type: 'subs' }); } catch {}
         }
+        if (!mounted) return;
+        setProducts(subs);
+
+        // Load token (consumable) product metadata
+        try {
+          const tokenProds = await fetchProducts({ skus: ALL_TOKEN_PRODUCT_IDS, type: 'in-app' });
+          if (mounted) setTokenProducts(tokenProds);
+        } catch (e) {
+          console.warn('[Subscription] Token product fetch failed:', e.message);
+        }
+
+        if (mounted) setIapReady(true);
       } catch (e) {
         console.warn('[Subscription] IAP init failed:', e.message);
         // App still works — IAP just won't be available
@@ -93,28 +123,36 @@ export function SubscriptionProvider({ children }) {
       const jws = purchase?.transactionReceipt;
       if (!jws || !user?.id) return;
 
+      const isTokenPurchase = ALL_TOKEN_PRODUCT_IDS.includes(purchase.productId);
+
       try {
-        // Validate with server and activate subscription in DB
+        // Validate with server (handles both tokens and subscriptions)
         const result = await validateReceipt(jws, user.id);
 
-        // Finish/acknowledge the transaction with Apple
-        await finishTransaction({ purchase, isConsumable: false });
-
-        // Update local state
-        setSubscription(prev => ({
-          ...prev,
-          tier: result.tier,
-          quotaLimit: result.quotaLimit,
-          generationsUsed: prev.generationsUsed,
-          generationsRemaining: result.generationsRemaining,
-          canGenerate: result.generationsRemaining > 0 || result.quotaLimit === -1,
-          subscriptionStatus: result.subscriptionStatus,
-          subscriptionExpiresAt: result.subscriptionExpiresAt,
-        }));
+        if (result.type === 'tokens') {
+          // Finish as consumable
+          await finishTransaction({ purchase, isConsumable: true });
+          // Update token balance
+          setTokenBalance(result.newBalance);
+        } else {
+          // Finish as non-consumable (subscription)
+          await finishTransaction({ purchase, isConsumable: false });
+          // Update subscription state
+          setSubscription(prev => ({
+            ...prev,
+            tier: result.tier,
+            quotaLimit: result.quotaLimit,
+            generationsUsed: prev.generationsUsed,
+            generationsRemaining: result.generationsRemaining,
+            canGenerate: result.generationsRemaining > 0 || result.quotaLimit === -1,
+            subscriptionStatus: result.subscriptionStatus,
+            subscriptionExpiresAt: result.subscriptionExpiresAt,
+          }));
+        }
       } catch (e) {
         console.error('[Subscription] purchase validation failed:', e.message);
         // Still finish transaction to avoid stuck pending state
-        try { await finishTransaction({ purchase, isConsumable: false }); } catch {}
+        try { await finishTransaction({ purchase, isConsumable: isTokenPurchase }); } catch {}
       }
     });
 
@@ -165,6 +203,57 @@ export function SubscriptionProvider({ children }) {
       }
     }
   }, [user?.id]);
+
+  // ── Refresh token balance from backend ───────────────────────────────────
+  const refreshTokenBalance = useCallback(async () => {
+    if (!user?.id) return;
+    try {
+      const result = await fetchTokenBalance(user.id);
+      setTokenBalance(result.balance);
+    } catch (e) {
+      console.warn('[Subscription] token balance refresh failed:', e.message);
+    }
+  }, [user?.id]);
+
+  // ── Deduct one token (optimistic + persist) ────────────────────────────
+  const deductToken = useCallback(async () => {
+    // Optimistic update
+    setTokenBalance(prev => Math.max(0, prev - 1));
+
+    if (user?.id) {
+      try {
+        const { data, error } = await supabase.rpc('deduct_token', { p_user_id: user.id });
+        if (error) throw error;
+        // Sync to authoritative server balance
+        if (data?.[0]?.balance !== undefined) setTokenBalance(data[0].balance);
+      } catch (e) {
+        // Revert optimistic update on failure
+        setTokenBalance(prev => prev + 1);
+        throw e;
+      }
+    }
+  }, [user?.id]);
+
+  // ── Purchase tokens (consumable IAP) ───────────────────────────────────
+  const purchaseTokens = useCallback(async (productId) => {
+    if (__DEV__ && !iapReady) {
+      // Dev fallback when StoreKit not configured
+      console.log('[Subscription] DEV MODE — mock token purchase:', productId);
+      const pkg = TOKEN_PACKAGES.find(p => p.id === productId);
+      if (pkg) {
+        setTokenBalance(prev => prev + pkg.tokens);
+      }
+      return { success: true, dev: true };
+    }
+
+    if (!iapReady) throw new Error('In-app purchases are not available right now.');
+
+    await requestPurchase({
+      request: { apple: { sku: productId } },
+      type: 'in-app',
+    });
+    return { success: true };
+  }, [iapReady]);
 
   // ── Purchase subscription ───────────────────────────────────────────────
   const purchaseSubscription = useCallback(async (productId) => {
@@ -223,8 +312,11 @@ export function SubscriptionProvider({ children }) {
 
   // ── Refresh on user login ───────────────────────────────────────────────
   useEffect(() => {
-    if (user?.id) refreshQuota();
-  }, [user?.id, refreshQuota]);
+    if (user?.id) {
+      refreshQuota();
+      refreshTokenBalance();
+    }
+  }, [user?.id, refreshQuota, refreshTokenBalance]);
 
   return (
     <SubscriptionContext.Provider
@@ -232,13 +324,21 @@ export function SubscriptionProvider({ children }) {
         subscription,
         shouldShowPaywall,
         iapReady,
-        products,           // StoreKit product metadata (prices, etc.)
+        products,           // StoreKit subscription product metadata
+        tokenProducts,      // StoreKit token product metadata
         devForcePaywall,
         setDevForcePaywall: __DEV__ ? setDevForcePaywall : () => {},
         refreshQuota,
         recordGeneration,
         purchaseSubscription,
         restorePurchases,
+        // Token system
+        tokenBalance,
+        refreshTokenBalance,
+        deductToken,
+        purchaseTokens,
+        TOKEN_PACKAGES,
+        // Constants
         TIERS,
         PAID_TIERS,
       }}

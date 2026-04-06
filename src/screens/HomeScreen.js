@@ -812,7 +812,10 @@ const FIRST_VISIT_KEY = 'snapspace_home_visited';
 
 export default function HomeScreen({ navigation, route }) {
   const { user } = useAuth();
-  const { subscription, shouldShowPaywall, refreshQuota, recordGeneration } = useSubscription();
+  const {
+    subscription, shouldShowPaywall, refreshQuota, recordGeneration,
+    tokenBalance, deductToken, refreshTokenBalance,
+  } = useSubscription();
   const { addToCart, items: cartItems } = useCart();
   const { liked } = useLiked();
   const [prompt, setPrompt] = useState('');
@@ -1183,8 +1186,14 @@ export default function HomeScreen({ navigation, route }) {
       setGenStatus('Finding products for your space…');
       const matchedProducts = getProductsForPrompt(designPrompt, 4);
 
-      // ── Quota check (SubscriptionContext) ────────────────────────────────
-      if (shouldShowPaywall || !subscription.canGenerate) {
+      // ── Quota waterfall: free → tokens → subscription → paywall ─────────
+      let generationSource = null;
+
+      if (subscription.canGenerate) {
+        generationSource = subscription.tier === 'free' ? 'free' : 'subscription';
+      } else if (tokenBalance > 0) {
+        generationSource = 'token';
+      } else {
         stopLoadingBar(false);
         setGenerating(false);
         navigation.navigate('Paywall');
@@ -1287,9 +1296,14 @@ export default function HomeScreen({ navigation, route }) {
             console.log('[Gen] BFL complete');
           }
 
-          // Record generation in DB, then refresh quota from server
-          await recordGeneration();
-          refreshQuota();
+          // Record generation based on payment source
+          if (generationSource === 'token') {
+            await deductToken();
+            refreshTokenBalance();
+          } else {
+            await recordGeneration();
+            refreshQuota();
+          }
 
         } catch (genErr) {
           stopLoadingBar(false);
