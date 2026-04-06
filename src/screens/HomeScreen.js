@@ -47,6 +47,7 @@ import { PRODUCT_CATALOG } from '../data/productCatalog';
 import { saveUserDesign, updateDesignVisibility, uploadRoomPhoto } from '../services/supabase';
 import { useSubscription } from '../context/SubscriptionContext';
 import { generateWithBFL } from '../services/bfl';
+import { checkRateLimit, recordRateLimit } from '../services/subscriptionService';
 import TabScreenFade from '../components/TabScreenFade';
 
 const { width, height } = Dimensions.get('window');
@@ -812,7 +813,10 @@ const FIRST_VISIT_KEY = 'snapspace_home_visited';
 
 export default function HomeScreen({ navigation, route }) {
   const { user } = useAuth();
-  const { subscription, shouldShowPaywall, refreshQuota, recordGeneration } = useSubscription();
+  const {
+    subscription, shouldShowPaywall, refreshQuota, recordGeneration,
+    tokenBalance, deductToken, refreshTokenBalance,
+  } = useSubscription();
   const { addToCart, items: cartItems } = useCart();
   const { liked } = useLiked();
   const [prompt, setPrompt] = useState('');
@@ -1183,12 +1187,38 @@ export default function HomeScreen({ navigation, route }) {
       setGenStatus('Finding products for your space…');
       const matchedProducts = getProductsForPrompt(designPrompt, 4);
 
-      // ── Quota check (SubscriptionContext) ────────────────────────────────
-      if (shouldShowPaywall || !subscription.canGenerate) {
+      // ── Quota + token waterfall check ────────────────────────────────────
+      // Priority: free quota → token balance → subscription quota → paywall
+      let generationSource = null;
+
+      if (subscription.canGenerate) {
+        generationSource = subscription.tier === 'free' ? 'free' : 'subscription';
+      } else if (tokenBalance > 0) {
+        generationSource = 'token';
+      } else {
         stopLoadingBar(false);
         setGenerating(false);
         navigation.navigate('Paywall');
         return;
+      }
+
+      // ── Rate limit check (max 20 generations per hour) ──────────────────
+      if (user?.id) {
+        try {
+          const rateCheck = await checkRateLimit(user.id);
+          if (!rateCheck.allowed) {
+            stopLoadingBar(false);
+            setGenerating(false);
+            Alert.alert(
+              'Slow Down',
+              `You've reached the limit of ${rateCheck.maxPerHour} generations per hour. Please wait a bit before generating again.`,
+            );
+            return;
+          }
+        } catch (e) {
+          console.warn('[Gen] rate limit check failed:', e.message);
+          // Don't block generation if rate limit check fails
+        }
       }
 
       // ── Route: premium tier → edge function pipeline (v3) ─────────────────
@@ -1287,9 +1317,27 @@ export default function HomeScreen({ navigation, route }) {
             console.log('[Gen] BFL complete');
           }
 
-          // Record generation in DB, then refresh quota from server
-          await recordGeneration();
-          refreshQuota();
+          // Record generation — deduct from the correct source
+          if (generationSource === 'token') {
+            await deductToken();
+            refreshTokenBalance();
+          } else {
+            await recordGeneration();
+            refreshQuota();
+          }
+
+          // Record for rate limiting (non-blocking)
+          if (user?.id) {
+            recordRateLimit(user.id).catch(e =>
+              console.warn('[Gen] rate limit record failed:', e.message)
+            );
+
+            // Complete referral bonus if this user was referred (non-blocking)
+            // The first time a referred user generates, their referrer gets 2 free tokens.
+            import('../services/supabase').then(({ supabase }) => {
+              supabase.rpc('complete_referral', { p_referred_id: user.id }).catch(() => {});
+            });
+          }
 
         } catch (genErr) {
           stopLoadingBar(false);

@@ -15,6 +15,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
 import * as AppleAuthentication from 'expo-apple-authentication';
 import { useAuth } from '../context/AuthContext';
+import { applyReferralCode } from '../services/subscriptionService';
 
 function AppleIcon() {
   return (
@@ -106,6 +107,7 @@ export default function AuthScreen({ navigation }) {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [referralCode, setReferralCode] = useState('');
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
 
@@ -136,6 +138,17 @@ export default function AuthScreen({ navigation }) {
     try {
       if (isSignUp) {
         const result = await signUp(name, email, password);
+
+        // Apply referral code if provided (non-blocking — don't fail signup)
+        if (referralCode.trim()) {
+          try {
+            const userId = result.userId || result.user?.id;
+            if (userId) await applyReferralCode(userId, referralCode.trim());
+          } catch (e) {
+            console.warn('[Auth] referral code apply failed:', e.message);
+          }
+        }
+
         if (result.needsEmailVerification) {
           navigation.replace('VerifyEmailSent', { email });
         } else {
@@ -249,6 +262,14 @@ export default function AuthScreen({ navigation }) {
                 {errors.confirmPassword && (
                   <Text style={styles.errorText}>{errors.confirmPassword}</Text>
                 )}
+                <MinimalInput
+                  placeholder="Referral code (optional)"
+                  value={referralCode}
+                  onChangeText={(text) => setReferralCode(text.toUpperCase())}
+                  autoCapitalize="characters"
+                  textContentType="none"
+                  autoComplete="off"
+                />
               </>
             )}
 
