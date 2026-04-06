@@ -334,19 +334,49 @@ export async function deduplicateUserDesigns(userId) {
   // Handled at insert time by checking for recent duplicates
 }
 
-/** Get all designs for a specific user (own profile). */
+/**
+ * Delete designs whose image_url is a temporary CDN URL (non-Supabase Storage).
+ * BFL / Replicate CDN links expire after ~1 hour — this purges those stale rows
+ * so they never appear as gray placeholders in the profile or explore grids.
+ */
+export async function deleteExpiredDesigns(userId) {
+  const supabaseHost = (process.env.EXPO_PUBLIC_SUPABASE_URL || '').replace('https://', '');
+  if (!supabaseHost) return;
+
+  const { data: all } = await supabase
+    .from('user_designs')
+    .select('id, image_url')
+    .eq('user_id', userId);
+
+  if (!all?.length) return;
+
+  const expiredIds = all
+    .filter(d => !d.image_url || !d.image_url.includes(supabaseHost))
+    .map(d => d.id);
+
+  if (!expiredIds.length) return;
+
+  await supabase.from('user_designs').delete().in('id', expiredIds);
+  console.log(`[Cleanup] Removed ${expiredIds.length} expired design(s)`);
+}
+
+/** Get all designs for a specific user (own profile) — permanent images only. */
 export async function getUserDesigns(userId) {
+  const supabaseHost = (process.env.EXPO_PUBLIC_SUPABASE_URL || '').replace('https://', '');
   const { data, error } = await supabase
     .from('user_designs')
     .select('*')
     .eq('user_id', userId)
     .order('created_at', { ascending: false });
   if (error) throw error;
-  return data || [];
+  // Strip any temp-URL rows that slipped through before cleanup ran
+  return (data || []).filter(d => d.image_url && (!supabaseHost || d.image_url.includes(supabaseHost)));
 }
 
-/** Get public designs for the Explore feed. */
+/** Get public designs for the Explore feed — permanent images only. */
 export async function getPublicDesigns(limit = 20, offset = 0) {
+  const supabaseHost = (process.env.EXPO_PUBLIC_SUPABASE_URL || '').replace('https://', '');
+
   // First try with profiles join (richer data)
   const { data, error } = await supabase
     .from('user_designs')
@@ -365,9 +395,9 @@ export async function getPublicDesigns(limit = 20, offset = 0) {
       .order('created_at', { ascending: false })
       .range(offset, offset + limit - 1);
     if (plainErr) throw plainErr;
-    return plain || [];
+    return (plain || []).filter(d => d.image_url && (!supabaseHost || d.image_url.includes(supabaseHost)));
   }
-  return data || [];
+  return (data || []).filter(d => d.image_url && (!supabaseHost || d.image_url.includes(supabaseHost)));
 }
 
 // ─── Push Token Helpers ───────────────────────────────────────────────────────

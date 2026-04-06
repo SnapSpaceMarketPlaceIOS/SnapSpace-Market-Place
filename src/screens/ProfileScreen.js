@@ -25,7 +25,7 @@ import { useShared } from '../context/SharedContext';
 import { useAuth } from '../context/AuthContext';
 import AuthGate from '../components/AuthGate';
 import { useFocusEffect } from '@react-navigation/native';
-import { updateProfile, uploadAvatar, getUserDesigns, getMyStats } from '../services/supabase';
+import { updateProfile, uploadAvatar, getUserDesigns, getMyStats, deleteExpiredDesigns } from '../services/supabase';
 // DESIGNS import removed — profile only shows real user designs from Supabase
 import Skeleton from '../components/Skeleton';
 import PressableCard from '../components/PressableCard';
@@ -295,12 +295,14 @@ export default function ProfileScreen({ navigation }) {
     }, [user?.id])
   );
 
-  // Fetch user's own designs from Supabase
+  // Fetch user's own designs from Supabase (cleanup expired rows first)
   useFocusEffect(
     useCallback(() => {
       if (!user?.id) { setDesignsLoading(false); return; }
       let cancelled = false;
       setDesignsLoading(true);
+      // Silently purge any designs with expired CDN URLs before loading
+      deleteExpiredDesigns(user.id).catch(() => {});
       getUserDesigns(user.id)
         .then(designs => {
           if (cancelled) return;
