@@ -860,12 +860,10 @@ export default function HomeScreen({ navigation, route }) {
   const springOut = (anim) => Animated.spring(anim, { toValue: 1,    useNativeDriver: true, tension: 200, friction: 7  }).start();
 
   // Scroll-driven parallax
-  const scrollY = useRef(new Animated.Value(0)).current;
-  // bgScrollY is updated by a JS listener so it works regardless of TabScreenFade's
-  // native-driver parent container. Parallax: 50% of scroll speed = unmissable depth.
-  const bgScrollY   = useRef(new Animated.Value(0)).current;
-  const bgParallax  = useRef(
-    bgScrollY.interpolate({ inputRange: [0, 600], outputRange: [0, -300], extrapolate: 'clamp' }),
+  // Parallax — plain JS setValue, no native driver needed
+  const scrollY    = useRef(new Animated.Value(0)).current;
+  const bgParallax = useRef(
+    scrollY.interpolate({ inputRange: [0, 600], outputRange: [0, -300], extrapolate: 'clamp' }),
   ).current;
 
   // ── Personalization ─────────────────────────────────────────────────────────
@@ -1448,14 +1446,7 @@ export default function HomeScreen({ navigation, route }) {
       <Animated.ScrollView
         style={StyleSheet.absoluteFill}
         contentContainerStyle={styles.scrollContent}
-        onScroll={Animated.event(
-          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-          {
-            useNativeDriver: true,
-            // JS listener keeps bgScrollY in sync for the parallax image transform
-            listener: (e) => bgScrollY.setValue(e.nativeEvent.contentOffset.y),
-          },
-        )}
+        onScroll={(e) => scrollY.setValue(e.nativeEvent.contentOffset.y)}
         scrollEventThrottle={16}
         showsVerticalScrollIndicator={false}
         bounces={false}

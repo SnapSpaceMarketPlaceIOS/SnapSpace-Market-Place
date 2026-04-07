@@ -111,8 +111,7 @@ export default function AuthScreen({ navigation }) {
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
 
-  // ── Parallax — JS listener drives heroScrollY so KAV/native-driver conflicts are avoided
-  const scrollY      = React.useRef(new Animated.Value(0)).current;
+  // ── Parallax — plain JS setValue, no native driver needed
   const heroScrollY  = React.useRef(new Animated.Value(0)).current;
   const heroParallax = React.useRef(
     heroScrollY.interpolate({ inputRange: [0, HERO_H], outputRange: [0, HERO_PARALLAX], extrapolate: 'clamp' }),
@@ -222,13 +221,7 @@ export default function AuthScreen({ navigation }) {
           showsVerticalScrollIndicator={false}
           bounces={false}
           scrollEventThrottle={16}
-          onScroll={Animated.event(
-            [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-            {
-              useNativeDriver: true,
-              listener: (e) => heroScrollY.setValue(e.nativeEvent.contentOffset.y),
-            },
-          )}
+          onScroll={(e) => heroScrollY.setValue(e.nativeEvent.contentOffset.y)}
         >
           {/* ── Hero Image ─────────────────────────────────────────── */}
           <View style={styles.heroWrap}>

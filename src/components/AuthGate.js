@@ -102,8 +102,7 @@ const iS = StyleSheet.create({
 export default function AuthGate({ title, subtitle, navigation, onSuccess }) {
   const { signUp, signIn, signInWithApple } = useAuth();
 
-  // ── Parallax — JS listener drives heroScrollY so KAV/native-driver conflicts are avoided
-  const scrollY      = React.useRef(new Animated.Value(0)).current;
+  // ── Parallax — plain JS setValue, no native driver needed
   const heroScrollY  = React.useRef(new Animated.Value(0)).current;
   const heroParallax = React.useRef(
     heroScrollY.interpolate({ inputRange: [0, HERO_H], outputRange: [0, HERO_PARALLAX], extrapolate: 'clamp' }),
@@ -196,13 +195,7 @@ export default function AuthGate({ title, subtitle, navigation, onSuccess }) {
         showsVerticalScrollIndicator={false}
         bounces={false}
         scrollEventThrottle={16}
-        onScroll={Animated.event(
-          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-          {
-            useNativeDriver: true,
-            listener: (e) => heroScrollY.setValue(e.nativeEvent.contentOffset.y),
-          },
-        )}
+        onScroll={(e) => heroScrollY.setValue(e.nativeEvent.contentOffset.y)}
       >
         {/* ── Hero Image ─────────────────────────────────────────── */}
         <View style={s.heroWrap}>
