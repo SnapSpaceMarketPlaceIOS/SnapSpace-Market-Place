@@ -34,9 +34,44 @@ import { VerifiedBadge } from '../components/VerifiedBadge';
 import TabScreenFade from '../components/TabScreenFade';
 
 const { width } = Dimensions.get('window');
-// 2px padding each side + 3px gap between cards — tight photo grid
-const CARD_WIDTH = (width - 2 * 2 - 3) / 2;
 const BANNER_HEIGHT = 210;
+
+// ── Grid helpers ──────────────────────────────────────────────────────────────
+function colWidthPct(cols) {
+  if (cols === 3) return '33.33%';
+  if (cols === 1) return '100%';
+  return '50%';
+}
+
+function GridLayoutIcon({ cols }) {
+  const color = '#888';
+  if (cols === 3) {
+    return (
+      <Svg width={20} height={20} viewBox="0 0 18 18" fill="none">
+        {[0, 6, 12].map(x => [0, 6, 12].map(y => (
+          <Rect key={`${x}${y}`} x={x + 0.5} y={y + 0.5} width={2.5} height={2.5} rx={0.75} fill={color} />
+        )))}
+      </Svg>
+    );
+  }
+  if (cols === 1) {
+    return (
+      <Svg width={20} height={20} viewBox="0 0 18 18" fill="none">
+        <Rect x={0} y={2} width={18} height={1.5} rx={0.75} fill={color} />
+        <Rect x={0} y={8.25} width={18} height={1.5} rx={0.75} fill={color} />
+        <Rect x={0} y={14.5} width={18} height={1.5} rx={0.75} fill={color} />
+      </Svg>
+    );
+  }
+  return (
+    <Svg width={20} height={20} viewBox="0 0 18 18" fill="none">
+      <Rect x={0} y={0} width={6} height={6} rx={1.2} fill={color} />
+      <Rect x={12} y={0} width={6} height={6} rx={1.2} fill={color} />
+      <Rect x={0} y={12} width={6} height={6} rx={1.2} fill={color} />
+      <Rect x={12} y={12} width={6} height={6} rx={1.2} fill={color} />
+    </Svg>
+  );
+}
 
 // ── Icons ─────────────────────────────────────────────────────────────────────
 
@@ -279,6 +314,10 @@ export default function ProfileScreen({ navigation }) {
   const { shared, addShared } = useShared();
   const { user, signOut, deleteAccount, refreshUser } = useAuth();
   const [activeTab, setActiveTab] = useState(0);
+  const [gridCols, setGridCols] = useState(2);
+  const cycleGrid = () => setGridCols(c => c === 3 ? 1 : c + 1);
+  const approxCardWidth = width / gridCols;
+  const cardRadius = Math.min(Math.round(approxCardWidth * (gridCols === 3 ? 0.025 : 0.05)), 12);
 
   // ── Gear icon spring press animation ─────────────────────────────────────
   const gearScale = useRef(new Animated.Value(1)).current;
@@ -487,21 +526,26 @@ export default function ProfileScreen({ navigation }) {
 
         </View>
 
-        {/* ── Tabs ── */}
+        {/* ── Tabs + Grid Toggle ── */}
         <View style={styles.tabsRow}>
-          {tabs.map((tab, i) => (
-            <TouchableOpacity
-              key={tab}
-              style={styles.tab}
-              onPress={() => setActiveTab(i)}
-              activeOpacity={0.7}
-            >
-              <Text style={[styles.tabLabel, activeTab === i && styles.tabLabelActive]}>
-                {tab}
-              </Text>
-              {activeTab === i && <View style={styles.tabUnderline} />}
-            </TouchableOpacity>
-          ))}
+          <View style={styles.tabsLeft}>
+            {tabs.map((tab, i) => (
+              <TouchableOpacity
+                key={tab}
+                style={styles.tab}
+                onPress={() => setActiveTab(i)}
+                activeOpacity={0.7}
+              >
+                <Text style={[styles.tabLabel, activeTab === i && styles.tabLabelActive]}>
+                  {tab}
+                </Text>
+                {activeTab === i && <View style={styles.tabUnderline} />}
+              </TouchableOpacity>
+            ))}
+          </View>
+          <TouchableOpacity style={styles.gridToggleBtn} onPress={cycleGrid} activeOpacity={0.7}>
+            <GridLayoutIcon cols={gridCols} />
+          </TouchableOpacity>
         </View>
         <View style={styles.tabBorder} />
 
@@ -532,19 +576,20 @@ export default function ProfileScreen({ navigation }) {
             );
           }
           return (
-            <View style={styles.grid}>
+            <View style={[styles.grid, gridCols === 1 && { paddingHorizontal: 10 }]}>
               {filtered.map(design => (
-                <PressableCard
-                  key={design.id}
-                  style={styles.card}
-                  animStyle={{ width: CARD_WIDTH }}
-                  onPress={() => navigation.navigate('ShopTheLook', { design })}
-                >
-                  <View style={styles.cardImg}>
-                    <View style={styles.cardImgBg} />
-                    <CardImage uri={design.imageUrl} style={styles.cardImgPhoto} resizeMode="cover" />
-                  </View>
-                </PressableCard>
+                <View key={design.id} style={{ width: colWidthPct(gridCols), padding: gridCols === 1 ? 5 : 1 }}>
+                  <PressableCard
+                    style={[styles.card, { borderRadius: cardRadius }, gridCols === 1 && styles.cardSingle]}
+                    animStyle={{ width: '100%' }}
+                    onPress={() => navigation.navigate('ShopTheLook', { design })}
+                  >
+                    <View style={[styles.cardImg, { borderRadius: cardRadius }]}>
+                      <View style={styles.cardImgBg} />
+                      <CardImage uri={design.imageUrl} style={styles.cardImgPhoto} resizeMode="cover" />
+                    </View>
+                  </PressableCard>
+                </View>
               ))}
             </View>
           );
@@ -1079,8 +1124,20 @@ const styles = StyleSheet.create({
   // Tabs
   tabsRow: {
     flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     paddingHorizontal: space.lg,
     marginTop: space.sm,
+  },
+  tabsLeft: {
+    flexDirection: 'row',
+  },
+  gridToggleBtn: {
+    paddingLeft: 8,
+    paddingRight: 0,
+    paddingVertical: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   tab: {
     paddingBottom: space.md,
@@ -1109,7 +1166,7 @@ const styles = StyleSheet.create({
   tabBorder: {
     height: 1,
     backgroundColor: 'rgba(0,0,0,0.06)',
-    marginBottom: space.md,
+    marginBottom: 0,
   },
 
   // Grid
@@ -1145,6 +1202,15 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     overflow: 'hidden',
     backgroundColor: '#ECEEF2',
+  },
+  cardSingle: {
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.07,
+    shadowRadius: 10,
+    elevation: 3,
+    borderWidth: 1,
+    borderColor: 'rgba(0,0,0,0.05)',
   },
   cardImg: {
     width: '100%',
