@@ -861,6 +861,12 @@ export default function HomeScreen({ navigation, route }) {
 
   // Scroll-driven parallax
   const scrollY = useRef(new Animated.Value(0)).current;
+  // Parallax: background drifts at ~13% of scroll speed for depth
+  const bgParallax = scrollY.interpolate({
+    inputRange: [0, 600],
+    outputRange: [0, -80],
+    extrapolate: 'clamp',
+  });
 
   // ── Personalization ─────────────────────────────────────────────────────────
 
@@ -1431,10 +1437,10 @@ export default function HomeScreen({ navigation, route }) {
 
   return (
     <TabScreenFade style={styles.container}>
-      {/* Static hero background */}
-      <Image
+      {/* Parallax hero background */}
+      <Animated.Image
         source={require('../../assets/snap-bg.jpg')}
-        style={styles.bgImage}
+        style={[styles.bgImage, { transform: [{ translateY: bgParallax }] }]}
         resizeMode="cover"
       />
       <View style={styles.heroTint} pointerEvents="none" />
@@ -2177,9 +2183,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#035DA8', // dark fallback — no white flash at bottom
   },
   bgImage: {
-    ...StyleSheet.absoluteFillObject,
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
     width: width,
-    height: height,
+    height: height + 80, // extra 80px so parallax slide never reveals background
   },
   heroTint: {
     ...StyleSheet.absoluteFillObject,

@@ -8,6 +8,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  Animated,
   Alert,
   Image,
   Dimensions,
@@ -20,6 +21,7 @@ import { applyReferralCode } from '../services/subscriptionService';
 
 const { width: SCREEN_W } = Dimensions.get('window');
 const HERO_H = 280;
+const HERO_PARALLAX = 60; // image slides 60px to create depth during scroll
 const BLUE = '#0B6DC3';
 
 // ── Hero image — same living room used on the landing page ────────────────────
@@ -109,6 +111,14 @@ export default function AuthScreen({ navigation }) {
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
 
+  // ── Parallax ──────────────────────────────────────────────────────────────
+  const scrollY = React.useRef(new Animated.Value(0)).current;
+  const heroParallax = scrollY.interpolate({
+    inputRange: [0, HERO_H],
+    outputRange: [0, HERO_PARALLAX],
+    extrapolate: 'clamp',
+  });
+
   // Safety net — force-clear the spinner after 20s so it can never get stuck.
   const loadingTimerRef = React.useRef(null);
   const safeSetLoading = (val) => {
@@ -195,21 +205,30 @@ export default function AuthScreen({ navigation }) {
         style={styles.flex}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
-        <ScrollView
+        <Animated.ScrollView
           contentContainerStyle={styles.scroll}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
           bounces={false}
+          scrollEventThrottle={16}
+          onScroll={Animated.event(
+            [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+            { useNativeDriver: true },
+          )}
         >
           {/* ── Hero Image ─────────────────────────────────────────── */}
           <View style={styles.heroWrap}>
-            <Image source={HERO_IMG} style={styles.heroImg} resizeMode="cover" />
+            <Animated.Image
+              source={HERO_IMG}
+              style={[styles.heroImg, { transform: [{ translateY: heroParallax }] }]}
+              resizeMode="cover"
+            />
             {/* Dark gradient overlay for text legibility */}
             <LinearGradient
               colors={['rgba(0,0,0,0.15)', 'rgba(0,0,0,0.55)']}
               style={StyleSheet.absoluteFill}
             />
-            {/* Branding overlay */}
+            {/* Branding overlay — centered */}
             <View style={styles.heroContent}>
               <Text style={styles.heroWordmark}>SnapSpace</Text>
               <Text style={styles.heroTagline}>Design your space with SnapSpace MarketPlace</Text>
@@ -337,7 +356,7 @@ export default function AuthScreen({ navigation }) {
               <Text style={styles.switchLink}>{isSignUp ? 'Sign in' : 'Sign Up'}</Text>
             </Text>
           </TouchableOpacity>
-        </ScrollView>
+        </Animated.ScrollView>
       </KeyboardAvoidingView>
     </View>
   );
@@ -362,22 +381,26 @@ const styles = StyleSheet.create({
   },
   heroImg: {
     width: '100%',
-    height: '100%',
+    height: HERO_H + HERO_PARALLAX,
+    marginTop: -HERO_PARALLAX,
   },
   heroContent: {
     position: 'absolute',
+    top: 0,
     bottom: 0,
     left: 0,
     right: 0,
     paddingHorizontal: 28,
-    paddingBottom: 36,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   heroWordmark: {
     fontSize: 38,
     fontWeight: '800',
     color: '#fff',
     letterSpacing: -0.5,
-    marginBottom: 6,
+    marginBottom: 8,
+    textAlign: 'center',
     textShadowColor: 'rgba(0,0,0,0.3)',
     textShadowOffset: { width: 0, height: 2 },
     textShadowRadius: 8,
@@ -387,6 +410,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     color: 'rgba(255,255,255,0.88)',
     letterSpacing: 0.2,
+    textAlign: 'center',
     textShadowColor: 'rgba(0,0,0,0.3)',
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 4,

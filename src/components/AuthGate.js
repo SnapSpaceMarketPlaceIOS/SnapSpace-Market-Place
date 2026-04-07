@@ -18,6 +18,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  Animated,
   Alert,
   Image,
   Dimensions,
@@ -29,6 +30,7 @@ import LensLoader from './LensLoader';
 
 const { width: SCREEN_W } = Dimensions.get('window');
 const HERO_H = 240;
+const HERO_PARALLAX = 60;
 const BLUE = '#0B6DC3';
 
 const HERO_IMG = require('../../assets/snap-bg.jpg');
@@ -100,6 +102,14 @@ const iS = StyleSheet.create({
 export default function AuthGate({ title, subtitle, navigation, onSuccess }) {
   const { signUp, signIn, signInWithApple } = useAuth();
 
+  // ── Parallax ──────────────────────────────────────────────────────────────
+  const scrollY = React.useRef(new Animated.Value(0)).current;
+  const heroParallax = scrollY.interpolate({
+    inputRange: [0, HERO_H],
+    outputRange: [0, HERO_PARALLAX],
+    extrapolate: 'clamp',
+  });
+
   const [isSignUp, setIsSignUp] = useState(true);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -167,15 +177,24 @@ export default function AuthGate({ title, subtitle, navigation, onSuccess }) {
       style={s.root}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
-      <ScrollView
+      <Animated.ScrollView
         contentContainerStyle={s.scroll}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
         bounces={false}
+        scrollEventThrottle={16}
+        onScroll={Animated.event(
+          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+          { useNativeDriver: true },
+        )}
       >
         {/* ── Hero Image ─────────────────────────────────────────── */}
         <View style={s.heroWrap}>
-          <Image source={HERO_IMG} style={s.heroImg} resizeMode="cover" />
+          <Animated.Image
+            source={HERO_IMG}
+            style={[s.heroImg, { transform: [{ translateY: heroParallax }] }]}
+            resizeMode="cover"
+          />
           <LinearGradient
             colors={['rgba(0,0,0,0.15)', 'rgba(0,0,0,0.55)']}
             style={StyleSheet.absoluteFill}
@@ -276,7 +295,7 @@ export default function AuthGate({ title, subtitle, navigation, onSuccess }) {
             <Text style={s.switchLink}>{isSignUp ? 'Sign In' : 'Sign Up'}</Text>
           </Text>
         </TouchableOpacity>
-      </ScrollView>
+      </Animated.ScrollView>
     </KeyboardAvoidingView>
   );
 }
@@ -294,22 +313,26 @@ const s = StyleSheet.create({
   },
   heroImg: {
     width: '100%',
-    height: '100%',
+    height: HERO_H + HERO_PARALLAX,
+    marginTop: -HERO_PARALLAX,
   },
   heroContent: {
     position: 'absolute',
+    top: 0,
     bottom: 0,
     left: 0,
     right: 0,
     paddingHorizontal: 28,
-    paddingBottom: 32,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   heroWordmark: {
     fontSize: 34,
     fontWeight: '800',
     color: '#fff',
     letterSpacing: -0.5,
-    marginBottom: 5,
+    marginBottom: 6,
+    textAlign: 'center',
     textShadowColor: 'rgba(0,0,0,0.3)',
     textShadowOffset: { width: 0, height: 2 },
     textShadowRadius: 8,
@@ -319,6 +342,7 @@ const s = StyleSheet.create({
     fontWeight: '500',
     color: 'rgba(255,255,255,0.88)',
     letterSpacing: 0.2,
+    textAlign: 'center',
     textShadowColor: 'rgba(0,0,0,0.3)',
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 4,
