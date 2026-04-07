@@ -10,10 +10,10 @@ import {
   Platform,
   Alert,
   Dimensions,
-  ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path, Polyline, Line, Rect } from 'react-native-svg';
+import LensLoader from '../components/LensLoader';
 import { CardField, useStripe } from '@stripe/stripe-react-native';
 import { colors } from '../constants/colors';
 
@@ -219,7 +219,7 @@ function AddCardForm({ onSave, onCancel }) {
         </TouchableOpacity>
         <TouchableOpacity style={[styles.saveCardBtn, saving && { opacity: 0.7 }]} onPress={handleSave} activeOpacity={0.85} disabled={saving}>
           {saving ? (
-            <ActivityIndicator color="#fff" size="small" />
+            <LensLoader size={20} color="#fff" light="#fff" />
           ) : (
             <Text style={styles.saveCardBtnText}>Save Card</Text>
           )}

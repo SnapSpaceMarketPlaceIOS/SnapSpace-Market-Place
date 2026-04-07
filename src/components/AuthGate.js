@@ -18,11 +18,11 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-  ActivityIndicator,
   Alert,
 } from 'react-native';
 import * as AppleAuthentication from 'expo-apple-authentication';
 import { useAuth } from '../context/AuthContext';
+import LensLoader from './LensLoader';
 
 const BLUE = '#0B6DC3';
 
@@ -231,7 +231,7 @@ export default function AuthGate({ title, subtitle, navigation, onSuccess }) {
             activeOpacity={0.85}
           >
             {loading ? (
-              <ActivityIndicator color="#fff" size="small" />
+              <LensLoader size={20} color="#fff" light="#fff" />
             ) : (
               <Text style={s.primaryBtnText}>
                 {isSignUp ? 'Create Account' : 'Sign In'}

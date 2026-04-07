@@ -6,7 +6,6 @@ import {
   TouchableOpacity,
   ScrollView,
   TextInput,
-  ActivityIndicator,
   Alert,
   Animated,
   KeyboardAvoidingView,
@@ -14,6 +13,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path, Circle, Polyline, Line } from 'react-native-svg';
+import LensLoader from '../components/LensLoader';
 import { useAuth } from '../context/AuthContext';
 import { space, radius, fontWeight, fontSize, uiColors, typeScale, shadow } from '../constants/tokens';
 import { Button, Badge, SectionHeader } from '../components/ds';
@@ -337,7 +337,7 @@ export default function SupplierOnboardingScreen({ navigation }) {
               activeOpacity={0.85}
             >
               {saving
-                ? <ActivityIndicator color="#fff" size="small" />
+                ? <LensLoader size={20} color="#fff" light="#fff" />
                 : <Text style={styles.nextBtnText}>Go to My Dashboard</Text>
               }
             </TouchableOpacity>

@@ -13,10 +13,10 @@ import {
   Alert,
   Share,
   Linking,
-  ActivityIndicator,
   Animated,
 } from 'react-native';
 import CardImage from '../components/CardImage';
+import LensLoader from '../components/LensLoader';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path, Circle, Line, Polyline, Rect } from 'react-native-svg';
 import { colors as C } from '../constants/theme';
@@ -508,7 +508,7 @@ export default function ProfileScreen({ navigation }) {
         {/* ── Designs Grid ── */}
         {designsLoading ? (
           <View style={styles.emptyGrid}>
-            <ActivityIndicator size="large" color={C.primary} />
+            <LensLoader size={48} />
           </View>
         ) : (() => {
           const filtered = (activeTab === 0

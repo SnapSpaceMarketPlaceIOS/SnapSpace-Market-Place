@@ -10,7 +10,6 @@ import {
   Easing,
   ScrollView,
   Image,
-  ActivityIndicator,
   Alert,
   Platform,
   Keyboard,
@@ -27,6 +26,7 @@ let MediaLibrary = null;
 try { MediaLibrary = require('expo-media-library'); } catch {} // optional — needs dev client rebuild
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Svg, { Path, Circle, Line, Polyline, Rect, Ellipse, G } from 'react-native-svg';
+import LensLoader from '../components/LensLoader';
 import { LinearGradient } from 'expo-linear-gradient';
 import { fontSize, fontWeight, letterSpacing, palette, space, radius, shadow, typeScale, roomChipColors } from '../constants/tokens';
 import { colors as C } from '../constants/theme';
@@ -2000,7 +2000,7 @@ export default function HomeScreen({ navigation, route }) {
                     </TouchableOpacity>
                     <TouchableOpacity style={resultStyles.shopHeaderBtnPost} onPress={() => setShowPostSheet(true)} activeOpacity={0.7}>
                       {posting
-                        ? <ActivityIndicator size="small" color="#fff" />
+                        ? <LensLoader size={20} color="#fff" light="#fff" />
                         : <PostIcon size={28} />
                       }
                     </TouchableOpacity>

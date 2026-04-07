@@ -6,7 +6,6 @@ import {
   StyleSheet,
   TouchableOpacity,
   Dimensions,
-  ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path, Circle, Line, Polyline, LinearGradient, Defs, Stop } from 'react-native-svg';
@@ -14,6 +13,7 @@ import { colors as C } from '../constants/theme';
 import { typeScale, radius, space } from '../constants/tokens';
 import { VerifiedBadge } from '../components/VerifiedBadge';
 import CardImage from '../components/CardImage';
+import LensLoader from '../components/LensLoader';
 import { useAuth } from '../context/AuthContext';
 import {
   getUserProfileData,
@@ -292,7 +292,7 @@ export default function UserProfileScreen({ navigation, route }) {
   if (profileLoading) {
     return (
       <View style={[styles.container, { alignItems: 'center', justifyContent: 'center' }]}>
-        <ActivityIndicator size="large" color={C.primary} />
+        <LensLoader size={48} />
       </View>
     );
   }
@@ -334,7 +334,7 @@ export default function UserProfileScreen({ navigation, route }) {
                   disabled={followLoading || !currentUser}
                 >
                   {followLoading
-                    ? <ActivityIndicator size="small" color={isFollowing ? C.primary : '#fff'} />
+                    ? <LensLoader size={18} color={isFollowing ? C.primary : '#fff'} light={isFollowing ? '#67ACE9' : '#fff'} />
                     : <Text style={[styles.followBtnText, isFollowing && styles.followingBtnText]}>
                         {isFollowing ? 'Following' : 'Follow'}
                       </Text>
@@ -396,7 +396,7 @@ export default function UserProfileScreen({ navigation, route }) {
         {/* ── Posts Grid ── */}
         {designsLoading ? (
           <View style={{ padding: 40, alignItems: 'center' }}>
-            <ActivityIndicator size="large" color={C.primary} />
+            <LensLoader size={48} />
           </View>
         ) : designs.length === 0 ? (
           <View style={{ padding: 40, alignItems: 'center' }}>

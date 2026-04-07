@@ -8,13 +8,13 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-  ActivityIndicator,
   Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
 import * as AppleAuthentication from 'expo-apple-authentication';
 import { useAuth } from '../context/AuthContext';
+import LensLoader from '../components/LensLoader';
 import { applyReferralCode } from '../services/subscriptionService';
 
 function AppleIcon() {
@@ -294,7 +294,7 @@ export default function AuthScreen({ navigation }) {
               activeOpacity={0.85}
             >
               {loading ? (
-                <ActivityIndicator color="#fff" size="small" />
+                <LensLoader size={20} color="#fff" light="#fff" />
               ) : (
                 <Text style={styles.primaryBtnText}>
                   {isSignUp ? 'Create Account' : 'Sign In'}

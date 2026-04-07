@@ -6,7 +6,6 @@ import {
   TouchableOpacity,
   ScrollView,
   TextInput,
-  ActivityIndicator,
   Alert,
   KeyboardAvoidingView,
   Platform,
@@ -14,6 +13,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path, Circle, Polyline } from 'react-native-svg';
+import LensLoader from '../components/LensLoader';
 import { useAuth } from '../context/AuthContext';
 import { space, radius, fontWeight, fontSize, uiColors, typeScale, shadow } from '../constants/tokens';
 import { Button, Badge, SectionHeader } from '../components/ds';
@@ -232,7 +232,7 @@ export default function AdminApplicationDetailScreen({ navigation, route }) {
           <View style={{ width: 22 }} />
         </View>
         <View style={styles.center}>
-          <ActivityIndicator color={BLUE} size="large" />
+          <LensLoader size={48} />
         </View>
       </SafeAreaView>
     );
@@ -374,7 +374,7 @@ export default function AdminApplicationDetailScreen({ navigation, route }) {
               activeOpacity={0.85}
             >
               {actionLoading === 'reject' ? (
-                <ActivityIndicator color="#fff" size="small" />
+                <LensLoader size={20} color="#fff" light="#fff" />
               ) : (
                 <>
                   <XIcon />
@@ -390,7 +390,7 @@ export default function AdminApplicationDetailScreen({ navigation, route }) {
               activeOpacity={0.85}
             >
               {actionLoading === 'approve' ? (
-                <ActivityIndicator color="#fff" size="small" />
+                <LensLoader size={20} color="#fff" light="#fff" />
               ) : (
                 <>
                   <CheckIcon />

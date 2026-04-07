@@ -23,10 +23,10 @@ import {
   View,
   StyleSheet,
   Animated,
-  ActivityIndicator,
   Easing,
 } from 'react-native';
 import { uiColors, radius, motion, typeScale } from '../../constants/tokens';
+import LensLoader from '../LensLoader';
 
 const C = uiColors;
 
@@ -176,9 +176,10 @@ export default function Button({
         accessibilityState={{ disabled }}
       >
         {loading ? (
-          <ActivityIndicator
-            size="small"
+          <LensLoader
+            size={20}
             color={variant === 'secondary' || variant === 'ghost' ? C.primary : '#FFFFFF'}
+            light={variant === 'secondary' || variant === 'ghost' ? '#67ACE9' : '#FFFFFF'}
           />
         ) : (
           <>

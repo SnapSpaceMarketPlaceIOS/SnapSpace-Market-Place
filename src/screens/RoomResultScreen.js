@@ -9,12 +9,12 @@ import {
   Share,
   Alert,
   Image,
-  ActivityIndicator,
   Animated,
   Pressable,
   Modal,
 } from 'react-native';
 import CardImage from '../components/CardImage';
+import LensLoader from '../components/LensLoader';
 import AutoImage from '../components/AutoImage';
 import Svg, { Path, Circle, Polyline, Line, G } from 'react-native-svg';
 import { colors } from '../constants/colors';
@@ -408,7 +408,7 @@ export default function RoomResultScreen({ route, navigation }) {
         <View style={s.imageWrap}>
           {resultUri
             ? <AutoImage uri={resultUri} borderRadius={IMG_RADIUS} />
-            : <View style={s.imagePlaceholder}><ActivityIndicator color="#0B6DC3" /></View>}
+            : <View style={s.imagePlaceholder}><LensLoader size={40} /></View>}
         </View>
 
         {/* ── Actions row ──────────────────────────────────────────── */}

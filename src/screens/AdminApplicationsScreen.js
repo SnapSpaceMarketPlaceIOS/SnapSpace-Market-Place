@@ -5,12 +5,12 @@ import {
   StyleSheet,
   TouchableOpacity,
   FlatList,
-  ActivityIndicator,
   RefreshControl,
   TextInput,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path, Circle } from 'react-native-svg';
+import LensLoader from '../components/LensLoader';
 import { useAuth } from '../context/AuthContext';
 import { space, radius, fontWeight, fontSize, uiColors, typeScale, shadow } from '../constants/tokens';
 import { Button, Badge, SectionHeader } from '../components/ds';
@@ -296,7 +296,7 @@ export default function AdminApplicationsScreen({ navigation }) {
       {/* List */}
       {loading ? (
         <View style={styles.loadingWrap}>
-          <ActivityIndicator color={BLUE} size="large" />
+          <LensLoader size={48} />
         </View>
       ) : (
         <FlatList

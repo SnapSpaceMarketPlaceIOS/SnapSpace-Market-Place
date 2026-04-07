@@ -4,11 +4,11 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  ActivityIndicator,
   Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path, Circle } from 'react-native-svg';
+import LensLoader from '../components/LensLoader';
 import { useAuth } from '../context/AuthContext';
 import { space, radius, fontWeight, fontSize, uiColors, typeScale, shadow } from '../constants/tokens';
 import { Button, Badge, SectionHeader } from '../components/ds';
@@ -95,7 +95,7 @@ export default function VerifyEmailSentScreen({ route, navigation }) {
           activeOpacity={0.7}
         >
           {resending ? (
-            <ActivityIndicator color={BLUE} size="small" />
+            <LensLoader size={20} />
           ) : (
             <Text style={styles.resendText}>Resend verification email</Text>
           )}

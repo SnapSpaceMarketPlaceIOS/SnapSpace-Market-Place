@@ -7,7 +7,6 @@ import {
   ScrollView,
   FlatList,
   RefreshControl,
-  ActivityIndicator,
   Alert,
   TextInput,
   Modal,
@@ -16,6 +15,7 @@ import {
   Animated,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import LensLoader from '../components/LensLoader';
 import Svg, { Path, Circle, Polyline, Rect } from 'react-native-svg';
 import { useAuth } from '../context/AuthContext';
 import { space, radius, fontWeight, fontSize, uiColors, typeScale, shadow } from '../constants/tokens';
@@ -150,7 +150,7 @@ function ProductFormModal({ visible, onClose, onSave, initial }) {
           <TouchableOpacity onPress={onClose}><Text style={modalStyles.cancel}>Cancel</Text></TouchableOpacity>
           <Text style={modalStyles.title}>{initial ? 'Edit Product' : 'New Product'}</Text>
           <TouchableOpacity onPress={handleSave} disabled={saving}>
-            {saving ? <ActivityIndicator color={BLUE} size="small" /> : <Text style={modalStyles.save}>Save</Text>}
+            {saving ? <LensLoader size={20} /> : <Text style={modalStyles.save}>Save</Text>}
           </TouchableOpacity>
         </View>
         <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
@@ -238,7 +238,7 @@ function FulfillModal({ visible, order, onClose, onFulfill }) {
             autoCapitalize="characters"
           />
           <TouchableOpacity style={[fulfillStyles.btn, loading && { opacity: 0.6 }]} onPress={handleFulfill} disabled={loading} activeOpacity={0.85}>
-            {loading ? <ActivityIndicator color="#fff" size="small" /> : <Text style={fulfillStyles.btnText}>Confirm Fulfillment</Text>}
+            {loading ? <LensLoader size={20} color="#fff" light="#fff" /> : <Text style={fulfillStyles.btnText}>Confirm Fulfillment</Text>}
           </TouchableOpacity>
           <TouchableOpacity style={fulfillStyles.cancelBtn} onPress={onClose} activeOpacity={0.7}>
             <Text style={fulfillStyles.cancelText}>Cancel</Text>
@@ -409,7 +409,7 @@ export default function SupplierDashboardScreen({ navigation }) {
   if (loading) {
     return (
       <SafeAreaView style={styles.safe}>
-        <View style={styles.center}><ActivityIndicator color={BLUE} size="large" /></View>
+        <View style={styles.center}><LensLoader size={48} /></View>
       </SafeAreaView>
     );
   }
@@ -698,7 +698,7 @@ export default function SupplierDashboardScreen({ navigation }) {
               activeOpacity={0.85}
             >
               {storeSaving
-                ? <ActivityIndicator color="#fff" size="small" />
+                ? <LensLoader size={20} color="#fff" light="#fff" />
                 : <Text style={storeStyles.saveBtnText}>Save Changes</Text>
               }
             </TouchableOpacity>

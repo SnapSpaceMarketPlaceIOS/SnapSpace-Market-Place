@@ -18,7 +18,6 @@ import {
   FlatList,
   ScrollView,
   Dimensions,
-  ActivityIndicator,
   Modal,
   Image,
   Share,
@@ -28,6 +27,7 @@ import Svg, { Path, Line, Polyline, Circle } from 'react-native-svg';
 import { useFocusEffect } from '@react-navigation/native';
 import CardImage from '../components/CardImage';
 import AutoImage from '../components/AutoImage';
+import LensLoader from '../components/LensLoader';
 import { useAuth } from '../context/AuthContext';
 import { getUserDesigns } from '../services/supabase';
 import { colors } from '../constants/colors';
@@ -245,7 +245,7 @@ export default function MySpacesScreen({ navigation }) {
 
       {loading ? (
         <View style={s.center}>
-          <ActivityIndicator size="large" color={colors.bluePrimary} />
+          <LensLoader size={48} />
         </View>
       ) : designs.length === 0 ? (
         <View style={s.center}>

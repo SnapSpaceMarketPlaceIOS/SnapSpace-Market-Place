@@ -1,8 +1,9 @@
 import React, { useRef, useCallback } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator, Animated, Pressable } from 'react-native';
+import { View, Text, StyleSheet, Animated, Pressable } from 'react-native';
 import { StripeProvider } from '@stripe/stripe-react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import LensLoader from './src/components/LensLoader';
 import { LikedProvider } from './src/context/LikedContext';
 import { SharedProvider } from './src/context/SharedContext';
 import { CartProvider, useCart } from './src/context/CartContext';
@@ -257,7 +258,7 @@ function RootNavigator() {
     return (
       <View style={styles.loadingScreen}>
         <Text style={styles.loadingWordmark}>SnapSpace</Text>
-        <ActivityIndicator color={C.primary} style={{ marginTop: 24 }} />
+        <LensLoader size={48} style={{ marginTop: 24 }} />
       </View>
     );
   }

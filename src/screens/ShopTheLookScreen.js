@@ -16,13 +16,13 @@ import {
   Dimensions,
   Alert,
   Share,
-  ActivityIndicator,
   Animated,
   Pressable,
 } from 'react-native';
 import * as FileSystem from 'expo-file-system';
 import CardImage from '../components/CardImage';
 import AutoImage from '../components/AutoImage';
+import LensLoader from '../components/LensLoader';
 import Svg, { Path, Circle, Polyline, Line, G } from 'react-native-svg';
 import { colors } from '../constants/colors';
 import { colors as C } from '../constants/theme';
@@ -106,38 +106,7 @@ function ShareIcon({ color = '#9CA3AF' }) {
   );
 }
 
-// Mini camera-lens loader — matches the generation loading animation
-function MiniLensLoader({ color = '#0B6DC3', size = 24 }) {
-  const spin = useRef(new Animated.Value(0)).current;
-  useEffect(() => {
-    const loop = Animated.loop(
-      Animated.timing(spin, { toValue: 1, duration: 1800, useNativeDriver: true })
-    );
-    loop.start();
-    return () => loop.stop();
-  }, [spin]);
-  const rotate = spin.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '360deg'] });
-  const counterRotate = spin.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '-200deg'] });
-  return (
-    <View style={{ width: size, height: size, alignItems: 'center', justifyContent: 'center' }}>
-      <Animated.View style={{ position: 'absolute', transform: [{ rotate }] }}>
-        <Svg width={size} height={size} viewBox="0 0 30 30">
-          <Circle cx={15} cy={15} r={13} stroke={color} strokeWidth={1.2}
-            fill="none" strokeDasharray="3 4" strokeLinecap="round" />
-        </Svg>
-      </Animated.View>
-      <Animated.View style={{ position: 'absolute', transform: [{ rotate: counterRotate }] }}>
-        <Svg width={size} height={size} viewBox="0 0 30 30">
-          <Circle cx={15} cy={15} r={9} stroke={color} strokeWidth={0.8}
-            fill="none" opacity={0.6} strokeDasharray="4 3" strokeLinecap="round" />
-        </Svg>
-      </Animated.View>
-      <Svg width={size} height={size} viewBox="0 0 30 30" style={{ position: 'absolute' }}>
-        <Circle cx={15} cy={15} r={3} fill={color} opacity={0.5} />
-      </Svg>
-    </View>
-  );
-}
+// MiniLensLoader replaced by shared LensLoader component
 
 // Animated icon button — same spring bounce as the bottom tab bar
 function AnimatedIconBtn({ onPress, color, children, style }) {
@@ -357,7 +326,7 @@ export default function ShopTheLookScreen({ route, navigation }) {
                 style={[s.shareBtn, downloadActive && s.shareBtnActive]}
               >
                 {saving
-                  ? <MiniLensLoader color={downloadActive ? '#0B6DC3' : '#9CA3AF'} />
+                  ? <LensLoader size={24} color={downloadActive ? '#0B6DC3' : '#9CA3AF'} />
                   : <DownloadIcon color={downloadActive ? '#0B6DC3' : '#9CA3AF'} />}
               </AnimatedIconBtn>
             ) : (

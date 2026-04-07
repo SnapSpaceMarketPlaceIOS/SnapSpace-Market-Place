@@ -8,10 +8,10 @@ import {
   Alert,
   Animated,
   Easing,
-  ActivityIndicator,
   Linking,
 } from 'react-native';
 import CardImage from '../components/CardImage';
+import LensLoader from '../components/LensLoader';
 import Svg, { Path, Circle, Line, Polyline, Rect } from 'react-native-svg';
 import { useStripe } from '@stripe/stripe-react-native';
 import theme from '../constants/theme';
@@ -512,7 +512,7 @@ export default function CartScreen({ navigation }) {
           accessibilityLabel={`Checkout for $${total.toLocaleString()}`}
         >
           {checkingOut ? (
-            <ActivityIndicator color="#fff" size="small" />
+            <LensLoader size={20} color="#fff" light="#fff" />
           ) : allAmazon ? (
             <View style={styles.checkoutBtnInnerCentered}>
               <CheckoutCartIcon />

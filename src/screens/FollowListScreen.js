@@ -4,7 +4,6 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  ActivityIndicator,
   FlatList,
   RefreshControl,
 } from 'react-native';
@@ -12,6 +11,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Polyline } from 'react-native-svg';
 import { colors as C } from '../constants/theme';
 import { space, radius, typeScale } from '../constants/tokens';
+import LensLoader from '../components/LensLoader';
 import { getFollowers, getFollowing } from '../services/supabase';
 
 const AVATAR_COLORS = ['#035DA8','#8B5CF6','#059669','#D97706','#DC2626','#0891B2','#BE185D','#0F766E'];
@@ -108,7 +108,7 @@ export default function FollowListScreen({ route, navigation }) {
       {/* List */}
       {loading ? (
         <View style={s.center}>
-          <ActivityIndicator size="large" color={C.primary} />
+          <LensLoader size={48} />
         </View>
       ) : (
         <FlatList
