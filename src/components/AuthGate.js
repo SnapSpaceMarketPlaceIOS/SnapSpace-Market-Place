@@ -22,7 +22,6 @@ import {
   Image,
   Dimensions,
 } from 'react-native';
-import Svg, { Path } from 'react-native-svg';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as AppleAuthentication from 'expo-apple-authentication';
 import { useAuth } from '../context/AuthContext';
@@ -31,9 +30,8 @@ import LensLoader from './LensLoader';
 const { width: SCREEN_W } = Dimensions.get('window');
 const HERO_H = 240;
 const BLUE = '#0B6DC3';
-const LIGHT_BLUE = '#67ACE9';
 
-const HERO_IMG = require('../assets/hero/room1.jpg');
+const HERO_IMG = require('../../assets/snap-bg.jpg');
 
 // ── Reusable input ────────────────────────────────────────────────────────────
 
@@ -188,16 +186,6 @@ export default function AuthGate({ title, subtitle, navigation, onSuccess }) {
           </View>
         </View>
 
-        {/* ── Dark Curve Transition ──────────────────────────────── */}
-        <View style={s.curveWrap}>
-          <Svg width={SCREEN_W} height={50} viewBox={`0 0 ${SCREEN_W} 50`} preserveAspectRatio="none">
-            <Path
-              d={`M0,0 L0,20 Q${SCREEN_W / 2},55 ${SCREEN_W},20 L${SCREEN_W},0 Z`}
-              fill="#1A1A2E"
-            />
-          </Svg>
-        </View>
-
         {/* ── Form ───────────────────────────────────────────────── */}
         <View style={s.formSection}>
           {isSignUp && (
@@ -250,28 +238,20 @@ export default function AuthGate({ title, subtitle, navigation, onSuccess }) {
             </>
           )}
 
-          {/* ── Gradient CTA Button ── */}
+          {/* ── CTA Button ── */}
           <TouchableOpacity
-            style={[s.primaryBtnWrap, loading && { opacity: 0.6 }]}
+            style={[s.primaryBtn, loading && { opacity: 0.6 }]}
             onPress={handleAuth}
             disabled={loading}
             activeOpacity={0.85}
           >
-            <LinearGradient
-              colors={['#FFFFFF', LIGHT_BLUE, BLUE]}
-              locations={[0.02, 0.33, 0.77]}
-              start={{ x: 0, y: 0.5 }}
-              end={{ x: 1, y: 0.5 }}
-              style={s.primaryBtn}
-            >
-              {loading ? (
-                <LensLoader size={20} color="#fff" light="#fff" />
-              ) : (
-                <Text style={s.primaryBtnText}>
-                  {isSignUp ? 'Create Account' : 'Sign In'}
-                </Text>
-              )}
-            </LinearGradient>
+            {loading ? (
+              <LensLoader size={20} color="#fff" light="#fff" />
+            ) : (
+              <Text style={s.primaryBtnText}>
+                {isSignUp ? 'Create Account' : 'Sign In'}
+              </Text>
+            )}
           </TouchableOpacity>
 
           <View style={s.dividerRow}>
@@ -344,31 +324,24 @@ const s = StyleSheet.create({
     textShadowRadius: 4,
   },
 
-  // ── Curve ──
-  curveWrap: {
-    width: SCREEN_W,
-    height: 50,
-    marginTop: -1,
-    backgroundColor: 'transparent',
-  },
-
   // ── Form ──
   formSection: {
+    backgroundColor: '#fff',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    marginTop: -20,
     paddingHorizontal: 24,
     paddingTop: 24,
   },
 
   err: { fontSize: 12, color: '#E74C3C', marginTop: -8, marginBottom: 10, marginLeft: 4 },
 
-  primaryBtnWrap: {
-    borderRadius: 14,
-    overflow: 'hidden',
-  },
   primaryBtn: {
     height: 54,
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 14,
+    backgroundColor: '#67ACE9',
   },
   primaryBtnText: { color: '#fff', fontSize: 16, fontWeight: '700' },
 
