@@ -124,13 +124,6 @@ export default function LanguageScreen({ navigation }) {
         contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
       >
-        {/* Current language banner */}
-        <View style={styles.currentCard}>
-          <Text style={styles.currentLabel}>CURRENT LANGUAGE</Text>
-          <Text style={styles.currentName}>{selectedLang.name}</Text>
-          <Text style={styles.currentNative}>{selectedLang.native}</Text>
-        </View>
-
         {/* Search */}
         <View style={styles.searchBar}>
           <SearchIcon />
@@ -223,39 +216,7 @@ const styles = StyleSheet.create({
     letterSpacing: -0.3,
   },
 
-  scrollContent: { paddingHorizontal: 16, paddingTop: 20 },
-
-  // Current language card
-  currentCard: {
-    backgroundColor: colors.bluePrimary,
-    borderRadius: 18,
-    padding: 20,
-    marginBottom: 16,
-    shadowColor: colors.bluePrimary,
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.28,
-    shadowRadius: 14,
-    elevation: 6,
-  },
-  currentLabel: {
-    fontSize: 10,
-    fontWeight: '700',
-    color: 'rgba(255,255,255,0.6)',
-    letterSpacing: 1.2,
-    marginBottom: 8,
-  },
-  currentName: {
-    fontSize: 22,
-    fontWeight: '800',
-    color: '#fff',
-    letterSpacing: -0.3,
-    marginBottom: 4,
-  },
-  currentNative: {
-    fontSize: 14,
-    color: 'rgba(255,255,255,0.75)',
-    fontWeight: '500',
-  },
+  scrollContent: { paddingHorizontal: 16, paddingTop: 16 },
 
   // Search
   searchBar: {

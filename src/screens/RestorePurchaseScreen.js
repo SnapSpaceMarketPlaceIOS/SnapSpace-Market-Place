@@ -296,7 +296,7 @@ const styles = StyleSheet.create({
   },
   heroSubtitle: {
     fontSize: 14,
-    color: '#666',
+    color: '#67ACE9',
     lineHeight: 22,
     textAlign: 'center',
   },

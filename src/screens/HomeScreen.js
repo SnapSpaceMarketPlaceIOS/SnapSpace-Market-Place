@@ -48,6 +48,7 @@ import { saveUserDesign, updateDesignVisibility, uploadRoomPhoto } from '../serv
 import { useSubscription } from '../context/SubscriptionContext';
 import { generateWithBFL } from '../services/bfl';
 import TabScreenFade from '../components/TabScreenFade';
+import { sendNotificationIfEnabled } from '../services/notifications';
 
 const { width, height } = Dimensions.get('window');
 
@@ -849,6 +850,15 @@ export default function HomeScreen({ navigation, route }) {
   const lensDot     = useRef(new Animated.Value(0.5)).current; // center dot pulse
   const lensAnim    = useRef(null);
 
+  // ── Spring press animations (tab-bar style) ──────────────────────────────
+  const cameraScale  = useRef(new Animated.Value(1)).current;
+  const galleryScale = useRef(new Animated.Value(1)).current;
+  const sendScale    = useRef(new Animated.Value(1)).current;
+  const inputScale   = useRef(new Animated.Value(1)).current;
+
+  const springIn  = (anim) => Animated.spring(anim, { toValue: 0.82, useNativeDriver: true, tension: 300, friction: 10 }).start();
+  const springOut = (anim) => Animated.spring(anim, { toValue: 1,    useNativeDriver: true, tension: 200, friction: 7  }).start();
+
   // Scroll-driven parallax
   const scrollY = useRef(new Animated.Value(0)).current;
 
@@ -1343,6 +1353,15 @@ export default function HomeScreen({ navigation, route }) {
         prompt: designPrompt,
         products: finalMatchedProducts,
       });
+
+      // Fire local notification if user has AI Generation Ready enabled
+      sendNotificationIfEnabled(
+        'ai_ready',
+        '✨ Your design is ready!',
+        'Tap to see your AI-redesigned room and matched products.',
+        { screen: 'RoomResult' }
+      ).catch(() => {});
+
       // Navigate to the full RoomResult screen instead of showing inline modal
       navigation.navigate('RoomResult', {
         prompt: designPrompt,
@@ -1565,15 +1584,19 @@ export default function HomeScreen({ navigation, route }) {
                 ))}
               </ScrollView>
             )}
-            <View style={styles.inputBar}>
+            <Animated.View style={[styles.inputBar, { transform: [{ scale: inputScale }] }]}>
               {/* Camera icon — badge only when photo came from camera */}
               <View>
                 <TouchableOpacity
                   style={styles.inputIconBtn}
                   onPress={() => navigation?.navigate('Snap')}
-                  activeOpacity={0.6}
+                  activeOpacity={1}
+                  onPressIn={() => springIn(cameraScale)}
+                  onPressOut={() => springOut(cameraScale)}
                 >
-                  <CameraSmallIcon />
+                  <Animated.View style={{ transform: [{ scale: cameraScale }] }}>
+                    <CameraSmallIcon />
+                  </Animated.View>
                 </TouchableOpacity>
                 {photo && photoSource === 'camera' && (
                   <View style={styles.attachBadge}>
@@ -1586,9 +1609,13 @@ export default function HomeScreen({ navigation, route }) {
                 <TouchableOpacity
                   style={styles.inputIconBtn}
                   onPress={photo ? () => { setPhoto(null); setPhotoSource(null); setImageLayout(null); } : handlePickFromLibrary}
-                  activeOpacity={0.6}
+                  activeOpacity={1}
+                  onPressIn={() => springIn(galleryScale)}
+                  onPressOut={() => springOut(galleryScale)}
                 >
-                  <GalleryIcon />
+                  <Animated.View style={{ transform: [{ scale: galleryScale }] }}>
+                    <GalleryIcon />
+                  </Animated.View>
                 </TouchableOpacity>
                 {photo && photoSource === 'library' && (
                   <View style={styles.attachBadge}>
@@ -1606,24 +1633,30 @@ export default function HomeScreen({ navigation, route }) {
                 editable={!generating}
                 maxLength={200}
                 onSubmitEditing={runGeneration}
+                onFocus={() => springOut(inputScale)}
+                onBlur={() => Animated.spring(inputScale, { toValue: 1, useNativeDriver: true, tension: 200, friction: 7 }).start()}
               />
               <TouchableOpacity
                 style={[styles.inputSendBtn, (!prompt.trim() && !photo) && styles.inputSendBtnOff]}
-                activeOpacity={0.8}
+                activeOpacity={1}
                 onPress={runGeneration}
                 disabled={generating}
+                onPressIn={() => !generating && springIn(sendScale)}
+                onPressOut={() => !generating && springOut(sendScale)}
               >
-                {generating ? (
-                  <Animated.View style={{ transform: [{ rotate: lensRotate.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '360deg'] }) }] }}>
-                    <Svg width={20} height={20} viewBox="0 0 24 24">
-                      <Circle cx={12} cy={12} r={10} stroke="#fff" strokeWidth={1.8} fill="none" strokeDasharray="6 4" strokeLinecap="round" />
-                      <Circle cx={12} cy={12} r={5}  stroke="rgba(255,255,255,0.55)" strokeWidth={1} fill="none" />
-                      <Circle cx={12} cy={12} r={2}  fill="#fff" />
-                    </Svg>
-                  </Animated.View>
-                ) : <SendIcon />}
+                <Animated.View style={{ transform: [{ scale: sendScale }] }}>
+                  {generating ? (
+                    <Animated.View style={{ transform: [{ rotate: lensRotate.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '360deg'] }) }] }}>
+                      <Svg width={20} height={20} viewBox="0 0 24 24">
+                        <Circle cx={12} cy={12} r={10} stroke="#fff" strokeWidth={1.8} fill="none" strokeDasharray="6 4" strokeLinecap="round" />
+                        <Circle cx={12} cy={12} r={5}  stroke="rgba(255,255,255,0.55)" strokeWidth={1} fill="none" />
+                        <Circle cx={12} cy={12} r={2}  fill="#fff" />
+                      </Svg>
+                    </Animated.View>
+                  ) : <SendIcon />}
+                </Animated.View>
               </TouchableOpacity>
-            </View>
+            </Animated.View>
             {/* Loading progress bar */}
             {generating && (
               <View style={styles.loadingBarTrack}>

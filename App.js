@@ -39,7 +39,6 @@ import TermsOfUseScreen from './src/screens/TermsOfUseScreen';
 import PrivacyPolicyScreen from './src/screens/PrivacyPolicyScreen';
 import VerifyEmailSentScreen from './src/screens/VerifyEmailSentScreen';
 import SupplierApplicationScreen from './src/screens/SupplierApplicationScreen';
-import SupplierApplicationStatusScreen from './src/screens/SupplierApplicationStatusScreen';
 import AdminApplicationsScreen from './src/screens/AdminApplicationsScreen';
 import AdminApplicationDetailScreen from './src/screens/AdminApplicationDetailScreen';
 import SupplierOnboardingScreen from './src/screens/SupplierOnboardingScreen';
@@ -285,14 +284,13 @@ function RootNavigator() {
       <Stack.Screen name="TermsOfUse" component={TermsOfUseScreen} />
       <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicyScreen} />
       <Stack.Screen name="SupplierApplication" component={SupplierApplicationScreen} />
-      <Stack.Screen name="SupplierApplicationStatus" component={SupplierApplicationStatusScreen} />
       <Stack.Screen name="AdminApplications" component={AdminApplicationsScreen} />
       <Stack.Screen name="AdminApplicationDetail" component={AdminApplicationDetailScreen} />
       <Stack.Screen name="SupplierOnboarding" component={SupplierOnboardingScreen} />
       <Stack.Screen name="SupplierDashboard" component={SupplierDashboardScreen} />
       <Stack.Screen name="Browse" component={BrowseScreen} />
       <Stack.Screen name="AllCollections" component={AllCollectionsScreen} />
-      <Stack.Screen name="Paywall" component={PaywallScreen} options={{ presentation: 'modal' }} />
+      <Stack.Screen name="Paywall" component={PaywallScreen} options={{ presentation: 'transparentModal', headerShown: false }} />
       <Stack.Screen name="FollowList" component={FollowListScreen} />
     </Stack.Navigator>
   );

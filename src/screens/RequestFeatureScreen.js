@@ -28,12 +28,14 @@ function BackIcon() {
   );
 }
 
-function LightbulbIcon({ size = 52, color = '#F59E0B' }) {
+function SparkleIcon({ size = 22, color = '#0B6DC3' }) {
   return (
-    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={1.4} strokeLinecap="round" strokeLinejoin="round">
-      <Line x1={9} y1={18} x2={15} y2={18} />
-      <Line x1={10} y1={22} x2={14} y2={22} />
-      <Path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14" />
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <Path
+        d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2Z"
+        fill={color}
+        opacity={0.9}
+      />
     </Svg>
   );
 }
@@ -57,12 +59,42 @@ const CATEGORIES = [
   { id: 'other',    label: 'Other' },
 ];
 
-const RECENT_REQUESTS = [
-  { title: 'Dark mode support',            votes: 847, status: 'planned' },
-  { title: 'Save AI generations to album', votes: 612, status: 'in_progress' },
-  { title: '3D room preview',              votes: 589, status: 'planned' },
-  { title: 'Collaborative mood boards',    votes: 441, status: 'under_review' },
-  { title: 'Budget filter for shopping',   votes: 318, status: 'under_review' },
+const POPULAR_REQUESTS = [
+  {
+    title: 'AR Furniture Placement',
+    description: 'See exactly how a sofa or lamp fits in your real room — in scale — before you buy.',
+    tag: 'Design Tools',
+    votes: 1241,
+    status: 'under_review',
+  },
+  {
+    title: 'Redesign in 3 Styles at Once',
+    description: 'Generate your room in Japandi, Coastal, and Dark Luxe side-by-side and pick your favorite.',
+    tag: 'AI & Generation',
+    votes: 934,
+    status: 'planned',
+  },
+  {
+    title: 'Budget Dupe Finder',
+    description: 'Love a high-end piece but over budget? AI finds the closest look-alike at a fraction of the price.',
+    tag: 'Shopping',
+    votes: 721,
+    status: 'planned',
+  },
+  {
+    title: '"Find My Style" AI Profile',
+    description: 'Swipe through rooms and SnapSpace builds a taste profile that makes every design feel more you.',
+    tag: 'AI & Generation',
+    votes: 608,
+    status: 'under_review',
+  },
+  {
+    title: 'Before & After Creator',
+    description: 'Auto-generate a side-by-side of your real room vs. the AI redesign — ready to post.',
+    tag: 'Social',
+    votes: 487,
+    status: 'in_progress',
+  },
 ];
 
 const STATUS_CONFIG = {
@@ -82,8 +114,8 @@ export default function RequestFeatureScreen({ navigation }) {
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [votedIds, setVotedIds] = useState({});
-  const [recentVotes, setRecentVotes] = useState(
-    RECENT_REQUESTS.reduce((acc, r) => ({ ...acc, [r.title]: r.votes }), {})
+  const [popularVotes, setPopularVotes] = useState(
+    POPULAR_REQUESTS.reduce((acc, r) => ({ ...acc, [r.title]: r.votes }), {})
   );
 
   const handleSubmit = async () => {
@@ -104,7 +136,7 @@ export default function RequestFeatureScreen({ navigation }) {
         user_id: user?.id ?? null,
       });
     } catch (_) {
-      // Non-fatal: show success regardless so UX isn't blocked if table doesn't exist yet
+      // Non-fatal — show success regardless so UX isn't blocked if table doesn't exist yet
     } finally {
       setSubmitting(false);
     }
@@ -114,7 +146,7 @@ export default function RequestFeatureScreen({ navigation }) {
   const handleVote = (requestTitle) => {
     if (votedIds[requestTitle]) return;
     setVotedIds((prev) => ({ ...prev, [requestTitle]: true }));
-    setRecentVotes((prev) => ({ ...prev, [requestTitle]: (prev[requestTitle] || 0) + 1 }));
+    setPopularVotes((prev) => ({ ...prev, [requestTitle]: (prev[requestTitle] || 0) + 1 }));
   };
 
   const handleNewRequest = () => {
@@ -138,14 +170,14 @@ export default function RequestFeatureScreen({ navigation }) {
         </SafeAreaView>
         <View style={styles.successContainer}>
           <View style={styles.successIcon}>
-            <LightbulbIcon size={44} color="#F59E0B" />
+            <SparkleIcon size={38} color="#0B6DC3" />
           </View>
-          <Text style={styles.successTitle}>Request Submitted!</Text>
+          <Text style={styles.successTitle}>Idea Received!</Text>
           <Text style={styles.successSubtitle}>
-            Thanks for sharing your idea. Our team reviews every request and uses your feedback to shape the roadmap.
+            Thanks for sharing. Our team reads every request and uses your feedback to shape the SnapSpace roadmap.
           </Text>
           <TouchableOpacity style={styles.submitBtn} onPress={handleNewRequest} activeOpacity={0.85}>
-            <Text style={styles.submitBtnText}>Submit Another Request</Text>
+            <Text style={styles.submitBtnText}>Submit Another Idea</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.backHomeBtn} onPress={() => navigation.goBack()} activeOpacity={0.7}>
             <Text style={styles.backHomeBtnText}>Back to Settings</Text>
@@ -176,8 +208,12 @@ export default function RequestFeatureScreen({ navigation }) {
         keyboardShouldPersistTaps="handled"
       >
 
+        {/* Hero */}
+        <Text style={styles.heroTitle}>Shape your SnapSpace.</Text>
+        <Text style={styles.heroSubtitle}>Your ideas build the roadmap. We read every single one.</Text>
+
         {/* Form */}
-        <Text style={styles.sectionLabel}>YOUR REQUEST</Text>
+        <Text style={styles.sectionLabel}>YOUR IDEA</Text>
         <View style={styles.formCard}>
 
           <Text style={styles.fieldLabel}>Feature Title <Text style={styles.required}>*</Text></Text>
@@ -185,7 +221,7 @@ export default function RequestFeatureScreen({ navigation }) {
             style={styles.input}
             value={title}
             onChangeText={setTitle}
-            placeholder="e.g. Dark mode, Budget filter, 3D preview..."
+            placeholder="e.g. AR room preview, budget mode, style quiz..."
             placeholderTextColor="#BBBBC0"
             maxLength={80}
           />
@@ -233,22 +269,30 @@ export default function RequestFeatureScreen({ navigation }) {
           activeOpacity={0.85}
           disabled={submitting}
         >
-          <Text style={styles.submitBtnText}>{submitting ? 'Submitting…' : 'Submit Request'}</Text>
+          <Text style={styles.submitBtnText}>{submitting ? 'Submitting…' : 'Submit Idea'}</Text>
         </TouchableOpacity>
 
         {/* Popular requests */}
-        <Text style={[styles.sectionLabel, { marginTop: 32 }]}>POPULAR REQUESTS</Text>
-        <Text style={styles.popularSubtitle}>Vote for features you'd love to see.</Text>
+        <Text style={[styles.sectionLabel, { marginTop: 36 }]}>POPULAR REQUESTS</Text>
+        <Text style={styles.popularSubtitle}>Vote for the features you want most.</Text>
         <View style={styles.card}>
-          {RECENT_REQUESTS.map((req, i) => {
+          {POPULAR_REQUESTS.map((req, i) => {
             const cfg = STATUS_CONFIG[req.status];
             const voted = !!votedIds[req.title];
             return (
-              <View key={req.title} style={[styles.popularItem, i < RECENT_REQUESTS.length - 1 && styles.popularItemBorder]}>
+              <View key={req.title} style={[styles.popularItem, i < POPULAR_REQUESTS.length - 1 && styles.popularItemBorder]}>
                 <View style={styles.popularLeft}>
-                  <Text style={styles.popularTitle}>{req.title}</Text>
-                  <View style={[styles.statusBadge, { backgroundColor: cfg.bg }]}>
-                    <Text style={[styles.statusText, { color: cfg.text }]}>{cfg.label}</Text>
+                  <View style={styles.popularTitleRow}>
+                    <Text style={styles.popularTitle}>{req.title}</Text>
+                  </View>
+                  <Text style={styles.popularDescription}>{req.description}</Text>
+                  <View style={styles.popularMeta}>
+                    <View style={[styles.statusBadge, { backgroundColor: cfg.bg }]}>
+                      <Text style={[styles.statusText, { color: cfg.text }]}>{cfg.label}</Text>
+                    </View>
+                    <View style={styles.tagPill}>
+                      <Text style={styles.tagText}>{req.tag}</Text>
+                    </View>
                   </View>
                 </View>
                 <TouchableOpacity
@@ -258,7 +302,9 @@ export default function RequestFeatureScreen({ navigation }) {
                 >
                   <Text style={[styles.voteArrow, voted && styles.voteArrowVoted]}>▲</Text>
                   <Text style={[styles.voteCount, voted && styles.voteCountVoted]}>
-                    {recentVotes[req.title]}
+                    {popularVotes[req.title] >= 1000
+                      ? `${(popularVotes[req.title] / 1000).toFixed(1)}k`
+                      : popularVotes[req.title]}
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -306,7 +352,22 @@ const styles = StyleSheet.create({
 
   scrollContent: {
     paddingHorizontal: 16,
-    paddingTop: 28,
+    paddingTop: 22,
+  },
+
+  // Hero
+  heroTitle: {
+    fontSize: 26,
+    fontWeight: '800',
+    color: '#111',
+    letterSpacing: -0.5,
+    marginBottom: 6,
+  },
+  heroSubtitle: {
+    fontSize: 14,
+    color: '#67ACE9',
+    lineHeight: 20,
+    marginBottom: 24,
   },
 
   sectionLabel: {
@@ -460,13 +521,30 @@ const styles = StyleSheet.create({
   },
   popularLeft: {
     flex: 1,
+    gap: 5,
+  },
+  popularTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: 6,
   },
   popularTitle: {
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: '700',
     color: '#111',
     lineHeight: 19,
+    flex: 1,
+  },
+  popularDescription: {
+    fontSize: 12,
+    color: '#777',
+    lineHeight: 17,
+  },
+  popularMeta: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginTop: 2,
   },
   statusBadge: {
     alignSelf: 'flex-start',
@@ -478,11 +556,22 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: '600',
   },
+  tagPill: {
+    backgroundColor: '#F4F4F6',
+    borderRadius: 20,
+    paddingHorizontal: 9,
+    paddingVertical: 3,
+  },
+  tagText: {
+    fontSize: 11,
+    fontWeight: '500',
+    color: '#888',
+  },
   voteBtn: {
     alignItems: 'center',
     justifyContent: 'center',
-    width: 46,
-    height: 52,
+    width: 48,
+    height: 54,
     borderRadius: 12,
     borderWidth: 1.5,
     borderColor: '#E5E5E5',
@@ -517,10 +606,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 36,
   },
   successIcon: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    backgroundColor: '#FFFBEB',
+    width: 90,
+    height: 90,
+    borderRadius: 45,
+    backgroundColor: '#EFF6FF',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 24,
@@ -541,6 +630,7 @@ const styles = StyleSheet.create({
   },
   backHomeBtn: {
     paddingVertical: 12,
+    marginTop: 8,
   },
   backHomeBtnText: {
     fontSize: 14,

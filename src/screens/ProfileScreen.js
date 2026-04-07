@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import {
   View,
   Text,
@@ -14,6 +14,7 @@ import {
   Share,
   Linking,
   ActivityIndicator,
+  Animated,
 } from 'react-native';
 import CardImage from '../components/CardImage';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -41,7 +42,7 @@ const BANNER_HEIGHT = 210;
 
 function GearIcon() {
   return (
-    <Svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke="#111" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+    <Svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke="#111" strokeWidth={1.4} strokeLinecap="round" strokeLinejoin="round">
       <Circle cx={12} cy={12} r={3} />
       <Path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
     </Svg>
@@ -207,15 +208,13 @@ function InfoIcon() {
 const ACCOUNT_ITEMS = [
   { label: 'Subscription',           icon: <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="#444" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round"><Path d="M2 4l3 12h14l3-12-6 7-4-9-4 9-6-7z" /><Path d="M5 16h14v2H5z" /></Svg>, screen: 'Paywall' },
   { label: 'My Spaces',              icon: <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="#444" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round"><Path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z" /><Line x1={4} y1={22} x2={4} y2={15} /></Svg>,  screen: 'MySpaces' },
-  { label: 'Saved Designs',          icon: <SavedIcon />, screen: 'Explore' },
   { label: 'Order History',          icon: <OrderIcon />, screen: 'OrderHistory' },
   { label: 'Payment Methods',        icon: <CardIcon />,  screen: 'PaymentMethods' },
-  { label: 'Supplier Application',   icon: <StarIcon />,  screen: 'SupplierApplicationStatus' },
+  { label: 'Become a Supplier',       icon: <StarIcon />,  screen: 'SupplierApplication' },
 ];
 
 const SUPPORT_ITEMS = [
   { label: 'Help',              icon: <HelpIcon />,    screen: 'Help' },
-  { label: 'Restore Purchase',  icon: <RestoreIcon />, screen: 'RestorePurchase' },
   { label: 'Request a Feature', icon: <FeatureIcon />, screen: 'RequestFeature' },
 ];
 
@@ -276,6 +275,11 @@ export default function ProfileScreen({ navigation }) {
   const { shared, addShared } = useShared();
   const { user, signOut, refreshUser } = useAuth();
   const [activeTab, setActiveTab] = useState(0);
+
+  // ── Gear icon spring press animation ─────────────────────────────────────
+  const gearScale = useRef(new Animated.Value(1)).current;
+  const gearSpringIn  = () => Animated.spring(gearScale, { toValue: 0.82, useNativeDriver: true, tension: 300, friction: 10 }).start();
+  const gearSpringOut = () => Animated.spring(gearScale, { toValue: 1,    useNativeDriver: true, tension: 200, friction: 7  }).start();
   const [showSettings, setShowSettings] = useState(false);
   const [showEditProfile, setShowEditProfile] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -411,8 +415,16 @@ export default function ProfileScreen({ navigation }) {
           <CardImage uri={profile.bannerUri} style={styles.bannerImage} resizeMode="cover" />
           <SafeAreaView style={styles.navRow}>
             <View style={{ width: space['2xl'] + space.xs }} />
-            <TouchableOpacity style={styles.navBtn} onPress={() => setShowSettings(true)}>
-              <GearIcon />
+            <TouchableOpacity
+              style={styles.navBtn}
+              onPress={() => setShowSettings(true)}
+              activeOpacity={1}
+              onPressIn={gearSpringIn}
+              onPressOut={gearSpringOut}
+            >
+              <Animated.View style={{ transform: [{ scale: gearScale }] }}>
+                <GearIcon />
+              </Animated.View>
             </TouchableOpacity>
           </SafeAreaView>
         </View>
@@ -534,8 +546,8 @@ export default function ProfileScreen({ navigation }) {
           );
         })()}
 
-        {/* ── Supplier CTA: apply if consumer, dashboard if verified supplier ── */}
-        {user?.is_verified_supplier ? (
+        {/* ── Seller Dashboard CTA — only shown to verified suppliers ── */}
+        {user?.is_verified_supplier && (
           <TouchableOpacity
             style={styles.dashboardCta}
             onPress={() => navigation.navigate('SupplierDashboard')}
@@ -557,27 +569,6 @@ export default function ProfileScreen({ navigation }) {
               <Path d="M5 12h14M12 5l7 7-7 7" />
             </Svg>
           </TouchableOpacity>
-        ) : (
-          <View style={styles.supplierCta}>
-            <View style={styles.supplierCtaLeft}>
-              <View style={styles.supplierCtaBadge}>
-                <Svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="#0B6DC3" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round">
-                  <Path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.77 5.82 21 7 14.14 2 9.27l6.91-1.01L12 2z" />
-                </Svg>
-              </View>
-              <View style={styles.supplierCtaText}>
-                <Text style={styles.supplierCtaTitle}>Sell on SnapSpace</Text>
-                <Text style={styles.supplierCtaSubtitle}>Apply to become a Verified Supplier</Text>
-              </View>
-            </View>
-            <TouchableOpacity
-              style={styles.supplierCtaBtn}
-              onPress={() => navigation.navigate('SupplierApplication')}
-              activeOpacity={0.85}
-            >
-              <Text style={styles.supplierCtaBtnText}>Apply</Text>
-            </TouchableOpacity>
-          </View>
         )}
 
         <View style={{ height: space['3xl'] }} />
@@ -950,17 +941,19 @@ const styles = StyleSheet.create({
     borderRadius: radius.full,
   },
   editProfileBtn: {
-    height: 36,
-    borderRadius: radius.sm,
-    paddingHorizontal: space.xl,
+    height: 28,
+    borderRadius: 9999,
+    paddingHorizontal: 16,
     borderWidth: 1,
-    borderColor: 'rgba(0,0,0,0.08)',
+    borderColor: 'rgba(0,0,0,0.12)',
     backgroundColor: '#fff',
-    marginBottom: space.xs,
+    alignSelf: 'flex-end',
+    marginBottom: -14,
     justifyContent: 'center',
   },
   editProfileBtnText: {
-    ...typeScale.button,
+    fontSize: 12,
+    fontWeight: '600',
     color: '#222',
   },
 

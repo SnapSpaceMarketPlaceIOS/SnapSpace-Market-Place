@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -8,7 +8,15 @@ import {
   Alert,
   Dimensions,
   Share,
+  LayoutAnimation,
+  Platform,
+  UIManager,
 } from 'react-native';
+
+// Enable LayoutAnimation on Android
+if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
+  UIManager.setLayoutAnimationEnabledExperimental(true);
+}
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Line, Circle, Polyline, Path } from 'react-native-svg';
 import { colors } from '../constants/colors';
@@ -76,31 +84,51 @@ const TIER_FEATURES = {
 
 function TierCard({ tier, selected, onSelect }) {
   const isUnlimited = tier.displayLabel === 'Unlimited';
+  const features = TIER_FEATURES[tier.id] || [];
 
   return (
     <TouchableOpacity
-      activeOpacity={0.7}
+      activeOpacity={0.85}
       onPress={() => onSelect(tier.id)}
       style={[styles.subCard, selected && styles.subCardSelected]}
     >
-      {/* Row: radio + name + price */}
+      {/* ── Compact header row ── */}
       <View style={styles.subCardHeader}>
         <View style={[styles.radio, selected && styles.radioSelected]}>
           {selected && <View style={styles.radioDot} />}
         </View>
         <View style={{ flex: 1 }}>
-          <Text style={[styles.subTierName, selected && styles.subTierNameSelected]}>
-            {tier.name}
-          </Text>
-          <Text style={[styles.subGenCount, isUnlimited && styles.subGenCountUnlimited]}>
-            {tier.displayLabel}
-          </Text>
-          <Text style={styles.subGenLabel}>designs per month</Text>
+          <Text style={styles.subTierName}>{tier.name}</Text>
+          <View style={styles.subGenRow}>
+            <Text style={[styles.subGenCount, isUnlimited && styles.subGenCountUnlimited]}>
+              {tier.displayLabel}
+            </Text>
+            <Text style={styles.subGenLabel}> designs/mo</Text>
+          </View>
         </View>
         <Text style={[styles.subTierPrice, selected && styles.subTierPriceSelected]}>
           {tier.priceLabel}
         </Text>
       </View>
+
+      {/* ── Accordion: features drop down when selected ── */}
+      {selected && features.length > 0 && (
+        <View style={styles.subFeaturesContainer}>
+          <View style={styles.subFeaturesDivider} />
+          {features.map((feature, i) => (
+            <View key={i} style={styles.subFeatureRow}>
+              <Svg
+                width={14} height={14} viewBox="0 0 24 24"
+                fill="none" stroke="#0B6DC3" strokeWidth={2.5}
+                strokeLinecap="round" strokeLinejoin="round"
+              >
+                <Polyline points="20 6 9 17 4 12" />
+              </Svg>
+              <Text style={styles.subFeatureText}>{feature}</Text>
+            </View>
+          ))}
+        </View>
+      )}
     </TouchableOpacity>
   );
 }
@@ -166,6 +194,12 @@ export default function PaywallScreen({ navigation }) {
   const [purchasing, setPurchasing] = useState(false);
   const [restoring, setRestoring] = useState(false);
 
+  // Animate card expand/collapse when tier selection changes
+  const handleSelectTier = (tierId) => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    setSelectedTier(tierId);
+  };
+
   // Quota progress
   const usedCount = subscription.generationsUsed;
   const totalFree = subscription.tier === 'free' ? 5 : subscription.quotaLimit;
@@ -222,64 +256,68 @@ export default function PaywallScreen({ navigation }) {
     : selectedSubTier?.priceLabel ?? '$19.99/mo';
 
   return (
+    <View style={styles.overlay}>
     <SafeAreaView style={styles.root} edges={['top', 'bottom']}>
 
-      {/* ── Wordmark header ───────────────────────────────────────── */}
-      <View style={styles.header}>
-        <View style={{ width: 40 }} />
-        <Text style={styles.wordmark}>SnapSpace</Text>
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          style={styles.closeBtn}
-          hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-        >
-          <CloseIcon />
-        </TouchableOpacity>
-      </View>
-
-      <Text style={styles.subtitle}>Shop and Design your room with AI...</Text>
-
-      {/* ── Progress bar card ─────────────────────────────────────── */}
-      <View style={styles.progressCard}>
-        <View style={styles.progressLabelRow}>
-          <Text style={styles.progressLabel}>Free generations used</Text>
-          <Text style={styles.progressCount}>{usedCount}/{totalFree}</Text>
-        </View>
-        <View style={styles.progressTrack}>
-          <View style={[styles.progressFill, { width: `${progressPct * 100}%` }]} />
-        </View>
-      </View>
-
-      {/* ── Toggle pill ───────────────────────────────────────────── */}
-      <View style={styles.toggleWrapper}>
-        <TogglePill activeTab={activeTab} onTabChange={setActiveTab} />
-      </View>
-
-      {/* ── Referral banner ───────────────────────────────────────── */}
-      <TouchableOpacity
-        activeOpacity={0.7}
-        onPress={handleShareReferral}
-        style={styles.referralBanner}
-      >
-        <View style={{ flex: 1 }}>
-          <Text style={styles.referralText}>
-            Refer a friend get <Text style={styles.referralHighlight}>2 Free</Text> Credits
-          </Text>
-          <Text style={styles.referralSub}>when they sign up!</Text>
-        </View>
-        <View style={styles.referralShareBtn}>
-          <ShareIcon />
-        </View>
-      </TouchableOpacity>
-
-      {/* ── Scrollable content ────────────────────────────────────── */}
+      {/* ── Everything scrolls together ───────────────────────────── */}
       <ScrollView
         style={styles.scroll}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
+        bounces={false}
+        alwaysBounceVertical={false}
+        overScrollMode="never"
       >
-        {/* ── Gray container box ────────────────────────────────── */}
+        {/* ── Wordmark header ─────────────────────────────────────── */}
+        <View style={styles.header}>
+          <View style={{ width: 40 }} />
+          <Text style={styles.wordmark}>SnapSpace</Text>
+          <TouchableOpacity
+            onPress={() => navigation.goBack()}
+            style={styles.closeBtn}
+            hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+          >
+            <CloseIcon />
+          </TouchableOpacity>
+        </View>
+
+        <Text style={styles.subtitle}>Shop and Design your room with AI...</Text>
+
+        {/* ── Progress bar card ───────────────────────────────────── */}
+        <View style={styles.progressCard}>
+          <View style={styles.progressLabelRow}>
+            <Text style={styles.progressLabel}>Free generations used</Text>
+            <Text style={styles.progressCount}>{usedCount}/{totalFree}</Text>
+          </View>
+          <View style={styles.progressTrack}>
+            <View style={[styles.progressFill, { width: `${progressPct * 100}%` }]} />
+          </View>
+        </View>
+
+        {/* ── Toggle pill ─────────────────────────────────────────── */}
+        <View style={styles.toggleWrapper}>
+          <TogglePill activeTab={activeTab} onTabChange={setActiveTab} />
+        </View>
+
+        {/* ── Referral banner ─────────────────────────────────────── */}
+        <TouchableOpacity
+          activeOpacity={0.7}
+          onPress={handleShareReferral}
+          style={styles.referralBanner}
+        >
+          <View style={{ flex: 1 }}>
+            <Text style={styles.referralText}>
+              Refer a friend get <Text style={styles.referralHighlight}>2 Free</Text> Credits
+            </Text>
+            <Text style={styles.referralSub}>when they sign up!</Text>
+          </View>
+          <View style={styles.referralShareBtn}>
+            <ShareIcon />
+          </View>
+        </TouchableOpacity>
+
+        {/* ── Gray container box ──────────────────────────────────── */}
         <View style={styles.contentBox}>
           {activeTab === 'tokens' ? (
             <>
@@ -307,7 +345,7 @@ export default function PaywallScreen({ navigation }) {
                   key={tier.id}
                   tier={tier}
                   selected={selectedTier === tier.id}
-                  onSelect={setSelectedTier}
+                  onSelect={handleSelectTier}
                 />
               ))}
             </>
@@ -333,10 +371,9 @@ export default function PaywallScreen({ navigation }) {
           </View>
         </View>
 
-        <View style={{ height: 16 }} />
       </ScrollView>
 
-      {/* ── Sticky CTA bar ────────────────────────────────────────── */}
+      {/* ── Sticky CTA bar — always pinned at bottom ─────────────── */}
       <View style={styles.stickyBar}>
         <TouchableOpacity
           onPress={handlePurchase}
@@ -352,6 +389,7 @@ export default function PaywallScreen({ navigation }) {
         </TouchableOpacity>
       </View>
     </SafeAreaView>
+    </View>
   );
 }
 
@@ -362,9 +400,17 @@ const BLUE = colors.bluePrimary;
 const TOKEN_CARD_W = (SCREEN_W - 2 * layout.screenPaddingH - 2 * space.base - 2 * space.sm) / 3;
 
 const styles = StyleSheet.create({
+  overlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.45)',
+    paddingTop: 90,
+  },
   root: {
     flex: 1,
     backgroundColor: '#fff',
+    borderTopLeftRadius: 15,
+    borderTopRightRadius: 15,
+    overflow: 'hidden',
   },
 
   // ── Header
@@ -404,7 +450,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 14,
     backgroundColor: '#F3F4F6',
-    borderRadius: 8.5,
+    borderRadius: 6,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.13,
@@ -430,7 +476,7 @@ const styles = StyleSheet.create({
     height: 4,
     borderRadius: 2,
     backgroundColor: '#D1D5DB',
-    overflow: 'hidden',
+    // No overflow:hidden — allows the fill's glow shadow to render
   },
   progressFill: {
     height: 4,
@@ -438,8 +484,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#67ACE9',
     shadowColor: '#67ACE9',
     shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.5,
-    shadowRadius: 4,
+    shadowOpacity: 0.95,
+    shadowRadius: 12,
   },
 
   // ── Toggle pill
@@ -522,8 +568,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    paddingHorizontal: layout.screenPaddingH,
-    paddingTop: space.xs,
+    paddingBottom: 32,
+    flexGrow: 1,
   },
 
   // ── Gray content box
@@ -531,8 +577,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#F6F7F9',
     borderRadius: 16,
     paddingTop: space.lg,
-    paddingBottom: space.base,
+    paddingBottom: space.xl,
     paddingHorizontal: space.base,
+    marginHorizontal: layout.screenPaddingH,
     marginBottom: space.sm,
   },
 
@@ -560,7 +607,7 @@ const styles = StyleSheet.create({
     width: TOKEN_CARD_W,
     paddingVertical: space.lg,
     paddingHorizontal: space.sm,
-    borderRadius: 10,
+    borderRadius: 5,
     borderWidth: 1,
     borderColor: '#D1D5DB',
     backgroundColor: '#fff',
@@ -597,11 +644,12 @@ const styles = StyleSheet.create({
 
   // ── Subscription cards
   subCard: {
-    borderRadius: 14,
+    borderRadius: 5,
     borderWidth: 1,
     borderColor: '#E5E7EB',
     backgroundColor: '#fff',
-    padding: space.base,
+    paddingVertical: 10,
+    paddingHorizontal: space.base,
     marginBottom: space.md,
   },
   subCardSelected: {
@@ -638,30 +686,32 @@ const styles = StyleSheet.create({
     backgroundColor: BLUE,
   },
   subTierName: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: fontWeight.semibold,
     color: '#111827',
-    marginBottom: 2,
+    marginBottom: 1,
   },
-  subTierNameSelected: {
-    color: '#111827',
+  subGenRow: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
   },
   subGenCount: {
-    fontSize: 32,
+    fontSize: 26,
     fontWeight: fontWeight.semibold,
     color: BLUE,
-    lineHeight: 38,
+    lineHeight: 30,
   },
   subGenCountUnlimited: {
-    fontSize: 28,
+    fontSize: 22,
   },
   subGenLabel: {
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: fontWeight.regular,
     color: '#6B7280',
+    marginLeft: 2,
   },
   subTierPrice: {
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: fontWeight.semibold,
     color: '#111827',
   },
@@ -669,9 +719,32 @@ const styles = StyleSheet.create({
     color: BLUE,
   },
 
+  // ── Expandable features section
+  subFeaturesContainer: {
+    marginTop: space.sm,
+  },
+  subFeaturesDivider: {
+    height: 1,
+    backgroundColor: 'rgba(11,109,195,0.15)',
+    marginBottom: space.sm,
+  },
+  subFeatureRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    paddingVertical: 3,
+  },
+  subFeatureText: {
+    fontSize: 13,
+    fontWeight: fontWeight.regular,
+    color: '#374151',
+    flex: 1,
+  },
+
   // ── Legal section
   legalSection: {
     marginTop: space.xl,
+    marginHorizontal: layout.screenPaddingH,
     paddingHorizontal: 4,
     gap: 10,
   },

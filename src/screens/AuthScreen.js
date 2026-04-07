@@ -84,12 +84,12 @@ const inputStyles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#fff',
-    borderRadius: 12,
+    borderRadius: 1,
     paddingHorizontal: 16,
-    height: 54,
-    marginBottom: 14,
-    borderWidth: 1.5,
-    borderColor: '#D7D7D7',
+    height: 52,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: '#DCDCDC',
   },
   wrapFocused: { borderColor: BLUE },
   input: { flex: 1, fontSize: 15, color: '#111' },
@@ -208,7 +208,11 @@ export default function AuthScreen({ navigation }) {
           {/* Logo */}
           <View style={styles.logoSection}>
             <Text style={styles.wordmark}>SnapSpace</Text>
-            <Text style={styles.tagline}>Design your space with AI.</Text>
+            <Text style={styles.tagline}>
+              {isSignUp
+                ? 'Create a free account to save items,\ncheck out, and track your orders.'
+                : 'Sign in to access your profile,\nsaved designs, and order history.'}
+            </Text>
           </View>
 
           {/* Form */}
@@ -344,31 +348,58 @@ export default function AuthScreen({ navigation }) {
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: '#fff' },
   flex: { flex: 1 },
-  scroll: { flexGrow: 1, paddingHorizontal: 28, paddingBottom: 32 },
+  scroll: {
+    flexGrow: 1,
+    paddingHorizontal: 24,
+    paddingBottom: 32,
+    justifyContent: 'center',
+  },
 
-  logoSection: { alignItems: 'center', paddingTop: 72, paddingBottom: 52 },
-  wordmark: { fontSize: 36, fontWeight: '800', color: '#111', letterSpacing: -0.8, marginBottom: 10 },
-  tagline: { fontSize: 14, color: '#ABABAB', fontWeight: '400', letterSpacing: 0.1 },
+  logoSection: {
+    alignItems: 'center',
+    paddingTop: 92,
+    paddingBottom: 32,
+  },
+  wordmark: {
+    fontSize: 36,
+    fontWeight: '800',
+    color: '#111',
+    letterSpacing: -0.8,
+    marginBottom: 12,
+  },
+  tagline: {
+    fontSize: 15,
+    color: BLUE,
+    fontWeight: '500',
+    textAlign: 'center',
+    lineHeight: 22,
+  },
 
-  form: { width: '100%' },
+  form: {
+    width: '100%',
+    backgroundColor: '#F5F6F8',
+    borderRadius: 16,
+    padding: 18,
+    marginBottom: 8,
+  },
 
-  errorText: { fontSize: 12, color: '#E74C3C', marginTop: -10, marginBottom: 10, marginLeft: 4 },
+  errorText: { fontSize: 12, color: '#E74C3C', marginTop: -8, marginBottom: 10, marginLeft: 2 },
 
-  forgotBtn: { alignSelf: 'flex-end', marginBottom: 22, marginTop: -4 },
+  forgotBtn: { alignSelf: 'flex-end', marginBottom: 20, marginTop: -4 },
   forgotText: { fontSize: 13, color: BLUE, fontWeight: '600' },
 
   primaryBtn: {
     backgroundColor: BLUE,
-    borderRadius: 14,
-    height: 56,
+    borderRadius: 10,
+    height: 54,
     alignItems: 'center',
     justifyContent: 'center',
   },
   primaryBtnDisabled: { opacity: 0.6 },
   primaryBtnText: { color: '#fff', fontSize: 16, fontWeight: '700' },
 
-  dividerRow: { flexDirection: 'row', alignItems: 'center', marginVertical: 20, gap: 12 },
-  dividerLine: { flex: 1, height: 1, backgroundColor: '#E8E8E8' },
+  dividerRow: { flexDirection: 'row', alignItems: 'center', marginVertical: 18, gap: 12 },
+  dividerLine: { flex: 1, height: 1, backgroundColor: '#E0E0E0' },
   dividerText: { fontSize: 12, color: '#BBBBBB', fontWeight: '500' },
 
   appleBtn: {
@@ -376,15 +407,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
-    backgroundColor: '#fff',
-    borderWidth: 1.5,
-    borderColor: '#000',
-    borderRadius: 14,
-    height: 56,
+    backgroundColor: '#000',
+    borderRadius: 10,
+    height: 54,
   },
-  appleBtnText: { color: '#000', fontSize: 15, fontWeight: '700' },
+  appleBtnText: { color: '#fff', fontSize: 15, fontWeight: '700' },
 
-  switchBtn: { marginTop: 32, alignItems: 'center' },
+  switchBtn: { marginTop: 28, alignItems: 'center' },
   switchText: { fontSize: 14, color: '#ABABAB' },
   switchLink: { color: BLUE, fontWeight: '700' },
 });

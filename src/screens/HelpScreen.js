@@ -6,6 +6,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   TextInput,
+  Linking,
   Dimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -56,53 +57,40 @@ const FAQ_SECTIONS = [
     items: [
       {
         q: 'What is SnapSpace?',
-        a: 'SnapSpace is an AI-powered interior design app. Snap a photo of any room and our AI instantly redesigns it with curated furniture and decor you can shop directly.',
+        a: 'SnapSpace is an AI-powered interior design marketplace. Take a photo of any room, describe your style, and our AI instantly redesigns it with real furniture and decor from our curated catalog — all shoppable in one tap.',
       },
       {
         q: 'How do I generate a room design?',
-        a: 'Tap the camera icon (Snap) in the center of the tab bar. Point your camera at any room, enter a style prompt like "Modern minimalist with warm tones", then tap "Generate with AI". Your redesigned room appears in seconds.',
+        a: 'Tap the Snap tab (the camera icon with the blue sparkle) in the center of the tab bar. Take a photo or upload one from your gallery, write a style prompt — for example "Japandi bedroom with warm wood tones and soft lighting" — then tap Generate. Your AI redesign appears in seconds with matched products.',
+      },
+      {
+        q: 'What kind of rooms can I redesign?',
+        a: 'Any indoor space works: living rooms, bedrooms, kitchens, dining rooms, home offices, bathrooms, nurseries, and more. The AI performs best with well-lit, clear photos where the room boundaries are visible.',
       },
       {
         q: 'Is SnapSpace free to use?',
-        a: 'Browsing and exploring designs is completely free. AI room generation may have usage limits on the free tier. Premium features and unlimited generations are available with a subscription.',
+        a: 'Browsing designs, exploring the catalog, liking, and saving is completely free. AI room generation uses credits — free accounts include a set number of generations. Additional generations are available through token packs.',
       },
     ],
   },
   {
-    title: 'Orders & Shopping',
+    title: 'Shopping & Products',
     items: [
+      {
+        q: 'How does shopping work in SnapSpace?',
+        a: 'SnapSpace surfaces matching furniture and decor products alongside every AI design. All products are affiliate-linked — tapping "Buy on Amazon" opens Amazon\'s app or website where you complete your purchase directly. SnapSpace earns a small referral commission at no extra cost to you.',
+      },
       {
         q: 'How do I add items to my cart?',
-        a: 'Tap any product in a design post or room result to open its detail page, then tap "Add to Cart". You can also tap "Shop The Look" to see and add all items from a design at once.',
+        a: 'Tap any product card to open its detail page, then tap "Add to Cart." You can also tap "Shop The Look" on any design to see and cart all matched products at once. Your cart saves items as you browse.',
       },
       {
-        q: 'Where can I see my past orders?',
-        a: 'Go to Profile → tap the gear icon → Order History. Every completed purchase is listed there with item details, status, and total breakdown.',
+        q: 'What does "We may earn a commission" mean?',
+        a: 'SnapSpace participates in the Amazon Associates affiliate program. When you purchase a product through a link in our app, we earn a small commission from Amazon. The price you pay is always identical to Amazon\'s listed price — there is no markup from SnapSpace.',
       },
       {
-        q: 'How do I track my order status?',
-        a: 'Open Order History from your profile settings. Each order displays a status badge: Confirmed, Processing, Shipped, or Delivered. Tap any order to expand the full details.',
-      },
-      {
-        q: 'Can I cancel or return an order?',
-        a: 'Orders can be cancelled within 1 hour of placement by contacting support. Returns are accepted within 30 days of delivery for most items. Reach out to our support team via email for assistance.',
-      },
-    ],
-  },
-  {
-    title: 'Account & Settings',
-    items: [
-      {
-        q: 'How do I update my payment method?',
-        a: 'Go to Profile → tap the gear icon → Payment Methods. There you can add new cards, set a default payment method, and update your shipping and billing address.',
-      },
-      {
-        q: 'How do I edit my profile?',
-        a: 'From the Profile tab, tap "Edit Profile" to change your display name, username, bio, profile photo, and banner image.',
-      },
-      {
-        q: 'How do I change my shipping address?',
-        a: 'Go to Profile → gear icon → Payment Methods → scroll to the Shipping Address section. Fill in your details and tap "Save Changes".',
+        q: 'Why do some product prices say "Price may vary"?',
+        a: 'Amazon product prices change frequently. We display the price at the time we last synced our catalog, but the live price on Amazon may differ. Always check Amazon\'s product page for the current price before purchasing.',
       },
     ],
   },
@@ -110,16 +98,62 @@ const FAQ_SECTIONS = [
     title: 'AI & Designs',
     items: [
       {
+        q: 'How do I write a better prompt?',
+        a: 'The best prompts include four things: room type, design style, color palette, and mood. Example: "Scandinavian living room with white oak furniture, cream and sage tones, cozy and minimal feel." Vague prompts like "nice room" give unpredictable results — the more specific you are, the better the output.',
+      },
+      {
         q: 'Why does my AI result look different from what I described?',
-        a: 'AI generation works best with specific, descriptive prompts. Try including style ("Scandinavian", "mid-century modern"), colors ("warm neutrals", "deep blues"), and mood ("cozy", "airy and minimal"). More detail = better results.',
+        a: 'AI generation is creative and interpretive by nature. If the result misses the mark, try being more specific with your style name (e.g. "Wabi-Sabi" instead of "Japanese"), mention specific materials like "linen", "rattan", or "marble", and describe the lighting feel ("warm ambient" vs "bright and airy").',
       },
       {
-        q: 'Can I save designs I like?',
-        a: 'Yes! Tap the heart icon on any design card to like and save it. View all your saved designs in Profile → Liked, or from your settings under Saved Designs.',
+        q: 'Where do my generated designs get saved?',
+        a: 'Every design you generate is automatically saved to My Spaces — accessible from Profile → gear icon → My Spaces. Each saved space shows your photo, your prompt, and the matched products.',
       },
       {
-        q: 'How do I share a design with someone?',
-        a: 'Tap the share icon on any design card. You can share via Messages, AirDrop, or any app on your device. Shared designs also appear in your Profile under the Shared tab.',
+        q: 'Can I like and save designs from the feed?',
+        a: 'Yes. Tap the heart icon on any design card in Home or Explore to like it. All liked designs are accessible from the Liked tab on your Profile page.',
+      },
+      {
+        q: 'How do I share a design?',
+        a: 'Tap the share icon on any design card or room result. You can share via Messages, Instagram, AirDrop, or any app on your device.',
+      },
+    ],
+  },
+  {
+    title: 'Account & Profile',
+    items: [
+      {
+        q: 'How do I edit my profile?',
+        a: 'From the Profile tab, tap "Edit Profile" to update your display name, username, bio, and profile photo.',
+      },
+      {
+        q: 'How do I follow other users?',
+        a: 'Tap any username or profile photo anywhere in the app to visit their profile, then tap "Follow." Your follower and following counts are displayed on your own profile.',
+      },
+      {
+        q: 'How do I manage my saved payment methods?',
+        a: 'Go to Profile → tap the gear icon → Payment Methods. You can add new cards and set a default for future use.',
+      },
+      {
+        q: 'How do I become a Verified Supplier?',
+        a: 'Go to Profile → tap the gear icon → Become a Supplier. Fill out the application form with your business details and our team will review it within 3–5 business days.',
+      },
+    ],
+  },
+  {
+    title: 'Contact & Support',
+    items: [
+      {
+        q: 'How do I contact the SnapSpace team?',
+        a: 'Email us at info@snapspaceios.com. Our team typically responds within 1–2 business days. For the fastest response, include your device model and a brief description of your issue.',
+      },
+      {
+        q: 'How do I request a new feature?',
+        a: 'Go to Profile → tap the gear icon → Request a Feature. Tell us what you\'d love to see in SnapSpace and we\'ll consider it for a future update. We read every submission.',
+      },
+      {
+        q: 'How do I report a bug?',
+        a: 'Email info@snapspaceios.com with a description of what happened, your device model (e.g. iPhone 15 Pro), your iOS version, and a screenshot if possible. This helps us reproduce and fix it quickly.',
       },
     ],
   },
@@ -245,6 +279,19 @@ export default function HelpScreen({ navigation }) {
           ))
         )}
 
+        {/* Contact card */}
+        <View style={styles.contactCard}>
+          <Text style={styles.contactTitle}>Still need help?</Text>
+          <Text style={styles.contactSubtitle}>Our team is here for you. Send us an email and we'll get back to you within 1–2 business days.</Text>
+          <TouchableOpacity
+            style={styles.contactBtn}
+            onPress={() => Linking.openURL('mailto:info@snapspaceios.com?subject=SnapSpace Support')}
+            activeOpacity={0.85}
+          >
+            <Text style={styles.contactBtnText}>Email Support</Text>
+          </TouchableOpacity>
+        </View>
+
         <View style={{ height: 48 }} />
       </ScrollView>
     </View>
@@ -306,7 +353,7 @@ const styles = StyleSheet.create({
   },
   heroSubtitle: {
     fontSize: 14,
-    color: '#888',
+    color: '#67ACE9',
     marginBottom: 18,
   },
   searchBar: {
@@ -394,6 +441,40 @@ const styles = StyleSheet.create({
     height: 1,
     backgroundColor: '#F4F4F6',
     marginHorizontal: 16,
+  },
+
+  // Contact card
+  contactCard: {
+    marginHorizontal: 16,
+    marginTop: 8,
+    backgroundColor: '#F0F6FF',
+    borderRadius: 16,
+    padding: 20,
+    alignItems: 'center',
+  },
+  contactTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#111',
+    marginBottom: 8,
+  },
+  contactSubtitle: {
+    fontSize: 13,
+    color: '#6B7280',
+    textAlign: 'center',
+    lineHeight: 19,
+    marginBottom: 16,
+  },
+  contactBtn: {
+    backgroundColor: '#0B6DC3',
+    borderRadius: 10,
+    paddingHorizontal: 28,
+    paddingVertical: 12,
+  },
+  contactBtnText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '700',
   },
 
   // No results

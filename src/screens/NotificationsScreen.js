@@ -18,7 +18,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const STORAGE_KEY_PREFS = '@snapspace_notif_prefs';
 const STORAGE_KEY_PUSH = '@snapspace_notif_push';
 
-// ── Icons ──────────────────────────────────────────────────────────────────────
+// ── Icons — all accept a `color` prop ─────────────────────────────────────────
 
 function BackIcon() {
   return (
@@ -28,18 +28,18 @@ function BackIcon() {
   );
 }
 
-function BellIcon() {
+function BellIcon({ color = '#999' }) {
   return (
-    <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="#555" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+    <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
       <Path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
       <Path d="M13.73 21a2 2 0 0 1-3.46 0" />
     </Svg>
   );
 }
 
-function CartBellIcon() {
+function CartBellIcon({ color = '#999' }) {
   return (
-    <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="#555" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+    <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
       <Path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
       <Line x1={3} y1={6} x2={21} y2={6} />
       <Path d="M16 10a4 4 0 0 1-8 0" />
@@ -47,17 +47,17 @@ function CartBellIcon() {
   );
 }
 
-function HeartBellIcon() {
+function HeartBellIcon({ color = '#999' }) {
   return (
-    <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="#555" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+    <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
       <Path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
     </Svg>
   );
 }
 
-function AIIcon() {
+function AIIcon({ color = '#999' }) {
   return (
-    <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="#555" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+    <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
       <Path d="M12 2a10 10 0 1 0 10 10" />
       <Path d="M12 8v4l3 3" />
       <Circle cx={18} cy={5} r={3} />
@@ -65,9 +65,9 @@ function AIIcon() {
   );
 }
 
-function UserPlusIcon() {
+function UserPlusIcon({ color = '#999' }) {
   return (
-    <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="#555" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+    <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
       <Path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
       <Circle cx={8.5} cy={7} r={4} />
       <Line x1={20} y1={8} x2={20} y2={14} />
@@ -76,47 +76,47 @@ function UserPlusIcon() {
   );
 }
 
-function PromoIcon() {
+function PromoIcon({ color = '#999' }) {
   return (
-    <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="#555" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+    <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
       <Path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" />
       <Line x1={7} y1={7} x2={7.01} y2={7} />
     </Svg>
   );
 }
 
-function EmailIcon() {
+function EmailIcon({ color = '#999' }) {
   return (
-    <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="#555" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+    <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
       <Path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
       <Polyline points="22,6 12,13 2,6" />
     </Svg>
   );
 }
 
-// ── Data ───────────────────────────────────────────────────────────────────────
+// ── Data — store component reference, not rendered JSX ────────────────────────
 
 const NOTIFICATION_SECTIONS = [
   {
     title: 'Activity',
     items: [
-      { id: 'orders',    label: 'Order Updates',       desc: 'Shipping, delivery, and order status changes', icon: <CartBellIcon />, default: true },
-      { id: 'likes',     label: 'Likes & Reactions',   desc: 'When someone likes your designs or posts',     icon: <HeartBellIcon />, default: true },
-      { id: 'followers', label: 'New Followers',        desc: 'When someone starts following you',           icon: <UserPlusIcon />, default: true },
+      { id: 'orders',     label: 'Order Updates',       desc: 'Shipping, delivery, and order status changes', Icon: CartBellIcon,  default: true  },
+      { id: 'likes',      label: 'Likes & Reactions',   desc: 'When someone likes your designs or posts',     Icon: HeartBellIcon, default: true  },
+      { id: 'followers',  label: 'New Followers',        desc: 'When someone starts following you',           Icon: UserPlusIcon,  default: true  },
     ],
   },
   {
     title: 'AI & Design',
     items: [
-      { id: 'ai_ready',  label: 'AI Generation Ready',  desc: 'When your AI room design is finished',        icon: <AIIcon />, default: true },
-      { id: 'ai_tips',   label: 'Design Tips',          desc: 'Personalized prompts and style suggestions',  icon: <BellIcon />, default: false },
+      { id: 'ai_ready',   label: 'AI Generation Ready', desc: 'When your AI room design is finished',         Icon: AIIcon,        default: true  },
+      { id: 'ai_tips',    label: 'Design Tips',          desc: 'Personalized prompts and style suggestions',  Icon: BellIcon,      default: false },
     ],
   },
   {
     title: 'Promotions',
     items: [
-      { id: 'deals',     label: 'Deals & Offers',       desc: 'Sales and discounts on items in your cart',   icon: <PromoIcon />, default: false },
-      { id: 'newsletter',label: 'SnapSpace Newsletter',  desc: 'Weekly design inspiration and app updates',   icon: <EmailIcon />, default: false },
+      { id: 'deals',      label: 'Deals & Offers',      desc: 'Sales and discounts on items in your cart',   Icon: PromoIcon,     default: false },
+      { id: 'newsletter', label: 'SnapSpace Newsletter', desc: 'Weekly design inspiration and app updates',   Icon: EmailIcon,     default: false },
     ],
   },
 ];
@@ -185,7 +185,7 @@ export default function NotificationsScreen({ navigation }) {
         <View style={styles.masterCard}>
           <View style={styles.masterLeft}>
             <View style={styles.masterIconWrap}>
-              <BellIcon />
+              <BellIcon color={pushEnabled ? colors.bluePrimary : '#BBBBBB'} />
             </View>
             <View>
               <Text style={styles.masterTitle}>Push Notifications</Text>
@@ -205,30 +205,33 @@ export default function NotificationsScreen({ navigation }) {
         {NOTIFICATION_SECTIONS.map((section) => (
           <View key={section.title} style={styles.section}>
             <Text style={styles.sectionLabel}>{section.title.toUpperCase()}</Text>
-            <View style={styles.card}>
-              {section.items.map((item, i) => (
-                <View
-                  key={item.id}
-                  style={[styles.row, i < section.items.length - 1 && styles.rowBorder]}
-                >
-                  <View style={styles.rowIconWrap}>{item.icon}</View>
+            {section.items.map(({ id, label, desc, Icon }) => {
+              const isOn = prefs[id] && pushEnabled;
+              const iconColor = isOn ? colors.bluePrimary : '#BBBBBB';
+              return (
+                <View key={id} style={styles.itemCard}>
+                  <View style={styles.rowIconWrap}>
+                    <Icon color={iconColor} />
+                  </View>
                   <View style={styles.rowContent}>
                     <Text style={[styles.rowLabel, !pushEnabled && styles.rowLabelDisabled]}>
-                      {item.label}
+                      {label}
                     </Text>
-                    <Text style={styles.rowDesc}>{item.desc}</Text>
+                    <Text style={styles.rowDesc} numberOfLines={1} ellipsizeMode="tail">
+                      {desc}
+                    </Text>
                   </View>
                   <Switch
-                    value={prefs[item.id] && pushEnabled}
-                    onValueChange={() => toggle(item.id)}
+                    value={isOn}
+                    onValueChange={() => toggle(id)}
                     disabled={!pushEnabled}
                     trackColor={{ false: '#E5E5E5', true: colors.bluePrimary }}
                     thumbColor="#fff"
                     ios_backgroundColor="#E5E5E5"
                   />
                 </View>
-              ))}
-            </View>
+              );
+            })}
           </View>
         ))}
 
@@ -286,7 +289,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     backgroundColor: '#fff',
-    borderRadius: 18,
+    borderRadius: 10,
     padding: 16,
     marginBottom: 24,
     shadowColor: '#000',
@@ -297,10 +300,8 @@ const styles = StyleSheet.create({
   },
   masterLeft: { flexDirection: 'row', alignItems: 'center', gap: 14, flex: 1 },
   masterIconWrap: {
-    width: 40,
-    height: 40,
-    borderRadius: 12,
-    backgroundColor: '#F4F4F6',
+    width: 36,
+    height: 36,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -308,7 +309,7 @@ const styles = StyleSheet.create({
   masterDesc: { fontSize: 12, color: '#999' },
 
   // Sections
-  section: { marginBottom: 24 },
+  section: { marginBottom: 20 },
   sectionLabel: {
     fontSize: 11,
     fontWeight: '700',
@@ -316,35 +317,30 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
     marginBottom: 10,
   },
-  card: {
-    backgroundColor: '#fff',
-    borderRadius: 18,
-    overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 10,
-    elevation: 2,
-  },
-  row: {
+  itemCard: {
     flexDirection: 'row',
     alignItems: 'center',
+    backgroundColor: '#fff',
+    borderRadius: 10,
     paddingHorizontal: 16,
-    paddingVertical: 14,
+    height: 62,
     gap: 12,
+    marginBottom: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 6,
+    elevation: 1,
   },
-  rowBorder: { borderBottomWidth: 1, borderBottomColor: '#F4F4F6' },
   rowIconWrap: {
     width: 36,
     height: 36,
-    borderRadius: 10,
-    backgroundColor: '#F4F4F6',
     alignItems: 'center',
     justifyContent: 'center',
     flexShrink: 0,
   },
   rowContent: { flex: 1 },
-  rowLabel: { fontSize: 14, fontWeight: '600', color: '#111', marginBottom: 2 },
+  rowLabel: { fontSize: 14, fontWeight: '600', color: '#111', marginBottom: 1 },
   rowLabelDisabled: { color: '#BBBBBB' },
   rowDesc: { fontSize: 12, color: '#999', lineHeight: 16 },
 

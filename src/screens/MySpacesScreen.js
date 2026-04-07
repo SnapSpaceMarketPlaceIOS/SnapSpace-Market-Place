@@ -33,10 +33,9 @@ import { getUserDesigns } from '../services/supabase';
 import { colors } from '../constants/colors';
 
 const { width: SW } = Dimensions.get('window');
-const GRID_PAD = 16;
-const GRID_GAP  = 10;
+const GRID_PAD = 20;
+const GRID_GAP  = 12;
 const THUMB_W   = (SW - GRID_PAD * 2 - GRID_GAP) / 2;
-const THUMB_H   = THUMB_W * 1.2;
 
 // ── Icons ──────────────────────────────────────────────────────────────────────
 
@@ -270,14 +269,15 @@ export default function MySpacesScreen({ navigation }) {
               activeOpacity={0.85}
               onPress={() => setSelected(item)}
             >
-              <CardImage
-                uri={item.image_url}
-                style={s.thumbImg}
-                resizeMode="cover"
-              />
-              {/* Prompt overlay at bottom */}
-              <View style={s.thumbOverlay}>
-                <Text style={s.thumbPrompt} numberOfLines={1}>{item.prompt}</Text>
+              <View style={s.thumbImgContainer}>
+                <CardImage
+                  uri={item.image_url}
+                  style={s.thumbImg}
+                  resizeMode="cover"
+                />
+              </View>
+              <View style={s.thumbPromptBox}>
+                <Text style={s.thumbPrompt} numberOfLines={2}>{item.prompt}</Text>
               </View>
             </TouchableOpacity>
           )}
@@ -320,23 +320,27 @@ const s = StyleSheet.create({
   grid: { padding: GRID_PAD, paddingBottom: 40 },
   thumb: {
     width: THUMB_W,
-    height: THUMB_H,
-    borderRadius: 12,
+  },
+  thumbImgContainer: {
+    width: THUMB_W,
+    height: THUMB_W,
+    borderRadius: 5,
     overflow: 'hidden',
     backgroundColor: '#E5E7EB',
   },
   thumbImg: { width: '100%', height: '100%' },
-  thumbOverlay: {
-    position: 'absolute',
-    bottom: 0, left: 0, right: 0,
-    backgroundColor: 'rgba(0,0,0,0.45)',
+  thumbPromptBox: {
+    backgroundColor: '#F5F6F8',
+    borderRadius: 5,
+    marginTop: 6,
     paddingHorizontal: 10,
     paddingVertical: 8,
   },
   thumbPrompt: {
-    color: '#FFFFFF',
+    color: '#374151',
     fontSize: 12,
     fontWeight: '500',
+    lineHeight: 16,
   },
 
   // ── Detail Modal ──

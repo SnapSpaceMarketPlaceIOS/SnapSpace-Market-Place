@@ -13,8 +13,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Button, Badge, SectionHeader } from '../components/ds';
-import Svg, { Path, Circle, Polyline, Line, Rect, G } from 'react-native-svg';
+import Svg, { Path, Polyline, Line, Rect } from 'react-native-svg';
 import { CardField, useStripe } from '@stripe/stripe-react-native';
 import { colors } from '../constants/colors';
 
@@ -26,14 +25,6 @@ function BackIcon() {
   return (
     <Svg width={24} height={24} viewBox="0 0 24 24" fill="none" stroke="#111" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round">
       <Polyline points="15 18 9 12 15 6" />
-    </Svg>
-  );
-}
-
-function CheckIcon({ color = '#fff', size = 16 }) {
-  return (
-    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
-      <Polyline points="20 6 9 17 4 12" />
     </Svg>
   );
 }
@@ -56,29 +47,19 @@ function TrashIcon() {
   );
 }
 
-function CardIcon({ color = '#fff' }) {
+// EMV chip — gold rectangle with internal contacts
+function ChipIcon() {
   return (
-    <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
-      <Rect x={1} y={4} width={22} height={16} rx={2} ry={2} />
-      <Line x1={1} y1={10} x2={23} y2={10} />
-    </Svg>
-  );
-}
-
-function LocationIcon() {
-  return (
-    <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="#555" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
-      <Path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-      <Circle cx={12} cy={10} r={3} />
-    </Svg>
-  );
-}
-
-function UserIcon() {
-  return (
-    <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="#555" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
-      <Path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-      <Circle cx={12} cy={7} r={4} />
+    <Svg width={42} height={32} viewBox="0 0 42 32" fill="none">
+      <Rect x={0} y={0} width={42} height={32} rx={5} fill="rgba(255,215,0,0.88)" />
+      {/* Vertical dividers */}
+      <Rect x={13} y={0} width={1.5} height={32} fill="rgba(0,0,0,0.12)" />
+      <Rect x={27.5} y={0} width={1.5} height={32} fill="rgba(0,0,0,0.12)" />
+      {/* Horizontal dividers */}
+      <Rect x={0} y={11} width={42} height={1.5} fill="rgba(0,0,0,0.12)" />
+      <Rect x={0} y={19.5} width={42} height={1.5} fill="rgba(0,0,0,0.12)" />
+      {/* Center contact pad */}
+      <Rect x={14.5} y={11} width={13} height={10} rx={1.5} fill="rgba(0,0,0,0.07)" />
     </Svg>
   );
 }
@@ -90,10 +71,10 @@ function maskCardNumber(last4) {
 }
 
 const CARD_BRAND_COLORS = {
-  visa:       { bg: '#1A1F71', accent: '#F7B731' },
-  mastercard: { bg: '#252525', accent: '#EB001B' },
-  amex:       { bg: '#007BC1', accent: '#fff' },
-  default:    { bg: '#2C3E50', accent: '#BDC3C7' },
+  visa:       { bg: '#67ACE9', accent: '#fff' },
+  mastercard: { bg: '#67ACE9', accent: '#fff' },
+  amex:       { bg: '#67ACE9', accent: '#fff' },
+  default:    { bg: '#67ACE9', accent: '#fff' },
 };
 
 // ── Saved Card Component ───────────────────────────────────────────────────────
@@ -104,37 +85,57 @@ function SavedCard({ card, isDefault, onSetDefault, onDelete }) {
 
   return (
     <View style={[styles.savedCard, { backgroundColor: brand.bg }]}>
+      {/* Decorative background circles for card depth */}
+      <View style={styles.cardCircle1} />
+      <View style={styles.cardCircle2} />
+
+      {/* Row 1: Chip + Default badge */}
       <View style={styles.savedCardTop}>
-        <Text style={[styles.savedCardBrand, { color: '#fff' }]}>{brandLabel}</Text>
+        <ChipIcon />
         {isDefault && (
           <View style={styles.defaultBadge}>
             <Text style={styles.defaultBadgeText}>Default</Text>
           </View>
         )}
       </View>
+
+      {/* Row 2: Card number */}
       <Text style={styles.savedCardNumber}>{maskCardNumber(card.last4)}</Text>
+
+      {/* Row 3: Cardholder name */}
+      {!!card.name && (
+        <View style={styles.savedCardNameRow}>
+          <Text style={styles.savedCardNameLabel}>CARDHOLDER NAME</Text>
+          <Text style={styles.savedCardNameValue} numberOfLines={1}>{card.name.toUpperCase()}</Text>
+        </View>
+      )}
+
+      {/* Row 4: Expiry + Brand + Actions */}
       <View style={styles.savedCardBottom}>
         <View>
           <Text style={styles.savedCardExpLabel}>EXPIRES</Text>
           <Text style={styles.savedCardExpValue}>{card.expiry}</Text>
         </View>
-        <View style={styles.savedCardActions}>
-          {!isDefault && (
+        <View style={styles.savedCardBottomRight}>
+          <Text style={styles.savedCardBrandLabel}>{brandLabel.toUpperCase()}</Text>
+          <View style={styles.savedCardActions}>
+            {!isDefault && (
+              <TouchableOpacity
+                style={styles.savedCardActionBtn}
+                onPress={onSetDefault}
+                activeOpacity={0.75}
+              >
+                <Text style={styles.savedCardActionText}>Set Default</Text>
+              </TouchableOpacity>
+            )}
             <TouchableOpacity
-              style={styles.savedCardActionBtn}
-              onPress={onSetDefault}
+              style={[styles.savedCardActionBtn, styles.savedCardDeleteBtn]}
+              onPress={onDelete}
               activeOpacity={0.75}
             >
-              <Text style={styles.savedCardActionText}>Set Default</Text>
+              <TrashIcon />
             </TouchableOpacity>
-          )}
-          <TouchableOpacity
-            style={[styles.savedCardActionBtn, styles.savedCardDeleteBtn]}
-            onPress={onDelete}
-            activeOpacity={0.75}
-          >
-            <TrashIcon />
-          </TouchableOpacity>
+          </View>
         </View>
       </View>
     </View>
@@ -230,36 +231,12 @@ function AddCardForm({ onSave, onCancel }) {
 
 // ── Screen ─────────────────────────────────────────────────────────────────────
 
-const INITIAL_ADDRESS = {
-  fullName: '',
-  street: '',
-  apt: '',
-  city: '',
-  state: '',
-  zip: '',
-  country: 'United States',
-};
-
-const INITIAL_BILLING = {
-  fullName: '',
-  street: '',
-  apt: '',
-  city: '',
-  state: '',
-  zip: '',
-  country: 'United States',
-};
-
 export default function PaymentMethodsScreen({ navigation }) {
   const [savedCards, setSavedCards] = useState([
     { id: '1', last4: '4242', brand: 'visa', expiry: '12/27', name: 'SnapSpace User' },
   ]);
   const [defaultCardId, setDefaultCardId] = useState('1');
   const [showAddCard, setShowAddCard] = useState(false);
-
-  const [shipping, setShipping] = useState(INITIAL_ADDRESS);
-  const [billing, setBilling] = useState(INITIAL_BILLING);
-  const [billingSameAsShipping, setBillingSameAsShipping] = useState(true);
 
   const handleAddCard = (card) => {
     const newCard = { ...card, id: Date.now().toString() };
@@ -277,7 +254,6 @@ export default function PaymentMethodsScreen({ navigation }) {
         onPress: () => {
           setSavedCards((prev) => {
             const remaining = prev.filter((c) => c.id !== id);
-            // Fix stale closure: update defaultCardId inside the updater callback
             setDefaultCardId((currentDefault) => {
               if (currentDefault === id) {
                 return remaining.length > 0 ? remaining[0].id : null;
@@ -289,18 +265,6 @@ export default function PaymentMethodsScreen({ navigation }) {
         },
       },
     ]);
-  };
-
-  const handleSave = () => {
-    Alert.alert('Saved', 'Your payment and shipping details have been updated.');
-  };
-
-  const updateShipping = (field, value) => {
-    setShipping((prev) => ({ ...prev, [field]: value }));
-  };
-
-  const updateBilling = (field, value) => {
-    setBilling((prev) => ({ ...prev, [field]: value }));
   };
 
   return (
@@ -317,7 +281,7 @@ export default function PaymentMethodsScreen({ navigation }) {
           >
             <BackIcon />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Payment & Shipping</Text>
+          <Text style={styles.headerTitle}>Payment Methods</Text>
           <View style={{ width: 40 }} />
         </View>
       </SafeAreaView>
@@ -327,9 +291,7 @@ export default function PaymentMethodsScreen({ navigation }) {
         contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
       >
-
-        {/* ── PAYMENT METHODS ── */}
-        <Text style={styles.sectionTitle}>Payment Methods</Text>
+        <Text style={styles.sectionTitle}>Saved Cards</Text>
 
         {savedCards.map((card) => (
           <SavedCard
@@ -356,195 +318,6 @@ export default function PaymentMethodsScreen({ navigation }) {
             onCancel={() => setShowAddCard(false)}
           />
         )}
-
-        {/* ── SHIPPING ADDRESS ── */}
-        <Text style={[styles.sectionTitle, { marginTop: 32 }]}>Shipping Address</Text>
-        <View style={styles.formCard}>
-
-          <Text style={styles.fieldLabel}>Full Name</Text>
-          <TextInput
-            style={styles.input}
-            value={shipping.fullName}
-            onChangeText={(t) => updateShipping('fullName', t)}
-            placeholder="First and last name"
-            placeholderTextColor="#BBBBC0"
-            autoCapitalize="words"
-          />
-
-          <Text style={styles.fieldLabel}>Street Address</Text>
-          <TextInput
-            style={styles.input}
-            value={shipping.street}
-            onChangeText={(t) => updateShipping('street', t)}
-            placeholder="123 Main St"
-            placeholderTextColor="#BBBBC0"
-          />
-
-          <Text style={styles.fieldLabel}>Apt / Suite / Unit <Text style={styles.optionalLabel}>(optional)</Text></Text>
-          <TextInput
-            style={styles.input}
-            value={shipping.apt}
-            onChangeText={(t) => updateShipping('apt', t)}
-            placeholder="Apt 4B"
-            placeholderTextColor="#BBBBC0"
-          />
-
-          <View style={styles.row}>
-            <View style={{ flex: 1.5, marginRight: 10 }}>
-              <Text style={styles.fieldLabel}>City</Text>
-              <TextInput
-                style={styles.input}
-                value={shipping.city}
-                onChangeText={(t) => updateShipping('city', t)}
-                placeholder="New York"
-                placeholderTextColor="#BBBBC0"
-              />
-            </View>
-            <View style={{ flex: 1 }}>
-              <Text style={styles.fieldLabel}>State</Text>
-              <TextInput
-                style={styles.input}
-                value={shipping.state}
-                onChangeText={(t) => updateShipping('state', t)}
-                placeholder="NY"
-                placeholderTextColor="#BBBBC0"
-                autoCapitalize="characters"
-                maxLength={2}
-              />
-            </View>
-          </View>
-
-          <View style={styles.row}>
-            <View style={{ flex: 1, marginRight: 10 }}>
-              <Text style={styles.fieldLabel}>ZIP Code</Text>
-              <TextInput
-                style={styles.input}
-                value={shipping.zip}
-                onChangeText={(t) => updateShipping('zip', t.replace(/\D/g, '').slice(0, 10))}
-                placeholder="10001"
-                placeholderTextColor="#BBBBC0"
-                keyboardType="numeric"
-              />
-            </View>
-            <View style={{ flex: 1.8 }}>
-              <Text style={styles.fieldLabel}>Country</Text>
-              <TextInput
-                style={styles.input}
-                value={shipping.country}
-                onChangeText={(t) => updateShipping('country', t)}
-                placeholder="United States"
-                placeholderTextColor="#BBBBC0"
-                autoCapitalize="words"
-              />
-            </View>
-          </View>
-        </View>
-
-        {/* ── BILLING DETAILS ── */}
-        <Text style={[styles.sectionTitle, { marginTop: 32 }]}>Billing Details</Text>
-
-        {/* Same as shipping toggle */}
-        <TouchableOpacity
-          style={styles.sameAsRow}
-          onPress={() => setBillingSameAsShipping((v) => !v)}
-          activeOpacity={0.7}
-        >
-          <View style={[styles.checkbox, billingSameAsShipping && styles.checkboxChecked]}>
-            {billingSameAsShipping && <CheckIcon size={12} />}
-          </View>
-          <Text style={styles.sameAsLabel}>Same as shipping address</Text>
-        </TouchableOpacity>
-
-        {!billingSameAsShipping && (
-          <View style={styles.formCard}>
-            <Text style={styles.fieldLabel}>Full Name</Text>
-            <TextInput
-              style={styles.input}
-              value={billing.fullName}
-              onChangeText={(t) => updateBilling('fullName', t)}
-              placeholder="First and last name"
-              placeholderTextColor="#BBBBC0"
-              autoCapitalize="words"
-            />
-
-            <Text style={styles.fieldLabel}>Street Address</Text>
-            <TextInput
-              style={styles.input}
-              value={billing.street}
-              onChangeText={(t) => updateBilling('street', t)}
-              placeholder="123 Main St"
-              placeholderTextColor="#BBBBC0"
-            />
-
-            <Text style={styles.fieldLabel}>Apt / Suite / Unit <Text style={styles.optionalLabel}>(optional)</Text></Text>
-            <TextInput
-              style={styles.input}
-              value={billing.apt}
-              onChangeText={(t) => updateBilling('apt', t)}
-              placeholder="Apt 4B"
-              placeholderTextColor="#BBBBC0"
-            />
-
-            <View style={styles.row}>
-              <View style={{ flex: 1.5, marginRight: 10 }}>
-                <Text style={styles.fieldLabel}>City</Text>
-                <TextInput
-                  style={styles.input}
-                  value={billing.city}
-                  onChangeText={(t) => updateBilling('city', t)}
-                  placeholder="New York"
-                  placeholderTextColor="#BBBBC0"
-                />
-              </View>
-              <View style={{ flex: 1 }}>
-                <Text style={styles.fieldLabel}>State</Text>
-                <TextInput
-                  style={styles.input}
-                  value={billing.state}
-                  onChangeText={(t) => updateBilling('state', t)}
-                  placeholder="NY"
-                  placeholderTextColor="#BBBBC0"
-                  autoCapitalize="characters"
-                  maxLength={2}
-                />
-              </View>
-            </View>
-
-            <View style={styles.row}>
-              <View style={{ flex: 1, marginRight: 10 }}>
-                <Text style={styles.fieldLabel}>ZIP Code</Text>
-                <TextInput
-                  style={styles.input}
-                  value={billing.zip}
-                  onChangeText={(t) => updateBilling('zip', t.replace(/\D/g, '').slice(0, 10))}
-                  placeholder="10001"
-                  placeholderTextColor="#BBBBC0"
-                  keyboardType="numeric"
-                />
-              </View>
-              <View style={{ flex: 1.8 }}>
-                <Text style={styles.fieldLabel}>Country</Text>
-                <TextInput
-                  style={styles.input}
-                  value={billing.country}
-                  onChangeText={(t) => updateBilling('country', t)}
-                  placeholder="United States"
-                  placeholderTextColor="#BBBBC0"
-                  autoCapitalize="words"
-                />
-              </View>
-            </View>
-          </View>
-        )}
-
-        {/* Save button */}
-        <TouchableOpacity
-          style={styles.saveBtn}
-          onPress={handleSave}
-          activeOpacity={0.85}
-        >
-          <Text style={styles.saveBtnText}>Save Changes</Text>
-        </TouchableOpacity>
 
         <View style={{ height: 48 }} />
       </ScrollView>
@@ -604,30 +377,46 @@ const styles = StyleSheet.create({
   // Saved card
   savedCard: {
     borderRadius: 18,
-    padding: 20,
+    padding: 22,
     marginBottom: 12,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.14,
     shadowRadius: 12,
     elevation: 5,
+    overflow: 'hidden',
+    minHeight: 190,
+  },
+  // Decorative background circles
+  cardCircle1: {
+    position: 'absolute',
+    top: -40,
+    right: -40,
+    width: 160,
+    height: 160,
+    borderRadius: 80,
+    backgroundColor: 'rgba(255,255,255,0.06)',
+  },
+  cardCircle2: {
+    position: 'absolute',
+    bottom: -60,
+    right: 40,
+    width: 200,
+    height: 200,
+    borderRadius: 100,
+    backgroundColor: 'rgba(255,255,255,0.04)',
   },
   savedCardTop: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  savedCardBrand: {
-    fontSize: 14,
-    fontWeight: '700',
-    letterSpacing: 0.5,
+    alignItems: 'flex-start',
+    marginBottom: 22,
   },
   defaultBadge: {
     backgroundColor: 'rgba(255,255,255,0.2)',
     borderRadius: 20,
     paddingHorizontal: 10,
-    paddingVertical: 3,
+    paddingVertical: 4,
   },
   defaultBadgeText: {
     color: '#fff',
@@ -635,12 +424,28 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   savedCardNumber: {
-    fontSize: 16,
+    fontSize: 18,
+    fontWeight: '500',
+    color: 'rgba(255,255,255,0.92)',
+    letterSpacing: 3,
+    marginBottom: 16,
+    fontVariant: ['tabular-nums'],
+  },
+  savedCardNameRow: {
+    marginBottom: 16,
+  },
+  savedCardNameLabel: {
+    fontSize: 9,
+    color: 'rgba(255,255,255,0.5)',
+    fontWeight: '600',
+    letterSpacing: 1.2,
+    marginBottom: 2,
+  },
+  savedCardNameValue: {
+    fontSize: 13,
     fontWeight: '600',
     color: 'rgba(255,255,255,0.9)',
-    letterSpacing: 2,
-    marginBottom: 18,
-    fontVariant: ['tabular-nums'],
+    letterSpacing: 0.5,
   },
   savedCardBottom: {
     flexDirection: 'row',
@@ -648,16 +453,27 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
   },
   savedCardExpLabel: {
-    fontSize: 10,
-    color: 'rgba(255,255,255,0.6)',
+    fontSize: 9,
+    color: 'rgba(255,255,255,0.5)',
     fontWeight: '600',
-    letterSpacing: 1,
+    letterSpacing: 1.2,
     marginBottom: 2,
   },
   savedCardExpValue: {
     fontSize: 14,
     fontWeight: '700',
     color: '#fff',
+  },
+  savedCardBottomRight: {
+    alignItems: 'flex-end',
+    gap: 6,
+  },
+  savedCardBrandLabel: {
+    fontSize: 17,
+    fontWeight: '800',
+    color: 'rgba(255,255,255,0.85)',
+    letterSpacing: 1.5,
+    fontStyle: 'italic',
   },
   savedCardActions: {
     flexDirection: 'row',
@@ -689,9 +505,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 18,
     backgroundColor: '#fff',
     borderRadius: 14,
-    borderWidth: 1.5,
-    borderColor: '#E5E5E5',
-    borderStyle: 'dashed',
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
     marginBottom: 4,
   },
   addCardTriggerText: {
@@ -755,20 +570,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
 
-  // Form card
-  formCard: {
-    backgroundColor: '#fff',
-    borderRadius: 18,
-    padding: 18,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 10,
-    elevation: 3,
-    marginBottom: 4,
-  },
-
-  // Inputs
+  // Add card form inputs
   fieldLabel: {
     fontSize: 12,
     fontWeight: '600',
@@ -776,11 +578,6 @@ const styles = StyleSheet.create({
     letterSpacing: 0.3,
     marginBottom: 6,
     marginTop: 12,
-  },
-  optionalLabel: {
-    fontWeight: '400',
-    color: '#BBB',
-    fontSize: 11,
   },
   input: {
     borderWidth: 1.5,
@@ -791,57 +588,5 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: '#111',
     backgroundColor: '#FAFAFA',
-  },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-  },
-
-  // Billing same as shipping
-  sameAsRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    marginBottom: 16,
-    paddingVertical: 4,
-  },
-  checkbox: {
-    width: 22,
-    height: 22,
-    borderRadius: 6,
-    borderWidth: 1.8,
-    borderColor: '#CCC',
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  checkboxChecked: {
-    backgroundColor: colors.bluePrimary,
-    borderColor: colors.bluePrimary,
-  },
-  sameAsLabel: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#333',
-  },
-
-  // Save button
-  saveBtn: {
-    backgroundColor: colors.bluePrimary,
-    borderRadius: 16,
-    height: 56,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 28,
-    shadowColor: colors.bluePrimary,
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.3,
-    shadowRadius: 12,
-    elevation: 6,
-  },
-  saveBtnText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '700',
   },
 });

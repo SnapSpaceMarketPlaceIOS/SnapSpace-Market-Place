@@ -87,7 +87,7 @@ const STATUS_CONFIG = {
   Confirmed:  { bg: '#EFF6FF', text: '#0B6DC3', dot: '#3B82F6' },
   Processing: { bg: '#FFF7ED', text: '#C2410C', dot: '#F97316' },
   Shipped:    { bg: '#F5F3FF', text: '#6D28D9', dot: '#8B5CF6' },
-  Delivered:  { bg: '#F0FDF4', text: '#15803D', dot: '#22C55E' },
+  Delivered:  { bg: 'rgba(103,172,233,0.12)', text: '#0B6DC3', dot: '#67ACE9' },
 };
 
 // ── Sub-components ─────────────────────────────────────────────────────────────
