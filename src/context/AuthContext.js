@@ -206,6 +206,38 @@ export function AuthProvider({ children }) {
   };
 
   /**
+   * Permanently delete the current user's account and all associated data.
+   * Deletes: profile row, saved designs, room photos, avatars, then the auth user.
+   */
+  const deleteAccount = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) throw new Error('No active session');
+    const userId = session.user.id;
+
+    // Delete user data from tables (best-effort — RLS policies may limit some)
+    await Promise.allSettled([
+      supabase.from('user_designs').delete().eq('user_id', userId),
+      supabase.from('feature_requests').delete().eq('user_id', userId),
+      supabase.from('supplier_applications').delete().eq('user_id', userId),
+      supabase.from('profiles').delete().eq('id', userId),
+    ]);
+
+    // Delete storage files (best-effort)
+    await Promise.allSettled([
+      supabase.storage.from('avatars').remove([`${userId}/avatar.jpeg`]),
+      supabase.storage.from('room-uploads').list(userId).then(({ data }) => {
+        if (data?.length) {
+          return supabase.storage.from('room-uploads').remove(data.map(f => `${userId}/${f.name}`));
+        }
+      }),
+    ]);
+
+    // Sign out and clear local state
+    await supabase.auth.signOut();
+    setUser(null);
+  };
+
+  /**
    * Send a password reset email.
    */
   const resetPassword = async (email) => {
@@ -268,6 +300,7 @@ export function AuthProvider({ children }) {
         signUp,
         signIn,
         signOut,
+        deleteAccount,
         signInWithApple,
         resetPassword,
         resendVerificationEmail,

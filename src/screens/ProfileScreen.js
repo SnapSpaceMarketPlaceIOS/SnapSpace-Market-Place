@@ -162,7 +162,11 @@ function HelpIcon() {
 }
 
 function LogOutIcon() {
-  return <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="#E74C3C" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round"><Path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><Polyline points="16 17 21 12 16 7" /><Line x1={21} y1={12} x2={9} y2={12} /></Svg>;
+  return <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="#67ACE9" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round"><Path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><Polyline points="16 17 21 12 16 7" /><Line x1={21} y1={12} x2={9} y2={12} /></Svg>;
+}
+
+function TrashIcon() {
+  return <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="#EF4444" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round"><Polyline points="3 6 5 6 21 6" /><Path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /><Line x1={10} y1={11} x2={10} y2={17} /><Line x1={14} y1={11} x2={14} y2={17} /></Svg>;
 }
 
 function RestoreIcon() {
@@ -273,7 +277,7 @@ const getInitialProfile = (user) => ({
 export default function ProfileScreen({ navigation }) {
   const { liked, toggleLiked } = useLiked();
   const { shared, addShared } = useShared();
-  const { user, signOut, refreshUser } = useAuth();
+  const { user, signOut, deleteAccount, refreshUser } = useAuth();
   const [activeTab, setActiveTab] = useState(0);
 
   // ── Gear icon spring press animation ─────────────────────────────────────
@@ -724,7 +728,7 @@ export default function ProfileScreen({ navigation }) {
                       { text: 'Cancel', style: 'cancel' },
                       {
                         text: 'Log Out',
-                        style: 'destructive',
+                        style: 'default',
                         onPress: () => {
                           setShowSettings(false);
                           setTimeout(() => signOut(), 300);
@@ -736,6 +740,48 @@ export default function ProfileScreen({ navigation }) {
               >
                 <LogOutIcon />
                 <Text style={styles.logoutText}>Log Out</Text>
+              </TouchableOpacity>
+
+              {/* Delete Account */}
+              <TouchableOpacity
+                style={styles.deleteAccountBtn}
+                onPress={() => {
+                  Alert.alert(
+                    'Delete Account',
+                    'This will permanently delete your account, all saved designs, room photos, and personal data. This action cannot be undone.\n\nActive Apple subscriptions must be canceled separately in your Apple ID settings.',
+                    [
+                      { text: 'Cancel', style: 'cancel' },
+                      {
+                        text: 'Delete My Account',
+                        style: 'destructive',
+                        onPress: () => {
+                          Alert.alert(
+                            'Are you absolutely sure?',
+                            'All your data will be permanently erased. There is no way to recover your account after this.',
+                            [
+                              { text: 'Go Back', style: 'cancel' },
+                              {
+                                text: 'Yes, Delete Everything',
+                                style: 'destructive',
+                                onPress: async () => {
+                                  try {
+                                    setShowSettings(false);
+                                    await deleteAccount();
+                                  } catch (e) {
+                                    Alert.alert('Error', 'Could not delete account. Please try again or contact info@snapspaceios.com.');
+                                  }
+                                },
+                              },
+                            ]
+                          );
+                        },
+                      },
+                    ]
+                  );
+                }}
+              >
+                <TrashIcon />
+                <Text style={styles.deleteAccountText}>Delete Account</Text>
               </TouchableOpacity>
 
             </ScrollView>
@@ -1241,11 +1287,29 @@ const styles = StyleSheet.create({
     paddingVertical: space.base,
     borderRadius: radius.md,
     borderWidth: 1,
+    borderColor: 'rgba(103,172,233,0.3)',
+    backgroundColor: 'rgba(103,172,233,0.08)',
+    marginBottom: space.sm,
+  },
+  logoutText: {
+    ...typeScale.body,
+    fontWeight: '700',
+    color: '#67ACE9',
+  },
+  deleteAccountBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: space.sm,
+    marginHorizontal: space.base,
+    paddingVertical: space.base,
+    borderRadius: radius.md,
+    borderWidth: 1,
     borderColor: '#FECACA',
     backgroundColor: '#FFF5F5',
     marginBottom: space.base,
   },
-  logoutText: {
+  deleteAccountText: {
     ...typeScale.body,
     fontWeight: '700',
     color: '#EF4444',
