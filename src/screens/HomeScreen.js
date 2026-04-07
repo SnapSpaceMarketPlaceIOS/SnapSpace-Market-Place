@@ -861,12 +861,11 @@ export default function HomeScreen({ navigation, route }) {
 
   // Scroll-driven parallax
   const scrollY = useRef(new Animated.Value(0)).current;
-  // Parallax: background drifts at ~13% of scroll speed for depth
-  const bgParallax = scrollY.interpolate({
-    inputRange: [0, 600],
-    outputRange: [0, -80],
-    extrapolate: 'clamp',
-  });
+  // Parallax: background drifts at ~25% of scroll speed — memoized for stability
+  const bgParallax = useMemo(
+    () => scrollY.interpolate({ inputRange: [0, 600], outputRange: [0, -150], extrapolate: 'clamp' }),
+    [],
+  );
 
   // ── Personalization ─────────────────────────────────────────────────────────
 
@@ -2188,7 +2187,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     width: width,
-    height: height + 80, // extra 80px so parallax slide never reveals background
+    height: height + 150, // extra 150px so parallax upward drift never reveals background
   },
   heroTint: {
     ...StyleSheet.absoluteFillObject,

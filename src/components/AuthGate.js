@@ -30,7 +30,7 @@ import LensLoader from './LensLoader';
 
 const { width: SCREEN_W } = Dimensions.get('window');
 const HERO_H = 240;
-const HERO_PARALLAX = 60;
+const HERO_PARALLAX = 100;
 const BLUE = '#0B6DC3';
 
 const HERO_IMG = require('../../assets/snap-bg.jpg');
@@ -102,13 +102,24 @@ const iS = StyleSheet.create({
 export default function AuthGate({ title, subtitle, navigation, onSuccess }) {
   const { signUp, signIn, signInWithApple } = useAuth();
 
-  // ── Parallax ──────────────────────────────────────────────────────────────
+  // ── Parallax — memoized so it's stable across re-renders ─────────────────
   const scrollY = React.useRef(new Animated.Value(0)).current;
-  const heroParallax = scrollY.interpolate({
-    inputRange: [0, HERO_H],
-    outputRange: [0, HERO_PARALLAX],
-    extrapolate: 'clamp',
-  });
+  const heroParallax = React.useMemo(
+    () => scrollY.interpolate({ inputRange: [0, HERO_H], outputRange: [0, HERO_PARALLAX], extrapolate: 'clamp' }),
+    [],
+  );
+
+  // ── Button bounce animations ───────────────────────────────────────────────
+  const btnScale   = React.useRef(new Animated.Value(1)).current;
+  const appleScale = React.useRef(new Animated.Value(1)).current;
+  const pressIn  = (anim) => Animated.spring(anim, { toValue: 0.94, useNativeDriver: true, speed: 60, bounciness: 0 }).start();
+  const pressOut = (anim) => Animated.spring(anim, { toValue: 1,    useNativeDriver: true, speed: 18, bounciness: 14 }).start();
+
+  // ── Form slide-up entrance ────────────────────────────────────────────────
+  const formSlideY = React.useRef(new Animated.Value(700)).current;
+  React.useEffect(() => {
+    Animated.spring(formSlideY, { toValue: 0, useNativeDriver: true, speed: 13, bounciness: 4 }).start();
+  }, []);
 
   const [isSignUp, setIsSignUp] = useState(true);
   const [name, setName] = useState('');
@@ -152,6 +163,8 @@ export default function AuthGate({ title, subtitle, navigation, onSuccess }) {
   };
 
   const handleApple = async () => {
+    pressIn(appleScale);
+    setTimeout(() => pressOut(appleScale), 120);
     setLoading(true);
     try {
       await signInWithApple();
@@ -205,7 +218,8 @@ export default function AuthGate({ title, subtitle, navigation, onSuccess }) {
           </View>
         </View>
 
-        {/* ── Form ───────────────────────────────────────────────── */}
+        {/* ── Form — slides up from bottom on mount ──────────────── */}
+        <Animated.View style={{ transform: [{ translateY: formSlideY }] }}>
         <View style={s.formSection}>
           {isSignUp && (
             <>
@@ -258,20 +272,24 @@ export default function AuthGate({ title, subtitle, navigation, onSuccess }) {
           )}
 
           {/* ── CTA Button ── */}
-          <TouchableOpacity
-            style={[s.primaryBtn, loading && { opacity: 0.6 }]}
-            onPress={handleAuth}
-            disabled={loading}
-            activeOpacity={0.85}
-          >
-            {loading ? (
-              <LensLoader size={20} color="#fff" light="#fff" />
-            ) : (
-              <Text style={s.primaryBtnText}>
-                {isSignUp ? 'Create Account' : 'Sign In'}
-              </Text>
-            )}
-          </TouchableOpacity>
+          <Animated.View style={{ transform: [{ scale: btnScale }] }}>
+            <TouchableOpacity
+              style={[s.primaryBtn, loading && { opacity: 0.6 }]}
+              onPress={handleAuth}
+              onPressIn={() => pressIn(btnScale)}
+              onPressOut={() => pressOut(btnScale)}
+              disabled={loading}
+              activeOpacity={1}
+            >
+              {loading ? (
+                <LensLoader size={20} color="#fff" light="#fff" />
+              ) : (
+                <Text style={s.primaryBtnText}>
+                  {isSignUp ? 'Create Account' : 'Sign In'}
+                </Text>
+              )}
+            </TouchableOpacity>
+          </Animated.View>
 
           <View style={s.dividerRow}>
             <View style={s.dividerLine} />
@@ -279,13 +297,15 @@ export default function AuthGate({ title, subtitle, navigation, onSuccess }) {
             <View style={s.dividerLine} />
           </View>
 
-          <AppleAuthentication.AppleAuthenticationButton
-            buttonType={AppleAuthentication.AppleAuthenticationButtonType.SIGN_IN}
-            buttonStyle={AppleAuthentication.AppleAuthenticationButtonStyle.BLACK}
-            cornerRadius={14}
-            style={s.appleBtn}
-            onPress={handleApple}
-          />
+          <Animated.View style={{ transform: [{ scale: appleScale }] }}>
+            <AppleAuthentication.AppleAuthenticationButton
+              buttonType={AppleAuthentication.AppleAuthenticationButtonType.SIGN_IN}
+              buttonStyle={AppleAuthentication.AppleAuthenticationButtonStyle.BLACK}
+              cornerRadius={14}
+              style={s.appleBtn}
+              onPress={handleApple}
+            />
+          </Animated.View>
         </View>
 
         {/* Switch mode */}
@@ -295,6 +315,7 @@ export default function AuthGate({ title, subtitle, navigation, onSuccess }) {
             <Text style={s.switchLink}>{isSignUp ? 'Sign In' : 'Sign Up'}</Text>
           </Text>
         </TouchableOpacity>
+        </Animated.View>
       </Animated.ScrollView>
     </KeyboardAvoidingView>
   );
