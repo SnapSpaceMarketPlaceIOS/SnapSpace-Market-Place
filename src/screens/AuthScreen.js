@@ -9,23 +9,23 @@ import {
   Platform,
   ScrollView,
   Alert,
+  Image,
+  Dimensions,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
+import { LinearGradient } from 'expo-linear-gradient';
 import * as AppleAuthentication from 'expo-apple-authentication';
 import { useAuth } from '../context/AuthContext';
 import LensLoader from '../components/LensLoader';
 import { applyReferralCode } from '../services/subscriptionService';
 
-function AppleIcon() {
-  return (
-    <Svg width={17} height={17} viewBox="0 0 24 24" fill="#000" stroke="none">
-      <Path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z" />
-    </Svg>
-  );
-}
-
+const { width: SCREEN_W } = Dimensions.get('window');
+const HERO_H = 280;
 const BLUE = '#0B6DC3';
+const LIGHT_BLUE = '#67ACE9';
+
+// ── Hero image — same living room used on the landing page ────────────────────
+const HERO_IMG = require('../assets/hero/room1.jpg');
 
 // ── Input Field ───────────────────────────────────────────────────────────────
 
@@ -84,12 +84,12 @@ const inputStyles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#fff',
-    borderRadius: 1,
+    borderRadius: 12,
     paddingHorizontal: 16,
     height: 52,
     marginBottom: 12,
     borderWidth: 1,
-    borderColor: '#DCDCDC',
+    borderColor: '#E5E7EB',
   },
   wrapFocused: { borderColor: BLUE },
   input: { flex: 1, fontSize: 15, color: '#111' },
@@ -156,8 +156,6 @@ export default function AuthScreen({ navigation }) {
         }
       } else {
         await signIn(email, password);
-        // Use reset instead of goBack — goBack silently fails if Auth was
-        // the first screen (cold start), leaving the spinner stuck forever.
         navigation.reset({ index: 0, routes: [{ name: 'Main' }] });
       }
     } catch (err) {
@@ -194,7 +192,7 @@ export default function AuthScreen({ navigation }) {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
+    <View style={styles.root}>
       <KeyboardAvoidingView
         style={styles.flex}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
@@ -205,22 +203,37 @@ export default function AuthScreen({ navigation }) {
           showsVerticalScrollIndicator={false}
           bounces={false}
         >
-          {/* Logo */}
-          <View style={styles.logoSection}>
-            <Text style={styles.wordmark}>SnapSpace</Text>
-            <Text style={styles.tagline}>
-              {isSignUp
-                ? 'Create a free account to save items,\ncheck out, and track your orders.'
-                : 'Sign in to access your profile,\nsaved designs, and order history.'}
-            </Text>
+          {/* ── Hero Image ─────────────────────────────────────────── */}
+          <View style={styles.heroWrap}>
+            <Image source={HERO_IMG} style={styles.heroImg} resizeMode="cover" />
+            {/* Dark gradient overlay for text legibility */}
+            <LinearGradient
+              colors={['rgba(0,0,0,0.15)', 'rgba(0,0,0,0.55)']}
+              style={StyleSheet.absoluteFill}
+            />
+            {/* Branding overlay */}
+            <View style={styles.heroContent}>
+              <Text style={styles.heroWordmark}>SnapSpace</Text>
+              <Text style={styles.heroTagline}>Design your space with SnapSpace MarketPlace</Text>
+            </View>
           </View>
 
-          {/* Form */}
-          <View style={styles.form}>
+          {/* ── Dark Curve Transition ──────────────────────────────── */}
+          <View style={styles.curveWrap}>
+            <Svg width={SCREEN_W} height={50} viewBox={`0 0 ${SCREEN_W} 50`} preserveAspectRatio="none">
+              <Path
+                d={`M0,0 L0,20 Q${SCREEN_W / 2},55 ${SCREEN_W},20 L${SCREEN_W},0 Z`}
+                fill="#1A1A2E"
+              />
+            </Svg>
+          </View>
+
+          {/* ── Form Section ───────────────────────────────────────── */}
+          <View style={styles.formSection}>
             {isSignUp && (
               <>
                 <MinimalInput
-                  placeholder="Full name"
+                  placeholder="Full Name"
                   value={name}
                   onChangeText={setName}
                   autoCapitalize="words"
@@ -256,7 +269,7 @@ export default function AuthScreen({ navigation }) {
             {isSignUp && (
               <>
                 <MinimalInput
-                  placeholder="Confirm password"
+                  placeholder="Confirm Password"
                   value={confirmPassword}
                   onChangeText={setConfirmPassword}
                   secureTextEntry={!showPassword}
@@ -267,7 +280,7 @@ export default function AuthScreen({ navigation }) {
                   <Text style={styles.errorText}>{errors.confirmPassword}</Text>
                 )}
                 <MinimalInput
-                  placeholder="Referral code (optional)"
+                  placeholder="Referral Code (optional)"
                   value={referralCode}
                   onChangeText={(text) => setReferralCode(text.toUpperCase())}
                   autoCapitalize="characters"
@@ -287,19 +300,28 @@ export default function AuthScreen({ navigation }) {
               </TouchableOpacity>
             )}
 
+            {/* ── Gradient CTA Button ── */}
             <TouchableOpacity
-              style={[styles.primaryBtn, loading && styles.primaryBtnDisabled]}
+              style={[styles.primaryBtnWrap, loading && styles.primaryBtnDisabled]}
               onPress={handleAuth}
               disabled={loading}
               activeOpacity={0.85}
             >
-              {loading ? (
-                <LensLoader size={20} color="#fff" light="#fff" />
-              ) : (
-                <Text style={styles.primaryBtnText}>
-                  {isSignUp ? 'Create Account' : 'Sign In'}
-                </Text>
-              )}
+              <LinearGradient
+                colors={['#FFFFFF', LIGHT_BLUE, BLUE]}
+                locations={[0.02, 0.33, 0.77]}
+                start={{ x: 0, y: 0.5 }}
+                end={{ x: 1, y: 0.5 }}
+                style={styles.primaryBtn}
+              >
+                {loading ? (
+                  <LensLoader size={20} color="#fff" light="#fff" />
+                ) : (
+                  <Text style={styles.primaryBtnText}>
+                    {isSignUp ? 'Create Account' : 'Sign In'}
+                  </Text>
+                )}
+              </LinearGradient>
             </TouchableOpacity>
 
             <View style={styles.dividerRow}>
@@ -317,8 +339,6 @@ export default function AuthScreen({ navigation }) {
                 safeSetLoading(true);
                 try {
                   await signInWithApple();
-                  // Use reset (not goBack) — goBack silently fails when Auth
-                  // is the first/only screen in the stack (cold start or deep link).
                   navigation.reset({ index: 0, routes: [{ name: 'Main' }] });
                 } catch (err) {
                   if (err.code !== 'ERR_REQUEST_CANCELED') {
@@ -333,73 +353,99 @@ export default function AuthScreen({ navigation }) {
 
           <TouchableOpacity style={styles.switchBtn} onPress={switchMode} activeOpacity={0.7}>
             <Text style={styles.switchText}>
-              {isSignUp ? 'Already have an account?  ' : "Don't have an account?  "}
-              <Text style={styles.switchLink}>{isSignUp ? 'Sign In' : 'Sign Up'}</Text>
+              {isSignUp ? 'Already have an account?  ' : "Dont have an account?  "}
+              <Text style={styles.switchLink}>{isSignUp ? 'Sign in' : 'Sign Up'}</Text>
             </Text>
           </TouchableOpacity>
         </ScrollView>
       </KeyboardAvoidingView>
-    </SafeAreaView>
+    </View>
   );
 }
 
 // ── Styles ────────────────────────────────────────────────────────────────────
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: '#fff' },
+  root: { flex: 1, backgroundColor: '#fff' },
   flex: { flex: 1 },
   scroll: {
     flexGrow: 1,
-    paddingHorizontal: 24,
-    paddingBottom: 32,
-    justifyContent: 'center',
+    paddingBottom: 40,
   },
 
-  logoSection: {
-    alignItems: 'center',
-    paddingTop: 92,
-    paddingBottom: 32,
+  // ── Hero ──
+  heroWrap: {
+    width: SCREEN_W,
+    height: HERO_H,
+    position: 'relative',
+    overflow: 'hidden',
   },
-  wordmark: {
-    fontSize: 36,
-    fontWeight: '800',
-    color: '#111',
-    letterSpacing: -0.8,
-    marginBottom: 12,
-  },
-  tagline: {
-    fontSize: 15,
-    color: BLUE,
-    fontWeight: '500',
-    textAlign: 'center',
-    lineHeight: 22,
-  },
-
-  form: {
+  heroImg: {
     width: '100%',
-    backgroundColor: '#F5F6F8',
-    borderRadius: 16,
-    padding: 18,
-    marginBottom: 8,
+    height: '100%',
+  },
+  heroContent: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    paddingHorizontal: 28,
+    paddingBottom: 36,
+  },
+  heroWordmark: {
+    fontSize: 38,
+    fontWeight: '800',
+    color: '#fff',
+    letterSpacing: -0.5,
+    marginBottom: 6,
+    textShadowColor: 'rgba(0,0,0,0.3)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 8,
+  },
+  heroTagline: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: 'rgba(255,255,255,0.88)',
+    letterSpacing: 0.2,
+    textShadowColor: 'rgba(0,0,0,0.3)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 4,
   },
 
-  errorText: { fontSize: 12, color: '#E74C3C', marginTop: -8, marginBottom: 10, marginLeft: 2 },
+  // ── Dark Curve ──
+  curveWrap: {
+    width: SCREEN_W,
+    height: 50,
+    marginTop: -1, // seamless overlap with hero bottom
+    backgroundColor: 'transparent',
+  },
+
+  // ── Form ──
+  formSection: {
+    paddingHorizontal: 28,
+    paddingTop: 28,
+  },
+
+  errorText: { fontSize: 12, color: '#E74C3C', marginTop: -8, marginBottom: 10, marginLeft: 4 },
 
   forgotBtn: { alignSelf: 'flex-end', marginBottom: 20, marginTop: -4 },
   forgotText: { fontSize: 13, color: BLUE, fontWeight: '600' },
 
+  primaryBtnWrap: {
+    borderRadius: 14,
+    overflow: 'hidden',
+  },
+  primaryBtnDisabled: { opacity: 0.6 },
   primaryBtn: {
-    backgroundColor: BLUE,
-    borderRadius: 10,
     height: 54,
     alignItems: 'center',
     justifyContent: 'center',
+    borderRadius: 14,
   },
-  primaryBtnDisabled: { opacity: 0.6 },
   primaryBtnText: { color: '#fff', fontSize: 16, fontWeight: '700' },
 
   dividerRow: { flexDirection: 'row', alignItems: 'center', marginVertical: 18, gap: 12 },
-  dividerLine: { flex: 1, height: 1, backgroundColor: '#E0E0E0' },
+  dividerLine: { flex: 1, height: 1, backgroundColor: '#E5E7EB' },
   dividerText: { fontSize: 12, color: '#BBBBBB', fontWeight: '500' },
 
   appleBtn: {
@@ -408,7 +454,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 8,
     backgroundColor: '#000',
-    borderRadius: 10,
+    borderRadius: 14,
     height: 54,
   },
   appleBtnText: { color: '#fff', fontSize: 15, fontWeight: '700' },
