@@ -215,7 +215,7 @@ export default function AuthScreen({ navigation }) {
         style={styles.flex}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
-        <Animated.ScrollView
+        <ScrollView
           contentContainerStyle={styles.scroll}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
@@ -225,11 +225,13 @@ export default function AuthScreen({ navigation }) {
         >
           {/* ── Hero Image ─────────────────────────────────────────── */}
           <View style={styles.heroWrap}>
-            <Animated.Image
-              source={HERO_IMG}
-              style={[styles.heroImg, { transform: [{ translateY: heroParallax }] }]}
-              resizeMode="cover"
-            />
+            <Animated.View style={[styles.heroImg, { transform: [{ translateY: heroParallax }] }]}>
+              <Image
+                source={HERO_IMG}
+                style={{ width: '100%', height: '100%' }}
+                resizeMode="cover"
+              />
+            </Animated.View>
             {/* Dark gradient overlay for text legibility */}
             <LinearGradient
               colors={['rgba(0,0,0,0.15)', 'rgba(0,0,0,0.55)']}
@@ -373,7 +375,7 @@ export default function AuthScreen({ navigation }) {
             </Text>
           </TouchableOpacity>
           </Animated.View>
-        </Animated.ScrollView>
+        </ScrollView>
       </KeyboardAvoidingView>
     </View>
   );

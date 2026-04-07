@@ -189,7 +189,7 @@ export default function AuthGate({ title, subtitle, navigation, onSuccess }) {
       style={s.root}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
-      <Animated.ScrollView
+      <ScrollView
         contentContainerStyle={s.scroll}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
@@ -199,11 +199,13 @@ export default function AuthGate({ title, subtitle, navigation, onSuccess }) {
       >
         {/* ── Hero Image ─────────────────────────────────────────── */}
         <View style={s.heroWrap}>
-          <Animated.Image
-            source={HERO_IMG}
-            style={[s.heroImg, { transform: [{ translateY: heroParallax }] }]}
-            resizeMode="cover"
-          />
+          <Animated.View style={[s.heroImg, { transform: [{ translateY: heroParallax }] }]}>
+            <Image
+              source={HERO_IMG}
+              style={{ width: '100%', height: '100%' }}
+              resizeMode="cover"
+            />
+          </Animated.View>
           <LinearGradient
             colors={['rgba(0,0,0,0.15)', 'rgba(0,0,0,0.55)']}
             style={StyleSheet.absoluteFill}
@@ -312,7 +314,7 @@ export default function AuthGate({ title, subtitle, navigation, onSuccess }) {
           </Text>
         </TouchableOpacity>
         </Animated.View>
-      </Animated.ScrollView>
+      </ScrollView>
     </KeyboardAvoidingView>
   );
 }

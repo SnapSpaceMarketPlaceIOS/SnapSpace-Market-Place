@@ -1436,14 +1436,16 @@ export default function HomeScreen({ navigation, route }) {
   return (
     <TabScreenFade style={styles.container}>
       {/* Parallax hero background */}
-      <Animated.Image
-        source={require('../../assets/snap-bg.jpg')}
-        style={[styles.bgImage, { transform: [{ translateY: bgParallax }] }]}
-        resizeMode="cover"
-      />
+      <Animated.View style={[styles.bgImage, { transform: [{ translateY: bgParallax }] }]}>
+        <Image
+          source={require('../../assets/snap-bg.jpg')}
+          style={{ width: '100%', height: '100%' }}
+          resizeMode="cover"
+        />
+      </Animated.View>
       <View style={styles.heroTint} pointerEvents="none" />
 
-      <Animated.ScrollView
+      <ScrollView
         style={StyleSheet.absoluteFill}
         contentContainerStyle={styles.scrollContent}
         onScroll={(e) => scrollY.setValue(e.nativeEvent.contentOffset.y)}
@@ -1950,7 +1952,7 @@ export default function HomeScreen({ navigation, route }) {
           </View>
         </View>
 
-      </Animated.ScrollView>
+      </ScrollView>
 
       {/* ── Result Popup Modal ─────────────────────────────────────────── */}
       <Modal
