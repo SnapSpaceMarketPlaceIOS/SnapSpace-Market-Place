@@ -1,9 +1,9 @@
 /**
  * AuthGate — inline sign-up / sign-in form embedded directly in Snap, Cart,
- * and Profile screens. Eliminates the dead-end "navigate to Auth" wall.
+ * and Profile screens. Matches the AuthScreen hero + gradient design.
  *
  * Props:
- *   title      {string}  — headline shown above the form
+ *   title      {string}  — headline shown above the form (unused — hero replaces it)
  *   subtitle   {string}  — supporting copy below the headline
  *   navigation {object}  — React Navigation prop (for VerifyEmailSent redirect)
  *   onSuccess  {function} optional — called after successful auth (default: noop)
@@ -19,12 +19,21 @@ import {
   Platform,
   ScrollView,
   Alert,
+  Image,
+  Dimensions,
 } from 'react-native';
+import Svg, { Path } from 'react-native-svg';
+import { LinearGradient } from 'expo-linear-gradient';
 import * as AppleAuthentication from 'expo-apple-authentication';
 import { useAuth } from '../context/AuthContext';
 import LensLoader from './LensLoader';
 
+const { width: SCREEN_W } = Dimensions.get('window');
+const HERO_H = 240;
 const BLUE = '#0B6DC3';
+const LIGHT_BLUE = '#67ACE9';
+
+const HERO_IMG = require('../assets/hero/room1.jpg');
 
 // ── Reusable input ────────────────────────────────────────────────────────────
 
@@ -80,8 +89,8 @@ const iS = StyleSheet.create({
     paddingHorizontal: 16,
     height: 52,
     marginBottom: 12,
-    borderWidth: 1.5,
-    borderColor: '#D7D7D7',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
   },
   wrapFocused: { borderColor: BLUE },
   input: { flex: 1, fontSize: 15, color: '#111' },
@@ -166,18 +175,35 @@ export default function AuthGate({ title, subtitle, navigation, onSuccess }) {
         showsVerticalScrollIndicator={false}
         bounces={false}
       >
-        {/* Wordmark + subtitle */}
-        <View style={s.logoRow}>
-          <Text style={s.wordmark}>SnapSpace</Text>
-          <Text style={s.contextSub}>{subtitle}</Text>
+        {/* ── Hero Image ─────────────────────────────────────────── */}
+        <View style={s.heroWrap}>
+          <Image source={HERO_IMG} style={s.heroImg} resizeMode="cover" />
+          <LinearGradient
+            colors={['rgba(0,0,0,0.15)', 'rgba(0,0,0,0.55)']}
+            style={StyleSheet.absoluteFill}
+          />
+          <View style={s.heroContent}>
+            <Text style={s.heroWordmark}>SnapSpace</Text>
+            <Text style={s.heroTagline}>Design your space with SnapSpace MarketPlace</Text>
+          </View>
         </View>
 
-        {/* Form card */}
-        <View style={s.card}>
+        {/* ── Dark Curve Transition ──────────────────────────────── */}
+        <View style={s.curveWrap}>
+          <Svg width={SCREEN_W} height={50} viewBox={`0 0 ${SCREEN_W} 50`} preserveAspectRatio="none">
+            <Path
+              d={`M0,0 L0,20 Q${SCREEN_W / 2},55 ${SCREEN_W},20 L${SCREEN_W},0 Z`}
+              fill="#1A1A2E"
+            />
+          </Svg>
+        </View>
+
+        {/* ── Form ───────────────────────────────────────────────── */}
+        <View style={s.formSection}>
           {isSignUp && (
             <>
               <MinimalInput
-                placeholder="Full name"
+                placeholder="Full Name"
                 value={name}
                 onChangeText={setName}
                 textContentType="name"
@@ -213,7 +239,7 @@ export default function AuthGate({ title, subtitle, navigation, onSuccess }) {
           {isSignUp && (
             <>
               <MinimalInput
-                placeholder="Confirm password"
+                placeholder="Confirm Password"
                 value={confirmPassword}
                 onChangeText={setConfirmPassword}
                 secureTextEntry={!showPassword}
@@ -224,29 +250,36 @@ export default function AuthGate({ title, subtitle, navigation, onSuccess }) {
             </>
           )}
 
+          {/* ── Gradient CTA Button ── */}
           <TouchableOpacity
-            style={[s.primaryBtn, loading && { opacity: 0.6 }]}
+            style={[s.primaryBtnWrap, loading && { opacity: 0.6 }]}
             onPress={handleAuth}
             disabled={loading}
             activeOpacity={0.85}
           >
-            {loading ? (
-              <LensLoader size={20} color="#fff" light="#fff" />
-            ) : (
-              <Text style={s.primaryBtnText}>
-                {isSignUp ? 'Create Account' : 'Sign In'}
-              </Text>
-            )}
+            <LinearGradient
+              colors={['#FFFFFF', LIGHT_BLUE, BLUE]}
+              locations={[0.02, 0.33, 0.77]}
+              start={{ x: 0, y: 0.5 }}
+              end={{ x: 1, y: 0.5 }}
+              style={s.primaryBtn}
+            >
+              {loading ? (
+                <LensLoader size={20} color="#fff" light="#fff" />
+              ) : (
+                <Text style={s.primaryBtnText}>
+                  {isSignUp ? 'Create Account' : 'Sign In'}
+                </Text>
+              )}
+            </LinearGradient>
           </TouchableOpacity>
 
-          {/* Divider */}
           <View style={s.dividerRow}>
             <View style={s.dividerLine} />
             <Text style={s.dividerText}>or</Text>
             <View style={s.dividerLine} />
           </View>
 
-          {/* Apple */}
           <AppleAuthentication.AppleAuthenticationButton
             buttonType={AppleAuthentication.AppleAuthenticationButtonType.SIGN_IN}
             buttonStyle={AppleAuthentication.AppleAuthenticationButtonStyle.BLACK}
@@ -270,48 +303,85 @@ export default function AuthGate({ title, subtitle, navigation, onSuccess }) {
 
 const s = StyleSheet.create({
   root: { flex: 1, backgroundColor: '#fff' },
-  scroll: { flexGrow: 1, paddingHorizontal: 24, paddingBottom: 40 },
+  scroll: { flexGrow: 1, paddingBottom: 40 },
 
-  logoRow: { alignItems: 'center', paddingTop: 56, marginBottom: 28 },
-  wordmark: { fontSize: 30, fontWeight: '800', color: '#111', letterSpacing: -0.5, marginBottom: 6 },
-  tagline: { fontSize: 13, color: '#ABABAB', fontWeight: '400' },
+  // ── Hero ──
+  heroWrap: {
+    width: SCREEN_W,
+    height: HERO_H,
+    position: 'relative',
+    overflow: 'hidden',
+  },
+  heroImg: {
+    width: '100%',
+    height: '100%',
+  },
+  heroContent: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    paddingHorizontal: 28,
+    paddingBottom: 32,
+  },
+  heroWordmark: {
+    fontSize: 34,
+    fontWeight: '800',
+    color: '#fff',
+    letterSpacing: -0.5,
+    marginBottom: 5,
+    textShadowColor: 'rgba(0,0,0,0.3)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 8,
+  },
+  heroTagline: {
+    fontSize: 13,
+    fontWeight: '500',
+    color: 'rgba(255,255,255,0.88)',
+    letterSpacing: 0.2,
+    textShadowColor: 'rgba(0,0,0,0.3)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 4,
+  },
 
-  contextRow: { alignItems: 'center', marginBottom: 28, paddingHorizontal: 8 },
-  contextTitle: { fontSize: 20, fontWeight: '800', color: '#0F172A', textAlign: 'center', marginBottom: 6 },
-  contextSub: { fontSize: 14, color: BLUE, textAlign: 'center', lineHeight: 20 },
+  // ── Curve ──
+  curveWrap: {
+    width: SCREEN_W,
+    height: 50,
+    marginTop: -1,
+    backgroundColor: 'transparent',
+  },
 
-  card: {
-    backgroundColor: '#FAFAFA',
-    borderRadius: 20,
-    padding: 20,
-    borderWidth: 1,
-    borderColor: 'rgba(0,0,0,0.06)',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.08,
-    shadowRadius: 16,
-    elevation: 4,
+  // ── Form ──
+  formSection: {
+    paddingHorizontal: 24,
+    paddingTop: 24,
   },
 
   err: { fontSize: 12, color: '#E74C3C', marginTop: -8, marginBottom: 10, marginLeft: 4 },
 
-  primaryBtn: {
-    backgroundColor: BLUE,
+  primaryBtnWrap: {
     borderRadius: 14,
+    overflow: 'hidden',
+  },
+  primaryBtn: {
     height: 54,
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 4,
+    borderRadius: 14,
   },
   primaryBtnText: { color: '#fff', fontSize: 16, fontWeight: '700' },
 
   dividerRow: { flexDirection: 'row', alignItems: 'center', marginVertical: 18, gap: 12 },
-  dividerLine: { flex: 1, height: 1, backgroundColor: '#E8E8E8' },
+  dividerLine: { flex: 1, height: 1, backgroundColor: '#E5E7EB' },
   dividerText: { fontSize: 12, color: '#BBBBBB', fontWeight: '500' },
 
-  appleBtn: { height: 54, width: '100%' },
+  appleBtn: {
+    height: 54,
+    borderRadius: 14,
+  },
 
-  switchBtn: { marginTop: 24, alignItems: 'center' },
+  switchBtn: { marginTop: 24, alignItems: 'center', paddingBottom: 8 },
   switchText: { fontSize: 14, color: '#ABABAB' },
   switchLink: { color: BLUE, fontWeight: '700' },
 });
