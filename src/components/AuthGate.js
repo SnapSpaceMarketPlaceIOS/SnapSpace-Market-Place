@@ -92,7 +92,7 @@ const iS = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#E5E7EB',
   },
-  wrapFocused: { borderColor: BLUE },
+  wrapFocused: { borderColor: '#67ACE9' },
   input: { flex: 1, fontSize: 15, color: '#111' },
   toggleText: { fontSize: 13, color: '#ABABAB', fontWeight: '500', marginLeft: 8 },
 });
@@ -102,12 +102,12 @@ const iS = StyleSheet.create({
 export default function AuthGate({ title, subtitle, navigation, onSuccess }) {
   const { signUp, signIn, signInWithApple } = useAuth();
 
-  // ── Parallax — memoized so it's stable across re-renders ─────────────────
-  const scrollY = React.useRef(new Animated.Value(0)).current;
-  const heroParallax = React.useMemo(
-    () => scrollY.interpolate({ inputRange: [0, HERO_H], outputRange: [0, HERO_PARALLAX], extrapolate: 'clamp' }),
-    [],
-  );
+  // ── Parallax — JS listener drives heroScrollY so KAV/native-driver conflicts are avoided
+  const scrollY      = React.useRef(new Animated.Value(0)).current;
+  const heroScrollY  = React.useRef(new Animated.Value(0)).current;
+  const heroParallax = React.useRef(
+    heroScrollY.interpolate({ inputRange: [0, HERO_H], outputRange: [0, HERO_PARALLAX], extrapolate: 'clamp' }),
+  ).current;
 
   // ── Button bounce animations ───────────────────────────────────────────────
   const btnScale   = React.useRef(new Animated.Value(1)).current;
@@ -198,7 +198,10 @@ export default function AuthGate({ title, subtitle, navigation, onSuccess }) {
         scrollEventThrottle={16}
         onScroll={Animated.event(
           [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-          { useNativeDriver: true },
+          {
+            useNativeDriver: true,
+            listener: (e) => heroScrollY.setValue(e.nativeEvent.contentOffset.y),
+          },
         )}
       >
         {/* ── Hero Image ─────────────────────────────────────────── */}

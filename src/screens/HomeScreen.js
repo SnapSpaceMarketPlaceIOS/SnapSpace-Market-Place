@@ -861,11 +861,12 @@ export default function HomeScreen({ navigation, route }) {
 
   // Scroll-driven parallax
   const scrollY = useRef(new Animated.Value(0)).current;
-  // Parallax: background drifts at ~25% of scroll speed — memoized for stability
-  const bgParallax = useMemo(
-    () => scrollY.interpolate({ inputRange: [0, 600], outputRange: [0, -150], extrapolate: 'clamp' }),
-    [],
-  );
+  // bgScrollY is updated by a JS listener so it works regardless of TabScreenFade's
+  // native-driver parent container. Parallax: 50% of scroll speed = unmissable depth.
+  const bgScrollY   = useRef(new Animated.Value(0)).current;
+  const bgParallax  = useRef(
+    bgScrollY.interpolate({ inputRange: [0, 600], outputRange: [0, -300], extrapolate: 'clamp' }),
+  ).current;
 
   // ── Personalization ─────────────────────────────────────────────────────────
 
@@ -1449,7 +1450,11 @@ export default function HomeScreen({ navigation, route }) {
         contentContainerStyle={styles.scrollContent}
         onScroll={Animated.event(
           [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-          { useNativeDriver: true },
+          {
+            useNativeDriver: true,
+            // JS listener keeps bgScrollY in sync for the parallax image transform
+            listener: (e) => bgScrollY.setValue(e.nativeEvent.contentOffset.y),
+          },
         )}
         scrollEventThrottle={16}
         showsVerticalScrollIndicator={false}
@@ -2187,7 +2192,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     width: width,
-    height: height + 150, // extra 150px so parallax upward drift never reveals background
+    height: height + 300, // extra 300px so parallax upward drift never reveals background
   },
   heroTint: {
     ...StyleSheet.absoluteFillObject,
