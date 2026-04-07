@@ -1169,13 +1169,11 @@ const styles = StyleSheet.create({
     marginBottom: 0,
   },
 
-  // Grid
+  // Grid — spacing handled by per-card padding (matches Explore)
   grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    rowGap: 3,
-    columnGap: 3,
-    paddingHorizontal: 2,
+    paddingTop: 4,
   },
   emptyGrid: {
     alignItems: 'center',
