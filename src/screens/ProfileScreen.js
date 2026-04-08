@@ -285,8 +285,8 @@ const ABOUT_ITEMS = [
     action: async () => {
       try {
         await Share.share({
-          title: 'SnapSpace — AI Interior Design',
-          message: `Check out SnapSpace! Design your dream space with AI and shop the look instantly.\n\nDownload it here: ${APP_STORE_URL}`,
+          title: 'HomeGenie — AI Interior Design',
+          message: `Check out HomeGenie! Design your dream space with AI and shop the look instantly.\n\nDownload it here: ${APP_STORE_URL}`,
           url: APP_STORE_URL,
         });
       } catch {
@@ -302,8 +302,8 @@ const ABOUT_ITEMS = [
 // ── Component ─────────────────────────────────────────────────────────────────
 
 const getInitialProfile = (user) => ({
-  displayName: user?.name || 'SnapSpace User',
-  username: user?.username || (user?.email ? user.email.split('@')[0].toLowerCase().replace(/\s/g, '.') : 'snapspace.user'),
+  displayName: user?.name || 'HomeGenie User',
+  username: user?.username || (user?.email ? user.email.split('@')[0].toLowerCase().replace(/\s/g, '.') : 'homegenie.user'),
   bio: user?.bio || 'Building Dream Spaces\nOne Prompt At A Time...',
   avatarUri: user?.avatarUrl || null,
   bannerUri: null,
@@ -813,7 +813,7 @@ export default function ProfileScreen({ navigation }) {
                                     setShowSettings(false);
                                     await deleteAccount();
                                   } catch (e) {
-                                    Alert.alert('Error', 'Could not delete account. Please try again or contact info@snapspaceios.com.');
+                                    Alert.alert('Error', 'Could not delete account. Please try again or contact info@homegenie.app.');
                                   }
                                 },
                               },
@@ -1024,6 +1024,7 @@ const styles = StyleSheet.create({
   avatarInitial: {
     fontSize: fontSize.xl,
     fontWeight: fontWeight.bold,
+    fontFamily: 'KantumruyPro_700Bold',
     color: '#fff',
   },
   avatarImage: {
@@ -1045,6 +1046,7 @@ const styles = StyleSheet.create({
   editProfileBtnText: {
     fontSize: 12,
     fontWeight: '600',
+    fontFamily: 'KantumruyPro_600SemiBold',
     color: '#222',
   },
 
@@ -1057,12 +1059,14 @@ const styles = StyleSheet.create({
   displayName: {
     ...typeScale.title,
     fontWeight: '800',
+    fontFamily: 'KantumruyPro_700Bold',
     color: '#111',
     letterSpacing: letterSpacing.tight,
   },
   // verifiedDot replaced by VerifiedBadge component
   username: {
     ...typeScale.caption,
+    fontFamily: 'KantumruyPro_400Regular',
     color: '#888',
     opacity: 0.44,
     marginBottom: space.sm,
@@ -1070,6 +1074,7 @@ const styles = StyleSheet.create({
   },
   bio: {
     ...typeScale.body,
+    fontFamily: 'KantumruyPro_400Regular',
     color: '#333',
     opacity: 0.72,
     marginBottom: space.md,
@@ -1089,10 +1094,12 @@ const styles = StyleSheet.create({
   followValue: {
     ...typeScale.body,
     fontWeight: '700',
+    fontFamily: 'KantumruyPro_700Bold',
     color: '#111',
   },
   followLabel: {
     ...typeScale.body,
+    fontFamily: 'KantumruyPro_400Regular',
     color: '#888',
     opacity: 0.44,
   },
@@ -1117,6 +1124,7 @@ const styles = StyleSheet.create({
   },
   actionChipLabel: {
     ...typeScale.micro,
+    fontFamily: 'KantumruyPro_600SemiBold',
     color: '#333',
     textTransform: undefined,
   },
@@ -1147,11 +1155,13 @@ const styles = StyleSheet.create({
   tabLabel: {
     ...typeScale.caption,
     fontWeight: '500',
+    fontFamily: 'KantumruyPro_500Medium',
     color: '#A0A0A8',
   },
   tabLabelActive: {
     ...typeScale.caption,
     fontWeight: '700',
+    fontFamily: 'KantumruyPro_700Bold',
     color: '#111',
   },
   tabUnderline: {
@@ -1184,12 +1194,14 @@ const styles = StyleSheet.create({
   emptyGridTitle: {
     fontSize: 17,
     fontWeight: '700',
+    fontFamily: 'KantumruyPro_700Bold',
     color: '#111827',
     marginBottom: 8,
     textAlign: 'center',
   },
   emptyGridSub: {
     fontSize: 14,
+    fontFamily: 'KantumruyPro_400Regular',
     color: '#9CA3AF',
     textAlign: 'center',
     lineHeight: 20,
@@ -1289,11 +1301,13 @@ const styles = StyleSheet.create({
   settingsTitle: {
     ...typeScale.headline,
     fontWeight: '700',
+    fontFamily: 'KantumruyPro_700Bold',
     color: '#111',
     letterSpacing: letterSpacing.tight,
   },
   settingsSectionLabel: {
     ...typeScale.subheadline,
+    fontFamily: 'KantumruyPro_600SemiBold',
     color: '#A0A0A8',
     paddingHorizontal: space.lg,
     paddingTop: space.base,
@@ -1335,10 +1349,12 @@ const styles = StyleSheet.create({
   settingsLabel: {
     ...typeScale.body,
     fontWeight: '500',
+    fontFamily: 'KantumruyPro_500Medium',
     color: '#111',
   },
   settingsValue: {
     ...typeScale.caption,
+    fontFamily: 'KantumruyPro_400Regular',
     color: '#A0A0A8',
     opacity: 0.44,
   },
@@ -1358,6 +1374,7 @@ const styles = StyleSheet.create({
   logoutText: {
     ...typeScale.body,
     fontWeight: '700',
+    fontFamily: 'KantumruyPro_700Bold',
     color: '#67ACE9',
   },
   deleteAccountBtn: {
@@ -1376,10 +1393,12 @@ const styles = StyleSheet.create({
   deleteAccountText: {
     ...typeScale.body,
     fontWeight: '700',
+    fontFamily: 'KantumruyPro_700Bold',
     color: '#EF4444',
   },
   version: {
     ...typeScale.caption,
+    fontFamily: 'KantumruyPro_400Regular',
     textAlign: 'center',
     color: '#BBB',
   },
@@ -1431,11 +1450,13 @@ const styles = StyleSheet.create({
   photoOptionPlaceholder: {
     fontSize: fontSize.lg,
     fontWeight: fontWeight.bold,
+    fontFamily: 'KantumruyPro_700Bold',
     color: '#fff',
   },
   photoOptionLabel: {
     ...typeScale.body,
     fontWeight: '700',
+    fontFamily: 'KantumruyPro_700Bold',
     color: C.primary,
   },
   bannerOptionRow: {
@@ -1458,10 +1479,12 @@ const styles = StyleSheet.create({
   },
   bannerOptionPlaceholderText: {
     ...typeScale.caption,
+    fontFamily: 'KantumruyPro_400Regular',
     color: '#888',
   },
   editProfileLabel: {
     ...typeScale.micro,
+    fontFamily: 'KantumruyPro_600SemiBold',
     color: '#888',
     textTransform: 'uppercase',
     marginBottom: space.sm,
@@ -1469,6 +1492,7 @@ const styles = StyleSheet.create({
   },
   editProfileInput: {
     ...typeScale.body,
+    fontFamily: 'KantumruyPro_400Regular',
     borderWidth: 1,
     borderColor: 'rgba(0,0,0,0.08)',
     borderRadius: radius.md,
@@ -1490,6 +1514,7 @@ const styles = StyleSheet.create({
     ...typeScale.body,
     color: '#888',
     fontWeight: '500',
+    fontFamily: 'KantumruyPro_500Medium',
   },
   usernameInput: {
     flex: 1,
@@ -1512,6 +1537,7 @@ const styles = StyleSheet.create({
   saveProfileBtnText: {
     ...typeScale.button,
     fontWeight: '700',
+    fontFamily: 'KantumruyPro_700Bold',
     color: '#fff',
   },
 
@@ -1544,11 +1570,13 @@ const styles = StyleSheet.create({
   dashboardCtaTitle: {
     ...typeScale.caption,
     fontWeight: '700',
+    fontFamily: 'KantumruyPro_700Bold',
     color: '#fff',
     marginBottom: 2,
   },
   dashboardCtaSubtitle: {
     ...typeScale.micro,
+    fontFamily: 'KantumruyPro_600SemiBold',
     textTransform: undefined,
     color: 'rgba(255,255,255,0.7)',
   },
@@ -1585,11 +1613,13 @@ const styles = StyleSheet.create({
   supplierCtaTitle: {
     ...typeScale.caption,
     fontWeight: '700',
+    fontFamily: 'KantumruyPro_700Bold',
     color: '#1E3A5F',
     marginBottom: 2,
   },
   supplierCtaSubtitle: {
     ...typeScale.micro,
+    fontFamily: 'KantumruyPro_600SemiBold',
     textTransform: undefined,
     color: '#3B82F6',
   },
@@ -1602,6 +1632,7 @@ const styles = StyleSheet.create({
   },
   supplierCtaBtnText: {
     ...typeScale.button,
+    fontFamily: 'KantumruyPro_600SemiBold',
     color: '#fff',
   },
 });

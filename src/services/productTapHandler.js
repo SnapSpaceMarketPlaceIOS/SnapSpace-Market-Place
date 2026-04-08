@@ -3,7 +3,7 @@ import { trackEvent } from './trackingService';
 import { getAffiliateUrl } from './affiliateProducts';
 
 /**
- * ProductTapHandler — the function that pays SnapSpace.
+ * ProductTapHandler — the function that pays HomeGenie.
  *
  * Called by EVERY "Shop Now" / "Buy on Amazon" button in the entire app:
  *   Home (Deal of the Day, New Arrivals, Picked For You)

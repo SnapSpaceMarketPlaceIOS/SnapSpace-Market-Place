@@ -25,7 +25,7 @@ const SECTIONS = [
   // ═══ TOP — What users care about ═══
   {
     title: '1. Introduction',
-    body: `SnapSpace ("we," "us," or "our") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, retain, and safeguard your personal information when you use the SnapSpace mobile application ("App").
+    body: `HomeGenie ("we," "us," or "our") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, retain, and safeguard your personal information when you use the HomeGenie mobile application ("App").
 
 This policy is written in plain language wherever possible. By creating an account or using the App, you consent to the data practices described in this policy. If you do not agree, please do not use the App.
 
@@ -37,7 +37,7 @@ This Privacy Policy applies to all users of the App, including consumers, Verifi
 
 1. Your room photo is uploaded to our secure cloud storage (Supabase Storage) and transmitted over encrypted connections (TLS/SSL)
 2. Your photo and prompt are sent to third-party AI model providers (Replicate, Inc. and/or Black Forest Labs GmbH) for image generation
-3. The AI-generated result is returned to you and saved to your SnapSpace account
+3. The AI-generated result is returned to you and saved to your HomeGenie account
 4. Your original room photos are stored in our cloud storage for the purpose of displaying them in your "My Spaces" history
 
 Data Protection Commitments:
@@ -50,7 +50,7 @@ We do not analyze, scan, or process your room photos for any purpose other than 
   },
   {
     title: '3. Camera and Photo Library Access',
-    body: `SnapSpace requests access to your device's camera and photo library for the following purposes only:
+    body: `HomeGenie requests access to your device's camera and photo library for the following purposes only:
 
 • Camera: To capture room photos for AI design generation
 • Photo Library: To select existing room photos for AI design generation and to upload a profile photo
@@ -69,9 +69,9 @@ Photos captured or selected are:
 • Activity notifications (likes, follows, order updates) — on by default
 • AI Generation Ready — on by default
 • Design Tips and Promotions — off by default (opt-in only)
-• SnapSpace Newsletter — off by default (opt-in only)
+• HomeGenie Newsletter — off by default (opt-in only)
 
-You can manage these preferences at any time in the App (Profile → Settings → Notifications) or by disabling notifications for SnapSpace in your device's system settings.
+You can manage these preferences at any time in the App (Profile → Settings → Notifications) or by disabling notifications for HomeGenie in your device's system settings.
 
 We use Expo's push notification service to deliver notifications. Your device's push token is stored in our database and is invalidated when you sign out or delete your account.`,
   },
@@ -181,7 +181,7 @@ We require all service providers to:
   },
   {
     title: '9. Affiliate Links and Product Data',
-    body: `SnapSpace participates in the Amazon Associates Program and may participate in other affiliate programs. When you interact with product listings in the App:
+    body: `HomeGenie participates in the Amazon Associates Program and may participate in other affiliate programs. When you interact with product listings in the App:
 
 • Product names, images, prices, and descriptions displayed in the App are sourced from our internal product catalog and may not reflect real-time pricing
 • Tapping "Buy on Amazon" or similar links redirects you to Amazon's website or app, where Amazon's privacy policy governs
@@ -214,7 +214,7 @@ After Account Deletion:
 All Users:
 • Access — Request a copy of the personal information we hold about you
 • Correction — Request correction of inaccurate or incomplete data
-• Deletion — Delete your account and all associated data from within the App (Profile → Settings → Delete Account) or by emailing info@snapspaceios.com
+• Deletion — Delete your account and all associated data from within the App (Profile → Settings → Delete Account) or by emailing info@homegenie.app
 • Portability — Request your data in a commonly used, machine-readable format
 • Notification Opt-Out — Manage push notification preferences in the App or via your device settings
 • Marketing Opt-Out — Unsubscribe from promotional communications at any time
@@ -222,7 +222,7 @@ All Users:
 California Residents (CCPA/CPRA):
 • Right to know what personal information we collect and how it is used
 • Right to request deletion of your personal information
-• Right to opt out of the sale of personal information — SnapSpace does not sell your personal information
+• Right to opt out of the sale of personal information — HomeGenie does not sell your personal information
 • Right to non-discrimination for exercising your privacy rights
 • You may designate an authorized agent to make requests on your behalf
 
@@ -231,15 +231,15 @@ European Economic Area / UK Residents (GDPR):
 • Legal basis for processing: performance of a contract (providing the App), legitimate interests (improving the App), and consent (notifications, marketing)
 • You may lodge a complaint with your local data protection authority
 
-To exercise any of these rights, contact us at info@snapspaceios.com. We will verify your identity and respond to your request within 30 days (45 days if an extension is needed, with notice).`,
+To exercise any of these rights, contact us at info@homegenie.app. We will verify your identity and respond to your request within 30 days (45 days if an extension is needed, with notice).`,
   },
   {
     title: '12. Children\'s Privacy',
-    body: `SnapSpace is not directed to children under the age of 13. We do not knowingly collect, use, or disclose personal information from children under 13.
+    body: `HomeGenie is not directed to children under the age of 13. We do not knowingly collect, use, or disclose personal information from children under 13.
 
 If we discover that we have collected personal information from a child under 13 without verified parental consent, we will promptly delete that information and terminate the associated account.
 
-If you are a parent or guardian and believe your child under 13 has provided us with personal information, please contact us immediately at info@snapspaceios.com and we will take appropriate action.
+If you are a parent or guardian and believe your child under 13 has provided us with personal information, please contact us immediately at info@homegenie.app and we will take appropriate action.
 
 Users between 13 and 17 years of age may use the App only with the consent and supervision of a parent or legal guardian.`,
   },
@@ -259,7 +259,7 @@ Despite these measures, no method of electronic transmission or storage is 100% 
   },
   {
     title: '14. Do Not Track',
-    body: `SnapSpace does not currently respond to "Do Not Track" (DNT) browser signals. However, we do not engage in cross-app tracking or behavioral advertising. We do not share your data with advertising networks or data brokers.`,
+    body: `HomeGenie does not currently respond to "Do Not Track" (DNT) browser signals. However, we do not engage in cross-app tracking or behavioral advertising. We do not share your data with advertising networks or data brokers.`,
   },
   {
     title: '15. International Data Transfers',
@@ -287,10 +287,10 @@ We encourage you to review this Privacy Policy periodically to stay informed abo
   // ═══ BOTTOM — Actionable, user-friendly ═══
   {
     title: '17. Account Deletion',
-    body: `You can delete your SnapSpace account at any time:
+    body: `You can delete your HomeGenie account at any time:
 
 In-App: Profile → Settings → Delete Account
-By Email: Send a request to info@snapspaceios.com with the subject "Account Deletion Request"
+By Email: Send a request to info@homegenie.app with the subject "Account Deletion Request"
 
 When you delete your account:
 • Your profile, username, bio, and avatar are permanently deleted
@@ -309,9 +309,9 @@ Important:
     title: '18. Contact Us',
     body: `If you have any questions, concerns, or requests regarding this Privacy Policy or our data practices, please contact us:
 
-SnapSpace
-Email: info@snapspaceios.com
-Website: www.snapspaceios.com
+HomeGenie
+Email: info@homegenie.app
+Website: www.homegenie.app
 
 For privacy-specific inquiries, please include "Privacy Inquiry" in the subject line.
 
@@ -342,7 +342,7 @@ export default function PrivacyPolicyScreen({ navigation }) {
         <Text style={styles.lastUpdated}>Last updated: April 6, 2026</Text>
 
         <Text style={styles.intro}>
-          Your privacy matters to us. This policy explains exactly what data SnapSpace collects, why we collect it, who we share it with, and how we protect it — written in plain language.
+          Your privacy matters to us. This policy explains exactly what data HomeGenie collects, why we collect it, who we share it with, and how we protect it — written in plain language.
         </Text>
 
         {SECTIONS.map((section) => (
@@ -353,7 +353,7 @@ export default function PrivacyPolicyScreen({ navigation }) {
         ))}
 
         <View style={styles.footer}>
-          <Text style={styles.footerText}>© 2026 SnapSpace. All rights reserved.</Text>
+          <Text style={styles.footerText}>© 2026 HomeGenie. All rights reserved.</Text>
         </View>
 
         <View style={{ height: 48 }} />
@@ -386,6 +386,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 17,
     fontWeight: '800',
+    fontFamily: 'KantumruyPro_700Bold',
     color: '#111',
     letterSpacing: -0.3,
   },
@@ -396,10 +397,12 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#AAA',
     fontWeight: '500',
+    fontFamily: 'KantumruyPro_500Medium',
     marginBottom: 16,
   },
   intro: {
     fontSize: 14,
+    fontFamily: 'KantumruyPro_400Regular',
     color: '#555',
     lineHeight: 22,
     marginBottom: 28,
@@ -414,6 +417,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 15,
     fontWeight: '800',
+    fontFamily: 'KantumruyPro_700Bold',
     color: '#111',
     letterSpacing: -0.2,
     marginBottom: 10,
@@ -423,6 +427,7 @@ const styles = StyleSheet.create({
     color: '#555',
     lineHeight: 23,
     fontWeight: '400',
+    fontFamily: 'KantumruyPro_400Regular',
   },
 
   footer: {
@@ -432,5 +437,5 @@ const styles = StyleSheet.create({
     marginTop: 8,
     alignItems: 'center',
   },
-  footerText: { fontSize: 12, color: '#BBB' },
+  footerText: { fontSize: 12, color: '#BBB', fontFamily: 'KantumruyPro_400Regular'},
 });

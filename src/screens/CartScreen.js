@@ -13,7 +13,6 @@ import {
 import CardImage from '../components/CardImage';
 import LensLoader from '../components/LensLoader';
 import Svg, { Path, Circle, Line, Polyline, Rect } from 'react-native-svg';
-import { useStripe } from '@stripe/stripe-react-native';
 import theme from '../constants/theme';
 import { typeScale } from '../constants/tokens';
 import { useCart } from '../context/CartContext';
@@ -241,7 +240,6 @@ export default function CartScreen({ navigation }) {
   const { user }                              = useAuth();
   const { items, removeFromCart, updateQuantity, subtotal, clearCart } = useCart();
   const { addOrder }                          = useOrderHistory();
-  const { initPaymentSheet, presentPaymentSheet } = useStripe();
   const [checkingOut, setCheckingOut]         = useState(false);
 
   const shipping   = items.length > 0 ? 29 : 0;
@@ -257,7 +255,7 @@ export default function CartScreen({ navigation }) {
     const amazonItems = items.filter((i) => i.source === 'amazon');
     if (amazonItems.length === items.length && items.length > 0) {
       // Amazon multi-cart URL: adds ALL items to the user's Amazon cart in one tap
-      // Format: /gp/aws/cart/add.html?ASIN.1=XXX&Quantity.1=1&ASIN.2=YYY&Quantity.2=2&tag=snapspace20-20
+      // Format: /gp/aws/cart/add.html?ASIN.1=XXX&Quantity.1=1&ASIN.2=YYY&Quantity.2=2&tag=snapspacemkt-20
       const AFFILIATE_TAG = 'snapspace20-20';
       const itemsWithAsin = amazonItems.filter((i) => i.asin);
 
@@ -280,46 +278,12 @@ export default function CartScreen({ navigation }) {
       return;
     }
 
-    // SnapSpace marketplace checkout (Stripe) for non-affiliate items
-    setCheckingOut(true);
-    try {
-      const { data, error: fnError } = await supabase.functions.invoke('create-payment-intent', {
-        body: { amount: total },
-      });
-      if (fnError) throw new Error(fnError.message);
-
-      const { clientSecret, ephemeralKey, customerId } = data;
-
-      const { error: initError } = await initPaymentSheet({
-        merchantDisplayName: 'SnapSpace',
-        customerId,
-        customerEphemeralKeySecret: ephemeralKey,
-        paymentIntentClientSecret: clientSecret,
-        allowsDelayedPaymentMethods: false,
-        defaultBillingDetails: { name: '' },
-      });
-      if (initError) throw new Error(initError.message);
-
-      const { error: presentError } = await presentPaymentSheet();
-      if (presentError) {
-        if (presentError.code !== 'Canceled') {
-          Alert.alert('Payment failed', presentError.message);
-        }
-        return;
-      }
-
-      addOrder({ items: [...items], subtotal, shipping, total });
-      clearCart();
-      Alert.alert(
-        'Order Confirmed!',
-        'Your payment was successful. View your order in Order History from your profile.',
-        [{ text: 'OK' }]
-      );
-    } catch (err) {
-      Alert.alert('Checkout error', err.message || 'Something went wrong. Please try again.');
-    } finally {
-      setCheckingOut(false);
-    }
+    // Non-Amazon items — not currently supported
+    Alert.alert(
+      'Amazon Only',
+      'At this time, checkout is supported for Amazon items only. Non-Amazon items coming soon.',
+      [{ text: 'OK' }]
+    );
   }, [checkingOut, total, items, subtotal, shipping]);
 
   // ── Guest gate ───────────────────────────────────────────────────────────────
@@ -561,6 +525,7 @@ const styles = StyleSheet.create({
   pageTitle: {
     ...typeScale.display,
     fontWeight: '800',              // slightly heavier than display for screen title
+    fontFamily: 'KantumruyPro_700Bold',
     color: C.textPrimary,
   },
   cartCountBadge: {
@@ -574,11 +539,13 @@ const styles = StyleSheet.create({
   },
   cartCountText: {
     ...typeScale.micro,
+    fontFamily: 'KantumruyPro_600SemiBold',
     color: C.white,
     textTransform: undefined,
   },
   subtitle: {
     ...typeScale.caption,
+    fontFamily: 'KantumruyPro_400Regular',
     color: C.primary,
     marginTop: 4,
   },
@@ -626,6 +593,7 @@ const styles = StyleSheet.create({
   itemName: {
     fontSize: 14,
     fontWeight: '500',
+    fontFamily: 'KantumruyPro_500Medium',
     lineHeight: 19,
     color: C.textPrimary,
     flex: 1,
@@ -648,6 +616,7 @@ const styles = StyleSheet.create({
   sellerName: {
     fontSize: 11,
     fontWeight: '600',
+    fontFamily: 'KantumruyPro_600SemiBold',
     lineHeight: 14,
     color: C.primary,
   },
@@ -665,6 +634,7 @@ const styles = StyleSheet.create({
   },
   inStockText: {
     ...typeScale.micro,
+    fontFamily: 'KantumruyPro_600SemiBold',
     color: C.success,
     textTransform: undefined,
   },
@@ -677,14 +647,17 @@ const styles = StyleSheet.create({
   ratingScore: {
     ...typeScale.caption,
     fontWeight: '600',
+    fontFamily: 'KantumruyPro_600SemiBold',
     color: C.textPrimary,
   },
   ratingCount: {
     ...typeScale.caption,
+    fontFamily: 'KantumruyPro_400Regular',
     color: C.textSecondary,
   },
   shippingText: {
     ...typeScale.caption,
+    fontFamily: 'KantumruyPro_400Regular',
     color: C.textSecondary,
   },
   priceQtyRow: {
@@ -695,6 +668,7 @@ const styles = StyleSheet.create({
   },
   price: {
     ...typeScale.price,             // 16px / 700 — bold but compact
+    fontFamily: 'KantumruyPro_700Bold',
     color: C.textPrimary,
     fontVariant: ['tabular-nums'],
   },
@@ -716,6 +690,7 @@ const styles = StyleSheet.create({
   qtyText: {
     fontSize: 13,
     fontWeight: '700',
+    fontFamily: 'KantumruyPro_700Bold',
     color: C.textPrimary,
     minWidth: 22,
     textAlign: 'center',
@@ -742,10 +717,12 @@ const styles = StyleSheet.create({
   summaryTitle: {
     ...typeScale.headline,
     fontWeight: '700',
+    fontFamily: 'KantumruyPro_700Bold',
     color: C.textPrimary,
   },
   summaryDate: {
     ...typeScale.caption,
+    fontFamily: 'KantumruyPro_400Regular',
     color: C.textSecondary,
   },
   solidDivider: {
@@ -761,15 +738,18 @@ const styles = StyleSheet.create({
   },
   summaryLabel: {
     ...typeScale.body,
+    fontFamily: 'KantumruyPro_400Regular',
     color: C.textSecondary,
   },
   summaryValue: {
     ...typeScale.body,
     fontWeight: '600',
+    fontFamily: 'KantumruyPro_600SemiBold',
     color: C.textPrimary,
   },
   summaryMuted: {
     ...typeScale.caption,
+    fontFamily: 'KantumruyPro_400Regular',
     fontStyle: 'italic',
     color: C.textTertiary,
   },
@@ -781,11 +761,13 @@ const styles = StyleSheet.create({
   totalLabel: {
     ...typeScale.headline,
     fontWeight: '700',
+    fontFamily: 'KantumruyPro_700Bold',
     color: C.textPrimary,
   },
   totalValue: {
     ...typeScale.display,
     fontWeight: '800',
+    fontFamily: 'KantumruyPro_700Bold',
     color: C.textPrimary,
     fontVariant: ['tabular-nums'],
   },
@@ -798,14 +780,17 @@ const styles = StyleSheet.create({
     ...typeScale.caption,
     color: C.primary,
     fontWeight: '500',
+    fontFamily: 'KantumruyPro_500Medium',
   },
   trustTextMuted: {
     ...typeScale.caption,
+    fontFamily: 'KantumruyPro_400Regular',
     color: C.textTertiary,
   },
 
   ftcDisclosure: {
     fontSize: 11,
+    fontFamily: 'KantumruyPro_400Regular',
     fontStyle: 'italic',
     color: C.textTertiary,
     textAlign: 'center',
@@ -857,6 +842,7 @@ const styles = StyleSheet.create({
   },
   checkoutLabel: {
     ...typeScale.button,
+    fontFamily: 'KantumruyPro_600SemiBold',
     color: C.white,
   },
   checkoutDivider: {
@@ -867,6 +853,7 @@ const styles = StyleSheet.create({
   checkoutPrice: {
     ...typeScale.button,
     fontWeight: '800',
+    fontFamily: 'KantumruyPro_700Bold',
     color: C.white,
     fontVariant: ['tabular-nums'],
   },
@@ -881,12 +868,14 @@ const styles = StyleSheet.create({
   },
   emptyTitle: {
     ...typeScale.title,
+    fontFamily: 'KantumruyPro_700Bold',
     color: C.textPrimary,
     marginTop: SP[5],
     marginBottom: SP[2],
   },
   emptySubtitle: {
     ...typeScale.body,
+    fontFamily: 'KantumruyPro_400Regular',
     color: C.textSecondary,
     textAlign: 'center',
     maxWidth: 260,
@@ -906,6 +895,7 @@ const styles = StyleSheet.create({
   },
   emptyBtnText: {
     ...typeScale.button,
+    fontFamily: 'KantumruyPro_600SemiBold',
     color: C.white,
   },
 });

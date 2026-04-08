@@ -130,7 +130,7 @@ function SpaceDetailModal({ design, visible, onClose, navigation }) {
 
   const handleShare = async () => {
     try {
-      await Share.share({ message: `Check out my AI room design on SnapSpace: "${design?.prompt}"` });
+      await Share.share({ message: `Check out my AI room design on HomeGenie: "${design?.prompt}"` });
     } catch (e) {}
   };
 
@@ -310,11 +310,11 @@ const s = StyleSheet.create({
     borderBottomColor: 'rgba(0,0,0,0.06)',
   },
   backBtn: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center' },
-  headerTitle: { fontSize: 17, fontWeight: '700', color: '#111' },
+  headerTitle: { fontSize: 17, fontWeight: '700', color: '#111', fontFamily: 'KantumruyPro_700Bold'},
 
   center: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 40 },
-  emptyTitle: { fontSize: 18, fontWeight: '700', color: '#111', marginBottom: 8, textAlign: 'center' },
-  emptySubtitle: { fontSize: 14, color: '#9CA3AF', textAlign: 'center', lineHeight: 20 },
+  emptyTitle: { fontSize: 18, fontWeight: '700', color: '#111', marginBottom: 8, textAlign: 'center', fontFamily: 'KantumruyPro_700Bold'},
+  emptySubtitle: { fontSize: 14, color: '#9CA3AF', textAlign: 'center', lineHeight: 20, fontFamily: 'KantumruyPro_400Regular'},
 
   // ── Grid ──
   grid: { padding: GRID_PAD, paddingBottom: 40 },
@@ -340,6 +340,7 @@ const s = StyleSheet.create({
     color: '#374151',
     fontSize: 12,
     fontWeight: '500',
+    fontFamily: 'KantumruyPro_500Medium',
     lineHeight: 16,
   },
 
@@ -366,6 +367,7 @@ const s = StyleSheet.create({
     flex: 1,
     fontSize: 15,
     fontWeight: '600',
+    fontFamily: 'KantumruyPro_600SemiBold',
     color: '#111',
     textAlign: 'center',
     marginHorizontal: 8,
@@ -388,6 +390,7 @@ const s = StyleSheet.create({
   promptLabel: {
     fontSize: 11,
     fontWeight: '600',
+    fontFamily: 'KantumruyPro_600SemiBold',
     color: '#9CA3AF',
     letterSpacing: 1,
     textTransform: 'uppercase',
@@ -397,6 +400,7 @@ const s = StyleSheet.create({
   promptText: {
     fontSize: 16,
     fontWeight: '500',
+    fontFamily: 'KantumruyPro_500Medium',
     color: '#111827',
     lineHeight: 22,
     marginTop: 6,
@@ -416,12 +420,14 @@ const s = StyleSheet.create({
   shopTitle: {
     fontSize: 13,
     fontWeight: '700',
+    fontFamily: 'KantumruyPro_700Bold',
     color: '#9CA3AF',
     letterSpacing: 1.5,
     textTransform: 'uppercase',
   },
   shopSubtitle: {
     fontSize: 13,
+    fontFamily: 'KantumruyPro_400Regular',
     color: '#67ACE9',
     marginTop: 3,
   },
@@ -433,6 +439,7 @@ const s = StyleSheet.create({
   },
   ftc: {
     fontSize: 11,
+    fontFamily: 'KantumruyPro_400Regular',
     color: '#9CA3AF',
     fontStyle: 'italic',
     textAlign: 'center',
@@ -462,12 +469,14 @@ const s = StyleSheet.create({
   hCardName: {
     fontSize: 13,
     fontWeight: '600',
+    fontFamily: 'KantumruyPro_600SemiBold',
     color: '#111',
     lineHeight: 17,
   },
   hCardBrand: {
     fontSize: 11,
     fontWeight: '400',
+    fontFamily: 'KantumruyPro_400Regular',
     color: '#9CA3AF',
     marginTop: 1,
   },
@@ -480,16 +489,19 @@ const s = StyleSheet.create({
   hCardRatingText: {
     fontSize: 10,
     fontWeight: '600',
+    fontFamily: 'KantumruyPro_600SemiBold',
     color: '#111',
     marginLeft: 2,
   },
   hCardReviews: {
     fontSize: 10,
+    fontFamily: 'KantumruyPro_400Regular',
     color: '#6B7280',
   },
   hCardPrice: {
     fontSize: 14,
     fontWeight: '700',
+    fontFamily: 'KantumruyPro_700Bold',
     color: colors.bluePrimary,
     marginTop: 4,
   },

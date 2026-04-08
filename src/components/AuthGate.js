@@ -102,11 +102,8 @@ const iS = StyleSheet.create({
 export default function AuthGate({ title, subtitle, navigation, onSuccess }) {
   const { signUp, signIn, signInWithApple } = useAuth();
 
-  // ── Parallax — plain JS setValue, no native driver needed
-  const heroScrollY  = React.useRef(new Animated.Value(0)).current;
-  const heroParallax = React.useRef(
-    heroScrollY.interpolate({ inputRange: [0, HERO_H], outputRange: [0, HERO_PARALLAX], extrapolate: 'clamp' }),
-  ).current;
+  // ── Parallax — native driver for smooth 60fps
+  const heroScrollY = React.useRef(new Animated.Value(0)).current;
 
   // ── Button bounce animations ───────────────────────────────────────────────
   const btnScale   = React.useRef(new Animated.Value(1)).current;
@@ -189,17 +186,28 @@ export default function AuthGate({ title, subtitle, navigation, onSuccess }) {
       style={s.root}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
-      <ScrollView
+      <Animated.ScrollView
         contentContainerStyle={s.scroll}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
         bounces={false}
         scrollEventThrottle={16}
-        onScroll={(e) => heroScrollY.setValue(e.nativeEvent.contentOffset.y)}
+        onScroll={Animated.event(
+          [{ nativeEvent: { contentOffset: { y: heroScrollY } } }],
+          { useNativeDriver: true },
+        )}
       >
         {/* ── Hero Image ─────────────────────────────────────────── */}
         <View style={s.heroWrap}>
-          <Animated.View style={[s.heroImg, { transform: [{ translateY: heroParallax }] }]}>
+          <Animated.View style={[s.heroImg, {
+            transform: [{
+              translateY: heroScrollY.interpolate({
+                inputRange: [0, HERO_H],
+                outputRange: [0, HERO_PARALLAX],
+                extrapolate: 'clamp',
+              }),
+            }],
+          }]}>
             <Image
               source={HERO_IMG}
               style={{ width: '100%', height: '100%' }}
@@ -211,8 +219,8 @@ export default function AuthGate({ title, subtitle, navigation, onSuccess }) {
             style={StyleSheet.absoluteFill}
           />
           <View style={s.heroContent}>
-            <Text style={s.heroWordmark}>SnapSpace</Text>
-            <Text style={s.heroTagline}>Design your space with SnapSpace MarketPlace</Text>
+            <Text style={s.heroWordmark}>HomeGenie</Text>
+            <Text style={s.heroTagline}>Design your space with HomeGenie MarketPlace</Text>
           </View>
         </View>
 
@@ -314,7 +322,7 @@ export default function AuthGate({ title, subtitle, navigation, onSuccess }) {
           </Text>
         </TouchableOpacity>
         </Animated.View>
-      </ScrollView>
+      </Animated.ScrollView>
     </KeyboardAvoidingView>
   );
 }

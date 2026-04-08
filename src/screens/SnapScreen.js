@@ -85,11 +85,11 @@ export default function SnapScreen({ navigation }) {
   if (!permission.granted) {
     return (
       <View style={[s.container, { justifyContent: 'center', alignItems: 'center', gap: 16 }]}>
-        <Text style={{ color: '#fff', fontSize: 16, textAlign: 'center', paddingHorizontal: 32 }}>
+        <Text style={{ color: '#fff', fontSize: 16, textAlign: 'center', paddingHorizontal: 32, fontFamily: 'KantumruyPro_400Regular' }}>
           Camera access is required to snap your room.
         </Text>
         <TouchableOpacity style={s.permBtn} onPress={requestPermission}>
-          <Text style={{ color: '#fff', fontWeight: '700' }}>Grant Access</Text>
+          <Text style={{ color: '#fff', fontWeight: '700', fontFamily: 'KantumruyPro_700Bold' }}>Grant Access</Text>
         </TouchableOpacity>
       </View>
     );
@@ -181,7 +181,7 @@ const s = StyleSheet.create({
     paddingHorizontal: 32,
   },
   galleryBtn: { width: 70, alignItems: 'center', gap: 4 },
-  galleryLabel: { color: 'rgba(255,255,255,0.8)', fontSize: 11, fontWeight: '500' },
+  galleryLabel: { color: 'rgba(255,255,255,0.8)', fontSize: 11, fontWeight: '500', fontFamily: 'KantumruyPro_500Medium'},
   shutter: {
     width: 72, height: 72, borderRadius: 36,
     borderWidth: 4, borderColor: '#fff',

@@ -1,5 +1,5 @@
 /**
- * LensLoader — SnapSpace's signature camera-lens loading animation.
+ * LensLoader — HomeGenie's signature camera-lens loading animation.
  *
  * Replaces ActivityIndicator everywhere.
  *

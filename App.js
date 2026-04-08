@@ -1,6 +1,13 @@
 import React, { useRef, useCallback } from 'react';
 import { View, Text, StyleSheet, Animated, Pressable } from 'react-native';
-import { StripeProvider } from '@stripe/stripe-react-native';
+import { useFonts } from 'expo-font';
+import {
+  KantumruyPro_400Regular,
+  KantumruyPro_500Medium,
+  KantumruyPro_600SemiBold,
+  KantumruyPro_700Bold,
+} from '@expo-google-fonts/kantumruy-pro';
+
 import { NavigationContainer } from '@react-navigation/native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import LensLoader from './src/components/LensLoader';
@@ -182,6 +189,7 @@ function TabNavigator() {
         tabBarLabelStyle: {
           fontSize: 10,
           fontWeight: '500',
+          fontFamily: 'KantumruyPro_500Medium',
           marginTop: 2,
         },
         tabBarItemStyle: {
@@ -257,7 +265,7 @@ function RootNavigator() {
   if (loading) {
     return (
       <View style={styles.loadingScreen}>
-        <Text style={styles.loadingWordmark}>SnapSpace</Text>
+        <Text style={styles.loadingWordmark}>HomeGenie</Text>
         <LensLoader size={48} style={{ marginTop: 24 }} />
       </View>
     );
@@ -298,26 +306,42 @@ function RootNavigator() {
 }
 
 export default function App() {
+  const [fontsLoaded] = useFonts({
+    KantumruyPro_400Regular,
+    KantumruyPro_500Medium,
+    KantumruyPro_600SemiBold,
+    KantumruyPro_700Bold,
+  });
+
+  if (!fontsLoaded) {
+    return (
+      <View style={styles.loadingScreen}>
+        <Text style={{ fontSize: 32, fontWeight: '800', color: '#111827', letterSpacing: -0.6 }}>
+          HomeGenie
+        </Text>
+        <LensLoader size={48} style={{ marginTop: 24 }} />
+      </View>
+    );
+  }
+
   return (
-    <StripeProvider publishableKey={process.env.EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY}>
-      <SafeAreaProvider>
-        <AuthProvider>
-          <SubscriptionProvider>
-          <CartProvider>
-            <OrderHistoryProvider>
-              <LikedProvider>
-                <SharedProvider>
-                  <NavigationContainer>
-                    <RootNavigator />
-                  </NavigationContainer>
-                </SharedProvider>
-              </LikedProvider>
-            </OrderHistoryProvider>
-          </CartProvider>
-          </SubscriptionProvider>
-        </AuthProvider>
-      </SafeAreaProvider>
-    </StripeProvider>
+    <SafeAreaProvider>
+      <AuthProvider>
+        <SubscriptionProvider>
+        <CartProvider>
+          <OrderHistoryProvider>
+            <LikedProvider>
+              <SharedProvider>
+                <NavigationContainer>
+                  <RootNavigator />
+                </NavigationContainer>
+              </SharedProvider>
+            </LikedProvider>
+          </OrderHistoryProvider>
+        </CartProvider>
+        </SubscriptionProvider>
+      </AuthProvider>
+    </SafeAreaProvider>
   );
 }
 
@@ -349,6 +373,7 @@ const styles = StyleSheet.create({
     color: C.white,
     fontSize: 9,
     fontWeight: fontWeight.bold,
+    fontFamily: 'KantumruyPro_700Bold',
   },
   loadingScreen: {
     flex: 1,
@@ -361,5 +386,6 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     color: C.textPrimary,
     letterSpacing: -0.6,
+    fontFamily: 'KantumruyPro_700Bold',
   },
 });

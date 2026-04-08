@@ -245,7 +245,7 @@ export default function SupplierOnboardingScreen({ navigation }) {
                   onChangeText={setSlug}
                   placeholder="acme-home-goods"
                   autoCapitalize="none"
-                  hint="snapspace.com/store/your-slug — lowercase letters, numbers and hyphens only."
+                  hint="homegenie.app/store/your-slug — lowercase letters, numbers and hyphens only."
                   required
                 />
                 <Field
@@ -295,7 +295,7 @@ export default function SupplierOnboardingScreen({ navigation }) {
                 <View style={styles.doneCard}>
                   {[
                     { label: 'Store Name', value: storeName },
-                    { label: 'URL', value: `snapspace.com/store/${slug}` },
+                    { label: 'URL', value: `homegenie.app/store/${slug}` },
                     { label: 'Tagline', value: tagline || 'Not set' },
                   ].map(r => (
                     <View key={r.label} style={styles.doneRow}>
@@ -355,7 +355,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20, paddingVertical: 14,
     borderBottomWidth: 1, borderBottomColor: 'rgba(0,0,0,0.06)',
   },
-  headerTitle: { fontSize: 17, fontWeight: '700', color: '#111', letterSpacing: -0.2 },
+  headerTitle: { fontSize: 17, fontWeight: '700', color: '#111', letterSpacing: -0.2, fontFamily: 'KantumruyPro_700Bold'},
   progressSection: { alignItems: 'center', paddingVertical: 16, paddingHorizontal: 32 },
   progressWrap: { flexDirection: 'row', alignItems: 'center', width: '100%', maxWidth: 240, marginBottom: 8 },
   dot: {
@@ -365,25 +365,26 @@ const styles = StyleSheet.create({
   },
   dotActive: { backgroundColor: BLUE, borderColor: BLUE },
   dotDone: { backgroundColor: '#16A34A', borderColor: '#16A34A' },
-  dotNum: { fontSize: 12, fontWeight: '700', color: '#94A3B8' },
+  dotNum: { fontSize: 12, fontWeight: '700', color: '#94A3B8', fontFamily: 'KantumruyPro_700Bold'},
   dotNumActive: { color: '#fff' },
   line: { flex: 1, height: 2, backgroundColor: '#E2E8F0' },
   lineDone: { backgroundColor: '#16A34A' },
-  stepLabel: { fontSize: 12, color: '#94A3B8', fontWeight: '600' },
+  stepLabel: { fontSize: 12, color: '#94A3B8', fontWeight: '600', fontFamily: 'KantumruyPro_600SemiBold'},
   scroll: { paddingHorizontal: 20, paddingTop: 20, paddingBottom: 16 },
   heroRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 14, marginBottom: 28 },
   heroIcon: {
     width: 60, height: 60, borderRadius: 16,
     backgroundColor: '#EFF6FF', alignItems: 'center', justifyContent: 'center',
   },
-  stepTitle: { fontSize: 20, fontWeight: '800', color: '#111', letterSpacing: -0.4, marginBottom: 4 },
-  stepSubtitle: { fontSize: 13, color: '#6B7280', lineHeight: 19 },
+  stepTitle: { fontSize: 20, fontWeight: '800', color: '#111', letterSpacing: -0.4, marginBottom: 4, fontFamily: 'KantumruyPro_700Bold'},
+  stepSubtitle: { fontSize: 13, color: '#6B7280', lineHeight: 19, fontFamily: 'KantumruyPro_400Regular'},
   field: { marginBottom: 18 },
-  fieldLabel: { fontSize: 13, fontWeight: '700', color: '#374151', marginBottom: 6 },
-  fieldHint: { fontSize: 11, color: '#9CA3AF', marginBottom: 6, marginTop: -2 },
+  fieldLabel: { fontSize: 13, fontWeight: '700', color: '#374151', marginBottom: 6, fontFamily: 'KantumruyPro_700Bold'},
+  fieldHint: { fontSize: 11, color: '#9CA3AF', marginBottom: 6, marginTop: -2, fontFamily: 'KantumruyPro_400Regular'},
   input: {
     borderWidth: 1.5, borderColor: '#E5E7EB', borderRadius: 12,
     paddingHorizontal: 14, paddingVertical: 12, fontSize: 15, color: '#111', backgroundColor: '#FAFAFA',
+    fontFamily: 'KantumruyPro_400Regular',
   },
   inputFocused: { borderColor: BLUE, backgroundColor: '#fff' },
   inputMulti: { minHeight: 100, textAlignVertical: 'top' },
@@ -392,8 +393,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#F9FAFB', borderRadius: 12,
     padding: 14, marginTop: 4, borderWidth: 1, borderColor: '#E5E7EB',
   },
-  payoutTitle: { fontSize: 13, fontWeight: '700', color: '#374151', marginBottom: 2 },
-  payoutBody: { fontSize: 12, color: '#9CA3AF', lineHeight: 17 },
+  payoutTitle: { fontSize: 13, fontWeight: '700', color: '#374151', marginBottom: 2, fontFamily: 'KantumruyPro_700Bold'},
+  payoutBody: { fontSize: 12, color: '#9CA3AF', lineHeight: 17, fontFamily: 'KantumruyPro_400Regular'},
   doneSection: { gap: 12 },
   doneCard: {
     backgroundColor: '#F9FAFB', borderRadius: 14,
@@ -404,16 +405,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16, paddingVertical: 12,
     borderBottomWidth: 1, borderBottomColor: '#F3F4F6',
   },
-  doneLabel: { fontSize: 13, color: '#9CA3AF', fontWeight: '600' },
-  doneValue: { fontSize: 13, color: '#111', fontWeight: '600', flex: 1, textAlign: 'right' },
+  doneLabel: { fontSize: 13, color: '#9CA3AF', fontWeight: '600', fontFamily: 'KantumruyPro_600SemiBold'},
+  doneValue: { fontSize: 13, color: '#111', fontWeight: '600', flex: 1, textAlign: 'right', fontFamily: 'KantumruyPro_600SemiBold'},
   tipsCard: {
     backgroundColor: '#EFF6FF', borderRadius: 14,
     padding: 16, borderWidth: 1, borderColor: '#BFDBFE',
   },
-  tipsTitle: { fontSize: 13, fontWeight: '700', color: '#1E3A5F', marginBottom: 10 },
+  tipsTitle: { fontSize: 13, fontWeight: '700', color: '#1E3A5F', marginBottom: 10, fontFamily: 'KantumruyPro_700Bold'},
   tipRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 8, marginBottom: 8 },
   tipDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: BLUE_DARK, marginTop: 6 },
-  tipText: { fontSize: 13, color: '#374151', flex: 1, lineHeight: 19 },
+  tipText: { fontSize: 13, color: '#374151', flex: 1, lineHeight: 19, fontFamily: 'KantumruyPro_400Regular'},
   bottomBar: {
     paddingHorizontal: 20, paddingVertical: 14,
     borderTopWidth: 1, borderTopColor: 'rgba(0,0,0,0.06)', backgroundColor: '#fff',
@@ -422,5 +423,5 @@ const styles = StyleSheet.create({
     backgroundColor: BLUE_DARK, borderRadius: 14, height: 56,
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8,
   },
-  nextBtnText: { color: '#fff', fontSize: 16, fontWeight: '700' },
+  nextBtnText: { color: '#fff', fontSize: 16, fontWeight: '700', fontFamily: 'KantumruyPro_700Bold'},
 });

@@ -25,13 +25,13 @@ const SECTIONS = [
   // ═══ TOP — What users care about ═══
   {
     title: '1. Acceptance of Terms',
-    body: `By downloading, installing, or using the SnapSpace mobile application ("App"), you agree to be bound by these Terms of Use ("Terms"). If you do not agree to these Terms, do not use the App.
+    body: `By downloading, installing, or using the HomeGenie mobile application ("App"), you agree to be bound by these Terms of Use ("Terms"). If you do not agree to these Terms, do not use the App.
 
-These Terms constitute a legally binding agreement between you and SnapSpace ("we," "us," or "our"). We reserve the right to update these Terms at any time by posting the revised version within the App and updating the "Last updated" date. Continued use of the App after changes are posted constitutes your acceptance of the revised Terms. If a change is material, we will notify you via in-app notification or email before it takes effect.`,
+These Terms constitute a legally binding agreement between you and HomeGenie ("we," "us," or "our"). We reserve the right to update these Terms at any time by posting the revised version within the App and updating the "Last updated" date. Continued use of the App after changes are posted constitutes your acceptance of the revised Terms. If a change is material, we will notify you via in-app notification or email before it takes effect.`,
   },
   {
     title: '2. Description of the App',
-    body: `SnapSpace is an AI-powered interior design application that allows users to:
+    body: `HomeGenie is an AI-powered interior design application that allows users to:
 
 • Photograph or upload images of rooms and interior spaces
 • Write text prompts describing a desired design style
@@ -42,7 +42,7 @@ These Terms constitute a legally binding agreement between you and SnapSpace ("w
 • Save designs, follow other users, and interact with shared content
 • Apply to become a Verified Supplier on the marketplace
 
-SnapSpace is intended for personal, non-commercial use unless you have been approved as a Verified Supplier.`,
+HomeGenie is intended for personal, non-commercial use unless you have been approved as a Verified Supplier.`,
   },
   {
     title: '3. Eligibility',
@@ -58,14 +58,14 @@ You agree to:
 
 • Provide accurate, current, and complete information during registration
 • Maintain the security and confidentiality of your login credentials
-• Notify us immediately at info@snapspaceios.com of any unauthorized use of your account
+• Notify us immediately at info@homegenie.app of any unauthorized use of your account
 • Accept sole responsibility for all activity that occurs under your account
 
 We reserve the right to suspend or terminate accounts that violate these Terms, remain inactive for an extended period, or are reasonably suspected of fraudulent activity.`,
   },
   {
     title: '5. Subscriptions and In-App Purchases',
-    body: `SnapSpace offers the following paid features, all processed exclusively through Apple's In-App Purchase system:
+    body: `HomeGenie offers the following paid features, all processed exclusively through Apple's In-App Purchase system:
 
 Auto-Renewable Subscriptions
 
@@ -89,7 +89,7 @@ All prices are in USD and may vary by region. Prices are subject to change, but 
   },
   {
     title: '6. AI-Generated Content',
-    body: `SnapSpace uses third-party AI models — including models hosted by Replicate, Inc. and Black Forest Labs — to generate room design imagery based on your photos and text prompts.
+    body: `HomeGenie uses third-party AI models — including models hosted by Replicate, Inc. and Black Forest Labs — to generate room design imagery based on your photos and text prompts.
 
 By using the AI generation feature, you acknowledge and agree that:
 
@@ -97,14 +97,14 @@ By using the AI generation feature, you acknowledge and agree that:
 • Results are creative and interpretive — they may not match your exact description
 • Generated images do not constitute professional interior design, architectural, or structural advice
 • You should not rely on AI-generated designs for construction, renovation, or safety-critical decisions
-• You grant SnapSpace a limited, non-exclusive license to process your uploaded photos and prompts solely to deliver the AI generation service and to save completed designs to your account
+• You grant HomeGenie a limited, non-exclusive license to process your uploaded photos and prompts solely to deliver the AI generation service and to save completed designs to your account
 • We may use anonymized, non-identifiable usage data (such as prompt categories and generation counts) to improve our service, but we will not use your personal photos or specific prompts for AI model training without your explicit opt-in consent
 
 Ownership: You retain ownership of your original room photos. AI-generated designs are provided to you for personal use. Because AI-generated content may not be eligible for copyright protection in all jurisdictions, we do not claim ownership of and make no guarantee regarding the copyrightability of AI-generated images.`,
   },
   {
     title: '7. Push Notifications',
-    body: `With your permission, SnapSpace may send push notifications to your device regarding:
+    body: `With your permission, HomeGenie may send push notifications to your device regarding:
 
 • AI generation status updates (when your design is ready)
 • New likes, follows, and reactions on your content
@@ -117,7 +117,7 @@ You can manage notification preferences within the App (Profile → Settings →
   // ═══ MIDDLE — Dense compliance ═══
   {
     title: '8. User-Generated Content',
-    body: `When you post, upload, share, or publicly display content on SnapSpace — including design posts, profile information, prompts, comments, and any other materials — you grant SnapSpace a worldwide, non-exclusive, royalty-free, sublicensable, and transferable license to use, reproduce, display, distribute, and create derivative works of that content solely in connection with operating, promoting, and improving the App.
+    body: `When you post, upload, share, or publicly display content on HomeGenie — including design posts, profile information, prompts, comments, and any other materials — you grant HomeGenie a worldwide, non-exclusive, royalty-free, sublicensable, and transferable license to use, reproduce, display, distribute, and create derivative works of that content solely in connection with operating, promoting, and improving the App.
 
 You represent and warrant that:
 
@@ -132,18 +132,18 @@ You may delete your own content at any time. Upon deletion, we will make commerc
   },
   {
     title: '9. Affiliate Commerce and Third-Party Purchases',
-    body: `SnapSpace participates in the Amazon Associates Program and may participate in other affiliate programs (including but not limited to CJ Affiliate and ShareASale). When you tap a product link within the App, you are redirected to the third-party retailer's website or app (e.g., Amazon) where you complete your purchase directly with that retailer.
+    body: `HomeGenie participates in the Amazon Associates Program and may participate in other affiliate programs (including but not limited to CJ Affiliate and ShareASale). When you tap a product link within the App, you are redirected to the third-party retailer's website or app (e.g., Amazon) where you complete your purchase directly with that retailer.
 
 You acknowledge and agree that:
 
-• SnapSpace earns a small referral commission from qualifying purchases at no additional cost to you
-• SnapSpace is not a seller, retailer, or merchant — we do not sell, ship, or fulfill any physical products
+• HomeGenie earns a small referral commission from qualifying purchases at no additional cost to you
+• HomeGenie is not a seller, retailer, or merchant — we do not sell, ship, or fulfill any physical products
 • Product prices displayed in the App are approximate and may differ from the live price on the retailer's website — always verify the price before purchasing
 • All order fulfillment, shipping, returns, refunds, warranties, and customer service for physical products are handled exclusively by the third-party retailer
-• SnapSpace is not responsible or liable for the quality, safety, legality, or availability of any products purchased through affiliate links
+• HomeGenie is not responsible or liable for the quality, safety, legality, or availability of any products purchased through affiliate links
 • Product listings and availability may change without notice
 
-FTC Disclosure: In accordance with the Federal Trade Commission's Guidelines Concerning the Use of Endorsements and Testimonials in Advertising, SnapSpace discloses that we may earn a commission when you buy through links on this app.`,
+FTC Disclosure: In accordance with the Federal Trade Commission's Guidelines Concerning the Use of Endorsements and Testimonials in Advertising, HomeGenie discloses that we may earn a commission when you buy through links on this app.`,
   },
   {
     title: '10. Prohibited Conduct',
@@ -165,28 +165,28 @@ Violation of these restrictions may result in immediate account suspension or pe
   },
   {
     title: '11. Supplier Marketplace',
-    body: `SnapSpace allows approved sellers ("Verified Suppliers") to list and sell products through the marketplace. If you apply to become a Verified Supplier, additional terms apply:
+    body: `HomeGenie allows approved sellers ("Verified Suppliers") to list and sell products through the marketplace. If you apply to become a Verified Supplier, additional terms apply:
 
 • You must submit a complete and truthful supplier application
-• Approval is at SnapSpace's sole discretion and may take 3–5 business days
+• Approval is at HomeGenie's sole discretion and may take 3–5 business days
 • Approved suppliers must comply with all applicable laws, including consumer protection, product safety, and tax regulations
-• SnapSpace reserves the right to revoke supplier status, remove product listings, or suspend supplier accounts for violations of these Terms or marketplace policies
+• HomeGenie reserves the right to revoke supplier status, remove product listings, or suspend supplier accounts for violations of these Terms or marketplace policies
 • Product listings must be accurate, not misleading, and must not infringe on third-party intellectual property rights
-• SnapSpace is not responsible for disputes between suppliers and buyers`,
+• HomeGenie is not responsible for disputes between suppliers and buyers`,
   },
   {
     title: '12. Intellectual Property',
-    body: `All content, features, and functionality of the App — including but not limited to the SnapSpace name, logo, visual design system, user interface, AI pipeline, product matching algorithms, and underlying codebase — are owned by SnapSpace and are protected by United States and international copyright, trademark, patent, trade secret, and other intellectual property laws.
+    body: `All content, features, and functionality of the App — including but not limited to the HomeGenie name, logo, visual design system, user interface, AI pipeline, product matching algorithms, and underlying codebase — are owned by HomeGenie and are protected by United States and international copyright, trademark, patent, trade secret, and other intellectual property laws.
 
-The SnapSpace name and logo are trademarks of SnapSpace. You may not use our trademarks without our prior written consent.
+The HomeGenie name and logo are trademarks of HomeGenie. You may not use our trademarks without our prior written consent.
 
 Nothing in these Terms grants you any right, title, or interest in our intellectual property. You may not copy, reproduce, distribute, modify, create derivative works of, publicly display, or commercially exploit any portion of the App or its content without our express written permission.`,
   },
   {
     title: '13. Disclaimers',
-    body: `THE APP IS PROVIDED ON AN "AS IS" AND "AS AVAILABLE" BASIS WITHOUT WARRANTIES OF ANY KIND, WHETHER EXPRESS, IMPLIED, STATUTORY, OR OTHERWISE. TO THE FULLEST EXTENT PERMITTED BY LAW, SNAPSPACE DISCLAIMS ALL WARRANTIES, INCLUDING BUT NOT LIMITED TO IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, TITLE, AND NON-INFRINGEMENT.
+    body: `THE APP IS PROVIDED ON AN "AS IS" AND "AS AVAILABLE" BASIS WITHOUT WARRANTIES OF ANY KIND, WHETHER EXPRESS, IMPLIED, STATUTORY, OR OTHERWISE. TO THE FULLEST EXTENT PERMITTED BY LAW, HOMEGENIE DISCLAIMS ALL WARRANTIES, INCLUDING BUT NOT LIMITED TO IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, TITLE, AND NON-INFRINGEMENT.
 
-WITHOUT LIMITING THE FOREGOING, SNAPSPACE DOES NOT WARRANT THAT:
+WITHOUT LIMITING THE FOREGOING, HOMEGENIE DOES NOT WARRANT THAT:
 • THE APP WILL BE UNINTERRUPTED, TIMELY, SECURE, OR ERROR-FREE
 • THE RESULTS OBTAINED FROM THE APP (INCLUDING AI-GENERATED DESIGNS) WILL BE ACCURATE, RELIABLE, OR SUITABLE FOR ANY PARTICULAR PURPOSE
 • ANY DEFECTS OR ERRORS IN THE APP WILL BE CORRECTED
@@ -196,7 +196,7 @@ AI-GENERATED DESIGNS ARE PROVIDED FOR INSPIRATIONAL PURPOSES ONLY AND SHOULD NOT
   },
   {
     title: '14. Limitation of Liability',
-    body: `TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, IN NO EVENT SHALL SNAPSPACE, ITS OFFICERS, DIRECTORS, EMPLOYEES, AGENTS, OR AFFILIATES BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, EXEMPLARY, OR PUNITIVE DAMAGES, INCLUDING BUT NOT LIMITED TO LOSS OF PROFITS, DATA, USE, GOODWILL, OR OTHER INTANGIBLE LOSSES, ARISING OUT OF OR IN CONNECTION WITH:
+    body: `TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, IN NO EVENT SHALL HOMEGENIE, ITS OFFICERS, DIRECTORS, EMPLOYEES, AGENTS, OR AFFILIATES BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, EXEMPLARY, OR PUNITIVE DAMAGES, INCLUDING BUT NOT LIMITED TO LOSS OF PROFITS, DATA, USE, GOODWILL, OR OTHER INTANGIBLE LOSSES, ARISING OUT OF OR IN CONNECTION WITH:
 
 • YOUR ACCESS TO OR USE OF (OR INABILITY TO ACCESS OR USE) THE APP
 • ANY CONDUCT OR CONTENT OF ANY THIRD PARTY ON THE APP
@@ -204,13 +204,13 @@ AI-GENERATED DESIGNS ARE PROVIDED FOR INSPIRATIONAL PURPOSES ONLY AND SHOULD NOT
 • UNAUTHORIZED ACCESS, USE, OR ALTERATION OF YOUR CONTENT OR DATA
 • ANY AI-GENERATED CONTENT OR DESIGN RECOMMENDATIONS
 
-IN NO EVENT SHALL SNAPSPACE'S TOTAL AGGREGATE LIABILITY TO YOU EXCEED THE GREATER OF (A) THE AMOUNTS YOU HAVE PAID TO SNAPSPACE IN THE TWELVE (12) MONTHS PRECEDING THE CLAIM, OR (B) ONE HUNDRED DOLLARS ($100.00 USD).
+IN NO EVENT SHALL HOMEGENIE'S TOTAL AGGREGATE LIABILITY TO YOU EXCEED THE GREATER OF (A) THE AMOUNTS YOU HAVE PAID TO HOMEGENIE IN THE TWELVE (12) MONTHS PRECEDING THE CLAIM, OR (B) ONE HUNDRED DOLLARS ($100.00 USD).
 
 SOME JURISDICTIONS DO NOT ALLOW THE EXCLUSION OR LIMITATION OF CERTAIN DAMAGES, SO SOME OF THE ABOVE LIMITATIONS MAY NOT APPLY TO YOU.`,
   },
   {
     title: '15. Indemnification',
-    body: `You agree to defend, indemnify, and hold harmless SnapSpace and its officers, directors, employees, contractors, agents, licensors, and suppliers from and against any claims, liabilities, damages, judgments, awards, losses, costs, expenses, or fees (including reasonable attorneys' fees) arising out of or relating to:
+    body: `You agree to defend, indemnify, and hold harmless HomeGenie and its officers, directors, employees, contractors, agents, licensors, and suppliers from and against any claims, liabilities, damages, judgments, awards, losses, costs, expenses, or fees (including reasonable attorneys' fees) arising out of or relating to:
 
 • Your violation of these Terms
 • Your use of the App
@@ -234,29 +234,29 @@ Notwithstanding the above, either party may seek injunctive or equitable relief 
   },
   {
     title: '18. Entire Agreement',
-    body: `These Terms, together with our Privacy Policy and any other legal notices or policies published by SnapSpace within the App, constitute the entire agreement between you and SnapSpace regarding your use of the App. These Terms supersede all prior agreements, communications, and understandings, whether written or oral, regarding the subject matter herein.`,
+    body: `These Terms, together with our Privacy Policy and any other legal notices or policies published by HomeGenie within the App, constitute the entire agreement between you and HomeGenie regarding your use of the App. These Terms supersede all prior agreements, communications, and understandings, whether written or oral, regarding the subject matter herein.`,
   },
 
   // ═══ BOTTOM — Actionable, user-friendly ═══
   {
     title: '19. Account Deletion',
-    body: `You may delete your SnapSpace account at any time from within the App by navigating to Profile → Settings → Delete Account. Upon requesting account deletion:
+    body: `You may delete your HomeGenie account at any time from within the App by navigating to Profile → Settings → Delete Account. Upon requesting account deletion:
 
 • Your profile, saved designs, liked content, and personal data will be permanently deleted from our active databases within 30 days
-• Any active subscriptions must be canceled separately through your Apple ID settings — deleting your SnapSpace account does not automatically cancel Apple subscriptions
+• Any active subscriptions must be canceled separately through your Apple ID settings — deleting your HomeGenie account does not automatically cancel Apple subscriptions
 • Token balances are non-refundable and will be forfeited upon account deletion
 • Content you have shared publicly may have been copied or re-shared by other users prior to deletion — we cannot control third-party copies
 • Certain data may be retained for up to 90 days after deletion for fraud prevention, legal compliance, or dispute resolution, after which it will be permanently purged
 
-You may also request account deletion by emailing info@snapspaceios.com with the subject line "Account Deletion Request."`,
+You may also request account deletion by emailing info@homegenie.app with the subject line "Account Deletion Request."`,
   },
   {
     title: '20. Contact Us',
     body: `If you have any questions, concerns, or feedback about these Terms of Use, please contact us:
 
-SnapSpace
-Email: info@snapspaceios.com
-Website: www.snapspaceios.com
+HomeGenie
+Email: info@homegenie.app
+Website: www.homegenie.app
 
 For legal inquiries, please include "Legal Inquiry" in the subject line of your email.`,
   },
@@ -283,7 +283,7 @@ export default function TermsOfUseScreen({ navigation }) {
         <Text style={styles.lastUpdated}>Last updated: April 6, 2026</Text>
 
         <Text style={styles.intro}>
-          Please read these Terms of Use carefully before using SnapSpace. These terms govern your access to and use of our AI-powered interior design platform, including all features, content, subscriptions, and affiliated services.
+          Please read these Terms of Use carefully before using HomeGenie. These terms govern your access to and use of our AI-powered interior design platform, including all features, content, subscriptions, and affiliated services.
         </Text>
 
         {SECTIONS.map((section) => (
@@ -294,7 +294,7 @@ export default function TermsOfUseScreen({ navigation }) {
         ))}
 
         <View style={styles.footer}>
-          <Text style={styles.footerText}>© 2026 SnapSpace. All rights reserved.</Text>
+          <Text style={styles.footerText}>© 2026 HomeGenie. All rights reserved.</Text>
         </View>
 
         <View style={{ height: 48 }} />
@@ -327,6 +327,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 17,
     fontWeight: '800',
+    fontFamily: 'KantumruyPro_700Bold',
     color: '#111',
     letterSpacing: -0.3,
   },
@@ -337,10 +338,12 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#AAA',
     fontWeight: '500',
+    fontFamily: 'KantumruyPro_500Medium',
     marginBottom: 16,
   },
   intro: {
     fontSize: 14,
+    fontFamily: 'KantumruyPro_400Regular',
     color: '#555',
     lineHeight: 22,
     marginBottom: 28,
@@ -355,6 +358,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 15,
     fontWeight: '800',
+    fontFamily: 'KantumruyPro_700Bold',
     color: '#111',
     letterSpacing: -0.2,
     marginBottom: 10,
@@ -364,6 +368,7 @@ const styles = StyleSheet.create({
     color: '#555',
     lineHeight: 23,
     fontWeight: '400',
+    fontFamily: 'KantumruyPro_400Regular',
   },
 
   footer: {
@@ -373,5 +378,5 @@ const styles = StyleSheet.create({
     marginTop: 8,
     alignItems: 'center',
   },
-  footerText: { fontSize: 12, color: '#BBB' },
+  footerText: { fontSize: 12, color: '#BBB', fontFamily: 'KantumruyPro_400Regular'},
 });

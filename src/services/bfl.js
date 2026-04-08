@@ -1,5 +1,5 @@
 /**
- * SnapSpace — Black Forest Labs direct client
+ * HomeGenie — Black Forest Labs direct client
  *
  * Calls api.bfl.ai directly from React Native — no Supabase edge function
  * in the generation path. React Native has no CORS restrictions.

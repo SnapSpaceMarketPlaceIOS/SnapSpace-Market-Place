@@ -45,7 +45,7 @@ const VARIANT = {
       justifyContent: 'center',
       gap: 6,
     },
-    label: { color: '#FFFFFF', ...typeScale.button },
+    label: { color: '#FFFFFF', ...typeScale.button, fontFamily: 'KantumruyPro_600SemiBold' },
     pressedBg: C.primary, // darken handled via opacity on press
   },
   secondary: {
@@ -62,7 +62,7 @@ const VARIANT = {
       justifyContent: 'center',
       gap: 6,
     },
-    label: { color: C.primary, ...typeScale.button },
+    label: { color: C.primary, ...typeScale.button, fontFamily: 'KantumruyPro_600SemiBold' },
   },
   ghost: {
     container: {
@@ -76,7 +76,7 @@ const VARIANT = {
       justifyContent: 'center',
       gap: 4,
     },
-    label: { color: C.primary, ...typeScale.button },
+    label: { color: C.primary, ...typeScale.button, fontFamily: 'KantumruyPro_600SemiBold' },
   },
   destructive: {
     container: {
@@ -90,7 +90,7 @@ const VARIANT = {
       justifyContent: 'center',
       gap: 6,
     },
-    label: { color: '#FFFFFF', ...typeScale.button },
+    label: { color: '#FFFFFF', ...typeScale.button, fontFamily: 'KantumruyPro_600SemiBold' },
   },
   icon: {
     container: {

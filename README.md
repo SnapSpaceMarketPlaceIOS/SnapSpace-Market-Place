@@ -1,186 +1,177 @@
-# SnapSpace
+# Supabase CLI
 
-AI-powered interior design marketplace built with React Native + Expo. Snap a photo of any room, generate a redesigned version with AI, and shop curated affiliate products that match the look.
+[![Coverage Status](https://coveralls.io/repos/github/supabase/cli/badge.svg?branch=develop)](https://coveralls.io/github/supabase/cli?branch=develop) [![Bitbucket Pipelines](https://img.shields.io/bitbucket/pipelines/supabase-cli/setup-cli/master?style=flat-square&label=Bitbucket%20Canary)](https://bitbucket.org/supabase-cli/setup-cli/pipelines) [![Gitlab Pipeline Status](https://img.shields.io/gitlab/pipeline-status/sweatybridge%2Fsetup-cli?label=Gitlab%20Canary)
+](https://gitlab.com/sweatybridge/setup-cli/-/pipelines)
 
----
+[Supabase](https://supabase.io) is an open source Firebase alternative. We're building the features of Firebase using enterprise-grade open source tools.
 
-## Quick Start
+This repository contains all the functionality for Supabase CLI.
 
-```bash
-# 1. Install dependencies
-npm install
+- [x] Running Supabase locally
+- [x] Managing database migrations
+- [x] Creating and deploying Supabase Functions
+- [x] Generating types directly from your database schema
+- [x] Making authenticated HTTP requests to [Management API](https://supabase.com/docs/reference/api/introduction)
 
-# 2. Copy env template and fill in your keys
-cp .env.example .env
+## Getting started
 
-# 3. Start Expo dev server
-npx expo start        # scan QR code with Expo Go
-npx expo start --web  # open in browser
-```
+### Install the CLI
 
-**Simulator shortcuts** (after `npx expo start`): press `i` for iOS Simulator, `a` for Android emulator.
-
----
-
-## Prerequisites
-
-| Tool | Version | Install |
-|------|---------|---------|
-| Node.js | ≥ 18 | [nodejs.org](https://nodejs.org) |
-| Expo CLI | latest | `npm install -g expo-cli` |
-| iOS Simulator | Xcode 15+ | Mac App Store |
-| Android Studio | latest | [developer.android.com](https://developer.android.com) |
-
----
-
-## Environment Variables
-
-Copy `.env.example` to `.env` and fill in all values:
-
-```env
-EXPO_PUBLIC_SUPABASE_URL=          # Supabase project URL
-EXPO_PUBLIC_SUPABASE_ANON_KEY=     # Supabase anon/public key
-EXPO_PUBLIC_REPLICATE_API_TOKEN=   # Replicate API token (adirik/interior-design)
-EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY= # Stripe publishable key (test mode)
-EXPO_PUBLIC_AMAZON_PARTNER_TAG=snapspace20-20
-```
-
-See `.env.example` for the full list including affiliate platform IDs.
-
----
-
-## Architecture
-
-### Stack
-
-| Layer | Technology |
-|-------|-----------|
-| Framework | React Native 0.83 + Expo 55 |
-| Navigation | React Navigation (Stack + Bottom Tabs) |
-| Auth & DB | Supabase (PostgreSQL + RLS) |
-| AI | Replicate API — `adirik/interior-design` |
-| Payments | Stripe (`@stripe/stripe-react-native`) |
-| Affiliates | Amazon Associates (snapspace20-20), Wayfair/CJ, Houzz/ShareASale |
-
-### Key Directories
-
-```
-src/
-├── screens/          # 28 screen components (one file per route)
-├── components/
-│   └── ds/           # Design system: Button, Badge, SectionHeader
-├── constants/
-│   ├── tokens.js     # SINGLE SOURCE OF TRUTH — all design tokens
-│   ├── colors.js     # Brand color palette
-│   └── theme.js      # Thin shim → maps to tokens.js
-├── context/          # AuthContext, CartContext, LikedContext, SharedContext, OrderHistoryContext
-├── services/
-│   ├── supabase.js   # DB helpers + Supabase client
-│   ├── api.js        # Unified API layer with guards
-│   ├── replicate.js  # AI image generation
-│   ├── affiliateProducts.js  # Product search + affiliate URLs
-│   └── productMatcher.js     # Scoring algorithm
-├── data/             # Seed data: designs, productCatalog, sellers, styleMap
-└── utils/
-    └── promptParser.js  # Parses design prompts → structured data
-supabase/
-├── migrations/       # SQL migrations (001–007)
-├── functions/        # Edge functions
-└── config.toml       # Local dev config (npx supabase start)
-```
-
-### AI Data Flow
-
-```
-User prompt/photo
-  → Replicate AI (adirik/interior-design) → room image
-  → promptParser.js → { roomType, styles, materials, moods, furnitureCategories }
-  → productMatcher.js → scored catalog (style 35%, room 25%, material 15%, furniture 15%, mood 5%, diversity 10%)
-  → affiliateProducts.js → top 6 affiliate products
-  → RoomResultScreen / ShopTheLookScreen
-```
-
----
-
-## Database
-
-Run migrations against your Supabase project:
+Available via [NPM](https://www.npmjs.com) as dev dependency. To install:
 
 ```bash
-npx supabase db push          # push migrations to remote
-npx supabase start            # start local Supabase (Docker required)
-npx supabase db reset         # reset local DB and re-run all migrations
+npm i supabase --save-dev
 ```
 
-### Key Tables
+When installing with yarn 4, you need to disable experimental fetch with the following nodejs config.
 
-| Table | Purpose |
-|-------|---------|
-| `profiles` | User accounts — extends Supabase auth.users |
-| `supplier_applications` | Vendor onboarding requests |
-| `supplier_profiles` | Approved supplier storefronts |
-| `products` | Supplier product listings |
-| `supplier_orders` | Orders placed through supplier storefronts |
-| `feature_requests` | User-submitted feature requests |
-| `audit_log` | Admin action log |
+```
+NODE_OPTIONS=--no-experimental-fetch yarn add supabase
+```
 
----
+> **Note**
+For Bun versions below v1.0.17, you must add `supabase` as a [trusted dependency](https://bun.sh/guides/install/trusted) before running `bun add -D supabase`.
 
-## Development Scripts
+<details>
+  <summary><b>macOS</b></summary>
+
+  Available via [Homebrew](https://brew.sh). To install:
+
+  ```sh
+  brew install supabase/tap/supabase
+  ```
+
+  To install the beta release channel:
+  
+  ```sh
+  brew install supabase/tap/supabase-beta
+  brew link --overwrite supabase-beta
+  ```
+  
+  To upgrade:
+
+  ```sh
+  brew upgrade supabase
+  ```
+</details>
+
+<details>
+  <summary><b>Windows</b></summary>
+
+  Available via [Scoop](https://scoop.sh). To install:
+
+  ```powershell
+  scoop bucket add supabase https://github.com/supabase/scoop-bucket.git
+  scoop install supabase
+  ```
+
+  To upgrade:
+
+  ```powershell
+  scoop update supabase
+  ```
+</details>
+
+<details>
+  <summary><b>Linux</b></summary>
+
+  Available via [Homebrew](https://brew.sh) and Linux packages.
+
+  #### via Homebrew
+
+  To install:
+
+  ```sh
+  brew install supabase/tap/supabase
+  ```
+
+  To upgrade:
+
+  ```sh
+  brew upgrade supabase
+  ```
+
+  #### via Linux packages
+
+  Linux packages are provided in [Releases](https://github.com/supabase/cli/releases). To install, download the `.apk`/`.deb`/`.rpm`/`.pkg.tar.zst` file depending on your package manager and run the respective commands.
+
+  ```sh
+  sudo apk add --allow-untrusted <...>.apk
+  ```
+
+  ```sh
+  sudo dpkg -i <...>.deb
+  ```
+
+  ```sh
+  sudo rpm -i <...>.rpm
+  ```
+
+  ```sh
+  sudo pacman -U <...>.pkg.tar.zst
+  ```
+</details>
+
+<details>
+  <summary><b>Other Platforms</b></summary>
+
+  You can also install the CLI via [go modules](https://go.dev/ref/mod#go-install) without the help of package managers.
+
+  ```sh
+  go install github.com/supabase/cli@latest
+  ```
+
+  Add a symlink to the binary in `$PATH` for easier access:
+
+  ```sh
+  ln -s "$(go env GOPATH)/bin/cli" /usr/bin/supabase
+  ```
+
+  This works on other non-standard Linux distros.
+</details>
+
+<details>
+  <summary><b>Community Maintained Packages</b></summary>
+
+  Available via [pkgx](https://pkgx.sh/). Package script [here](https://github.com/pkgxdev/pantry/blob/main/projects/supabase.com/cli/package.yml).
+  To install in your working directory:
+
+  ```bash
+  pkgx install supabase
+  ```
+
+  Available via [Nixpkgs](https://nixos.org/). Package script [here](https://github.com/NixOS/nixpkgs/blob/master/pkgs/development/tools/supabase-cli/default.nix).
+</details>
+
+### Run the CLI
 
 ```bash
-npm start             # Start Expo dev server
-npm run ios           # Build and run on iOS simulator
-npm run android       # Build and run on Android emulator
-npm run web           # Start web preview
-
-npm run lint          # Check code quality (ESLint)
-npm run lint:fix      # Auto-fix lint issues
-npm run test          # Run Jest test suite
-npm run test:coverage # Run tests with coverage report
+supabase bootstrap
 ```
 
----
+Or using npx:
 
-## Supabase Edge Functions
+```bash
+npx supabase bootstrap
+```
 
-Located in `supabase/functions/`. Required secrets (set via Supabase dashboard or `supabase secrets set`):
+The bootstrap command will guide you through the process of setting up a Supabase project using one of the [starter](https://github.com/supabase-community/supabase-samples/blob/main/samples.json) templates.
 
-| Secret | Purpose |
-|--------|---------|
-| `STRIPE_SECRET_KEY` | Stripe server-side operations |
-| `RESEND_API_KEY` | Transactional email via Resend |
-| `EMAIL_FROM` | Sender address (e.g. `noreply@snapspace.app`) |
+## Docs
 
----
+Command & config reference can be found [here](https://supabase.com/docs/reference/cli/about).
 
-## Affiliate Pipeline
+## Breaking changes
 
-| Platform | Status | Tag/ID |
-|----------|--------|--------|
-| Amazon Associates | Active | `snapspace20-20` |
-| Wayfair (CJ Affiliate) | Pending signup | `EXPO_PUBLIC_CJ_PUBLISHER_ID` |
-| Houzz (ShareASale) | Pending signup | `EXPO_PUBLIC_SHAREASALE_AFFILIATE_ID` |
+We follow semantic versioning for changes that directly impact CLI commands, flags, and configurations.
 
-**FTC Compliance**: All screens showing affiliate products must display: *"We may earn a commission when you buy through links on this app."*
+However, due to dependencies on other service images, we cannot guarantee that schema migrations, seed.sql, and generated types will always work for the same CLI major version. If you need such guarantees, we encourage you to pin a specific version of CLI in package.json.
 
-**Amazon TOS**: Never cache Amazon prices longer than 1 hour. Static catalog prices must note "Price may vary."
+## Developing
 
----
+To run from source:
 
-## Contribution Guide
-
-1. **Branch naming**: `feat/short-description`, `fix/issue-description`, `chore/task-name`
-2. **Commits**: Use conventional commits — `feat:`, `fix:`, `chore:`, `docs:`
-3. **Design tokens**: All colors, spacing, font sizes, and radii must come from `src/constants/tokens.js` — never hardcode values
-4. **DS components**: Use `Button`, `Badge`, `SectionHeader` from `src/components/ds` — never create ad-hoc inline versions
-5. **Contexts**: Global state lives in `src/context/` — never lift to `App.js`
-6. **SVG icons**: Inline with `react-native-svg` — no icon libraries
-7. **TypeScript**: Project is JavaScript — do not add `.ts`/`.tsx` files without team agreement
-8. **Tests**: Add tests to `src/__tests__/` for new utilities and services
-
----
-
-## License
-
-Private — all rights reserved. © SnapSpace.
+```sh
+# Go >= 1.22
+go run . help
+```

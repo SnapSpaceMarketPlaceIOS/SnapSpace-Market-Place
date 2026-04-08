@@ -1,5 +1,5 @@
 /**
- * SnapSpace — Product-Aware Generation Service
+ * HomeGenie — Product-Aware Generation Service
  *
  * Client-side wrapper for the generate-with-products Supabase Edge Function.
  *

@@ -571,7 +571,7 @@ function AddAllToCartButton({ products, onAddAll, onViewCart }) {
             <Path d="M16 10a4 4 0 01-8 0" />
           </Svg>
         )}
-        <Text style={{ color: iconColor, fontSize: 15, fontWeight: '700', letterSpacing: 0.3 }}>
+        <Text style={{ color: iconColor, fontSize: 15, fontWeight: '700', letterSpacing: 0.3, fontFamily: 'KantumruyPro_700Bold' }}>
           {added ? 'View Cart' : 'Add All to Cart'}
         </Text>
       </TouchableOpacity>
@@ -731,6 +731,7 @@ const amazonBadgeStyle = StyleSheet.create({
   wordmark: {
     fontSize: 11,
     fontWeight: '800',
+    fontFamily: 'KantumruyPro_700Bold',
     color: '#232F3E',
     letterSpacing: -0.3,
     lineHeight: 13,
@@ -1125,7 +1126,7 @@ export default function HomeScreen({ navigation, route }) {
     const prompt = resultData.prompt || 'My AI design';
     try {
       await Share.share({
-        message: `Check out my AI room design on SnapSpace!\n\n"${prompt}"`,
+        message: `Check out my AI room design on HomeGenie!\n\n"${prompt}"`,
         url: resultData.resultUri,
       });
     } catch (err) {
@@ -1458,7 +1459,7 @@ export default function HomeScreen({ navigation, route }) {
           {/* Top bar: logo + icons */}
           <View style={styles.topBar}>
             <View style={styles.logoRow}>
-              <Text style={styles.logo}>SnapSpace</Text>
+              <Text style={styles.logo}>HomeGenie</Text>
               <View style={styles.logoDot} />
             </View>
             <View style={styles.topIcons}>
@@ -2216,6 +2217,7 @@ const styles = StyleSheet.create({
   logo: {
     fontSize: fontSize.lg,
     fontWeight: fontWeight.bold,
+    fontFamily: 'KantumruyPro_700Bold',
     color: '#FFFFFF',
     letterSpacing: letterSpacing.tight,
   },
@@ -2249,6 +2251,7 @@ const styles = StyleSheet.create({
   heroSubtitle: {
     fontSize: 16,
     fontWeight: '600',
+    fontFamily: 'KantumruyPro_600SemiBold',
     color: '#FFFFFF',
     lineHeight: 22,
     marginTop: 6,
@@ -2271,8 +2274,8 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255,255,255,0.22)',
   },
   floatingPillOn: { backgroundColor: '#0B6DC3', borderColor: '#0B6DC3' },
-  floatingPillText: { fontSize: 13, fontWeight: '500', color: 'rgba(255,255,255,0.85)' },
-  floatingPillTextOn: { color: '#fff', fontWeight: '600' },
+  floatingPillText: { fontSize: 13, fontWeight: '500', color: 'rgba(255,255,255,0.85)', fontFamily: 'KantumruyPro_500Medium'},
+  floatingPillTextOn: { color: '#fff', fontWeight: '600', fontFamily: 'KantumruyPro_600SemiBold'},
 
   // Photo preview
   photoPreviewWrap: {
@@ -2291,14 +2294,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 10,
   },
-  photoOverlayText: { color: '#fff', fontSize: 13, fontWeight: '600' },
+  photoOverlayText: { color: '#fff', fontSize: 13, fontWeight: '600', fontFamily: 'KantumruyPro_600SemiBold'},
   photoRemoveBtn: {
     position: 'absolute', top: 8, right: 8,
     width: 26, height: 26, borderRadius: 13,
     backgroundColor: 'rgba(0,0,0,0.5)',
     alignItems: 'center', justifyContent: 'center',
   },
-  photoRemoveX: { color: '#fff', fontSize: 11, fontWeight: '700' },
+  photoRemoveX: { color: '#fff', fontSize: 11, fontWeight: '700', fontFamily: 'KantumruyPro_700Bold'},
 
   // Prompt chips
   promptChipsScroll: {
@@ -2320,6 +2323,7 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 10,
     fontWeight: '500',
+    fontFamily: 'KantumruyPro_500Medium',
   },
 
   // Input bar — pinned to hero bottom via absolute positioning
@@ -2349,6 +2353,7 @@ const styles = StyleSheet.create({
   inputText: {
     flex: 1,
     fontSize: 15,
+    fontFamily: 'KantumruyPro_400Regular',
     color: '#fff',
     paddingVertical: 0,
     paddingHorizontal: 6,
@@ -2364,6 +2369,7 @@ const styles = StyleSheet.create({
   headline: {
     fontSize: 38,
     fontWeight: fontWeight.xbold,
+    fontFamily: 'KantumruyPro_700Bold',
     color: '#FFFFFF',
     lineHeight: 40,
     letterSpacing: letterSpacing.tight,
@@ -2372,11 +2378,12 @@ const styles = StyleSheet.create({
     textShadowOffset: { width: 0, height: 2 },
     textShadowRadius: 12,
   },
-  headlineBold: { fontWeight: fontWeight.xbold },
+  headlineBold: { fontWeight: fontWeight.xbold, fontFamily: 'KantumruyPro_700Bold'},
   genStatusText: {
     color: '#fff',
     fontSize: 14,
     fontWeight: '400',
+    fontFamily: 'KantumruyPro_400Regular',
     marginTop: 20,
     textAlign: 'center',
     textShadowColor: 'rgba(0,0,0,0.4)',
@@ -2410,10 +2417,11 @@ const styles = StyleSheet.create({
   snapBannerText: { flex: 1 },
   snapBannerTitle: {
     ...typeScale.headline,
+    fontFamily: 'KantumruyPro_600SemiBold',
     color: '#FFFFFF',
     marginBottom: space.xs,
   },
-  snapBannerSub: { ...typeScale.caption, color: 'rgba(255,255,255,0.5)' },
+  snapBannerSub: { ...typeScale.caption, color: 'rgba(255,255,255,0.5)', fontFamily: 'KantumruyPro_400Regular'},
   snapChevron: {
     width: space['2xl'],
     height: space['2xl'],
@@ -2455,6 +2463,7 @@ const styles = StyleSheet.create({
   dnaTitle: {
     fontSize: 13,
     fontWeight: '700',
+    fontFamily: 'KantumruyPro_700Bold',
     color: C.textTertiary,
     letterSpacing: 1.5,
     textTransform: 'uppercase',
@@ -2462,6 +2471,7 @@ const styles = StyleSheet.create({
   dnaSeeAll: {
     fontSize: 14,
     fontWeight: '600',
+    fontFamily: 'KantumruyPro_600SemiBold',
     color: C.primary,
   },
   dnaChipsRow: {
@@ -2479,10 +2489,12 @@ const styles = StyleSheet.create({
   },
   dnaChipText: {
     ...typeScale.micro,
+    fontFamily: 'KantumruyPro_600SemiBold',
     textTransform: undefined, // override — chips show mixed case, not all-caps
   },
   dnaNote: {
     ...typeScale.caption,
+    fontFamily: 'KantumruyPro_400Regular',
     color: C.textTertiary,
     marginLeft: 4,
   },
@@ -2502,6 +2514,7 @@ const styles = StyleSheet.create({
   },
   discoverBtnText: {
     ...typeScale.body,
+    fontFamily: 'KantumruyPro_400Regular',
     color: C.textSecondary,
     flex: 1,
   },
@@ -2522,6 +2535,7 @@ const styles = StyleSheet.create({
   roomNavLabel: {
     fontSize: 13,
     fontWeight: '700',
+    fontFamily: 'KantumruyPro_700Bold',
     color: C.textTertiary,
     letterSpacing: 1.5,
     textTransform: 'uppercase',
@@ -2553,6 +2567,7 @@ const styles = StyleSheet.create({
   roomNavNewBadgeText: {
     fontSize: 8,
     fontWeight: '800',
+    fontFamily: 'KantumruyPro_700Bold',
     color: '#FFFFFF',
     letterSpacing: 0.5,
   },
@@ -2566,9 +2581,10 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: C.border,
   },
-  roomNavEmoji: { fontSize: 22 },
+  roomNavEmoji: { fontSize: 22, fontFamily: 'KantumruyPro_400Regular'},
   roomNavItemLabel: {
     ...typeScale.caption,
+    fontFamily: 'KantumruyPro_400Regular',
     color: C.textSecondary,
     textAlign: 'center',
   },
@@ -2595,6 +2611,7 @@ const styles = StyleSheet.create({
   sectionLabel: {
     fontSize: 13,
     fontWeight: '700',
+    fontFamily: 'KantumruyPro_700Bold',
     color: C.textTertiary,
     letterSpacing: 1.5,
     textTransform: 'uppercase',
@@ -2602,15 +2619,18 @@ const styles = StyleSheet.create({
   sectionSeeAll: {
     fontSize: 14,
     fontWeight: '600',
+    fontFamily: 'KantumruyPro_600SemiBold',
     color: C.primary,
   },
   sectionClear: {
     fontSize: fontSize.sm,
     fontWeight: fontWeight.medium,
+    fontFamily: 'KantumruyPro_500Medium',
     color: C.textTertiary,
   },
   sectionSub: {
     ...typeScale.caption,
+    fontFamily: 'KantumruyPro_400Regular',
     color: C.textTertiary,
     paddingHorizontal: space.lg,
     marginBottom: space.md,
@@ -2659,12 +2679,14 @@ const styles = StyleSheet.create({
   forYouInfoCreator: {
     fontSize: 10,
     fontWeight: '600',
+    fontFamily: 'KantumruyPro_600SemiBold',
     color: palette.primaryBlue,
     letterSpacing: 0.1,
   },
   forYouCardTitle: {
     ...typeScale.caption,
     fontWeight: fontWeight.semibold,
+    fontFamily: 'KantumruyPro_600SemiBold',
     color: palette.textPrimary,
     lineHeight: 16,
   },
@@ -2708,6 +2730,7 @@ const styles = StyleSheet.create({
   },
   collectionCardTitle: {
     ...typeScale.headline,
+    fontFamily: 'KantumruyPro_600SemiBold',
     color: '#fff',
     letterSpacing: letterSpacing.tight,
     marginBottom: 4,
@@ -2719,6 +2742,7 @@ const styles = StyleSheet.create({
   },
   collectionCardSub: {
     ...typeScale.caption,
+    fontFamily: 'KantumruyPro_400Regular',
     color: 'rgba(255,255,255,0.75)',
   },
   collectionExploreBtn: {
@@ -2733,6 +2757,7 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 11,
     fontWeight: '600',
+    fontFamily: 'KantumruyPro_600SemiBold',
     letterSpacing: 0.2,
   },
   // ── New Arrivals product cards (split: image top, info bottom) ────────────────
@@ -2759,6 +2784,7 @@ const styles = StyleSheet.create({
     ...typeScale.caption,
     color: palette.textPrimary,
     fontWeight: '600',
+    fontFamily: 'KantumruyPro_600SemiBold',
     lineHeight: 16,
   },
   newArrivalCardFooter: {
@@ -2769,6 +2795,7 @@ const styles = StyleSheet.create({
   },
   newArrivalCardBrand: {
     ...typeScale.caption,
+    fontFamily: 'KantumruyPro_400Regular',
     color: palette.textSecondary,
     flex: 1,
   },
@@ -2776,11 +2803,13 @@ const styles = StyleSheet.create({
     ...typeScale.caption,
     color: palette.primaryBlue,
     fontWeight: '700',
+    fontFamily: 'KantumruyPro_700Bold',
   },
   trendingViewLook: {
     ...typeScale.caption,
     color: palette.primaryBlue,
     fontWeight: '600',
+    fontFamily: 'KantumruyPro_600SemiBold',
   },
   productRatingRow: {
     flexDirection: 'row',
@@ -2790,6 +2819,7 @@ const styles = StyleSheet.create({
   },
   productStars: {
     fontSize: 11,
+    fontFamily: 'KantumruyPro_400Regular',
     color: '#67ACE9',
     letterSpacing: 1,
   },
@@ -2797,6 +2827,7 @@ const styles = StyleSheet.create({
     fontSize: 11,
     color: palette.textSecondary,
     fontWeight: '400',
+    fontFamily: 'KantumruyPro_400Regular',
   },
 
   // ── Shop By Style cards ──────────────────────────────────────────────────────
@@ -2825,12 +2856,14 @@ const styles = StyleSheet.create({
   styleCardLabel: {
     fontSize: 12,
     fontWeight: fontWeight.bold,
+    fontFamily: 'KantumruyPro_700Bold',
     color: palette.textPrimary,
     letterSpacing: 0.1,
   },
   styleCardSub: {
     fontSize: 10,
     fontWeight: '400',
+    fontFamily: 'KantumruyPro_400Regular',
     color: palette.primaryBlue,
   },
 
@@ -2861,11 +2894,13 @@ const styles = StyleSheet.create({
   trendCardTitle: {
     ...typeScale.body,
     fontWeight: '700',
+    fontFamily: 'KantumruyPro_700Bold',
     color: C.textPrimary,
     marginBottom: 2,
   },
   trendCardTag: {
     ...typeScale.caption,
+    fontFamily: 'KantumruyPro_400Regular',
     color: C.textSecondary,
   },
 
@@ -2892,6 +2927,7 @@ const styles = StyleSheet.create({
   dealEyebrow: {
     fontSize: 10,
     fontWeight: fontWeight.semibold,
+    fontFamily: 'KantumruyPro_600SemiBold',
     letterSpacing: 2,
     textTransform: 'uppercase',
     color: 'rgba(0,0,0,0.38)',
@@ -2937,6 +2973,7 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 9,
     fontWeight: fontWeight.bold,
+    fontFamily: 'KantumruyPro_700Bold',
     letterSpacing: 1.2,
     textTransform: 'uppercase',
   },
@@ -2950,6 +2987,7 @@ const styles = StyleSheet.create({
   dealBrand: {
     fontSize: 10,
     fontWeight: fontWeight.bold,
+    fontFamily: 'KantumruyPro_700Bold',
     letterSpacing: 1.4,
     color: palette.primaryBlue,
     textTransform: 'uppercase',
@@ -2957,6 +2995,7 @@ const styles = StyleSheet.create({
   dealProductName: {
     fontSize: 17,
     fontWeight: fontWeight.bold,
+    fontFamily: 'KantumruyPro_700Bold',
     color: palette.textPrimary,
     lineHeight: 23,
     letterSpacing: -0.2,
@@ -2964,6 +3003,7 @@ const styles = StyleSheet.create({
   dealDescription: {
     fontSize: 13,
     fontWeight: fontWeight.regular,
+    fontFamily: 'KantumruyPro_400Regular',
     color: palette.textSecondary,
     lineHeight: 19,
     marginTop: 1,
@@ -2977,17 +3017,20 @@ const styles = StyleSheet.create({
   dealRatingScore: {
     fontSize: 13,
     fontWeight: fontWeight.semibold,
+    fontFamily: 'KantumruyPro_600SemiBold',
     color: palette.textPrimary,
     marginLeft: 3,
   },
   dealReviewCount: {
     fontSize: 12,
     fontWeight: fontWeight.regular,
+    fontFamily: 'KantumruyPro_400Regular',
     color: palette.textSecondary,
   },
   dealSourceTag: {
     fontSize: 11,
     fontWeight: fontWeight.medium,
+    fontFamily: 'KantumruyPro_500Medium',
     color: palette.textTertiary,
     marginLeft: 4,
   },
@@ -3000,12 +3043,14 @@ const styles = StyleSheet.create({
   dealPrice: {
     fontSize: 28,
     fontWeight: fontWeight.xbold,
+    fontFamily: 'KantumruyPro_700Bold',
     color: palette.textPrimary,
     letterSpacing: -0.5,
   },
   dealPriceOrig: {
     fontSize: 14,
     fontWeight: fontWeight.regular,
+    fontFamily: 'KantumruyPro_400Regular',
     color: palette.textSecondary,
     textDecorationLine: 'line-through',
   },
@@ -3023,6 +3068,7 @@ const styles = StyleSheet.create({
   dealShopBtnText: {
     fontSize: 15,
     fontWeight: fontWeight.semibold,
+    fontFamily: 'KantumruyPro_600SemiBold',
     color: '#FFFFFF',
     letterSpacing: 0.1,
   },
@@ -3052,6 +3098,7 @@ const styles = StyleSheet.create({
   arrivalNewBadgeText: {
     fontSize: 10,
     fontWeight: '800',
+    fontFamily: 'KantumruyPro_700Bold',
     color: '#fff',
     letterSpacing: 1.2,
   },
@@ -3074,12 +3121,14 @@ const styles = StyleSheet.create({
   arrivalInfoCreator: {
     fontSize: 10,
     fontWeight: '600',
+    fontFamily: 'KantumruyPro_600SemiBold',
     color: palette.primaryBlue,
     letterSpacing: 0.1,
   },
   arrivalInfoTitle: {
     ...typeScale.caption,
     fontWeight: fontWeight.semibold,
+    fontFamily: 'KantumruyPro_600SemiBold',
     color: palette.textPrimary,
     lineHeight: 16,
   },
@@ -3106,12 +3155,14 @@ const styles = StyleSheet.create({
   },
   recentCardTitle: {
     ...typeScale.caption,
+    fontFamily: 'KantumruyPro_400Regular',
     color: C.textPrimary,
   },
 
   // ── Featured Product cards ───────────────────────────────────────────────────
   affiliateDisclosure: {
     ...typeScale.caption,
+    fontFamily: 'KantumruyPro_400Regular',
     color: C.textTertiary,
     paddingHorizontal: space.lg,
     marginBottom: space.sm,
@@ -3171,6 +3222,7 @@ const styles = StyleSheet.create({
   featuredProductName: {
     ...typeScale.caption,
     fontWeight: fontWeight.semibold,
+    fontFamily: 'KantumruyPro_600SemiBold',
     color: palette.textPrimary,
     lineHeight: 17,
   },
@@ -3181,12 +3233,14 @@ const styles = StyleSheet.create({
   },
   featuredProductPrice: {
     ...typeScale.price,
+    fontFamily: 'KantumruyPro_700Bold',
     color: palette.textPrimary,
   },
   featuredShopLink: {
     ...typeScale.caption,
     color: palette.primaryBlue,
     fontWeight: '600',
+    fontFamily: 'KantumruyPro_600SemiBold',
   },
 
   quickAddBtn: {
@@ -3204,15 +3258,18 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 20,
     fontWeight: '700',
+    fontFamily: 'KantumruyPro_700Bold',
     lineHeight: 24,
   },
   productCardName: {
     ...typeScale.headline,
+    fontFamily: 'KantumruyPro_600SemiBold',
     color: C.textPrimary,
     marginBottom: 2,
   },
   productCardPrice: {
     ...typeScale.price,
+    fontFamily: 'KantumruyPro_700Bold',
     color: C.primary,
   },
 
@@ -3302,6 +3359,7 @@ const resultStyles = StyleSheet.create({
   promptLabel: {
     fontSize: 11,
     fontWeight: '600',
+    fontFamily: 'KantumruyPro_600SemiBold',
     color: '#9CA3AF',
     letterSpacing: 1,
     textTransform: 'uppercase',
@@ -3311,6 +3369,7 @@ const resultStyles = StyleSheet.create({
   promptText: {
     fontSize: 16,
     fontWeight: '500',
+    fontFamily: 'KantumruyPro_500Medium',
     color: '#111827',
     lineHeight: 22,
     marginTop: 6,
@@ -3349,6 +3408,7 @@ const resultStyles = StyleSheet.create({
   productsTitle: {
     fontSize: 13,
     fontWeight: '700',
+    fontFamily: 'KantumruyPro_700Bold',
     color: '#9CA3AF',
     letterSpacing: 1.5,
     textTransform: 'uppercase',
@@ -3356,6 +3416,7 @@ const resultStyles = StyleSheet.create({
   productsSubtitle: {
     fontSize: 14,
     fontWeight: '400',
+    fontFamily: 'KantumruyPro_400Regular',
     color: '#67ACE9',
     marginTop: 4,
   },
@@ -3381,12 +3442,14 @@ const resultStyles = StyleSheet.create({
   hCardName: {
     fontSize: 13,
     fontWeight: '600',
+    fontFamily: 'KantumruyPro_600SemiBold',
     color: '#111827',
     lineHeight: 17,
   },
   hCardBrand: {
     fontSize: 11,
     fontWeight: '400',
+    fontFamily: 'KantumruyPro_400Regular',
     color: '#9CA3AF',
     marginTop: 1,
   },
@@ -3399,16 +3462,19 @@ const resultStyles = StyleSheet.create({
   hCardRatingText: {
     fontSize: 10,
     fontWeight: '600',
+    fontFamily: 'KantumruyPro_600SemiBold',
     color: '#111827',
     marginLeft: 2,
   },
   hCardReviews: {
     fontSize: 10,
+    fontFamily: 'KantumruyPro_400Regular',
     color: '#6B7280',
   },
   hCardPrice: {
     fontSize: 15,
     fontWeight: '700',
+    fontFamily: 'KantumruyPro_700Bold',
     color: '#0B6DC3',
     marginTop: 4,
   },
@@ -3432,6 +3498,7 @@ const resultStyles = StyleSheet.create({
   disclosure: {
     fontSize: 11,
     fontWeight: '400',
+    fontFamily: 'KantumruyPro_400Regular',
     color: '#9CA3AF',
     fontStyle: 'italic',
     textAlign: 'center',
@@ -3462,12 +3529,14 @@ const resultStyles = StyleSheet.create({
   sheetTitle: {
     fontSize: 18,
     fontWeight: '700',
+    fontFamily: 'KantumruyPro_700Bold',
     color: '#111827',
     textAlign: 'center',
   },
   sheetSubtitle: {
     fontSize: 14,
     fontWeight: '400',
+    fontFamily: 'KantumruyPro_400Regular',
     color: '#6B7280',
     textAlign: 'center',
     marginTop: 4,
@@ -3492,11 +3561,13 @@ const resultStyles = StyleSheet.create({
   sheetOptionTitle: {
     fontSize: 15,
     fontWeight: '600',
+    fontFamily: 'KantumruyPro_600SemiBold',
     color: '#111827',
   },
   sheetOptionDesc: {
     fontSize: 13,
     fontWeight: '400',
+    fontFamily: 'KantumruyPro_400Regular',
     color: '#6B7280',
     marginTop: 2,
   },
@@ -3510,6 +3581,7 @@ const resultStyles = StyleSheet.create({
   sheetCancelText: {
     fontSize: 15,
     fontWeight: '600',
+    fontFamily: 'KantumruyPro_600SemiBold',
     color: '#6B7280',
   },
 });

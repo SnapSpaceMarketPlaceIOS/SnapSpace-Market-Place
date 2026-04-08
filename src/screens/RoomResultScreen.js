@@ -325,7 +325,7 @@ export default function RoomResultScreen({ route, navigation }) {
   const handleShare = async () => {
     setShareActive(true);
     try {
-      const msg = `Check out my AI room design on SnapSpace!\n\n"${prompt}"`;
+      const msg = `Check out my AI room design on HomeGenie!\n\n"${prompt}"`;
       await Share.share(resultUri ? { message: msg, url: resultUri } : { message: msg });
     } catch {}
   };
@@ -344,7 +344,7 @@ export default function RoomResultScreen({ route, navigation }) {
       }
     } catch {
       try {
-        await Share.share({ message: `My SnapSpace AI design: "${prompt}"\n\n${resultUri}` });
+        await Share.share({ message: `My HomeGenie AI design: "${prompt}"\n\n${resultUri}` });
       } catch {
         Alert.alert('Could Not Save', 'Please screenshot the image to save it.');
       }
@@ -613,6 +613,7 @@ const s = StyleSheet.create({
   headerTitle: {
     fontSize: 17,
     fontWeight: '700',
+    fontFamily: 'KantumruyPro_700Bold',
     color: C.textPrimary,
     letterSpacing: letterSpacing.tight,
   },
@@ -648,10 +649,12 @@ const s = StyleSheet.create({
   actionsInfo: { flex: 1 },
   actionsTitle: {
     ...typeScale.headline,
+    fontFamily: 'KantumruyPro_600SemiBold',
     color: C.textPrimary,
   },
   actionsSub: {
     ...typeScale.caption,
+    fontFamily: 'KantumruyPro_400Regular',
     color: C.textSecondary,
     marginTop: 2,
   },
@@ -685,6 +688,7 @@ const s = StyleSheet.create({
   // ── Prompt ──
   promptLabel: {
     ...typeScale.subheadline,
+    fontFamily: 'KantumruyPro_600SemiBold',
     color: C.textTertiary,
     marginHorizontal: space.lg,
     marginBottom: 4,
@@ -693,6 +697,7 @@ const s = StyleSheet.create({
   promptBody: {
     fontSize: 13,
     fontWeight: '400',
+    fontFamily: 'KantumruyPro_400Regular',
     color: '#67ACE9',
     lineHeight: 18,
     marginHorizontal: space.lg,
@@ -713,6 +718,7 @@ const s = StyleSheet.create({
   },
   sectionLabel: {
     ...typeScale.subheadline,
+    fontFamily: 'KantumruyPro_600SemiBold',
     color: C.textTertiary,
     marginBottom: space.md,
   },
@@ -740,6 +746,7 @@ const s = StyleSheet.create({
   },
   tagText: {
     ...typeScale.caption,
+    fontFamily: 'KantumruyPro_400Regular',
     color: C.textSecondary,
   },
 
@@ -765,12 +772,14 @@ const s = StyleSheet.create({
   hCardName: {
     fontSize: 13,
     fontWeight: '600',
+    fontFamily: 'KantumruyPro_600SemiBold',
     color: C.textPrimary,
     lineHeight: 17,
   },
   hCardBrand: {
     fontSize: 11,
     fontWeight: '400',
+    fontFamily: 'KantumruyPro_400Regular',
     color: C.textTertiary,
     marginTop: 1,
   },
@@ -783,16 +792,19 @@ const s = StyleSheet.create({
   hCardRatingText: {
     fontSize: 10,
     fontWeight: '600',
+    fontFamily: 'KantumruyPro_600SemiBold',
     color: C.textPrimary,
     marginLeft: 2,
   },
   hCardReviews: {
     fontSize: 10,
+    fontFamily: 'KantumruyPro_400Regular',
     color: C.textSecondary,
   },
   hCardPrice: {
     fontSize: 14,
     fontWeight: '700',
+    fontFamily: 'KantumruyPro_700Bold',
     color: C.primary,
     marginTop: 4,
   },
@@ -855,6 +867,7 @@ const s = StyleSheet.create({
   pillCheck: {
     fontSize: 18,
     fontWeight: '700',
+    fontFamily: 'KantumruyPro_700Bold',
     color: '#fff',
   },
   pillMeta: {
@@ -863,18 +876,21 @@ const s = StyleSheet.create({
   pillCount: {
     fontSize: 11,
     fontWeight: '500',
+    fontFamily: 'KantumruyPro_500Medium',
     color: 'rgba(255,255,255,0.75)',
     lineHeight: 14,
   },
   pillPrice: {
     fontSize: 15,
     fontWeight: '700',
+    fontFamily: 'KantumruyPro_700Bold',
     color: '#fff',
     lineHeight: 18,
   },
   pillAction: {
     fontSize: 15,
     fontWeight: '700',
+    fontFamily: 'KantumruyPro_700Bold',
     color: '#fff',
   },
 
@@ -897,11 +913,13 @@ const s = StyleSheet.create({
   modalTitle: {
     fontSize: 20,
     fontWeight: '800',
+    fontFamily: 'KantumruyPro_700Bold',
     color: '#111',
     marginBottom: 4,
   },
   modalSubtitle: {
     fontSize: 13,
+    fontFamily: 'KantumruyPro_400Regular',
     color: '#888',
     marginBottom: 16,
   },
@@ -915,6 +933,7 @@ const s = StyleSheet.create({
   modalLabel: {
     fontSize: 13,
     fontWeight: '600',
+    fontFamily: 'KantumruyPro_600SemiBold',
     color: '#555',
     alignSelf: 'flex-start',
     marginBottom: 8,
@@ -940,6 +959,7 @@ const s = StyleSheet.create({
   toggleText: {
     fontSize: 14,
     fontWeight: '600',
+    fontFamily: 'KantumruyPro_600SemiBold',
     color: colors.bluePrimary,
   },
   toggleTextActive: {
@@ -957,6 +977,7 @@ const s = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: '700',
+    fontFamily: 'KantumruyPro_700Bold',
   },
   cancelBtn: {
     paddingVertical: 8,
@@ -964,6 +985,7 @@ const s = StyleSheet.create({
   cancelBtnText: {
     fontSize: 14,
     fontWeight: '500',
+    fontFamily: 'KantumruyPro_500Medium',
     color: '#888',
   },
 });

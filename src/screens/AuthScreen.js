@@ -92,8 +92,8 @@ const inputStyles = StyleSheet.create({
     borderColor: '#E5E7EB',
   },
   wrapFocused: { borderColor: '#67ACE9' },
-  input: { flex: 1, fontSize: 15, color: '#111' },
-  toggleText: { fontSize: 13, color: '#ABABAB', fontWeight: '500', marginLeft: 8 },
+  input: { flex: 1, fontSize: 15, color: '#111', fontFamily: 'KantumruyPro_400Regular'},
+  toggleText: { fontSize: 13, color: '#ABABAB', fontWeight: '500', marginLeft: 8, fontFamily: 'KantumruyPro_500Medium'},
 });
 
 // ── Screen ────────────────────────────────────────────────────────────────────
@@ -239,8 +239,8 @@ export default function AuthScreen({ navigation }) {
             />
             {/* Branding overlay — centered */}
             <View style={styles.heroContent}>
-              <Text style={styles.heroWordmark}>SnapSpace</Text>
-              <Text style={styles.heroTagline}>Design your space with SnapSpace MarketPlace</Text>
+              <Text style={styles.heroWordmark}>HomeGenie</Text>
+              <Text style={styles.heroTagline}>Design your space with HomeGenie</Text>
             </View>
           </View>
 
@@ -416,6 +416,7 @@ const styles = StyleSheet.create({
   heroWordmark: {
     fontSize: 38,
     fontWeight: '800',
+    fontFamily: 'KantumruyPro_700Bold',
     color: '#fff',
     letterSpacing: -0.5,
     marginBottom: 8,
@@ -427,6 +428,7 @@ const styles = StyleSheet.create({
   heroTagline: {
     fontSize: 14,
     fontWeight: '500',
+    fontFamily: 'KantumruyPro_500Medium',
     color: 'rgba(255,255,255,0.88)',
     letterSpacing: 0.2,
     textAlign: 'center',
@@ -445,10 +447,10 @@ const styles = StyleSheet.create({
     paddingTop: 28,
   },
 
-  errorText: { fontSize: 12, color: '#E74C3C', marginTop: -8, marginBottom: 10, marginLeft: 4 },
+  errorText: { fontSize: 12, color: '#E74C3C', marginTop: -8, marginBottom: 10, marginLeft: 4, fontFamily: 'KantumruyPro_400Regular'},
 
   forgotBtn: { alignSelf: 'flex-end', marginBottom: 20, marginTop: -4 },
-  forgotText: { fontSize: 13, color: BLUE, fontWeight: '600' },
+  forgotText: { fontSize: 13, color: BLUE, fontWeight: '600', fontFamily: 'KantumruyPro_600SemiBold'},
 
   primaryBtnDisabled: { opacity: 0.6 },
   primaryBtn: {
@@ -458,11 +460,11 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     backgroundColor: '#67ACE9',
   },
-  primaryBtnText: { color: '#fff', fontSize: 16, fontWeight: '700' },
+  primaryBtnText: { color: '#fff', fontSize: 16, fontWeight: '700', fontFamily: 'KantumruyPro_700Bold'},
 
   dividerRow: { flexDirection: 'row', alignItems: 'center', marginVertical: 18, gap: 12 },
   dividerLine: { flex: 1, height: 1, backgroundColor: '#E5E7EB' },
-  dividerText: { fontSize: 12, color: '#BBBBBB', fontWeight: '500' },
+  dividerText: { fontSize: 12, color: '#BBBBBB', fontWeight: '500', fontFamily: 'KantumruyPro_500Medium'},
 
   appleBtn: {
     flexDirection: 'row',
@@ -473,9 +475,9 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     height: 54,
   },
-  appleBtnText: { color: '#fff', fontSize: 15, fontWeight: '700' },
+  appleBtnText: { color: '#fff', fontSize: 15, fontWeight: '700', fontFamily: 'KantumruyPro_700Bold'},
 
   switchBtn: { marginTop: 28, alignItems: 'center' },
-  switchText: { fontSize: 14, color: '#ABABAB' },
-  switchLink: { color: BLUE, fontWeight: '700' },
+  switchText: { fontSize: 14, color: '#ABABAB', fontFamily: 'KantumruyPro_400Regular'},
+  switchLink: { color: BLUE, fontWeight: '700', fontFamily: 'KantumruyPro_700Bold'},
 });

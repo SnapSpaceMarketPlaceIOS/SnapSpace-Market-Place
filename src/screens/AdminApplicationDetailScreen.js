@@ -430,10 +430,10 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(0,0,0,0.06)',
   },
-  headerTitle: { fontSize: 17, fontWeight: '700', color: '#111', letterSpacing: -0.2 },
+  headerTitle: { fontSize: 17, fontWeight: '700', color: '#111', letterSpacing: -0.2, fontFamily: 'KantumruyPro_700Bold'},
 
   pill: { borderRadius: 12, paddingVertical: 4, paddingHorizontal: 10 },
-  pillText: { fontSize: 11, fontWeight: '700' },
+  pillText: { fontSize: 11, fontWeight: '700', fontFamily: 'KantumruyPro_700Bold'},
 
   scroll: { paddingHorizontal: 16, paddingTop: 16, paddingBottom: 16 },
 
@@ -459,18 +459,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  applicantInitial: { fontSize: 20, fontWeight: '800', color: BLUE_DARK },
+  applicantInitial: { fontSize: 20, fontWeight: '800', color: BLUE_DARK, fontFamily: 'KantumruyPro_700Bold'},
   applicantInfo: { flex: 1 },
-  applicantName: { fontSize: 16, fontWeight: '700', color: '#111', marginBottom: 2 },
-  applicantEmail: { fontSize: 13, color: '#9CA3AF', marginBottom: 8 },
+  applicantName: { fontSize: 16, fontWeight: '700', color: '#111', marginBottom: 2, fontFamily: 'KantumruyPro_700Bold'},
+  applicantEmail: { fontSize: 13, color: '#9CA3AF', marginBottom: 8, fontFamily: 'KantumruyPro_400Regular'},
   applicantMeta: { gap: 4 },
   metaItem: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  metaText: { fontSize: 12, color: '#6B7280' },
+  metaText: { fontSize: 12, color: '#6B7280', fontFamily: 'KantumruyPro_400Regular'},
 
   // Section header
   sectionHeader: {
     fontSize: 11,
     fontWeight: '700',
+    fontFamily: 'KantumruyPro_700Bold',
     color: '#9CA3AF',
     letterSpacing: 0.8,
     textTransform: 'uppercase',
@@ -501,25 +502,26 @@ const styles = StyleSheet.create({
     borderBottomColor: '#F3F4F6',
     gap: 16,
   },
-  detailLabel: { fontSize: 13, color: '#9CA3AF', fontWeight: '600', minWidth: 110 },
-  detailValue: { fontSize: 13, color: '#111', fontWeight: '500', flex: 1, textAlign: 'right' },
+  detailLabel: { fontSize: 13, color: '#9CA3AF', fontWeight: '600', minWidth: 110, fontFamily: 'KantumruyPro_600SemiBold'},
+  detailValue: { fontSize: 13, color: '#111', fontWeight: '500', flex: 1, textAlign: 'right', fontFamily: 'KantumruyPro_500Medium'},
   detailMono: { fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace', fontSize: 12 },
   descriptionWrap: { padding: 16, borderBottomWidth: 1, borderBottomColor: '#F3F4F6' },
-  descriptionText: { fontSize: 14, color: '#374151', lineHeight: 21, marginTop: 6 },
+  descriptionText: { fontSize: 14, color: '#374151', lineHeight: 21, marginTop: 6, fontFamily: 'KantumruyPro_400Regular'},
 
   // Admin notes
-  notesHint: { fontSize: 12, color: '#9CA3AF', paddingHorizontal: 16, paddingTop: 12, paddingBottom: 6 },
+  notesHint: { fontSize: 12, color: '#9CA3AF', paddingHorizontal: 16, paddingTop: 12, paddingBottom: 6, fontFamily: 'KantumruyPro_400Regular'},
   notesInput: {
     minHeight: 100,
     paddingHorizontal: 16,
     paddingBottom: 14,
     paddingTop: 8,
     fontSize: 14,
+    fontFamily: 'KantumruyPro_400Regular',
     color: '#111',
     lineHeight: 21,
   },
   notesInputReadOnly: { color: '#6B7280' },
-  errorText: { fontSize: 14, color: '#EF4444' },
+  errorText: { fontSize: 14, color: '#EF4444', fontFamily: 'KantumruyPro_400Regular'},
 
   // Action bar
   actionBar: {
@@ -541,7 +543,7 @@ const styles = StyleSheet.create({
     borderRadius: 13,
     backgroundColor: RED,
   },
-  rejectBtnText: { color: '#fff', fontSize: 15, fontWeight: '700' },
+  rejectBtnText: { color: '#fff', fontSize: 15, fontWeight: '700', fontFamily: 'KantumruyPro_700Bold'},
   approveBtn: {
     flex: 1.4,
     flexDirection: 'row',
@@ -552,7 +554,7 @@ const styles = StyleSheet.create({
     borderRadius: 13,
     backgroundColor: GREEN,
   },
-  approveBtnText: { color: '#fff', fontSize: 15, fontWeight: '700' },
+  approveBtnText: { color: '#fff', fontSize: 15, fontWeight: '700', fontFamily: 'KantumruyPro_700Bold'},
   btnDisabled: { opacity: 0.5 },
 
   // Resolved bar
@@ -563,5 +565,5 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: 'rgba(0,0,0,0.06)',
   },
-  resolvedBarText: { fontSize: 14, fontWeight: '600' },
+  resolvedBarText: { fontSize: 14, fontWeight: '600', fontFamily: 'KantumruyPro_600SemiBold'},
 });

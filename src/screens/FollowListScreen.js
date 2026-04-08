@@ -37,7 +37,7 @@ function UserRow({ item, onPress }) {
         <Text style={s.avatarText}>{initial}</Text>
       </View>
       <View style={s.rowInfo}>
-        <Text style={s.rowName} numberOfLines={1}>{item.full_name || item.username || 'SnapSpace User'}</Text>
+        <Text style={s.rowName} numberOfLines={1}>{item.full_name || item.username || 'HomeGenie User'}</Text>
         {item.username ? <Text style={s.rowUsername} numberOfLines={1}>@{item.username}</Text> : null}
       </View>
       <TouchableOpacity style={s.followBtn} activeOpacity={0.8}>
@@ -139,7 +139,7 @@ export default function FollowListScreen({ route, navigation }) {
 const s = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#fff' },
   center: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 40 },
-  emptyText: { ...typeScale.body, color: C.textSecondary, textAlign: 'center' },
+  emptyText: { ...typeScale.body, color: C.textSecondary, textAlign: 'center', fontFamily: 'KantumruyPro_400Regular'},
 
   header: {
     flexDirection: 'row',
@@ -156,6 +156,7 @@ const s = StyleSheet.create({
   },
   headerTitle: {
     ...typeScale.title,
+    fontFamily: 'KantumruyPro_700Bold',
     color: C.textPrimary,
     flex: 1,
     textAlign: 'center',
@@ -177,6 +178,7 @@ const s = StyleSheet.create({
   },
   tabText: {
     ...typeScale.headline,
+    fontFamily: 'KantumruyPro_600SemiBold',
     color: C.textSecondary,
   },
   tabTextActive: {
@@ -207,6 +209,7 @@ const s = StyleSheet.create({
   avatarText: {
     fontSize: 18,
     fontWeight: '700',
+    fontFamily: 'KantumruyPro_700Bold',
     color: '#fff',
   },
   rowInfo: {
@@ -214,10 +217,12 @@ const s = StyleSheet.create({
   },
   rowName: {
     ...typeScale.headline,
+    fontFamily: 'KantumruyPro_600SemiBold',
     color: C.textPrimary,
   },
   rowUsername: {
     ...typeScale.caption,
+    fontFamily: 'KantumruyPro_400Regular',
     color: C.textSecondary,
     marginTop: 2,
   },
@@ -230,6 +235,7 @@ const s = StyleSheet.create({
   followBtnText: {
     fontSize: 13,
     fontWeight: '600',
+    fontFamily: 'KantumruyPro_600SemiBold',
     color: '#fff',
   },
   separator: {

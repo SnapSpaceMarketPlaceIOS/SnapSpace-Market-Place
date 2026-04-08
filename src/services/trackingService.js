@@ -91,7 +91,7 @@ export function trackEvent(eventName, properties = {}) {
 
   // Log for development visibility
   if (__DEV__) {
-    console.log('[SnapSpace Tracking]', JSON.stringify(payload, null, 2));
+    console.log('[HomeGenie Tracking]', JSON.stringify(payload, null, 2));
   }
 
   // TODO: When Tapp.so React Native SDK is available, replace the log

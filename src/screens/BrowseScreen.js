@@ -334,12 +334,14 @@ const styles = StyleSheet.create({
   pageTitle: {
     fontSize: 24,
     fontWeight: '800',
+    fontFamily: 'KantumruyPro_700Bold',
     color: colors.bluePrimary,
     letterSpacing: letterSpacing.tight,
     marginBottom: 4,
   },
   pageSub: {
     ...typeScale.caption,
+    fontFamily: 'KantumruyPro_400Regular',
     color: '#6B7280',
   },
 
@@ -356,6 +358,7 @@ const styles = StyleSheet.create({
   },
   affiliateNote: {
     ...typeScale.caption,
+    fontFamily: 'KantumruyPro_400Regular',
     color: C.textTertiary,
     paddingHorizontal: space.lg,
     marginBottom: space.sm,
@@ -401,11 +404,13 @@ const styles = StyleSheet.create({
   },
   designCardTitle: {
     ...typeScale.headline,
+    fontFamily: 'KantumruyPro_600SemiBold',
     color: '#111827',
     letterSpacing: letterSpacing.tight,
   },
   designCardLikes: {
     ...typeScale.caption,
+    fontFamily: 'KantumruyPro_400Regular',
     color: '#9CA3AF',
   },
   designBadge: {
@@ -449,11 +454,13 @@ const styles = StyleSheet.create({
   productName: {
     ...typeScale.body,
     fontWeight: '600',
+    fontFamily: 'KantumruyPro_600SemiBold',
     color: '#111827',
     lineHeight: 18,
   },
   productPrice: {
     ...typeScale.price,
+    fontFamily: 'KantumruyPro_700Bold',
     color: colors.bluePrimary,
   },
   ratingRow: {
@@ -466,6 +473,7 @@ const styles = StyleSheet.create({
     fontSize: 10,
     color: C.textTertiary,
     fontWeight: '500',
+    fontFamily: 'KantumruyPro_500Medium',
   },
 
   // ── Empty state ───────────────────────────────────────────────────────────
@@ -476,11 +484,13 @@ const styles = StyleSheet.create({
   },
   emptyTitle: {
     ...typeScale.title,
+    fontFamily: 'KantumruyPro_700Bold',
     color: C.textPrimary,
     marginBottom: 8,
   },
   emptyText: {
     ...typeScale.body,
+    fontFamily: 'KantumruyPro_400Regular',
     color: C.textSecondary,
     textAlign: 'center',
     lineHeight: 22,

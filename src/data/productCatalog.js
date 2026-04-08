@@ -1,4 +1,4 @@
-// SnapSpace MarketPlace — Curated Product Catalog
+// HomeGenie MarketPlace — Curated Product Catalog
 // 27 hand-picked Amazon affiliate products
 // Affiliate tag: snapspacemkt-20
 // Fully replaces previous placeholder catalog as of March 2026

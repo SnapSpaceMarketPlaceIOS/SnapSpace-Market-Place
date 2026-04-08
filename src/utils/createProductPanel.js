@@ -1,5 +1,5 @@
 /**
- * SnapSpace — Product Panel Compositor (client-side utility)
+ * HomeGenie — Product Panel Compositor (client-side utility)
  *
  * Calls the composite-products Supabase Edge Function to stitch up to 4
  * product reference images into a single 512×512 2×2 panel JPEG.

@@ -148,6 +148,7 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     ...typeScale.title,
+    fontFamily: 'KantumruyPro_700Bold',
     color: C.textPrimary,
   },
   headerRight: {
@@ -160,6 +161,7 @@ const styles = StyleSheet.create({
   headerCount: {
     ...typeScale.button,
     fontWeight: '700',
+    fontFamily: 'KantumruyPro_700Bold',
     color: C.primary,
   },
 
@@ -168,6 +170,7 @@ const styles = StyleSheet.create({
   },
   countLabel: {
     ...typeScale.caption,
+    fontFamily: 'KantumruyPro_400Regular',
     color: C.textSecondary,
     paddingHorizontal: space.base,
     marginBottom: 10,
@@ -202,6 +205,7 @@ const styles = StyleSheet.create({
   },
   cellTitle: {
     ...typeScale.micro,
+    fontFamily: 'KantumruyPro_600SemiBold',
     color: C.textPrimary,
     textTransform: undefined,
     paddingHorizontal: 4,
@@ -229,11 +233,13 @@ const styles = StyleSheet.create({
   },
   emptyTitle: {
     ...typeScale.title,
+    fontFamily: 'KantumruyPro_700Bold',
     color: C.textPrimary,
     marginTop: 8,
   },
   emptySubtitle: {
     ...typeScale.body,
+    fontFamily: 'KantumruyPro_400Regular',
     color: C.textSecondary,
     textAlign: 'center',
   },
@@ -249,6 +255,7 @@ const styles = StyleSheet.create({
   },
   browseBtnText: {
     ...typeScale.button,
+    fontFamily: 'KantumruyPro_600SemiBold',
     color: C.white,
   },
 });

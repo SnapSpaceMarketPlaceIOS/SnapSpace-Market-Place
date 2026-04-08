@@ -119,9 +119,9 @@ export default function SupplierApplicationScreen({ navigation }) {
       return;
     }
 
-    const subject = encodeURIComponent(`SnapSpace Supplier Application — ${businessName.trim()}`);
+    const subject = encodeURIComponent(`HomeGenie Supplier Application — ${businessName.trim()}`);
     const body = encodeURIComponent(
-      `SNAPSPACE SUPPLIER APPLICATION\n` +
+      `HOMEGENIE SUPPLIER APPLICATION\n` +
       `================================\n\n` +
       `Business Name:  ${businessName.trim()}\n` +
       `Business Type:  ${businessType}\n` +
@@ -129,16 +129,16 @@ export default function SupplierApplicationScreen({ navigation }) {
       `Contact Email:  ${email.trim()}\n\n` +
       `About the Business:\n${description.trim()}\n\n` +
       `================================\n` +
-      `Submitted via SnapSpace iOS App`
+      `Submitted via HomeGenie iOS App`
     );
 
-    Linking.openURL(`mailto:info@snapspaceios.com?subject=${subject}&body=${body}`)
+    Linking.openURL(`mailto:info@homegenie.app?subject=${subject}&body=${body}`)
       .then(() => {
         AsyncStorage.setItem(SUBMITTED_KEY, 'true');
         setSubmitted(true);
       })
       .catch(() => {
-        Alert.alert('Could not open email', 'Please email info@snapspaceios.com directly.');
+        Alert.alert('Could not open email', 'Please email info@homegenie.app directly.');
       });
   };
 
@@ -159,12 +159,12 @@ export default function SupplierApplicationScreen({ navigation }) {
           <CheckCircleIcon />
           <Text style={s.confirmedTitle}>Application Received</Text>
           <Text style={s.confirmedSubtitle}>
-            Thank you for applying to become a SnapSpace Verified Supplier. Our team will review your application and reach out to you at the email you provided within 3–5 business days.
+            Thank you for applying to become a HomeGenie Verified Supplier. Our team will review your application and reach out to you at the email you provided within 3–5 business days.
           </Text>
           <View style={s.confirmedNote}>
             <Text style={s.confirmedNoteText}>Questions? Email us at{' '}
-              <Text style={s.confirmedNoteLink} onPress={() => Linking.openURL('mailto:info@snapspaceios.com')}>
-                info@snapspaceios.com
+              <Text style={s.confirmedNoteLink} onPress={() => Linking.openURL('mailto:info@homegenie.app')}>
+                info@homegenie.app
               </Text>
             </Text>
           </View>
@@ -197,7 +197,7 @@ export default function SupplierApplicationScreen({ navigation }) {
       >
         {/* Hero */}
         <View style={s.hero}>
-          <Text style={s.heroTitle}>Sell Your Products{'\n'}on SnapSpace</Text>
+          <Text style={s.heroTitle}>Sell Your Products{'\n'}on HomeGenie</Text>
           <Text style={s.heroSubtitle}>
             Join our network of verified suppliers and get your products in front of thousands of interior design enthusiasts every day.
           </Text>
@@ -261,7 +261,7 @@ export default function SupplierApplicationScreen({ navigation }) {
           style={[s.input, s.textArea]}
           value={description}
           onChangeText={setDescription}
-          placeholder="Describe what you sell, your product categories, and why you'd be a great fit for SnapSpace..."
+          placeholder="Describe what you sell, your product categories, and why you'd be a great fit for HomeGenie..."
           placeholderTextColor="#ABABAB"
           multiline
           maxLength={500}
@@ -279,7 +279,7 @@ export default function SupplierApplicationScreen({ navigation }) {
             )}
           </View>
           <Text style={s.termsText}>
-            I agree to SnapSpace's{' '}
+            I agree to HomeGenie's{' '}
             <Text style={s.termsLink} onPress={() => navigation.navigate('TermsOfUse')}>
               Supplier Terms of Service
             </Text>
@@ -292,7 +292,7 @@ export default function SupplierApplicationScreen({ navigation }) {
         </TouchableOpacity>
 
         <Text style={s.footerNote}>
-          Your application will be sent to our team at info@snapspaceios.com. We review all applications within 3–5 business days.
+          Your application will be sent to our team at info@homegenie.app. We review all applications within 3–5 business days.
         </Text>
 
         <View style={{ height: 48 }} />
@@ -326,6 +326,7 @@ const s = StyleSheet.create({
   headerTitle: {
     fontSize: 17,
     fontWeight: '700',
+    fontFamily: 'KantumruyPro_700Bold',
     color: '#111',
     letterSpacing: -0.3,
   },
@@ -342,6 +343,7 @@ const s = StyleSheet.create({
   heroTitle: {
     fontSize: 28,
     fontWeight: '800',
+    fontFamily: 'KantumruyPro_700Bold',
     color: '#0F172A',
     lineHeight: 34,
     letterSpacing: -0.5,
@@ -349,6 +351,7 @@ const s = StyleSheet.create({
   },
   heroSubtitle: {
     fontSize: 15,
+    fontFamily: 'KantumruyPro_400Regular',
     color: '#67ACE9',
     lineHeight: 22,
   },
@@ -379,10 +382,12 @@ const s = StyleSheet.create({
   benefitTitle: {
     fontSize: 12,
     fontWeight: '700',
+    fontFamily: 'KantumruyPro_700Bold',
     color: '#0F172A',
   },
   benefitBody: {
     fontSize: 11,
+    fontFamily: 'KantumruyPro_400Regular',
     color: '#6B7280',
     lineHeight: 15,
   },
@@ -397,6 +402,7 @@ const s = StyleSheet.create({
   formSectionTitle: {
     fontSize: 13,
     fontWeight: '700',
+    fontFamily: 'KantumruyPro_700Bold',
     color: '#9CA3AF',
     letterSpacing: 1.2,
     textTransform: 'uppercase',
@@ -405,12 +411,13 @@ const s = StyleSheet.create({
   label: {
     fontSize: 13,
     fontWeight: '600',
+    fontFamily: 'KantumruyPro_600SemiBold',
     color: '#374151',
     marginBottom: 8,
     marginTop: 4,
   },
   required: { color: '#EF4444' },
-  optional: { fontWeight: '400', color: '#9CA3AF', fontSize: 12 },
+  optional: { fontWeight: '400', color: '#9CA3AF', fontSize: 12, fontFamily: 'KantumruyPro_400Regular'},
 
   input: {
     borderWidth: 1,
@@ -419,6 +426,7 @@ const s = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 13,
     fontSize: 15,
+    fontFamily: 'KantumruyPro_400Regular',
     color: '#111',
     backgroundColor: '#FAFAFA',
     marginBottom: 16,
@@ -429,6 +437,7 @@ const s = StyleSheet.create({
   },
   charCount: {
     fontSize: 11,
+    fontFamily: 'KantumruyPro_400Regular',
     color: '#9CA3AF',
     textAlign: 'right',
     marginTop: -12,
@@ -457,11 +466,13 @@ const s = StyleSheet.create({
   pillText: {
     fontSize: 13,
     fontWeight: '500',
+    fontFamily: 'KantumruyPro_500Medium',
     color: '#6B7280',
   },
   pillTextActive: {
     color: BLUE,
     fontWeight: '600',
+    fontFamily: 'KantumruyPro_600SemiBold',
   },
 
   // Terms
@@ -491,12 +502,14 @@ const s = StyleSheet.create({
   termsText: {
     flex: 1,
     fontSize: 13,
+    fontFamily: 'KantumruyPro_400Regular',
     color: '#6B7280',
     lineHeight: 19,
   },
   termsLink: {
     color: BLUE,
     fontWeight: '600',
+    fontFamily: 'KantumruyPro_600SemiBold',
   },
 
   // Submit
@@ -512,9 +525,11 @@ const s = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: '700',
+    fontFamily: 'KantumruyPro_700Bold',
   },
   footerNote: {
     fontSize: 12,
+    fontFamily: 'KantumruyPro_400Regular',
     color: '#9CA3AF',
     textAlign: 'center',
     lineHeight: 17,
@@ -531,6 +546,7 @@ const s = StyleSheet.create({
   confirmedTitle: {
     fontSize: 24,
     fontWeight: '800',
+    fontFamily: 'KantumruyPro_700Bold',
     color: '#0F172A',
     marginTop: 20,
     marginBottom: 12,
@@ -538,6 +554,7 @@ const s = StyleSheet.create({
   },
   confirmedSubtitle: {
     fontSize: 15,
+    fontFamily: 'KantumruyPro_400Regular',
     color: '#6B7280',
     lineHeight: 22,
     textAlign: 'center',
@@ -552,6 +569,7 @@ const s = StyleSheet.create({
   },
   confirmedNoteText: {
     fontSize: 13,
+    fontFamily: 'KantumruyPro_400Regular',
     color: '#6B7280',
     textAlign: 'center',
     lineHeight: 19,
@@ -559,6 +577,7 @@ const s = StyleSheet.create({
   confirmedNoteLink: {
     color: BLUE,
     fontWeight: '600',
+    fontFamily: 'KantumruyPro_600SemiBold',
   },
   doneBtn: {
     backgroundColor: BLUE,
@@ -572,5 +591,6 @@ const s = StyleSheet.create({
     color: '#fff',
     fontSize: 15,
     fontWeight: '700',
+    fontFamily: 'KantumruyPro_700Bold',
   },
 });

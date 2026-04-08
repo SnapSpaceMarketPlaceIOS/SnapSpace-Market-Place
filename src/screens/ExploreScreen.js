@@ -413,9 +413,9 @@ const sliderS = StyleSheet.create({
     shadowRadius: 4,
     elevation: 4,
   },
-  rangeLabel: { fontSize: 18, fontWeight: '700', color: '#111' },
-  rangeSep:   { fontSize: 14, fontWeight: '400', color: '#BBBBBB' },
-  tick:       { fontSize: 10, fontWeight: '400', color: '#CCCCCC' },
+  rangeLabel: { fontSize: 18, fontWeight: '700', color: '#111', fontFamily: 'KantumruyPro_700Bold'},
+  rangeSep:   { fontSize: 14, fontWeight: '400', color: '#BBBBBB', fontFamily: 'KantumruyPro_400Regular'},
+  tick:       { fontSize: 10, fontWeight: '400', color: '#CCCCCC', fontFamily: 'KantumruyPro_400Regular'},
 });
 
 // ── Search engine ──────────────────────────────────────────────────────────────
@@ -679,7 +679,7 @@ export default function ExploreScreen({ navigation, route }) {
         const normalized = designs.map(d => ({
           id: `user-${d.id}`,
           title: d.prompt || 'AI Generated Design',
-          user: d.author?.username || d.author?.full_name || 'SnapSpace User',
+          user: d.author?.username || d.author?.full_name || 'HomeGenie User',
           initial: (d.author?.full_name || 'U')[0],
           verified: d.author?.is_verified_supplier || false,
           imageUrl: d.image_url,
@@ -1367,6 +1367,7 @@ const styles = StyleSheet.create({
   // Header
   title: {
     ...typeScale.display,
+    fontFamily: 'KantumruyPro_700Bold',
     color: '#000',
     letterSpacing: letterSpacing.tight,
     paddingHorizontal: space.lg,
@@ -1374,6 +1375,7 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     ...typeScale.caption,
+    fontFamily: 'KantumruyPro_400Regular',
     color: TC.primary,
     opacity: 0.9,
     marginTop: 2,
@@ -1408,6 +1410,7 @@ const styles = StyleSheet.create({
     ...typeScale.body,
     fontSize: 13,
     fontWeight: '300',
+    fontFamily: 'KantumruyPro_400Regular',
     color: '#555',
   },
   searchSubmit: {
@@ -1465,11 +1468,13 @@ const styles = StyleSheet.create({
   tabLabel: {
     fontSize: 12,
     fontWeight: '300',
+    fontFamily: 'KantumruyPro_400Regular',
     color: 'rgba(0,0,0,0.45)',
   },
   tabLabelActive: {
     fontSize: 13,
     fontWeight: '500',
+    fontFamily: 'KantumruyPro_500Medium',
     color: '#0B6DC3',
   },
   tabBorder: {
@@ -1507,11 +1512,13 @@ const styles = StyleSheet.create({
     ...typeScale.button,
     fontSize: 12,
     fontWeight: '300',
+    fontFamily: 'KantumruyPro_400Regular',
     color: 'rgba(0,0,0,0.45)',
   },
   modeToggleLabelActive: {
     fontSize: 13,
     fontWeight: '500',
+    fontFamily: 'KantumruyPro_500Medium',
     color: TC.primary,
   },
 
@@ -1580,6 +1587,7 @@ const styles = StyleSheet.create({
   },
   cardTitle: {
     ...typeScale.headline,
+    fontFamily: 'KantumruyPro_600SemiBold',
     color: '#111',
   },
 
@@ -1602,15 +1610,18 @@ const styles = StyleSheet.create({
     ...typeScale.caption,
     color: '#111',
     fontWeight: '600',
+    fontFamily: 'KantumruyPro_600SemiBold',
     lineHeight: 16,
   },
   prodCardNameSingle: {
     fontSize: 15,
     fontWeight: '600',
+    fontFamily: 'KantumruyPro_600SemiBold',
     lineHeight: 20,
   },
   prodCardBrand: {
     ...typeScale.micro,
+    fontFamily: 'KantumruyPro_600SemiBold',
     color: TC.textSecondary,
     textTransform: 'none',
     letterSpacing: 0,
@@ -1625,21 +1636,25 @@ const styles = StyleSheet.create({
   prodCardRatingText: {
     fontSize: 10,
     fontWeight: '600',
+    fontFamily: 'KantumruyPro_600SemiBold',
     color: '#111',
     marginLeft: 2,
   },
   prodCardReviews: {
     fontSize: 10,
+    fontFamily: 'KantumruyPro_400Regular',
     color: TC.textSecondary,
   },
   prodCardPrice: {
     ...typeScale.priceSmall,
+    fontFamily: 'KantumruyPro_600SemiBold',
     color: TC.primary,
     marginTop: 3,
   },
   prodCardPriceSingle: {
     fontSize: 17,
     fontWeight: '700',
+    fontFamily: 'KantumruyPro_700Bold',
     marginTop: 6,
   },
 
@@ -1731,16 +1746,19 @@ const styles = StyleSheet.create({
     ...typeScale.caption,
     color: TC.white,
     fontWeight: '700',
+    fontFamily: 'KantumruyPro_700Bold',
   },
   modalUserInfo: {
     flex: 1,
   },
   modalUsername: {
     ...typeScale.headline,
+    fontFamily: 'KantumruyPro_600SemiBold',
     color: TC.textPrimary,
   },
   modalTime: {
     ...typeScale.caption,
+    fontFamily: 'KantumruyPro_400Regular',
     color: TC.textSecondary,
     marginTop: 2,
   },
@@ -1754,18 +1772,21 @@ const styles = StyleSheet.create({
   },
   followBtnText: {
     ...typeScale.button,
+    fontFamily: 'KantumruyPro_600SemiBold',
     color: TC.white,
   },
 
   // ── Section 3C: Post Title & Description ──────────────────────────────────
   modalTitle: {
     ...typeScale.title,
+    fontFamily: 'KantumruyPro_700Bold',
     color: TC.textPrimary,
     marginTop: SP[4],
     marginBottom: 6,
   },
   modalDesc: {
     ...typeScale.body,
+    fontFamily: 'KantumruyPro_400Regular',
     color: TC.textSecondary,
     marginBottom: SP[4],
   },
@@ -1793,6 +1814,7 @@ const styles = StyleSheet.create({
   },
   actionCircleCount: {
     ...typeScale.micro,
+    fontFamily: 'KantumruyPro_600SemiBold',
     color: TC.textSecondary,
   },
   shopBtn: {
@@ -1809,12 +1831,14 @@ const styles = StyleSheet.create({
   },
   shopBtnText: {
     ...typeScale.button,
+    fontFamily: 'KantumruyPro_600SemiBold',
     color: TC.white,
   },
 
   // ── Section 3E: Products in This Post ──────────────────────────────────────
   sectionLabel: {
     ...typeScale.subheadline,
+    fontFamily: 'KantumruyPro_600SemiBold',
     color: TC.textTertiary,
     marginTop: SP[5],
     marginBottom: SP[3],
@@ -1843,6 +1867,7 @@ const styles = StyleSheet.create({
   },
   productName: {
     ...typeScale.headline,
+    fontFamily: 'KantumruyPro_600SemiBold',
     color: TC.textPrimary,
   },
 
@@ -1856,6 +1881,7 @@ const styles = StyleSheet.create({
   productRatingScore: {
     fontSize: 11,
     fontWeight: '600',
+    fontFamily: 'KantumruyPro_600SemiBold',
     color: TC.textPrimary,
     marginLeft: 3,
     lineHeight: 14,
@@ -1863,6 +1889,7 @@ const styles = StyleSheet.create({
   productReviewCount: {
     fontSize: 11,
     fontWeight: '400',
+    fontFamily: 'KantumruyPro_400Regular',
     color: TC.textSecondary,
     lineHeight: 14,
   },
@@ -1875,6 +1902,7 @@ const styles = StyleSheet.create({
   },
   productBrand: {
     ...typeScale.caption,
+    fontFamily: 'KantumruyPro_400Regular',
     color: TC.textTertiary,
   },
   productSourceBadge: {
@@ -1890,6 +1918,7 @@ const styles = StyleSheet.create({
   productShipping: {
     fontSize: 11,
     fontWeight: '400',
+    fontFamily: 'KantumruyPro_400Regular',
     color: '#16A34A',
     lineHeight: 14,
   },
@@ -1901,12 +1930,14 @@ const styles = StyleSheet.create({
   },
   productPrice: {
     ...typeScale.price,
+    fontFamily: 'KantumruyPro_700Bold',
     color: TC.primary,
     textAlign: 'right',
   },
   productOrigPrice: {
     fontSize: 11,
     fontWeight: '400',
+    fontFamily: 'KantumruyPro_400Regular',
     color: TC.textTertiary,
     textDecorationLine: 'line-through',
     textAlign: 'right',
@@ -1935,12 +1966,14 @@ const styles = StyleSheet.create({
   hCardName: {
     fontSize: 13,
     fontWeight: '600',
+    fontFamily: 'KantumruyPro_600SemiBold',
     color: TC.textPrimary,
     lineHeight: 17,
   },
   hCardBrand: {
     fontSize: 11,
     fontWeight: '400',
+    fontFamily: 'KantumruyPro_400Regular',
     color: TC.textTertiary,
     marginTop: 1,
   },
@@ -1953,16 +1986,19 @@ const styles = StyleSheet.create({
   hCardRatingText: {
     fontSize: 10,
     fontWeight: '600',
+    fontFamily: 'KantumruyPro_600SemiBold',
     color: TC.textPrimary,
     marginLeft: 2,
   },
   hCardReviews: {
     fontSize: 10,
+    fontFamily: 'KantumruyPro_400Regular',
     color: TC.textSecondary,
   },
   hCardPrice: {
     fontSize: 14,
     fontWeight: '700',
+    fontFamily: 'KantumruyPro_700Bold',
     color: TC.primary,
     marginTop: 4,
   },
@@ -1980,6 +2016,7 @@ const styles = StyleSheet.create({
 
   ftcDisclosure: {
     fontSize: 11,
+    fontFamily: 'KantumruyPro_400Regular',
     fontStyle: 'italic',
     color: TC.textTertiary,
     textAlign: 'center',
@@ -2004,6 +2041,7 @@ const styles = StyleSheet.create({
   },
   tagText: {
     ...typeScale.caption,
+    fontFamily: 'KantumruyPro_400Regular',
     color: TC.textSecondary,
   },
   tagTextHighlight: {
@@ -2022,6 +2060,7 @@ const styles = StyleSheet.create({
   },
   postModalTitle: {
     ...typeScale.title,
+    fontFamily: 'KantumruyPro_700Bold',
     color: '#111',
   },
   postShareBtn: {
@@ -2035,6 +2074,7 @@ const styles = StyleSheet.create({
   },
   postShareBtnText: {
     ...typeScale.button,
+    fontFamily: 'KantumruyPro_600SemiBold',
     color: '#fff',
   },
   postModalBody: {
@@ -2058,15 +2098,18 @@ const styles = StyleSheet.create({
   uploadLabel: {
     ...typeScale.caption,
     fontWeight: '600',
+    fontFamily: 'KantumruyPro_600SemiBold',
     color: '#555',
   },
   uploadSub: {
     ...typeScale.caption,
+    fontFamily: 'KantumruyPro_400Regular',
     color: '#bbb',
     opacity: 0.44,
   },
   fieldLabel: {
     ...typeScale.micro,
+    fontFamily: 'KantumruyPro_600SemiBold',
     color: '#A0A0A8',
     marginBottom: space.sm,
   },
@@ -2077,6 +2120,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: space.base,
     height: 48,                                  // form input spec: 48px height
     ...typeScale.body,
+    fontFamily: 'KantumruyPro_400Regular',
     color: '#111',
     marginBottom: space.md,
     backgroundColor: '#FFFFFF',
@@ -2096,6 +2140,7 @@ const styles = StyleSheet.create({
   },
   postTagChipText: {
     ...typeScale.caption,
+    fontFamily: 'KantumruyPro_400Regular',
     color: '#555',
   },
   postTagChipTextSelected: {
@@ -2122,12 +2167,14 @@ const styles = StyleSheet.create({
   filterBannerTitle: {
     fontSize: fontSize.sm,
     fontWeight: fontWeight.bold,
+    fontFamily: 'KantumruyPro_700Bold',
     color: TC.primary,
     letterSpacing: 0.2,
     marginBottom: 1,
   },
   filterBannerCount: {
     fontSize: 11,
+    fontFamily: 'KantumruyPro_400Regular',
     color: TC.primary,
     opacity: 0.72,
   },
@@ -2141,6 +2188,7 @@ const styles = StyleSheet.create({
   filterClearText: {
     fontSize: 11,
     fontWeight: fontWeight.bold,
+    fontFamily: 'KantumruyPro_700Bold',
     color: '#FFFFFF',
     letterSpacing: 0.3,
   },
@@ -2173,6 +2221,7 @@ const styles = StyleSheet.create({
   filterBadgeText: {
     fontSize: 9,
     fontWeight: '700',
+    fontFamily: 'KantumruyPro_700Bold',
     color: '#fff',
   },
 
@@ -2188,10 +2237,12 @@ const styles = StyleSheet.create({
   },
   filterSheetTitle: {
     ...typeScale.title,
+    fontFamily: 'KantumruyPro_700Bold',
     color: '#111',
   },
   filterSheetClearAll: {
     ...typeScale.button,
+    fontFamily: 'KantumruyPro_600SemiBold',
     color: TC.textTertiary,
   },
   filterSheetBody: {
@@ -2206,6 +2257,7 @@ const styles = StyleSheet.create({
   },
   filterSectionLabel: {
     ...typeScale.micro,
+    fontFamily: 'KantumruyPro_600SemiBold',
     color: TC.textTertiary,
     marginTop: space.base,
     marginBottom: space.sm,
@@ -2231,10 +2283,12 @@ const styles = StyleSheet.create({
     ...typeScale.caption,
     color: '#555',
     fontWeight: '500',
+    fontFamily: 'KantumruyPro_500Medium',
   },
   filterChipTextActive: {
     color: TC.primary,
     fontWeight: '600',
+    fontFamily: 'KantumruyPro_600SemiBold',
   },
   filterRatingRow: {
     flexDirection: 'row',
@@ -2269,6 +2323,7 @@ const styles = StyleSheet.create({
     ...typeScale.body,
     color: TC.textPrimary,
     fontWeight: '500',
+    fontFamily: 'KantumruyPro_500Medium',
   },
   aiImageBtn: {
     flexDirection: 'row',
@@ -2290,10 +2345,12 @@ const styles = StyleSheet.create({
   },
   aiImageBtnText: {
     ...typeScale.button,
+    fontFamily: 'KantumruyPro_600SemiBold',
     color: '#333',
   },
   aiImageBtnSub: {
     ...typeScale.caption,
+    fontFamily: 'KantumruyPro_400Regular',
     color: TC.textTertiary,
     textAlign: 'center',
     marginTop: space.xs,
@@ -2311,6 +2368,7 @@ const styles = StyleSheet.create({
     ...typeScale.button,
     color: '#fff',
     fontSize: 15,
+    fontFamily: 'KantumruyPro_600SemiBold',
   },
 
   // Empty state
@@ -2322,11 +2380,13 @@ const styles = StyleSheet.create({
   },
   emptyStateTitle: {
     ...typeScale.title,
+    fontFamily: 'KantumruyPro_700Bold',
     color: '#111',
     marginBottom: space.sm,
   },
   emptyStateSub: {
     ...typeScale.body,
+    fontFamily: 'KantumruyPro_400Regular',
     color: '#A0A0A8',
     textAlign: 'center',
   },

@@ -234,7 +234,7 @@ export default function PaywallScreen({ navigation }) {
     try {
       const code = await getReferralCode(user?.id);
       await Share.share({
-        message: `Join me on SnapSpace! Use my referral code ${code} when you sign up and we both get 2 free design credits. Download: https://apps.apple.com/app/snapspace`,
+        message: `Join me on HomeGenie! Use my referral code ${code} when you sign up and we both get 2 free design credits. Download: https://apps.apple.com/app/homegenie`,
       });
     } catch (e) {
       if (e.message !== 'User did not share') {
@@ -248,7 +248,7 @@ export default function PaywallScreen({ navigation }) {
   const ctaLabel = purchasing
     ? 'Processing...'
     : activeTab === 'tokens'
-      ? `Snap Space Tokens: ${selectedTokenPkg?.tokens ?? 4}`
+      ? `HomeGenie Tokens: ${selectedTokenPkg?.tokens ?? 4}`
       : 'Subscribe Monthly';
 
   const ctaPrice = activeTab === 'tokens'
@@ -272,7 +272,7 @@ export default function PaywallScreen({ navigation }) {
         {/* ── Wordmark header ─────────────────────────────────────── */}
         <View style={styles.header}>
           <View style={{ width: 40 }} />
-          <Text style={styles.wordmark}>SnapSpace</Text>
+          <Text style={styles.wordmark}>HomeGenie</Text>
           <TouchableOpacity
             onPress={() => navigation.goBack()}
             style={styles.closeBtn}
@@ -321,7 +321,7 @@ export default function PaywallScreen({ navigation }) {
         <View style={styles.contentBox}>
           {activeTab === 'tokens' ? (
             <>
-              <Text style={styles.sectionTitle}>Buy SnapSpace Tokens Individual</Text>
+              <Text style={styles.sectionTitle}>Buy HomeGenie Tokens Individual</Text>
               <View style={styles.sectionDivider} />
 
               <View style={styles.tokenGrid}>
@@ -337,7 +337,7 @@ export default function PaywallScreen({ navigation }) {
             </>
           ) : (
             <>
-              <Text style={styles.sectionTitle}>Subscribe Monthly To SnapSpace</Text>
+              <Text style={styles.sectionTitle}>Subscribe Monthly To HomeGenie</Text>
               <View style={styles.sectionDivider} />
 
               {PAID_TIERS.map(tier => (
@@ -425,6 +425,7 @@ const styles = StyleSheet.create({
   wordmark: {
     fontSize: 24,
     fontWeight: fontWeight.xbold,
+    fontFamily: 'KantumruyPro_700Bold',
     color: '#111827',
     letterSpacing: -0.5,
   },
@@ -437,6 +438,7 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 14,
     fontWeight: fontWeight.regular,
+    fontFamily: 'KantumruyPro_400Regular',
     color: '#6B7280',
     textAlign: 'center',
     paddingHorizontal: layout.screenPaddingH,
@@ -465,11 +467,13 @@ const styles = StyleSheet.create({
   progressLabel: {
     fontSize: 13,
     fontWeight: fontWeight.regular,
+    fontFamily: 'KantumruyPro_400Regular',
     color: '#6B7280',
   },
   progressCount: {
     fontSize: 13,
     fontWeight: fontWeight.bold,
+    fontFamily: 'KantumruyPro_700Bold',
     color: '#111827',
   },
   progressTrack: {
@@ -517,11 +521,13 @@ const styles = StyleSheet.create({
   toggleText: {
     fontSize: 14,
     fontWeight: fontWeight.medium,
+    fontFamily: 'KantumruyPro_500Medium',
     color: '#9CA3AF',
   },
   toggleTextActive: {
     color: BLUE,
     fontWeight: fontWeight.semibold,
+    fontFamily: 'KantumruyPro_600SemiBold',
   },
 
   // ── Referral banner
@@ -540,16 +546,19 @@ const styles = StyleSheet.create({
   referralText: {
     fontSize: 13,
     fontWeight: fontWeight.regular,
+    fontFamily: 'KantumruyPro_400Regular',
     color: '#6B7280',
     lineHeight: 18,
   },
   referralHighlight: {
     fontWeight: fontWeight.bold,
+    fontFamily: 'KantumruyPro_700Bold',
     color: BLUE,
   },
   referralSub: {
     fontSize: 13,
     fontWeight: fontWeight.regular,
+    fontFamily: 'KantumruyPro_400Regular',
     color: '#9CA3AF',
     lineHeight: 18,
   },
@@ -587,6 +596,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 15,
     fontWeight: fontWeight.bold,
+    fontFamily: 'KantumruyPro_700Bold',
     color: '#111827',
     textAlign: 'center',
     marginBottom: space.sm,
@@ -627,6 +637,7 @@ const styles = StyleSheet.create({
   tokenCount: {
     fontSize: 14,
     fontWeight: fontWeight.semibold,
+    fontFamily: 'KantumruyPro_600SemiBold',
     color: '#374151',
     marginBottom: 4,
   },
@@ -636,6 +647,7 @@ const styles = StyleSheet.create({
   tokenPrice: {
     fontSize: 12,
     fontWeight: fontWeight.regular,
+    fontFamily: 'KantumruyPro_400Regular',
     color: '#9CA3AF',
   },
   tokenPriceSelected: {
@@ -688,6 +700,7 @@ const styles = StyleSheet.create({
   subTierName: {
     fontSize: 13,
     fontWeight: fontWeight.semibold,
+    fontFamily: 'KantumruyPro_600SemiBold',
     color: '#111827',
     marginBottom: 1,
   },
@@ -698,21 +711,25 @@ const styles = StyleSheet.create({
   subGenCount: {
     fontSize: 26,
     fontWeight: fontWeight.semibold,
+    fontFamily: 'KantumruyPro_600SemiBold',
     color: BLUE,
     lineHeight: 30,
   },
   subGenCountUnlimited: {
     fontSize: 22,
+    fontFamily: 'KantumruyPro_400Regular',
   },
   subGenLabel: {
     fontSize: 12,
     fontWeight: fontWeight.regular,
+    fontFamily: 'KantumruyPro_400Regular',
     color: '#6B7280',
     marginLeft: 2,
   },
   subTierPrice: {
     fontSize: 14,
     fontWeight: fontWeight.semibold,
+    fontFamily: 'KantumruyPro_600SemiBold',
     color: '#111827',
   },
   subTierPriceSelected: {
@@ -737,6 +754,7 @@ const styles = StyleSheet.create({
   subFeatureText: {
     fontSize: 13,
     fontWeight: fontWeight.regular,
+    fontFamily: 'KantumruyPro_400Regular',
     color: '#374151',
     flex: 1,
   },
@@ -751,6 +769,7 @@ const styles = StyleSheet.create({
   finePrint: {
     fontSize: 11,
     fontWeight: fontWeight.regular,
+    fontFamily: 'KantumruyPro_400Regular',
     color: '#9CA3AF',
     textAlign: 'center',
     lineHeight: 16,
@@ -764,10 +783,12 @@ const styles = StyleSheet.create({
   legalLink: {
     fontSize: 12,
     fontWeight: fontWeight.medium,
+    fontFamily: 'KantumruyPro_500Medium',
     color: BLUE,
   },
   legalDot: {
     fontSize: 12,
+    fontFamily: 'KantumruyPro_400Regular',
     color: '#9CA3AF',
   },
 
@@ -797,6 +818,7 @@ const styles = StyleSheet.create({
   ctaText: {
     fontSize: 15,
     fontWeight: fontWeight.bold,
+    fontFamily: 'KantumruyPro_700Bold',
     color: '#fff',
     letterSpacing: -0.2,
   },
@@ -809,6 +831,7 @@ const styles = StyleSheet.create({
   ctaPrice: {
     fontSize: 16,
     fontWeight: fontWeight.bold,
+    fontFamily: 'KantumruyPro_700Bold',
     color: '#fff',
   },
 });

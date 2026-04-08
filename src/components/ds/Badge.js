@@ -104,6 +104,7 @@ const styles = StyleSheet.create({
   },
   label: {
     ...typeScale.micro,
+    fontFamily: 'KantumruyPro_600SemiBold',
     color: '#FFFFFF',
   },
 });
@@ -125,5 +126,6 @@ const pillStyles = StyleSheet.create({
     ...typeScale.caption,
     color: '#FFFFFF',
     fontWeight: '600',
+    fontFamily: 'KantumruyPro_600SemiBold',
   },
 });

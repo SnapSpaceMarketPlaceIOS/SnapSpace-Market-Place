@@ -56,8 +56,8 @@ const FAQ_SECTIONS = [
     title: 'Getting Started',
     items: [
       {
-        q: 'What is SnapSpace?',
-        a: 'SnapSpace is an AI-powered interior design marketplace. Take a photo of any room, describe your style, and our AI instantly redesigns it with real furniture and decor from our curated catalog — all shoppable in one tap.',
+        q: 'What is HomeGenie?',
+        a: 'HomeGenie is an AI-powered interior design marketplace. Take a photo of any room, describe your style, and our AI instantly redesigns it with real furniture and decor from our curated catalog — all shoppable in one tap.',
       },
       {
         q: 'How do I generate a room design?',
@@ -68,7 +68,7 @@ const FAQ_SECTIONS = [
         a: 'Any indoor space works: living rooms, bedrooms, kitchens, dining rooms, home offices, bathrooms, nurseries, and more. The AI performs best with well-lit, clear photos where the room boundaries are visible.',
       },
       {
-        q: 'Is SnapSpace free to use?',
+        q: 'Is HomeGenie free to use?',
         a: 'Browsing designs, exploring the catalog, liking, and saving is completely free. AI room generation uses credits — free accounts include a set number of generations. Additional generations are available through token packs.',
       },
     ],
@@ -77,8 +77,8 @@ const FAQ_SECTIONS = [
     title: 'Shopping & Products',
     items: [
       {
-        q: 'How does shopping work in SnapSpace?',
-        a: 'SnapSpace surfaces matching furniture and decor products alongside every AI design. All products are affiliate-linked — tapping "Buy on Amazon" opens Amazon\'s app or website where you complete your purchase directly. SnapSpace earns a small referral commission at no extra cost to you.',
+        q: 'How does shopping work in HomeGenie?',
+        a: 'HomeGenie surfaces matching furniture and decor products alongside every AI design. All products are affiliate-linked — tapping "Buy on Amazon" opens Amazon\'s app or website where you complete your purchase directly. HomeGenie earns a small referral commission at no extra cost to you.',
       },
       {
         q: 'How do I add items to my cart?',
@@ -86,7 +86,7 @@ const FAQ_SECTIONS = [
       },
       {
         q: 'What does "We may earn a commission" mean?',
-        a: 'SnapSpace participates in the Amazon Associates affiliate program. When you purchase a product through a link in our app, we earn a small commission from Amazon. The price you pay is always identical to Amazon\'s listed price — there is no markup from SnapSpace.',
+        a: 'HomeGenie participates in the Amazon Associates affiliate program. When you purchase a product through a link in our app, we earn a small commission from Amazon. The price you pay is always identical to Amazon\'s listed price — there is no markup from HomeGenie.',
       },
       {
         q: 'Why do some product prices say "Price may vary"?',
@@ -144,16 +144,16 @@ const FAQ_SECTIONS = [
     title: 'Contact & Support',
     items: [
       {
-        q: 'How do I contact the SnapSpace team?',
-        a: 'Email us at info@snapspaceios.com. Our team typically responds within 1–2 business days. For the fastest response, include your device model and a brief description of your issue.',
+        q: 'How do I contact the HomeGenie team?',
+        a: 'Email us at info@homegenie.app. Our team typically responds within 1–2 business days. For the fastest response, include your device model and a brief description of your issue.',
       },
       {
         q: 'How do I request a new feature?',
-        a: 'Go to Profile → tap the gear icon → Request a Feature. Tell us what you\'d love to see in SnapSpace and we\'ll consider it for a future update. We read every submission.',
+        a: 'Go to Profile → tap the gear icon → Request a Feature. Tell us what you\'d love to see in HomeGenie and we\'ll consider it for a future update. We read every submission.',
       },
       {
         q: 'How do I report a bug?',
-        a: 'Email info@snapspaceios.com with a description of what happened, your device model (e.g. iPhone 15 Pro), your iOS version, and a screenshot if possible. This helps us reproduce and fix it quickly.',
+        a: 'Email info@homegenie.app with a description of what happened, your device model (e.g. iPhone 15 Pro), your iOS version, and a screenshot if possible. This helps us reproduce and fix it quickly.',
       },
     ],
   },
@@ -285,7 +285,7 @@ export default function HelpScreen({ navigation }) {
           <Text style={styles.contactSubtitle}>Our team is here for you. Send us an email and we'll get back to you within 1–2 business days.</Text>
           <TouchableOpacity
             style={styles.contactBtn}
-            onPress={() => Linking.openURL('mailto:info@snapspaceios.com?subject=SnapSpace Support')}
+            onPress={() => Linking.openURL('mailto:info@homegenie.app?subject=HomeGenie Support')}
             activeOpacity={0.85}
           >
             <Text style={styles.contactBtnText}>Email Support</Text>
@@ -327,6 +327,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 17,
     fontWeight: '800',
+    fontFamily: 'KantumruyPro_700Bold',
     color: '#111',
     letterSpacing: -0.3,
   },
@@ -347,12 +348,14 @@ const styles = StyleSheet.create({
   heroTitle: {
     fontSize: 26,
     fontWeight: '800',
+    fontFamily: 'KantumruyPro_700Bold',
     color: '#111',
     letterSpacing: -0.5,
     marginBottom: 6,
   },
   heroSubtitle: {
     fontSize: 14,
+    fontFamily: 'KantumruyPro_400Regular',
     color: '#67ACE9',
     marginBottom: 18,
   },
@@ -368,18 +371,21 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     fontSize: 15,
+    fontFamily: 'KantumruyPro_400Regular',
     color: '#111',
   },
   clearBtn: {
     fontSize: 13,
     color: '#AAA',
     fontWeight: '600',
+    fontFamily: 'KantumruyPro_600SemiBold',
   },
 
   // FAQ header
   faqHeader: {
     fontSize: 13,
     fontWeight: '700',
+    fontFamily: 'KantumruyPro_700Bold',
     color: '#A0A0A8',
     letterSpacing: 1,
     textTransform: 'uppercase',
@@ -396,6 +402,7 @@ const styles = StyleSheet.create({
   faqSectionTitle: {
     fontSize: 16,
     fontWeight: '700',
+    fontFamily: 'KantumruyPro_700Bold',
     color: '#111',
     marginBottom: 10,
     letterSpacing: -0.2,
@@ -425,6 +432,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 14,
     fontWeight: '600',
+    fontFamily: 'KantumruyPro_600SemiBold',
     color: '#111',
     lineHeight: 20,
   },
@@ -436,6 +444,7 @@ const styles = StyleSheet.create({
     color: '#555',
     lineHeight: 21,
     fontWeight: '400',
+    fontFamily: 'KantumruyPro_400Regular',
   },
   faqDivider: {
     height: 1,
@@ -455,11 +464,13 @@ const styles = StyleSheet.create({
   contactTitle: {
     fontSize: 16,
     fontWeight: '700',
+    fontFamily: 'KantumruyPro_700Bold',
     color: '#111',
     marginBottom: 8,
   },
   contactSubtitle: {
     fontSize: 13,
+    fontFamily: 'KantumruyPro_400Regular',
     color: '#6B7280',
     textAlign: 'center',
     lineHeight: 19,
@@ -475,6 +486,7 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 14,
     fontWeight: '700',
+    fontFamily: 'KantumruyPro_700Bold',
   },
 
   // No results
@@ -486,12 +498,14 @@ const styles = StyleSheet.create({
   noResultsText: {
     fontSize: 15,
     fontWeight: '600',
+    fontFamily: 'KantumruyPro_600SemiBold',
     color: '#555',
     textAlign: 'center',
     marginBottom: 8,
   },
   noResultsSub: {
     fontSize: 13,
+    fontFamily: 'KantumruyPro_400Regular',
     color: '#999',
     textAlign: 'center',
   },

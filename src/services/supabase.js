@@ -702,6 +702,37 @@ export async function toggleLike(userId, designId) {
   return data; // { liked: boolean, count: number }
 }
 
+/** Fetch all design IDs a user has liked (for hydrating LikedContext). */
+export async function getUserLikedIds(userId) {
+  const { data, error } = await supabase
+    .from('design_likes')
+    .select('design_id')
+    .eq('user_id', userId);
+  if (error) throw error;
+  return (data || []).map(r => r.design_id);
+}
+
+/** Fetch full design objects for all designs a user has liked. */
+export async function getUserLikedDesigns(userId) {
+  const { data, error } = await supabase
+    .from('design_likes')
+    .select('design_id, user_designs(id, image_url, prompt, style_tags, products, likes, visibility, user_id, profiles:user_designs_user_id_fkey(full_name, username, avatar_url, is_verified_supplier))')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    // Fallback: try without profile join
+    const { data: plain, error: plainErr } = await supabase
+      .from('design_likes')
+      .select('design_id, user_designs(id, image_url, prompt, style_tags, products, likes, visibility, user_id)')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false });
+    if (plainErr) throw plainErr;
+    return (plain || []).map(r => r.user_designs).filter(Boolean);
+  }
+  return (data || []).map(r => r.user_designs).filter(Boolean);
+}
+
 // ─── Social: Profiles ────────────────────────────────────────────────────────
 
 export async function getUserProfileData(username) {

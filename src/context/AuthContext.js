@@ -43,7 +43,7 @@ export function AuthProvider({ children }) {
   const buildUser = (session, profile) => ({
     id: session.user.id,
     email: session.user.email,
-    name: profile?.full_name || session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || 'SnapSpace User',
+    name: profile?.full_name || session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || 'HomeGenie User',
     username: profile?.username || null,
     bio: profile?.bio || null,
     avatarUrl: profile?.avatar_url || null,

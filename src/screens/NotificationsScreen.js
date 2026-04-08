@@ -116,7 +116,7 @@ const NOTIFICATION_SECTIONS = [
     title: 'Promotions',
     items: [
       { id: 'deals',      label: 'Deals & Offers',      desc: 'Sales and discounts on items in your cart',   Icon: PromoIcon,     default: false },
-      { id: 'newsletter', label: 'SnapSpace Newsletter', desc: 'Weekly design inspiration and app updates',   Icon: EmailIcon,     default: false },
+      { id: 'newsletter', label: 'HomeGenie Newsletter', desc: 'Weekly design inspiration and app updates',   Icon: EmailIcon,     default: false },
     ],
   },
 ];
@@ -236,7 +236,7 @@ export default function NotificationsScreen({ navigation }) {
         ))}
 
         <Text style={styles.footer}>
-          You can also manage notifications in your iPhone's Settings app under SnapSpace.
+          You can also manage notifications in your iPhone's Settings app under HomeGenie.
         </Text>
 
         <View style={{ height: 48 }} />
@@ -271,12 +271,14 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 17,
     fontWeight: '800',
+    fontFamily: 'KantumruyPro_700Bold',
     color: '#111',
     letterSpacing: -0.3,
   },
   saveBtn: {
     fontSize: 15,
     fontWeight: '700',
+    fontFamily: 'KantumruyPro_700Bold',
     color: colors.bluePrimary,
     paddingRight: 4,
   },
@@ -305,14 +307,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  masterTitle: { fontSize: 15, fontWeight: '700', color: '#111', marginBottom: 2 },
-  masterDesc: { fontSize: 12, color: '#999' },
+  masterTitle: { fontSize: 15, fontWeight: '700', color: '#111', marginBottom: 2, fontFamily: 'KantumruyPro_700Bold'},
+  masterDesc: { fontSize: 12, color: '#999', fontFamily: 'KantumruyPro_400Regular'},
 
   // Sections
   section: { marginBottom: 20 },
   sectionLabel: {
     fontSize: 11,
     fontWeight: '700',
+    fontFamily: 'KantumruyPro_700Bold',
     color: '#A0A0A8',
     letterSpacing: 1,
     marginBottom: 10,
@@ -340,12 +343,13 @@ const styles = StyleSheet.create({
     flexShrink: 0,
   },
   rowContent: { flex: 1 },
-  rowLabel: { fontSize: 14, fontWeight: '600', color: '#111', marginBottom: 1 },
+  rowLabel: { fontSize: 14, fontWeight: '600', color: '#111', marginBottom: 1, fontFamily: 'KantumruyPro_600SemiBold'},
   rowLabelDisabled: { color: '#BBBBBB' },
-  rowDesc: { fontSize: 12, color: '#999', lineHeight: 16 },
+  rowDesc: { fontSize: 12, color: '#999', lineHeight: 16, fontFamily: 'KantumruyPro_400Regular'},
 
   footer: {
     fontSize: 12,
+    fontFamily: 'KantumruyPro_400Regular',
     color: '#AAAAAA',
     textAlign: 'center',
     lineHeight: 18,

@@ -1,5 +1,5 @@
 /**
- * SnapSpace Marketplace — Unified API Service Layer
+ * HomeGenie Marketplace — Unified API Service Layer
  * ─────────────────────────────────────────────────────────────────────────────
  * This file is the single source of truth for all data operations in the app.
  * Every function maps to a spec-defined API route and enforces its auth/role

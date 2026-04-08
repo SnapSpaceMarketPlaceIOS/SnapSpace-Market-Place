@@ -193,7 +193,7 @@ const USER_DATA = {
 };
 
 const FALLBACK_USER = {
-  name: 'SnapSpace Creator',
+  name: 'HomeGenie Creator',
   username: '@creator',
   bio: 'AI-powered interior design enthusiast.',
   location: 'United States',
@@ -400,7 +400,7 @@ export default function UserProfileScreen({ navigation, route }) {
           </View>
         ) : designs.length === 0 ? (
           <View style={{ padding: 40, alignItems: 'center' }}>
-            <Text style={{ color: C.textSecondary, fontSize: 14 }}>No public posts yet</Text>
+            <Text style={{ color: C.textSecondary, fontSize: 14, fontFamily: 'KantumruyPro_400Regular' }}>No public posts yet</Text>
           </View>
         ) : (
           <View style={styles.grid}>
@@ -508,6 +508,7 @@ const styles = StyleSheet.create({
   avatarInitial: {
     fontSize: 34,
     fontWeight: '800',
+    fontFamily: 'KantumruyPro_700Bold',
     color: '#fff',
   },
   headerActions: {
@@ -531,6 +532,7 @@ const styles = StyleSheet.create({
   },
   followBtnText: {
     ...typeScale.button,
+    fontFamily: 'KantumruyPro_600SemiBold',
     color: C.white,
   },
   followingBtnText: {
@@ -549,6 +551,7 @@ const styles = StyleSheet.create({
   },
   messageBtnText: {
     ...typeScale.button,
+    fontFamily: 'KantumruyPro_600SemiBold',
     color: C.textPrimary,
   },
 
@@ -561,21 +564,25 @@ const styles = StyleSheet.create({
   displayName: {
     ...typeScale.title,
     fontWeight: '800',
+    fontFamily: 'KantumruyPro_700Bold',
     color: C.textPrimary,
     letterSpacing: -0.5,
   },
   username: {
     ...typeScale.caption,
+    fontFamily: 'KantumruyPro_400Regular',
     color: C.textSecondary,
     marginBottom: 10,
   },
   bio: {
     ...typeScale.body,
+    fontFamily: 'KantumruyPro_400Regular',
     color: C.textSecondary,
     marginBottom: 6,
   },
   location: {
     ...typeScale.caption,
+    fontFamily: 'KantumruyPro_400Regular',
     color: C.textTertiary,
     marginBottom: 12,
   },
@@ -595,6 +602,7 @@ const styles = StyleSheet.create({
   specialtyTagText: {
     ...typeScale.caption,
     fontWeight: '600',
+    fontFamily: 'KantumruyPro_600SemiBold',
     color: C.primary,
   },
 
@@ -613,11 +621,13 @@ const styles = StyleSheet.create({
   statValue: {
     ...typeScale.headline,
     fontWeight: '800',
+    fontFamily: 'KantumruyPro_700Bold',
     color: C.textPrimary,
     letterSpacing: -0.3,
   },
   statLabel: {
     ...typeScale.micro,
+    fontFamily: 'KantumruyPro_600SemiBold',
     color: C.textTertiary,
     marginTop: 3,
     textTransform: undefined,
@@ -641,12 +651,14 @@ const styles = StyleSheet.create({
   },
   tabLabel: {
     ...typeScale.body,
+    fontFamily: 'KantumruyPro_400Regular',
     color: C.textTertiary,
   },
   tabLabelActive: {
     ...typeScale.body,
     color: C.textPrimary,
     fontWeight: '700',
+    fontFamily: 'KantumruyPro_700Bold',
   },
   tabUnderline: {
     position: 'absolute',

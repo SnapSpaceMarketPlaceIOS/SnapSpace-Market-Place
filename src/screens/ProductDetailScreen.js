@@ -1,11 +1,11 @@
 /**
- * ProductDetailScreen — SnapSpace PDP
+ * ProductDetailScreen — HomeGenie PDP
  *
  * Layout (scroll order, top → bottom):
  *   S0  Hero image        Full-bleed photo + floating Back / Share / Heart
  *   ─── White card (rounded top corners, overlaps hero) ───────────────────
  *   S1  Identity          Brand (blue) · In-Stock pill · Title · Rating row
- *   S2  Verified badge    "This Item Is SnapSpace Verified" full-width pill
+ *   S2  Verified badge    "This Item Is HomeGenie Verified" full-width pill
  *   S3  Variants          Color / Size / Shape swatches (horizontal scroll)
  *   S4  Description       DESCRIPTION label + collapsible body  ← ABOVE price
  *   S5  FTC disclosure    Italic affiliate disclaimer
@@ -341,17 +341,17 @@ function ProductIdentity({ brand, title, description, rating, reviewCount, inSto
 const id = StyleSheet.create({
   wrap:      { paddingHorizontal: T.padH, paddingTop: 28 },
   bestSeller:   { backgroundColor: '#FFF4E6', borderRadius: 6, paddingHorizontal: 10, paddingVertical: 5, alignSelf: 'flex-start', marginBottom: 10 },
-  bestSellerTxt:{ fontSize: 12, fontWeight: T.w700, color: '#B45309', lineHeight: 16 },
-  title:     { fontSize: 22, fontWeight: T.w700, color: T.txtPri, lineHeight: 29, letterSpacing: -0.3 },
-  desc:      { fontSize: 14, fontWeight: T.w400, color: T.txtSec, lineHeight: 22, marginTop: 10 },
+  bestSellerTxt:{ fontSize: 12, fontWeight: T.w700, color: '#B45309', lineHeight: 16, fontFamily: 'KantumruyPro_700Bold'},
+  title:     { fontSize: 22, fontWeight: T.w700, color: T.txtPri, lineHeight: 29, letterSpacing: -0.3, fontFamily: 'KantumruyPro_700Bold'},
+  desc:      { fontSize: 14, fontWeight: T.w400, color: T.txtSec, lineHeight: 22, marginTop: 10, fontFamily: 'KantumruyPro_400Regular'},
   byRow:     { flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 14 },
-  byLine:    { fontSize: 14, fontWeight: T.w400, color: T.blue, lineHeight: 20 },
+  byLine:    { fontSize: 14, fontWeight: T.w400, color: T.blue, lineHeight: 20, fontFamily: 'KantumruyPro_400Regular'},
   stockPill: { flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: T.greenBg, borderRadius: T.rPill, paddingHorizontal: 7, paddingVertical: 3, borderWidth: 1, borderColor: T.green },
   dot:       { width: 5, height: 5, borderRadius: 3, backgroundColor: T.green },
-  stockTxt:  { fontSize: 11, fontWeight: T.w600, color: T.green, lineHeight: 14 },
+  stockTxt:  { fontSize: 11, fontWeight: T.w600, color: T.green, lineHeight: 14, fontFamily: 'KantumruyPro_600SemiBold'},
   ratingRow: { flexDirection: 'row', alignItems: 'center', gap: 3, marginTop: 14 },
-  score:     { fontSize: 14, fontWeight: T.w600, color: T.txtPri, lineHeight: 18, marginLeft: 3 },
-  reviews:   { fontSize: 13, fontWeight: T.w400, color: T.txtSec, lineHeight: 18 },
+  score:     { fontSize: 14, fontWeight: T.w600, color: T.txtPri, lineHeight: 18, marginLeft: 3, fontFamily: 'KantumruyPro_600SemiBold'},
+  reviews:   { fontSize: 13, fontWeight: T.w400, color: T.txtSec, lineHeight: 18, fontFamily: 'KantumruyPro_400Regular'},
 });
 
 // ─── S2: Best Seller Badge ────────────────────────────────────────────────────
@@ -378,7 +378,7 @@ function BestSellerBadge({ text }) {
 const vb = StyleSheet.create({
   wrap: { paddingHorizontal: T.padH, marginTop: 24 },
   pill: { flexDirection: 'row', alignItems: 'center', alignSelf: 'flex-start', backgroundColor: '#FFFFFF', borderRadius: 10, borderWidth: 1, borderColor: T.blue, paddingVertical: 8, paddingHorizontal: 14, gap: 6 },
-  label: { fontSize: 13, fontWeight: T.w600, color: T.blue, lineHeight: 18 },
+  label: { fontSize: 13, fontWeight: T.w600, color: T.blue, lineHeight: 18, fontFamily: 'KantumruyPro_600SemiBold'},
 });
 
 // ─── S3: VariantSelector ──────────────────────────────────────────────────────
@@ -447,7 +447,7 @@ function VariantSelector({ variants, selectedId, onSelect }) {
 
 const va = StyleSheet.create({
   wrap:       { paddingTop: 28 },
-  hint:       { fontSize: 13, fontWeight: T.w600, color: T.txtPri, lineHeight: 18, paddingHorizontal: T.padH, marginBottom: 12 },
+  hint:       { fontSize: 13, fontWeight: T.w600, color: T.txtPri, lineHeight: 18, paddingHorizontal: T.padH, marginBottom: 12, fontFamily: 'KantumruyPro_600SemiBold'},
   scroll:     { paddingHorizontal: T.padH, gap: 12 },
   tile:       { width: 120, borderRadius: T.rVariant, backgroundColor: '#FFFFFF', overflow: 'hidden', flexDirection: 'column' },
   tileOff:    { borderWidth: 1, borderColor: T.border },
@@ -456,8 +456,8 @@ const va = StyleSheet.create({
   swatchImg:  { width: '100%', height: '100%' },
   colorBlock: { width: '100%', height: '100%' },
   labelRow:   { paddingVertical: 8, paddingHorizontal: 6, minHeight: 36, justifyContent: 'center', backgroundColor: T.surface },
-  tileLabel:  { fontSize: 11, fontWeight: T.w400, color: T.txtSec, textAlign: 'center', lineHeight: 15 },
-  tileLabelOn:{ fontWeight: T.w700, color: T.txtPri },
+  tileLabel:  { fontSize: 11, fontWeight: T.w400, color: T.txtSec, textAlign: 'center', lineHeight: 15, fontFamily: 'KantumruyPro_400Regular'},
+  tileLabelOn:{ fontWeight: T.w700, color: T.txtPri, fontFamily: 'KantumruyPro_700Bold'},
 });
 
 // ─── S3b: SizeSelector ───────────────────────────────────────────────────────
@@ -498,17 +498,17 @@ function SizeSelector({ sizes }) {
 
 const sz = StyleSheet.create({
   wrap:            { paddingHorizontal: T.padH, marginTop: 24 },
-  label:           { fontSize: 14, fontWeight: T.w400, color: T.txtPri, marginBottom: 10 },
-  labelBold:       { fontWeight: T.w700 },
+  label:           { fontSize: 14, fontWeight: T.w400, color: T.txtPri, marginBottom: 10, fontFamily: 'KantumruyPro_400Regular'},
+  labelBold:       { fontWeight: T.w700, fontFamily: 'KantumruyPro_700Bold'},
   scroll:          { gap: 10 },
   tile:            { borderWidth: 1, borderColor: T.border, borderRadius: T.rMd, paddingHorizontal: 16, paddingVertical: 10, minWidth: 120 },
   tileActive:      { borderColor: T.blue, borderWidth: 1 },
-  sizeLabel:       { fontSize: 14, fontWeight: T.w600, color: T.txtPri, lineHeight: 20 },
+  sizeLabel:       { fontSize: 14, fontWeight: T.w600, color: T.txtPri, lineHeight: 20, fontFamily: 'KantumruyPro_600SemiBold'},
   sizeLabelActive: { color: T.txtPri },
-  sizePrice:       { fontSize: 13, fontWeight: T.w400, color: T.txtPri, lineHeight: 18, marginTop: 2 },
-  sizePriceActive: { fontWeight: T.w600 },
-  sizeCompare:     { fontSize: 12, fontWeight: T.w400, color: T.txtSec, textDecorationLine: 'line-through', lineHeight: 16 },
-  sizeStock:       { fontSize: 11, fontWeight: T.w600, color: T.green, marginTop: 3, lineHeight: 14 },
+  sizePrice:       { fontSize: 13, fontWeight: T.w400, color: T.txtPri, lineHeight: 18, marginTop: 2, fontFamily: 'KantumruyPro_400Regular'},
+  sizePriceActive: { fontWeight: T.w600, fontFamily: 'KantumruyPro_600SemiBold'},
+  sizeCompare:     { fontSize: 12, fontWeight: T.w400, color: T.txtSec, textDecorationLine: 'line-through', lineHeight: 16, fontFamily: 'KantumruyPro_400Regular'},
+  sizeStock:       { fontSize: 11, fontWeight: T.w600, color: T.green, marginTop: 3, lineHeight: 14, fontFamily: 'KantumruyPro_600SemiBold'},
 });
 
 // ─── S4: ProductDescription ───────────────────────────────────────────────────
@@ -531,9 +531,9 @@ function ProductDescription({ text }) {
 
 const dc = StyleSheet.create({
   wrap:   { paddingHorizontal: T.padH, marginTop: 22 },
-  label:  { fontSize: 10, fontWeight: T.w600, color: T.txtSec, letterSpacing: 1.0, textTransform: 'uppercase', lineHeight: 14 },
-  body:   { fontSize: 15, fontWeight: T.w400, color: T.txtPri, lineHeight: 24, marginTop: 8 },
-  toggle: { fontSize: 13, fontWeight: T.w600, color: T.blue, marginTop: 4 },
+  label:  { fontSize: 10, fontWeight: T.w600, color: T.txtSec, letterSpacing: 1.0, textTransform: 'uppercase', lineHeight: 14, fontFamily: 'KantumruyPro_600SemiBold'},
+  body:   { fontSize: 15, fontWeight: T.w400, color: T.txtPri, lineHeight: 24, marginTop: 8, fontFamily: 'KantumruyPro_400Regular'},
+  toggle: { fontSize: 13, fontWeight: T.w600, color: T.blue, marginTop: 4, fontFamily: 'KantumruyPro_600SemiBold'},
 });
 
 // ─── S5: FTC Disclosure ───────────────────────────────────────────────────────
@@ -547,7 +547,7 @@ function FTCNote() {
 }
 
 const ftc = StyleSheet.create({
-  txt: { fontSize: 11, fontWeight: T.w400, color: T.txtMeta, fontStyle: 'italic', textAlign: 'center', marginTop: 24, marginHorizontal: T.padH },
+  txt: { fontSize: 11, fontWeight: T.w400, color: T.txtMeta, fontStyle: 'italic', textAlign: 'center', marginTop: 24, marginHorizontal: T.padH, fontFamily: 'KantumruyPro_400Regular'},
 });
 
 // ─── S6: PriceBlock ───────────────────────────────────────────────────────────
@@ -566,8 +566,8 @@ function PriceBlock({ price, originalPrice }) {
 
 const pr = StyleSheet.create({
   wrap:     { flexDirection: 'row', alignItems: 'center', gap: 14, paddingHorizontal: T.padH, marginTop: 24 },
-  price:    { fontSize: 28, fontWeight: T.w800, color: T.blue, letterSpacing: -0.5, lineHeight: 34 },
-  original: { fontSize: 15, fontWeight: T.w400, color: T.txtSec, textDecorationLine: 'line-through', lineHeight: 20 },
+  price:    { fontSize: 28, fontWeight: T.w800, color: T.blue, letterSpacing: -0.5, lineHeight: 34, fontFamily: 'KantumruyPro_700Bold'},
+  original: { fontSize: 15, fontWeight: T.w400, color: T.txtSec, textDecorationLine: 'line-through', lineHeight: 20, fontFamily: 'KantumruyPro_400Regular'},
 });
 
 // ─── S7: DeliveryBox ─────────────────────────────────────────────────────────
@@ -587,8 +587,8 @@ function DeliveryBox({ date }) {
 const dv = StyleSheet.create({
   box:      { marginHorizontal: T.padH, marginTop: 14, borderWidth: 1, borderColor: T.blue, borderRadius: 30, paddingVertical: 8, paddingHorizontal: 14, flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: T.surface },
   greenPill:{ backgroundColor: '#F0FDF4', borderRadius: T.rPill, paddingHorizontal: 10, paddingVertical: 4, borderWidth: 1, borderColor: T.green },
-  greenTxt: { fontSize: 11, fontWeight: T.w600, color: T.green, lineHeight: 15 },
-  date:     { flex: 1, fontSize: 13, fontWeight: T.w400, color: T.txtPri, lineHeight: 18 },
+  greenTxt: { fontSize: 11, fontWeight: T.w600, color: T.green, lineHeight: 15, fontFamily: 'KantumruyPro_600SemiBold'},
+  date:     { flex: 1, fontSize: 13, fontWeight: T.w400, color: T.txtPri, lineHeight: 18, fontFamily: 'KantumruyPro_400Regular'},
 });
 
 // ─── S8: QuantitySelector ────────────────────────────────────────────────────
@@ -626,9 +626,9 @@ const qs = StyleSheet.create({
   btn:       { width: 28, height: 28, alignItems: 'center', justifyContent: 'center' },
   btnDim:    { opacity: 0.32 },
   divider:   { width: 1, height: 16, backgroundColor: T.border },
-  symbol:    { fontSize: 16, fontWeight: T.w400, color: T.txtPri, lineHeight: 20 },
+  symbol:    { fontSize: 16, fontWeight: T.w400, color: T.txtPri, lineHeight: 20, fontFamily: 'KantumruyPro_400Regular'},
   symbolDim: { color: T.txtMeta },
-  count:     { fontSize: 14, fontWeight: T.w600, color: T.txtPri, width: 36, textAlign: 'center', lineHeight: 20 },
+  count:     { fontSize: 14, fontWeight: T.w600, color: T.txtPri, width: 36, textAlign: 'center', lineHeight: 20, fontFamily: 'KantumruyPro_600SemiBold'},
 });
 
 // ─── S9: ProductDetails ───────────────────────────────────────────────────────
@@ -691,12 +691,12 @@ const pdt = StyleSheet.create({
   header:       { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 },
   headerLeft:   { flexDirection: 'row', alignItems: 'center', gap: 8 },
   headerAccent: { width: 3, height: 14, borderRadius: 2, backgroundColor: T.blue },
-  sLabel:       { fontSize: 11, fontWeight: T.w700, color: T.txtSec, letterSpacing: 1.2, textTransform: 'uppercase' },
+  sLabel:       { fontSize: 11, fontWeight: T.w700, color: T.txtSec, letterSpacing: 1.2, textTransform: 'uppercase', fontFamily: 'KantumruyPro_700Bold'},
   card:    { backgroundColor: T.surface, borderRadius: T.rMd, borderWidth: 1, borderColor: T.border, marginTop: 12, overflow: 'hidden' },
   row:     { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', height: 52, paddingHorizontal: T.padH, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: T.divider },
   rowLast: { borderBottomWidth: 0 },
-  key:     { fontSize: 14, fontWeight: T.w400, color: T.txtSec, lineHeight: 20 },
-  val:     { fontSize: 14, fontWeight: T.w700, color: T.txtPri, textAlign: 'right', maxWidth: '58%', lineHeight: 20 },
+  key:     { fontSize: 14, fontWeight: T.w400, color: T.txtSec, lineHeight: 20, fontFamily: 'KantumruyPro_400Regular'},
+  val:     { fontSize: 14, fontWeight: T.w700, color: T.txtPri, textAlign: 'right', maxWidth: '58%', lineHeight: 20, fontFamily: 'KantumruyPro_700Bold'},
 });
 
 // ─── S10: KeyFeatures — Premium Numbered Infographic ─────────────────────────
@@ -780,7 +780,7 @@ const kf = StyleSheet.create({
   headerRow:   { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 },
   headerLeft:  { flexDirection: 'row', alignItems: 'center', gap: 8 },
   headerAccent:{ width: 3, height: 14, borderRadius: 2, backgroundColor: T.blue },
-  sLabel:      { fontSize: 11, fontWeight: T.w700, color: T.txtSec, letterSpacing: 1.2, textTransform: 'uppercase' },
+  sLabel:      { fontSize: 11, fontWeight: T.w700, color: T.txtSec, letterSpacing: 1.2, textTransform: 'uppercase', fontFamily: 'KantumruyPro_700Bold'},
 
   // Outer panel — single rounded card
   panel:       { borderRadius: T.rMd, borderWidth: 1, borderColor: T.border, backgroundColor: T.surface, overflow: 'hidden' },
@@ -791,13 +791,13 @@ const kf = StyleSheet.create({
 
   // Left column: number above icon
   leftCol:     { alignItems: 'center', gap: 6, width: 44 },
-  num:         { fontSize: 11, fontWeight: T.w700, color: T.blue, letterSpacing: 0.5, lineHeight: 14 },
+  num:         { fontSize: 11, fontWeight: T.w700, color: T.blue, letterSpacing: 0.5, lineHeight: 14, fontFamily: 'KantumruyPro_700Bold'},
   iconCircle:  { width: 40, height: 40, borderRadius: 10, backgroundColor: T.featBg, alignItems: 'center', justifyContent: 'center' },
 
   // Right column: title + sub
   rightCol:    { flex: 1 },
-  featureName: { fontSize: 14, fontWeight: T.w600, color: T.txtPri, lineHeight: 20 },
-  featureSub:  { fontSize: 13, fontWeight: T.w400, color: T.txtSec, lineHeight: 19, marginTop: 3 },
+  featureName: { fontSize: 14, fontWeight: T.w600, color: T.txtPri, lineHeight: 20, fontFamily: 'KantumruyPro_600SemiBold'},
+  featureSub:  { fontSize: 13, fontWeight: T.w400, color: T.txtSec, lineHeight: 19, marginTop: 3, fontFamily: 'KantumruyPro_400Regular'},
 });
 
 // ─── S11: TrustBadges ────────────────────────────────────────────────────────
@@ -830,8 +830,8 @@ function TrustBadges() {
 const tb = StyleSheet.create({
   tile:       { alignItems: 'center', backgroundColor: T.surface, borderRadius: T.rMd, borderWidth: 1, borderColor: T.border, paddingHorizontal: 20, paddingVertical: 16, minWidth: 114 },
   iconCircle: { width: 44, height: 44, borderRadius: 22, backgroundColor: T.featBg, alignItems: 'center', justifyContent: 'center' },
-  name:       { fontSize: 12, fontWeight: T.w600, color: T.txtPri, textAlign: 'center', marginTop: 8, lineHeight: 16 },
-  sub:        { fontSize: 11, fontWeight: T.w400, color: T.txtSec, textAlign: 'center', marginTop: 2, lineHeight: 14 },
+  name:       { fontSize: 12, fontWeight: T.w600, color: T.txtPri, textAlign: 'center', marginTop: 8, lineHeight: 16, fontFamily: 'KantumruyPro_600SemiBold'},
+  sub:        { fontSize: 11, fontWeight: T.w400, color: T.txtSec, textAlign: 'center', marginTop: 2, lineHeight: 14, fontFamily: 'KantumruyPro_400Regular'},
 });
 
 // ─── S12: SimilarProducts ────────────────────────────────────────────────────
@@ -860,13 +860,13 @@ function SimilarProducts({ products, onPress }) {
 }
 
 const sp = StyleSheet.create({
-  sLabel:  { fontSize: 10, fontWeight: T.w600, color: T.txtSec, letterSpacing: 1.0, textTransform: 'uppercase', paddingHorizontal: T.padH },
+  sLabel:  { fontSize: 10, fontWeight: T.w600, color: T.txtSec, letterSpacing: 1.0, textTransform: 'uppercase', paddingHorizontal: T.padH, fontFamily: 'KantumruyPro_600SemiBold'},
   card:    { width: 158 },
   imgWrap: { width: 158, height: 138, borderRadius: T.rMd, overflow: 'hidden', backgroundColor: T.imageBg },
   img:     { width: 158, height: 138 },
-  brand:   { fontSize: 10, fontWeight: T.w600, color: T.blue, letterSpacing: 0.6, marginTop: 8, lineHeight: 14 },
-  title:   { fontSize: 13, fontWeight: T.w600, color: T.txtPri, lineHeight: 17, marginTop: 3 },
-  price:   { fontSize: 14, fontWeight: T.w700, color: T.txtPri, marginTop: 3 },
+  brand:   { fontSize: 10, fontWeight: T.w600, color: T.blue, letterSpacing: 0.6, marginTop: 8, lineHeight: 14, fontFamily: 'KantumruyPro_600SemiBold'},
+  title:   { fontSize: 13, fontWeight: T.w600, color: T.txtPri, lineHeight: 17, marginTop: 3, fontFamily: 'KantumruyPro_600SemiBold'},
+  price:   { fontSize: 14, fontWeight: T.w700, color: T.txtPri, marginTop: 3, fontFamily: 'KantumruyPro_700Bold'},
 });
 
 // ─── S13: FromPost ────────────────────────────────────────────────────────────
@@ -898,12 +898,12 @@ function FromPostSection({ design }) {
 
 const fp = StyleSheet.create({
   wrap:      { marginHorizontal: T.padH, marginTop: 32, backgroundColor: '#F8F9FB', borderRadius: T.rMd, padding: 14 },
-  sLabel:    { fontSize: 10, fontWeight: T.w600, color: T.txtSec, letterSpacing: 1.0, textTransform: 'uppercase', marginBottom: 10 },
+  sLabel:    { fontSize: 10, fontWeight: T.w600, color: T.txtSec, letterSpacing: 1.0, textTransform: 'uppercase', marginBottom: 10, fontFamily: 'KantumruyPro_600SemiBold'},
   row:       { flexDirection: 'row', alignItems: 'center', gap: 10 },
   avatar:    { width: 30, height: 30, borderRadius: 15, backgroundColor: T.blue, alignItems: 'center', justifyContent: 'center' },
-  initial:   { fontSize: 13, fontWeight: T.w700, color: '#FFF' },
-  postTitle: { fontSize: 13, fontWeight: T.w700, color: T.txtPri, lineHeight: 17 },
-  postUser:  { fontSize: 12, color: T.txtSec },
+  initial:   { fontSize: 13, fontWeight: T.w700, color: '#FFF', fontFamily: 'KantumruyPro_700Bold'},
+  postTitle: { fontSize: 13, fontWeight: T.w700, color: T.txtPri, lineHeight: 17, fontFamily: 'KantumruyPro_700Bold'},
+  postUser:  { fontSize: 12, color: T.txtSec, fontFamily: 'KantumruyPro_400Regular'},
 });
 
 // ─── Fixed: StickyHeader ─────────────────────────────────────────────────────
@@ -928,7 +928,7 @@ const sth = StyleSheet.create({
   bar:   { position: 'absolute', top: 0, left: 0, right: 0, backgroundColor: T.surface, borderBottomWidth: 0.5, borderBottomColor: 'rgba(0,0,0,0.08)', zIndex: 100 },
   inner: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: T.padH, paddingBottom: 12 },
   btn:   { width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
-  title: { flex: 1, fontSize: 15, fontWeight: T.w600, color: T.txtPri, textAlign: 'center', marginHorizontal: 4 },
+  title: { flex: 1, fontSize: 15, fontWeight: T.w600, color: T.txtPri, textAlign: 'center', marginHorizontal: 4, fontFamily: 'KantumruyPro_600SemiBold'},
 });
 
 // ─── Fixed: CTABar ────────────────────────────────────────────────────────────
@@ -1014,7 +1014,7 @@ const cta = StyleSheet.create({
 
   // ── Affiliate link ────────────────────────────────────────────────────────
   affiliateRow: { alignItems: 'center', marginBottom: 10 },
-  affiliateTxt: { fontSize: 12, fontWeight: T.w500, color: T.txtSec, lineHeight: 16 },
+  affiliateTxt: { fontSize: 12, fontWeight: T.w500, color: T.txtSec, lineHeight: 16, fontFamily: 'KantumruyPro_500Medium'},
 
   // ── Add to Cart button — full-width pill ─────────────────────────────────
   cartWrap:     { flex: 1 },
@@ -1043,6 +1043,7 @@ const cta = StyleSheet.create({
     top: 0, left: 0, right: 0,
     fontSize: 16,
     fontWeight: T.w700,
+    fontFamily: 'KantumruyPro_400Regular',
     lineHeight: 22,
     textAlign: 'center',
     letterSpacing: 0.1,

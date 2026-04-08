@@ -204,8 +204,8 @@ export default function ShopTheLookScreen({ route, navigation }) {
     setShareActive(true);
     try {
       const msg = design.prompt
-        ? `Check out this SnapSpace design: "${design.prompt}"`
-        : 'Check out this SnapSpace design!';
+        ? `Check out this HomeGenie design: "${design.prompt}"`
+        : 'Check out this HomeGenie design!';
       await Share.share({ message: msg, url: design.imageUrl || '' });
     } catch {}
   };
@@ -471,6 +471,7 @@ const s = StyleSheet.create({
   headerTitle: {
     fontSize: 17,
     fontWeight: '700',
+    fontFamily: 'KantumruyPro_700Bold',
     color: C.textPrimary,
     letterSpacing: letterSpacing.tight,
   },
@@ -514,14 +515,17 @@ const s = StyleSheet.create({
     ...typeScale.caption,
     color: '#fff',
     fontWeight: '700',
+    fontFamily: 'KantumruyPro_700Bold',
   },
   userInfo: { flex: 1 },
   username: {
     ...typeScale.headline,
+    fontFamily: 'KantumruyPro_600SemiBold',
     color: C.textPrimary,
   },
   userSub: {
     ...typeScale.caption,
+    fontFamily: 'KantumruyPro_400Regular',
     color: C.textSecondary,
     marginTop: 2,
   },
@@ -553,12 +557,14 @@ const s = StyleSheet.create({
   },
   followBtnText: {
     ...typeScale.button,
+    fontFamily: 'KantumruyPro_600SemiBold',
     color: '#fff',
   },
 
   // ── Title + Description ──
   promptLabel: {
     ...typeScale.subheadline,
+    fontFamily: 'KantumruyPro_600SemiBold',
     color: C.textTertiary,
     marginHorizontal: space.lg,
     marginBottom: 4,
@@ -567,6 +573,7 @@ const s = StyleSheet.create({
   promptBody: {
     fontSize: 13,
     fontWeight: '400',
+    fontFamily: 'KantumruyPro_400Regular',
     color: '#67ACE9',
     lineHeight: 18,
     marginHorizontal: space.lg,
@@ -574,6 +581,7 @@ const s = StyleSheet.create({
   },
   desc: {
     ...typeScale.body,
+    fontFamily: 'KantumruyPro_400Regular',
     color: C.textSecondary,
     marginHorizontal: space.lg,
     marginBottom: space.base,
@@ -593,6 +601,7 @@ const s = StyleSheet.create({
   },
   sectionLabel: {
     ...typeScale.subheadline,
+    fontFamily: 'KantumruyPro_600SemiBold',
     color: C.textTertiary,
     marginBottom: space.md,
   },
@@ -603,6 +612,7 @@ const s = StyleSheet.create({
   },
   ftc: {
     fontSize: 11,
+    fontFamily: 'KantumruyPro_400Regular',
     fontStyle: 'italic',
     color: C.textTertiary,
     textAlign: 'center',
@@ -632,6 +642,7 @@ const s = StyleSheet.create({
   },
   tagText: {
     ...typeScale.caption,
+    fontFamily: 'KantumruyPro_400Regular',
     color: C.textSecondary,
   },
   tagTextHighlight: {
@@ -660,12 +671,14 @@ const s = StyleSheet.create({
   hCardName: {
     fontSize: 13,
     fontWeight: '600',
+    fontFamily: 'KantumruyPro_600SemiBold',
     color: C.textPrimary,
     lineHeight: 17,
   },
   hCardBrand: {
     fontSize: 11,
     fontWeight: '400',
+    fontFamily: 'KantumruyPro_400Regular',
     color: C.textTertiary,
     marginTop: 1,
   },
@@ -678,16 +691,19 @@ const s = StyleSheet.create({
   hCardRatingText: {
     fontSize: 10,
     fontWeight: '600',
+    fontFamily: 'KantumruyPro_600SemiBold',
     color: C.textPrimary,
     marginLeft: 2,
   },
   hCardReviews: {
     fontSize: 10,
+    fontFamily: 'KantumruyPro_400Regular',
     color: C.textSecondary,
   },
   hCardPrice: {
     fontSize: 14,
     fontWeight: '700',
+    fontFamily: 'KantumruyPro_700Bold',
     color: C.primary,
     marginTop: 4,
   },
@@ -750,6 +766,7 @@ const s = StyleSheet.create({
   pillCheck: {
     fontSize: 18,
     fontWeight: '700',
+    fontFamily: 'KantumruyPro_700Bold',
     color: '#fff',
   },
   pillMeta: {
@@ -758,18 +775,21 @@ const s = StyleSheet.create({
   pillCount: {
     fontSize: 11,
     fontWeight: '500',
+    fontFamily: 'KantumruyPro_500Medium',
     color: 'rgba(255,255,255,0.75)',
     lineHeight: 14,
   },
   pillPrice: {
     fontSize: 15,
     fontWeight: '700',
+    fontFamily: 'KantumruyPro_700Bold',
     color: '#fff',
     lineHeight: 18,
   },
   pillAction: {
     fontSize: 15,
     fontWeight: '700',
+    fontFamily: 'KantumruyPro_700Bold',
     color: '#fff',
   },
 });

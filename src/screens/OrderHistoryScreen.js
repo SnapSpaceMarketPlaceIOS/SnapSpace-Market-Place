@@ -256,6 +256,7 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     ...typeScale.title,
+    fontFamily: 'KantumruyPro_700Bold',
     color: C.textPrimary,
   },
 
@@ -268,12 +269,14 @@ const styles = StyleSheet.create({
   },
   emptyTitle: {
     ...typeScale.title,
+    fontFamily: 'KantumruyPro_700Bold',
     color: C.textPrimary,
     marginTop: 20,
     marginBottom: 10,
   },
   emptySubtitle: {
     ...typeScale.body,
+    fontFamily: 'KantumruyPro_400Regular',
     color: C.textSecondary,
     textAlign: 'center',
     marginBottom: 32,
@@ -289,6 +292,7 @@ const styles = StyleSheet.create({
   },
   emptyBtnText: {
     ...typeScale.button,
+    fontFamily: 'KantumruyPro_600SemiBold',
     color: C.white,
   },
 
@@ -299,6 +303,7 @@ const styles = StyleSheet.create({
   },
   sectionLabel: {
     ...typeScale.subheadline,
+    fontFamily: 'KantumruyPro_600SemiBold',
     color: C.textTertiary,
     marginBottom: 14,
   },
@@ -333,10 +338,12 @@ const styles = StyleSheet.create({
   orderId: {
     ...typeScale.button,
     fontWeight: '700',
+    fontFamily: 'KantumruyPro_700Bold',
     color: C.textPrimary,
   },
   orderDate: {
     ...typeScale.caption,
+    fontFamily: 'KantumruyPro_400Regular',
     color: C.textSecondary,
     marginTop: 3,
   },
@@ -358,6 +365,7 @@ const styles = StyleSheet.create({
   badgeText: {
     ...typeScale.caption,
     fontWeight: '600',
+    fontFamily: 'KantumruyPro_600SemiBold',
   },
 
   // Summary row
@@ -370,10 +378,12 @@ const styles = StyleSheet.create({
   },
   itemCountText: {
     ...typeScale.caption,
+    fontFamily: 'KantumruyPro_400Regular',
     color: C.textSecondary,
   },
   totalText: {
     ...typeScale.price,
+    fontFamily: 'KantumruyPro_700Bold',
     color: C.textPrimary,
   },
 
@@ -413,15 +423,18 @@ const styles = StyleSheet.create({
   itemName: {
     ...typeScale.caption,
     fontWeight: '600',
+    fontFamily: 'KantumruyPro_600SemiBold',
     color: C.textPrimary,
     marginBottom: 2,
   },
   itemMeta: {
     ...typeScale.caption,
+    fontFamily: 'KantumruyPro_400Regular',
     color: C.textSecondary,
   },
   itemPrice: {
     ...typeScale.priceSmall,
+    fontFamily: 'KantumruyPro_600SemiBold',
     color: C.textPrimary,
     marginLeft: 8,
   },
@@ -436,20 +449,24 @@ const styles = StyleSheet.create({
   },
   breakdownLabel: {
     ...typeScale.caption,
+    fontFamily: 'KantumruyPro_400Regular',
     color: C.textSecondary,
   },
   breakdownValue: {
     ...typeScale.caption,
     fontWeight: '600',
+    fontFamily: 'KantumruyPro_600SemiBold',
     color: C.textSecondary,
   },
   breakdownTotalLabel: {
     ...typeScale.button,
     fontWeight: '700',
+    fontFamily: 'KantumruyPro_700Bold',
     color: C.textPrimary,
   },
   breakdownTotalValue: {
     ...typeScale.price,
+    fontFamily: 'KantumruyPro_700Bold',
     color: C.textPrimary,
   },
 });

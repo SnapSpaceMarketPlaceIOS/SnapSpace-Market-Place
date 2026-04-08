@@ -212,6 +212,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 17,
     fontWeight: '800',
+    fontFamily: 'KantumruyPro_700Bold',
     color: '#111',
     letterSpacing: -0.3,
   },
@@ -234,12 +235,13 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 2,
   },
-  searchInput: { flex: 1, fontSize: 15, color: '#111' },
-  clearBtn: { fontSize: 13, color: '#AAA', fontWeight: '600' },
+  searchInput: { flex: 1, fontSize: 15, color: '#111', fontFamily: 'KantumruyPro_400Regular'},
+  clearBtn: { fontSize: 13, color: '#AAA', fontWeight: '600', fontFamily: 'KantumruyPro_600SemiBold'},
 
   sectionLabel: {
     fontSize: 11,
     fontWeight: '700',
+    fontFamily: 'KantumruyPro_700Bold',
     color: '#A0A0A8',
     letterSpacing: 1,
     marginBottom: 10,
@@ -267,15 +269,16 @@ const styles = StyleSheet.create({
   rowBorder: { borderBottomWidth: 1, borderBottomColor: '#F4F4F6' },
   rowSelected: { backgroundColor: '#F5F9FF' },
   rowContent: { flex: 1 },
-  rowName: { fontSize: 14, fontWeight: '600', color: '#111', marginBottom: 2 },
+  rowName: { fontSize: 14, fontWeight: '600', color: '#111', marginBottom: 2, fontFamily: 'KantumruyPro_600SemiBold'},
   rowNameSelected: { color: colors.bluePrimary },
-  rowMeta: { fontSize: 12, color: '#999' },
+  rowMeta: { fontSize: 12, color: '#999', fontFamily: 'KantumruyPro_400Regular'},
 
   noResults: { paddingVertical: 28, alignItems: 'center' },
-  noResultsText: { fontSize: 14, color: '#AAA' },
+  noResultsText: { fontSize: 14, color: '#AAA', fontFamily: 'KantumruyPro_400Regular'},
 
   footer: {
     fontSize: 12,
+    fontFamily: 'KantumruyPro_400Regular',
     color: '#AAAAAA',
     textAlign: 'center',
     lineHeight: 18,

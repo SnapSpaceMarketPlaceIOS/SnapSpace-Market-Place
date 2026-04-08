@@ -48,7 +48,7 @@ export async function registerForPushNotifications(userId) {
 
     if (Platform.OS === 'android') {
       await Notifications.setNotificationChannelAsync('default', {
-        name: 'SnapSpace',
+        name: 'HomeGenie',
         importance: Notifications.AndroidImportance.MAX,
         vibrationPattern: [0, 250, 250, 250],
         lightColor: '#0B6DC3',

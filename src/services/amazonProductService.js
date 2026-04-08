@@ -1,5 +1,5 @@
 /**
- * SnapSpace — Amazon Product Service
+ * HomeGenie — Amazon Product Service
  *
  * Calls the `amazon-search` Supabase Edge Function, which proxies
  * Amazon PA-API v5 SearchItems server-side (keeps the secret key off device).
