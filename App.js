@@ -19,7 +19,7 @@ import { AuthProvider, useAuth } from './src/context/AuthContext';
 import { SubscriptionProvider } from './src/context/SubscriptionContext';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import Svg, { Path, Circle, Polyline, Line } from 'react-native-svg';
+import Svg, { Path, Circle, Polyline, Line, Ellipse } from 'react-native-svg';
 import { colors as C } from './src/constants/theme';
 import { fontSize, fontWeight, radius } from './src/constants/tokens';
 
@@ -62,70 +62,81 @@ const Stack = createNativeStackNavigator();
 // ─── Figma spec constants ────────────────────────────────────────
 const ICON_SIZE = 26;
 
-// ─── Icons — matched to Figma "light" asset set ───────────────────
+// ─── Tab Bar Icons (from Navigation Bar Icons.svg) ──────────────
 
-// Home_light: house outline with small arched window inside
+// Home: house with peaked roof + rounded-corner door
 function HomeIcon({ color, size }) {
   return (
-    <Svg width={size} height={size} viewBox="0 0 35 35" fill="none">
+    <Svg width={size} height={size} viewBox="95 20.5 23 23" fill="none">
       <Path
-        d="M4 15.5L17.5 4L31 15.5V30C31 30.55 30.55 31 30 31H22V23C22 22.45 21.55 22 21 22H14C13.45 22 13 22.45 13 23V31H5C4.45 31 4 30.55 4 30V15.5Z"
-        stroke={color} strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round"
+        d="M96 31.8422C96 30.0656 96 29.1773 96.4117 28.3964C96.8234 27.6156 97.5965 27.0375 99.1429 25.8813L100.643 24.7597C103.438 22.6698 104.835 21.6249 106.5 21.6249C108.165 21.6249 109.562 22.6698 112.357 24.7597L113.857 25.8813C115.403 27.0375 116.177 27.6156 116.588 28.3964C117 29.1773 117 30.0656 117 31.8422V37.3908C117 39.8582 117 41.0919 116.121 41.8584C115.243 42.6249 113.828 42.6249 111 42.6249H102C99.1716 42.6249 97.7574 42.6249 96.8787 41.8584C96 41.0919 96 39.8582 96 37.3908V31.8422Z"
+        stroke={color} strokeWidth={1}
       />
       <Path
-        d="M14 31V24H21V31"
-        stroke={color} strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round"
+        d="M110.146 42.625V34.875C110.146 34.3227 109.698 33.875 109.146 33.875H103.854C103.302 33.875 102.854 34.3227 102.854 34.875V42.625"
+        stroke={color} strokeWidth={1} strokeLinecap="round" strokeLinejoin="round"
       />
     </Svg>
   );
 }
 
-// Search_light: clean circle + angled handle
+// Explore: oval magnifying glass + angled handle
 function SearchIcon({ color, size }) {
   return (
-    <Svg width={size} height={size} viewBox="0 0 31 32" fill="none">
-      <Circle cx={13} cy={13} r={9} stroke={color} strokeWidth={1.6} />
-      <Line x1={20} y1={20} x2={28} y2={28} stroke={color} strokeWidth={1.6} strokeLinecap="round" />
+    <Svg width={size} height={size} viewBox="154 21.5 22 22" fill="none">
+      <Ellipse cx={163.208} cy={30.6666} rx={7.75} ry={8} stroke={color} strokeWidth={1} />
+      <Path d="M174.833 42.6666L170.958 38.6666" stroke={color} strokeWidth={1} strokeLinecap="round" />
     </Svg>
   );
 }
 
-// Camera: rounded rect body + bump + circle lens
+// Snap: camera body + circular lens (sparkle added as overlay in tab options)
 function CameraIcon({ color, size }) {
   return (
-    <Svg width={size} height={size} viewBox="0 0 32 31" fill="none">
+    <Svg width={size} height={size} viewBox="208 21 26 23" fill="none">
       <Path
-        d="M2 10C2 8.9 2.9 8 4 8H8.5L10.5 5H21.5L23.5 8H28C29.1 8 30 8.9 30 10V26C30 27.1 29.1 28 28 28H4C2.9 28 2 27.1 2 26V10Z"
-        stroke={color} strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round"
+        d="M209 29.819C209 28.4462 210.113 27.3333 211.486 27.3333C212.416 27.3333 213.268 26.8141 213.695 25.9876L214.778 23.8888C215.098 23.2694 215.257 22.9596 215.491 22.7324C215.706 22.5234 215.966 22.3654 216.25 22.2702C216.559 22.1666 216.908 22.1666 217.605 22.1666H224.395C225.092 22.1666 225.441 22.1666 225.75 22.2702C226.034 22.3654 226.294 22.5234 226.509 22.7324C226.743 22.9596 226.902 23.2694 227.222 23.8888L228.305 25.9876C228.732 26.8141 229.584 27.3333 230.514 27.3333C231.887 27.3333 233 28.4462 233 29.819V36.8333C233 39.6617 233 41.0759 232.121 41.9546C231.243 42.8333 229.828 42.8333 227 42.8333H215C212.172 42.8333 210.757 42.8333 209.879 41.9546C209 41.0759 209 39.6617 209 36.8333V29.819Z"
+        stroke={color} strokeWidth={1}
       />
-      <Circle cx={16} cy={18} r={5} stroke={color} strokeWidth={1.6} />
+      <Path
+        d="M221 29.125C223.684 29.125 225.834 31.2295 225.834 33.792C225.833 36.3543 223.684 38.458 221 38.458C218.315 38.4578 216.167 36.3542 216.167 33.792C216.167 31.2296 218.315 29.1252 221 29.125Z"
+        stroke={color} strokeWidth={1}
+      />
     </Svg>
   );
 }
 
-// Basket_alt_3_light: shopping cart with angled handle + 2 wheels
+// Cart: angled trolley with handle + body + wheels
 function CartIcon({ color, size }) {
   return (
-    <Svg width={size} height={size} viewBox="0 0 35 32" fill="none">
+    <Svg width={size} height={size} viewBox="265.5 20.5 27 25" fill="none">
       <Path
-        d="M1 1H6L9 20H27L30 8H6"
-        stroke={color} strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round"
+        d="M267.104 22H270.08C270.756 22 271.094 22 271.353 22.1807C271.611 22.3614 271.727 22.6792 271.959 23.3149L272.937 26"
+        stroke={color} strokeWidth={1} strokeLinecap="round"
       />
-      <Circle cx={12} cy={27} r={2} stroke={color} strokeWidth={1.6} />
-      <Circle cx={25} cy={27} r={2} stroke={color} strokeWidth={1.6} />
+      <Path
+        d="M287.521 39.3334H273.63C272.984 39.3334 272.661 39.3334 272.442 39.218C272.156 39.0675 271.961 38.7883 271.917 38.4684C271.884 38.2233 271.995 37.9197 272.216 37.3126C272.448 36.675 272.565 36.3562 272.755 36.1102C273.003 35.789 273.343 35.551 273.73 35.4278C274.026 35.3334 274.365 35.3334 275.044 35.3334H283.146"
+        stroke={color} strokeWidth={1} strokeLinecap="round" strokeLinejoin="round"
+      />
+      <Path
+        d="M283.846 35.3333H276.939C275.703 35.3333 275.085 35.3333 274.594 35.0212C274.103 34.7091 273.841 34.1497 273.317 33.0311L272.024 30.2733C271.123 28.3515 270.673 27.3906 271.115 26.6953C271.557 26 272.618 26 274.74 26H286.483C288.876 26 290.073 26 290.501 26.7728C290.93 27.5457 290.296 28.5605 289.027 30.59L287.238 33.4533C286.663 34.3724 286.376 34.8319 285.924 35.0826C285.471 35.3333 284.929 35.3333 283.846 35.3333Z"
+        stroke={color} strokeWidth={1} strokeLinecap="round"
+      />
+      <Ellipse cx={286.792} cy={42.6667} rx={1.45833} ry={1.33333} fill={color} />
+      <Ellipse cx={275.125} cy={42.6667} rx={1.45833} ry={1.33333} fill={color} />
     </Svg>
   );
 }
 
-// User_cicrle_light: person silhouette inside outer circle
+// Profile: head + body circle + shoulders arc
 function ProfileIcon({ color, size }) {
   return (
-    <Svg width={size} height={size} viewBox="0 0 30 29" fill="none">
-      <Circle cx={15} cy={14.5} r={13} stroke={color} strokeWidth={1.6} />
-      <Circle cx={15} cy={11} r={4} stroke={color} strokeWidth={1.6} />
+    <Svg width={size} height={size} viewBox="325 20.5 24 24" fill="none">
+      <Ellipse cx={337} cy={30.0834} rx={3.75} ry={3.625} stroke={color} strokeWidth={1} strokeLinecap="round" />
+      <Ellipse cx={337} cy={32.5} rx={11.25} ry={10.875} stroke={color} strokeWidth={1} />
       <Path
-        d="M7 25C7.5 20.5 10.5 18 15 18C19.5 18 22.5 20.5 23 25"
-        stroke={color} strokeWidth={1.6} strokeLinecap="round"
+        d="M344.5 40.603C344.058 39.3183 343.083 38.1831 341.727 37.3735C340.371 36.5639 338.709 36.125 337 36.125C335.291 36.125 333.629 36.5639 332.273 37.3735C330.917 38.1831 329.942 39.3183 329.5 40.603"
+        stroke={color} strokeWidth={1} strokeLinecap="round"
       />
     </Svg>
   );
@@ -222,11 +233,11 @@ function TabNavigator() {
           tabBarIcon: ({ color }) => (
             <View style={{ position: 'relative' }}>
               <CameraIcon color={color} size={ICON_SIZE} />
-              <View style={{ position: 'absolute', top: -4, right: -4 }}>
-                <Svg width={10} height={10} viewBox="0 0 8 8" fill="none">
-                  {/* 4-pointed AI sparkle star */}
+              <View style={{ position: 'absolute', top: -5, right: -6 }}>
+                <Svg width={12} height={14} viewBox="0 0 8 10" fill="none">
+                  {/* 4-pointed AI sparkle star (from design SVG) */}
                   <Path
-                    d="M4 0 L5 3 L8 4 L5 5 L4 8 L3 5 L0 4 L3 3 Z"
+                    d="M4 0L4.891 3.796L8 4.819L5.098 5.635L4 9.886L2.939 5.635L0 4.819L3.076 3.796L4 0Z"
                     fill="#0B6DC3"
                   />
                 </Svg>

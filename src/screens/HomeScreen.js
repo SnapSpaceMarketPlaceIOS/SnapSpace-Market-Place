@@ -337,20 +337,20 @@ function RoomIcon({ roomKey, size = 28 }) {
 // Local assets for curated styles (permanent, no CDN expiry)
 const STYLE_IMG_JAPANDI      = require('../assets/styles/Japandi.jpg');
 const STYLE_IMG_SCANDI       = require('../assets/styles/Scandanavian.jpg');
-const STYLE_IMG_MINIMALIST   = require('../assets/styles/Minimalist.avif');
+const STYLE_IMG_MINIMALIST   = require('../assets/styles/Minimalist.jpg');
 const STYLE_IMG_GLAM         = require('../assets/styles/Glam.jpg');
 const STYLE_IMG_MODERN       = require('../assets/styles/Modern.jpg');
 
 const STYLE_CATEGORIES = [
   { key: 'japandi',     label: 'Japandi',     sub: 'Refined Calm',
     bg: '#F0FDF4', text: '#166534', accent: '#16A34A',
-    localImage: STYLE_IMG_JAPANDI,    nativeW: 658,  nativeH: 986 },
+    localImage: STYLE_IMG_JAPANDI,    nativeW: 600,  nativeH: 750 },
   { key: 'scandi',      label: 'Scandi',      sub: 'Pure & Airy',
     bg: '#EFF6FF', text: '#1E40AF', accent: '#3B82F6',
-    localImage: STYLE_IMG_SCANDI,     nativeW: 1367, nativeH: 2048 },
+    localImage: STYLE_IMG_SCANDI,     nativeW: 600,  nativeH: 750 },
   { key: 'minimalist',  label: 'Minimalist',  sub: 'Less Is More',
     bg: '#F3F4F6', text: '#111827', accent: '#374151',
-    localImage: STYLE_IMG_MINIMALIST, nativeW: 2500, nativeH: 1667 },
+    localImage: STYLE_IMG_MINIMALIST, nativeW: 600,  nativeH: 750 },
   { key: 'luxury',      label: 'Glam',        sub: 'Opulent Edge',
     bg: '#F5F3FF', text: '#5B21B6', accent: '#7C3AED',
     localImage: STYLE_IMG_GLAM,       nativeW: 736,  nativeH: 1031 },
@@ -1723,57 +1723,7 @@ export default function HomeScreen({ navigation, route }) {
           </View>
         </View>
 
-        {/* ── 2. Shop By Style ────────────────────────────────────────── */}
-        <View style={[styles.section, styles.sectionAlt]}>
-          <SectionHeader
-            noTopMargin
-            title="SHOP BY STYLE"
-            actionLabel="See all"
-            onAction={() => navigation?.navigate('Explore', {
-              title: 'All Styles',
-            })}
-          />
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.hScroll}
-          >
-            {STYLE_CATEGORIES.map(cat => {
-              const count = STYLE_PRODUCT_COUNTS[cat.key] || 0;
-              return (
-                <TouchableOpacity
-                  key={cat.key}
-                  style={styles.styleCard}
-                  activeOpacity={0.85}
-                  onPress={() => navigation?.navigate('Explore', {
-                    filterStyle: cat.key,
-                    title: cat.label,
-                  })}
-                >
-                  <View style={styles.styleCardImgWrap}>
-                    {cat.localImage ? (
-                      <Image
-                        source={cat.localImage}
-                        resizeMode="contain"
-                        style={StyleSheet.absoluteFill}
-                      />
-                    ) : cat.imageUrl ? (
-                      <Image
-                        source={{ uri: cat.imageUrl }}
-                        resizeMode="cover"
-                        style={StyleSheet.absoluteFill}
-                      />
-                    ) : null}
-                  </View>
-                  <View style={styles.styleCardInfoBox}>
-                    <Text style={styles.styleCardLabel} numberOfLines={1}>{cat.label}</Text>
-                    <Text style={styles.styleCardSub} numberOfLines={1}>{cat.sub}</Text>
-                  </View>
-                </TouchableOpacity>
-              );
-            })}
-          </ScrollView>
-        </View>
+        {/* Shop By Style section removed */}
 
         {/* ── 3. Deal of the Day — premium editorial treatment ────────── */}
         {dealProduct && (
@@ -1833,7 +1783,7 @@ export default function HomeScreen({ navigation, route }) {
                       <StarIcon
                         key={i}
                         size={13}
-                        color={i <= Math.round(dealProduct.rating) ? '#F59E0B' : '#E5E7EB'}
+                        color={i <= Math.round(dealProduct.rating) ? '#67ACE9' : '#E5E7EB'}
                       />
                     ))}
                     <Text style={styles.dealRatingScore}>{dealProduct.rating.toFixed(1)}</Text>
@@ -2964,7 +2914,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 5,
-    backgroundColor: palette.primaryBlue,
+    backgroundColor: '#67ACE9',
     paddingHorizontal: 11,
     paddingVertical: 6,
     borderRadius: radius.full,
