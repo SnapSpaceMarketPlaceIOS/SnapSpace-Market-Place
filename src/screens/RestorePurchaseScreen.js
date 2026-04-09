@@ -262,7 +262,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 17,
     fontWeight: '800',
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
     color: '#111',
     letterSpacing: -0.3,
   },
@@ -290,7 +290,7 @@ const styles = StyleSheet.create({
   heroTitle: {
     fontSize: 22,
     fontWeight: '800',
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
     color: '#111',
     letterSpacing: -0.4,
     marginBottom: 10,
@@ -298,7 +298,7 @@ const styles = StyleSheet.create({
   },
   heroSubtitle: {
     fontSize: 14,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: '#67ACE9',
     lineHeight: 22,
     textAlign: 'center',
@@ -307,7 +307,7 @@ const styles = StyleSheet.create({
   sectionLabel: {
     fontSize: 11,
     fontWeight: '700',
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
     color: '#A0A0A8',
     letterSpacing: 1,
     marginBottom: 10,
@@ -342,7 +342,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 14,
     fontWeight: '500',
-    fontFamily: 'KantumruyPro_500Medium',
+    fontFamily: 'Geist_500Medium',
     color: '#111',
     lineHeight: 20,
   },
@@ -372,7 +372,7 @@ const styles = StyleSheet.create({
   stepNumberText: {
     fontSize: 13,
     fontWeight: '800',
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
     color: '#fff',
   },
   stepContent: {
@@ -381,13 +381,13 @@ const styles = StyleSheet.create({
   stepTitle: {
     fontSize: 14,
     fontWeight: '700',
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
     color: '#111',
     marginBottom: 4,
   },
   stepDesc: {
     fontSize: 13,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: '#666',
     lineHeight: 19,
   },
@@ -407,7 +407,7 @@ const styles = StyleSheet.create({
   noteText: {
     flex: 1,
     fontSize: 13,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: '#666',
     lineHeight: 19,
   },
@@ -435,7 +435,7 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: '700',
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
   },
   contactLink: {
     alignItems: 'center',
@@ -445,6 +445,6 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: colors.bluePrimary,
     fontWeight: '500',
-    fontFamily: 'KantumruyPro_500Medium',
+    fontFamily: 'Geist_500Medium',
   },
 });

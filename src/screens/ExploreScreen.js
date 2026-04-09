@@ -26,6 +26,7 @@ import { useLiked } from '../context/LikedContext';
 import { PRODUCT_CATALOG } from '../data/productCatalog';
 import { getPublicDesigns } from '../services/supabase';
 import PressableCard from '../components/PressableCard';
+import Skeleton from '../components/Skeleton';
 import { SellerName } from '../components/VerifiedBadge';
 import { getProductsForDesign, getProductsForPrompt } from '../services/affiliateProducts';
 import TabScreenFade from '../components/TabScreenFade';
@@ -54,7 +55,7 @@ const PRODUCT_IMG_SIZE = 88;
 
 function SearchIcon({ color = '#fff', size = 16 }) {
   return (
-    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round">
       <Circle cx={11} cy={11} r={8} />
       <Line x1={21} y1={21} x2={16.65} y2={16.65} />
     </Svg>
@@ -63,7 +64,7 @@ function SearchIcon({ color = '#fff', size = 16 }) {
 
 function PlusIcon({ color = '#555', size = 18 }) {
   return (
-    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={2.2} strokeLinecap="round">
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={1.2} strokeLinecap="round">
       <Line x1={12} y1={5} x2={12} y2={19} />
       <Line x1={5} y1={12} x2={19} y2={12} />
     </Svg>
@@ -72,7 +73,7 @@ function PlusIcon({ color = '#555', size = 18 }) {
 
 function HeartIcon({ filled = false, size = 18 }) {
   return (
-    <Svg width={size} height={size} viewBox="0 0 24 24" fill={filled ? '#ef4444' : 'none'} stroke={filled ? '#ef4444' : '#444'} strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round">
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill={filled ? '#ef4444' : 'none'} stroke={filled ? '#ef4444' : '#444'} strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round">
       <Path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
     </Svg>
   );
@@ -80,7 +81,7 @@ function HeartIcon({ filled = false, size = 18 }) {
 
 function ShareIcon({ color = '#444', size = 18 }) {
   return (
-    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round">
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round">
       <Path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
       <Polyline points="16 6 12 2 8 6" />
       <Line x1={12} y1={2} x2={12} y2={15} />
@@ -100,7 +101,7 @@ function ImagePlaceholderIcon() {
 
 function CloseIcon({ size = 12 }) {
   return (
-    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="#555" strokeWidth={2.5} strokeLinecap="round">
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="#555" strokeWidth={1.2} strokeLinecap="round">
       <Line x1={18} y1={6} x2={6} y2={18} />
       <Line x1={6} y1={6} x2={18} y2={18} />
     </Svg>
@@ -173,7 +174,7 @@ function StarIconSmall({ filled = true, size = 11, amber = false }) {
 
 function SlidersIcon({ size = 18, color = '#555' }) {
   return (
-    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round">
       <Line x1={4} y1={21} x2={4} y2={14} />
       <Line x1={4} y1={10} x2={4} y2={3} />
       <Line x1={12} y1={21} x2={12} y2={12} />
@@ -256,16 +257,16 @@ const FILTER_STYLES = [
   'farmhouse', 'glam', 'biophilic',
 ];
 
-const FILTER_SOURCES = ['amazon', 'wayfair', 'houzz'];
-const FILTER_SOURCE_LABELS = { amazon: 'Amazon', wayfair: 'Wayfair', houzz: 'Houzz' };
+// Source is Amazon-only for now — no source filter UI needed
+const FILTER_SOURCES = ['amazon'];
 
 // ── Price range slider ────────────────────────────────────────────────────────
 // FIX: trackWRef (not state) so PanResponder closures always read current width.
 // Live labels update on every move via displayMin/displayMax local state.
 
 function PriceRangeSlider({ minVal, maxVal, onChangeMin, onChangeMax }) {
-  const HANDLE  = 24;
-  const TRACK_H = 2;
+  const HANDLE  = 28;
+  const TRACK_H = 4;
 
   // ← ref, not state — PanResponder closures capture this by reference
   const trackWRef = useRef(0);
@@ -348,28 +349,28 @@ function PriceRangeSlider({ minVal, maxVal, onChangeMin, onChangeMax }) {
   const maxLabel = displayMax >= PRICE_ABSOLUTE_MAX ? '$5K+' : `$${displayMax.toLocaleString()}`;
 
   return (
-    <View style={{ paddingVertical: 4 }}>
-      {/* Live range labels — update as user drags */}
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 24 }}>
+    <View style={{ paddingVertical: 8 }}>
+      {/* Live range labels */}
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 20 }}>
         <Text style={sliderS.rangeLabel}>{minLabel}</Text>
         <Text style={sliderS.rangeSep}>–</Text>
         <Text style={sliderS.rangeLabel}>{maxLabel}</Text>
       </View>
 
-      {/* Track + handles — padding so handles don't clip at edges */}
+      {/* Track + handles */}
       <View style={{ paddingHorizontal: HANDLE / 2 }}>
         <View
-          style={{ height: HANDLE, justifyContent: 'center' }}
+          style={{ height: HANDLE + 8, justifyContent: 'center' }}
           onLayout={handleLayout}
         >
           {/* Grey base track */}
-          <View style={{ height: TRACK_H, backgroundColor: '#E5E7EB', borderRadius: 1 }} />
+          <View style={{ height: TRACK_H, backgroundColor: '#E8E8E8', borderRadius: TRACK_H / 2 }} />
           {/* Blue active segment */}
           <Animated.View style={{
             position: 'absolute',
             height: TRACK_H,
-            backgroundColor: TC.primary,
-            borderRadius: 1,
+            backgroundColor: '#0B6DC3',
+            borderRadius: TRACK_H / 2,
             left: minAnim,
             width: activeWidth,
           }} />
@@ -391,7 +392,7 @@ function PriceRangeSlider({ minVal, maxVal, onChangeMin, onChangeMax }) {
       </View>
 
       {/* Tick labels */}
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 14 }}>
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 12, paddingHorizontal: 2 }}>
         {['$0', '$1K', '$2K', '$3K', '$4K', '$5K+'].map(t => (
           <Text key={t} style={sliderS.tick}>{t}</Text>
         ))}
@@ -403,19 +404,19 @@ function PriceRangeSlider({ minVal, maxVal, onChangeMin, onChangeMax }) {
 const sliderS = StyleSheet.create({
   handle: {
     position: 'absolute',
-    width: 24, height: 24, borderRadius: 12,
+    width: 28, height: 28, borderRadius: 14,
     backgroundColor: '#FFFFFF',
-    borderWidth: 2.5,
-    borderColor: TC.primary,
+    borderWidth: 2,
+    borderColor: '#0B6DC3',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.18,
-    shadowRadius: 4,
+    shadowOpacity: 0.12,
+    shadowRadius: 6,
     elevation: 4,
   },
-  rangeLabel: { fontSize: 18, fontWeight: '700', color: '#111', fontFamily: 'KantumruyPro_700Bold'},
-  rangeSep:   { fontSize: 14, fontWeight: '400', color: '#BBBBBB', fontFamily: 'KantumruyPro_400Regular'},
-  tick:       { fontSize: 10, fontWeight: '400', color: '#CCCCCC', fontFamily: 'KantumruyPro_400Regular'},
+  rangeLabel: { fontSize: 22, fontWeight: '700', color: TC.textPrimary, fontFamily: 'Geist_700Bold', letterSpacing: -0.5 },
+  rangeSep:   { fontSize: 16, fontWeight: '400', color: TC.textTertiary, fontFamily: 'Geist_400Regular' },
+  tick:       { fontSize: 11, fontWeight: '500', color: '#B0B0B0', fontFamily: 'Geist_500Medium' },
 });
 
 // ── Search engine ──────────────────────────────────────────────────────────────
@@ -552,6 +553,7 @@ export default function ExploreScreen({ navigation, route }) {
   const [filterLabel, setFilterLabel] = useState(null);
   const [overrideDesigns, setOverrideDesigns] = useState(null);
   const [communityDesigns, setCommunityDesigns] = useState([]);
+  const [communityLoading, setCommunityLoading] = useState(true);
   const consumedParamsRef = useRef(null);
 
   // ── Product filter state ───────────────────────────────────────────────────
@@ -559,7 +561,7 @@ export default function ExploreScreen({ navigation, route }) {
   const [priceMin, setPriceMin] = useState(PRICE_ABSOLUTE_MIN);
   const [priceMax, setPriceMax] = useState(PRICE_ABSOLUTE_MAX);
   const [filterStyles, setFilterStyles] = useState([]);
-  const [filterSources, setFilterSources] = useState([]);
+  // Source filter removed — Amazon-only for now
   const [filterInStockOnly, setFilterInStockOnly] = useState(false);
   const [aiImageLoading, setAiImageLoading] = useState(false);
   const [aiImageProducts, setAiImageProducts] = useState(null);
@@ -631,17 +633,13 @@ export default function ExploreScreen({ navigation, route }) {
     setPriceMin(PRICE_ABSOLUTE_MIN);
     setPriceMax(PRICE_ABSOLUTE_MAX);
     setFilterStyles([]);
-    setFilterSources([]);
     setFilterInStockOnly(false);
-    setAiImageProducts(null);
   }, []);
 
   const activeProductFilterCount = [
     priceMin > PRICE_ABSOLUTE_MIN || priceMax < PRICE_ABSOLUTE_MAX,
     filterStyles.length > 0,
-    filterSources.length > 0,
     filterInStockOnly,
-    aiImageProducts !== null,
   ].filter(Boolean).length;
 
   const handleAiImageFilter = useCallback(async () => {
@@ -675,6 +673,7 @@ export default function ExploreScreen({ navigation, route }) {
   // Fetch community (user-posted) designs on screen focus
   useFocusEffect(
     useCallback(() => {
+      setCommunityLoading(true);
       getPublicDesigns(20, 0).then(designs => {
         const normalized = designs.map(d => ({
           id: `user-${d.id}`,
@@ -695,7 +694,8 @@ export default function ExploreScreen({ navigation, route }) {
         })).filter(d => !!d.imageUrl);
         console.log('[Explore] Loaded', normalized.length, 'community designs');
         setCommunityDesigns(normalized);
-      }).catch(err => console.warn('[Explore] Failed to load community designs:', err.message));
+      }).catch(err => console.warn('[Explore] Failed to load community designs:', err.message))
+        .finally(() => setCommunityLoading(false));
     }, [])
   );
 
@@ -716,7 +716,6 @@ export default function ExploreScreen({ navigation, route }) {
   );
 
   const filteredProducts = useMemo(() => {
-    if (aiImageProducts) return aiImageProducts;
     const catLabel = PRODUCT_CATEGORIES[activeProdCat];
     const cats = PRODUCT_CAT_MAP[catLabel];
     let pool = cats ? PRODUCT_CATALOG.filter((p) => cats.includes(p.category)) : PRODUCT_CATALOG;
@@ -734,14 +733,11 @@ export default function ExploreScreen({ navigation, route }) {
     if (filterStyles.length > 0) {
       pool = pool.filter((p) => (p.styles || []).some((s) => filterStyles.includes(s)));
     }
-    if (filterSources.length > 0) {
-      pool = pool.filter((p) => filterSources.includes(p.source));
-    }
     if (filterInStockOnly) {
       pool = pool.filter((p) => p.stock !== false);
     }
     return pool;
-  }, [activeProdCat, search, priceMin, priceMax, filterStyles, filterSources, filterInStockOnly, aiImageProducts]);
+  }, [activeProdCat, search, priceMin, priceMax, filterStyles, filterInStockOnly]);
 
   return (
     <TabScreenFade style={styles.container}>
@@ -787,7 +783,7 @@ export default function ExploreScreen({ navigation, route }) {
               />
               {/* Right: clear X or search icon */}
               {search.length > 0 ? (
-                <TouchableOpacity style={styles.searchSubmit} onPress={() => { setSearch(''); Keyboard.dismiss(); }}>
+                <TouchableOpacity style={styles.searchSubmit} onPress={() => { setSearch(''); Keyboard.dismiss(); }} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
                   <CloseIcon size={14} />
                 </TouchableOpacity>
               ) : (
@@ -926,6 +922,14 @@ export default function ExploreScreen({ navigation, route }) {
                 })}
               </View>
             )
+          ) : communityLoading && filteredDesigns.length === 0 ? (
+            <View style={[styles.grid, { paddingHorizontal: SP[5], paddingTop: SP[4] }]}>
+              {[0,1,2,3,4,5].map(i => (
+                <View key={i} style={{ width: colWidthPct(gridCols), padding: 1 }}>
+                  <Skeleton width="100%" height={160} radius="image" />
+                </View>
+              ))}
+            </View>
           ) : filteredDesigns.length === 0 ? (
             <View style={styles.emptyState}>
               <Text style={styles.emptyStateTitle}>No results found</Text>
@@ -1022,6 +1026,7 @@ export default function ExploreScreen({ navigation, route }) {
                   {/* Follow button — logic unchanged */}
                   <TouchableOpacity
                     style={styles.followBtn}
+                    activeOpacity={0.75}
                     onPress={(e) => {
                       e.stopPropagation();
                     }}
@@ -1087,7 +1092,7 @@ export default function ExploreScreen({ navigation, route }) {
                         </Text>
                       </View>
                       <View style={styles.hCardAddBtn}>
-                        <Svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth={2.5}>
+                        <Svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth={1.2}>
                           <Line x1={12} y1={5} x2={12} y2={19} />
                           <Line x1={5} y1={12} x2={19} y2={12} />
                         </Svg>
@@ -1155,7 +1160,7 @@ export default function ExploreScreen({ navigation, route }) {
                 <CloseIcon size={18} />
               </TouchableOpacity>
               <Text style={styles.postModalTitle}>New Post</Text>
-              <TouchableOpacity style={styles.postShareBtn} onPress={() => setShowPostModal(false)}>
+              <TouchableOpacity style={styles.postShareBtn} onPress={() => setShowPostModal(false)} activeOpacity={0.75}>
                 <Text style={styles.postShareBtnText}>Share</Text>
               </TouchableOpacity>
             </View>
@@ -1165,7 +1170,7 @@ export default function ExploreScreen({ navigation, route }) {
               contentContainerStyle={styles.postModalBody}
             >
               {/* Upload zone */}
-              <TouchableOpacity style={styles.uploadZone}>
+              <TouchableOpacity style={styles.uploadZone} activeOpacity={0.75}>
                 <UploadIcon />
                 <Text style={styles.uploadLabel}>Upload your AI-generated room</Text>
                 <Text style={styles.uploadSub}>Tap to choose from camera roll</Text>
@@ -1201,6 +1206,7 @@ export default function ExploreScreen({ navigation, route }) {
                       selectedTags.includes(tag) && styles.postTagChipSelected,
                     ]}
                     onPress={() => togglePostTag(tag)}
+                    activeOpacity={0.75}
                   >
                     <Text
                       style={[
@@ -1260,8 +1266,8 @@ export default function ExploreScreen({ navigation, route }) {
               />
 
               {/* ── Style ── */}
-              <Text style={[styles.filterSectionLabel, { marginTop: space.base }]}>STYLE</Text>
-              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filterHScrollContent}>
+              <Text style={[styles.filterSectionLabel, { marginTop: space.lg }]}>STYLE</Text>
+              <View style={styles.filterChipWrap}>
                 {FILTER_STYLES.map((s) => (
                   <TouchableOpacity
                     key={s}
@@ -1274,24 +1280,7 @@ export default function ExploreScreen({ navigation, route }) {
                     </Text>
                   </TouchableOpacity>
                 ))}
-              </ScrollView>
-
-              {/* ── Source ── */}
-              <Text style={[styles.filterSectionLabel, { marginTop: space.base }]}>SOURCE</Text>
-              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filterHScrollContent}>
-                {FILTER_SOURCES.map((src) => (
-                  <TouchableOpacity
-                    key={src}
-                    style={[styles.filterChip, filterSources.includes(src) && styles.filterChipActive]}
-                    onPress={() => setFilterSources(prev => prev.includes(src) ? prev.filter(x => x !== src) : [...prev, src])}
-                    activeOpacity={0.75}
-                  >
-                    <Text style={[styles.filterChipText, filterSources.includes(src) && styles.filterChipTextActive]}>
-                      {FILTER_SOURCE_LABELS[src]}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </ScrollView>
+              </View>
 
               {/* ── In Stock Only ── */}
               <View style={styles.filterToggleRow}>
@@ -1299,35 +1288,10 @@ export default function ExploreScreen({ navigation, route }) {
                 <Switch
                   value={filterInStockOnly}
                   onValueChange={setFilterInStockOnly}
-                  trackColor={{ false: '#E5E7EB', true: TC.primary }}
+                  trackColor={{ false: '#E5E7EB', true: '#0B6DC3' }}
                   thumbColor="#FFFFFF"
                 />
               </View>
-
-              {/* ── AI Visual Search ── */}
-              <Text style={[styles.filterSectionLabel, { marginTop: space.base }]}>VISUAL SEARCH</Text>
-              <TouchableOpacity
-                style={[styles.aiImageBtn, aiImageProducts && styles.aiImageBtnActive]}
-                onPress={handleAiImageFilter}
-                activeOpacity={0.8}
-                disabled={aiImageLoading}
-              >
-                {aiImageLoading ? (
-                  <Text style={styles.aiImageBtnText}>Searching…</Text>
-                ) : aiImageProducts ? (
-                  <>
-                    <Text style={[styles.aiImageBtnText, { color: TC.primary }]}>AI Photo Active</Text>
-                    <TouchableOpacity onPress={() => setAiImageProducts(null)} hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}>
-                      <CloseIcon size={14} />
-                    </TouchableOpacity>
-                  </>
-                ) : (
-                  <Text style={styles.aiImageBtnText}>Find by Photo</Text>
-                )}
-              </TouchableOpacity>
-              <Text style={styles.aiImageBtnSub}>
-                Pick a room photo to find matching products using AI
-              </Text>
 
               {/* ── Apply Button ── */}
               <TouchableOpacity
@@ -1354,7 +1318,7 @@ export default function ExploreScreen({ navigation, route }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: TC.bg,
   },
   safeArea: {
     flex: 1,
@@ -1367,7 +1331,7 @@ const styles = StyleSheet.create({
   // Header
   title: {
     ...typeScale.display,
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
     color: '#000',
     letterSpacing: letterSpacing.tight,
     paddingHorizontal: space.lg,
@@ -1375,7 +1339,7 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     ...typeScale.caption,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: TC.primary,
     opacity: 0.9,
     marginTop: 2,
@@ -1403,15 +1367,15 @@ const styles = StyleSheet.create({
     paddingLeft: space.md,
     paddingRight: space.xs,
     gap: space.sm,
-    backgroundColor: '#F1F5F9',
+    backgroundColor: '#F8F8F8',
   },
   searchInput: {
     flex: 1,
     ...typeScale.body,
     fontSize: 13,
     fontWeight: '300',
-    fontFamily: 'KantumruyPro_400Regular',
-    color: '#555',
+    fontFamily: 'Geist_400Regular',
+    color: TC.textSecondary,
   },
   searchSubmit: {
     width: 28,
@@ -1429,7 +1393,7 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(0,0,0,0.08)',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: TC.bg,
   },
 
   // Category filter row with grid toggle
@@ -1463,19 +1427,19 @@ const styles = StyleSheet.create({
     borderBottomColor: 'transparent',
   },
   tabActive: {
-    borderBottomColor: '#0B6DC3',
+    borderBottomColor: TC.primary,
   },
   tabLabel: {
     fontSize: 12,
     fontWeight: '300',
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: 'rgba(0,0,0,0.45)',
   },
   tabLabelActive: {
     fontSize: 13,
     fontWeight: '500',
-    fontFamily: 'KantumruyPro_500Medium',
-    color: '#0B6DC3',
+    fontFamily: 'Geist_500Medium',
+    color: TC.primary,
   },
   tabBorder: {
     height: 1,
@@ -1489,7 +1453,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     marginHorizontal: space.lg,
     marginBottom: space.xs,
-    backgroundColor: '#F1F5F9',
+    backgroundColor: '#F8F8F8',
     borderRadius: radius.full,
     padding: 3,
   },
@@ -1501,24 +1465,20 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   modeToggleBtnActive: {
-    backgroundColor: '#FFFFFF',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.08,
-    shadowRadius: 4,
-    elevation: 2,
+    backgroundColor: TC.bg,
+    ...TS.sm,
   },
   modeToggleLabel: {
     ...typeScale.button,
     fontSize: 12,
     fontWeight: '300',
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: 'rgba(0,0,0,0.45)',
   },
   modeToggleLabelActive: {
     fontSize: 13,
     fontWeight: '500',
-    fontFamily: 'KantumruyPro_500Medium',
+    fontFamily: 'Geist_500Medium',
     color: TC.primary,
   },
 
@@ -1533,7 +1493,7 @@ const styles = StyleSheet.create({
     width: '100%',
     borderRadius: radius.md,
     overflow: 'hidden',
-    backgroundColor: '#FFFFFF',  // match prodCardBody so no color bleed at image bottom
+    backgroundColor: TC.bg,  // match prodCardBody so no color bleed at image bottom
   },
   // 1-col single view — adds shadow + border for premium feel
   cardSingle: {
@@ -1587,13 +1547,13 @@ const styles = StyleSheet.create({
   },
   cardTitle: {
     ...typeScale.headline,
-    fontFamily: 'KantumruyPro_600SemiBold',
-    color: '#111',
+    fontFamily: 'Geist_600SemiBold',
+    color: TC.textPrimary,
   },
 
   // Product card styles (2-col: white info card; 3-col: image only)
   prodCardBody: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: TC.bg,
     paddingHorizontal: 12,
     paddingTop: 10,
     paddingBottom: 12,
@@ -1608,20 +1568,20 @@ const styles = StyleSheet.create({
   },
   prodCardName: {
     ...typeScale.caption,
-    color: '#111',
+    color: TC.textPrimary,
     fontWeight: '600',
-    fontFamily: 'KantumruyPro_600SemiBold',
+    fontFamily: 'Geist_600SemiBold',
     lineHeight: 16,
   },
   prodCardNameSingle: {
     fontSize: 15,
     fontWeight: '600',
-    fontFamily: 'KantumruyPro_600SemiBold',
+    fontFamily: 'Geist_600SemiBold',
     lineHeight: 20,
   },
   prodCardBrand: {
     ...typeScale.micro,
-    fontFamily: 'KantumruyPro_600SemiBold',
+    fontFamily: 'Geist_600SemiBold',
     color: TC.textSecondary,
     textTransform: 'none',
     letterSpacing: 0,
@@ -1636,25 +1596,25 @@ const styles = StyleSheet.create({
   prodCardRatingText: {
     fontSize: 10,
     fontWeight: '600',
-    fontFamily: 'KantumruyPro_600SemiBold',
-    color: '#111',
+    fontFamily: 'Geist_600SemiBold',
+    color: TC.textPrimary,
     marginLeft: 2,
   },
   prodCardReviews: {
     fontSize: 10,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: TC.textSecondary,
   },
   prodCardPrice: {
     ...typeScale.priceSmall,
-    fontFamily: 'KantumruyPro_600SemiBold',
+    fontFamily: 'Geist_600SemiBold',
     color: TC.primary,
     marginTop: 3,
   },
   prodCardPriceSingle: {
     fontSize: 17,
     fontWeight: '700',
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
     marginTop: 6,
   },
 
@@ -1746,19 +1706,19 @@ const styles = StyleSheet.create({
     ...typeScale.caption,
     color: TC.white,
     fontWeight: '700',
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
   },
   modalUserInfo: {
     flex: 1,
   },
   modalUsername: {
     ...typeScale.headline,
-    fontFamily: 'KantumruyPro_600SemiBold',
+    fontFamily: 'Geist_600SemiBold',
     color: TC.textPrimary,
   },
   modalTime: {
     ...typeScale.caption,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: TC.textSecondary,
     marginTop: 2,
   },
@@ -1772,21 +1732,21 @@ const styles = StyleSheet.create({
   },
   followBtnText: {
     ...typeScale.button,
-    fontFamily: 'KantumruyPro_600SemiBold',
+    fontFamily: 'Geist_600SemiBold',
     color: TC.white,
   },
 
   // ── Section 3C: Post Title & Description ──────────────────────────────────
   modalTitle: {
     ...typeScale.title,
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
     color: TC.textPrimary,
     marginTop: SP[4],
     marginBottom: 6,
   },
   modalDesc: {
     ...typeScale.body,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: TC.textSecondary,
     marginBottom: SP[4],
   },
@@ -1814,7 +1774,7 @@ const styles = StyleSheet.create({
   },
   actionCircleCount: {
     ...typeScale.micro,
-    fontFamily: 'KantumruyPro_600SemiBold',
+    fontFamily: 'Geist_600SemiBold',
     color: TC.textSecondary,
   },
   shopBtn: {
@@ -1831,14 +1791,14 @@ const styles = StyleSheet.create({
   },
   shopBtnText: {
     ...typeScale.button,
-    fontFamily: 'KantumruyPro_600SemiBold',
+    fontFamily: 'Geist_600SemiBold',
     color: TC.white,
   },
 
   // ── Section 3E: Products in This Post ──────────────────────────────────────
   sectionLabel: {
     ...typeScale.subheadline,
-    fontFamily: 'KantumruyPro_600SemiBold',
+    fontFamily: 'Geist_600SemiBold',
     color: TC.textTertiary,
     marginTop: SP[5],
     marginBottom: SP[3],
@@ -1867,7 +1827,7 @@ const styles = StyleSheet.create({
   },
   productName: {
     ...typeScale.headline,
-    fontFamily: 'KantumruyPro_600SemiBold',
+    fontFamily: 'Geist_600SemiBold',
     color: TC.textPrimary,
   },
 
@@ -1881,7 +1841,7 @@ const styles = StyleSheet.create({
   productRatingScore: {
     fontSize: 11,
     fontWeight: '600',
-    fontFamily: 'KantumruyPro_600SemiBold',
+    fontFamily: 'Geist_600SemiBold',
     color: TC.textPrimary,
     marginLeft: 3,
     lineHeight: 14,
@@ -1889,7 +1849,7 @@ const styles = StyleSheet.create({
   productReviewCount: {
     fontSize: 11,
     fontWeight: '400',
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: TC.textSecondary,
     lineHeight: 14,
   },
@@ -1902,11 +1862,11 @@ const styles = StyleSheet.create({
   },
   productBrand: {
     ...typeScale.caption,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: TC.textTertiary,
   },
   productSourceBadge: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: TC.bg,
     borderRadius: 3,
     borderWidth: 0.5,
     borderColor: 'rgba(0,0,0,0.08)',
@@ -1918,7 +1878,7 @@ const styles = StyleSheet.create({
   productShipping: {
     fontSize: 11,
     fontWeight: '400',
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: '#16A34A',
     lineHeight: 14,
   },
@@ -1930,14 +1890,14 @@ const styles = StyleSheet.create({
   },
   productPrice: {
     ...typeScale.price,
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
     color: TC.primary,
     textAlign: 'right',
   },
   productOrigPrice: {
     fontSize: 11,
     fontWeight: '400',
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: TC.textTertiary,
     textDecorationLine: 'line-through',
     textAlign: 'right',
@@ -1946,7 +1906,7 @@ const styles = StyleSheet.create({
   // ── Horizontal product cards ──────────────────────────────────────────────
   hCard: {
     width: 170,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: TC.bg,
     borderRadius: 10,
     borderWidth: 1,
     borderColor: 'rgba(0,0,0,0.06)',
@@ -1966,14 +1926,14 @@ const styles = StyleSheet.create({
   hCardName: {
     fontSize: 13,
     fontWeight: '600',
-    fontFamily: 'KantumruyPro_600SemiBold',
+    fontFamily: 'Geist_600SemiBold',
     color: TC.textPrimary,
     lineHeight: 17,
   },
   hCardBrand: {
     fontSize: 11,
     fontWeight: '400',
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: TC.textTertiary,
     marginTop: 1,
   },
@@ -1986,19 +1946,19 @@ const styles = StyleSheet.create({
   hCardRatingText: {
     fontSize: 10,
     fontWeight: '600',
-    fontFamily: 'KantumruyPro_600SemiBold',
+    fontFamily: 'Geist_600SemiBold',
     color: TC.textPrimary,
     marginLeft: 2,
   },
   hCardReviews: {
     fontSize: 10,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: TC.textSecondary,
   },
   hCardPrice: {
     fontSize: 14,
     fontWeight: '700',
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
     color: TC.primary,
     marginTop: 4,
   },
@@ -2016,7 +1976,7 @@ const styles = StyleSheet.create({
 
   ftcDisclosure: {
     fontSize: 11,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     fontStyle: 'italic',
     color: TC.textTertiary,
     textAlign: 'center',
@@ -2041,7 +2001,7 @@ const styles = StyleSheet.create({
   },
   tagText: {
     ...typeScale.caption,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: TC.textSecondary,
   },
   tagTextHighlight: {
@@ -2060,8 +2020,8 @@ const styles = StyleSheet.create({
   },
   postModalTitle: {
     ...typeScale.title,
-    fontFamily: 'KantumruyPro_700Bold',
-    color: '#111',
+    fontFamily: 'Geist_700Bold',
+    color: TC.textPrimary,
   },
   postShareBtn: {
     backgroundColor: TC.primary,
@@ -2074,8 +2034,8 @@ const styles = StyleSheet.create({
   },
   postShareBtnText: {
     ...typeScale.button,
-    fontFamily: 'KantumruyPro_600SemiBold',
-    color: '#fff',
+    fontFamily: 'Geist_600SemiBold',
+    color: TC.white,
   },
   postModalBody: {
     paddingHorizontal: space.lg,
@@ -2098,19 +2058,19 @@ const styles = StyleSheet.create({
   uploadLabel: {
     ...typeScale.caption,
     fontWeight: '600',
-    fontFamily: 'KantumruyPro_600SemiBold',
-    color: '#555',
+    fontFamily: 'Geist_600SemiBold',
+    color: TC.textSecondary,
   },
   uploadSub: {
     ...typeScale.caption,
-    fontFamily: 'KantumruyPro_400Regular',
-    color: '#bbb',
+    fontFamily: 'Geist_400Regular',
+    color: TC.textTertiary,
     opacity: 0.44,
   },
   fieldLabel: {
     ...typeScale.micro,
-    fontFamily: 'KantumruyPro_600SemiBold',
-    color: '#A0A0A8',
+    fontFamily: 'Geist_600SemiBold',
+    color: TC.textTertiary,
     marginBottom: space.sm,
   },
   fieldInput: {
@@ -2120,10 +2080,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: space.base,
     height: 48,                                  // form input spec: 48px height
     ...typeScale.body,
-    fontFamily: 'KantumruyPro_400Regular',
-    color: '#111',
+    fontFamily: 'Geist_400Regular',
+    color: TC.textPrimary,
     marginBottom: space.md,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: TC.bg,
   },
   fieldTextarea: {
     height: 80,
@@ -2140,8 +2100,8 @@ const styles = StyleSheet.create({
   },
   postTagChipText: {
     ...typeScale.caption,
-    fontFamily: 'KantumruyPro_400Regular',
-    color: '#555',
+    fontFamily: 'Geist_400Regular',
+    color: TC.textSecondary,
   },
   postTagChipTextSelected: {
     color: TC.primary,
@@ -2167,14 +2127,14 @@ const styles = StyleSheet.create({
   filterBannerTitle: {
     fontSize: fontSize.sm,
     fontWeight: fontWeight.bold,
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
     color: TC.primary,
     letterSpacing: 0.2,
     marginBottom: 1,
   },
   filterBannerCount: {
     fontSize: 11,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: TC.primary,
     opacity: 0.72,
   },
@@ -2188,8 +2148,8 @@ const styles = StyleSheet.create({
   filterClearText: {
     fontSize: 11,
     fontWeight: fontWeight.bold,
-    fontFamily: 'KantumruyPro_700Bold',
-    color: '#FFFFFF',
+    fontFamily: 'Geist_700Bold',
+    color: TC.white,
     letterSpacing: 0.3,
   },
 
@@ -2221,8 +2181,8 @@ const styles = StyleSheet.create({
   filterBadgeText: {
     fontSize: 9,
     fontWeight: '700',
-    fontFamily: 'KantumruyPro_700Bold',
-    color: '#fff',
+    fontFamily: 'Geist_700Bold',
+    color: TC.white,
   },
 
   // ── Filter sheet ──────────────────────────────────────────────────────────
@@ -2237,12 +2197,12 @@ const styles = StyleSheet.create({
   },
   filterSheetTitle: {
     ...typeScale.title,
-    fontFamily: 'KantumruyPro_700Bold',
-    color: '#111',
+    fontFamily: 'Geist_700Bold',
+    color: TC.textPrimary,
   },
   filterSheetClearAll: {
     ...typeScale.button,
-    fontFamily: 'KantumruyPro_600SemiBold',
+    fontFamily: 'Geist_600SemiBold',
     color: TC.textTertiary,
   },
   filterSheetBody: {
@@ -2257,7 +2217,7 @@ const styles = StyleSheet.create({
   },
   filterSectionLabel: {
     ...typeScale.micro,
-    fontFamily: 'KantumruyPro_600SemiBold',
+    fontFamily: 'Geist_600SemiBold',
     color: TC.textTertiary,
     marginTop: space.base,
     marginBottom: space.sm,
@@ -2267,28 +2227,33 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     gap: space.sm,
   },
+  filterChipWrap: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: space.sm,
+  },
   filterChip: {
-    paddingHorizontal: space.md,
-    paddingVertical: 7,
+    paddingHorizontal: space.base,
+    paddingVertical: space.sm,
     borderRadius: radius.full,
     borderWidth: 1,
-    borderColor: 'rgba(0,0,0,0.12)',
-    backgroundColor: '#F8F9FA',
+    borderColor: '#E5E5E5',
+    backgroundColor: '#FAFAFA',
   },
   filterChipActive: {
-    borderColor: TC.primary,
-    backgroundColor: 'rgba(29,78,216,0.08)',
+    borderColor: '#0B6DC3',
+    backgroundColor: '#0B6DC3',
   },
   filterChipText: {
     ...typeScale.caption,
-    color: '#555',
+    color: TC.textSecondary,
     fontWeight: '500',
-    fontFamily: 'KantumruyPro_500Medium',
+    fontFamily: 'Geist_500Medium',
   },
   filterChipTextActive: {
-    color: TC.primary,
+    color: '#FFFFFF',
     fontWeight: '600',
-    fontFamily: 'KantumruyPro_600SemiBold',
+    fontFamily: 'Geist_600SemiBold',
   },
   filterRatingRow: {
     flexDirection: 'row',
@@ -2323,7 +2288,7 @@ const styles = StyleSheet.create({
     ...typeScale.body,
     color: TC.textPrimary,
     fontWeight: '500',
-    fontFamily: 'KantumruyPro_500Medium',
+    fontFamily: 'Geist_500Medium',
   },
   aiImageBtn: {
     flexDirection: 'row',
@@ -2345,12 +2310,12 @@ const styles = StyleSheet.create({
   },
   aiImageBtnText: {
     ...typeScale.button,
-    fontFamily: 'KantumruyPro_600SemiBold',
+    fontFamily: 'Geist_600SemiBold',
     color: '#333',
   },
   aiImageBtnSub: {
     ...typeScale.caption,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: TC.textTertiary,
     textAlign: 'center',
     marginTop: space.xs,
@@ -2366,9 +2331,9 @@ const styles = StyleSheet.create({
   },
   filterApplyBtnText: {
     ...typeScale.button,
-    color: '#fff',
+    color: TC.white,
     fontSize: 15,
-    fontFamily: 'KantumruyPro_600SemiBold',
+    fontFamily: 'Geist_600SemiBold',
   },
 
   // Empty state
@@ -2380,14 +2345,14 @@ const styles = StyleSheet.create({
   },
   emptyStateTitle: {
     ...typeScale.title,
-    fontFamily: 'KantumruyPro_700Bold',
-    color: '#111',
+    fontFamily: 'Geist_700Bold',
+    color: TC.textPrimary,
     marginBottom: space.sm,
   },
   emptyStateSub: {
     ...typeScale.body,
-    fontFamily: 'KantumruyPro_400Regular',
-    color: '#A0A0A8',
+    fontFamily: 'Geist_400Regular',
+    color: TC.textTertiary,
     textAlign: 'center',
   },
 });

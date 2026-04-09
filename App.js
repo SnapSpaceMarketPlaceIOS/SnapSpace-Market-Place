@@ -2,11 +2,11 @@ import React, { useRef, useCallback } from 'react';
 import { View, Text, StyleSheet, Animated, Pressable } from 'react-native';
 import { useFonts } from 'expo-font';
 import {
-  KantumruyPro_400Regular,
-  KantumruyPro_500Medium,
-  KantumruyPro_600SemiBold,
-  KantumruyPro_700Bold,
-} from '@expo-google-fonts/kantumruy-pro';
+  Geist_400Regular,
+  Geist_500Medium,
+  Geist_600SemiBold,
+  Geist_700Bold,
+} from '@expo-google-fonts/geist';
 
 import { NavigationContainer } from '@react-navigation/native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -21,7 +21,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Svg, { Path, Circle, Polyline, Line, Ellipse } from 'react-native-svg';
 import { colors as C } from './src/constants/theme';
-import { fontSize, fontWeight, radius } from './src/constants/tokens';
+import { fontSize, fontWeight, radius, layout, space, typeScale, palette } from './src/constants/tokens';
 
 import HomeScreen from './src/screens/HomeScreen';
 import ExploreScreen from './src/screens/ExploreScreen';
@@ -194,13 +194,13 @@ function TabNavigator() {
       screenOptions={{
         headerShown: false,
         tabBarStyle: styles.tabBar,
-        tabBarActiveTintColor: '#0B6DC3',
-        tabBarInactiveTintColor: '#111827',
+        tabBarActiveTintColor: C.primary,
+        tabBarInactiveTintColor: C.textPrimary,
         tabBarShowLabel: true,
         tabBarLabelStyle: {
           fontSize: 10,
           fontWeight: '500',
-          fontFamily: 'KantumruyPro_500Medium',
+          fontFamily: 'Geist_500Medium',
           marginTop: 2,
         },
         tabBarItemStyle: {
@@ -238,7 +238,7 @@ function TabNavigator() {
                   {/* 4-pointed AI sparkle star (from design SVG) */}
                   <Path
                     d="M4 0L4.891 3.796L8 4.819L5.098 5.635L4 9.886L2.939 5.635L0 4.819L3.076 3.796L4 0Z"
-                    fill="#0B6DC3"
+                    fill={C.primary}
                   />
                 </Svg>
               </View>
@@ -318,16 +318,16 @@ function RootNavigator() {
 
 export default function App() {
   const [fontsLoaded] = useFonts({
-    KantumruyPro_400Regular,
-    KantumruyPro_500Medium,
-    KantumruyPro_600SemiBold,
-    KantumruyPro_700Bold,
+    Geist_400Regular,
+    Geist_500Medium,
+    Geist_600SemiBold,
+    Geist_700Bold,
   });
 
   if (!fontsLoaded) {
     return (
       <View style={styles.loadingScreen}>
-        <Text style={{ fontSize: 32, fontWeight: '800', color: '#111827', letterSpacing: -0.6 }}>
+        <Text style={styles.loadingWordmark}>
           HomeGenie
         </Text>
         <LensLoader size={48} style={{ marginTop: 24 }} />
@@ -361,9 +361,9 @@ const styles = StyleSheet.create({
   tabBar: {
     backgroundColor: 'rgba(255,255,255,0.96)',
     borderTopWidth: 0.5,
-    borderTopColor: 'rgba(0,0,0,0.08)',
-    height: 82,
-    paddingTop: 10,
+    borderTopColor: palette.borderLight,
+    height: layout.tabBarHeight,
+    paddingTop: space.sm,
     paddingBottom: 0,
   },
 
@@ -371,10 +371,10 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: -2,
     right: -4,
-    backgroundColor: C.destructive,
-    width: 16,
-    height: 16,
-    borderRadius: 8,
+    backgroundColor: '#0B6DC3',
+    width: space.base,
+    height: space.base,
+    borderRadius: space.sm,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1.5,
@@ -384,7 +384,7 @@ const styles = StyleSheet.create({
     color: C.white,
     fontSize: 9,
     fontWeight: fontWeight.bold,
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
   },
   loadingScreen: {
     flex: 1,
@@ -397,6 +397,6 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     color: C.textPrimary,
     letterSpacing: -0.6,
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
   },
 });

@@ -1,7 +1,6 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import { colors } from '../constants/colors';
-import { radius, space } from '../constants/tokens';
+import { colors, radius, space } from '../constants/tokens';
 
 export default function GlassCard({ children, style }) {
   return (

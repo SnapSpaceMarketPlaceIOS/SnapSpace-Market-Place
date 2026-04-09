@@ -13,11 +13,12 @@ import Svg, { Path, Circle } from 'react-native-svg';
 import LensLoader from '../components/LensLoader';
 import { useAuth } from '../context/AuthContext';
 import { space, radius, fontWeight, fontSize, uiColors, typeScale, shadow } from '../constants/tokens';
+import { colors } from '../constants/colors';
 import { Button, Badge, SectionHeader } from '../components/ds';
 import { Admin } from '../services/api';
 
-const BLUE = '#0B6DC3';
-const BLUE_DARK = '#0B6DC3';
+const BLUE = colors.bluePrimary;
+const BLUE_DARK = colors.bluePrimary;
 
 // ── Icons ─────────────────────────────────────────────────────────────────────
 
@@ -350,7 +351,7 @@ const styles = StyleSheet.create({
     borderBottomColor: 'rgba(0,0,0,0.06)',
   },
   headerCenter: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  headerTitle: { fontSize: 17, fontWeight: '700', color: '#111', letterSpacing: -0.2, fontFamily: 'KantumruyPro_700Bold'},
+  headerTitle: { fontSize: 17, fontWeight: '700', color: '#111', letterSpacing: -0.2, fontFamily: 'Geist_700Bold'},
   adminBadge: {
     width: 28,
     height: 28,
@@ -377,8 +378,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 4,
   },
-  statNum: { fontSize: 22, fontWeight: '800', color: '#111', letterSpacing: -0.5, fontFamily: 'KantumruyPro_700Bold'},
-  statLabel: { fontSize: 11, color: '#9CA3AF', fontWeight: '600', marginTop: 1, fontFamily: 'KantumruyPro_600SemiBold'},
+  statNum: { fontSize: 22, fontWeight: '800', color: '#111', letterSpacing: -0.5, fontFamily: 'Geist_700Bold'},
+  statLabel: { fontSize: 11, color: '#9CA3AF', fontWeight: '600', marginTop: 1, fontFamily: 'Geist_600SemiBold'},
 
   // Filter tabs
   filterTabsWrap: { backgroundColor: '#fff' },
@@ -390,7 +391,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F1F5F9',
   },
   filterTabActive: { backgroundColor: BLUE_DARK },
-  filterTabText: { fontSize: 13, fontWeight: '600', color: '#64748B', fontFamily: 'KantumruyPro_600SemiBold'},
+  filterTabText: { fontSize: 13, fontWeight: '600', color: '#64748B', fontFamily: 'Geist_600SemiBold'},
   filterTabTextActive: { color: '#fff' },
 
   // Secondary filters
@@ -405,8 +406,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   btypeChipActive: { borderColor: BLUE, backgroundColor: '#EFF6FF' },
-  btypeChipText: { fontSize: 12, fontWeight: '500', color: '#6B7280', fontFamily: 'KantumruyPro_500Medium'},
-  btypeChipTextActive: { color: BLUE, fontWeight: '700', fontFamily: 'KantumruyPro_700Bold'},
+  btypeChipText: { fontSize: 12, fontWeight: '500', color: '#6B7280', fontFamily: 'Geist_500Medium'},
+  btypeChipTextActive: { color: BLUE, fontWeight: '700', fontFamily: 'Geist_700Bold'},
 
   // Search bar
   searchBar: {
@@ -423,7 +424,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     height: 44,
   },
-  searchInput: { flex: 1, fontSize: 14, color: '#111', fontFamily: 'KantumruyPro_400Regular'},
+  searchInput: { flex: 1, fontSize: 14, color: '#111', fontFamily: 'Geist_400Regular'},
 
   // List
   list: { paddingHorizontal: 16, paddingTop: 12, paddingBottom: 32 },
@@ -454,8 +455,8 @@ const styles = StyleSheet.create({
   cardBody: { flex: 1, padding: 14 },
   cardTop: { marginBottom: 8 },
   cardTitleRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: 4 },
-  cardBusinessName: { fontSize: 15, fontWeight: '700', color: '#111', flex: 1, fontFamily: 'KantumruyPro_700Bold'},
-  cardEmail: { fontSize: 12, color: '#9CA3AF', fontFamily: 'KantumruyPro_400Regular'},
+  cardBusinessName: { fontSize: 15, fontWeight: '700', color: '#111', flex: 1, fontFamily: 'Geist_700Bold'},
+  cardEmail: { fontSize: 12, color: '#9CA3AF', fontFamily: 'Geist_400Regular'},
   cardMeta: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   metaChip: {
     backgroundColor: '#F1F5F9',
@@ -463,19 +464,19 @@ const styles = StyleSheet.create({
     paddingVertical: 3,
     paddingHorizontal: 8,
   },
-  metaChipText: { fontSize: 11, fontWeight: '600', color: '#64748B', fontFamily: 'KantumruyPro_600SemiBold'},
-  metaDate: { fontSize: 11, color: '#9CA3AF', fontFamily: 'KantumruyPro_400Regular'},
+  metaChipText: { fontSize: 11, fontWeight: '600', color: '#64748B', fontFamily: 'Geist_600SemiBold'},
+  metaDate: { fontSize: 11, color: '#9CA3AF', fontFamily: 'Geist_400Regular'},
 
   // Status pill
   pill: { borderRadius: 12, paddingVertical: 3, paddingHorizontal: 10 },
-  pillText: { fontSize: 11, fontWeight: '700', fontFamily: 'KantumruyPro_700Bold'},
+  pillText: { fontSize: 11, fontWeight: '700', fontFamily: 'Geist_700Bold'},
 
   // Empty
   emptyWrap: { alignItems: 'center', paddingTop: 60, gap: 12 },
-  emptyText: { fontSize: 14, color: '#9CA3AF', fontWeight: '500', fontFamily: 'KantumruyPro_500Medium'},
+  emptyText: { fontSize: 14, color: '#9CA3AF', fontWeight: '500', fontFamily: 'Geist_500Medium'},
 
   // Access denied
   accessDenied: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 32, gap: 12 },
-  accessDeniedTitle: { fontSize: 20, fontWeight: '800', color: '#111', fontFamily: 'KantumruyPro_700Bold'},
-  accessDeniedBody: { fontSize: 14, color: '#6B7280', textAlign: 'center', fontFamily: 'KantumruyPro_400Regular'},
+  accessDeniedTitle: { fontSize: 20, fontWeight: '800', color: '#111', fontFamily: 'Geist_700Bold'},
+  accessDeniedBody: { fontSize: 14, color: '#6B7280', textAlign: 'center', fontFamily: 'Geist_400Regular'},
 });

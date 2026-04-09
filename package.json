@@ -13,6 +13,7 @@
     "test:coverage": "jest --coverage --watchAll=false"
   },
   "dependencies": {
+    "@expo-google-fonts/geist": "^0.4.1",
     "@expo-google-fonts/jomolhari": "^0.4.1",
     "@expo-google-fonts/kantumruy-pro": "^0.4.1",
     "@expo/metro-config": "~55.0.9",

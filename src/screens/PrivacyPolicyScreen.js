@@ -386,7 +386,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 17,
     fontWeight: '800',
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
     color: '#111',
     letterSpacing: -0.3,
   },
@@ -397,12 +397,12 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#AAA',
     fontWeight: '500',
-    fontFamily: 'KantumruyPro_500Medium',
+    fontFamily: 'Geist_500Medium',
     marginBottom: 16,
   },
   intro: {
     fontSize: 14,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: '#555',
     lineHeight: 22,
     marginBottom: 28,
@@ -417,7 +417,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 15,
     fontWeight: '800',
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
     color: '#111',
     letterSpacing: -0.2,
     marginBottom: 10,
@@ -427,7 +427,7 @@ const styles = StyleSheet.create({
     color: '#555',
     lineHeight: 23,
     fontWeight: '400',
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
   },
 
   footer: {
@@ -437,5 +437,5 @@ const styles = StyleSheet.create({
     marginTop: 8,
     alignItems: 'center',
   },
-  footerText: { fontSize: 12, color: '#BBB', fontFamily: 'KantumruyPro_400Regular'},
+  footerText: { fontSize: 12, color: '#BBB', fontFamily: 'Geist_400Regular'},
 });

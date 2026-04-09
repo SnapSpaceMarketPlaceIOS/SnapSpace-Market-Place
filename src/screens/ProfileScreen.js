@@ -26,7 +26,7 @@ import { useShared } from '../context/SharedContext';
 import { useAuth } from '../context/AuthContext';
 import AuthGate from '../components/AuthGate';
 import { useFocusEffect } from '@react-navigation/native';
-import { updateProfile, uploadAvatar, getUserDesigns, getMyStats, deleteExpiredDesigns } from '../services/supabase';
+import { updateProfile, uploadAvatar, getUserDesigns, getMyStats, deleteExpiredDesigns, getUserLikedDesigns } from '../services/supabase';
 // DESIGNS import removed — profile only shows real user designs from Supabase
 import Skeleton from '../components/Skeleton';
 import PressableCard from '../components/PressableCard';
@@ -86,7 +86,7 @@ function GearIcon() {
 
 function PencilIcon() {
   return (
-    <Svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
+    <Svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round">
       <Path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
       <Path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
     </Svg>
@@ -113,7 +113,7 @@ function ImagePlaceholderIcon({ size = 28 }) {
 
 function HeartIcon({ filled = false, size = 13 }) {
   return (
-    <Svg width={size} height={size} viewBox="0 0 24 24" fill={filled ? '#ef4444' : 'none'} stroke={filled ? '#ef4444' : '#444'} strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round">
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill={filled ? '#ef4444' : 'none'} stroke={filled ? '#ef4444' : '#444'} strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round">
       <Path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
     </Svg>
   );
@@ -121,7 +121,7 @@ function HeartIcon({ filled = false, size = 13 }) {
 
 function ShareIcon() {
   return (
-    <Svg width={13} height={13} viewBox="0 0 24 24" fill="none" stroke="#444" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round">
+    <Svg width={13} height={13} viewBox="0 0 24 24" fill="none" stroke="#444" strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round">
       <Path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
       <Polyline points="16 6 12 2 8 6" />
       <Line x1={12} y1={2} x2={12} y2={15} />
@@ -131,7 +131,7 @@ function ShareIcon() {
 
 function ChevronRight() {
   return (
-    <Svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="#CCC" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round">
+    <Svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="#CCC" strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round">
       <Polyline points="9 18 15 12 9 6" />
     </Svg>
   );
@@ -139,7 +139,7 @@ function ChevronRight() {
 
 function CartActionIcon() {
   return (
-    <Svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="#444" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+    <Svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="#444" strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round">
       <Path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
       <Line x1={3} y1={6} x2={21} y2={6} />
       <Path d="M16 10a4 4 0 0 1-8 0" />
@@ -149,7 +149,7 @@ function CartActionIcon() {
 
 function RepostIcon() {
   return (
-    <Svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="#444" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+    <Svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="#444" strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round">
       <Polyline points="17 1 21 5 17 9" />
       <Path d="M3 11V9a4 4 0 0 1 4-4h14" />
       <Polyline points="7 23 3 19 7 15" />
@@ -160,7 +160,7 @@ function RepostIcon() {
 
 function SharedIcon() {
   return (
-    <Svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="#444" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+    <Svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="#444" strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round">
       <Circle cx={18} cy={5} r={3} />
       <Circle cx={6} cy={12} r={3} />
       <Circle cx={18} cy={19} r={3} />
@@ -172,7 +172,7 @@ function SharedIcon() {
 
 function CloseIcon() {
   return (
-    <Svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="#444" strokeWidth={2.5} strokeLinecap="round">
+    <Svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="#444" strokeWidth={1.2} strokeLinecap="round">
       <Line x1={18} y1={6} x2={6} y2={18} />
       <Line x1={6} y1={6} x2={18} y2={18} />
     </Svg>
@@ -181,63 +181,63 @@ function CloseIcon() {
 
 // Settings menu icons
 function SavedIcon() {
-  return <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="#444" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round"><Path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" /></Svg>;
+  return <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="#444" strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round"><Path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" /></Svg>;
 }
 
 function OrderIcon() {
-  return <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="#444" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round"><Circle cx={12} cy={12} r={10} /><Polyline points="12 6 12 12 16 14" /></Svg>;
+  return <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="#444" strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round"><Circle cx={12} cy={12} r={10} /><Polyline points="12 6 12 12 16 14" /></Svg>;
 }
 
 function CardIcon() {
-  return <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="#444" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round"><Rect x={1} y={4} width={22} height={16} rx={2} ry={2} /><Line x1={1} y1={10} x2={23} y2={10} /></Svg>;
+  return <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="#444" strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round"><Rect x={1} y={4} width={22} height={16} rx={2} ry={2} /><Line x1={1} y1={10} x2={23} y2={10} /></Svg>;
 }
 
 function HelpIcon() {
-  return <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="#444" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round"><Circle cx={12} cy={12} r={10} /><Path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" /><Line x1={12} y1={17} x2={12.01} y2={17} /></Svg>;
+  return <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="#444" strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round"><Circle cx={12} cy={12} r={10} /><Path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" /><Line x1={12} y1={17} x2={12.01} y2={17} /></Svg>;
 }
 
 function LogOutIcon() {
-  return <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="#67ACE9" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round"><Path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><Polyline points="16 17 21 12 16 7" /><Line x1={21} y1={12} x2={9} y2={12} /></Svg>;
+  return <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="#67ACE9" strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round"><Path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><Polyline points="16 17 21 12 16 7" /><Line x1={21} y1={12} x2={9} y2={12} /></Svg>;
 }
 
 function TrashIcon() {
-  return <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="#EF4444" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round"><Polyline points="3 6 5 6 21 6" /><Path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /><Line x1={10} y1={11} x2={10} y2={17} /><Line x1={14} y1={11} x2={14} y2={17} /></Svg>;
+  return <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="#EF4444" strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round"><Polyline points="3 6 5 6 21 6" /><Path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /><Line x1={10} y1={11} x2={10} y2={17} /><Line x1={14} y1={11} x2={14} y2={17} /></Svg>;
 }
 
 function RestoreIcon() {
-  return <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="#444" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round"><Polyline points="1 4 1 10 7 10" /><Path d="M3.51 15a9 9 0 1 0 .49-3.51" /></Svg>;
+  return <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="#444" strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round"><Polyline points="1 4 1 10 7 10" /><Path d="M3.51 15a9 9 0 1 0 .49-3.51" /></Svg>;
 }
 
 function FeatureIcon() {
-  return <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="#444" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round"><Circle cx={12} cy={12} r={10} /><Line x1={12} y1={8} x2={12} y2={16} /><Line x1={8} y1={12} x2={16} y2={12} /></Svg>;
+  return <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="#444" strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round"><Circle cx={12} cy={12} r={10} /><Line x1={12} y1={8} x2={12} y2={16} /><Line x1={8} y1={12} x2={16} y2={12} /></Svg>;
 }
 
 function BellSettingsIcon() {
-  return <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="#444" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round"><Path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" /><Path d="M13.73 21a2 2 0 0 1-3.46 0" /></Svg>;
+  return <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="#444" strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round"><Path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" /><Path d="M13.73 21a2 2 0 0 1-3.46 0" /></Svg>;
 }
 
 function GlobeIcon() {
-  return <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="#444" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round"><Circle cx={12} cy={12} r={10} /><Line x1={2} y1={12} x2={22} y2={12} /><Path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" /></Svg>;
+  return <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="#444" strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round"><Circle cx={12} cy={12} r={10} /><Line x1={2} y1={12} x2={22} y2={12} /><Path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" /></Svg>;
 }
 
 function StarIcon() {
-  return <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="#444" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round"><Polyline points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" /></Svg>;
+  return <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="#444" strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round"><Polyline points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" /></Svg>;
 }
 
 function ShareSettingsIcon() {
-  return <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="#444" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round"><Circle cx={18} cy={5} r={3} /><Circle cx={6} cy={12} r={3} /><Circle cx={18} cy={19} r={3} /><Line x1={8.59} y1={13.51} x2={15.42} y2={17.49} /><Line x1={15.41} y1={6.51} x2={8.59} y2={10.49} /></Svg>;
+  return <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="#444" strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round"><Circle cx={18} cy={5} r={3} /><Circle cx={6} cy={12} r={3} /><Circle cx={18} cy={19} r={3} /><Line x1={8.59} y1={13.51} x2={15.42} y2={17.49} /><Line x1={15.41} y1={6.51} x2={8.59} y2={10.49} /></Svg>;
 }
 
 function FileIcon() {
-  return <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="#444" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round"><Path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><Polyline points="14 2 14 8 20 8" /><Line x1={16} y1={13} x2={8} y2={13} /><Line x1={16} y1={17} x2={8} y2={17} /><Polyline points="10 9 9 9 8 9" /></Svg>;
+  return <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="#444" strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round"><Path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><Polyline points="14 2 14 8 20 8" /><Line x1={16} y1={13} x2={8} y2={13} /><Line x1={16} y1={17} x2={8} y2={17} /><Polyline points="10 9 9 9 8 9" /></Svg>;
 }
 
 function LockSettingsIcon() {
-  return <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="#444" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round"><Rect x={3} y={11} width={18} height={11} rx={2} ry={2} /><Path d="M7 11V7a5 5 0 0 1 10 0v4" /></Svg>;
+  return <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="#444" strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round"><Rect x={3} y={11} width={18} height={11} rx={2} ry={2} /><Path d="M7 11V7a5 5 0 0 1 10 0v4" /></Svg>;
 }
 
 function InfoIcon() {
-  return <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="#444" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round"><Circle cx={12} cy={12} r={10} /><Line x1={12} y1={16} x2={12} y2={12} /><Line x1={12} y1={8} x2={12.01} y2={8} /></Svg>;
+  return <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="#444" strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round"><Circle cx={12} cy={12} r={10} /><Line x1={12} y1={16} x2={12} y2={12} /><Line x1={12} y1={8} x2={12.01} y2={8} /></Svg>;
 }
 
 // ── Data ──────────────────────────────────────────────────────────────────────
@@ -245,8 +245,8 @@ function InfoIcon() {
 // No static placeholder data — only show real user designs from Supabase
 
 const ACCOUNT_ITEMS = [
-  { label: 'Subscription',           icon: <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="#444" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round"><Path d="M2 4l3 12h14l3-12-6 7-4-9-4 9-6-7z" /><Path d="M5 16h14v2H5z" /></Svg>, screen: 'Paywall' },
-  { label: 'My Spaces',              icon: <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="#444" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round"><Path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z" /><Line x1={4} y1={22} x2={4} y2={15} /></Svg>,  screen: 'MySpaces' },
+  { label: 'Subscription',           icon: <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="#444" strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round"><Path d="M2 4l3 12h14l3-12-6 7-4-9-4 9-6-7z" /><Path d="M5 16h14v2H5z" /></Svg>, screen: 'Paywall' },
+  { label: 'My Spaces',              icon: <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="#444" strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round"><Path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z" /><Line x1={4} y1={22} x2={4} y2={15} /></Svg>,  screen: 'MySpaces' },
   { label: 'Order History',          icon: <OrderIcon />, screen: 'OrderHistory' },
   { label: 'Payment Methods',        icon: <CardIcon />,  screen: 'PaymentMethods' },
   { label: 'Become a Supplier',       icon: <StarIcon />,  screen: 'SupplierApplication' },
@@ -331,14 +331,39 @@ export default function ProfileScreen({ navigation }) {
   const [myDesigns, setMyDesigns] = useState([]);
   const [designsLoading, setDesignsLoading] = useState(true);
   const [socialStats, setSocialStats] = useState({ followers: 0, following: 0, designs: 0 });
+  const [serverLikedDesigns, setServerLikedDesigns] = useState([]);
 
-  // Fetch real follower/following/design counts
+  // Fetch real follower/following/design counts + liked designs
   useFocusEffect(
     useCallback(() => {
       if (!user?.id) return;
       getMyStats(user.id)
         .then(stats => { if (stats) setSocialStats(stats); })
         .catch(() => {}); // fail silently — counts stay at 0
+      // Fetch designs the user has liked from Supabase
+      getUserLikedDesigns(user.id)
+        .then(rows => {
+          const normalized = (rows || []).map(d => ({
+            id: `liked-${d.id}`,
+            _rawId: d.id,
+            title: d.prompt || 'Liked Design',
+            user: d.profiles?.username || d.profiles?.full_name || 'Creator',
+            initial: (d.profiles?.full_name || 'C')[0],
+            verified: d.profiles?.is_verified_supplier || false,
+            imageUrl: d.image_url,
+            description: d.prompt,
+            prompt: d.prompt,
+            roomType: 'living-room',
+            styles: d.style_tags || [],
+            products: d.products || [],
+            tags: (d.style_tags || []).map(s => `#${s}`),
+            likes: d.likes || 0,
+            shares: 0,
+            isUserDesign: true,
+          }));
+          setServerLikedDesigns(normalized);
+        })
+        .catch(err => console.warn('[Profile] liked designs fetch failed:', err.message));
     }, [user?.id])
   );
 
@@ -487,7 +512,7 @@ export default function ProfileScreen({ navigation }) {
                 </View>
               </View>
             </View>
-            <TouchableOpacity style={styles.editProfileBtn} onPress={openEditProfile} activeOpacity={0.8}>
+            <TouchableOpacity style={styles.editProfileBtn} onPress={openEditProfile} activeOpacity={0.8} hitSlop={{ top: 8, bottom: 8, left: 0, right: 0 }}>
               <Text style={styles.editProfileBtnText}>Edit Profile</Text>
             </TouchableOpacity>
           </View>
@@ -551,14 +576,18 @@ export default function ProfileScreen({ navigation }) {
 
         {/* ── Designs Grid ── */}
         {designsLoading ? (
-          <View style={styles.emptyGrid}>
-            <LensLoader size={48} />
+          <View style={[styles.grid, { paddingHorizontal: space.lg, paddingTop: space.base }]}>
+            {[0,1,2,3].map(i => (
+              <View key={i} style={{ width: colWidthPct(gridCols), padding: 1 }}>
+                <Skeleton width="100%" height={160} radius="image" />
+              </View>
+            ))}
           </View>
         ) : (() => {
           const filtered = (activeTab === 0
             ? myDesigns
             : activeTab === 1
-              ? myDesigns.filter(d => liked[d.id])
+              ? [...myDesigns.filter(d => liked[d.id]), ...serverLikedDesigns]
               : myDesigns.filter(d => shared[d.id])
           ).filter(d => !!d.imageUrl);
           if (filtered.length === 0) {
@@ -604,7 +633,7 @@ export default function ProfileScreen({ navigation }) {
           >
             <View style={styles.dashboardCtaLeft}>
               <View style={styles.dashboardCtaIcon}>
-                <Svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                <Svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round">
                   <Path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
                   <Polyline points="9 22 9 12 15 12 15 22" />
                 </Svg>
@@ -614,7 +643,7 @@ export default function ProfileScreen({ navigation }) {
                 <Text style={styles.dashboardCtaSubtitle}>Manage products, orders & store</Text>
               </View>
             </View>
-            <Svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round">
+            <Svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round">
               <Path d="M5 12h14M12 5l7 7-7 7" />
             </Svg>
           </TouchableOpacity>
@@ -682,7 +711,7 @@ export default function ProfileScreen({ navigation }) {
                     >
                       <View style={styles.settingsLeft}>
                         <View style={[styles.settingsIconWrap, { backgroundColor: '#EEF2FF' }]}>
-                          <Svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="#0B6DC3" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                          <Svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="#0B6DC3" strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round">
                             <Path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
                           </Svg>
                         </View>
@@ -945,7 +974,7 @@ export default function ProfileScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: C.white,
   },
 
   // Banner
@@ -1024,7 +1053,7 @@ const styles = StyleSheet.create({
   avatarInitial: {
     fontSize: fontSize.xl,
     fontWeight: fontWeight.bold,
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
     color: '#fff',
   },
   avatarImage: {
@@ -1034,11 +1063,11 @@ const styles = StyleSheet.create({
   },
   editProfileBtn: {
     height: 28,
-    borderRadius: 9999,
+    borderRadius: radius.full,
     paddingHorizontal: 16,
     borderWidth: 1,
     borderColor: 'rgba(0,0,0,0.12)',
-    backgroundColor: '#fff',
+    backgroundColor: C.white,
     alignSelf: 'flex-end',
     marginBottom: -14,
     justifyContent: 'center',
@@ -1046,8 +1075,8 @@ const styles = StyleSheet.create({
   editProfileBtnText: {
     fontSize: 12,
     fontWeight: '600',
-    fontFamily: 'KantumruyPro_600SemiBold',
-    color: '#222',
+    fontFamily: 'Geist_600SemiBold',
+    color: C.textPrimary,
   },
 
   // Name block
@@ -1059,23 +1088,23 @@ const styles = StyleSheet.create({
   displayName: {
     ...typeScale.title,
     fontWeight: '800',
-    fontFamily: 'KantumruyPro_700Bold',
-    color: '#111',
+    fontFamily: 'Geist_700Bold',
+    color: C.textPrimary,
     letterSpacing: letterSpacing.tight,
   },
   // verifiedDot replaced by VerifiedBadge component
   username: {
     ...typeScale.caption,
-    fontFamily: 'KantumruyPro_400Regular',
-    color: '#888',
+    fontFamily: 'Geist_400Regular',
+    color: C.textTertiary,
     opacity: 0.44,
     marginBottom: space.sm,
     marginTop: space.xs,
   },
   bio: {
     ...typeScale.body,
-    fontFamily: 'KantumruyPro_400Regular',
-    color: '#333',
+    fontFamily: 'Geist_400Regular',
+    color: C.textPrimary,
     opacity: 0.72,
     marginBottom: space.md,
     marginTop: space.sm,
@@ -1094,13 +1123,13 @@ const styles = StyleSheet.create({
   followValue: {
     ...typeScale.body,
     fontWeight: '700',
-    fontFamily: 'KantumruyPro_700Bold',
-    color: '#111',
+    fontFamily: 'Geist_700Bold',
+    color: C.textPrimary,
   },
   followLabel: {
     ...typeScale.body,
-    fontFamily: 'KantumruyPro_400Regular',
-    color: '#888',
+    fontFamily: 'Geist_400Regular',
+    color: C.textTertiary,
     opacity: 0.44,
   },
 
@@ -1119,13 +1148,13 @@ const styles = StyleSheet.create({
     height: 36,
     paddingHorizontal: space.base,
     borderRadius: radius.sm,
-    backgroundColor: '#F1F5F9',
+    backgroundColor: C.surface,
     gap: 6,
   },
   actionChipLabel: {
     ...typeScale.micro,
-    fontFamily: 'KantumruyPro_600SemiBold',
-    color: '#333',
+    fontFamily: 'Geist_600SemiBold',
+    color: C.textPrimary,
     textTransform: undefined,
   },
 
@@ -1155,14 +1184,14 @@ const styles = StyleSheet.create({
   tabLabel: {
     ...typeScale.caption,
     fontWeight: '500',
-    fontFamily: 'KantumruyPro_500Medium',
-    color: '#A0A0A8',
+    fontFamily: 'Geist_500Medium',
+    color: C.textTertiary,
   },
   tabLabelActive: {
     ...typeScale.caption,
     fontWeight: '700',
-    fontFamily: 'KantumruyPro_700Bold',
-    color: '#111',
+    fontFamily: 'Geist_700Bold',
+    color: C.textPrimary,
   },
   tabUnderline: {
     position: 'absolute',
@@ -1194,14 +1223,14 @@ const styles = StyleSheet.create({
   emptyGridTitle: {
     fontSize: 17,
     fontWeight: '700',
-    fontFamily: 'KantumruyPro_700Bold',
-    color: '#111827',
+    fontFamily: 'Geist_700Bold',
+    color: C.textPrimary,
     marginBottom: 8,
     textAlign: 'center',
   },
   emptyGridSub: {
     fontSize: 14,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: '#9CA3AF',
     textAlign: 'center',
     lineHeight: 20,
@@ -1214,11 +1243,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#ECEEF2',
   },
   cardSingle: {
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.07,
-    shadowRadius: 10,
-    elevation: 3,
+    ...shadow.medium,
     borderWidth: 1,
     borderColor: 'rgba(0,0,0,0.05)',
   },
@@ -1269,7 +1294,7 @@ const styles = StyleSheet.create({
   },
   // Settings bottom sheet — shadow.high per spec
   settingsSheet: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: C.white,
     borderTopLeftRadius: radius.xl,
     borderTopRightRadius: radius.xl,
     paddingBottom: space['2xl'],
@@ -1301,20 +1326,20 @@ const styles = StyleSheet.create({
   settingsTitle: {
     ...typeScale.headline,
     fontWeight: '700',
-    fontFamily: 'KantumruyPro_700Bold',
-    color: '#111',
+    fontFamily: 'Geist_700Bold',
+    color: C.textPrimary,
     letterSpacing: letterSpacing.tight,
   },
   settingsSectionLabel: {
     ...typeScale.subheadline,
-    fontFamily: 'KantumruyPro_600SemiBold',
-    color: '#A0A0A8',
+    fontFamily: 'Geist_600SemiBold',
+    color: C.textTertiary,
     paddingHorizontal: space.lg,
     paddingTop: space.base,
     paddingBottom: space.sm,
   },
   settingsCard: {
-    backgroundColor: '#fff',
+    backgroundColor: C.white,
     marginHorizontal: space.base,
     borderRadius: radius.md,
     borderWidth: 1,
@@ -1342,20 +1367,20 @@ const styles = StyleSheet.create({
     width: space['2xl'],
     height: space['2xl'],
     borderRadius: radius.sm,
-    backgroundColor: '#F1F5F9',
+    backgroundColor: C.surface,
     alignItems: 'center',
     justifyContent: 'center',
   },
   settingsLabel: {
     ...typeScale.body,
     fontWeight: '500',
-    fontFamily: 'KantumruyPro_500Medium',
-    color: '#111',
+    fontFamily: 'Geist_500Medium',
+    color: C.textPrimary,
   },
   settingsValue: {
     ...typeScale.caption,
-    fontFamily: 'KantumruyPro_400Regular',
-    color: '#A0A0A8',
+    fontFamily: 'Geist_400Regular',
+    color: C.textTertiary,
     opacity: 0.44,
   },
   logoutBtn: {
@@ -1374,7 +1399,7 @@ const styles = StyleSheet.create({
   logoutText: {
     ...typeScale.body,
     fontWeight: '700',
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
     color: '#67ACE9',
   },
   deleteAccountBtn: {
@@ -1393,14 +1418,14 @@ const styles = StyleSheet.create({
   deleteAccountText: {
     ...typeScale.body,
     fontWeight: '700',
-    fontFamily: 'KantumruyPro_700Bold',
-    color: '#EF4444',
+    fontFamily: 'Geist_700Bold',
+    color: C.destructive,
   },
   version: {
     ...typeScale.caption,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     textAlign: 'center',
-    color: '#BBB',
+    color: C.textTertiary,
   },
 
   // Edit Profile modal
@@ -1410,7 +1435,7 @@ const styles = StyleSheet.create({
   },
   // Edit profile bottom sheet — shadow.high per spec
   editProfileSheet: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: C.white,
     borderTopLeftRadius: radius.xl,
     borderTopRightRadius: radius.xl,
     paddingBottom: space.xl,
@@ -1450,13 +1475,13 @@ const styles = StyleSheet.create({
   photoOptionPlaceholder: {
     fontSize: fontSize.lg,
     fontWeight: fontWeight.bold,
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
     color: '#fff',
   },
   photoOptionLabel: {
     ...typeScale.body,
     fontWeight: '700',
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
     color: C.primary,
   },
   bannerOptionRow: {
@@ -1479,27 +1504,27 @@ const styles = StyleSheet.create({
   },
   bannerOptionPlaceholderText: {
     ...typeScale.caption,
-    fontFamily: 'KantumruyPro_400Regular',
-    color: '#888',
+    fontFamily: 'Geist_400Regular',
+    color: C.textTertiary,
   },
   editProfileLabel: {
     ...typeScale.micro,
-    fontFamily: 'KantumruyPro_600SemiBold',
-    color: '#888',
+    fontFamily: 'Geist_600SemiBold',
+    color: C.textTertiary,
     textTransform: 'uppercase',
     marginBottom: space.sm,
     marginTop: space.md,
   },
   editProfileInput: {
     ...typeScale.body,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     borderWidth: 1,
     borderColor: 'rgba(0,0,0,0.08)',
     borderRadius: radius.md,
     paddingHorizontal: space.md,
     paddingVertical: space.md,
-    color: '#111',
-    backgroundColor: '#fff',
+    color: C.textPrimary,
+    backgroundColor: C.white,
   },
   usernameInputWrap: {
     flexDirection: 'row',
@@ -1507,14 +1532,14 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(0,0,0,0.08)',
     borderRadius: radius.md,
-    backgroundColor: '#fff',
+    backgroundColor: C.white,
     paddingLeft: space.md,
   },
   usernamePrefix: {
     ...typeScale.body,
-    color: '#888',
+    color: C.textTertiary,
     fontWeight: '500',
-    fontFamily: 'KantumruyPro_500Medium',
+    fontFamily: 'Geist_500Medium',
   },
   usernameInput: {
     flex: 1,
@@ -1537,7 +1562,7 @@ const styles = StyleSheet.create({
   saveProfileBtnText: {
     ...typeScale.button,
     fontWeight: '700',
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
     color: '#fff',
   },
 
@@ -1548,7 +1573,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginHorizontal: space.lg,
     marginTop: space.xl,
-    backgroundColor: '#0B6DC3',
+    backgroundColor: C.primary,
     borderRadius: radius.lg,
     paddingVertical: space.md,
     paddingHorizontal: space.lg,
@@ -1570,13 +1595,13 @@ const styles = StyleSheet.create({
   dashboardCtaTitle: {
     ...typeScale.caption,
     fontWeight: '700',
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
     color: '#fff',
     marginBottom: 2,
   },
   dashboardCtaSubtitle: {
     ...typeScale.micro,
-    fontFamily: 'KantumruyPro_600SemiBold',
+    fontFamily: 'Geist_600SemiBold',
     textTransform: undefined,
     color: 'rgba(255,255,255,0.7)',
   },
@@ -1613,18 +1638,18 @@ const styles = StyleSheet.create({
   supplierCtaTitle: {
     ...typeScale.caption,
     fontWeight: '700',
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
     color: '#1E3A5F',
     marginBottom: 2,
   },
   supplierCtaSubtitle: {
     ...typeScale.micro,
-    fontFamily: 'KantumruyPro_600SemiBold',
+    fontFamily: 'Geist_600SemiBold',
     textTransform: undefined,
     color: '#3B82F6',
   },
   supplierCtaBtn: {
-    backgroundColor: '#0B6DC3',
+    backgroundColor: C.primary,
     borderRadius: radius.sm,
     paddingVertical: 8,
     paddingHorizontal: 16,
@@ -1632,7 +1657,7 @@ const styles = StyleSheet.create({
   },
   supplierCtaBtnText: {
     ...typeScale.button,
-    fontFamily: 'KantumruyPro_600SemiBold',
+    fontFamily: 'Geist_600SemiBold',
     color: '#fff',
   },
 });

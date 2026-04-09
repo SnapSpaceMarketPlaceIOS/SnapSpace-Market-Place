@@ -31,6 +31,7 @@ import LensLoader from '../components/LensLoader';
 import { useAuth } from '../context/AuthContext';
 import { getUserDesigns } from '../services/supabase';
 import { colors } from '../constants/colors';
+import { colors as C } from '../constants/theme';
 
 const { width: SW } = Dimensions.get('window');
 const GRID_PAD = 20;
@@ -141,7 +142,7 @@ function SpaceDetailModal({ design, visible, onClose, navigation }) {
       <SafeAreaView style={s.modalRoot} edges={['top']}>
         {/* Header */}
         <View style={s.modalHeader}>
-          <TouchableOpacity style={s.modalCloseBtn} onPress={onClose}>
+          <TouchableOpacity style={s.modalCloseBtn} onPress={onClose} activeOpacity={0.7}>
             <CloseIcon />
           </TouchableOpacity>
           <Text style={s.modalHeaderTitle} numberOfLines={1}>{design.prompt || 'My Space'}</Text>
@@ -173,7 +174,7 @@ function SpaceDetailModal({ design, visible, onClose, navigation }) {
                   <Text style={s.shopSubtitle}>Products matched to your design</Text>
                 </View>
                 <View style={s.shopActions}>
-                  <TouchableOpacity style={s.shopActionBtn} onPress={handleShare}>
+                  <TouchableOpacity style={s.shopActionBtn} onPress={handleShare} activeOpacity={0.7} hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}>
                     <ShareIcon />
                   </TouchableOpacity>
                 </View>
@@ -236,7 +237,7 @@ export default function MySpacesScreen({ navigation }) {
     <SafeAreaView style={s.root} edges={['top']}>
       {/* Header */}
       <View style={s.header}>
-        <TouchableOpacity style={s.backBtn} onPress={() => navigation.goBack()}>
+        <TouchableOpacity style={s.backBtn} onPress={() => navigation.goBack()} activeOpacity={0.7}>
           <BackIcon />
         </TouchableOpacity>
         <Text style={s.headerTitle}>My Spaces</Text>
@@ -298,7 +299,7 @@ export default function MySpacesScreen({ navigation }) {
 // ── Styles ─────────────────────────────────────────────────────────────────────
 
 const s = StyleSheet.create({
-  root: { flex: 1, backgroundColor: '#FFFFFF' },
+  root: { flex: 1, backgroundColor: C.white },
 
   header: {
     flexDirection: 'row',
@@ -310,11 +311,11 @@ const s = StyleSheet.create({
     borderBottomColor: 'rgba(0,0,0,0.06)',
   },
   backBtn: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center' },
-  headerTitle: { fontSize: 17, fontWeight: '700', color: '#111', fontFamily: 'KantumruyPro_700Bold'},
+  headerTitle: { fontSize: 17, fontWeight: '700', color: '#111', fontFamily: 'Geist_700Bold'},
 
   center: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 40 },
-  emptyTitle: { fontSize: 18, fontWeight: '700', color: '#111', marginBottom: 8, textAlign: 'center', fontFamily: 'KantumruyPro_700Bold'},
-  emptySubtitle: { fontSize: 14, color: '#9CA3AF', textAlign: 'center', lineHeight: 20, fontFamily: 'KantumruyPro_400Regular'},
+  emptyTitle: { fontSize: 18, fontWeight: '700', color: '#111', marginBottom: 8, textAlign: 'center', fontFamily: 'Geist_700Bold'},
+  emptySubtitle: { fontSize: 14, color: '#9CA3AF', textAlign: 'center', lineHeight: 20, fontFamily: 'Geist_400Regular'},
 
   // ── Grid ──
   grid: { padding: GRID_PAD, paddingBottom: 40 },
@@ -340,12 +341,12 @@ const s = StyleSheet.create({
     color: '#374151',
     fontSize: 12,
     fontWeight: '500',
-    fontFamily: 'KantumruyPro_500Medium',
+    fontFamily: 'Geist_500Medium',
     lineHeight: 16,
   },
 
   // ── Detail Modal ──
-  modalRoot: { flex: 1, backgroundColor: '#FFFFFF' },
+  modalRoot: { flex: 1, backgroundColor: C.white },
   modalHeader: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -367,7 +368,7 @@ const s = StyleSheet.create({
     flex: 1,
     fontSize: 15,
     fontWeight: '600',
-    fontFamily: 'KantumruyPro_600SemiBold',
+    fontFamily: 'Geist_600SemiBold',
     color: '#111',
     textAlign: 'center',
     marginHorizontal: 8,
@@ -390,7 +391,7 @@ const s = StyleSheet.create({
   promptLabel: {
     fontSize: 11,
     fontWeight: '600',
-    fontFamily: 'KantumruyPro_600SemiBold',
+    fontFamily: 'Geist_600SemiBold',
     color: '#9CA3AF',
     letterSpacing: 1,
     textTransform: 'uppercase',
@@ -400,7 +401,7 @@ const s = StyleSheet.create({
   promptText: {
     fontSize: 16,
     fontWeight: '500',
-    fontFamily: 'KantumruyPro_500Medium',
+    fontFamily: 'Geist_500Medium',
     color: '#111827',
     lineHeight: 22,
     marginTop: 6,
@@ -420,14 +421,14 @@ const s = StyleSheet.create({
   shopTitle: {
     fontSize: 13,
     fontWeight: '700',
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
     color: '#9CA3AF',
     letterSpacing: 1.5,
     textTransform: 'uppercase',
   },
   shopSubtitle: {
     fontSize: 13,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: '#67ACE9',
     marginTop: 3,
   },
@@ -439,7 +440,7 @@ const s = StyleSheet.create({
   },
   ftc: {
     fontSize: 11,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: '#9CA3AF',
     fontStyle: 'italic',
     textAlign: 'center',
@@ -450,7 +451,7 @@ const s = StyleSheet.create({
   // ── Horizontal product cards ──
   hCard: {
     width: 170,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: C.white,
     borderRadius: 10,
     borderWidth: 1,
     borderColor: 'rgba(0,0,0,0.06)',
@@ -469,14 +470,14 @@ const s = StyleSheet.create({
   hCardName: {
     fontSize: 13,
     fontWeight: '600',
-    fontFamily: 'KantumruyPro_600SemiBold',
+    fontFamily: 'Geist_600SemiBold',
     color: '#111',
     lineHeight: 17,
   },
   hCardBrand: {
     fontSize: 11,
     fontWeight: '400',
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: '#9CA3AF',
     marginTop: 1,
   },
@@ -489,19 +490,19 @@ const s = StyleSheet.create({
   hCardRatingText: {
     fontSize: 10,
     fontWeight: '600',
-    fontFamily: 'KantumruyPro_600SemiBold',
+    fontFamily: 'Geist_600SemiBold',
     color: '#111',
     marginLeft: 2,
   },
   hCardReviews: {
     fontSize: 10,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: '#6B7280',
   },
   hCardPrice: {
     fontSize: 14,
     fontWeight: '700',
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
     color: colors.bluePrimary,
     marginTop: 4,
   },

@@ -92,8 +92,8 @@ const inputStyles = StyleSheet.create({
     borderColor: '#E5E7EB',
   },
   wrapFocused: { borderColor: '#67ACE9' },
-  input: { flex: 1, fontSize: 15, color: '#111', fontFamily: 'KantumruyPro_400Regular'},
-  toggleText: { fontSize: 13, color: '#ABABAB', fontWeight: '500', marginLeft: 8, fontFamily: 'KantumruyPro_500Medium'},
+  input: { flex: 1, fontSize: 15, color: '#111', fontFamily: 'Geist_400Regular'},
+  toggleText: { fontSize: 13, color: '#ABABAB', fontWeight: '500', marginLeft: 8, fontFamily: 'Geist_500Medium'},
 });
 
 // ── Screen ────────────────────────────────────────────────────────────────────
@@ -129,11 +129,12 @@ export default function AuthScreen({ navigation }) {
     Animated.spring(formSlideY, { toValue: 0, useNativeDriver: true, speed: 13, bounciness: 4 }).start();
   }, []);
 
-  // Safety net — force-clear the spinner after 20s so it can never get stuck.
+  // Safety net — force-clear the spinner after 16s so it can never get stuck.
+  // signIn/signUp timeout at 15s, so this fires 1s after as a backstop.
   const loadingTimerRef = React.useRef(null);
   const safeSetLoading = (val) => {
     if (val) {
-      loadingTimerRef.current = setTimeout(() => setLoading(false), 20000);
+      loadingTimerRef.current = setTimeout(() => setLoading(false), 16000);
     } else {
       clearTimeout(loadingTimerRef.current);
     }
@@ -416,7 +417,7 @@ const styles = StyleSheet.create({
   heroWordmark: {
     fontSize: 38,
     fontWeight: '800',
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
     color: '#fff',
     letterSpacing: -0.5,
     marginBottom: 8,
@@ -428,7 +429,7 @@ const styles = StyleSheet.create({
   heroTagline: {
     fontSize: 14,
     fontWeight: '500',
-    fontFamily: 'KantumruyPro_500Medium',
+    fontFamily: 'Geist_500Medium',
     color: 'rgba(255,255,255,0.88)',
     letterSpacing: 0.2,
     textAlign: 'center',
@@ -447,10 +448,10 @@ const styles = StyleSheet.create({
     paddingTop: 28,
   },
 
-  errorText: { fontSize: 12, color: '#E74C3C', marginTop: -8, marginBottom: 10, marginLeft: 4, fontFamily: 'KantumruyPro_400Regular'},
+  errorText: { fontSize: 12, color: '#E74C3C', marginTop: -8, marginBottom: 10, marginLeft: 4, fontFamily: 'Geist_400Regular'},
 
   forgotBtn: { alignSelf: 'flex-end', marginBottom: 20, marginTop: -4 },
-  forgotText: { fontSize: 13, color: BLUE, fontWeight: '600', fontFamily: 'KantumruyPro_600SemiBold'},
+  forgotText: { fontSize: 13, color: BLUE, fontWeight: '600', fontFamily: 'Geist_600SemiBold'},
 
   primaryBtnDisabled: { opacity: 0.6 },
   primaryBtn: {
@@ -460,11 +461,11 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     backgroundColor: '#67ACE9',
   },
-  primaryBtnText: { color: '#fff', fontSize: 16, fontWeight: '700', fontFamily: 'KantumruyPro_700Bold'},
+  primaryBtnText: { color: '#fff', fontSize: 16, fontWeight: '700', fontFamily: 'Geist_700Bold'},
 
   dividerRow: { flexDirection: 'row', alignItems: 'center', marginVertical: 18, gap: 12 },
   dividerLine: { flex: 1, height: 1, backgroundColor: '#E5E7EB' },
-  dividerText: { fontSize: 12, color: '#BBBBBB', fontWeight: '500', fontFamily: 'KantumruyPro_500Medium'},
+  dividerText: { fontSize: 12, color: '#BBBBBB', fontWeight: '500', fontFamily: 'Geist_500Medium'},
 
   appleBtn: {
     flexDirection: 'row',
@@ -475,9 +476,9 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     height: 54,
   },
-  appleBtnText: { color: '#fff', fontSize: 15, fontWeight: '700', fontFamily: 'KantumruyPro_700Bold'},
+  appleBtnText: { color: '#fff', fontSize: 15, fontWeight: '700', fontFamily: 'Geist_700Bold'},
 
   switchBtn: { marginTop: 28, alignItems: 'center' },
-  switchText: { fontSize: 14, color: '#ABABAB', fontFamily: 'KantumruyPro_400Regular'},
-  switchLink: { color: BLUE, fontWeight: '700', fontFamily: 'KantumruyPro_700Bold'},
+  switchText: { fontSize: 14, color: '#ABABAB', fontFamily: 'Geist_400Regular'},
+  switchLink: { color: BLUE, fontWeight: '700', fontFamily: 'Geist_700Bold'},
 });

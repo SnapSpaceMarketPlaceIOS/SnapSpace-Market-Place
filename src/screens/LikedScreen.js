@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   View,
   Text,
@@ -9,18 +9,21 @@ import {
 } from 'react-native';
 import CardImage from '../components/CardImage';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useFocusEffect } from '@react-navigation/native';
 import Svg, { Path, Polyline } from 'react-native-svg';
 import { colors as C } from '../constants/theme';
 import { typeScale, radius, space } from '../constants/tokens';
 import { useLiked } from '../context/LikedContext';
+import { useAuth } from '../context/AuthContext';
 import { DESIGNS } from '../data/designs';
+import { getUserLikedDesigns } from '../services/supabase';
 
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = (width - 3) / 3;
 
 function BackIcon() {
   return (
-    <Svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke="#111" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round">
+    <Svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke="#111" strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round">
       <Polyline points="15 18 9 12 15 6" />
     </Svg>
   );
@@ -28,7 +31,7 @@ function BackIcon() {
 
 function HeartIcon({ filled = false, size = 14 }) {
   return (
-    <Svg width={size} height={size} viewBox="0 0 24 24" fill={filled ? '#ef4444' : 'none'} stroke={filled ? '#ef4444' : '#fff'} strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round">
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill={filled ? '#ef4444' : 'none'} stroke={filled ? '#ef4444' : '#fff'} strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round">
       <Path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
     </Svg>
   );
@@ -44,7 +47,40 @@ function EmptyHeartIcon() {
 
 export default function LikedScreen({ navigation }) {
   const { liked, toggleLiked } = useLiked();
-  const likedItems = DESIGNS.filter(d => liked[d.id]);
+  const { user } = useAuth();
+  const [serverLiked, setServerLiked] = useState([]);
+
+  // Fetch liked designs from Supabase on screen focus
+  useFocusEffect(
+    useCallback(() => {
+      if (!user?.id) return;
+      getUserLikedDesigns(user.id)
+        .then(rows => {
+          const normalized = (rows || []).map(d => ({
+            id: d.id,
+            title: d.prompt || 'Untitled',
+            imageUrl: d.image_url,
+            prompt: d.prompt,
+            styles: d.style_tags || [],
+            products: d.products || [],
+            tags: (d.style_tags || []).map(s => `#${s}`),
+            likes: d.likes || 0,
+            user: d.profiles?.username || d.profiles?.full_name || 'Creator',
+            seller: d.profiles?.username || 'creator',
+            initial: (d.profiles?.full_name || 'C')[0],
+            isUserDesign: true,
+          }));
+          setServerLiked(normalized);
+        })
+        .catch(err => console.warn('[Liked] server fetch failed:', err.message));
+    }, [user?.id])
+  );
+
+  // Merge static DESIGNS liked locally + server-fetched liked designs
+  const localLiked = DESIGNS.filter(d => liked[d.id]);
+  const serverIds = new Set(serverLiked.map(d => d.id));
+  const merged = [...localLiked.filter(d => !serverIds.has(d.id)), ...serverLiked];
+  const likedItems = merged;
 
   const handleCardPress = (design) => {
     navigation.navigate('ShopTheLook', { design });
@@ -111,13 +147,14 @@ export default function LikedScreen({ navigation }) {
                   <TouchableOpacity
                     style={styles.heartBtn}
                     onPress={() => toggleLiked(design.id)}
-                    hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+                    activeOpacity={0.7}
+                    hitSlop={{ top: 9, bottom: 9, left: 9, right: 9 }}
                   >
                     <HeartIcon filled={!!liked[design.id]} size={13} />
                   </TouchableOpacity>
                 </View>
                 <Text style={styles.cellTitle} numberOfLines={1}>{design.title}</Text>
-                <Text style={styles.cellSeller} numberOfLines={1}>@{design.seller}</Text>
+                <Text style={styles.cellSeller} numberOfLines={1}>@{design.seller || design.user || 'creator'}</Text>
               </TouchableOpacity>
             ))}
           </View>
@@ -155,7 +192,7 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     ...typeScale.title,
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
     color: C.textPrimary,
   },
   headerRight: {
@@ -168,7 +205,7 @@ const styles = StyleSheet.create({
   headerCount: {
     ...typeScale.button,
     fontWeight: '700',
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
     color: C.destructive,
   },
 
@@ -178,7 +215,7 @@ const styles = StyleSheet.create({
   },
   countLabel: {
     ...typeScale.caption,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: C.textSecondary,
     paddingHorizontal: space.base,
     marginBottom: 10,
@@ -225,7 +262,7 @@ const styles = StyleSheet.create({
   },
   cellTitle: {
     ...typeScale.micro,
-    fontFamily: 'KantumruyPro_600SemiBold',
+    fontFamily: 'Geist_600SemiBold',
     color: C.textPrimary,
     textTransform: undefined,
     paddingHorizontal: 4,
@@ -233,7 +270,7 @@ const styles = StyleSheet.create({
   },
   cellSeller: {
     ...typeScale.caption,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: C.textSecondary,
     paddingHorizontal: 4,
     paddingBottom: 2,
@@ -249,13 +286,13 @@ const styles = StyleSheet.create({
   },
   emptyTitle: {
     ...typeScale.title,
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
     color: C.textPrimary,
     marginTop: 8,
   },
   emptySubtitle: {
     ...typeScale.body,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: C.textSecondary,
     textAlign: 'center',
   },
@@ -271,7 +308,7 @@ const styles = StyleSheet.create({
   },
   browseBtnText: {
     ...typeScale.button,
-    fontFamily: 'KantumruyPro_600SemiBold',
+    fontFamily: 'Geist_600SemiBold',
     color: C.white,
   },
 });

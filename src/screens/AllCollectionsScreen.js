@@ -196,7 +196,7 @@ const styles = StyleSheet.create({
   eyebrow: {
     fontSize: 11,
     fontWeight: '700',
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
     color: '#9CA3AF',
     letterSpacing: 1.5,
     textTransform: 'uppercase',
@@ -206,7 +206,7 @@ const styles = StyleSheet.create({
   pageTitle: {
     fontSize: 28,
     fontWeight: '800',
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
     color: colors.bluePrimary,
     letterSpacing: letterSpacing.tight,
     paddingHorizontal: space.lg,
@@ -214,7 +214,7 @@ const styles = StyleSheet.create({
   },
   pageSub: {
     ...typeScale.body,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: '#6B7280',
     paddingHorizontal: space.lg,
     marginBottom: space.xl,
@@ -262,13 +262,13 @@ const styles = StyleSheet.create({
   cardTitle: {
     fontSize: 17,
     fontWeight: '700',
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
     color: '#111827',
     letterSpacing: letterSpacing.tight,
   },
   cardSubtitle: {
     ...typeScale.caption,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: '#6B7280',
     marginBottom: 4,
   },

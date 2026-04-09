@@ -39,7 +39,7 @@ const IMG_RADIUS = Math.round((width - space.lg * 2) * 0.025);
 
 function BackIcon() {
   return (
-    <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="#111" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round">
+    <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="#111" strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round">
       <Polyline points="15 18 9 12 15 6" />
     </Svg>
   );
@@ -47,7 +47,7 @@ function BackIcon() {
 
 function CartNavIcon() {
   return (
-    <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="#111" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+    <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="#111" strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round">
       <Circle cx={9} cy={21} r={1} />
       <Circle cx={20} cy={21} r={1} />
       <Path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
@@ -57,7 +57,7 @@ function CartNavIcon() {
 
 function PlusSmallIcon() {
   return (
-    <Svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth={2.5} strokeLinecap="round">
+    <Svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth={1.5} strokeLinecap="round">
       <Line x1={12} y1={5} x2={12} y2={19} />
       <Line x1={5} y1={12} x2={19} y2={12} />
     </Svg>
@@ -66,7 +66,7 @@ function PlusSmallIcon() {
 
 function CartWhiteIcon() {
   return (
-    <Svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+    <Svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round">
       <Circle cx={9} cy={21} r={1} />
       <Circle cx={20} cy={21} r={1} />
       <Path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
@@ -80,7 +80,7 @@ function DownloadIcon({ color = '#9CA3AF' }) {
     <Svg width={18} height={18} viewBox="0 0 30 30" fill="none">
       <Path
         d="M6.54815 18.5147C7.04668 20.3752 8.1452 22.0193 9.67334 23.1918C11.2015 24.3644 13.0738 25 15 25C16.9262 25 18.7985 24.3644 20.3267 23.1918C21.8548 22.0193 22.9533 20.3752 23.4519 18.5147"
-        stroke={color} strokeWidth={1.6} strokeLinecap="round"
+        stroke={color} strokeWidth={1.2} strokeLinecap="round"
       />
       <Path
         d="M15 16.25L14.6877 16.6404L15 16.8903L15.3123 16.6404L15 16.25ZM15.5 5C15.5 4.72386 15.2761 4.5 15 4.5C14.7239 4.5 14.5 4.72386 14.5 5L15 5L15.5 5ZM8.75 11.25L8.43765 11.6404L14.6877 16.6404L15 16.25L15.3123 15.8596L9.06235 10.8596L8.75 11.25ZM15 16.25L15.3123 16.6404L21.5623 11.6404L21.25 11.25L20.9377 10.8596L14.6877 15.8596L15 16.25ZM15 16.25L15.5 16.25L15.5 5L15 5L14.5 5L14.5 16.25L15 16.25Z"
@@ -96,7 +96,7 @@ function ShareIcon({ color = '#9CA3AF' }) {
     <Svg width={18} height={18} viewBox="0 0 30 30" fill="none">
       <Path
         d="M6.54815 18.5147C7.04668 20.3752 8.1452 22.0193 9.67334 23.1918C11.2015 24.3644 13.0738 25 15 25C16.9262 25 18.7985 24.3644 20.3267 23.1918C21.8548 22.0193 22.9533 20.3752 23.4519 18.5147"
-        stroke={color} strokeWidth={1.6} strokeLinecap="round"
+        stroke={color} strokeWidth={1.2} strokeLinecap="round"
       />
       <Path
         d="M15 5L14.6877 4.60957L15 4.35969L15.3123 4.60957L15 5ZM15.5 16.25C15.5 16.5261 15.2761 16.75 15 16.75C14.7239 16.75 14.5 16.5261 14.5 16.25L15 16.25L15.5 16.25ZM8.75 10L8.43765 9.60957L14.6877 4.60957L15 5L15.3123 5.39043L9.06235 10.3904L8.75 10ZM15 5L15.3123 4.60957L21.5623 9.60957L21.25 10L20.9377 10.3904L14.6877 5.39043L15 5ZM15 5L15.5 5L15.5 16.25L15 16.25L14.5 16.25L14.5 5L15 5Z"
@@ -109,7 +109,7 @@ function ShareIcon({ color = '#9CA3AF' }) {
 // MiniLensLoader replaced by shared LensLoader component
 
 // Animated icon button — same spring bounce as the bottom tab bar
-function AnimatedIconBtn({ onPress, color, children, style }) {
+function AnimatedIconBtn({ onPress, color, children, style, hitSlop }) {
   const scale = useRef(new Animated.Value(1)).current;
   const handlePressIn = useCallback(() => {
     Animated.spring(scale, { toValue: 0.88, useNativeDriver: true, speed: 50, bounciness: 4 }).start();
@@ -118,11 +118,21 @@ function AnimatedIconBtn({ onPress, color, children, style }) {
     Animated.spring(scale, { toValue: 1, useNativeDriver: true, speed: 20, bounciness: 10 }).start();
   }, [scale]);
   return (
-    <Pressable onPress={onPress} onPressIn={handlePressIn} onPressOut={handlePressOut}>
+    <Pressable onPress={onPress} onPressIn={handlePressIn} onPressOut={handlePressOut} hitSlop={hitSlop}>
       <Animated.View style={[style, { transform: [{ scale }] }]}>
         {children}
       </Animated.View>
     </Pressable>
+  );
+}
+
+function HeartIcon({ filled = false, size = 18 }) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24"
+      fill={filled ? '#ef4444' : 'none'} stroke={filled ? '#ef4444' : '#9CA3AF'}
+      strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round">
+      <Path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+    </Svg>
   );
 }
 
@@ -167,6 +177,7 @@ function ProductCard({ product, inCart, onAddToCart, onPress }) {
         style={[s.hCardAddBtn, inCart && s.hCardAddBtnDone]}
         activeOpacity={0.8}
         onPress={() => !inCart && onAddToCart(product)}
+        hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
       >
         {inCart
           ? <Svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round">
@@ -184,7 +195,7 @@ function ProductCard({ product, inCart, onAddToCart, onPress }) {
 export default function ShopTheLookScreen({ route, navigation }) {
   const { design } = route.params;
   const { addToCart, items } = useCart();
-  const { liked } = useLiked();
+  const { liked, toggleLiked } = useLiked();
   const { user } = useAuth();
   const [addedKeys, setAddedKeys] = useState({});
   const [products, setProducts] = useState(design.products || []);
@@ -286,11 +297,11 @@ export default function ShopTheLookScreen({ route, navigation }) {
 
         {/* ── Header ───────────────────────────────────────────────── */}
         <View style={s.header}>
-          <TouchableOpacity style={s.headerBtn} onPress={() => navigation.goBack()}>
+          <TouchableOpacity style={s.headerBtn} onPress={() => navigation.goBack()} hitSlop={{ top: 4, bottom: 4, left: 4, right: 4 }}>
             <BackIcon />
           </TouchableOpacity>
           <Text style={s.headerTitle}>Shop The Look</Text>
-          <TouchableOpacity style={s.headerBtn} onPress={() => navigation.navigate('Main', { screen: 'Cart' })}>
+          <TouchableOpacity style={s.headerBtn} onPress={() => navigation.navigate('Main', { screen: 'Cart' })} hitSlop={{ top: 4, bottom: 4, left: 4, right: 4 }}>
             <CartNavIcon />
           </TouchableOpacity>
         </View>
@@ -315,8 +326,16 @@ export default function ShopTheLookScreen({ route, navigation }) {
           </View>
           <View style={s.userActions}>
             <AnimatedIconBtn
+              onPress={() => toggleLiked(design.id)}
+              style={[s.shareBtn, liked[design.id] && s.likeBtnActive]}
+              hitSlop={{ top: 4, bottom: 4, left: 4, right: 4 }}
+            >
+              <HeartIcon filled={!!liked[design.id]} size={18} />
+            </AnimatedIconBtn>
+            <AnimatedIconBtn
               onPress={handleShare}
               style={[s.shareBtn, shareActive && s.shareBtnActive]}
+              hitSlop={{ top: 4, bottom: 4, left: 4, right: 4 }}
             >
               <ShareIcon color={shareActive ? '#0B6DC3' : '#9CA3AF'} />
             </AnimatedIconBtn>
@@ -324,6 +343,7 @@ export default function ShopTheLookScreen({ route, navigation }) {
               <AnimatedIconBtn
                 onPress={handleDownload}
                 style={[s.shareBtn, downloadActive && s.shareBtnActive]}
+                hitSlop={{ top: 4, bottom: 4, left: 4, right: 4 }}
               >
                 {saving
                   ? <LensLoader size={24} color={downloadActive ? '#0B6DC3' : '#9CA3AF'} />
@@ -449,7 +469,7 @@ export default function ShopTheLookScreen({ route, navigation }) {
 // ── Styles ─────────────────────────────────────────────────────────────────────
 
 const s = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#FFFFFF' },
+  container: { flex: 1, backgroundColor: C.bg },
   scrollContent: { paddingTop: space['5xl'], paddingBottom: space['2xl'] },
 
   // ── Header ──
@@ -471,7 +491,7 @@ const s = StyleSheet.create({
   headerTitle: {
     fontSize: 17,
     fontWeight: '700',
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
     color: C.textPrimary,
     letterSpacing: letterSpacing.tight,
   },
@@ -515,17 +535,17 @@ const s = StyleSheet.create({
     ...typeScale.caption,
     color: '#fff',
     fontWeight: '700',
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
   },
   userInfo: { flex: 1 },
   username: {
     ...typeScale.headline,
-    fontFamily: 'KantumruyPro_600SemiBold',
+    fontFamily: 'Geist_600SemiBold',
     color: C.textPrimary,
   },
   userSub: {
     ...typeScale.caption,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: C.textSecondary,
     marginTop: 2,
   },
@@ -542,10 +562,14 @@ const s = StyleSheet.create({
     borderColor: '#9CA3AF',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: C.white,
   },
   shareBtnActive: {
     borderColor: '#0B6DC3',
+  },
+  likeBtnActive: {
+    borderColor: 'rgba(239,68,68,0.4)',
+    backgroundColor: 'rgba(239,68,68,0.06)',
   },
   followBtn: {
     backgroundColor: C.primary,
@@ -557,14 +581,14 @@ const s = StyleSheet.create({
   },
   followBtnText: {
     ...typeScale.button,
-    fontFamily: 'KantumruyPro_600SemiBold',
+    fontFamily: 'Geist_600SemiBold',
     color: '#fff',
   },
 
   // ── Title + Description ──
   promptLabel: {
     ...typeScale.subheadline,
-    fontFamily: 'KantumruyPro_600SemiBold',
+    fontFamily: 'Geist_600SemiBold',
     color: C.textTertiary,
     marginHorizontal: space.lg,
     marginBottom: 4,
@@ -573,7 +597,7 @@ const s = StyleSheet.create({
   promptBody: {
     fontSize: 13,
     fontWeight: '400',
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: '#67ACE9',
     lineHeight: 18,
     marginHorizontal: space.lg,
@@ -581,7 +605,7 @@ const s = StyleSheet.create({
   },
   desc: {
     ...typeScale.body,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: C.textSecondary,
     marginHorizontal: space.lg,
     marginBottom: space.base,
@@ -601,7 +625,7 @@ const s = StyleSheet.create({
   },
   sectionLabel: {
     ...typeScale.subheadline,
-    fontFamily: 'KantumruyPro_600SemiBold',
+    fontFamily: 'Geist_600SemiBold',
     color: C.textTertiary,
     marginBottom: space.md,
   },
@@ -612,7 +636,7 @@ const s = StyleSheet.create({
   },
   ftc: {
     fontSize: 11,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     fontStyle: 'italic',
     color: C.textTertiary,
     textAlign: 'center',
@@ -642,7 +666,7 @@ const s = StyleSheet.create({
   },
   tagText: {
     ...typeScale.caption,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: C.textSecondary,
   },
   tagTextHighlight: {
@@ -652,7 +676,7 @@ const s = StyleSheet.create({
   // ── Horizontal product cards ──
   hCard: {
     width: 170,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: C.white,
     borderRadius: 10,
     borderWidth: 1,
     borderColor: 'rgba(0,0,0,0.06)',
@@ -671,14 +695,14 @@ const s = StyleSheet.create({
   hCardName: {
     fontSize: 13,
     fontWeight: '600',
-    fontFamily: 'KantumruyPro_600SemiBold',
+    fontFamily: 'Geist_600SemiBold',
     color: C.textPrimary,
     lineHeight: 17,
   },
   hCardBrand: {
     fontSize: 11,
     fontWeight: '400',
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: C.textTertiary,
     marginTop: 1,
   },
@@ -691,19 +715,19 @@ const s = StyleSheet.create({
   hCardRatingText: {
     fontSize: 10,
     fontWeight: '600',
-    fontFamily: 'KantumruyPro_600SemiBold',
+    fontFamily: 'Geist_600SemiBold',
     color: C.textPrimary,
     marginLeft: 2,
   },
   hCardReviews: {
     fontSize: 10,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: C.textSecondary,
   },
   hCardPrice: {
     fontSize: 14,
     fontWeight: '700',
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
     color: C.primary,
     marginTop: 4,
   },
@@ -731,7 +755,7 @@ const s = StyleSheet.create({
     paddingHorizontal: space.lg,
     paddingBottom: 34,
     paddingTop: space.md,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: C.bg,
     borderTopWidth: 1,
     borderTopColor: C.border,
     shadowColor: '#000',
@@ -766,7 +790,7 @@ const s = StyleSheet.create({
   pillCheck: {
     fontSize: 18,
     fontWeight: '700',
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
     color: '#fff',
   },
   pillMeta: {
@@ -775,21 +799,21 @@ const s = StyleSheet.create({
   pillCount: {
     fontSize: 11,
     fontWeight: '500',
-    fontFamily: 'KantumruyPro_500Medium',
+    fontFamily: 'Geist_500Medium',
     color: 'rgba(255,255,255,0.75)',
     lineHeight: 14,
   },
   pillPrice: {
     fontSize: 15,
     fontWeight: '700',
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
     color: '#fff',
     lineHeight: 18,
   },
   pillAction: {
     fontSize: 15,
     fontWeight: '700',
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
     color: '#fff',
   },
 });

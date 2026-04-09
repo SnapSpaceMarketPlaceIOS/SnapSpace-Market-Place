@@ -30,7 +30,7 @@ function getStatusColor(label) {
   const upper = (label || '').toUpperCase();
   if (upper === 'NEW' || upper === 'LIMITED TIME') return C.success;   // green
   if (upper === 'SALE' || upper === 'DISCOUNT')    return C.destructive; // red/coral
-  if (upper === 'SOLD OUT')                        return '#9CA3AF';    // mid-gray
+  if (upper === 'SOLD OUT')                        return C.textTertiary; // mid-gray
   return C.primary; // fallback
 }
 
@@ -104,7 +104,6 @@ const styles = StyleSheet.create({
   },
   label: {
     ...typeScale.micro,
-    fontFamily: 'KantumruyPro_600SemiBold',
     color: '#FFFFFF',
   },
 });
@@ -126,6 +125,6 @@ const pillStyles = StyleSheet.create({
     ...typeScale.caption,
     color: '#FFFFFF',
     fontWeight: '600',
-    fontFamily: 'KantumruyPro_600SemiBold',
+    fontFamily: 'Geist_600SemiBold',
   },
 });

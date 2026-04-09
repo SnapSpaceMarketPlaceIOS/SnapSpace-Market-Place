@@ -346,7 +346,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 17,
     fontWeight: '800',
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
     color: '#111',
     letterSpacing: -0.3,
   },
@@ -360,14 +360,14 @@ const styles = StyleSheet.create({
   heroTitle: {
     fontSize: 26,
     fontWeight: '800',
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
     color: '#111',
     letterSpacing: -0.5,
     marginBottom: 6,
   },
   heroSubtitle: {
     fontSize: 14,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: '#67ACE9',
     lineHeight: 20,
     marginBottom: 24,
@@ -376,7 +376,7 @@ const styles = StyleSheet.create({
   sectionLabel: {
     fontSize: 11,
     fontWeight: '700',
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
     color: '#A0A0A8',
     letterSpacing: 1,
     marginBottom: 10,
@@ -397,7 +397,7 @@ const styles = StyleSheet.create({
   fieldLabel: {
     fontSize: 12,
     fontWeight: '600',
-    fontFamily: 'KantumruyPro_600SemiBold',
+    fontFamily: 'Geist_600SemiBold',
     color: '#888',
     letterSpacing: 0.3,
     marginBottom: 7,
@@ -408,7 +408,7 @@ const styles = StyleSheet.create({
   },
   optional: {
     fontWeight: '400',
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: '#BBB',
   },
   input: {
@@ -418,7 +418,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 12,
     fontSize: 15,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: '#111',
     backgroundColor: '#FAFAFA',
   },
@@ -428,7 +428,7 @@ const styles = StyleSheet.create({
   },
   charCount: {
     fontSize: 11,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: '#BBB',
     textAlign: 'right',
     marginTop: 4,
@@ -467,13 +467,13 @@ const styles = StyleSheet.create({
   categoryChipText: {
     fontSize: 13,
     fontWeight: '500',
-    fontFamily: 'KantumruyPro_500Medium',
+    fontFamily: 'Geist_500Medium',
     color: '#555',
   },
   categoryChipTextSelected: {
     color: colors.bluePrimary,
     fontWeight: '600',
-    fontFamily: 'KantumruyPro_600SemiBold',
+    fontFamily: 'Geist_600SemiBold',
   },
 
   // Submit
@@ -498,13 +498,13 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: '700',
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
   },
 
   // Popular requests
   popularSubtitle: {
     fontSize: 13,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: '#888',
     marginBottom: 12,
     marginTop: -4,
@@ -543,14 +543,14 @@ const styles = StyleSheet.create({
   popularTitle: {
     fontSize: 14,
     fontWeight: '700',
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
     color: '#111',
     lineHeight: 19,
     flex: 1,
   },
   popularDescription: {
     fontSize: 12,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: '#777',
     lineHeight: 17,
   },
@@ -569,7 +569,7 @@ const styles = StyleSheet.create({
   statusText: {
     fontSize: 11,
     fontWeight: '600',
-    fontFamily: 'KantumruyPro_600SemiBold',
+    fontFamily: 'Geist_600SemiBold',
   },
   tagPill: {
     backgroundColor: '#F4F4F6',
@@ -580,7 +580,7 @@ const styles = StyleSheet.create({
   tagText: {
     fontSize: 11,
     fontWeight: '500',
-    fontFamily: 'KantumruyPro_500Medium',
+    fontFamily: 'Geist_500Medium',
     color: '#888',
   },
   voteBtn: {
@@ -600,7 +600,7 @@ const styles = StyleSheet.create({
   },
   voteArrow: {
     fontSize: 12,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: '#999',
   },
   voteArrowVoted: {
@@ -609,7 +609,7 @@ const styles = StyleSheet.create({
   voteCount: {
     fontSize: 13,
     fontWeight: '700',
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
     color: '#555',
   },
   voteCountVoted: {
@@ -635,14 +635,14 @@ const styles = StyleSheet.create({
   successTitle: {
     fontSize: 24,
     fontWeight: '800',
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
     color: '#111',
     marginBottom: 12,
     textAlign: 'center',
   },
   successSubtitle: {
     fontSize: 14,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: '#666',
     lineHeight: 22,
     textAlign: 'center',
@@ -656,6 +656,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#888',
     fontWeight: '500',
-    fontFamily: 'KantumruyPro_500Medium',
+    fontFamily: 'Geist_500Medium',
   },
 });

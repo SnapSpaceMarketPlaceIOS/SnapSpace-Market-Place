@@ -361,11 +361,11 @@ export default function PaywallScreen({ navigation }) {
             device's Settings {'>'} Apple ID {'>'} Subscriptions.
           </Text>
           <View style={styles.legalLinks}>
-            <TouchableOpacity onPress={() => navigation.navigate('TermsOfUse')}>
+            <TouchableOpacity onPress={() => navigation.navigate('TermsOfUse')} activeOpacity={0.7} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
               <Text style={styles.legalLink}>Terms of Use</Text>
             </TouchableOpacity>
             <Text style={styles.legalDot}>·</Text>
-            <TouchableOpacity onPress={() => navigation.navigate('PrivacyPolicy')}>
+            <TouchableOpacity onPress={() => navigation.navigate('PrivacyPolicy')} activeOpacity={0.7} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
               <Text style={styles.legalLink}>Privacy Policy</Text>
             </TouchableOpacity>
           </View>
@@ -407,7 +407,7 @@ const styles = StyleSheet.create({
   },
   root: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: C.white,
     borderTopLeftRadius: 15,
     borderTopRightRadius: 15,
     overflow: 'hidden',
@@ -425,7 +425,7 @@ const styles = StyleSheet.create({
   wordmark: {
     fontSize: 24,
     fontWeight: fontWeight.xbold,
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
     color: '#111827',
     letterSpacing: -0.5,
   },
@@ -438,7 +438,7 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 14,
     fontWeight: fontWeight.regular,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: '#6B7280',
     textAlign: 'center',
     paddingHorizontal: layout.screenPaddingH,
@@ -467,13 +467,13 @@ const styles = StyleSheet.create({
   progressLabel: {
     fontSize: 13,
     fontWeight: fontWeight.regular,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: '#6B7280',
   },
   progressCount: {
     fontSize: 13,
     fontWeight: fontWeight.bold,
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
     color: '#111827',
   },
   progressTrack: {
@@ -511,7 +511,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   toggleTabActive: {
-    backgroundColor: '#fff',
+    backgroundColor: C.white,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
@@ -521,13 +521,13 @@ const styles = StyleSheet.create({
   toggleText: {
     fontSize: 14,
     fontWeight: fontWeight.medium,
-    fontFamily: 'KantumruyPro_500Medium',
+    fontFamily: 'Geist_500Medium',
     color: '#9CA3AF',
   },
   toggleTextActive: {
     color: BLUE,
     fontWeight: fontWeight.semibold,
-    fontFamily: 'KantumruyPro_600SemiBold',
+    fontFamily: 'Geist_600SemiBold',
   },
 
   // ── Referral banner
@@ -546,19 +546,19 @@ const styles = StyleSheet.create({
   referralText: {
     fontSize: 13,
     fontWeight: fontWeight.regular,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: '#6B7280',
     lineHeight: 18,
   },
   referralHighlight: {
     fontWeight: fontWeight.bold,
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
     color: BLUE,
   },
   referralSub: {
     fontSize: 13,
     fontWeight: fontWeight.regular,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: '#9CA3AF',
     lineHeight: 18,
   },
@@ -596,7 +596,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 15,
     fontWeight: fontWeight.bold,
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
     color: '#111827',
     textAlign: 'center',
     marginBottom: space.sm,
@@ -620,7 +620,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     borderWidth: 1,
     borderColor: '#D1D5DB',
-    backgroundColor: '#fff',
+    backgroundColor: C.white,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -637,7 +637,7 @@ const styles = StyleSheet.create({
   tokenCount: {
     fontSize: 14,
     fontWeight: fontWeight.semibold,
-    fontFamily: 'KantumruyPro_600SemiBold',
+    fontFamily: 'Geist_600SemiBold',
     color: '#374151',
     marginBottom: 4,
   },
@@ -647,7 +647,7 @@ const styles = StyleSheet.create({
   tokenPrice: {
     fontSize: 12,
     fontWeight: fontWeight.regular,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: '#9CA3AF',
   },
   tokenPriceSelected: {
@@ -659,7 +659,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     borderWidth: 1,
     borderColor: '#E5E7EB',
-    backgroundColor: '#fff',
+    backgroundColor: C.white,
     paddingVertical: 10,
     paddingHorizontal: space.base,
     marginBottom: space.md,
@@ -700,7 +700,7 @@ const styles = StyleSheet.create({
   subTierName: {
     fontSize: 13,
     fontWeight: fontWeight.semibold,
-    fontFamily: 'KantumruyPro_600SemiBold',
+    fontFamily: 'Geist_600SemiBold',
     color: '#111827',
     marginBottom: 1,
   },
@@ -711,25 +711,25 @@ const styles = StyleSheet.create({
   subGenCount: {
     fontSize: 26,
     fontWeight: fontWeight.semibold,
-    fontFamily: 'KantumruyPro_600SemiBold',
+    fontFamily: 'Geist_600SemiBold',
     color: BLUE,
     lineHeight: 30,
   },
   subGenCountUnlimited: {
     fontSize: 22,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
   },
   subGenLabel: {
     fontSize: 12,
     fontWeight: fontWeight.regular,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: '#6B7280',
     marginLeft: 2,
   },
   subTierPrice: {
     fontSize: 14,
     fontWeight: fontWeight.semibold,
-    fontFamily: 'KantumruyPro_600SemiBold',
+    fontFamily: 'Geist_600SemiBold',
     color: '#111827',
   },
   subTierPriceSelected: {
@@ -754,7 +754,7 @@ const styles = StyleSheet.create({
   subFeatureText: {
     fontSize: 13,
     fontWeight: fontWeight.regular,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: '#374151',
     flex: 1,
   },
@@ -769,7 +769,7 @@ const styles = StyleSheet.create({
   finePrint: {
     fontSize: 11,
     fontWeight: fontWeight.regular,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: '#9CA3AF',
     textAlign: 'center',
     lineHeight: 16,
@@ -783,12 +783,12 @@ const styles = StyleSheet.create({
   legalLink: {
     fontSize: 12,
     fontWeight: fontWeight.medium,
-    fontFamily: 'KantumruyPro_500Medium',
+    fontFamily: 'Geist_500Medium',
     color: BLUE,
   },
   legalDot: {
     fontSize: 12,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: '#9CA3AF',
   },
 
@@ -799,7 +799,7 @@ const styles = StyleSheet.create({
     paddingBottom: space.md,
     borderTopWidth: 1,
     borderTopColor: '#F3F4F6',
-    backgroundColor: '#fff',
+    backgroundColor: C.white,
   },
   cta: {
     backgroundColor: BLUE,
@@ -818,8 +818,8 @@ const styles = StyleSheet.create({
   ctaText: {
     fontSize: 15,
     fontWeight: fontWeight.bold,
-    fontFamily: 'KantumruyPro_700Bold',
-    color: '#fff',
+    fontFamily: 'Geist_700Bold',
+    color: C.white,
     letterSpacing: -0.2,
   },
   ctaDivider: {
@@ -831,7 +831,7 @@ const styles = StyleSheet.create({
   ctaPrice: {
     fontSize: 16,
     fontWeight: fontWeight.bold,
-    fontFamily: 'KantumruyPro_700Bold',
-    color: '#fff',
+    fontFamily: 'Geist_700Bold',
+    color: C.white,
   },
 });

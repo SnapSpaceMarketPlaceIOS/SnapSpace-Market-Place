@@ -21,7 +21,7 @@ const { width } = Dimensions.get('window');
 
 function BackIcon() {
   return (
-    <Svg width={24} height={24} viewBox="0 0 24 24" fill="none" stroke="#111" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round">
+    <Svg width={24} height={24} viewBox="0 0 24 24" fill="none" stroke="#111" strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round">
       <Polyline points="15 18 9 12 15 6" />
     </Svg>
   );
@@ -31,7 +31,7 @@ function ChevronDownIcon({ rotated }) {
   return (
     <Svg
       width={18} height={18} viewBox="0 0 24 24" fill="none"
-      stroke="#999" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round"
+      stroke="#999" strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round"
       style={rotated ? { transform: [{ rotate: '180deg' }] } : {}}
     >
       <Polyline points="6 9 12 15 18 9" />
@@ -41,7 +41,7 @@ function ChevronDownIcon({ rotated }) {
 
 function SearchIcon() {
   return (
-    <Svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="#AAA" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+    <Svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="#AAA" strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round">
       <Circle cx={11} cy={11} r={8} />
       <Line x1={21} y1={21} x2={16.65} y2={16.65} />
     </Svg>
@@ -327,7 +327,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 17,
     fontWeight: '800',
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
     color: '#111',
     letterSpacing: -0.3,
   },
@@ -348,14 +348,14 @@ const styles = StyleSheet.create({
   heroTitle: {
     fontSize: 26,
     fontWeight: '800',
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
     color: '#111',
     letterSpacing: -0.5,
     marginBottom: 6,
   },
   heroSubtitle: {
     fontSize: 14,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: '#67ACE9',
     marginBottom: 18,
   },
@@ -371,21 +371,21 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     fontSize: 15,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: '#111',
   },
   clearBtn: {
     fontSize: 13,
     color: '#AAA',
     fontWeight: '600',
-    fontFamily: 'KantumruyPro_600SemiBold',
+    fontFamily: 'Geist_600SemiBold',
   },
 
   // FAQ header
   faqHeader: {
     fontSize: 13,
     fontWeight: '700',
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
     color: '#A0A0A8',
     letterSpacing: 1,
     textTransform: 'uppercase',
@@ -402,7 +402,7 @@ const styles = StyleSheet.create({
   faqSectionTitle: {
     fontSize: 16,
     fontWeight: '700',
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
     color: '#111',
     marginBottom: 10,
     letterSpacing: -0.2,
@@ -432,7 +432,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 14,
     fontWeight: '600',
-    fontFamily: 'KantumruyPro_600SemiBold',
+    fontFamily: 'Geist_600SemiBold',
     color: '#111',
     lineHeight: 20,
   },
@@ -444,7 +444,7 @@ const styles = StyleSheet.create({
     color: '#555',
     lineHeight: 21,
     fontWeight: '400',
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
   },
   faqDivider: {
     height: 1,
@@ -464,20 +464,20 @@ const styles = StyleSheet.create({
   contactTitle: {
     fontSize: 16,
     fontWeight: '700',
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
     color: '#111',
     marginBottom: 8,
   },
   contactSubtitle: {
     fontSize: 13,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: '#6B7280',
     textAlign: 'center',
     lineHeight: 19,
     marginBottom: 16,
   },
   contactBtn: {
-    backgroundColor: '#0B6DC3',
+    backgroundColor: colors.bluePrimary,
     borderRadius: 10,
     paddingHorizontal: 28,
     paddingVertical: 12,
@@ -486,7 +486,7 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 14,
     fontWeight: '700',
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
   },
 
   // No results
@@ -498,14 +498,14 @@ const styles = StyleSheet.create({
   noResultsText: {
     fontSize: 15,
     fontWeight: '600',
-    fontFamily: 'KantumruyPro_600SemiBold',
+    fontFamily: 'Geist_600SemiBold',
     color: '#555',
     textAlign: 'center',
     marginBottom: 8,
   },
   noResultsSub: {
     fontSize: 13,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: '#999',
     textAlign: 'center',
   },

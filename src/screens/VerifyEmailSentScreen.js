@@ -128,7 +128,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 26,
     fontWeight: '800',
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
     color: '#111',
     letterSpacing: -0.5,
     marginBottom: 12,
@@ -136,7 +136,7 @@ const styles = StyleSheet.create({
   },
   body: {
     fontSize: 15,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: '#666',
     textAlign: 'center',
     lineHeight: 22,
@@ -144,12 +144,12 @@ const styles = StyleSheet.create({
   },
   email: {
     fontWeight: '700',
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
     color: '#111',
   },
   instructions: {
     fontSize: 14,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: '#999',
     textAlign: 'center',
     lineHeight: 21,
@@ -167,7 +167,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     marginBottom: 16,
   },
-  resentText: { fontSize: 13, color: '#16A34A', fontWeight: '600', fontFamily: 'KantumruyPro_600SemiBold'},
+  resentText: { fontSize: 13, color: '#16A34A', fontWeight: '600', fontFamily: 'Geist_600SemiBold'},
 
   primaryBtn: {
     backgroundColor: BLUE,
@@ -178,12 +178,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginBottom: 14,
   },
-  primaryBtnText: { color: '#fff', fontSize: 16, fontWeight: '700', fontFamily: 'KantumruyPro_700Bold'},
+  primaryBtnText: { color: '#fff', fontSize: 16, fontWeight: '700', fontFamily: 'Geist_700Bold'},
 
   resendBtn: {
     height: 44,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  resendText: { fontSize: 14, color: BLUE, fontWeight: '600', fontFamily: 'KantumruyPro_600SemiBold'},
+  resendText: { fontSize: 14, color: BLUE, fontWeight: '600', fontFamily: 'Geist_600SemiBold'},
 });

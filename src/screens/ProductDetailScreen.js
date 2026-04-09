@@ -121,7 +121,7 @@ function getSimProducts(product) {
 
 const BackIcon = () => (
   <Svg width={18} height={18} viewBox="0 0 24 24" fill="none"
-    stroke={T.navy} strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
+    stroke={T.navy} strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round">
     <Polyline points="15 18 9 12 15 6" />
   </Svg>
 );
@@ -129,14 +129,14 @@ const BackIcon = () => (
 const HeartIcon = ({ filled, size = 22 }) => (
   <Svg width={size} height={size} viewBox="0 0 24 24"
     fill={filled ? T.red : 'none'} stroke={filled ? T.red : T.navy}
-    strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+    strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round">
     <Path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
   </Svg>
 );
 
 const ShareIcon = () => (
   <Svg width={18} height={18} viewBox="0 0 24 24" fill="none"
-    stroke={T.navy} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+    stroke={T.navy} strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round">
     <Path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
     <Polyline points="16 6 12 2 8 6" />
     <Line x1="12" y1="2" x2="12" y2="15" />
@@ -267,16 +267,19 @@ function ProductHero({ images, imageUrl, liked, onBack, onLike, onShare, topInse
       {/* Floating nav */}
       <View style={[hs.topBar, { paddingTop: topInset + 14 }]}>
         <TouchableOpacity style={hs.navBtn} onPress={onBack}
-          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+          activeOpacity={0.7}
+          hitSlop={{ top: 4, bottom: 4, left: 4, right: 4 }}>
           <BackIcon />
         </TouchableOpacity>
         <View style={hs.topRight}>
           <TouchableOpacity style={hs.navBtn} onPress={onShare}
-            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+            activeOpacity={0.7}
+            hitSlop={{ top: 4, bottom: 4, left: 4, right: 4 }}>
             <ShareIcon />
           </TouchableOpacity>
           <TouchableOpacity style={hs.navBtn} onPress={onLike}
-            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+            activeOpacity={0.7}
+            hitSlop={{ top: 4, bottom: 4, left: 4, right: 4 }}>
             <HeartIcon filled={liked} size={20} />
           </TouchableOpacity>
         </View>
@@ -290,7 +293,7 @@ const hs = StyleSheet.create({
   img:       { width: SW, height: IMAGE_H },
   topBar:    { position: 'absolute', top: 0, left: 0, right: 0, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: T.padH },
   topRight:  { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  navBtn:    { width: 42, height: 42, borderRadius: 21, backgroundColor: 'rgba(255,255,255,0.92)', alignItems: 'center', justifyContent: 'center', ...shadow.medium },
+  navBtn:    { width: 44, height: 44, borderRadius: 22, backgroundColor: 'rgba(255,255,255,0.92)', alignItems: 'center', justifyContent: 'center', ...shadow.medium },
   dots:      { position: 'absolute', bottom: 34, left: 0, right: 0, flexDirection: 'row', justifyContent: 'center', gap: 6 },
   dot:       { width: 7, height: 7, borderRadius: 4, backgroundColor: 'rgba(0,0,0,0.2)' },
   dotActive: { backgroundColor: '#111', width: 9, height: 9, borderRadius: 5 },
@@ -341,17 +344,17 @@ function ProductIdentity({ brand, title, description, rating, reviewCount, inSto
 const id = StyleSheet.create({
   wrap:      { paddingHorizontal: T.padH, paddingTop: 28 },
   bestSeller:   { backgroundColor: '#FFF4E6', borderRadius: 6, paddingHorizontal: 10, paddingVertical: 5, alignSelf: 'flex-start', marginBottom: 10 },
-  bestSellerTxt:{ fontSize: 12, fontWeight: T.w700, color: '#B45309', lineHeight: 16, fontFamily: 'KantumruyPro_700Bold'},
-  title:     { fontSize: 22, fontWeight: T.w700, color: T.txtPri, lineHeight: 29, letterSpacing: -0.3, fontFamily: 'KantumruyPro_700Bold'},
-  desc:      { fontSize: 14, fontWeight: T.w400, color: T.txtSec, lineHeight: 22, marginTop: 10, fontFamily: 'KantumruyPro_400Regular'},
+  bestSellerTxt:{ fontSize: 12, fontWeight: T.w700, color: '#B45309', lineHeight: 16, fontFamily: 'Geist_700Bold'},
+  title:     { fontSize: 22, fontWeight: T.w700, color: T.txtPri, lineHeight: 29, letterSpacing: -0.3, fontFamily: 'Geist_700Bold'},
+  desc:      { fontSize: 14, fontWeight: T.w400, color: T.txtSec, lineHeight: 22, marginTop: 10, fontFamily: 'Geist_400Regular'},
   byRow:     { flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 14 },
-  byLine:    { fontSize: 14, fontWeight: T.w400, color: T.blue, lineHeight: 20, fontFamily: 'KantumruyPro_400Regular'},
+  byLine:    { fontSize: 14, fontWeight: T.w400, color: T.blue, lineHeight: 20, fontFamily: 'Geist_400Regular'},
   stockPill: { flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: T.greenBg, borderRadius: T.rPill, paddingHorizontal: 7, paddingVertical: 3, borderWidth: 1, borderColor: T.green },
   dot:       { width: 5, height: 5, borderRadius: 3, backgroundColor: T.green },
-  stockTxt:  { fontSize: 11, fontWeight: T.w600, color: T.green, lineHeight: 14, fontFamily: 'KantumruyPro_600SemiBold'},
+  stockTxt:  { fontSize: 11, fontWeight: T.w600, color: T.green, lineHeight: 14, fontFamily: 'Geist_600SemiBold'},
   ratingRow: { flexDirection: 'row', alignItems: 'center', gap: 3, marginTop: 14 },
-  score:     { fontSize: 14, fontWeight: T.w600, color: T.txtPri, lineHeight: 18, marginLeft: 3, fontFamily: 'KantumruyPro_600SemiBold'},
-  reviews:   { fontSize: 13, fontWeight: T.w400, color: T.txtSec, lineHeight: 18, fontFamily: 'KantumruyPro_400Regular'},
+  score:     { fontSize: 14, fontWeight: T.w600, color: T.txtPri, lineHeight: 18, marginLeft: 3, fontFamily: 'Geist_600SemiBold'},
+  reviews:   { fontSize: 13, fontWeight: T.w400, color: T.txtSec, lineHeight: 18, fontFamily: 'Geist_400Regular'},
 });
 
 // ─── S2: Best Seller Badge ────────────────────────────────────────────────────
@@ -378,7 +381,7 @@ function BestSellerBadge({ text }) {
 const vb = StyleSheet.create({
   wrap: { paddingHorizontal: T.padH, marginTop: 24 },
   pill: { flexDirection: 'row', alignItems: 'center', alignSelf: 'flex-start', backgroundColor: '#FFFFFF', borderRadius: 10, borderWidth: 1, borderColor: T.blue, paddingVertical: 8, paddingHorizontal: 14, gap: 6 },
-  label: { fontSize: 13, fontWeight: T.w600, color: T.blue, lineHeight: 18, fontFamily: 'KantumruyPro_600SemiBold'},
+  label: { fontSize: 13, fontWeight: T.w600, color: T.blue, lineHeight: 18, fontFamily: 'Geist_600SemiBold'},
 });
 
 // ─── S3: VariantSelector ──────────────────────────────────────────────────────
@@ -447,7 +450,7 @@ function VariantSelector({ variants, selectedId, onSelect }) {
 
 const va = StyleSheet.create({
   wrap:       { paddingTop: 28 },
-  hint:       { fontSize: 13, fontWeight: T.w600, color: T.txtPri, lineHeight: 18, paddingHorizontal: T.padH, marginBottom: 12, fontFamily: 'KantumruyPro_600SemiBold'},
+  hint:       { fontSize: 13, fontWeight: T.w600, color: T.txtPri, lineHeight: 18, paddingHorizontal: T.padH, marginBottom: 12, fontFamily: 'Geist_600SemiBold'},
   scroll:     { paddingHorizontal: T.padH, gap: 12 },
   tile:       { width: 120, borderRadius: T.rVariant, backgroundColor: '#FFFFFF', overflow: 'hidden', flexDirection: 'column' },
   tileOff:    { borderWidth: 1, borderColor: T.border },
@@ -456,8 +459,8 @@ const va = StyleSheet.create({
   swatchImg:  { width: '100%', height: '100%' },
   colorBlock: { width: '100%', height: '100%' },
   labelRow:   { paddingVertical: 8, paddingHorizontal: 6, minHeight: 36, justifyContent: 'center', backgroundColor: T.surface },
-  tileLabel:  { fontSize: 11, fontWeight: T.w400, color: T.txtSec, textAlign: 'center', lineHeight: 15, fontFamily: 'KantumruyPro_400Regular'},
-  tileLabelOn:{ fontWeight: T.w700, color: T.txtPri, fontFamily: 'KantumruyPro_700Bold'},
+  tileLabel:  { fontSize: 11, fontWeight: T.w400, color: T.txtSec, textAlign: 'center', lineHeight: 15, fontFamily: 'Geist_400Regular'},
+  tileLabelOn:{ fontWeight: T.w700, color: T.txtPri, fontFamily: 'Geist_700Bold'},
 });
 
 // ─── S3b: SizeSelector ───────────────────────────────────────────────────────
@@ -498,17 +501,17 @@ function SizeSelector({ sizes }) {
 
 const sz = StyleSheet.create({
   wrap:            { paddingHorizontal: T.padH, marginTop: 24 },
-  label:           { fontSize: 14, fontWeight: T.w400, color: T.txtPri, marginBottom: 10, fontFamily: 'KantumruyPro_400Regular'},
-  labelBold:       { fontWeight: T.w700, fontFamily: 'KantumruyPro_700Bold'},
+  label:           { fontSize: 14, fontWeight: T.w400, color: T.txtPri, marginBottom: 10, fontFamily: 'Geist_400Regular'},
+  labelBold:       { fontWeight: T.w700, fontFamily: 'Geist_700Bold'},
   scroll:          { gap: 10 },
   tile:            { borderWidth: 1, borderColor: T.border, borderRadius: T.rMd, paddingHorizontal: 16, paddingVertical: 10, minWidth: 120 },
   tileActive:      { borderColor: T.blue, borderWidth: 1 },
-  sizeLabel:       { fontSize: 14, fontWeight: T.w600, color: T.txtPri, lineHeight: 20, fontFamily: 'KantumruyPro_600SemiBold'},
+  sizeLabel:       { fontSize: 14, fontWeight: T.w600, color: T.txtPri, lineHeight: 20, fontFamily: 'Geist_600SemiBold'},
   sizeLabelActive: { color: T.txtPri },
-  sizePrice:       { fontSize: 13, fontWeight: T.w400, color: T.txtPri, lineHeight: 18, marginTop: 2, fontFamily: 'KantumruyPro_400Regular'},
-  sizePriceActive: { fontWeight: T.w600, fontFamily: 'KantumruyPro_600SemiBold'},
-  sizeCompare:     { fontSize: 12, fontWeight: T.w400, color: T.txtSec, textDecorationLine: 'line-through', lineHeight: 16, fontFamily: 'KantumruyPro_400Regular'},
-  sizeStock:       { fontSize: 11, fontWeight: T.w600, color: T.green, marginTop: 3, lineHeight: 14, fontFamily: 'KantumruyPro_600SemiBold'},
+  sizePrice:       { fontSize: 13, fontWeight: T.w400, color: T.txtPri, lineHeight: 18, marginTop: 2, fontFamily: 'Geist_400Regular'},
+  sizePriceActive: { fontWeight: T.w600, fontFamily: 'Geist_600SemiBold'},
+  sizeCompare:     { fontSize: 12, fontWeight: T.w400, color: T.txtSec, textDecorationLine: 'line-through', lineHeight: 16, fontFamily: 'Geist_400Regular'},
+  sizeStock:       { fontSize: 11, fontWeight: T.w600, color: T.green, marginTop: 3, lineHeight: 14, fontFamily: 'Geist_600SemiBold'},
 });
 
 // ─── S4: ProductDescription ───────────────────────────────────────────────────
@@ -531,9 +534,9 @@ function ProductDescription({ text }) {
 
 const dc = StyleSheet.create({
   wrap:   { paddingHorizontal: T.padH, marginTop: 22 },
-  label:  { fontSize: 10, fontWeight: T.w600, color: T.txtSec, letterSpacing: 1.0, textTransform: 'uppercase', lineHeight: 14, fontFamily: 'KantumruyPro_600SemiBold'},
-  body:   { fontSize: 15, fontWeight: T.w400, color: T.txtPri, lineHeight: 24, marginTop: 8, fontFamily: 'KantumruyPro_400Regular'},
-  toggle: { fontSize: 13, fontWeight: T.w600, color: T.blue, marginTop: 4, fontFamily: 'KantumruyPro_600SemiBold'},
+  label:  { fontSize: 10, fontWeight: T.w600, color: T.txtSec, letterSpacing: 1.0, textTransform: 'uppercase', lineHeight: 14, fontFamily: 'Geist_600SemiBold'},
+  body:   { fontSize: 15, fontWeight: T.w400, color: T.txtPri, lineHeight: 24, marginTop: 8, fontFamily: 'Geist_400Regular'},
+  toggle: { fontSize: 13, fontWeight: T.w600, color: T.blue, marginTop: 4, fontFamily: 'Geist_600SemiBold'},
 });
 
 // ─── S5: FTC Disclosure ───────────────────────────────────────────────────────
@@ -547,7 +550,7 @@ function FTCNote() {
 }
 
 const ftc = StyleSheet.create({
-  txt: { fontSize: 11, fontWeight: T.w400, color: T.txtMeta, fontStyle: 'italic', textAlign: 'center', marginTop: 24, marginHorizontal: T.padH, fontFamily: 'KantumruyPro_400Regular'},
+  txt: { fontSize: 11, fontWeight: T.w400, color: T.txtMeta, fontStyle: 'italic', textAlign: 'center', marginTop: 24, marginHorizontal: T.padH, fontFamily: 'Geist_400Regular'},
 });
 
 // ─── S6: PriceBlock ───────────────────────────────────────────────────────────
@@ -566,8 +569,8 @@ function PriceBlock({ price, originalPrice }) {
 
 const pr = StyleSheet.create({
   wrap:     { flexDirection: 'row', alignItems: 'center', gap: 14, paddingHorizontal: T.padH, marginTop: 24 },
-  price:    { fontSize: 28, fontWeight: T.w800, color: T.blue, letterSpacing: -0.5, lineHeight: 34, fontFamily: 'KantumruyPro_700Bold'},
-  original: { fontSize: 15, fontWeight: T.w400, color: T.txtSec, textDecorationLine: 'line-through', lineHeight: 20, fontFamily: 'KantumruyPro_400Regular'},
+  price:    { fontSize: 28, fontWeight: T.w800, color: T.blue, letterSpacing: -0.5, lineHeight: 34, fontFamily: 'Geist_700Bold'},
+  original: { fontSize: 15, fontWeight: T.w400, color: T.txtSec, textDecorationLine: 'line-through', lineHeight: 20, fontFamily: 'Geist_400Regular'},
 });
 
 // ─── S7: DeliveryBox ─────────────────────────────────────────────────────────
@@ -587,8 +590,8 @@ function DeliveryBox({ date }) {
 const dv = StyleSheet.create({
   box:      { marginHorizontal: T.padH, marginTop: 14, borderWidth: 1, borderColor: T.blue, borderRadius: 30, paddingVertical: 8, paddingHorizontal: 14, flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: T.surface },
   greenPill:{ backgroundColor: '#F0FDF4', borderRadius: T.rPill, paddingHorizontal: 10, paddingVertical: 4, borderWidth: 1, borderColor: T.green },
-  greenTxt: { fontSize: 11, fontWeight: T.w600, color: T.green, lineHeight: 15, fontFamily: 'KantumruyPro_600SemiBold'},
-  date:     { flex: 1, fontSize: 13, fontWeight: T.w400, color: T.txtPri, lineHeight: 18, fontFamily: 'KantumruyPro_400Regular'},
+  greenTxt: { fontSize: 11, fontWeight: T.w600, color: T.green, lineHeight: 15, fontFamily: 'Geist_600SemiBold'},
+  date:     { flex: 1, fontSize: 13, fontWeight: T.w400, color: T.txtPri, lineHeight: 18, fontFamily: 'Geist_400Regular'},
 });
 
 // ─── S8: QuantitySelector ────────────────────────────────────────────────────
@@ -626,9 +629,9 @@ const qs = StyleSheet.create({
   btn:       { width: 28, height: 28, alignItems: 'center', justifyContent: 'center' },
   btnDim:    { opacity: 0.32 },
   divider:   { width: 1, height: 16, backgroundColor: T.border },
-  symbol:    { fontSize: 16, fontWeight: T.w400, color: T.txtPri, lineHeight: 20, fontFamily: 'KantumruyPro_400Regular'},
+  symbol:    { fontSize: 16, fontWeight: T.w400, color: T.txtPri, lineHeight: 20, fontFamily: 'Geist_400Regular'},
   symbolDim: { color: T.txtMeta },
-  count:     { fontSize: 14, fontWeight: T.w600, color: T.txtPri, width: 36, textAlign: 'center', lineHeight: 20, fontFamily: 'KantumruyPro_600SemiBold'},
+  count:     { fontSize: 14, fontWeight: T.w600, color: T.txtPri, width: 36, textAlign: 'center', lineHeight: 20, fontFamily: 'Geist_600SemiBold'},
 });
 
 // ─── S9: ProductDetails ───────────────────────────────────────────────────────
@@ -691,12 +694,12 @@ const pdt = StyleSheet.create({
   header:       { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 },
   headerLeft:   { flexDirection: 'row', alignItems: 'center', gap: 8 },
   headerAccent: { width: 3, height: 14, borderRadius: 2, backgroundColor: T.blue },
-  sLabel:       { fontSize: 11, fontWeight: T.w700, color: T.txtSec, letterSpacing: 1.2, textTransform: 'uppercase', fontFamily: 'KantumruyPro_700Bold'},
+  sLabel:       { fontSize: 11, fontWeight: T.w700, color: T.txtSec, letterSpacing: 1.2, textTransform: 'uppercase', fontFamily: 'Geist_700Bold'},
   card:    { backgroundColor: T.surface, borderRadius: T.rMd, borderWidth: 1, borderColor: T.border, marginTop: 12, overflow: 'hidden' },
   row:     { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', height: 52, paddingHorizontal: T.padH, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: T.divider },
   rowLast: { borderBottomWidth: 0 },
-  key:     { fontSize: 14, fontWeight: T.w400, color: T.txtSec, lineHeight: 20, fontFamily: 'KantumruyPro_400Regular'},
-  val:     { fontSize: 14, fontWeight: T.w700, color: T.txtPri, textAlign: 'right', maxWidth: '58%', lineHeight: 20, fontFamily: 'KantumruyPro_700Bold'},
+  key:     { fontSize: 14, fontWeight: T.w400, color: T.txtSec, lineHeight: 20, fontFamily: 'Geist_400Regular'},
+  val:     { fontSize: 14, fontWeight: T.w700, color: T.txtPri, textAlign: 'right', maxWidth: '58%', lineHeight: 20, fontFamily: 'Geist_700Bold'},
 });
 
 // ─── S10: KeyFeatures — Premium Numbered Infographic ─────────────────────────
@@ -780,7 +783,7 @@ const kf = StyleSheet.create({
   headerRow:   { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 },
   headerLeft:  { flexDirection: 'row', alignItems: 'center', gap: 8 },
   headerAccent:{ width: 3, height: 14, borderRadius: 2, backgroundColor: T.blue },
-  sLabel:      { fontSize: 11, fontWeight: T.w700, color: T.txtSec, letterSpacing: 1.2, textTransform: 'uppercase', fontFamily: 'KantumruyPro_700Bold'},
+  sLabel:      { fontSize: 11, fontWeight: T.w700, color: T.txtSec, letterSpacing: 1.2, textTransform: 'uppercase', fontFamily: 'Geist_700Bold'},
 
   // Outer panel — single rounded card
   panel:       { borderRadius: T.rMd, borderWidth: 1, borderColor: T.border, backgroundColor: T.surface, overflow: 'hidden' },
@@ -791,13 +794,13 @@ const kf = StyleSheet.create({
 
   // Left column: number above icon
   leftCol:     { alignItems: 'center', gap: 6, width: 44 },
-  num:         { fontSize: 11, fontWeight: T.w700, color: T.blue, letterSpacing: 0.5, lineHeight: 14, fontFamily: 'KantumruyPro_700Bold'},
+  num:         { fontSize: 11, fontWeight: T.w700, color: T.blue, letterSpacing: 0.5, lineHeight: 14, fontFamily: 'Geist_700Bold'},
   iconCircle:  { width: 40, height: 40, borderRadius: 10, backgroundColor: T.featBg, alignItems: 'center', justifyContent: 'center' },
 
   // Right column: title + sub
   rightCol:    { flex: 1 },
-  featureName: { fontSize: 14, fontWeight: T.w600, color: T.txtPri, lineHeight: 20, fontFamily: 'KantumruyPro_600SemiBold'},
-  featureSub:  { fontSize: 13, fontWeight: T.w400, color: T.txtSec, lineHeight: 19, marginTop: 3, fontFamily: 'KantumruyPro_400Regular'},
+  featureName: { fontSize: 14, fontWeight: T.w600, color: T.txtPri, lineHeight: 20, fontFamily: 'Geist_600SemiBold'},
+  featureSub:  { fontSize: 13, fontWeight: T.w400, color: T.txtSec, lineHeight: 19, marginTop: 3, fontFamily: 'Geist_400Regular'},
 });
 
 // ─── S11: TrustBadges ────────────────────────────────────────────────────────
@@ -830,8 +833,8 @@ function TrustBadges() {
 const tb = StyleSheet.create({
   tile:       { alignItems: 'center', backgroundColor: T.surface, borderRadius: T.rMd, borderWidth: 1, borderColor: T.border, paddingHorizontal: 20, paddingVertical: 16, minWidth: 114 },
   iconCircle: { width: 44, height: 44, borderRadius: 22, backgroundColor: T.featBg, alignItems: 'center', justifyContent: 'center' },
-  name:       { fontSize: 12, fontWeight: T.w600, color: T.txtPri, textAlign: 'center', marginTop: 8, lineHeight: 16, fontFamily: 'KantumruyPro_600SemiBold'},
-  sub:        { fontSize: 11, fontWeight: T.w400, color: T.txtSec, textAlign: 'center', marginTop: 2, lineHeight: 14, fontFamily: 'KantumruyPro_400Regular'},
+  name:       { fontSize: 12, fontWeight: T.w600, color: T.txtPri, textAlign: 'center', marginTop: 8, lineHeight: 16, fontFamily: 'Geist_600SemiBold'},
+  sub:        { fontSize: 11, fontWeight: T.w400, color: T.txtSec, textAlign: 'center', marginTop: 2, lineHeight: 14, fontFamily: 'Geist_400Regular'},
 });
 
 // ─── S12: SimilarProducts ────────────────────────────────────────────────────
@@ -860,13 +863,13 @@ function SimilarProducts({ products, onPress }) {
 }
 
 const sp = StyleSheet.create({
-  sLabel:  { fontSize: 10, fontWeight: T.w600, color: T.txtSec, letterSpacing: 1.0, textTransform: 'uppercase', paddingHorizontal: T.padH, fontFamily: 'KantumruyPro_600SemiBold'},
+  sLabel:  { fontSize: 10, fontWeight: T.w600, color: T.txtSec, letterSpacing: 1.0, textTransform: 'uppercase', paddingHorizontal: T.padH, fontFamily: 'Geist_600SemiBold'},
   card:    { width: 158 },
   imgWrap: { width: 158, height: 138, borderRadius: T.rMd, overflow: 'hidden', backgroundColor: T.imageBg },
   img:     { width: 158, height: 138 },
-  brand:   { fontSize: 10, fontWeight: T.w600, color: T.blue, letterSpacing: 0.6, marginTop: 8, lineHeight: 14, fontFamily: 'KantumruyPro_600SemiBold'},
-  title:   { fontSize: 13, fontWeight: T.w600, color: T.txtPri, lineHeight: 17, marginTop: 3, fontFamily: 'KantumruyPro_600SemiBold'},
-  price:   { fontSize: 14, fontWeight: T.w700, color: T.txtPri, marginTop: 3, fontFamily: 'KantumruyPro_700Bold'},
+  brand:   { fontSize: 10, fontWeight: T.w600, color: T.blue, letterSpacing: 0.6, marginTop: 8, lineHeight: 14, fontFamily: 'Geist_600SemiBold'},
+  title:   { fontSize: 13, fontWeight: T.w600, color: T.txtPri, lineHeight: 17, marginTop: 3, fontFamily: 'Geist_600SemiBold'},
+  price:   { fontSize: 14, fontWeight: T.w700, color: T.txtPri, marginTop: 3, fontFamily: 'Geist_700Bold'},
 });
 
 // ─── S13: FromPost ────────────────────────────────────────────────────────────
@@ -898,12 +901,12 @@ function FromPostSection({ design }) {
 
 const fp = StyleSheet.create({
   wrap:      { marginHorizontal: T.padH, marginTop: 32, backgroundColor: '#F8F9FB', borderRadius: T.rMd, padding: 14 },
-  sLabel:    { fontSize: 10, fontWeight: T.w600, color: T.txtSec, letterSpacing: 1.0, textTransform: 'uppercase', marginBottom: 10, fontFamily: 'KantumruyPro_600SemiBold'},
+  sLabel:    { fontSize: 10, fontWeight: T.w600, color: T.txtSec, letterSpacing: 1.0, textTransform: 'uppercase', marginBottom: 10, fontFamily: 'Geist_600SemiBold'},
   row:       { flexDirection: 'row', alignItems: 'center', gap: 10 },
   avatar:    { width: 30, height: 30, borderRadius: 15, backgroundColor: T.blue, alignItems: 'center', justifyContent: 'center' },
-  initial:   { fontSize: 13, fontWeight: T.w700, color: '#FFF', fontFamily: 'KantumruyPro_700Bold'},
-  postTitle: { fontSize: 13, fontWeight: T.w700, color: T.txtPri, lineHeight: 17, fontFamily: 'KantumruyPro_700Bold'},
-  postUser:  { fontSize: 12, color: T.txtSec, fontFamily: 'KantumruyPro_400Regular'},
+  initial:   { fontSize: 13, fontWeight: T.w700, color: '#FFF', fontFamily: 'Geist_700Bold'},
+  postTitle: { fontSize: 13, fontWeight: T.w700, color: T.txtPri, lineHeight: 17, fontFamily: 'Geist_700Bold'},
+  postUser:  { fontSize: 12, color: T.txtSec, fontFamily: 'Geist_400Regular'},
 });
 
 // ─── Fixed: StickyHeader ─────────────────────────────────────────────────────
@@ -928,7 +931,7 @@ const sth = StyleSheet.create({
   bar:   { position: 'absolute', top: 0, left: 0, right: 0, backgroundColor: T.surface, borderBottomWidth: 0.5, borderBottomColor: 'rgba(0,0,0,0.08)', zIndex: 100 },
   inner: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: T.padH, paddingBottom: 12 },
   btn:   { width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
-  title: { flex: 1, fontSize: 15, fontWeight: T.w600, color: T.txtPri, textAlign: 'center', marginHorizontal: 4, fontFamily: 'KantumruyPro_600SemiBold'},
+  title: { flex: 1, fontSize: 15, fontWeight: T.w600, color: T.txtPri, textAlign: 'center', marginHorizontal: 4, fontFamily: 'Geist_600SemiBold'},
 });
 
 // ─── Fixed: CTABar ────────────────────────────────────────────────────────────
@@ -1004,17 +1007,12 @@ const cta = StyleSheet.create({
     backgroundColor: T.surface,
     paddingHorizontal: T.padH,
     paddingTop: 12,
-    // Top shadow so the bar feels grounded, not floating
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: -3 },
-    shadowOpacity: 0.06,
-    shadowRadius: 12,
-    elevation: 12,
+    ...shadow.high,
   },
 
   // ── Affiliate link ────────────────────────────────────────────────────────
   affiliateRow: { alignItems: 'center', marginBottom: 10 },
-  affiliateTxt: { fontSize: 12, fontWeight: T.w500, color: T.txtSec, lineHeight: 16, fontFamily: 'KantumruyPro_500Medium'},
+  affiliateTxt: { fontSize: 12, fontWeight: T.w500, color: T.txtSec, lineHeight: 16, fontFamily: 'Geist_500Medium'},
 
   // ── Add to Cart button — full-width pill ─────────────────────────────────
   cartWrap:     { flex: 1 },
@@ -1043,7 +1041,7 @@ const cta = StyleSheet.create({
     top: 0, left: 0, right: 0,
     fontSize: 16,
     fontWeight: T.w700,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     lineHeight: 22,
     textAlign: 'center',
     letterSpacing: 0.1,

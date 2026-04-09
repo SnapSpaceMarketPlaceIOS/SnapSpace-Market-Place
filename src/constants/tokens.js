@@ -11,15 +11,15 @@ export { colors };
 
 // ── Font Families ─────────────────────────────────────────────────────────────
 // Loaded via @expo-google-fonts in App.js.
-// heading  → Kantumruy Pro Bold — screen titles, page headers, hero display text
-// body     → Kantumruy Pro (various weights) — all body, labels, buttons, captions
+// heading  → Geist Bold — screen titles, page headers, hero display text
+// body     → Geist (various weights) — all body, labels, buttons, captions
 export const fonts = {
-  heading:       'KantumruyPro_700Bold',
-  bodyRegular:   'KantumruyPro_400Regular',
-  bodyMedium:    'KantumruyPro_500Medium',
-  bodySemiBold:  'KantumruyPro_600SemiBold',
-  bodyBold:      'KantumruyPro_700Bold',
-  bodyExtraBold: 'KantumruyPro_700Bold', // Kantumruy Pro maxes at 700
+  heading:       'Geist_700Bold',
+  bodyRegular:   'Geist_400Regular',
+  bodyMedium:    'Geist_500Medium',
+  bodySemiBold:  'Geist_600SemiBold',
+  bodyBold:      'Geist_700Bold',
+  bodyExtraBold: 'Geist_700Bold', // Geist maxes at 700
 };
 
 export const palette = {
@@ -92,14 +92,14 @@ export const fontSize = {
 // ── Typography Scale — theme.js style (used by Cart, PDP, Explore) ───────────
 // Screens that do `import theme from '../constants/theme'` use TY.xs.fontSize etc.
 export const typography = {
-  xs:   { fontSize: 11, fontWeight: '400', fontFamily: 'KantumruyPro_400Regular' }, // Metadata, timestamps, fine print
-  sm:   { fontSize: 13, fontWeight: '400', fontFamily: 'KantumruyPro_400Regular' }, // Secondary labels, descriptions
-  base: { fontSize: 15, fontWeight: '400', fontFamily: 'KantumruyPro_400Regular' }, // Body text, product descriptions
-  md:   { fontSize: 17, fontWeight: '500', fontFamily: 'KantumruyPro_500Medium' },  // Section labels, card titles
-  lg:   { fontSize: 20, fontWeight: '600', fontFamily: 'KantumruyPro_700Bold' },    // Page subtitles, drawer headers
-  xl:   { fontSize: 24, fontWeight: '700', fontFamily: 'KantumruyPro_700Bold' },    // Price displays, key numbers
-  '2xl':{ fontSize: 28, fontWeight: '700', fontFamily: 'KantumruyPro_700Bold' },    // Page titles (My Cart, etc.)
-  '3xl':{ fontSize: 34, fontWeight: '800', fontFamily: 'KantumruyPro_700Bold' },    // Hero numbers
+  xs:   { fontSize: 11, fontWeight: '400', fontFamily: 'Geist_400Regular' }, // Metadata, timestamps, fine print
+  sm:   { fontSize: 13, fontWeight: '400', fontFamily: 'Geist_400Regular' }, // Secondary labels, descriptions
+  base: { fontSize: 15, fontWeight: '400', fontFamily: 'Geist_400Regular' }, // Body text, product descriptions
+  md:   { fontSize: 17, fontWeight: '500', fontFamily: 'Geist_500Medium' },  // Section labels, card titles
+  lg:   { fontSize: 20, fontWeight: '600', fontFamily: 'Geist_700Bold' },    // Page subtitles, drawer headers
+  xl:   { fontSize: 24, fontWeight: '700', fontFamily: 'Geist_700Bold' },    // Price displays, key numbers
+  '2xl':{ fontSize: 28, fontWeight: '700', fontFamily: 'Geist_700Bold' },    // Page titles (My Cart, etc.)
+  '3xl':{ fontSize: 34, fontWeight: '800', fontFamily: 'Geist_700Bold' },    // Hero numbers
 };
 
 // ── Font Weights ───────────────────────────────────────────────────────────────
@@ -245,7 +245,7 @@ export const textStyles = {
     letterSpacing: letterSpacing.tight,
     lineHeight: fontSize.xl * 1.15,
     color: palette.textPrimary,
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
   },
   screenTitleLarge: {
     fontSize: fontSize['2xl'],
@@ -253,7 +253,7 @@ export const textStyles = {
     letterSpacing: letterSpacing.tight,
     lineHeight: fontSize['2xl'] * 1.15,
     color: palette.textPrimary,
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
   },
 
   // Product name on cards
@@ -262,7 +262,7 @@ export const textStyles = {
     fontWeight: fontWeight.bold,
     letterSpacing: letterSpacing.tight,
     lineHeight: fontSize.md * 1.3,
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
   },
 
   // Price in lists
@@ -272,7 +272,7 @@ export const textStyles = {
     letterSpacing: letterSpacing.tight,
     fontVariant: ['tabular-nums'],
     color: palette.textPrimary,
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
   },
 
   // Price on PDP
@@ -282,7 +282,7 @@ export const textStyles = {
     letterSpacing: letterSpacing.tight,
     fontVariant: ['tabular-nums'],
     color: palette.textPrimary,
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
   },
 
   // Brand names / source labels
@@ -290,7 +290,7 @@ export const textStyles = {
     fontSize: fontSize.sm,
     fontWeight: fontWeight.regular,
     opacity: opacity.secondary,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
   },
 
   // Metadata (shipping, stock counts, captions)
@@ -299,7 +299,7 @@ export const textStyles = {
     fontWeight: fontWeight.regular,
     opacity: opacity.tertiary,
     lineHeight: fontSize.xs * 1.5,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
   },
 
   // Section headers ("PRODUCTS IN THIS LOOK")
@@ -310,7 +310,7 @@ export const textStyles = {
     textTransform: 'uppercase',
     opacity: opacity.tertiary,
     marginBottom: space.base,
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
   },
 
   // Body text
@@ -319,7 +319,7 @@ export const textStyles = {
     fontWeight: fontWeight.regular,
     opacity: opacity.secondary,
     lineHeight: fontSize.base * 1.6,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
   },
 };
 
@@ -330,39 +330,39 @@ export const homeTypography = {
     fontWeight: '700',
     letterSpacing: 1.5,
     textTransform: 'uppercase',
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
   },
   seeAllLink: {
     fontSize: 14,
     fontWeight: '600',
-    fontFamily: 'KantumruyPro_600SemiBold',
+    fontFamily: 'Geist_600SemiBold',
   },
   cardTitle: {
     fontSize: 15,
     fontWeight: '600',
-    fontFamily: 'KantumruyPro_600SemiBold',
+    fontFamily: 'Geist_600SemiBold',
   },
   cardSubtitle: {
     fontSize: 12,
     fontWeight: '400',
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
   },
   cardBadge: {
     fontSize: 11,
     fontWeight: '700',
     letterSpacing: 0.5,
     textTransform: 'uppercase',
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
   },
   price: {
     fontSize: 16,
     fontWeight: '700',
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
   },
   body: {
     fontSize: 14,
     fontWeight: '400',
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
   },
 };
 
@@ -424,45 +424,45 @@ export const layout = {
 export const typeScale = {
   display: {
     fontSize: 24, fontWeight: '700', lineHeight: 30,
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
   },
   title: {
     fontSize: 18, fontWeight: '700', lineHeight: 24,
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
   },
   headline: {
     fontSize: 15, fontWeight: '600', lineHeight: 20,
-    fontFamily: 'KantumruyPro_600SemiBold',
+    fontFamily: 'Geist_600SemiBold',
   },
   subheadline: {
     fontSize: 13, fontWeight: '600', lineHeight: 18,
     letterSpacing: 1.2, textTransform: 'uppercase',
-    fontFamily: 'KantumruyPro_600SemiBold',
+    fontFamily: 'Geist_600SemiBold',
   },
   body: {
     fontSize: 14, fontWeight: '400', lineHeight: 20,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
   },
   caption: {
     fontSize: 12, fontWeight: '400', lineHeight: 16,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
   },
   micro: {
     fontSize: 11, fontWeight: '600', lineHeight: 14,
     letterSpacing: 0.5, textTransform: 'uppercase',
-    fontFamily: 'KantumruyPro_600SemiBold',
+    fontFamily: 'Geist_600SemiBold',
   },
   price: {
     fontSize: 16, fontWeight: '700', lineHeight: 20,
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
   },
   priceSmall: {
     fontSize: 14, fontWeight: '600', lineHeight: 18,
-    fontFamily: 'KantumruyPro_600SemiBold',
+    fontFamily: 'Geist_600SemiBold',
   },
   button: {
     fontSize: 14, fontWeight: '600', lineHeight: 18,
-    fontFamily: 'KantumruyPro_600SemiBold',
+    fontFamily: 'Geist_600SemiBold',
   },
 };
 
@@ -539,7 +539,8 @@ export const roomChipColors = {
   'dining-room': '#ECFAF3',
   'office':      '#E8F0FA',
   'outdoor':     '#EAF6EE',
-  'bathroom':    '#F3EEFF',
+  'dorm':        '#F3EEFF',
+  'entryway':    '#FFF8EC',
 };
 
 const tokens = {

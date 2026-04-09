@@ -134,18 +134,14 @@ export function AuthProvider({ children }) {
     if (!process.env.EXPO_PUBLIC_SUPABASE_URL) {
       throw new Error('App is not configured. Please contact support.');
     }
-    const { data, error } = await withRetry(
-      () => withTimeout(
-        supabase.auth.signUp({
-          email: email.trim().toLowerCase(),
-          password,
-          options: { data: { full_name: fullName.trim() } },
-        }),
-        30000,
-        'Connection timed out. Please check your internet connection and try again.',
-      ),
-      3,
-      1000,
+    const { data, error } = await withTimeout(
+      supabase.auth.signUp({
+        email: email.trim().toLowerCase(),
+        password,
+        options: { data: { full_name: fullName.trim() } },
+      }),
+      15000,
+      'Connection timed out. Please check your internet connection and try again.',
     );
     if (error) throw new Error(error.message);
     // If Supabase requires email confirmation, session will be null here.
@@ -161,18 +157,14 @@ export function AuthProvider({ children }) {
    * Throws an Error with a user-friendly message on failure.
    */
   const signIn = async (email, password) => {
-    // Each attempt gets a 20s window; retry up to 3x on failure (60s max total).
-    const { data, error } = await withRetry(
-      () => withTimeout(
-        supabase.auth.signInWithPassword({
-          email: email.trim().toLowerCase(),
-          password,
-        }),
-        20000,
-        'Connection timed out. Please check your internet and try again.',
-      ),
-      3,
-      1000,
+    // Single attempt with a 15s window — no retries so user gets fast feedback.
+    const { data, error } = await withTimeout(
+      supabase.auth.signInWithPassword({
+        email: email.trim().toLowerCase(),
+        password,
+      }),
+      15000,
+      'Connection timed out. Please check your internet and try again.',
     );
 
     if (error) {
@@ -189,9 +181,15 @@ export function AuthProvider({ children }) {
     // see a populated user immediately — don't wait for onAuthStateChange.
     if (data?.session) {
       try {
-        const profile = await fetchProfile(data.session.user.id);
+        const profile = await withTimeout(
+          fetchProfile(data.session.user.id),
+          5000,
+          'Profile load timed out',
+        );
         setUser(buildUser(data.session, profile));
       } catch {
+        // Profile fetch failed or timed out — proceed with session-only data.
+        // onAuthStateChange will retry in the background.
         setUser(buildUser(data.session, null));
       }
     }

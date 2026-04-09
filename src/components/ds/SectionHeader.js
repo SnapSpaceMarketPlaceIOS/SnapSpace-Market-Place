@@ -89,7 +89,7 @@ const styles = StyleSheet.create({
   },
   title: {
     ...typeScale.subheadline,
-    fontFamily: 'KantumruyPro_600SemiBold',
+    fontFamily: 'Geist_600SemiBold',
     color: C.textTertiary,
   },
   actionTouch: {
@@ -99,7 +99,7 @@ const styles = StyleSheet.create({
   },
   action: {
     ...typeScale.button,
-    fontFamily: 'KantumruyPro_600SemiBold',
+    fontFamily: 'Geist_600SemiBold',
     color: C.primary,
   },
 });

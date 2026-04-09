@@ -35,7 +35,7 @@ const TY = theme.typography;
 function TrashIcon() {
   return (
     <Svg width={18} height={18} viewBox="0 0 24 24" fill="none"
-      stroke={C.textTertiary} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+      stroke={C.textTertiary} strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round">
       <Polyline points="3 6 5 6 21 6" />
       <Path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
     </Svg>
@@ -53,7 +53,7 @@ function StarIconSmall({ filled = true }) {
 function MinusIcon() {
   return (
     <Svg width={10} height={10} viewBox="0 0 24 24" fill="none"
-      stroke={C.textPrimary} strokeWidth={2.5} strokeLinecap="round">
+      stroke={C.textPrimary} strokeWidth={1.5} strokeLinecap="round">
       <Line x1={5} y1={12} x2={19} y2={12} />
     </Svg>
   );
@@ -62,7 +62,7 @@ function MinusIcon() {
 function PlusIcon() {
   return (
     <Svg width={10} height={10} viewBox="0 0 24 24" fill="none"
-      stroke={C.textPrimary} strokeWidth={2.5} strokeLinecap="round">
+      stroke={C.textPrimary} strokeWidth={1.5} strokeLinecap="round">
       <Line x1={12} y1={5} x2={12} y2={19} />
       <Line x1={5} y1={12} x2={19} y2={12} />
     </Svg>
@@ -72,7 +72,7 @@ function PlusIcon() {
 function CheckoutCartIcon() {
   return (
     <Svg width={20} height={20} viewBox="0 0 24 24" fill="none"
-      stroke="#FFFFFF" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+      stroke="#FFFFFF" strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round">
       <Path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
       <Circle cx={10} cy={20.5} r={1} fill="#FFFFFF" stroke="#FFFFFF" strokeWidth={1} />
       <Circle cx={17} cy={20.5} r={1} fill="#FFFFFF" stroke="#FFFFFF" strokeWidth={1} />
@@ -152,7 +152,7 @@ function VerifiedIcon() {
   return (
     <Svg width={12} height={12} viewBox="0 0 24 24" fill="none">
       <Circle cx={12} cy={12} r={10} fill={C.primary} />
-      <Path d="M9 12l2 2 4-4" stroke="#fff" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" />
+      <Path d="M9 12l2 2 4-4" stroke="#fff" strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round" />
     </Svg>
   );
 }
@@ -160,7 +160,7 @@ function VerifiedIcon() {
 function ShieldIcon({ color = C.success, size = 13 }) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none"
-      stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+      stroke={color} strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round">
       <Path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
     </Svg>
   );
@@ -361,6 +361,8 @@ export default function CartScreen({ navigation }) {
                   <TouchableOpacity
                     style={styles.deleteBtn}
                     onPress={() => removeFromCart(item.key)}
+                    activeOpacity={0.7}
+                    hitSlop={{ top: 2, bottom: 2, left: 2, right: 2 }}
                     accessibilityLabel="Remove item from cart"
                   >
                     <TrashIcon />
@@ -395,6 +397,8 @@ export default function CartScreen({ navigation }) {
                     <TouchableOpacity
                       style={styles.qtyBtn}
                       onPress={() => updateQuantity(item.key, -1)}
+                      activeOpacity={0.7}
+                      hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                       accessibilityLabel="Decrease quantity"
                     >
                       <MinusIcon />
@@ -403,6 +407,8 @@ export default function CartScreen({ navigation }) {
                     <TouchableOpacity
                       style={styles.qtyBtn}
                       onPress={() => updateQuantity(item.key, 1)}
+                      activeOpacity={0.7}
+                      hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                       accessibilityLabel="Increase quantity"
                     >
                       <PlusIcon />
@@ -525,7 +531,7 @@ const styles = StyleSheet.create({
   pageTitle: {
     ...typeScale.display,
     fontWeight: '800',              // slightly heavier than display for screen title
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
     color: C.textPrimary,
   },
   cartCountBadge: {
@@ -539,13 +545,13 @@ const styles = StyleSheet.create({
   },
   cartCountText: {
     ...typeScale.micro,
-    fontFamily: 'KantumruyPro_600SemiBold',
+    fontFamily: 'Geist_600SemiBold',
     color: C.white,
     textTransform: undefined,
   },
   subtitle: {
     ...typeScale.caption,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: C.primary,
     marginTop: 4,
   },
@@ -593,7 +599,7 @@ const styles = StyleSheet.create({
   itemName: {
     fontSize: 14,
     fontWeight: '500',
-    fontFamily: 'KantumruyPro_500Medium',
+    fontFamily: 'Geist_500Medium',
     lineHeight: 19,
     color: C.textPrimary,
     flex: 1,
@@ -611,19 +617,19 @@ const styles = StyleSheet.create({
   sellerRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 6,
+    marginTop: SP[1],
   },
   sellerName: {
     fontSize: 11,
     fontWeight: '600',
-    fontFamily: 'KantumruyPro_600SemiBold',
+    fontFamily: 'Geist_600SemiBold',
     lineHeight: 14,
     color: C.primary,
   },
   stockRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 6,
+    marginTop: SP[1],
     flexWrap: 'wrap',
   },
   inStockPill: {
@@ -634,41 +640,41 @@ const styles = StyleSheet.create({
   },
   inStockText: {
     ...typeScale.micro,
-    fontFamily: 'KantumruyPro_600SemiBold',
+    fontFamily: 'Geist_600SemiBold',
     color: C.success,
     textTransform: undefined,
   },
   ratingRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 7,
+    marginTop: SP[2],
     gap: 1,
   },
   ratingScore: {
     ...typeScale.caption,
     fontWeight: '600',
-    fontFamily: 'KantumruyPro_600SemiBold',
+    fontFamily: 'Geist_600SemiBold',
     color: C.textPrimary,
   },
   ratingCount: {
     ...typeScale.caption,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: C.textSecondary,
   },
   shippingText: {
     ...typeScale.caption,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: C.textSecondary,
   },
   priceQtyRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: 6,
+    marginTop: SP[1],
   },
   price: {
     ...typeScale.price,             // 16px / 700 — bold but compact
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
     color: C.textPrimary,
     fontVariant: ['tabular-nums'],
   },
@@ -690,7 +696,7 @@ const styles = StyleSheet.create({
   qtyText: {
     fontSize: 13,
     fontWeight: '700',
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
     color: C.textPrimary,
     minWidth: 22,
     textAlign: 'center',
@@ -717,12 +723,12 @@ const styles = StyleSheet.create({
   summaryTitle: {
     ...typeScale.headline,
     fontWeight: '700',
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
     color: C.textPrimary,
   },
   summaryDate: {
     ...typeScale.caption,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: C.textSecondary,
   },
   solidDivider: {
@@ -734,22 +740,22 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 10,
+    marginBottom: SP[3],
   },
   summaryLabel: {
     ...typeScale.body,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: C.textSecondary,
   },
   summaryValue: {
     ...typeScale.body,
     fontWeight: '600',
-    fontFamily: 'KantumruyPro_600SemiBold',
+    fontFamily: 'Geist_600SemiBold',
     color: C.textPrimary,
   },
   summaryMuted: {
     ...typeScale.caption,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     fontStyle: 'italic',
     color: C.textTertiary,
   },
@@ -761,13 +767,13 @@ const styles = StyleSheet.create({
   totalLabel: {
     ...typeScale.headline,
     fontWeight: '700',
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
     color: C.textPrimary,
   },
   totalValue: {
     ...typeScale.display,
     fontWeight: '800',
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
     color: C.textPrimary,
     fontVariant: ['tabular-nums'],
   },
@@ -780,17 +786,17 @@ const styles = StyleSheet.create({
     ...typeScale.caption,
     color: C.primary,
     fontWeight: '500',
-    fontFamily: 'KantumruyPro_500Medium',
+    fontFamily: 'Geist_500Medium',
   },
   trustTextMuted: {
     ...typeScale.caption,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: C.textTertiary,
   },
 
   ftcDisclosure: {
     fontSize: 11,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     fontStyle: 'italic',
     color: C.textTertiary,
     textAlign: 'center',
@@ -842,7 +848,7 @@ const styles = StyleSheet.create({
   },
   checkoutLabel: {
     ...typeScale.button,
-    fontFamily: 'KantumruyPro_600SemiBold',
+    fontFamily: 'Geist_600SemiBold',
     color: C.white,
   },
   checkoutDivider: {
@@ -853,7 +859,7 @@ const styles = StyleSheet.create({
   checkoutPrice: {
     ...typeScale.button,
     fontWeight: '800',
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
     color: C.white,
     fontVariant: ['tabular-nums'],
   },
@@ -868,14 +874,14 @@ const styles = StyleSheet.create({
   },
   emptyTitle: {
     ...typeScale.title,
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
     color: C.textPrimary,
     marginTop: SP[5],
     marginBottom: SP[2],
   },
   emptySubtitle: {
     ...typeScale.body,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: C.textSecondary,
     textAlign: 'center',
     maxWidth: 260,
@@ -895,7 +901,7 @@ const styles = StyleSheet.create({
   },
   emptyBtnText: {
     ...typeScale.button,
-    fontFamily: 'KantumruyPro_600SemiBold',
+    fontFamily: 'Geist_600SemiBold',
     color: C.white,
   },
 });

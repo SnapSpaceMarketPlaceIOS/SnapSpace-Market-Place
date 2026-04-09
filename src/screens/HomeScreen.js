@@ -64,28 +64,27 @@ const SELLER_MAP = SELLERS.reduce((acc, s) => { acc[s.handle] = s; return acc; }
 
 // ── Room type quick-nav ────────────────────────────────────────────────────────
 const ROOM_TYPES = [
-  { key: 'living-room', label: 'Living',   bg: roomChipColors['living-room'] },
-  { key: 'bedroom',     label: 'Bedroom',  bg: roomChipColors['bedroom'] },
-  { key: 'kitchen',     label: 'Kitchen',  bg: roomChipColors['kitchen'] },
-  { key: 'dining-room', label: 'Dining',   bg: roomChipColors['dining-room'] },
-  { key: 'office',      label: 'Office',   bg: roomChipColors['office'] },
-  { key: 'outdoor',     label: 'Outdoor',  bg: roomChipColors['outdoor'] },
-  { key: 'bathroom',    label: 'Bathroom', bg: roomChipColors['bathroom'] },
-  { key: 'entryway',    label: 'Entryway', bg: '#FFF8EC' },
-  { key: 'kids-room',   label: 'Kids',     bg: '#FFF0F5' },
-  { key: 'nursery',     label: 'Nursery',  bg: '#EBFAF9' },
+  { key: 'living-room', label: 'Living',    bg: roomChipColors['living-room'] },
+  { key: 'dining-room', label: 'Dining',    bg: roomChipColors['dining-room'] },
+  { key: 'bedroom',     label: 'Bedroom',   bg: roomChipColors['bedroom'] },
+  { key: 'kitchen',     label: 'Kitchen',   bg: roomChipColors['kitchen'] },
+  { key: 'office',      label: 'Office',    bg: roomChipColors['office'] },
+  { key: 'dorm',        label: 'Dorms',     bg: roomChipColors['dorm'] },
+  { key: 'outdoor',     label: 'Outdoor',   bg: roomChipColors['outdoor'] },
+  { key: 'entryway',    label: 'Entryway',  bg: roomChipColors['entryway'] },
 ];
 
-const NEW_ROOM_KEYS = ['entryway', 'kids-room', 'nursery'];
+const NEW_ROOM_KEYS = ['dorm'];
 
-const ROOM_ICON_PRIMARY   = '#0B6DC3';
-const ROOM_ICON_ACCENT    = '#67ACE9';
-const ROOM_ICON_WARM      = '#E07B39';
-const ROOM_ICON_GREEN     = '#2DA665';
-const ROOM_ICON_PURPLE    = '#7B5EA7';
-const ROOM_ICON_GOLD      = '#C4934A';
-const ROOM_ICON_ROSE      = '#D94F7A';
-const ROOM_ICON_TEAL      = '#2DADA0';
+// Room icon palette — each room gets a distinct accent within brand harmony
+const RI = {
+  blue:   '#0B6DC3',  // Living, Office
+  navy:   '#3B5998',  // Bedroom
+  warm:   '#D4855C',  // Kitchen
+  green:  '#3A9E6B',  // Dining, Outdoor
+  purple: '#7B5EA7',  // Dorms
+  gold:   '#C4934A',  // Entryway
+};
 
 // ── Star rating helper ─────────────────────────────────────────────────────────
 function renderStars(rating) {
@@ -94,237 +93,162 @@ function renderStars(rating) {
 }
 
 function RoomIcon({ roomKey, size = 28 }) {
-  const P = ROOM_ICON_PRIMARY;
-  const A = ROOM_ICON_ACCENT;
-  const sw = 1.45; // base stroke width
+  const sw = 1.3;
 
   switch (roomKey) {
-    // ── Living Room — modern 3-seat sofa ──────────────────────────────────────
+    // ── Living Room — clearly a sofa with armrests, seat, back cushions ──────
     case 'living-room':
       return (
         <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
           {/* Left armrest */}
-          <Rect x="1" y="10" width="3.5" height="8" rx="1.5" fill={P} />
+          <Rect x="1.5" y="9" width="3" height="7.5" rx="1.5" fill={RI.blue} opacity="0.35" stroke={RI.blue} strokeWidth={sw} />
           {/* Right armrest */}
-          <Rect x="19.5" y="10" width="3.5" height="8" rx="1.5" fill={P} />
-          {/* Seat base */}
-          <Rect x="4" y="13.5" width="16" height="4.5" rx="1" fill={A} opacity="0.25" stroke={P} strokeWidth={sw} />
-          {/* Back left cushion */}
-          <Rect x="4" y="7.5" width="7" height="7" rx="1.2" fill={A} opacity="0.35" stroke={P} strokeWidth={sw} />
-          {/* Back right cushion */}
-          <Rect x="13" y="7.5" width="7" height="7" rx="1.2" fill={A} opacity="0.35" stroke={P} strokeWidth={sw} />
-          {/* Cushion seam */}
-          <Line x1="12" y1="13.5" x2="12" y2="18" stroke={P} strokeWidth="1" strokeLinecap="round" opacity="0.35" />
+          <Rect x="19.5" y="9" width="3" height="7.5" rx="1.5" fill={RI.blue} opacity="0.35" stroke={RI.blue} strokeWidth={sw} />
+          {/* Seat cushion */}
+          <Rect x="4" y="13" width="16" height="3.5" rx="1" fill={RI.blue} opacity="0.15" stroke={RI.blue} strokeWidth={sw} />
+          {/* Left back cushion */}
+          <Rect x="4.5" y="7" width="7" height="6.5" rx="1.5" fill={RI.blue} opacity="0.2" stroke={RI.blue} strokeWidth={sw} />
+          {/* Right back cushion */}
+          <Rect x="12.5" y="7" width="7" height="6.5" rx="1.5" fill={RI.blue} opacity="0.2" stroke={RI.blue} strokeWidth={sw} />
           {/* Legs */}
-          <Line x1="5.5" y1="18" x2="5.5" y2="21" stroke={P} strokeWidth="1.6" strokeLinecap="round" />
-          <Line x1="18.5" y1="18" x2="18.5" y2="21" stroke={P} strokeWidth="1.6" strokeLinecap="round" />
+          <Line x1="6" y1="16.5" x2="6" y2="19" stroke={RI.blue} strokeWidth={sw} strokeLinecap="round" />
+          <Line x1="18" y1="16.5" x2="18" y2="19" stroke={RI.blue} strokeWidth={sw} strokeLinecap="round" />
         </Svg>
       );
 
-    // ── Bedroom — bed with headboard + two pillows ────────────────────────────
+    // ── Dining Room — rectangular table with 4 chairs clearly visible ────────
+    case 'dining-room':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+          {/* Table top — wide rectangle */}
+          <Rect x="4" y="10" width="16" height="4" rx="1" fill={RI.green} opacity="0.18" stroke={RI.green} strokeWidth={sw} />
+          {/* Table legs */}
+          <Line x1="6" y1="14" x2="6" y2="19" stroke={RI.green} strokeWidth={sw} strokeLinecap="round" />
+          <Line x1="18" y1="14" x2="18" y2="19" stroke={RI.green} strokeWidth={sw} strokeLinecap="round" />
+          {/* Top chairs — two chair backs above table */}
+          <Rect x="7" y="4" width="3" height="5" rx="1" stroke={RI.green} strokeWidth={sw} opacity="0.6" />
+          <Rect x="14" y="4" width="3" height="5" rx="1" stroke={RI.green} strokeWidth={sw} opacity="0.6" />
+          {/* Bottom chairs — two chair seats below table */}
+          <Rect x="7" y="15" width="3" height="5" rx="1" stroke={RI.green} strokeWidth={sw} opacity="0.6" />
+          <Rect x="14" y="15" width="3" height="5" rx="1" stroke={RI.green} strokeWidth={sw} opacity="0.6" />
+        </Svg>
+      );
+
+    // ── Bedroom — clearly a bed with tall headboard, 2 pillows, blanket ─────
     case 'bedroom':
       return (
         <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-          {/* Headboard */}
-          <Rect x="2" y="4" width="20" height="7" rx="2" fill={A} opacity="0.3" stroke={P} strokeWidth={sw} />
+          {/* Headboard — tall and prominent */}
+          <Rect x="2" y="3" width="20" height="8" rx="2" fill={RI.navy} opacity="0.15" stroke={RI.navy} strokeWidth={sw} />
           {/* Left pillow */}
-          <Rect x="3.5" y="5.5" width="7" height="4" rx="1.5" fill={P} opacity="0.55" />
+          <Rect x="3.5" y="5" width="7" height="4" rx="2" fill={RI.navy} opacity="0.3" />
           {/* Right pillow */}
-          <Rect x="13.5" y="5.5" width="7" height="4" rx="1.5" fill={P} opacity="0.55" />
-          {/* Bed frame / mattress */}
-          <Rect x="2" y="11" width="20" height="8" rx="1.5" fill={A} opacity="0.15" stroke={P} strokeWidth={sw} />
-          {/* Duvet fold line */}
-          <Path d="M2 14.5 Q12 16.5 22 14.5" stroke={P} strokeWidth="1.2" fill="none" strokeLinecap="round" opacity="0.45" />
+          <Rect x="13.5" y="5" width="7" height="4" rx="2" fill={RI.navy} opacity="0.3" />
+          {/* Mattress / blanket area */}
+          <Rect x="2" y="11" width="20" height="7" rx="1.5" fill={RI.navy} opacity="0.08" stroke={RI.navy} strokeWidth={sw} />
+          {/* Blanket fold line */}
+          <Path d="M2 14 Q12 16 22 14" stroke={RI.navy} strokeWidth={sw} fill="none" opacity="0.3" strokeLinecap="round" />
           {/* Legs */}
-          <Line x1="4.5" y1="19" x2="4.5" y2="21.5" stroke={P} strokeWidth="1.6" strokeLinecap="round" />
-          <Line x1="19.5" y1="19" x2="19.5" y2="21.5" stroke={P} strokeWidth="1.6" strokeLinecap="round" />
+          <Line x1="4" y1="18" x2="4" y2="21" stroke={RI.navy} strokeWidth={sw} strokeLinecap="round" />
+          <Line x1="20" y1="18" x2="20" y2="21" stroke={RI.navy} strokeWidth={sw} strokeLinecap="round" />
         </Svg>
       );
 
-    // ── Kitchen — range/stove with 4 burners + oven ───────────────────────────
+    // ── Kitchen — stove with 4 burners on top, oven door with handle ────────
     case 'kitchen':
       return (
         <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
           {/* Stove body */}
-          <Rect x="2" y="4" width="20" height="16" rx="2" fill={ROOM_ICON_WARM} opacity="0.08" stroke={ROOM_ICON_WARM} strokeWidth={sw} />
-          {/* Oven door */}
-          <Rect x="4" y="13.5" width="16" height="4.5" rx="1" fill={ROOM_ICON_WARM} opacity="0.14" stroke={ROOM_ICON_WARM} strokeWidth="1.2" />
-          {/* Oven handle */}
-          <Line x1="7.5" y1="15.8" x2="16.5" y2="15.8" stroke={ROOM_ICON_WARM} strokeWidth="2" strokeLinecap="round" />
-          {/* Burner top-left */}
-          <Circle cx="7.5" cy="8.5" r="2.2" fill={ROOM_ICON_WARM} opacity="0.18" stroke={ROOM_ICON_WARM} strokeWidth="1.3" />
-          <Circle cx="7.5" cy="8.5" r="0.8" fill={ROOM_ICON_WARM} opacity="0.7" />
-          {/* Burner top-right */}
-          <Circle cx="16.5" cy="8.5" r="2.2" fill={ROOM_ICON_WARM} opacity="0.18" stroke={ROOM_ICON_WARM} strokeWidth="1.3" />
-          <Circle cx="16.5" cy="8.5" r="0.8" fill={ROOM_ICON_WARM} opacity="0.7" />
-          {/* Knobs row */}
-          <Circle cx="8.5" cy="4" r="1" fill={ROOM_ICON_WARM} opacity="0.6" />
-          <Circle cx="12" cy="4" r="1" fill={ROOM_ICON_WARM} opacity="0.6" />
-          <Circle cx="15.5" cy="4" r="1" fill={ROOM_ICON_WARM} opacity="0.6" />
+          <Rect x="3" y="3" width="18" height="18" rx="2" fill={RI.warm} opacity="0.08" stroke={RI.warm} strokeWidth={sw} />
+          {/* 4 burners — 2x2 grid, clearly circular */}
+          <Circle cx="8" cy="7.5" r="2" stroke={RI.warm} strokeWidth={sw} />
+          <Circle cx="16" cy="7.5" r="2" stroke={RI.warm} strokeWidth={sw} />
+          <Circle cx="8" cy="7.5" r="0.6" fill={RI.warm} />
+          <Circle cx="16" cy="7.5" r="0.6" fill={RI.warm} />
+          {/* Oven door — clearly a rectangular window */}
+          <Rect x="5" y="13" width="14" height="6" rx="1" fill={RI.warm} opacity="0.12" stroke={RI.warm} strokeWidth={sw} />
+          {/* Oven handle — prominent bar */}
+          <Line x1="7" y1="14.5" x2="17" y2="14.5" stroke={RI.warm} strokeWidth="1.8" strokeLinecap="round" />
         </Svg>
       );
 
-    // ── Dining Room — oval table + 4 chairs ───────────────────────────────────
-    case 'dining-room':
-      return (
-        <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-          {/* Table top */}
-          <Ellipse cx="12" cy="12" rx="6.5" ry="4" fill={ROOM_ICON_GREEN} opacity="0.18" stroke={ROOM_ICON_GREEN} strokeWidth={sw} />
-          {/* Table leg + base */}
-          <Line x1="12" y1="16" x2="12" y2="19.5" stroke={ROOM_ICON_GREEN} strokeWidth="2" strokeLinecap="round" />
-          <Line x1="9" y1="19.5" x2="15" y2="19.5" stroke={ROOM_ICON_GREEN} strokeWidth="1.8" strokeLinecap="round" />
-          {/* Chair top */}
-          <Path d="M9 5.5 Q12 3.5 15 5.5" stroke={ROOM_ICON_GREEN} strokeWidth={sw} strokeLinecap="round" fill="none" />
-          <Line x1="9.5" y1="5.5" x2="9.5" y2="8" stroke={ROOM_ICON_GREEN} strokeWidth={sw} strokeLinecap="round" />
-          <Line x1="14.5" y1="5.5" x2="14.5" y2="8" stroke={ROOM_ICON_GREEN} strokeWidth={sw} strokeLinecap="round" />
-          {/* Chair left */}
-          <Path d="M3.5 9 Q2 12 3.5 15" stroke={ROOM_ICON_GREEN} strokeWidth={sw} strokeLinecap="round" fill="none" />
-          <Line x1="3.5" y1="9.5" x2="5.5" y2="10" stroke={ROOM_ICON_GREEN} strokeWidth={sw} strokeLinecap="round" />
-          <Line x1="3.5" y1="14.5" x2="5.5" y2="14" stroke={ROOM_ICON_GREEN} strokeWidth={sw} strokeLinecap="round" />
-          {/* Chair right */}
-          <Path d="M20.5 9 Q22 12 20.5 15" stroke={ROOM_ICON_GREEN} strokeWidth={sw} strokeLinecap="round" fill="none" />
-          <Line x1="20.5" y1="9.5" x2="18.5" y2="10" stroke={ROOM_ICON_GREEN} strokeWidth={sw} strokeLinecap="round" />
-          <Line x1="20.5" y1="14.5" x2="18.5" y2="14" stroke={ROOM_ICON_GREEN} strokeWidth={sw} strokeLinecap="round" />
-        </Svg>
-      );
-
-    // ── Office — monitor on desk with keyboard ─────────────────────────────────
+    // ── Office — monitor on stand with keyboard on desk ─────────────────────
     case 'office':
       return (
         <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-          {/* Monitor bezel */}
-          <Rect x="3" y="3" width="18" height="12" rx="1.5" fill={A} opacity="0.18" stroke={P} strokeWidth={sw} />
-          {/* Screen inner */}
-          <Rect x="5" y="5" width="14" height="8" rx="0.8" fill={P} opacity="0.12" />
-          {/* Cursor dot */}
-          <Circle cx="12" cy="9" r="1.2" fill={P} opacity="0.5" />
-          {/* Stand neck */}
-          <Line x1="12" y1="15" x2="12" y2="17.5" stroke={P} strokeWidth="2" strokeLinecap="round" />
-          {/* Stand base */}
-          <Line x1="8.5" y1="17.5" x2="15.5" y2="17.5" stroke={P} strokeWidth="2" strokeLinecap="round" />
+          {/* Monitor screen */}
+          <Rect x="4" y="2" width="16" height="10" rx="1.5" fill={RI.blue} opacity="0.12" stroke={RI.blue} strokeWidth={sw} />
+          {/* Screen glare */}
+          <Rect x="6" y="4" width="12" height="6" rx="0.5" fill={RI.blue} opacity="0.06" />
+          {/* Monitor stand neck */}
+          <Line x1="12" y1="12" x2="12" y2="15" stroke={RI.blue} strokeWidth="1.6" strokeLinecap="round" />
+          {/* Monitor stand base */}
+          <Line x1="8" y1="15" x2="16" y2="15" stroke={RI.blue} strokeWidth="1.6" strokeLinecap="round" />
+          {/* Desk surface */}
+          <Line x1="2" y1="17" x2="22" y2="17" stroke={RI.blue} strokeWidth={sw} strokeLinecap="round" />
           {/* Keyboard */}
-          <Rect x="5" y="19" width="14" height="3" rx="1" fill={P} opacity="0.22" stroke={P} strokeWidth="1.2" />
-          {/* Key row hints */}
-          <Line x1="7" y1="20.5" x2="17" y2="20.5" stroke={P} strokeWidth="0.9" strokeLinecap="round" opacity="0.45" />
+          <Rect x="6" y="18.5" width="12" height="2.5" rx="1" fill={RI.blue} opacity="0.12" stroke={RI.blue} strokeWidth={sw} />
+          <Line x1="8" y1="19.8" x2="16" y2="19.8" stroke={RI.blue} strokeWidth="0.8" strokeLinecap="round" opacity="0.4" />
         </Svg>
       );
 
-    // ── Outdoor — potted plant with layered leaves ─────────────────────────────
+    // ── Dorms — bunk bed / loft bed clearly recognizable ────────────────────
+    case 'dorm':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+          {/* Left post — full height */}
+          <Line x1="3" y1="2" x2="3" y2="22" stroke={RI.purple} strokeWidth={sw} strokeLinecap="round" />
+          {/* Right post — full height */}
+          <Line x1="21" y1="2" x2="21" y2="22" stroke={RI.purple} strokeWidth={sw} strokeLinecap="round" />
+          {/* Top bunk mattress */}
+          <Rect x="3" y="5" width="18" height="4" rx="1" fill={RI.purple} opacity="0.15" stroke={RI.purple} strokeWidth={sw} />
+          {/* Top bunk pillow */}
+          <Rect x="4.5" y="5.8" width="5" height="2.4" rx="1.2" fill={RI.purple} opacity="0.3" />
+          {/* Bottom bunk mattress */}
+          <Rect x="3" y="14" width="18" height="4" rx="1" fill={RI.purple} opacity="0.15" stroke={RI.purple} strokeWidth={sw} />
+          {/* Bottom bunk pillow */}
+          <Rect x="4.5" y="14.8" width="5" height="2.4" rx="1.2" fill={RI.purple} opacity="0.3" />
+          {/* Ladder rungs on right side */}
+          <Line x1="19" y1="10" x2="21" y2="10" stroke={RI.purple} strokeWidth={sw} strokeLinecap="round" opacity="0.5" />
+          <Line x1="19" y1="12.5" x2="21" y2="12.5" stroke={RI.purple} strokeWidth={sw} strokeLinecap="round" opacity="0.5" />
+        </Svg>
+      );
+
+    // ── Outdoor — patio table with umbrella + sun ────────────────────────────
     case 'outdoor':
       return (
         <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-          {/* Pot body */}
-          <Path d="M8.5 20.5 L7.5 15.5 L16.5 15.5 L15.5 20.5 Z" fill={ROOM_ICON_GREEN} opacity="0.25" stroke={ROOM_ICON_GREEN} strokeWidth={sw} strokeLinejoin="round" />
-          {/* Pot rim */}
-          <Line x1="7" y1="15.5" x2="17" y2="15.5" stroke={ROOM_ICON_GREEN} strokeWidth="2" strokeLinecap="round" />
-          {/* Soil hint */}
-          <Path d="M8 15.5 Q12 14.5 16 15.5" stroke={ROOM_ICON_GREEN} strokeWidth="1" strokeLinecap="round" fill="none" opacity="0.4" />
-          {/* Center stem */}
-          <Line x1="12" y1="15.5" x2="12" y2="9.5" stroke={ROOM_ICON_GREEN} strokeWidth="1.8" strokeLinecap="round" />
-          {/* Left leaf */}
-          <Path d="M12 13 C10 12 7.5 10 7 7 C9.5 7.5 12 10 12 13 Z" fill={ROOM_ICON_GREEN} opacity="0.55" stroke={ROOM_ICON_GREEN} strokeWidth="1.1" strokeLinejoin="round" />
-          {/* Right leaf */}
-          <Path d="M12 11.5 C14 10.5 16.5 8.5 17 5.5 C14.5 6 12 8.5 12 11.5 Z" fill={ROOM_ICON_GREEN} opacity="0.55" stroke={ROOM_ICON_GREEN} strokeWidth="1.1" strokeLinejoin="round" />
-          {/* Top sprout */}
-          <Path d="M12 9.5 C11 7.5 11.5 5 12 3.5 C12.5 5 13 7.5 12 9.5 Z" fill={A} opacity="0.7" stroke={ROOM_ICON_GREEN} strokeWidth="1" strokeLinejoin="round" />
+          {/* Umbrella canopy */}
+          <Path d="M4 10 Q12 3 20 10" fill={RI.green} opacity="0.15" stroke={RI.green} strokeWidth={sw} strokeLinecap="round" />
+          {/* Umbrella pole */}
+          <Line x1="12" y1="10" x2="12" y2="18" stroke={RI.green} strokeWidth={sw} strokeLinecap="round" />
+          {/* Table surface */}
+          <Line x1="6" y1="15" x2="18" y2="15" stroke={RI.green} strokeWidth="1.6" strokeLinecap="round" />
+          {/* Table legs */}
+          <Line x1="7" y1="15" x2="6" y2="19" stroke={RI.green} strokeWidth={sw} strokeLinecap="round" />
+          <Line x1="17" y1="15" x2="18" y2="19" stroke={RI.green} strokeWidth={sw} strokeLinecap="round" />
+          {/* Ground/grass hints */}
+          <Path d="M2 21 Q6 19.5 8 21" stroke={RI.green} strokeWidth={sw} strokeLinecap="round" opacity="0.3" />
+          <Path d="M10 21 Q14 19.5 18 21" stroke={RI.green} strokeWidth={sw} strokeLinecap="round" opacity="0.3" />
         </Svg>
       );
 
-    // ── Bathroom — clawfoot tub with faucet ───────────────────────────────────
-    case 'bathroom':
-      return (
-        <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-          {/* Tub body */}
-          <Path d="M3 13 L3 18 Q3 20.5 5.5 20.5 L18.5 20.5 Q21 20.5 21 18 L21 13 Z"
-            fill={ROOM_ICON_PURPLE} opacity="0.15" stroke={ROOM_ICON_PURPLE} strokeWidth={sw} strokeLinejoin="round" />
-          {/* Rim line */}
-          <Line x1="2" y1="13" x2="22" y2="13" stroke={ROOM_ICON_PURPLE} strokeWidth="2.2" strokeLinecap="round" />
-          {/* Clawfoot legs */}
-          <Line x1="5.5" y1="20.5" x2="4.5" y2="22.5" stroke={ROOM_ICON_PURPLE} strokeWidth="1.6" strokeLinecap="round" />
-          <Line x1="18.5" y1="20.5" x2="19.5" y2="22.5" stroke={ROOM_ICON_PURPLE} strokeWidth="1.6" strokeLinecap="round" />
-          {/* Faucet vertical neck */}
-          <Line x1="6" y1="13" x2="6" y2="7.5" stroke={ROOM_ICON_PURPLE} strokeWidth="1.8" strokeLinecap="round" />
-          {/* Faucet spout */}
-          <Line x1="6" y1="7.5" x2="9.5" y2="7.5" stroke={ROOM_ICON_PURPLE} strokeWidth="1.8" strokeLinecap="round" />
-          {/* Water drops */}
-          <Circle cx="9.5" cy="9.5" r="0.9" fill={ROOM_ICON_PURPLE} opacity="0.55" />
-          <Circle cx="11.5" cy="11" r="0.65" fill={ROOM_ICON_PURPLE} opacity="0.35" />
-          {/* Tub interior highlight */}
-          <Path d="M5 17 Q12 18.5 19 17" stroke={ROOM_ICON_PURPLE} strokeWidth="1" strokeLinecap="round" fill="none" opacity="0.3" />
-        </Svg>
-      );
-
-    // ── Entryway — arched door with knob ──────────────────────────────────────
+    // ── Entryway — front door with sidelights, clearly a doorway ────────────
     case 'entryway':
       return (
         <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-          {/* Door arch fill */}
-          <Path d="M5 22 L5 7 Q5 2.5 12 2.5 Q19 2.5 19 7 L19 22 Z"
-            fill={ROOM_ICON_GOLD} opacity="0.1" stroke={ROOM_ICON_GOLD} strokeWidth={sw} strokeLinejoin="round" />
-          {/* Inner door panel */}
-          <Rect x="7.5" y="12" width="9" height="10" rx="0.6"
-            fill={ROOM_ICON_GOLD} opacity="0.14" stroke={ROOM_ICON_GOLD} strokeWidth="1.2" />
-          {/* Upper panel detail */}
-          <Rect x="7.5" y="7" width="9" height="4.5" rx="1"
-            fill={ROOM_ICON_GOLD} opacity="0.1" stroke={ROOM_ICON_GOLD} strokeWidth="1.2" />
-          {/* Door knob */}
-          <Circle cx="15.5" cy="17.5" r="1.1" fill={ROOM_ICON_GOLD} opacity="0.75" />
-          {/* Floor threshold */}
-          <Line x1="3" y1="22" x2="21" y2="22" stroke={ROOM_ICON_GOLD} strokeWidth="2.2" strokeLinecap="round" />
-        </Svg>
-      );
-
-    // ── Kids Room — single bed with star accent ────────────────────────────────
-    case 'kids-room':
-      return (
-        <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-          {/* Headboard */}
-          <Rect x="2" y="7" width="17" height="5" rx="2"
-            fill={ROOM_ICON_ROSE} opacity="0.25" stroke={ROOM_ICON_ROSE} strokeWidth={sw} />
-          {/* Pillow */}
-          <Rect x="3.5" y="8.2" width="6" height="2.8" rx="1.4" fill={ROOM_ICON_ROSE} opacity="0.55" />
-          {/* Bed frame */}
-          <Rect x="2" y="12" width="17" height="6.5" rx="1.5"
-            fill={ROOM_ICON_ROSE} opacity="0.1" stroke={ROOM_ICON_ROSE} strokeWidth={sw} />
-          {/* Blanket wave */}
-          <Path d="M2 14.5 Q10 16.5 19 14.5" stroke={ROOM_ICON_ROSE} strokeWidth="1.3" fill="none" strokeLinecap="round" opacity="0.5" />
-          {/* Legs */}
-          <Line x1="4" y1="18.5" x2="4" y2="21" stroke={ROOM_ICON_ROSE} strokeWidth="1.6" strokeLinecap="round" />
-          <Line x1="17" y1="18.5" x2="17" y2="21" stroke={ROOM_ICON_ROSE} strokeWidth="1.6" strokeLinecap="round" />
-          {/* Star decoration */}
-          <Path d="M21 2 L21.7 4.2 L24 4.2 L22.2 5.6 L22.9 7.8 L21 6.4 L19.1 7.8 L19.8 5.6 L18 4.2 L20.3 4.2 Z"
-            fill={ROOM_ICON_ROSE} opacity="0.85" />
-        </Svg>
-      );
-
-    // ── Nursery — crib with hanging mobile ────────────────────────────────────
-    case 'nursery':
-      return (
-        <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-          {/* Mobile arm */}
-          <Line x1="12" y1="1.5" x2="12" y2="4.5" stroke={ROOM_ICON_TEAL} strokeWidth="1.3" strokeLinecap="round" opacity="0.65" />
-          <Line x1="8.5" y1="4.5" x2="15.5" y2="4.5" stroke={ROOM_ICON_TEAL} strokeWidth="1.3" strokeLinecap="round" opacity="0.65" />
-          <Line x1="8.5" y1="4.5" x2="8.5" y2="6.5" stroke={ROOM_ICON_TEAL} strokeWidth="1" strokeLinecap="round" opacity="0.55" />
-          <Line x1="15.5" y1="4.5" x2="15.5" y2="6.5" stroke={ROOM_ICON_TEAL} strokeWidth="1" strokeLinecap="round" opacity="0.55" />
-          <Circle cx="8.5" cy="7.5" r="1.1" fill={ROOM_ICON_TEAL} opacity="0.55" />
-          <Circle cx="15.5" cy="7.5" r="1.1" fill={ROOM_ICON_TEAL} opacity="0.55" />
-          {/* Crib left post */}
-          <Line x1="3" y1="9" x2="3" y2="21" stroke={ROOM_ICON_TEAL} strokeWidth="2" strokeLinecap="round" />
-          {/* Crib right post */}
-          <Line x1="21" y1="9" x2="21" y2="21" stroke={ROOM_ICON_TEAL} strokeWidth="2" strokeLinecap="round" />
-          {/* Top rail */}
-          <Line x1="3" y1="9" x2="21" y2="9" stroke={ROOM_ICON_TEAL} strokeWidth="2" strokeLinecap="round" />
-          {/* Bottom rail */}
-          <Line x1="3" y1="18" x2="21" y2="18" stroke={ROOM_ICON_TEAL} strokeWidth="2" strokeLinecap="round" />
-          {/* Vertical slats */}
-          <Line x1="7.5" y1="9" x2="7.5" y2="18" stroke={ROOM_ICON_TEAL} strokeWidth="1.3" strokeLinecap="round" opacity="0.5" />
-          <Line x1="12" y1="9" x2="12" y2="18" stroke={ROOM_ICON_TEAL} strokeWidth="1.3" strokeLinecap="round" opacity="0.5" />
-          <Line x1="16.5" y1="9" x2="16.5" y2="18" stroke={ROOM_ICON_TEAL} strokeWidth="1.3" strokeLinecap="round" opacity="0.5" />
-          {/* Mattress */}
-          <Rect x="4" y="15" width="16" height="3" rx="0.8" fill={ROOM_ICON_TEAL} opacity="0.18" />
-          {/* Legs */}
-          <Line x1="3" y1="20" x2="3" y2="22.5" stroke={ROOM_ICON_TEAL} strokeWidth="2" strokeLinecap="round" />
-          <Line x1="21" y1="20" x2="21" y2="22.5" stroke={ROOM_ICON_TEAL} strokeWidth="2" strokeLinecap="round" />
+          {/* Door frame */}
+          <Path d="M5 21V4a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v17" stroke={RI.gold} strokeWidth={sw} strokeLinejoin="round" />
+          {/* Door panel */}
+          <Rect x="7" y="5" width="10" height="16" rx="0.5" fill={RI.gold} opacity="0.1" stroke={RI.gold} strokeWidth={sw} />
+          {/* Upper door panel detail */}
+          <Rect x="8.5" y="6.5" width="7" height="5" rx="0.5" fill={RI.gold} opacity="0.08" stroke={RI.gold} strokeWidth={sw} opacity="0.5" />
+          {/* Lower door panel detail */}
+          <Rect x="8.5" y="13" width="7" height="6" rx="0.5" fill={RI.gold} opacity="0.08" stroke={RI.gold} strokeWidth={sw} opacity="0.5" />
+          {/* Door knob — clearly visible */}
+          <Circle cx="15" cy="13" r="1" fill={RI.gold} opacity="0.7" />
+          {/* Floor line */}
+          <Line x1="3" y1="21" x2="21" y2="21" stroke={RI.gold} strokeWidth={sw} strokeLinecap="round" />
         </Svg>
       );
 
@@ -332,6 +256,18 @@ function RoomIcon({ roomKey, size = 28 }) {
       return null;
   }
 }
+
+// ── Hero slideshow images — 786px wide, best-fit for portrait phone screen ────
+const HERO_IMAGES = [
+  require('../../assets/hero-slideshow-1.jpg'),   // minimalist white living room
+  require('../../assets/hero-slideshow-9.jpg'),   // warm modern interior
+  require('../../assets/hero-slideshow-6.jpg'),   // cozy gallery wall living room
+  require('../../assets/hero-slideshow-3.jpg'),   // B&W living room with lanterns
+  require('../../assets/hero-slideshow-5.jpg'),   // blush pink bedroom
+  require('../../assets/hero-slideshow-2.jpg'),   // elegant warm living space
+];
+const HERO_INTERVAL = 5500;  // 5.5 seconds between transitions
+const HERO_FADE_MS  = 1200;  // 1.2 second smooth crossfade
 
 // ── Style category chips with preview image ────────────────────────────────────
 // Local assets for curated styles (permanent, no CDN expiry)
@@ -403,7 +339,7 @@ const FEATURED_PRODUCTS  = searchProducts({ keywords: 'modern living room bedroo
 
 function BellIcon() {
   return (
-    <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+    <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round">
       <Path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
       <Path d="M13.73 21a2 2 0 0 1-3.46 0" />
     </Svg>
@@ -412,7 +348,7 @@ function BellIcon() {
 
 function UserIcon() {
   return (
-    <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+    <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round">
       <Path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
       <Circle cx={12} cy={7} r={4} />
     </Svg>
@@ -421,7 +357,7 @@ function UserIcon() {
 
 function SendIcon() {
   return (
-    <Svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round">
+    <Svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round">
       <Line x1={22} y1={2} x2={11} y2={13} />
       <Polyline points="22 2 15 22 11 13 2 9 22 2" />
     </Svg>
@@ -430,7 +366,7 @@ function SendIcon() {
 
 function CameraSmallIcon() {
   return (
-    <Svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.9)" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round">
+    <Svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.9)" strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round">
       <Path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
       <Circle cx={12} cy={13} r={4} />
     </Svg>
@@ -439,7 +375,7 @@ function CameraSmallIcon() {
 
 function GalleryIcon({ size = 18, color = 'rgba(255,255,255,0.9)' }) {
   return (
-    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round">
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round">
       <Rect x={3} y={3} width={18} height={18} rx={2} ry={2} />
       <Circle cx={8.5} cy={8.5} r={1.5} />
       <Polyline points="21 15 16 10 5 21" />
@@ -449,7 +385,7 @@ function GalleryIcon({ size = 18, color = 'rgba(255,255,255,0.9)' }) {
 
 function CheckIcon({ size = 10, color = '#fff' }) {
   return (
-    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={3.5} strokeLinecap="round" strokeLinejoin="round">
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
       <Polyline points="20 6 9 17 4 12" />
     </Svg>
   );
@@ -457,7 +393,7 @@ function CheckIcon({ size = 10, color = '#fff' }) {
 
 function CloseIcon({ size = 20, color = '#fff' }) {
   return (
-    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round">
       <Line x1={18} y1={6} x2={6} y2={18} />
       <Line x1={6} y1={6} x2={18} y2={18} />
     </Svg>
@@ -558,20 +494,20 @@ function AddAllToCartButton({ products, onAddAll, onViewCart }) {
       >
         {added ? (
           <Svg width={18} height={18} viewBox="0 0 24 24" fill="none"
-            stroke={iconColor} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"
+            stroke={iconColor} strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round"
             style={{ marginRight: 8 }}>
             <Polyline points="20 6 9 17 4 12" />
           </Svg>
         ) : (
           <Svg width={18} height={18} viewBox="0 0 24 24" fill="none"
-            stroke={iconColor} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"
+            stroke={iconColor} strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round"
             style={{ marginRight: 8 }}>
             <Path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" />
             <Line x1={3} y1={6} x2={21} y2={6} />
             <Path d="M16 10a4 4 0 01-8 0" />
           </Svg>
         )}
-        <Text style={{ color: iconColor, fontSize: 15, fontWeight: '700', letterSpacing: 0.3, fontFamily: 'KantumruyPro_700Bold' }}>
+        <Text style={{ color: iconColor, fontSize: 15, fontWeight: '700', letterSpacing: 0.3, fontFamily: 'Geist_700Bold' }}>
           {added ? 'View Cart' : 'Add All to Cart'}
         </Text>
       </TouchableOpacity>
@@ -631,7 +567,7 @@ function buildEnrichedPrompt(userPrompt, products) {
 
 function ChevronRight({ color = '#fff' }) {
   return (
-    <Svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
+    <Svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round">
       <Polyline points="9 18 15 12 9 6" />
     </Svg>
   );
@@ -639,7 +575,7 @@ function ChevronRight({ color = '#fff' }) {
 
 function HeartIcon({ size = 12, color = '#fff' }) {
   return (
-    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round">
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round">
       <Path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
     </Svg>
   );
@@ -647,7 +583,7 @@ function HeartIcon({ size = 12, color = '#fff' }) {
 
 function SparkleIcon({ size = 14, color = C.primary }) {
   return (
-    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round">
       <Path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
     </Svg>
   );
@@ -658,11 +594,11 @@ function PaperPlaneIcon({ size = 14, color = '#fff' }) {
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       <Path
         d="M22 2L11 13"
-        stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"
+        stroke={color} strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round"
       />
       <Path
         d="M22 2L15 22L11 13L2 9L22 2Z"
-        stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"
+        stroke={color} strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round"
       />
     </Svg>
   );
@@ -670,7 +606,7 @@ function PaperPlaneIcon({ size = 14, color = '#fff' }) {
 
 function TagIcon({ size = 13, color = '#F59E0B' }) {
   return (
-    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round">
       <Path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" />
       <Line x1={7} y1={7} x2={7.01} y2={7} />
     </Svg>
@@ -731,7 +667,7 @@ const amazonBadgeStyle = StyleSheet.create({
   wordmark: {
     fontSize: 11,
     fontWeight: '800',
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
     color: '#232F3E',
     letterSpacing: -0.3,
     lineHeight: 13,
@@ -860,12 +796,43 @@ export default function HomeScreen({ navigation, route }) {
   const springIn  = (anim) => Animated.spring(anim, { toValue: 0.82, useNativeDriver: true, tension: 300, friction: 10 }).start();
   const springOut = (anim) => Animated.spring(anim, { toValue: 1,    useNativeDriver: true, tension: 200, friction: 7  }).start();
 
-  // Scroll-driven parallax
-  // Parallax — plain JS setValue, no native driver needed
-  const scrollY    = useRef(new Animated.Value(0)).current;
-  const bgParallax = useRef(
-    scrollY.interpolate({ inputRange: [0, 600], outputRange: [0, -300], extrapolate: 'clamp' }),
-  ).current;
+  // ── Hero slideshow — sequential timeout chain (no setInterval race) ──────
+  // Uses setTimeout chaining so each transition completes fully before the
+  // next one starts. Prevents duplicate/skipped images from timer overlap.
+  const heroOpacities = useRef(HERO_IMAGES.map((_, i) => new Animated.Value(i === 0 ? 1 : 0))).current;
+  const heroCurrentIdx = useRef(0);
+  const heroTimerRef = useRef(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const scheduleNext = () => {
+      heroTimerRef.current = setTimeout(() => {
+        if (cancelled) return;
+        const currentIdx = heroCurrentIdx.current;
+        const nextIdx = (currentIdx + 1) % HERO_IMAGES.length;
+
+        // Fade in next image on top of current
+        Animated.timing(heroOpacities[nextIdx], {
+          toValue: 1,
+          duration: HERO_FADE_MS,
+          useNativeDriver: true,
+        }).start(() => {
+          if (cancelled) return;
+          // Hide old image, update index, schedule next
+          heroOpacities[currentIdx].setValue(0);
+          heroCurrentIdx.current = nextIdx;
+          scheduleNext();
+        });
+      }, HERO_INTERVAL);
+    };
+
+    scheduleNext();
+    return () => { cancelled = true; clearTimeout(heroTimerRef.current); };
+  }, []);
+
+  // Scroll ref (used by other scroll-dependent logic)
+  const scrollY = useRef(new Animated.Value(0)).current;
 
   // ── Personalization ─────────────────────────────────────────────────────────
 
@@ -1436,14 +1403,18 @@ export default function HomeScreen({ navigation, route }) {
 
   return (
     <TabScreenFade style={styles.container}>
-      {/* Parallax hero background */}
-      <Animated.View style={[styles.bgImage, { transform: [{ translateY: bgParallax }] }]}>
-        <Image
-          source={require('../../assets/snap-bg.jpg')}
-          style={{ width: '100%', height: '100%' }}
-          resizeMode="cover"
-        />
-      </Animated.View>
+      {/* Hero background — crossfading slideshow */}
+      <View style={styles.bgImage}>
+        {HERO_IMAGES.map((src, i) => (
+          <Animated.View key={i} style={[StyleSheet.absoluteFill, { opacity: heroOpacities[i], justifyContent: 'center' }]}>
+            <Image
+              source={src}
+              style={{ width: '100%', height: '100%' }}
+              resizeMode="cover"
+            />
+          </Animated.View>
+        ))}
+      </View>
       <View style={styles.heroTint} pointerEvents="none" />
 
       <ScrollView
@@ -1652,7 +1623,7 @@ export default function HomeScreen({ navigation, route }) {
                   {generating ? (
                     <Animated.View style={{ transform: [{ rotate: lensRotate.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '360deg'] }) }] }}>
                       <Svg width={20} height={20} viewBox="0 0 24 24">
-                        <Circle cx={12} cy={12} r={10} stroke="#fff" strokeWidth={1.8} fill="none" strokeDasharray="6 4" strokeLinecap="round" />
+                        <Circle cx={12} cy={12} r={10} stroke="#fff" strokeWidth={1.2} fill="none" strokeDasharray="6 4" strokeLinecap="round" />
                         <Circle cx={12} cy={12} r={5}  stroke="rgba(255,255,255,0.55)" strokeWidth={1} fill="none" />
                         <Circle cx={12} cy={12} r={2}  fill="#fff" />
                       </Svg>
@@ -1952,7 +1923,7 @@ export default function HomeScreen({ navigation, route }) {
                     <TouchableOpacity style={resultStyles.shopHeaderBtn} onPress={handleDownload} activeOpacity={0.7}>
                       <DownloadIcon size={22} />
                     </TouchableOpacity>
-                    <TouchableOpacity style={resultStyles.shopHeaderBtnPost} onPress={() => setShowPostSheet(true)} activeOpacity={0.7}>
+                    <TouchableOpacity style={resultStyles.shopHeaderBtnPost} onPress={() => setShowPostSheet(true)} activeOpacity={0.7} hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}>
                       {posting
                         ? <LensLoader size={20} color="#fff" light="#fff" />
                         : <PostIcon size={28} />
@@ -2014,6 +1985,7 @@ export default function HomeScreen({ navigation, route }) {
                           <TouchableOpacity
                             style={[resultStyles.hCardAdd, inCart && resultStyles.hCardAddDone]}
                             activeOpacity={0.7}
+                            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                             onPress={() => {
                               if (!inCart) {
                                 addToCart({ ...product, price: product.priceValue ?? product.price });
@@ -2025,7 +1997,7 @@ export default function HomeScreen({ navigation, route }) {
                                 <Polyline points="20 6 9 17 4 12" />
                               </Svg>
                             ) : (
-                              <Svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="#0B6DC3" strokeWidth={2.5}>
+                              <Svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="#0B6DC3" strokeWidth={1.2}>
                                 <Line x1={12} y1={5} x2={12} y2={19} />
                                 <Line x1={5} y1={12} x2={19} y2={12} />
                               </Svg>
@@ -2078,7 +2050,7 @@ export default function HomeScreen({ navigation, route }) {
                   activeOpacity={0.7}
                 >
                   <View style={[resultStyles.sheetOptionIcon, { backgroundColor: '#EFF6FF' }]}>
-                    <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="#0B6DC3" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+                    <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="#0B6DC3" strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round">
                       <Circle cx={12} cy={12} r={10} />
                       <Line x1={2} y1={12} x2={22} y2={12} />
                       <Path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
@@ -2096,7 +2068,7 @@ export default function HomeScreen({ navigation, route }) {
                   activeOpacity={0.7}
                 >
                   <View style={[resultStyles.sheetOptionIcon, { backgroundColor: '#F3F4F6' }]}>
-                    <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="#6B7280" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+                    <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="#6B7280" strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round">
                       <Rect x={3} y={11} width={18} height={11} rx={2} ry={2} />
                       <Path d="M7 11V7a5 5 0 0 1 10 0v4" />
                     </Svg>
@@ -2110,6 +2082,7 @@ export default function HomeScreen({ navigation, route }) {
                 <TouchableOpacity
                   style={resultStyles.sheetCancel}
                   onPress={() => setShowPostSheet(false)}
+                  activeOpacity={0.7}
                 >
                   <Text style={resultStyles.sheetCancelText}>Cancel</Text>
                 </TouchableOpacity>
@@ -2128,7 +2101,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     overflow: 'hidden',
-    backgroundColor: '#035DA8', // dark fallback — no white flash at bottom
+    backgroundColor: '#000000',
   },
   bgImage: {
     position: 'absolute',
@@ -2136,11 +2109,11 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     width: width,
-    height: height + 300, // extra 300px so parallax upward drift never reveals background
+    height: height - 88, // hero section = screen height minus tab bar
   },
   heroTint: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0,0,0,0.35)',
+    backgroundColor: 'rgba(0,0,0,0.40)',
   },
   scrollContent: {
     flexGrow: 1,
@@ -2167,7 +2140,7 @@ const styles = StyleSheet.create({
   logo: {
     fontSize: fontSize.lg,
     fontWeight: fontWeight.bold,
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
     color: '#FFFFFF',
     letterSpacing: letterSpacing.tight,
   },
@@ -2201,7 +2174,7 @@ const styles = StyleSheet.create({
   heroSubtitle: {
     fontSize: 16,
     fontWeight: '600',
-    fontFamily: 'KantumruyPro_600SemiBold',
+    fontFamily: 'Geist_600SemiBold',
     color: '#FFFFFF',
     lineHeight: 22,
     marginTop: 6,
@@ -2223,9 +2196,9 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.22)',
   },
-  floatingPillOn: { backgroundColor: '#0B6DC3', borderColor: '#0B6DC3' },
-  floatingPillText: { fontSize: 13, fontWeight: '500', color: 'rgba(255,255,255,0.85)', fontFamily: 'KantumruyPro_500Medium'},
-  floatingPillTextOn: { color: '#fff', fontWeight: '600', fontFamily: 'KantumruyPro_600SemiBold'},
+  floatingPillOn: { backgroundColor: C.primary, borderColor: C.primary },
+  floatingPillText: { fontSize: 13, fontWeight: '500', color: 'rgba(255,255,255,0.85)', fontFamily: 'Geist_500Medium'},
+  floatingPillTextOn: { color: '#fff', fontWeight: '600', fontFamily: 'Geist_600SemiBold'},
 
   // Photo preview
   photoPreviewWrap: {
@@ -2244,14 +2217,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 10,
   },
-  photoOverlayText: { color: '#fff', fontSize: 13, fontWeight: '600', fontFamily: 'KantumruyPro_600SemiBold'},
+  photoOverlayText: { color: '#fff', fontSize: 13, fontWeight: '600', fontFamily: 'Geist_600SemiBold'},
   photoRemoveBtn: {
     position: 'absolute', top: 8, right: 8,
     width: 26, height: 26, borderRadius: 13,
     backgroundColor: 'rgba(0,0,0,0.5)',
     alignItems: 'center', justifyContent: 'center',
   },
-  photoRemoveX: { color: '#fff', fontSize: 11, fontWeight: '700', fontFamily: 'KantumruyPro_700Bold'},
+  photoRemoveX: { color: '#fff', fontSize: 11, fontWeight: '700', fontFamily: 'Geist_700Bold'},
 
   // Prompt chips
   promptChipsScroll: {
@@ -2273,7 +2246,7 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 10,
     fontWeight: '500',
-    fontFamily: 'KantumruyPro_500Medium',
+    fontFamily: 'Geist_500Medium',
   },
 
   // Input bar — pinned to hero bottom via absolute positioning
@@ -2303,14 +2276,14 @@ const styles = StyleSheet.create({
   inputText: {
     flex: 1,
     fontSize: 15,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: '#fff',
     paddingVertical: 0,
     paddingHorizontal: 6,
   },
   inputSendBtn: {
     width: 34, height: 34, borderRadius: 17,
-    backgroundColor: '#0B6DC3',
+    backgroundColor: C.primary,
     alignItems: 'center', justifyContent: 'center',
   },
   inputSendBtnOff: {
@@ -2319,7 +2292,7 @@ const styles = StyleSheet.create({
   headline: {
     fontSize: 38,
     fontWeight: fontWeight.xbold,
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
     color: '#FFFFFF',
     lineHeight: 40,
     letterSpacing: letterSpacing.tight,
@@ -2328,12 +2301,12 @@ const styles = StyleSheet.create({
     textShadowOffset: { width: 0, height: 2 },
     textShadowRadius: 12,
   },
-  headlineBold: { fontWeight: fontWeight.xbold, fontFamily: 'KantumruyPro_700Bold'},
+  headlineBold: { fontWeight: fontWeight.xbold, fontFamily: 'Geist_700Bold'},
   genStatusText: {
     color: '#fff',
     fontSize: 14,
     fontWeight: '400',
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     marginTop: 20,
     textAlign: 'center',
     textShadowColor: 'rgba(0,0,0,0.4)',
@@ -2367,11 +2340,11 @@ const styles = StyleSheet.create({
   snapBannerText: { flex: 1 },
   snapBannerTitle: {
     ...typeScale.headline,
-    fontFamily: 'KantumruyPro_600SemiBold',
+    fontFamily: 'Geist_600SemiBold',
     color: '#FFFFFF',
     marginBottom: space.xs,
   },
-  snapBannerSub: { ...typeScale.caption, color: 'rgba(255,255,255,0.5)', fontFamily: 'KantumruyPro_400Regular'},
+  snapBannerSub: { ...typeScale.caption, color: 'rgba(255,255,255,0.5)', fontFamily: 'Geist_400Regular'},
   snapChevron: {
     width: space['2xl'],
     height: space['2xl'],
@@ -2383,7 +2356,7 @@ const styles = StyleSheet.create({
 
   // ── Peeled card — slides over hero bottom ────────────────────────────────────
   peeledCard: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: C.white,
     borderTopLeftRadius: 28,
     borderTopRightRadius: 28,
     marginTop: -28,
@@ -2413,7 +2386,7 @@ const styles = StyleSheet.create({
   dnaTitle: {
     fontSize: 13,
     fontWeight: '700',
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
     color: C.textTertiary,
     letterSpacing: 1.5,
     textTransform: 'uppercase',
@@ -2421,7 +2394,7 @@ const styles = StyleSheet.create({
   dnaSeeAll: {
     fontSize: 14,
     fontWeight: '600',
-    fontFamily: 'KantumruyPro_600SemiBold',
+    fontFamily: 'Geist_600SemiBold',
     color: C.primary,
   },
   dnaChipsRow: {
@@ -2439,12 +2412,12 @@ const styles = StyleSheet.create({
   },
   dnaChipText: {
     ...typeScale.micro,
-    fontFamily: 'KantumruyPro_600SemiBold',
+    fontFamily: 'Geist_600SemiBold',
     textTransform: undefined, // override — chips show mixed case, not all-caps
   },
   dnaNote: {
     ...typeScale.caption,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: C.textTertiary,
     marginLeft: 4,
   },
@@ -2464,7 +2437,7 @@ const styles = StyleSheet.create({
   },
   discoverBtnText: {
     ...typeScale.body,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: C.textSecondary,
     flex: 1,
   },
@@ -2485,7 +2458,7 @@ const styles = StyleSheet.create({
   roomNavLabel: {
     fontSize: 13,
     fontWeight: '700',
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
     color: C.textTertiary,
     letterSpacing: 1.5,
     textTransform: 'uppercase',
@@ -2506,7 +2479,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: -6,
     right: -8,
-    backgroundColor: '#0B6DC3',
+    backgroundColor: C.primary,
     borderRadius: 6,
     paddingHorizontal: 5,
     paddingVertical: 2.5,
@@ -2517,7 +2490,7 @@ const styles = StyleSheet.create({
   roomNavNewBadgeText: {
     fontSize: 8,
     fontWeight: '800',
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
     color: '#FFFFFF',
     letterSpacing: 0.5,
   },
@@ -2525,23 +2498,23 @@ const styles = StyleSheet.create({
     width: 58,
     height: 58,
     borderRadius: radius.sm,
-    backgroundColor: '#F3F4F6',
+    backgroundColor: C.surface2,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
     borderColor: C.border,
   },
-  roomNavEmoji: { fontSize: 22, fontFamily: 'KantumruyPro_400Regular'},
+  roomNavEmoji: { fontSize: 22, fontFamily: 'Geist_400Regular'},
   roomNavItemLabel: {
     ...typeScale.caption,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: C.textSecondary,
     textAlign: 'center',
   },
 
   // ── Shared section shell ─────────────────────────────────────────────────────
   section: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: C.white,
     paddingTop: space.lg,
     paddingBottom: space.xl,
     borderTopWidth: 1,
@@ -2561,7 +2534,7 @@ const styles = StyleSheet.create({
   sectionLabel: {
     fontSize: 13,
     fontWeight: '700',
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
     color: C.textTertiary,
     letterSpacing: 1.5,
     textTransform: 'uppercase',
@@ -2569,18 +2542,18 @@ const styles = StyleSheet.create({
   sectionSeeAll: {
     fontSize: 14,
     fontWeight: '600',
-    fontFamily: 'KantumruyPro_600SemiBold',
+    fontFamily: 'Geist_600SemiBold',
     color: C.primary,
   },
   sectionClear: {
     fontSize: fontSize.sm,
     fontWeight: fontWeight.medium,
-    fontFamily: 'KantumruyPro_500Medium',
+    fontFamily: 'Geist_500Medium',
     color: C.textTertiary,
   },
   sectionSub: {
     ...typeScale.caption,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: C.textTertiary,
     paddingHorizontal: space.lg,
     marginBottom: space.md,
@@ -2595,7 +2568,7 @@ const styles = StyleSheet.create({
   forYouCard: {
     width: ARRIVAL_CARD_W,
     borderRadius: 6,
-    backgroundColor: '#fff',
+    backgroundColor: C.white,
     ...shadow.low,
   },
   forYouImgWrap: {
@@ -2629,14 +2602,14 @@ const styles = StyleSheet.create({
   forYouInfoCreator: {
     fontSize: 10,
     fontWeight: '600',
-    fontFamily: 'KantumruyPro_600SemiBold',
+    fontFamily: 'Geist_600SemiBold',
     color: palette.primaryBlue,
     letterSpacing: 0.1,
   },
   forYouCardTitle: {
     ...typeScale.caption,
     fontWeight: fontWeight.semibold,
-    fontFamily: 'KantumruyPro_600SemiBold',
+    fontFamily: 'Geist_600SemiBold',
     color: palette.textPrimary,
     lineHeight: 16,
   },
@@ -2680,7 +2653,7 @@ const styles = StyleSheet.create({
   },
   collectionCardTitle: {
     ...typeScale.headline,
-    fontFamily: 'KantumruyPro_600SemiBold',
+    fontFamily: 'Geist_600SemiBold',
     color: '#fff',
     letterSpacing: letterSpacing.tight,
     marginBottom: 4,
@@ -2692,7 +2665,7 @@ const styles = StyleSheet.create({
   },
   collectionCardSub: {
     ...typeScale.caption,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: 'rgba(255,255,255,0.75)',
   },
   collectionExploreBtn: {
@@ -2707,7 +2680,7 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 11,
     fontWeight: '600',
-    fontFamily: 'KantumruyPro_600SemiBold',
+    fontFamily: 'Geist_600SemiBold',
     letterSpacing: 0.2,
   },
   // ── New Arrivals product cards (split: image top, info bottom) ────────────────
@@ -2715,7 +2688,7 @@ const styles = StyleSheet.create({
     width: COLL_CARD_W,
     borderRadius: 6,
     overflow: 'hidden',
-    backgroundColor: '#fff',
+    backgroundColor: C.white,
     borderWidth: 1,
     borderColor: 'rgba(0,0,0,0.07)',
     ...shadow.low,
@@ -2734,7 +2707,7 @@ const styles = StyleSheet.create({
     ...typeScale.caption,
     color: palette.textPrimary,
     fontWeight: '600',
-    fontFamily: 'KantumruyPro_600SemiBold',
+    fontFamily: 'Geist_600SemiBold',
     lineHeight: 16,
   },
   newArrivalCardFooter: {
@@ -2745,7 +2718,7 @@ const styles = StyleSheet.create({
   },
   newArrivalCardBrand: {
     ...typeScale.caption,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: palette.textSecondary,
     flex: 1,
   },
@@ -2753,13 +2726,13 @@ const styles = StyleSheet.create({
     ...typeScale.caption,
     color: palette.primaryBlue,
     fontWeight: '700',
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
   },
   trendingViewLook: {
     ...typeScale.caption,
     color: palette.primaryBlue,
     fontWeight: '600',
-    fontFamily: 'KantumruyPro_600SemiBold',
+    fontFamily: 'Geist_600SemiBold',
   },
   productRatingRow: {
     flexDirection: 'row',
@@ -2769,7 +2742,7 @@ const styles = StyleSheet.create({
   },
   productStars: {
     fontSize: 11,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: '#67ACE9',
     letterSpacing: 1,
   },
@@ -2777,14 +2750,14 @@ const styles = StyleSheet.create({
     fontSize: 11,
     color: palette.textSecondary,
     fontWeight: '400',
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
   },
 
   // ── Shop By Style cards ──────────────────────────────────────────────────────
   styleCard: {
     width: STYLE_CARD_W,
     borderRadius: 6,
-    backgroundColor: '#fff',
+    backgroundColor: C.white,
     ...shadow.low,
   },
   styleCardImgWrap: {
@@ -2793,7 +2766,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 6,
     borderTopRightRadius: 6,
     overflow: 'hidden',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: C.white,
   },
   styleCardInfoBox: {
     paddingHorizontal: 8,
@@ -2806,14 +2779,14 @@ const styles = StyleSheet.create({
   styleCardLabel: {
     fontSize: 12,
     fontWeight: fontWeight.bold,
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
     color: palette.textPrimary,
     letterSpacing: 0.1,
   },
   styleCardSub: {
     fontSize: 10,
     fontWeight: '400',
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: palette.primaryBlue,
   },
 
@@ -2844,13 +2817,13 @@ const styles = StyleSheet.create({
   trendCardTitle: {
     ...typeScale.body,
     fontWeight: '700',
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
     color: C.textPrimary,
     marginBottom: 2,
   },
   trendCardTag: {
     ...typeScale.caption,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: C.textSecondary,
   },
 
@@ -2877,7 +2850,7 @@ const styles = StyleSheet.create({
   dealEyebrow: {
     fontSize: 10,
     fontWeight: fontWeight.semibold,
-    fontFamily: 'KantumruyPro_600SemiBold',
+    fontFamily: 'Geist_600SemiBold',
     letterSpacing: 2,
     textTransform: 'uppercase',
     color: 'rgba(0,0,0,0.38)',
@@ -2886,7 +2859,7 @@ const styles = StyleSheet.create({
   dealCard: {
     borderRadius: 10,
     overflow: 'hidden',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: C.white,
     borderWidth: 1,
     borderColor: 'rgba(0,0,0,0.09)',
     ...shadow.medium,
@@ -2923,7 +2896,7 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 9,
     fontWeight: fontWeight.bold,
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
     letterSpacing: 1.2,
     textTransform: 'uppercase',
   },
@@ -2937,7 +2910,7 @@ const styles = StyleSheet.create({
   dealBrand: {
     fontSize: 10,
     fontWeight: fontWeight.bold,
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
     letterSpacing: 1.4,
     color: palette.primaryBlue,
     textTransform: 'uppercase',
@@ -2945,7 +2918,7 @@ const styles = StyleSheet.create({
   dealProductName: {
     fontSize: 17,
     fontWeight: fontWeight.bold,
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
     color: palette.textPrimary,
     lineHeight: 23,
     letterSpacing: -0.2,
@@ -2953,7 +2926,7 @@ const styles = StyleSheet.create({
   dealDescription: {
     fontSize: 13,
     fontWeight: fontWeight.regular,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: palette.textSecondary,
     lineHeight: 19,
     marginTop: 1,
@@ -2967,20 +2940,20 @@ const styles = StyleSheet.create({
   dealRatingScore: {
     fontSize: 13,
     fontWeight: fontWeight.semibold,
-    fontFamily: 'KantumruyPro_600SemiBold',
+    fontFamily: 'Geist_600SemiBold',
     color: palette.textPrimary,
     marginLeft: 3,
   },
   dealReviewCount: {
     fontSize: 12,
     fontWeight: fontWeight.regular,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: palette.textSecondary,
   },
   dealSourceTag: {
     fontSize: 11,
     fontWeight: fontWeight.medium,
-    fontFamily: 'KantumruyPro_500Medium',
+    fontFamily: 'Geist_500Medium',
     color: palette.textTertiary,
     marginLeft: 4,
   },
@@ -2993,14 +2966,14 @@ const styles = StyleSheet.create({
   dealPrice: {
     fontSize: 28,
     fontWeight: fontWeight.xbold,
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
     color: palette.textPrimary,
     letterSpacing: -0.5,
   },
   dealPriceOrig: {
     fontSize: 14,
     fontWeight: fontWeight.regular,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: palette.textSecondary,
     textDecorationLine: 'line-through',
   },
@@ -3018,7 +2991,7 @@ const styles = StyleSheet.create({
   dealShopBtnText: {
     fontSize: 15,
     fontWeight: fontWeight.semibold,
-    fontFamily: 'KantumruyPro_600SemiBold',
+    fontFamily: 'Geist_600SemiBold',
     color: '#FFFFFF',
     letterSpacing: 0.1,
   },
@@ -3027,7 +3000,7 @@ const styles = StyleSheet.create({
   arrivalCard: {
     width: ARRIVAL_CARD_W,
     borderRadius: radius.md,
-    backgroundColor: '#fff',
+    backgroundColor: C.white,
     ...shadow.low,
   },
   arrivalNewBadge: {
@@ -3039,16 +3012,12 @@ const styles = StyleSheet.create({
     borderRadius: radius.sm,
     paddingHorizontal: 10,
     paddingVertical: 4,
-    shadowColor: palette.primaryBlue,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.35,
-    shadowRadius: 4,
-    elevation: 4,
+    ...shadow.low,
   },
   arrivalNewBadgeText: {
     fontSize: 10,
     fontWeight: '800',
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
     color: '#fff',
     letterSpacing: 1.2,
   },
@@ -3071,14 +3040,14 @@ const styles = StyleSheet.create({
   arrivalInfoCreator: {
     fontSize: 10,
     fontWeight: '600',
-    fontFamily: 'KantumruyPro_600SemiBold',
+    fontFamily: 'Geist_600SemiBold',
     color: palette.primaryBlue,
     letterSpacing: 0.1,
   },
   arrivalInfoTitle: {
     ...typeScale.caption,
     fontWeight: fontWeight.semibold,
-    fontFamily: 'KantumruyPro_600SemiBold',
+    fontFamily: 'Geist_600SemiBold',
     color: palette.textPrimary,
     lineHeight: 16,
   },
@@ -3105,14 +3074,14 @@ const styles = StyleSheet.create({
   },
   recentCardTitle: {
     ...typeScale.caption,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: C.textPrimary,
   },
 
   // ── Featured Product cards ───────────────────────────────────────────────────
   affiliateDisclosure: {
     ...typeScale.caption,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: C.textTertiary,
     paddingHorizontal: space.lg,
     marginBottom: space.sm,
@@ -3145,7 +3114,7 @@ const styles = StyleSheet.create({
   featuredProductCard: {
     width: COLL_CARD_W,
     borderRadius: 6,
-    backgroundColor: '#fff',
+    backgroundColor: C.white,
     borderWidth: 1,
     borderColor: 'rgba(0,0,0,0.07)',
     overflow: 'hidden',
@@ -3172,7 +3141,7 @@ const styles = StyleSheet.create({
   featuredProductName: {
     ...typeScale.caption,
     fontWeight: fontWeight.semibold,
-    fontFamily: 'KantumruyPro_600SemiBold',
+    fontFamily: 'Geist_600SemiBold',
     color: palette.textPrimary,
     lineHeight: 17,
   },
@@ -3183,14 +3152,14 @@ const styles = StyleSheet.create({
   },
   featuredProductPrice: {
     ...typeScale.price,
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
     color: palette.textPrimary,
   },
   featuredShopLink: {
     ...typeScale.caption,
     color: palette.primaryBlue,
     fontWeight: '600',
-    fontFamily: 'KantumruyPro_600SemiBold',
+    fontFamily: 'Geist_600SemiBold',
   },
 
   quickAddBtn: {
@@ -3208,18 +3177,18 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 20,
     fontWeight: '700',
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
     lineHeight: 24,
   },
   productCardName: {
     ...typeScale.headline,
-    fontFamily: 'KantumruyPro_600SemiBold',
+    fontFamily: 'Geist_600SemiBold',
     color: C.textPrimary,
     marginBottom: 2,
   },
   productCardPrice: {
     ...typeScale.price,
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
     color: C.primary,
   },
 
@@ -3233,7 +3202,7 @@ const styles = StyleSheet.create({
     width: 14,
     height: 14,
     borderRadius: 7,
-    backgroundColor: '#0B6DC3',
+    backgroundColor: C.primary,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1.5,
@@ -3260,7 +3229,7 @@ const styles = StyleSheet.create({
 const resultStyles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: C.white,
   },
   imageWrap: {
     position: 'relative',
@@ -3309,8 +3278,8 @@ const resultStyles = StyleSheet.create({
   promptLabel: {
     fontSize: 11,
     fontWeight: '600',
-    fontFamily: 'KantumruyPro_600SemiBold',
-    color: '#9CA3AF',
+    fontFamily: 'Geist_600SemiBold',
+    color: C.textTertiary,
     letterSpacing: 1,
     textTransform: 'uppercase',
     marginTop: 24,
@@ -3319,8 +3288,8 @@ const resultStyles = StyleSheet.create({
   promptText: {
     fontSize: 16,
     fontWeight: '500',
-    fontFamily: 'KantumruyPro_500Medium',
-    color: '#111827',
+    fontFamily: 'Geist_500Medium',
+    color: C.textPrimary,
     lineHeight: 22,
     marginTop: 6,
     marginHorizontal: 20,
@@ -3345,7 +3314,7 @@ const resultStyles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: '#F3F4F6',
+    backgroundColor: C.surface2,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -3358,22 +3327,22 @@ const resultStyles = StyleSheet.create({
   productsTitle: {
     fontSize: 13,
     fontWeight: '700',
-    fontFamily: 'KantumruyPro_700Bold',
-    color: '#9CA3AF',
+    fontFamily: 'Geist_700Bold',
+    color: C.textTertiary,
     letterSpacing: 1.5,
     textTransform: 'uppercase',
   },
   productsSubtitle: {
     fontSize: 14,
     fontWeight: '400',
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: '#67ACE9',
     marginTop: 4,
   },
   // ── Horizontal product cards ──
   hCard: {
     width: 170,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: C.white,
     borderRadius: 10,
     borderWidth: 1,
     borderColor: 'rgba(0,0,0,0.06)',
@@ -3382,7 +3351,7 @@ const resultStyles = StyleSheet.create({
   hCardImg: {
     width: '100%',
     height: 150,
-    backgroundColor: '#F3F4F6',
+    backgroundColor: C.surface2,
   },
   hCardBody: {
     padding: 10,
@@ -3392,15 +3361,15 @@ const resultStyles = StyleSheet.create({
   hCardName: {
     fontSize: 13,
     fontWeight: '600',
-    fontFamily: 'KantumruyPro_600SemiBold',
-    color: '#111827',
+    fontFamily: 'Geist_600SemiBold',
+    color: C.textPrimary,
     lineHeight: 17,
   },
   hCardBrand: {
     fontSize: 11,
     fontWeight: '400',
-    fontFamily: 'KantumruyPro_400Regular',
-    color: '#9CA3AF',
+    fontFamily: 'Geist_400Regular',
+    color: C.textTertiary,
     marginTop: 1,
   },
   hCardRating: {
@@ -3412,20 +3381,20 @@ const resultStyles = StyleSheet.create({
   hCardRatingText: {
     fontSize: 10,
     fontWeight: '600',
-    fontFamily: 'KantumruyPro_600SemiBold',
-    color: '#111827',
+    fontFamily: 'Geist_600SemiBold',
+    color: C.textPrimary,
     marginLeft: 2,
   },
   hCardReviews: {
     fontSize: 10,
-    fontFamily: 'KantumruyPro_400Regular',
-    color: '#6B7280',
+    fontFamily: 'Geist_400Regular',
+    color: C.textSecondary,
   },
   hCardPrice: {
     fontSize: 15,
     fontWeight: '700',
-    fontFamily: 'KantumruyPro_700Bold',
-    color: '#0B6DC3',
+    fontFamily: 'Geist_700Bold',
+    color: C.primary,
     marginTop: 4,
   },
   hCardAdd: {
@@ -3436,20 +3405,20 @@ const resultStyles = StyleSheet.create({
     height: 28,
     borderRadius: 14,
     borderWidth: 1.5,
-    borderColor: '#0B6DC3',
+    borderColor: C.primary,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: C.white,
   },
   hCardAddDone: {
-    backgroundColor: '#0B6DC3',
-    borderColor: '#0B6DC3',
+    backgroundColor: C.primary,
+    borderColor: C.primary,
   },
   disclosure: {
     fontSize: 11,
     fontWeight: '400',
-    fontFamily: 'KantumruyPro_400Regular',
-    color: '#9CA3AF',
+    fontFamily: 'Geist_400Regular',
+    color: C.textTertiary,
     fontStyle: 'italic',
     textAlign: 'center',
     marginTop: 16,
@@ -3461,7 +3430,7 @@ const resultStyles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.45)',
   },
   sheet: {
-    backgroundColor: '#fff',
+    backgroundColor: C.white,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     paddingHorizontal: 20,
@@ -3479,15 +3448,15 @@ const resultStyles = StyleSheet.create({
   sheetTitle: {
     fontSize: 18,
     fontWeight: '700',
-    fontFamily: 'KantumruyPro_700Bold',
-    color: '#111827',
+    fontFamily: 'Geist_700Bold',
+    color: C.textPrimary,
     textAlign: 'center',
   },
   sheetSubtitle: {
     fontSize: 14,
     fontWeight: '400',
-    fontFamily: 'KantumruyPro_400Regular',
-    color: '#6B7280',
+    fontFamily: 'Geist_400Regular',
+    color: C.textSecondary,
     textAlign: 'center',
     marginTop: 4,
     marginBottom: 24,
@@ -3511,14 +3480,14 @@ const resultStyles = StyleSheet.create({
   sheetOptionTitle: {
     fontSize: 15,
     fontWeight: '600',
-    fontFamily: 'KantumruyPro_600SemiBold',
-    color: '#111827',
+    fontFamily: 'Geist_600SemiBold',
+    color: C.textPrimary,
   },
   sheetOptionDesc: {
     fontSize: 13,
     fontWeight: '400',
-    fontFamily: 'KantumruyPro_400Regular',
-    color: '#6B7280',
+    fontFamily: 'Geist_400Regular',
+    color: C.textSecondary,
     marginTop: 2,
   },
   sheetCancel: {
@@ -3531,7 +3500,7 @@ const resultStyles = StyleSheet.create({
   sheetCancelText: {
     fontSize: 15,
     fontWeight: '600',
-    fontFamily: 'KantumruyPro_600SemiBold',
-    color: '#6B7280',
+    fontFamily: 'Geist_600SemiBold',
+    color: C.textSecondary,
   },
 });

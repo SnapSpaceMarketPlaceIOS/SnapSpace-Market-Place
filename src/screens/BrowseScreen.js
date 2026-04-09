@@ -164,6 +164,7 @@ export default function BrowseScreen({ navigation, route }) {
             style={[styles.floatingBack, { top: insets.top + 12 }]}
             onPress={() => navigation.goBack()}
             activeOpacity={0.8}
+            hitSlop={{ top: 4, bottom: 4, left: 4, right: 4 }}
           >
             <BackIcon />
           </TouchableOpacity>
@@ -293,7 +294,7 @@ export default function BrowseScreen({ navigation, route }) {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: C.white,
   },
   scrollContent: {
     flexGrow: 1,
@@ -334,22 +335,22 @@ const styles = StyleSheet.create({
   pageTitle: {
     fontSize: 24,
     fontWeight: '800',
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
     color: colors.bluePrimary,
     letterSpacing: letterSpacing.tight,
     marginBottom: 4,
   },
   pageSub: {
     ...typeScale.caption,
-    fontFamily: 'KantumruyPro_400Regular',
-    color: '#6B7280',
+    fontFamily: 'Geist_400Regular',
+    color: C.textSecondary,
   },
 
   // ── Sections ──────────────────────────────────────────────────────────────
   section: {
     paddingTop: space.lg,
     paddingBottom: space.xl,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: C.white,
   },
   sectionAlt: {
     backgroundColor: '#F8F9FA',
@@ -358,7 +359,7 @@ const styles = StyleSheet.create({
   },
   affiliateNote: {
     ...typeScale.caption,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: C.textTertiary,
     paddingHorizontal: space.lg,
     marginBottom: space.sm,
@@ -379,7 +380,7 @@ const styles = StyleSheet.create({
     width: CARD_W,
     borderRadius: Math.round(CARD_W * 0.05),
     overflow: 'hidden',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: C.white,
     borderWidth: 1,
     borderColor: 'rgba(0,0,0,0.06)',
     shadowColor: shadow.low.shadowColor,
@@ -400,17 +401,17 @@ const styles = StyleSheet.create({
   designCardBody: {
     padding: space.md,
     gap: 4,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: C.white,
   },
   designCardTitle: {
     ...typeScale.headline,
-    fontFamily: 'KantumruyPro_600SemiBold',
-    color: '#111827',
+    fontFamily: 'Geist_600SemiBold',
+    color: C.textPrimary,
     letterSpacing: letterSpacing.tight,
   },
   designCardLikes: {
     ...typeScale.caption,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: '#9CA3AF',
   },
   designBadge: {
@@ -423,7 +424,7 @@ const styles = StyleSheet.create({
     width: CARD_W,
     borderRadius: Math.round(CARD_W * 0.05),
     overflow: 'hidden',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: C.white,
     borderWidth: 1,
     borderColor: 'rgba(0,0,0,0.06)',
     shadowColor: shadow.low.shadowColor,
@@ -449,18 +450,18 @@ const styles = StyleSheet.create({
   productCardBody: {
     padding: space.md,
     gap: 4,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: C.white,
   },
   productName: {
     ...typeScale.body,
     fontWeight: '600',
-    fontFamily: 'KantumruyPro_600SemiBold',
-    color: '#111827',
+    fontFamily: 'Geist_600SemiBold',
+    color: C.textPrimary,
     lineHeight: 18,
   },
   productPrice: {
     ...typeScale.price,
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
     color: colors.bluePrimary,
   },
   ratingRow: {
@@ -473,7 +474,7 @@ const styles = StyleSheet.create({
     fontSize: 10,
     color: C.textTertiary,
     fontWeight: '500',
-    fontFamily: 'KantumruyPro_500Medium',
+    fontFamily: 'Geist_500Medium',
   },
 
   // ── Empty state ───────────────────────────────────────────────────────────
@@ -484,13 +485,13 @@ const styles = StyleSheet.create({
   },
   emptyTitle: {
     ...typeScale.title,
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
     color: C.textPrimary,
     marginBottom: 8,
   },
   emptyText: {
     ...typeScale.body,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: C.textSecondary,
     textAlign: 'center',
     lineHeight: 22,

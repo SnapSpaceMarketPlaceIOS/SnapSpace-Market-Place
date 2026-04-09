@@ -326,7 +326,7 @@ const s = StyleSheet.create({
   headerTitle: {
     fontSize: 17,
     fontWeight: '700',
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
     color: '#111',
     letterSpacing: -0.3,
   },
@@ -343,7 +343,7 @@ const s = StyleSheet.create({
   heroTitle: {
     fontSize: 28,
     fontWeight: '800',
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
     color: '#0F172A',
     lineHeight: 34,
     letterSpacing: -0.5,
@@ -351,7 +351,7 @@ const s = StyleSheet.create({
   },
   heroSubtitle: {
     fontSize: 15,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: '#67ACE9',
     lineHeight: 22,
   },
@@ -382,12 +382,12 @@ const s = StyleSheet.create({
   benefitTitle: {
     fontSize: 12,
     fontWeight: '700',
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
     color: '#0F172A',
   },
   benefitBody: {
     fontSize: 11,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: '#6B7280',
     lineHeight: 15,
   },
@@ -402,7 +402,7 @@ const s = StyleSheet.create({
   formSectionTitle: {
     fontSize: 13,
     fontWeight: '700',
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
     color: '#9CA3AF',
     letterSpacing: 1.2,
     textTransform: 'uppercase',
@@ -411,13 +411,13 @@ const s = StyleSheet.create({
   label: {
     fontSize: 13,
     fontWeight: '600',
-    fontFamily: 'KantumruyPro_600SemiBold',
+    fontFamily: 'Geist_600SemiBold',
     color: '#374151',
     marginBottom: 8,
     marginTop: 4,
   },
   required: { color: '#EF4444' },
-  optional: { fontWeight: '400', color: '#9CA3AF', fontSize: 12, fontFamily: 'KantumruyPro_400Regular'},
+  optional: { fontWeight: '400', color: '#9CA3AF', fontSize: 12, fontFamily: 'Geist_400Regular'},
 
   input: {
     borderWidth: 1,
@@ -426,7 +426,7 @@ const s = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 13,
     fontSize: 15,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: '#111',
     backgroundColor: '#FAFAFA',
     marginBottom: 16,
@@ -437,7 +437,7 @@ const s = StyleSheet.create({
   },
   charCount: {
     fontSize: 11,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: '#9CA3AF',
     textAlign: 'right',
     marginTop: -12,
@@ -466,13 +466,13 @@ const s = StyleSheet.create({
   pillText: {
     fontSize: 13,
     fontWeight: '500',
-    fontFamily: 'KantumruyPro_500Medium',
+    fontFamily: 'Geist_500Medium',
     color: '#6B7280',
   },
   pillTextActive: {
     color: BLUE,
     fontWeight: '600',
-    fontFamily: 'KantumruyPro_600SemiBold',
+    fontFamily: 'Geist_600SemiBold',
   },
 
   // Terms
@@ -502,14 +502,14 @@ const s = StyleSheet.create({
   termsText: {
     flex: 1,
     fontSize: 13,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: '#6B7280',
     lineHeight: 19,
   },
   termsLink: {
     color: BLUE,
     fontWeight: '600',
-    fontFamily: 'KantumruyPro_600SemiBold',
+    fontFamily: 'Geist_600SemiBold',
   },
 
   // Submit
@@ -525,11 +525,11 @@ const s = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: '700',
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
   },
   footerNote: {
     fontSize: 12,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: '#9CA3AF',
     textAlign: 'center',
     lineHeight: 17,
@@ -546,7 +546,7 @@ const s = StyleSheet.create({
   confirmedTitle: {
     fontSize: 24,
     fontWeight: '800',
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
     color: '#0F172A',
     marginTop: 20,
     marginBottom: 12,
@@ -554,7 +554,7 @@ const s = StyleSheet.create({
   },
   confirmedSubtitle: {
     fontSize: 15,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: '#6B7280',
     lineHeight: 22,
     textAlign: 'center',
@@ -569,7 +569,7 @@ const s = StyleSheet.create({
   },
   confirmedNoteText: {
     fontSize: 13,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: '#6B7280',
     textAlign: 'center',
     lineHeight: 19,
@@ -577,7 +577,7 @@ const s = StyleSheet.create({
   confirmedNoteLink: {
     color: BLUE,
     fontWeight: '600',
-    fontFamily: 'KantumruyPro_600SemiBold',
+    fontFamily: 'Geist_600SemiBold',
   },
   doneBtn: {
     backgroundColor: BLUE,
@@ -591,6 +591,6 @@ const s = StyleSheet.create({
     color: '#fff',
     fontSize: 15,
     fontWeight: '700',
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
   },
 });

@@ -124,7 +124,7 @@ function PostIcon({ color = '#9CA3AF' }) {
 }
 
 // Mini camera-lens loader — matches the generation loading animation
-function MiniLensLoader({ color = '#0B6DC3', size = 24 }) {
+function MiniLensLoader({ color = colors.bluePrimary, size = 24 }) {
   const spin = useRef(new Animated.Value(0)).current;
   useEffect(() => {
     const loop = Animated.loop(
@@ -395,11 +395,11 @@ export default function RoomResultScreen({ route, navigation }) {
 
         {/* ── Header ───────────────────────────────────────────────── */}
         <View style={s.header}>
-          <TouchableOpacity style={s.headerBtn} onPress={() => navigation.goBack()}>
+          <TouchableOpacity style={s.headerBtn} onPress={() => navigation.goBack()} hitSlop={{ top: 4, bottom: 4, left: 4, right: 4 }}>
             <BackIcon />
           </TouchableOpacity>
           <Text style={s.headerTitle}>Room Result</Text>
-          <TouchableOpacity style={s.headerBtn} onPress={() => navigation.navigate('Main', { screen: 'Cart' })}>
+          <TouchableOpacity style={s.headerBtn} onPress={() => navigation.navigate('Main', { screen: 'Cart' })} hitSlop={{ top: 4, bottom: 4, left: 4, right: 4 }}>
             <CartNavIcon />
           </TouchableOpacity>
         </View>
@@ -424,8 +424,8 @@ export default function RoomResultScreen({ route, navigation }) {
               style={[s.iconCircleBtn, downloadActive && s.iconCircleBtnActive]}
             >
               {saving
-                ? <MiniLensLoader color={downloadActive ? '#0B6DC3' : '#9CA3AF'} />
-                : <DownloadIcon color={downloadActive ? '#0B6DC3' : '#9CA3AF'} />}
+                ? <MiniLensLoader color={downloadActive ? colors.bluePrimary : '#9CA3AF'} />
+                : <DownloadIcon color={downloadActive ? colors.bluePrimary : '#9CA3AF'} />}
             </AnimatedIconBtn>
 
             {user && (
@@ -435,8 +435,8 @@ export default function RoomResultScreen({ route, navigation }) {
                 style={s.postIconBtn}
               >
                 {posting
-                  ? <MiniLensLoader color={postActive ? '#0B6DC3' : '#9CA3AF'} />
-                  : <PostIcon color={postActive ? '#0B6DC3' : '#9CA3AF'} />}
+                  ? <MiniLensLoader color={postActive ? colors.bluePrimary : '#9CA3AF'} />
+                  : <PostIcon color={postActive ? colors.bluePrimary : '#9CA3AF'} />}
               </AnimatedIconBtn>
             )}
 
@@ -444,7 +444,7 @@ export default function RoomResultScreen({ route, navigation }) {
               onPress={handleShare}
               style={[s.iconCircleBtn, shareActive && s.iconCircleBtnActive]}
             >
-              <ShareIcon color={shareActive ? '#0B6DC3' : '#9CA3AF'} />
+              <ShareIcon color={shareActive ? colors.bluePrimary : '#9CA3AF'} />
             </AnimatedIconBtn>
           </View>
         </View>
@@ -559,12 +559,14 @@ export default function RoomResultScreen({ route, navigation }) {
               <TouchableOpacity
                 style={[s.toggleBtn, postVisibility === 'public' && s.toggleBtnActive]}
                 onPress={() => setPostVisibility('public')}
+                activeOpacity={0.7}
               >
                 <Text style={[s.toggleText, postVisibility === 'public' && s.toggleTextActive]}>Public</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={[s.toggleBtn, postVisibility === 'private' && s.toggleBtnActive]}
                 onPress={() => setPostVisibility('private')}
+                activeOpacity={0.7}
               >
                 <Text style={[s.toggleText, postVisibility === 'private' && s.toggleTextActive]}>Private</Text>
               </TouchableOpacity>
@@ -574,11 +576,12 @@ export default function RoomResultScreen({ route, navigation }) {
               style={[s.postBtn, posting && { opacity: 0.6 }]}
               onPress={handlePostToProfile}
               disabled={posting}
+              activeOpacity={0.85}
             >
               <Text style={s.postBtnText}>{posting ? 'Posting...' : 'Post to Profile'}</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity onPress={() => setShowPostModal(false)} style={s.cancelBtn}>
+            <TouchableOpacity onPress={() => setShowPostModal(false)} style={s.cancelBtn} activeOpacity={0.7}>
               <Text style={s.cancelBtnText}>Cancel</Text>
             </TouchableOpacity>
           </View>
@@ -591,7 +594,7 @@ export default function RoomResultScreen({ route, navigation }) {
 // ── Styles ───────────────────────────────────────────────────────────────────
 
 const s = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#FFFFFF' },
+  container: { flex: 1, backgroundColor: C.white },
   scrollContent: { paddingTop: space['5xl'], paddingBottom: space['2xl'] },
 
   // ── Header ──
@@ -613,7 +616,7 @@ const s = StyleSheet.create({
   headerTitle: {
     fontSize: 17,
     fontWeight: '700',
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
     color: C.textPrimary,
     letterSpacing: letterSpacing.tight,
   },
@@ -649,12 +652,12 @@ const s = StyleSheet.create({
   actionsInfo: { flex: 1 },
   actionsTitle: {
     ...typeScale.headline,
-    fontFamily: 'KantumruyPro_600SemiBold',
+    fontFamily: 'Geist_600SemiBold',
     color: C.textPrimary,
   },
   actionsSub: {
     ...typeScale.caption,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: C.textSecondary,
     marginTop: 2,
   },
@@ -671,10 +674,10 @@ const s = StyleSheet.create({
     borderColor: '#9CA3AF',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: C.white,
   },
   iconCircleBtnActive: {
-    borderColor: '#0B6DC3',
+    borderColor: colors.bluePrimary,
   },
   postIconBtn: {
     width: 36,
@@ -688,7 +691,7 @@ const s = StyleSheet.create({
   // ── Prompt ──
   promptLabel: {
     ...typeScale.subheadline,
-    fontFamily: 'KantumruyPro_600SemiBold',
+    fontFamily: 'Geist_600SemiBold',
     color: C.textTertiary,
     marginHorizontal: space.lg,
     marginBottom: 4,
@@ -697,7 +700,7 @@ const s = StyleSheet.create({
   promptBody: {
     fontSize: 13,
     fontWeight: '400',
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: '#67ACE9',
     lineHeight: 18,
     marginHorizontal: space.lg,
@@ -718,7 +721,7 @@ const s = StyleSheet.create({
   },
   sectionLabel: {
     ...typeScale.subheadline,
-    fontFamily: 'KantumruyPro_600SemiBold',
+    fontFamily: 'Geist_600SemiBold',
     color: C.textTertiary,
     marginBottom: space.md,
   },
@@ -746,14 +749,14 @@ const s = StyleSheet.create({
   },
   tagText: {
     ...typeScale.caption,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: C.textSecondary,
   },
 
   // ── Horizontal product cards ──
   hCard: {
     width: 170,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: C.white,
     borderRadius: 10,
     borderWidth: 1,
     borderColor: 'rgba(0,0,0,0.06)',
@@ -772,14 +775,14 @@ const s = StyleSheet.create({
   hCardName: {
     fontSize: 13,
     fontWeight: '600',
-    fontFamily: 'KantumruyPro_600SemiBold',
+    fontFamily: 'Geist_600SemiBold',
     color: C.textPrimary,
     lineHeight: 17,
   },
   hCardBrand: {
     fontSize: 11,
     fontWeight: '400',
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: C.textTertiary,
     marginTop: 1,
   },
@@ -792,19 +795,19 @@ const s = StyleSheet.create({
   hCardRatingText: {
     fontSize: 10,
     fontWeight: '600',
-    fontFamily: 'KantumruyPro_600SemiBold',
+    fontFamily: 'Geist_600SemiBold',
     color: C.textPrimary,
     marginLeft: 2,
   },
   hCardReviews: {
     fontSize: 10,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: C.textSecondary,
   },
   hCardPrice: {
     fontSize: 14,
     fontWeight: '700',
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
     color: C.primary,
     marginTop: 4,
   },
@@ -832,7 +835,7 @@ const s = StyleSheet.create({
     paddingHorizontal: space.lg,
     paddingBottom: 34,
     paddingTop: space.md,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: C.white,
     borderTopWidth: 1,
     borderTopColor: C.border,
     shadowColor: '#000',
@@ -867,7 +870,7 @@ const s = StyleSheet.create({
   pillCheck: {
     fontSize: 18,
     fontWeight: '700',
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
     color: '#fff',
   },
   pillMeta: {
@@ -876,21 +879,21 @@ const s = StyleSheet.create({
   pillCount: {
     fontSize: 11,
     fontWeight: '500',
-    fontFamily: 'KantumruyPro_500Medium',
+    fontFamily: 'Geist_500Medium',
     color: 'rgba(255,255,255,0.75)',
     lineHeight: 14,
   },
   pillPrice: {
     fontSize: 15,
     fontWeight: '700',
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
     color: '#fff',
     lineHeight: 18,
   },
   pillAction: {
     fontSize: 15,
     fontWeight: '700',
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
     color: '#fff',
   },
 
@@ -903,7 +906,7 @@ const s = StyleSheet.create({
     padding: 24,
   },
   modalCard: {
-    backgroundColor: '#fff',
+    backgroundColor: C.white,
     borderRadius: 20,
     padding: 24,
     width: '100%',
@@ -913,13 +916,13 @@ const s = StyleSheet.create({
   modalTitle: {
     fontSize: 20,
     fontWeight: '800',
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
     color: '#111',
     marginBottom: 4,
   },
   modalSubtitle: {
     fontSize: 13,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: '#888',
     marginBottom: 16,
   },
@@ -933,7 +936,7 @@ const s = StyleSheet.create({
   modalLabel: {
     fontSize: 13,
     fontWeight: '600',
-    fontFamily: 'KantumruyPro_600SemiBold',
+    fontFamily: 'Geist_600SemiBold',
     color: '#555',
     alignSelf: 'flex-start',
     marginBottom: 8,
@@ -951,7 +954,7 @@ const s = StyleSheet.create({
     flex: 1,
     paddingVertical: 10,
     alignItems: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: C.white,
   },
   toggleBtnActive: {
     backgroundColor: colors.bluePrimary,
@@ -959,7 +962,7 @@ const s = StyleSheet.create({
   toggleText: {
     fontSize: 14,
     fontWeight: '600',
-    fontFamily: 'KantumruyPro_600SemiBold',
+    fontFamily: 'Geist_600SemiBold',
     color: colors.bluePrimary,
   },
   toggleTextActive: {
@@ -977,7 +980,7 @@ const s = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: '700',
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
   },
   cancelBtn: {
     paddingVertical: 8,
@@ -985,7 +988,7 @@ const s = StyleSheet.create({
   cancelBtnText: {
     fontSize: 14,
     fontWeight: '500',
-    fontFamily: 'KantumruyPro_500Medium',
+    fontFamily: 'Geist_500Medium',
     color: '#888',
   },
 });

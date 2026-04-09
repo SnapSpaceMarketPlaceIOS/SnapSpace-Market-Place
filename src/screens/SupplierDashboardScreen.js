@@ -19,12 +19,13 @@ import LensLoader from '../components/LensLoader';
 import Svg, { Path, Circle, Polyline, Rect } from 'react-native-svg';
 import { useAuth } from '../context/AuthContext';
 import { space, radius, fontWeight, fontSize, uiColors, typeScale, shadow } from '../constants/tokens';
+import { colors } from '../constants/colors';
 import { Button, Badge, SectionHeader } from '../components/ds';
 import { VerifiedBadge } from '../components/VerifiedBadge';
 import { Supplier } from '../services/api';
 
-const BLUE = '#0B6DC3';
-const BLUE_DARK = '#0B6DC3';
+const BLUE = colors.bluePrimary;
+const BLUE_DARK = colors.bluePrimary;
 const GREEN = '#16A34A';
 
 // ── Icons ─────────────────────────────────────────────────────────────────────
@@ -87,19 +88,19 @@ function StatCard({ label, value, sub, accent }) {
 const statStyles = StyleSheet.create({
   card: { flex: 1, backgroundColor: '#fff', borderRadius: 14, padding: 14, alignItems: 'flex-start', shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 6, elevation: 2 },
   cardAccent: { backgroundColor: BLUE_DARK },
-  value: { fontSize: 22, fontWeight: '800', color: '#111', letterSpacing: -0.5, marginBottom: 2, fontFamily: 'KantumruyPro_700Bold'},
+  value: { fontSize: 22, fontWeight: '800', color: '#111', letterSpacing: -0.5, marginBottom: 2, fontFamily: 'Geist_700Bold'},
   valueAccent: { color: '#fff' },
-  label: { fontSize: 11, color: '#9CA3AF', fontWeight: '600', fontFamily: 'KantumruyPro_600SemiBold'},
+  label: { fontSize: 11, color: '#9CA3AF', fontWeight: '600', fontFamily: 'Geist_600SemiBold'},
   labelAccent: { color: 'rgba(255,255,255,0.7)' },
-  sub: { fontSize: 10, color: '#C4C4C4', marginTop: 2, fontFamily: 'KantumruyPro_400Regular'},
+  sub: { fontSize: 10, color: '#C4C4C4', marginTop: 2, fontFamily: 'Geist_400Regular'},
   subAccent: { color: 'rgba(255,255,255,0.5)' },
 });
 
 function SectionTitle({ children, action, onAction }) {
   return (
     <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-      <Text style={{ fontSize: 15, fontWeight: '800', color: '#111', letterSpacing: -0.3, fontFamily: 'KantumruyPro_700Bold' }}>{children}</Text>
-      {action && <TouchableOpacity onPress={onAction} activeOpacity={0.7}><Text style={{ fontSize: 13, color: BLUE, fontWeight: '600', fontFamily: 'KantumruyPro_600SemiBold' }}>{action}</Text></TouchableOpacity>}
+      <Text style={{ fontSize: 15, fontWeight: '800', color: '#111', letterSpacing: -0.3, fontFamily: 'Geist_700Bold' }}>{children}</Text>
+      {action && <TouchableOpacity onPress={onAction} activeOpacity={0.7}><Text style={{ fontSize: 13, color: BLUE, fontWeight: '600', fontFamily: 'Geist_600SemiBold' }}>{action}</Text></TouchableOpacity>}
     </View>
   );
 }
@@ -194,13 +195,13 @@ function ProductFormModal({ visible, onClose, onSave, initial }) {
 
 const modalStyles = StyleSheet.create({
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingVertical: 14, borderBottomWidth: 1, borderBottomColor: 'rgba(0,0,0,0.06)' },
-  title: { fontSize: 17, fontWeight: '700', color: '#111', fontFamily: 'KantumruyPro_700Bold'},
-  cancel: { fontSize: 15, color: '#6B7280', fontFamily: 'KantumruyPro_400Regular'},
-  save: { fontSize: 15, color: BLUE_DARK, fontWeight: '700', fontFamily: 'KantumruyPro_700Bold'},
+  title: { fontSize: 17, fontWeight: '700', color: '#111', fontFamily: 'Geist_700Bold'},
+  cancel: { fontSize: 15, color: '#6B7280', fontFamily: 'Geist_400Regular'},
+  save: { fontSize: 15, color: BLUE_DARK, fontWeight: '700', fontFamily: 'Geist_700Bold'},
   scroll: { padding: 20, paddingBottom: 40 },
   field: { marginBottom: 16 },
-  fieldLabel: { fontSize: 13, fontWeight: '700', color: '#374151', marginBottom: 6, fontFamily: 'KantumruyPro_700Bold'},
-  input: { borderWidth: 1.5, borderColor: '#E5E7EB', borderRadius: 12, paddingHorizontal: 14, paddingVertical: 12, fontSize: 15, color: '#111', backgroundColor: '#FAFAFA', fontFamily: 'KantumruyPro_400Regular'},
+  fieldLabel: { fontSize: 13, fontWeight: '700', color: '#374151', marginBottom: 6, fontFamily: 'Geist_700Bold'},
+  input: { borderWidth: 1.5, borderColor: '#E5E7EB', borderRadius: 12, paddingHorizontal: 14, paddingVertical: 12, fontSize: 15, color: '#111', backgroundColor: '#FAFAFA', fontFamily: 'Geist_400Regular'},
 });
 
 // ── Fulfill order modal ───────────────────────────────────────────────────────
@@ -253,14 +254,14 @@ const fulfillStyles = StyleSheet.create({
   overlay: { flex: 1, justifyContent: 'flex-end', backgroundColor: 'rgba(0,0,0,0.4)' },
   sheet: { backgroundColor: '#fff', borderTopLeftRadius: 20, borderTopRightRadius: 20, padding: 24, paddingBottom: 36 },
   drag: { width: 40, height: 4, borderRadius: 2, backgroundColor: '#E5E7EB', alignSelf: 'center', marginBottom: 18 },
-  title: { fontSize: 18, fontWeight: '800', color: '#111', marginBottom: 4, fontFamily: 'KantumruyPro_700Bold'},
-  body: { fontSize: 13, color: '#6B7280', marginBottom: 20, fontFamily: 'KantumruyPro_400Regular'},
-  label: { fontSize: 13, fontWeight: '700', color: '#374151', marginBottom: 6, fontFamily: 'KantumruyPro_700Bold'},
-  input: { borderWidth: 1.5, borderColor: '#E5E7EB', borderRadius: 12, paddingHorizontal: 14, paddingVertical: 12, fontSize: 15, color: '#111', marginBottom: 16, fontFamily: 'KantumruyPro_400Regular'},
+  title: { fontSize: 18, fontWeight: '800', color: '#111', marginBottom: 4, fontFamily: 'Geist_700Bold'},
+  body: { fontSize: 13, color: '#6B7280', marginBottom: 20, fontFamily: 'Geist_400Regular'},
+  label: { fontSize: 13, fontWeight: '700', color: '#374151', marginBottom: 6, fontFamily: 'Geist_700Bold'},
+  input: { borderWidth: 1.5, borderColor: '#E5E7EB', borderRadius: 12, paddingHorizontal: 14, paddingVertical: 12, fontSize: 15, color: '#111', marginBottom: 16, fontFamily: 'Geist_400Regular'},
   btn: { backgroundColor: GREEN, borderRadius: 13, height: 52, alignItems: 'center', justifyContent: 'center', marginBottom: 10 },
-  btnText: { color: '#fff', fontSize: 15, fontWeight: '700', fontFamily: 'KantumruyPro_700Bold'},
+  btnText: { color: '#fff', fontSize: 15, fontWeight: '700', fontFamily: 'Geist_700Bold'},
   cancelBtn: { alignItems: 'center', paddingVertical: 10 },
-  cancelText: { fontSize: 14, color: '#9CA3AF', fontWeight: '500', fontFamily: 'KantumruyPro_500Medium'},
+  cancelText: { fontSize: 14, color: '#9CA3AF', fontWeight: '500', fontFamily: 'Geist_500Medium'},
 });
 
 // ── Main Screen ───────────────────────────────────────────────────────────────
@@ -733,16 +734,16 @@ export default function SupplierDashboardScreen({ navigation }) {
 
 const storeStyles = StyleSheet.create({
   field: { marginBottom: 16 },
-  label: { fontSize: 13, fontWeight: '700', color: '#374151', marginBottom: 6, fontFamily: 'KantumruyPro_700Bold'},
-  hint: { fontSize: 11, color: '#9CA3AF', marginBottom: 4, fontFamily: 'KantumruyPro_400Regular'},
-  input: { borderWidth: 1.5, borderColor: '#E5E7EB', borderRadius: 12, paddingHorizontal: 14, paddingVertical: 12, fontSize: 15, color: '#111', backgroundColor: '#FAFAFA', fontFamily: 'KantumruyPro_400Regular'},
+  label: { fontSize: 13, fontWeight: '700', color: '#374151', marginBottom: 6, fontFamily: 'Geist_700Bold'},
+  hint: { fontSize: 11, color: '#9CA3AF', marginBottom: 4, fontFamily: 'Geist_400Regular'},
+  input: { borderWidth: 1.5, borderColor: '#E5E7EB', borderRadius: 12, paddingHorizontal: 14, paddingVertical: 12, fontSize: 15, color: '#111', backgroundColor: '#FAFAFA', fontFamily: 'Geist_400Regular'},
   divider: { height: 1, backgroundColor: '#F3F4F6', marginVertical: 20 },
-  sectionLabel: { fontSize: 11, fontWeight: '700', color: '#9CA3AF', letterSpacing: 0.8, textTransform: 'uppercase', marginBottom: 12, fontFamily: 'KantumruyPro_700Bold'},
+  sectionLabel: { fontSize: 11, fontWeight: '700', color: '#9CA3AF', letterSpacing: 0.8, textTransform: 'uppercase', marginBottom: 12, fontFamily: 'Geist_700Bold'},
   payoutPlaceholder: { flexDirection: 'row', alignItems: 'flex-start', gap: 12, backgroundColor: '#F9FAFB', borderRadius: 12, padding: 14, borderWidth: 1, borderColor: '#E5E7EB', marginBottom: 24 },
-  payoutTitle: { fontSize: 13, fontWeight: '700', color: '#374151', marginBottom: 2, fontFamily: 'KantumruyPro_700Bold'},
-  payoutBody: { fontSize: 12, color: '#9CA3AF', lineHeight: 17, fontFamily: 'KantumruyPro_400Regular'},
+  payoutTitle: { fontSize: 13, fontWeight: '700', color: '#374151', marginBottom: 2, fontFamily: 'Geist_700Bold'},
+  payoutBody: { fontSize: 12, color: '#9CA3AF', lineHeight: 17, fontFamily: 'Geist_400Regular'},
   saveBtn: { backgroundColor: BLUE_DARK, borderRadius: 13, height: 52, alignItems: 'center', justifyContent: 'center' },
-  saveBtnText: { color: '#fff', fontSize: 15, fontWeight: '700', fontFamily: 'KantumruyPro_700Bold'},
+  saveBtnText: { color: '#fff', fontSize: 15, fontWeight: '700', fontFamily: 'Geist_700Bold'},
 });
 
 // ── Main styles ───────────────────────────────────────────────────────────────
@@ -758,13 +759,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: 'rgba(0,0,0,0.06)',
   },
   headerCenter: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  headerTitle: { fontSize: 17, fontWeight: '800', color: '#111', letterSpacing: -0.3, fontFamily: 'KantumruyPro_700Bold'},
+  headerTitle: { fontSize: 17, fontWeight: '800', color: '#111', letterSpacing: -0.3, fontFamily: 'Geist_700Bold'},
   modePill: {
     backgroundColor: '#EFF6FF', borderRadius: 20,
     paddingVertical: 6, paddingHorizontal: 12,
     borderWidth: 1, borderColor: '#BFDBFE',
   },
-  modePillText: { fontSize: 12, fontWeight: '700', color: BLUE_DARK, fontFamily: 'KantumruyPro_700Bold'},
+  modePillText: { fontSize: 12, fontWeight: '700', color: BLUE_DARK, fontFamily: 'Geist_700Bold'},
 
   // Identity strip
   identityStrip: {
@@ -773,9 +774,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: 'rgba(0,0,0,0.04)',
   },
   identityAvatar: { width: 32, height: 32, borderRadius: 16, backgroundColor: '#EFF6FF', alignItems: 'center', justifyContent: 'center' },
-  identityInitial: { fontSize: 14, fontWeight: '800', color: BLUE_DARK, fontFamily: 'KantumruyPro_700Bold'},
-  identityName: { fontSize: 13, fontWeight: '700', color: '#111', fontFamily: 'KantumruyPro_700Bold'},
-  identitySlug: { fontSize: 11, color: '#9CA3AF', fontFamily: 'KantumruyPro_400Regular'},
+  identityInitial: { fontSize: 14, fontWeight: '800', color: BLUE_DARK, fontFamily: 'Geist_700Bold'},
+  identityName: { fontSize: 13, fontWeight: '700', color: '#111', fontFamily: 'Geist_700Bold'},
+  identitySlug: { fontSize: 11, color: '#9CA3AF', fontFamily: 'Geist_400Regular'},
 
   // Tab bar
   tabBar: {
@@ -783,7 +784,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1, borderBottomColor: 'rgba(0,0,0,0.06)',
   },
   tab: { flex: 1, alignItems: 'center', paddingVertical: 10, position: 'relative' },
-  tabLabel: { fontSize: 10, fontWeight: '600', color: '#9CA3AF', marginTop: 3, fontFamily: 'KantumruyPro_600SemiBold'},
+  tabLabel: { fontSize: 10, fontWeight: '600', color: '#9CA3AF', marginTop: 3, fontFamily: 'Geist_600SemiBold'},
   tabLabelActive: { color: BLUE_DARK },
   tabIndicator: { position: 'absolute', bottom: 0, left: '15%', right: '15%', height: 2, backgroundColor: BLUE_DARK, borderRadius: 1 },
 
@@ -802,15 +803,15 @@ const styles = StyleSheet.create({
   },
   productCardBody: { flexDirection: 'row', alignItems: 'center', padding: 14, paddingBottom: 10 },
   productLeft: { flex: 1 },
-  productTitle: { fontSize: 14, fontWeight: '700', color: '#111', marginBottom: 3, fontFamily: 'KantumruyPro_700Bold'},
-  productMeta: { fontSize: 12, color: '#9CA3AF', fontFamily: 'KantumruyPro_400Regular'},
+  productTitle: { fontSize: 14, fontWeight: '700', color: '#111', marginBottom: 3, fontFamily: 'Geist_700Bold'},
+  productMeta: { fontSize: 12, color: '#9CA3AF', fontFamily: 'Geist_400Regular'},
   statusDot: { width: 8, height: 8, borderRadius: 4, marginLeft: 8 },
   productActions: {
     flexDirection: 'row', borderTopWidth: 1, borderTopColor: '#F3F4F6',
     paddingHorizontal: 14, paddingVertical: 10, gap: 20,
   },
   productAction: { flexDirection: 'row', alignItems: 'center', gap: 5 },
-  productActionText: { fontSize: 12, fontWeight: '600', fontFamily: 'KantumruyPro_600SemiBold'},
+  productActionText: { fontSize: 12, fontWeight: '600', fontFamily: 'Geist_600SemiBold'},
 
   // Orders
   orderCard: {
@@ -818,36 +819,36 @@ const styles = StyleSheet.create({
     shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.04, shadowRadius: 6, elevation: 1,
   },
   orderTop: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4, gap: 8 },
-  orderTitle: { fontSize: 14, fontWeight: '700', color: '#111', flex: 1, fontFamily: 'KantumruyPro_700Bold'},
-  orderMeta: { fontSize: 12, color: '#9CA3AF', marginBottom: 4, fontFamily: 'KantumruyPro_400Regular'},
-  orderShipping: { fontSize: 12, color: '#6B7280', fontFamily: 'KantumruyPro_400Regular'},
+  orderTitle: { fontSize: 14, fontWeight: '700', color: '#111', flex: 1, fontFamily: 'Geist_700Bold'},
+  orderMeta: { fontSize: 12, color: '#9CA3AF', marginBottom: 4, fontFamily: 'Geist_400Regular'},
+  orderShipping: { fontSize: 12, color: '#6B7280', fontFamily: 'Geist_400Regular'},
   orderTracking: { fontSize: 12, color: '#6B7280', fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace' },
   fulfillBtn: {
     marginTop: 10, backgroundColor: GREEN, borderRadius: 10,
     paddingVertical: 9, alignItems: 'center',
   },
-  fulfillBtnText: { color: '#fff', fontSize: 13, fontWeight: '700', fontFamily: 'KantumruyPro_700Bold'},
+  fulfillBtnText: { color: '#fff', fontSize: 13, fontWeight: '700', fontFamily: 'Geist_700Bold'},
 
   // Filter chips
   filterChip: { paddingVertical: 7, paddingHorizontal: 14, borderRadius: 20, backgroundColor: '#F1F5F9', borderWidth: 1, borderColor: '#E5E7EB' },
   filterChipActive: { backgroundColor: BLUE_DARK, borderColor: BLUE_DARK },
-  filterChipText: { fontSize: 13, fontWeight: '600', color: '#64748B', fontFamily: 'KantumruyPro_600SemiBold'},
+  filterChipText: { fontSize: 13, fontWeight: '600', color: '#64748B', fontFamily: 'Geist_600SemiBold'},
   filterChipTextActive: { color: '#fff' },
 
   // Pill
   pill: { borderRadius: 12, paddingVertical: 3, paddingHorizontal: 10 },
-  pillText: { fontSize: 11, fontWeight: '700', fontFamily: 'KantumruyPro_700Bold'},
+  pillText: { fontSize: 11, fontWeight: '700', fontFamily: 'Geist_700Bold'},
 
   // Empty state
   emptyState: { alignItems: 'center', paddingVertical: 48, gap: 8 },
-  emptyTitle: { fontSize: 16, fontWeight: '700', color: '#111', fontFamily: 'KantumruyPro_700Bold'},
-  emptyBody: { fontSize: 13, color: '#9CA3AF', textAlign: 'center', lineHeight: 19, fontFamily: 'KantumruyPro_400Regular'},
+  emptyTitle: { fontSize: 16, fontWeight: '700', color: '#111', fontFamily: 'Geist_700Bold'},
+  emptyBody: { fontSize: 13, color: '#9CA3AF', textAlign: 'center', lineHeight: 19, fontFamily: 'Geist_400Regular'},
   emptyBtn: { marginTop: 8, backgroundColor: BLUE_DARK, borderRadius: 12, paddingVertical: 10, paddingHorizontal: 24 },
-  emptyBtnText: { color: '#fff', fontSize: 14, fontWeight: '700', fontFamily: 'KantumruyPro_700Bold'},
+  emptyBtnText: { color: '#fff', fontSize: 14, fontWeight: '700', fontFamily: 'Geist_700Bold'},
 
   // Guard
-  guardTitle: { fontSize: 20, fontWeight: '800', color: '#111', marginBottom: 8, fontFamily: 'KantumruyPro_700Bold'},
-  guardBody: { fontSize: 14, color: '#6B7280', textAlign: 'center', marginBottom: 24, fontFamily: 'KantumruyPro_400Regular'},
+  guardTitle: { fontSize: 20, fontWeight: '800', color: '#111', marginBottom: 8, fontFamily: 'Geist_700Bold'},
+  guardBody: { fontSize: 14, color: '#6B7280', textAlign: 'center', marginBottom: 24, fontFamily: 'Geist_400Regular'},
   guardBtn: { backgroundColor: BLUE_DARK, borderRadius: 12, paddingVertical: 12, paddingHorizontal: 28 },
-  guardBtnText: { color: '#fff', fontSize: 15, fontWeight: '700', fontFamily: 'KantumruyPro_700Bold'},
+  guardBtnText: { color: '#fff', fontSize: 15, fontWeight: '700', fontFamily: 'Geist_700Bold'},
 });

@@ -10,6 +10,9 @@ import { View, Image } from 'react-native';
  *   style          style         — applied to both Image and fallback View
  *   placeholderColor string      — background color when image fails (default #D0D7E3)
  *   resizeMode     string        — passed through to Image (default 'cover')
+ *
+ * Note: placeholderColor #D0D7E3 is a design system placeholder color with no
+ * corresponding token — intentionally kept as a hardcoded default.
  */
 export default function CardImage({ uri, style, placeholderColor = '#D0D7E3', resizeMode = 'cover' }) {
   const [err, setErr] = useState(false);

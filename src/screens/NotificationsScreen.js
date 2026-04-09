@@ -22,7 +22,7 @@ const STORAGE_KEY_PUSH = '@snapspace_notif_push';
 
 function BackIcon() {
   return (
-    <Svg width={24} height={24} viewBox="0 0 24 24" fill="none" stroke="#111" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round">
+    <Svg width={24} height={24} viewBox="0 0 24 24" fill="none" stroke="#111" strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round">
       <Polyline points="15 18 9 12 15 6" />
     </Svg>
   );
@@ -30,7 +30,7 @@ function BackIcon() {
 
 function BellIcon({ color = '#999' }) {
   return (
-    <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+    <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round">
       <Path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
       <Path d="M13.73 21a2 2 0 0 1-3.46 0" />
     </Svg>
@@ -39,7 +39,7 @@ function BellIcon({ color = '#999' }) {
 
 function CartBellIcon({ color = '#999' }) {
   return (
-    <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+    <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round">
       <Path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
       <Line x1={3} y1={6} x2={21} y2={6} />
       <Path d="M16 10a4 4 0 0 1-8 0" />
@@ -49,7 +49,7 @@ function CartBellIcon({ color = '#999' }) {
 
 function HeartBellIcon({ color = '#999' }) {
   return (
-    <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+    <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round">
       <Path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
     </Svg>
   );
@@ -57,7 +57,7 @@ function HeartBellIcon({ color = '#999' }) {
 
 function AIIcon({ color = '#999' }) {
   return (
-    <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+    <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round">
       <Path d="M12 2a10 10 0 1 0 10 10" />
       <Path d="M12 8v4l3 3" />
       <Circle cx={18} cy={5} r={3} />
@@ -67,7 +67,7 @@ function AIIcon({ color = '#999' }) {
 
 function UserPlusIcon({ color = '#999' }) {
   return (
-    <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+    <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round">
       <Path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
       <Circle cx={8.5} cy={7} r={4} />
       <Line x1={20} y1={8} x2={20} y2={14} />
@@ -78,7 +78,7 @@ function UserPlusIcon({ color = '#999' }) {
 
 function PromoIcon({ color = '#999' }) {
   return (
-    <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+    <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round">
       <Path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" />
       <Line x1={7} y1={7} x2={7.01} y2={7} />
     </Svg>
@@ -87,7 +87,7 @@ function PromoIcon({ color = '#999' }) {
 
 function EmailIcon({ color = '#999' }) {
   return (
-    <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+    <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round">
       <Path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
       <Polyline points="22,6 12,13 2,6" />
     </Svg>
@@ -271,14 +271,14 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 17,
     fontWeight: '800',
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
     color: '#111',
     letterSpacing: -0.3,
   },
   saveBtn: {
     fontSize: 15,
     fontWeight: '700',
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
     color: colors.bluePrimary,
     paddingRight: 4,
   },
@@ -307,15 +307,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  masterTitle: { fontSize: 15, fontWeight: '700', color: '#111', marginBottom: 2, fontFamily: 'KantumruyPro_700Bold'},
-  masterDesc: { fontSize: 12, color: '#999', fontFamily: 'KantumruyPro_400Regular'},
+  masterTitle: { fontSize: 15, fontWeight: '700', color: '#111', marginBottom: 2, fontFamily: 'Geist_700Bold'},
+  masterDesc: { fontSize: 12, color: '#999', fontFamily: 'Geist_400Regular'},
 
   // Sections
   section: { marginBottom: 20 },
   sectionLabel: {
     fontSize: 11,
     fontWeight: '700',
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
     color: '#A0A0A8',
     letterSpacing: 1,
     marginBottom: 10,
@@ -343,13 +343,13 @@ const styles = StyleSheet.create({
     flexShrink: 0,
   },
   rowContent: { flex: 1 },
-  rowLabel: { fontSize: 14, fontWeight: '600', color: '#111', marginBottom: 1, fontFamily: 'KantumruyPro_600SemiBold'},
+  rowLabel: { fontSize: 14, fontWeight: '600', color: '#111', marginBottom: 1, fontFamily: 'Geist_600SemiBold'},
   rowLabelDisabled: { color: '#BBBBBB' },
-  rowDesc: { fontSize: 12, color: '#999', lineHeight: 16, fontFamily: 'KantumruyPro_400Regular'},
+  rowDesc: { fontSize: 12, color: '#999', lineHeight: 16, fontFamily: 'Geist_400Regular'},
 
   footer: {
     fontSize: 12,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: '#AAAAAA',
     textAlign: 'center',
     lineHeight: 18,

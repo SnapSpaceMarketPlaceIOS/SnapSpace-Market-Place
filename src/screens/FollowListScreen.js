@@ -139,7 +139,7 @@ export default function FollowListScreen({ route, navigation }) {
 const s = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#fff' },
   center: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 40 },
-  emptyText: { ...typeScale.body, color: C.textSecondary, textAlign: 'center', fontFamily: 'KantumruyPro_400Regular'},
+  emptyText: { ...typeScale.body, color: C.textSecondary, textAlign: 'center', fontFamily: 'Geist_400Regular'},
 
   header: {
     flexDirection: 'row',
@@ -156,7 +156,7 @@ const s = StyleSheet.create({
   },
   headerTitle: {
     ...typeScale.title,
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
     color: C.textPrimary,
     flex: 1,
     textAlign: 'center',
@@ -178,7 +178,7 @@ const s = StyleSheet.create({
   },
   tabText: {
     ...typeScale.headline,
-    fontFamily: 'KantumruyPro_600SemiBold',
+    fontFamily: 'Geist_600SemiBold',
     color: C.textSecondary,
   },
   tabTextActive: {
@@ -209,7 +209,7 @@ const s = StyleSheet.create({
   avatarText: {
     fontSize: 18,
     fontWeight: '700',
-    fontFamily: 'KantumruyPro_700Bold',
+    fontFamily: 'Geist_700Bold',
     color: '#fff',
   },
   rowInfo: {
@@ -217,12 +217,12 @@ const s = StyleSheet.create({
   },
   rowName: {
     ...typeScale.headline,
-    fontFamily: 'KantumruyPro_600SemiBold',
+    fontFamily: 'Geist_600SemiBold',
     color: C.textPrimary,
   },
   rowUsername: {
     ...typeScale.caption,
-    fontFamily: 'KantumruyPro_400Regular',
+    fontFamily: 'Geist_400Regular',
     color: C.textSecondary,
     marginTop: 2,
   },
@@ -235,7 +235,7 @@ const s = StyleSheet.create({
   followBtnText: {
     fontSize: 13,
     fontWeight: '600',
-    fontFamily: 'KantumruyPro_600SemiBold',
+    fontFamily: 'Geist_600SemiBold',
     color: '#fff',
   },
   separator: {

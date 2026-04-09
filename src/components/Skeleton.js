@@ -24,11 +24,11 @@
 
 import React, { useEffect, useRef } from 'react';
 import { Animated, Easing, View, StyleSheet, Dimensions } from 'react-native';
-import { radius as R } from '../constants/tokens';
+import { radius as R, space } from '../constants/tokens';
 
 const { width: SCREEN_W } = Dimensions.get('window');
 
-// Base and shimmer colors
+// Base and shimmer colors — no corresponding design token; intentionally hardcoded
 const BASE_COLOR    = '#F0F0F0';
 const SHIMMER_COLOR = '#E8E8E8';
 const DURATION      = 1500; // ms
@@ -94,7 +94,7 @@ export default function Skeleton({
 
 export function SkeletonCard({ width = 155, height = 130 }) {
   return (
-    <View style={{ gap: 8 }}>
+    <View style={{ gap: space.sm }}>
       <Skeleton width={width} height={height} radius="image" />
       <Skeleton width={width * 0.8} height={14} radius="text" />
       <Skeleton width={width * 0.5} height={13} radius="text" />
@@ -104,7 +104,7 @@ export function SkeletonCard({ width = 155, height = 130 }) {
 
 export function SkeletonProductCard({ width = 155 }) {
   return (
-    <View style={{ gap: 8 }}>
+    <View style={{ gap: space.sm }}>
       <Skeleton width={width} height={width} radius="image" />
       <Skeleton width={width * 0.85} height={14} radius="text" />
       <Skeleton width={width * 0.4} height={14} radius="text" />
@@ -128,9 +128,9 @@ const rowStyles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
-    paddingHorizontal: 20,
-    paddingVertical: 12,
+    gap: space.md,
+    paddingHorizontal: space.lg,
+    paddingVertical: space.md,
   },
   text: {
     flex: 1,
