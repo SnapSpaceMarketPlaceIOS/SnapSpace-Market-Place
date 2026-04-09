@@ -1,10 +1,10 @@
 /**
- * SnapSpace Marketplace — Transactional Email Templates
+ * HomeGenie Marketplace — Transactional Email Templates
  * All templates return { subject, html } ready to pass to the Resend API.
  * Brand palette: Blue #0B6DC3, Dark text #111827, Muted #6B7280
  */
 
-const BASE_URL = Deno.env.get('APP_URL') ?? 'https://snapspace.app';
+const BASE_URL = Deno.env.get('APP_URL') ?? 'https://homegenie.app';
 
 // ─── Shared layout wrapper ────────────────────────────────────────────────────
 
@@ -18,7 +18,7 @@ function layout(content: string, previewText = ''): string {
   <!--[if !mso]><!-->
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <!--<![endif]-->
-  <title>SnapSpace</title>
+  <title>HomeGenie</title>
   <style>
     body { margin: 0; padding: 0; background: #F3F4F6; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; -webkit-text-size-adjust: 100%; }
     .wrapper { max-width: 560px; margin: 40px auto; }
@@ -49,7 +49,7 @@ function layout(content: string, previewText = ''): string {
   <div class="wrapper">
     <div class="card">
       <div class="header">
-        <div class="wordmark">SnapSpace</div>
+        <div class="wordmark">HomeGenie</div>
       </div>
       <div class="body">
         ${content}
@@ -57,7 +57,7 @@ function layout(content: string, previewText = ''): string {
     </div>
     <div class="footer">
       <p>
-        SnapSpace Marketplace &bull; <a href="${BASE_URL}">snapspace.app</a><br />
+        HomeGenie Marketplace &bull; <a href="${BASE_URL}">homegenie.app</a><br />
         You're receiving this because you have an account with us.<br />
         <a href="${BASE_URL}/unsubscribe">Unsubscribe</a>
       </p>
@@ -71,14 +71,14 @@ function layout(content: string, previewText = ''): string {
 
 export function welcome(recipientName: string): { subject: string; html: string } {
   return {
-    subject: 'Welcome to SnapSpace 👋',
+    subject: 'Welcome to HomeGenie 👋',
     html: layout(`
-      <h1>Welcome to SnapSpace, ${recipientName}!</h1>
+      <h1>Welcome to HomeGenie, ${recipientName}!</h1>
       <p>Your email is verified and your account is ready. Start exploring thousands of unique designs — or apply to become a Verified Supplier and sell to our community.</p>
       <a href="${BASE_URL}" class="btn">Browse Designs</a>
       <hr class="divider" />
-      <p class="muted">Want to sell on SnapSpace? Head to your Profile and tap <strong>Sell on SnapSpace</strong> to apply.</p>
-    `, `Welcome! Your SnapSpace account is ready.`),
+      <p class="muted">Want to sell on HomeGenie? Head to your Profile and tap <strong>Sell on HomeGenie</strong> to apply.</p>
+    `, `Welcome! Your HomeGenie account is ready.`),
   };
 }
 
@@ -97,7 +97,7 @@ export function applicationReceived(
       <p>Our team typically reviews applications within <strong>2–3 business days</strong>. We'll email you as soon as a decision is made.</p>
       <a href="${BASE_URL}/application-status" class="btn">Check Status</a>
       <hr class="divider" />
-      <p class="muted">In the meantime, keep browsing and shopping on SnapSpace. Your consumer account remains fully active.</p>
+      <p class="muted">In the meantime, keep browsing and shopping on HomeGenie. Your consumer account remains fully active.</p>
     `, `Your application for ${businessName} is under review.`),
   };
 }
@@ -109,16 +109,16 @@ export function applicationApproved(
   businessName: string,
 ): { subject: string; html: string } {
   return {
-    subject: `🎉 You're approved! Welcome to the SnapSpace Supplier Program`,
+    subject: `🎉 You're approved! Welcome to the HomeGenie Supplier Program`,
     html: layout(`
       <span class="badge status-approved">✓ Approved</span>
       <h1>Congratulations, ${recipientName}!</h1>
-      <p>Your application for <strong>${businessName}</strong> has been approved. You're now a Verified Supplier on SnapSpace — complete with the blue verification badge.</p>
+      <p>Your application for <strong>${businessName}</strong> has been approved. You're now a Verified Supplier on HomeGenie — complete with the blue verification badge.</p>
       <p>Set up your storefront, add your first products, and start selling to our community today.</p>
       <a href="${BASE_URL}/supplier/onboarding" class="btn">Set Up My Store →</a>
       <hr class="divider" />
       <p class="muted">As a Verified Supplier you can list products, track orders, and access your seller dashboard from the Profile tab.</p>
-    `, `Your SnapSpace supplier application was approved!`),
+    `, `Your HomeGenie supplier application was approved!`),
   };
 }
 
@@ -134,14 +134,14 @@ export function applicationRejected(
     : `<hr class="divider" />`;
 
   return {
-    subject: `Update on your SnapSpace supplier application`,
+    subject: `Update on your HomeGenie supplier application`,
     html: layout(`
       <span class="badge status-rejected">Application Update</span>
       <h1>Application not approved</h1>
       <p>Hi ${recipientName}, after reviewing your application for <strong>${businessName}</strong> we're unable to approve it at this time.</p>
       ${reasonSection}
       <p>You're welcome to reapply in 30 days if your situation changes. If you have questions, reply to this email.</p>
-      <a href="${BASE_URL}" class="btn-outline">Return to SnapSpace</a>
+      <a href="${BASE_URL}" class="btn-outline">Return to HomeGenie</a>
     `, `Update on your supplier application for ${businessName}.`),
   };
 }
@@ -170,7 +170,7 @@ export function newOrder(
     html: layout(`
       <span class="badge">New Order</span>
       <h1>You have a new order!</h1>
-      <p>Hi ${supplierName}, someone just purchased from your SnapSpace store.</p>
+      <p>Hi ${supplierName}, someone just purchased from your HomeGenie store.</p>
       <table style="width:100%;border-collapse:collapse;margin-bottom:20px;">
         <tr><td class="info-label">Order ID</td><td class="info-value">#${order.id.slice(0, 8).toUpperCase()}</td></tr>
         <tr><td class="info-label">Product</td><td class="info-value">${order.product_title}</td></tr>
@@ -203,7 +203,7 @@ export function orderFulfilled(
     : `<p>Your supplier will update the tracking information shortly.</p>`;
 
   return {
-    subject: `Your SnapSpace order has shipped! 📦`,
+    subject: `Your HomeGenie order has shipped! 📦`,
     html: layout(`
       <span class="badge status-approved">Shipped</span>
       <h1>Your order is on its way, ${buyerName}!</h1>

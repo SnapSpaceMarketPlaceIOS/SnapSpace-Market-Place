@@ -1,5 +1,5 @@
 /**
- * SnapSpace — amazon-search Edge Function
+ * HomeGenie — amazon-search Edge Function
  *
  * Proxies Amazon Product Advertising API v5 SearchItems.
  * Credentials stay server-side; the mobile app never touches the secret key.
@@ -12,7 +12,7 @@
  *   { products: AffiliateProduct[], source: "amazon" | "unavailable" | "error" }
  */
 
-const PARTNER_TAG = "snapspacemkt-20";
+const PARTNER_TAG = "homegenie-20";
 const REGION      = "us-east-1";
 const HOST        = "webservices.amazon.com";
 const ENDPOINT    = `https://${HOST}/paapi5/searchitems`;

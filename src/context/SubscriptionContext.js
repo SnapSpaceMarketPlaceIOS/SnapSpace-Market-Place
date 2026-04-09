@@ -15,29 +15,32 @@ import { useAuth } from './AuthContext';
 import { validateReceipt, fetchQuota, fetchTokenBalance } from '../services/subscriptionService';
 import { supabase } from '../services/supabase';
 
-// ── Tier definitions ────────────────────────────────────────────────────────
+// ── Tier definitions (weekly billing, 10% discount on Pro + Premium) ─────────
 export const TIERS = {
-  free:    { id: 'free',    name: 'Free',    price: 0,     priceLabel: 'Free',      gens: 5,  displayLabel: '5',         monthly: false },
-  basic:   { id: 'basic',   name: 'Basic',   price: 6.99,  priceLabel: '$6.99/mo',  gens: 25, displayLabel: '25',        monthly: true, productId: 'snapspace_basic_monthly' },
-  pro:     { id: 'pro',     name: 'Pro',     price: 12.99, priceLabel: '$12.99/mo', gens: 50, displayLabel: '50',        monthly: true, productId: 'snapspace_pro_monthly',   popular: true },
-  premium: { id: 'premium', name: 'Premium', price: 19.99, priceLabel: '$19.99/mo', gens: -1, displayLabel: 'Unlimited', monthly: true, productId: 'snapspace_premium_monthly' },
+  free:    { id: 'free',    name: 'Free',    price: 0,    priceLabel: 'Free',       gens: 5,  displayLabel: '5',         weekly: false },
+  basic:   { id: 'basic',   name: 'Basic',   price: 4.99,  priceLabel: '$4.99/wk',   gens: 25, displayLabel: '25',        weekly: true, productId: 'homegenie_basic_weekly' },
+  pro:     { id: 'pro',     name: 'Pro',     price: 9.99,  priceLabel: '$9.99/wk',   gens: 50, displayLabel: '50',        weekly: true, productId: 'homegenie_pro_weekly',   popular: true },
+  premium: { id: 'premium', name: 'Premium', price: 19.99, priceLabel: '$19.99/wk',  gens: -1, displayLabel: 'Unlimited', weekly: true, productId: 'homegenie_premium_weekly' },
 };
 
 export const PAID_TIERS = [TIERS.basic, TIERS.pro, TIERS.premium];
 
 const ALL_PRODUCT_IDS = PAID_TIERS.map(t => t.productId);
 
-// ── Token packages (consumable IAP) ───────────────────────────────────────
-export const TOKEN_PACKAGES = [
-  { id: 'snapspace_tokens_4',   tokens: 4,   price: '$0.99',  priceNum: 0.99  },
-  { id: 'snapspace_tokens_10',  tokens: 10,  price: '$2.49',  priceNum: 2.49  },
-  { id: 'snapspace_tokens_20',  tokens: 20,  price: '$4.99',  priceNum: 4.99  },
-  { id: 'snapspace_tokens_40',  tokens: 40,  price: '$9.99',  priceNum: 9.99  },
-  { id: 'snapspace_tokens_100', tokens: 100, price: '$24.99', priceNum: 24.99 },
-  { id: 'snapspace_tokens_200', tokens: 200, price: '$49.99', priceNum: 49.99 },
+// ── Wish packages (consumable IAP — "wishes" = design credits) ──────────
+export const WISH_PACKAGES = [
+  { id: 'homegenie_wishes_4',   wishes: 4,   price: '$0.99',  priceNum: 0.99  },
+  { id: 'homegenie_wishes_10',  wishes: 10,  price: '$2.49',  priceNum: 2.49  },
+  { id: 'homegenie_wishes_20',  wishes: 20,  price: '$4.99',  priceNum: 4.99  },
+  { id: 'homegenie_wishes_40',  wishes: 40,  price: '$9.99',  priceNum: 9.99  },
+  { id: 'homegenie_wishes_100', wishes: 100, price: '$24.99', priceNum: 24.99 },
+  { id: 'homegenie_wishes_200', wishes: 200, price: '$49.99', priceNum: 49.99 },
 ];
 
-const ALL_TOKEN_PRODUCT_IDS = TOKEN_PACKAGES.map(p => p.id);
+// Backward compatibility alias
+export const TOKEN_PACKAGES = WISH_PACKAGES.map(w => ({ ...w, tokens: w.wishes }));
+
+const ALL_TOKEN_PRODUCT_IDS = WISH_PACKAGES.map(p => p.id);
 
 // ── Default free-tier state ─────────────────────────────────────────────────
 const DEFAULT_SUBSCRIPTION = {
@@ -338,6 +341,7 @@ export function SubscriptionProvider({ children }) {
         deductToken,
         purchaseTokens,
         TOKEN_PACKAGES,
+        WISH_PACKAGES,
         // Constants
         TIERS,
         PAID_TIERS,

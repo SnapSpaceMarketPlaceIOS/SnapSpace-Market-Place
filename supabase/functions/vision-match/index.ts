@@ -1,5 +1,5 @@
 /**
- * SnapSpace — vision-match Edge Function
+ * HomeGenie — vision-match Edge Function
  *
  * Analyzes an AI-generated interior design image using Claude Haiku vision.
  * Describes the furniture actually rendered — not what was in the text prompt.

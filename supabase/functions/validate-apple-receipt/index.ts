@@ -1,5 +1,5 @@
 /**
- * validate-apple-receipt — SnapSpace Edge Function
+ * validate-apple-receipt — HomeGenie Edge Function
  *
  * Validates a StoreKit 2 JWS (JSON Web Signature) transaction and
  * activates the user's subscription in Supabase.
@@ -40,20 +40,20 @@ const CORS_HEADERS = {
 // ── Product → tier mapping (subscriptions) ──────────────────────────────────
 
 const PRODUCT_MAP: Record<string, { tier: string; quotaLimit: number }> = {
-  'snapspace_basic_monthly':   { tier: 'basic',   quotaLimit: 25 },
-  'snapspace_pro_monthly':     { tier: 'pro',     quotaLimit: 50 },
-  'snapspace_premium_monthly': { tier: 'premium', quotaLimit: -1 },
+  'homegenie_basic_weekly':   { tier: 'basic',   quotaLimit: 25 },
+  'homegenie_pro_weekly':     { tier: 'pro',     quotaLimit: 50 },
+  'homegenie_premium_weekly': { tier: 'premium', quotaLimit: -1 },
 };
 
-// ── Product → token count mapping (consumables) ─────────────────────────────
+// ── Product → wish count mapping (consumables) ──────────────────────────────
 
-const TOKEN_PRODUCT_MAP: Record<string, number> = {
-  'snapspace_tokens_4':   4,
-  'snapspace_tokens_10':  10,
-  'snapspace_tokens_20':  20,
-  'snapspace_tokens_40':  40,
-  'snapspace_tokens_100': 100,
-  'snapspace_tokens_200': 200,
+const WISH_PRODUCT_MAP: Record<string, number> = {
+  'homegenie_wishes_4':   4,
+  'homegenie_wishes_10':  10,
+  'homegenie_wishes_20':  20,
+  'homegenie_wishes_40':  40,
+  'homegenie_wishes_100': 100,
+  'homegenie_wishes_200': 200,
 };
 
 // ── JWS Decoder ─────────────────────────────────────────────────────────────
@@ -153,13 +153,13 @@ Deno.serve(async (req: Request) => {
     const expiresDateMs  = payload.expiresDate as number;
     const expiresAt      = expiresDateMs
       ? new Date(expiresDateMs).toISOString()
-      : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(); // fallback: +30 days
+      : new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(); // fallback: +7 days
 
-    // ── Route: subscription or token purchase ───────────────────────
+    // ── Route: subscription or wish purchase ────────────────────────
     const isSubscription = !!PRODUCT_MAP[productId];
-    const isToken        = !!TOKEN_PRODUCT_MAP[productId];
+    const isWish         = !!WISH_PRODUCT_MAP[productId];
 
-    if (!isSubscription && !isToken) {
+    if (!isSubscription && !isWish) {
       return new Response(JSON.stringify({ error: `Unknown productId: ${productId}` }), {
         status: 400,
         headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' },
@@ -168,24 +168,24 @@ Deno.serve(async (req: Request) => {
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
 
-    // ── TOKEN PURCHASE FLOW ──────────────────────────────────────
-    if (isToken) {
-      const tokenCount = TOKEN_PRODUCT_MAP[productId];
+    // ── WISH PURCHASE FLOW ───────────────────────────────────────
+    if (isWish) {
+      const wishCount = WISH_PRODUCT_MAP[productId];
 
       // Idempotency: check if this transactionId was already processed
       const { data: existingTx } = await supabase
-        .from('token_transactions')
+        .from('wish_transactions')
         .select('id')
         .eq('reference_id', transactionId)
         .limit(1);
 
       if (existingTx && existingTx.length > 0) {
         // Already processed — return current balance without double-crediting
-        const { data: balData } = await supabase.rpc('get_token_balance', { p_user_id: userId });
+        const { data: balData } = await supabase.rpc('get_wish_balance', { p_user_id: userId });
         const bal = balData?.[0]?.balance ?? 0;
         return new Response(JSON.stringify({
-          success: true, type: 'tokens',
-          tokens_added: tokenCount, new_balance: bal,
+          success: true, type: 'wishes',
+          wishes_added: wishCount, new_balance: bal,
           transaction_id: transactionId, environment,
         }), {
           status: 200,
@@ -193,28 +193,28 @@ Deno.serve(async (req: Request) => {
         });
       }
 
-      // Credit tokens
-      const { data: addData, error: addError } = await supabase.rpc('add_tokens', {
+      // Credit wishes
+      const { data: addData, error: addError } = await supabase.rpc('add_wishes', {
         p_user_id:      userId,
-        p_amount:       tokenCount,
+        p_amount:       wishCount,
         p_type:         'purchase',
         p_reference_id: transactionId,
         p_product_id:   productId,
       });
 
       if (addError) {
-        console.error('[validate-apple-receipt] add_tokens error:', addError);
+        console.error('[validate-apple-receipt] add_wishes error:', addError);
         return new Response(JSON.stringify({ error: addError.message }), {
           status: 500,
           headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' },
         });
       }
 
-      const newBalance = addData?.[0]?.new_balance ?? tokenCount;
+      const newBalance = addData?.[0]?.new_balance ?? wishCount;
 
       return new Response(JSON.stringify({
-        success: true, type: 'tokens',
-        tokens_added: tokenCount, new_balance: newBalance,
+        success: true, type: 'wishes',
+        wishes_added: wishCount, new_balance: newBalance,
         transaction_id: transactionId, environment,
       }), {
         status: 200,

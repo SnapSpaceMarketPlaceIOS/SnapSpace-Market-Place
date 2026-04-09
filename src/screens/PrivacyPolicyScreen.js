@@ -25,7 +25,7 @@ const SECTIONS = [
   // ═══ TOP — What users care about ═══
   {
     title: '1. Introduction',
-    body: `HomeGenie ("we," "us," or "our") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, retain, and safeguard your personal information when you use the HomeGenie mobile application ("App").
+    body: `HomeGenie, operated by SnapSpace Marketplace LLC ("we," "us," or "our"), is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, retain, and safeguard your personal information when you use the HomeGenie mobile application ("App").
 
 This policy is written in plain language wherever possible. By creating an account or using the App, you consent to the data practices described in this policy. If you do not agree, please do not use the App.
 
@@ -309,7 +309,7 @@ Important:
     title: '18. Contact Us',
     body: `If you have any questions, concerns, or requests regarding this Privacy Policy or our data practices, please contact us:
 
-HomeGenie
+HomeGenie — operated by SnapSpace Marketplace LLC
 Email: info@homegenie.app
 Website: www.homegenie.app
 

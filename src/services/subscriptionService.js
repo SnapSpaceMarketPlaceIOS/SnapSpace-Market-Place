@@ -11,9 +11,9 @@ const SUPABASE_ANON_KEY = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || '';
 // ── Tier constants ────────────────────────────────────────────────────────────
 
 export const PRODUCT_IDS = {
-  BASIC:   'snapspace_basic_monthly',
-  PRO:     'snapspace_pro_monthly',
-  PREMIUM: 'snapspace_premium_monthly',
+  BASIC:   'homegenie_basic_weekly',
+  PRO:     'homegenie_pro_weekly',
+  PREMIUM: 'homegenie_premium_weekly',
 };
 
 export const ALL_PRODUCT_IDS = Object.values(PRODUCT_IDS);
@@ -24,16 +24,19 @@ export const PRODUCT_TIER_MAP = {
   [PRODUCT_IDS.PREMIUM]: { tier: 'premium', quotaLimit: -1,  displayLabel: 'Unlimited' },
 };
 
-// ── Token product IDs (consumable IAP) ──────────────────────────────────────
+// ── Wish product IDs (consumable IAP — "wishes" = design credits) ───────────
 
-export const TOKEN_PRODUCT_IDS = {
-  TOKENS_4:   'snapspace_tokens_4',
-  TOKENS_10:  'snapspace_tokens_10',
-  TOKENS_20:  'snapspace_tokens_20',
-  TOKENS_40:  'snapspace_tokens_40',
-  TOKENS_100: 'snapspace_tokens_100',
-  TOKENS_200: 'snapspace_tokens_200',
+export const WISH_PRODUCT_IDS = {
+  WISHES_4:   'homegenie_wishes_4',
+  WISHES_10:  'homegenie_wishes_10',
+  WISHES_20:  'homegenie_wishes_20',
+  WISHES_40:  'homegenie_wishes_40',
+  WISHES_100: 'homegenie_wishes_100',
+  WISHES_200: 'homegenie_wishes_200',
 };
+
+// Backward compat alias
+export const TOKEN_PRODUCT_IDS = WISH_PRODUCT_IDS;
 
 export const ALL_TOKEN_PRODUCT_IDS = Object.values(TOKEN_PRODUCT_IDS);
 

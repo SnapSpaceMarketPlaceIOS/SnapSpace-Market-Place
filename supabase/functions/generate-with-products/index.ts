@@ -1,5 +1,5 @@
 /**
- * SnapSpace — generate-with-products Edge Function (v5)
+ * HomeGenie — generate-with-products Edge Function (v5)
  *
  * Switched from Replicate (middleman, $0.31/run) to Black Forest Labs direct
  * API (source, ~$0.08/run). Same model (FLUX.2 MAX), 74% cheaper.
@@ -143,7 +143,7 @@ Deno.serve(async (req: Request) => {
           error: "quota_exceeded",
           message: `You've used all ${quota.quota_limit} free generations this month. Upgrade to Premium for unlimited generations.`,
           quota_reset_date: quota.quota_reset_date,
-          upgrade_url: "snapspace://premium",
+          upgrade_url: "homegenie://premium",
         }),
         { status: 429, headers: { ...CORS, "Content-Type": "application/json" } },
       );

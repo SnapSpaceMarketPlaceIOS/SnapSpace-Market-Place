@@ -1,5 +1,5 @@
 /**
- * SnapSpace Marketplace — send-email Edge Function
+ * HomeGenie Marketplace — send-email Edge Function
  * ─────────────────────────────────────────────────────────────────────────────
  * Triggered by a Supabase Database Webhook on INSERT to `notification_queue`.
  *
@@ -14,7 +14,7 @@
  *
  * Required environment variables (set in Supabase Dashboard → Edge Functions → Secrets):
  *   RESEND_API_KEY      — from https://resend.com
- *   EMAIL_FROM          — verified sender, e.g. "SnapSpace <noreply@snapspace.com>"
+ *   EMAIL_FROM          — verified sender, e.g. "HomeGenie <noreply@homegenie.app>"
  *   SUPABASE_URL        — your project URL
  *   SUPABASE_SERVICE_ROLE_KEY — service role key (auto-injected by Supabase)
  */
@@ -33,7 +33,7 @@ import {
 // ─── Env ──────────────────────────────────────────────────────────────────────
 
 const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY') ?? '';
-const EMAIL_FROM = Deno.env.get('EMAIL_FROM') ?? 'SnapSpace <noreply@snapspace.com>';
+const EMAIL_FROM = Deno.env.get('EMAIL_FROM') ?? 'HomeGenie <noreply@homegenie.app>';
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL') ?? '';
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
 

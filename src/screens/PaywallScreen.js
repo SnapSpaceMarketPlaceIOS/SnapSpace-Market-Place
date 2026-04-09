@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -8,7 +8,8 @@ import {
   Alert,
   Dimensions,
   Share,
-  LayoutAnimation,
+  Image,
+  Animated,
   Platform,
   UIManager,
 } from 'react-native';
@@ -18,41 +19,54 @@ if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 import { SafeAreaView } from 'react-native-safe-area-context';
-import Svg, { Line, Circle, Polyline, Path } from 'react-native-svg';
+import Svg, { Line, Circle, Polyline, Path, Rect } from 'react-native-svg';
+import { LinearGradient } from 'expo-linear-gradient';
 import { colors } from '../constants/colors';
 import { colors as C } from '../constants/theme';
 import { space, radius, fontWeight, layout, uiColors } from '../constants/tokens';
-import { useSubscription, PAID_TIERS, TOKEN_PACKAGES } from '../context/SubscriptionContext';
+import { useSubscription, PAID_TIERS, WISH_PACKAGES } from '../context/SubscriptionContext';
 import { useAuth } from '../context/AuthContext';
 import { getReferralCode } from '../services/subscriptionService';
 
-const { width: SCREEN_W } = Dimensions.get('window');
+const { width: SCREEN_W, height: SCREEN_H } = Dimensions.get('window');
+
+// ── Hero slideshow images ────────────────────────────────────────────────────
+const HERO_IMAGES = [
+  require('../../assets/hero-slideshow-1.jpg'),
+  require('../../assets/hero-slideshow-9.jpg'),
+  require('../../assets/hero-slideshow-6.jpg'),
+  require('../../assets/hero-slideshow-3.jpg'),
+  require('../../assets/hero-slideshow-5.jpg'),
+  require('../../assets/hero-slideshow-2.jpg'),
+];
+const HERO_INTERVAL = 5500;
+const HERO_FADE_MS  = 1200;
 
 // ── Icons ────────────────────────────────────────────────────────────────────
 
 function CloseIcon() {
   return (
-    <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="#999" strokeWidth={2.2} strokeLinecap="round">
+    <Svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" strokeWidth={2.4} strokeLinecap="round">
       <Line x1={18} y1={6} x2={6} y2={18} />
       <Line x1={6} y1={6} x2={18} y2={18} />
     </Svg>
   );
 }
 
-function CircleBullet() {
+function CheckIcon({ size = 14, color = '#FFFFFF' }) {
   return (
-    <Svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth={2} style={{ marginTop: 2 }}>
-      <Circle cx={12} cy={12} r={10} />
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={3} strokeLinecap="round" strokeLinejoin="round">
+      <Polyline points="20 6 9 17 4 12" />
     </Svg>
   );
 }
 
-function ShareIcon() {
+function ShareIcon({ color = '#67ACE9', size = 20 }) {
   return (
-    <Svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-      <Path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
-      <Polyline points="16 6 12 2 8 6" />
-      <Line x1={12} y1={2} x2={12} y2={15} />
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={1.4} strokeLinecap="round" strokeLinejoin="round">
+      <Circle cx={12} cy={12} r={10} />
+      <Polyline points="15 11 12 8 9 11" />
+      <Line x1={12} y1={8} x2={12} y2={16} />
     </Svg>
   );
 }
@@ -61,118 +75,123 @@ function ShareIcon() {
 
 const TIER_FEATURES = {
   basic: [
-    '25 AI room designs per month',
-    'Product recommendations',
-    'Save & share designs',
+    '25 AI Room Designs per week',
+    'Shop curated furniture matched to your style',
+    'Save, share & post your designs',
+    'Access to all room types & design styles',
+    'New AI models as they release',
   ],
   pro: [
-    '50 AI room designs per month',
-    'Product recommendations',
-    'Save & share designs',
-    'Priority generation queue',
+    '50 AI Room Designs per week',
+    'Shop curated furniture matched to your style',
+    'Save, share & post your designs',
+    'Priority generation queue — skip the line',
+    'Access to all room types & design styles',
+    'New AI models as they release',
   ],
   premium: [
-    'Unlimited AI room designs per month',
-    'Product recommendations',
-    'Priority generation queue',
-    'Early access to new AI models',
-    'Faster Generation Time',
+    'Unlimited AI Room Designs per week',
+    'Shop curated furniture matched to your style',
+    'Save, share & post your designs',
+    'Priority generation — fastest results',
+    'Early access to new AI models & features',
+    'Access to all room types & design styles',
+    'Premium support',
   ],
 };
 
-// ── Tier Card (Subscribe Monthly view) ───────────────────────────────────────
+// ── Wish card order (cheapest first, most expensive at bottom) ──────────────
+const WISH_CARD_ORDER = [
+  'homegenie_wishes_4',
+  'homegenie_wishes_10',
+  'homegenie_wishes_20',
+  'homegenie_wishes_40',
+  'homegenie_wishes_100',
+  'homegenie_wishes_200',
+];
 
-function TierCard({ tier, selected, onSelect }) {
-  const isUnlimited = tier.displayLabel === 'Unlimited';
-  const features = TIER_FEATURES[tier.id] || [];
+// ── Subscribe card order (cheapest first) ───────────────────────────────────
+const TIER_CARD_ORDER = ['basic', 'pro', 'premium'];
 
+// ── Card dimensions (2-column grid) ─────────────────────────────────────────
+const CARD_GAP = 12;
+const CARD_W = (SCREEN_W - layout.screenPaddingH * 2 - CARD_GAP) / 2;
+
+// ── Wish Package Card ───────────────────────────────────────────────────────
+
+function WishCard({ pkg, selected, onSelect }) {
   return (
     <TouchableOpacity
-      activeOpacity={0.85}
-      onPress={() => onSelect(tier.id)}
-      style={[styles.subCard, selected && styles.subCardSelected]}
+      activeOpacity={0.8}
+      onPress={() => onSelect(pkg.id)}
+      style={[styles.gridCard, selected && styles.gridCardSelected]}
     >
-      {/* ── Compact header row ── */}
-      <View style={styles.subCardHeader}>
-        <View style={[styles.radio, selected && styles.radioSelected]}>
-          {selected && <View style={styles.radioDot} />}
-        </View>
-        <View style={{ flex: 1 }}>
-          <Text style={styles.subTierName}>{tier.name}</Text>
-          <View style={styles.subGenRow}>
-            <Text style={[styles.subGenCount, isUnlimited && styles.subGenCountUnlimited]}>
-              {tier.displayLabel}
-            </Text>
-            <Text style={styles.subGenLabel}> designs/mo</Text>
-          </View>
-        </View>
-        <Text style={[styles.subTierPrice, selected && styles.subTierPriceSelected]}>
-          {tier.priceLabel}
-        </Text>
-      </View>
-
-      {/* ── Accordion: features drop down when selected ── */}
-      {selected && features.length > 0 && (
-        <View style={styles.subFeaturesContainer}>
-          <View style={styles.subFeaturesDivider} />
-          {features.map((feature, i) => (
-            <View key={i} style={styles.subFeatureRow}>
-              <Svg
-                width={14} height={14} viewBox="0 0 24 24"
-                fill="none" stroke="#0B6DC3" strokeWidth={2.5}
-                strokeLinecap="round" strokeLinejoin="round"
-              >
-                <Polyline points="20 6 9 17 4 12" />
-              </Svg>
-              <Text style={styles.subFeatureText}>{feature}</Text>
-            </View>
-          ))}
+      {/* Checkmark badge */}
+      {selected && (
+        <View style={styles.checkBadge}>
+          <CheckIcon size={10} color="#FFFFFF" />
         </View>
       )}
+
+      <Text style={styles.cardBrandLabel}>HomeGenie Designs</Text>
+      <View style={styles.cardCountRow}>
+        <Text style={styles.cardBigNumber}>{pkg.wishes}</Text>
+        <Text style={styles.cardWishesLabel}>Wishes</Text>
+      </View>
+      <Text style={styles.cardPrice}>{pkg.price}</Text>
     </TouchableOpacity>
   );
 }
 
-// ── Token Package Card (Buy Tokens view) ─────────────────────────────────────
+// ── Tier Card (Subscribe view) ──────────────────────────────────────────────
 
-function TokenPackageCard({ pkg, selected, onSelect }) {
+function TierCard({ tier, selected, onSelect }) {
   return (
     <TouchableOpacity
-      activeOpacity={0.7}
-      onPress={() => onSelect(pkg.id)}
-      style={[styles.tokenCard, selected && styles.tokenCardSelected]}
+      activeOpacity={0.8}
+      onPress={() => onSelect(tier.id)}
+      style={[styles.gridCard, selected && styles.gridCardSelected]}
     >
-      <Text style={[styles.tokenCount, selected && styles.tokenCountSelected]}>
-        {pkg.tokens} Tokens
-      </Text>
-      <Text style={[styles.tokenPrice, selected && styles.tokenPriceSelected]}>
-        {pkg.price}
-      </Text>
+      {/* Checkmark badge */}
+      {selected && (
+        <View style={styles.checkBadge}>
+          <CheckIcon size={10} color="#FFFFFF" />
+        </View>
+      )}
+
+      <Text style={styles.cardBrandLabel}>{tier.name}</Text>
+      <View style={styles.cardCountRow}>
+        <Text style={styles.cardBigNumber}>
+          {tier.gens === -1 ? '\u221E' : tier.gens}
+        </Text>
+        <Text style={styles.cardWishesLabel}>Wishes</Text>
+      </View>
+      <Text style={styles.cardPrice}>{tier.priceLabel}</Text>
     </TouchableOpacity>
   );
 }
 
-// ── Toggle Pill ──────────────────────────────────────────────────────────────
+// ── Toggle Pill ─────────────────────────────────────────────────────────────
 
 function TogglePill({ activeTab, onTabChange }) {
   return (
     <View style={styles.toggleContainer}>
       <TouchableOpacity
         activeOpacity={0.7}
-        onPress={() => onTabChange('tokens')}
-        style={[styles.toggleTab, activeTab === 'tokens' && styles.toggleTabActive]}
-      >
-        <Text style={[styles.toggleText, activeTab === 'tokens' && styles.toggleTextActive]}>
-          Buy Tokens
-        </Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        activeOpacity={0.7}
         onPress={() => onTabChange('subscribe')}
         style={[styles.toggleTab, activeTab === 'subscribe' && styles.toggleTabActive]}
       >
         <Text style={[styles.toggleText, activeTab === 'subscribe' && styles.toggleTextActive]}>
-          Subscribe Monthly
+          Subscribe
+        </Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        activeOpacity={0.7}
+        onPress={() => onTabChange('wishes')}
+        style={[styles.toggleTab, activeTab === 'wishes' && styles.toggleTabActive]}
+      >
+        <Text style={[styles.toggleText, activeTab === 'wishes' && styles.toggleTextActive]}>
+          Wishes
         </Text>
       </TouchableOpacity>
     </View>
@@ -188,34 +207,70 @@ export default function PaywallScreen({ navigation }) {
     tokenBalance, purchaseTokens,
   } = useSubscription();
 
-  const [activeTab, setActiveTab] = useState('tokens'); // tokens is primary/default
+  const [activeTab, setActiveTab] = useState('wishes');
   const [selectedTier, setSelectedTier] = useState('premium');
-  const [selectedToken, setSelectedToken] = useState('snapspace_tokens_4');
+  const [selectedWish, setSelectedWish] = useState('homegenie_wishes_4');
   const [purchasing, setPurchasing] = useState(false);
   const [restoring, setRestoring] = useState(false);
 
-  // Animate card expand/collapse when tier selection changes
-  const handleSelectTier = (tierId) => {
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    setSelectedTier(tierId);
-  };
+  // ── Hero slideshow animation ───────────────────────────────────────────
+  const heroOpacities = useRef(HERO_IMAGES.map((_, i) => new Animated.Value(i === 0 ? 1 : 0))).current;
+  const heroCurrentIdx = useRef(0);
+  const heroTimerRef = useRef(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const scheduleNext = () => {
+      heroTimerRef.current = setTimeout(() => {
+        if (cancelled) return;
+        const currentIdx = heroCurrentIdx.current;
+        const nextIdx = (currentIdx + 1) % HERO_IMAGES.length;
+
+        Animated.timing(heroOpacities[nextIdx], {
+          toValue: 1,
+          duration: HERO_FADE_MS,
+          useNativeDriver: true,
+        }).start(() => {
+          if (cancelled) return;
+          heroOpacities[currentIdx].setValue(0);
+          heroCurrentIdx.current = nextIdx;
+          scheduleNext();
+        });
+      }, HERO_INTERVAL);
+    };
+
+    scheduleNext();
+    return () => { cancelled = true; clearTimeout(heroTimerRef.current); };
+  }, []);
 
   // Quota progress
   const usedCount = subscription.generationsUsed;
   const totalFree = subscription.tier === 'free' ? 5 : subscription.quotaLimit;
   const progressPct = Math.min(1, usedCount / totalFree);
 
+  // Entrance animation — bar fills from 0 to actual value once on mount
+  const progressAnim = useRef(new Animated.Value(0)).current;
+  useEffect(() => {
+    Animated.timing(progressAnim, {
+      toValue: progressPct,
+      duration: 800,
+      delay: 400,
+      useNativeDriver: false,
+    }).start();
+  }, [progressPct]);
+
   // Selected items
   const selectedSubTier = PAID_TIERS.find(t => t.id === selectedTier);
-  const selectedTokenPkg = TOKEN_PACKAGES.find(p => p.id === selectedToken);
+  const selectedWishPkg = WISH_PACKAGES.find(p => p.id === selectedWish);
 
   // ── Purchase handlers ──────────────────────────────────────────────────
 
   const handlePurchase = async () => {
     setPurchasing(true);
     try {
-      if (activeTab === 'tokens') {
-        const result = await purchaseTokens(selectedToken);
+      if (activeTab === 'wishes') {
+        const result = await purchaseTokens(selectedWish);
         if (result?.success) navigation.goBack();
       } else {
         const result = await purchaseSubscription(selectedSubTier.productId);
@@ -225,6 +280,25 @@ export default function PaywallScreen({ navigation }) {
       Alert.alert('Purchase Failed', e.message);
     } finally {
       setPurchasing(false);
+    }
+  };
+
+  // ── Restore purchases ─────────────────────────────────────────────────
+
+  const handleRestore = async () => {
+    setRestoring(true);
+    try {
+      const result = await restorePurchases();
+      if (result?.restored > 0) {
+        Alert.alert('Restored', 'Your purchases have been restored.');
+        navigation.goBack();
+      } else {
+        Alert.alert('Nothing to Restore', 'No previous purchases were found.');
+      }
+    } catch (e) {
+      Alert.alert('Restore Failed', e.message);
+    } finally {
+      setRestoring(false);
     }
   };
 
@@ -247,148 +321,190 @@ export default function PaywallScreen({ navigation }) {
 
   const ctaLabel = purchasing
     ? 'Processing...'
-    : activeTab === 'tokens'
-      ? `HomeGenie Tokens: ${selectedTokenPkg?.tokens ?? 4}`
-      : 'Subscribe Monthly';
+    : activeTab === 'wishes'
+      ? `HomeGenie Wishes`
+      : 'Subscribe Weekly';
 
-  const ctaPrice = activeTab === 'tokens'
-    ? selectedTokenPkg?.price ?? '$0.99'
-    : selectedSubTier?.priceLabel ?? '$19.99/mo';
+  const ctaPrice = activeTab === 'wishes'
+    ? selectedWishPkg?.price ?? '$0.99'
+    : selectedSubTier?.priceLabel ?? '$1.99/wk';
+
+  // ── Features for selected tier ─────────────────────────────────────────
+  const features = TIER_FEATURES[selectedTier] || TIER_FEATURES.basic;
+
+  // Ordered packages for the grid
+  const orderedWishes = WISH_CARD_ORDER
+    .map(id => WISH_PACKAGES.find(p => p.id === id))
+    .filter(Boolean);
+
+  const orderedTiers = TIER_CARD_ORDER
+    .map(id => PAID_TIERS.find(t => t.id === id))
+    .filter(Boolean);
 
   return (
-    <View style={styles.overlay}>
-    <SafeAreaView style={styles.root} edges={['top', 'bottom']}>
+    <View style={styles.root}>
+      {/* ── Background hero slideshow ─────────────────────────────── */}
+      <View style={StyleSheet.absoluteFill}>
+        {HERO_IMAGES.map((src, i) => (
+          <Animated.View key={i} style={[StyleSheet.absoluteFill, { opacity: heroOpacities[i] }]}>
+            <Image
+              source={src}
+              style={{ width: '100%', height: '100%' }}
+              resizeMode="cover"
+            />
+          </Animated.View>
+        ))}
+      </View>
 
-      {/* ── Everything scrolls together ───────────────────────────── */}
-      <ScrollView
-        style={styles.scroll}
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-        keyboardShouldPersistTaps="handled"
-        bounces={false}
-        alwaysBounceVertical={false}
-        overScrollMode="never"
-      >
-        {/* ── Wordmark header ─────────────────────────────────────── */}
-        <View style={styles.header}>
-          <View style={{ width: 40 }} />
-          <Text style={styles.wordmark}>HomeGenie</Text>
-          <TouchableOpacity
-            onPress={() => navigation.goBack()}
-            style={styles.closeBtn}
-            hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-          >
-            <CloseIcon />
-          </TouchableOpacity>
-        </View>
+      {/* ── Gradient overlay ──────────────────────────────────────── */}
+      <LinearGradient
+        colors={['rgba(11,109,195,0.65)', 'rgba(0,0,0,0.80)']}
+        locations={[0.17, 0.75]}
+        style={StyleSheet.absoluteFill}
+        pointerEvents="none"
+      />
 
-        <Text style={styles.subtitle}>Shop and Design your room with AI...</Text>
-
-        {/* ── Progress bar card ───────────────────────────────────── */}
-        <View style={styles.progressCard}>
-          <View style={styles.progressLabelRow}>
-            <Text style={styles.progressLabel}>Free generations used</Text>
-            <Text style={styles.progressCount}>{usedCount}/{totalFree}</Text>
-          </View>
-          <View style={styles.progressTrack}>
-            <View style={[styles.progressFill, { width: `${progressPct * 100}%` }]} />
-          </View>
-        </View>
-
-        {/* ── Toggle pill ─────────────────────────────────────────── */}
-        <View style={styles.toggleWrapper}>
-          <TogglePill activeTab={activeTab} onTabChange={setActiveTab} />
-        </View>
-
-        {/* ── Referral banner ─────────────────────────────────────── */}
-        <TouchableOpacity
-          activeOpacity={0.7}
-          onPress={handleShareReferral}
-          style={styles.referralBanner}
+      <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
+        {/* ── Scrollable content ────────────────────────────────────── */}
+        <ScrollView
+          style={styles.scroll}
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+          bounces={false}
+          alwaysBounceVertical={false}
+          overScrollMode="never"
         >
-          <View style={{ flex: 1 }}>
-            <Text style={styles.referralText}>
-              Refer a friend get <Text style={styles.referralHighlight}>2 Free</Text> Credits
-            </Text>
-            <Text style={styles.referralSub}>when they sign up!</Text>
+          {/* ── Header ─────────────────────────────────────────────── */}
+          <View style={styles.header}>
+            <View style={{ width: 40 }} />
+            <Text style={styles.wordmark}>HomeGenie</Text>
+            <TouchableOpacity
+              onPress={() => navigation.goBack()}
+              style={styles.closeBtn}
+              hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+            >
+              <CloseIcon />
+            </TouchableOpacity>
           </View>
-          <View style={styles.referralShareBtn}>
-            <ShareIcon />
-          </View>
-        </TouchableOpacity>
 
-        {/* ── Gray container box ──────────────────────────────────── */}
-        <View style={styles.contentBox}>
-          {activeTab === 'tokens' ? (
+          <Text style={styles.subtitle}>Shop and Design your room with AI...</Text>
+
+          {/* ── Free Wishes Usage bar ──────────────────────────────── */}
+          <View style={styles.progressCard}>
+            <View style={styles.progressLabelRow}>
+              <Text style={styles.progressLabel}>Free Wishes Usage</Text>
+              <Text style={styles.progressCount}>{usedCount}/{totalFree}</Text>
+            </View>
+            <View style={styles.progressTrack}>
+              <Animated.View style={[styles.progressFill, {
+                width: progressAnim.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: ['0%', '100%'],
+                }),
+              }]} />
+            </View>
+          </View>
+
+          {/* ── Toggle pill ───────────────────────────────────────── */}
+          <View style={styles.toggleWrapper}>
+            <TogglePill activeTab={activeTab} onTabChange={setActiveTab} />
+          </View>
+
+          {/* ── Card grid ─────────────────────────────────────────── */}
+          {activeTab === 'wishes' ? (
+            <View style={styles.cardGrid}>
+              {orderedWishes.map(pkg => (
+                <WishCard
+                  key={pkg.id}
+                  pkg={pkg}
+                  selected={selectedWish === pkg.id}
+                  onSelect={setSelectedWish}
+                />
+              ))}
+            </View>
+          ) : (
             <>
-              <Text style={styles.sectionTitle}>Buy HomeGenie Tokens Individual</Text>
-              <View style={styles.sectionDivider} />
-
-              <View style={styles.tokenGrid}>
-                {TOKEN_PACKAGES.map(pkg => (
-                  <TokenPackageCard
-                    key={pkg.id}
-                    pkg={pkg}
-                    selected={selectedToken === pkg.id}
-                    onSelect={setSelectedToken}
+              <View style={styles.cardGrid}>
+                {orderedTiers.map(tier => (
+                  <TierCard
+                    key={tier.id}
+                    tier={tier}
+                    selected={selectedTier === tier.id}
+                    onSelect={setSelectedTier}
                   />
                 ))}
               </View>
-            </>
-          ) : (
-            <>
-              <Text style={styles.sectionTitle}>Subscribe Monthly To HomeGenie</Text>
-              <View style={styles.sectionDivider} />
 
-              {PAID_TIERS.map(tier => (
-                <TierCard
-                  key={tier.id}
-                  tier={tier}
-                  selected={selectedTier === tier.id}
-                  onSelect={handleSelectTier}
-                />
-              ))}
+              {/* ── Feature checklist ──────────────────────────────── */}
+              <View style={styles.featuresSection}>
+                {features.map((feature, i) => (
+                  <View key={i} style={styles.featureRow}>
+                    <View style={styles.featureCheckCircle}>
+                      <CheckIcon size={11} color="#67ACE9" />
+                    </View>
+                    <Text style={styles.featureText}>{feature}</Text>
+                  </View>
+                ))}
+              </View>
             </>
           )}
-        </View>
 
-        {/* ── Fine print + legal ──────────────────────────────────── */}
-        <View style={styles.legalSection}>
-          <Text style={styles.finePrint}>
-            Payment will be charged to your Apple ID account at confirmation of purchase.
-            Subscription automatically renews unless cancelled at least 24 hours before the
-            end of the current period. You can manage or cancel your subscription in your
-            device's Settings {'>'} Apple ID {'>'} Subscriptions.
-          </Text>
-          <View style={styles.legalLinks}>
-            <TouchableOpacity onPress={() => navigation.navigate('TermsOfUse')} activeOpacity={0.7} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
-              <Text style={styles.legalLink}>Terms of Use</Text>
-            </TouchableOpacity>
-            <Text style={styles.legalDot}>·</Text>
-            <TouchableOpacity onPress={() => navigation.navigate('PrivacyPolicy')} activeOpacity={0.7} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
-              <Text style={styles.legalLink}>Privacy Policy</Text>
-            </TouchableOpacity>
+          {/* ── Legal section ─────────────────────────────────────── */}
+          <View style={styles.legalSection}>
+            <Text style={styles.finePrint}>
+              Payment will be charged to your Apple ID account at confirmation of purchase.
+              Subscription automatically renews unless cancelled at least 24 hours before the
+              end of the current period. You can manage or cancel your subscription in your
+              device's Settings {'>'} Apple ID {'>'} Subscriptions.
+            </Text>
+            <View style={styles.legalLinks}>
+              <TouchableOpacity onPress={() => navigation.navigate('TermsOfUse')} activeOpacity={0.7} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+                <Text style={styles.legalLink}>Terms of Use</Text>
+              </TouchableOpacity>
+              <Text style={styles.legalDot}>{'\u00B7'}</Text>
+              <TouchableOpacity onPress={() => navigation.navigate('PrivacyPolicy')} activeOpacity={0.7} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+                <Text style={styles.legalLink}>Privacy Policy</Text>
+              </TouchableOpacity>
+              <Text style={styles.legalDot}>{'\u00B7'}</Text>
+              <TouchableOpacity onPress={handleRestore} activeOpacity={0.7} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+                <Text style={styles.legalLink}>{restoring ? 'Restoring...' : 'Restore Purchases'}</Text>
+              </TouchableOpacity>
+            </View>
           </View>
+        </ScrollView>
+
+        {/* ── Sticky bottom section ─────────────────────────────────── */}
+        <View style={styles.stickyBar}>
+          {/* CTA button */}
+          <TouchableOpacity
+            onPress={handlePurchase}
+            disabled={purchasing}
+            activeOpacity={0.85}
+            style={[styles.cta, purchasing && styles.ctaDisabled]}
+          >
+            <View style={styles.ctaInner}>
+              <Text style={styles.ctaText}>{ctaLabel}</Text>
+              <View style={styles.ctaDivider} />
+              <Text style={styles.ctaPrice}>{ctaPrice}</Text>
+            </View>
+          </TouchableOpacity>
+
+          {/* Referral share button */}
+          <TouchableOpacity
+            activeOpacity={0.7}
+            onPress={handleShareReferral}
+            style={styles.referralBtn}
+          >
+            <Text style={styles.referralBtnText}>
+              Share to a friend and get free Wishes!
+            </Text>
+            <View style={styles.referralIconCircle}>
+              <ShareIcon />
+            </View>
+          </TouchableOpacity>
         </View>
-
-      </ScrollView>
-
-      {/* ── Sticky CTA bar — always pinned at bottom ─────────────── */}
-      <View style={styles.stickyBar}>
-        <TouchableOpacity
-          onPress={handlePurchase}
-          disabled={purchasing}
-          activeOpacity={0.85}
-          style={[styles.cta, purchasing && styles.ctaDisabled]}
-        >
-          <View style={styles.ctaInner}>
-            <Text style={styles.ctaText}>{ctaLabel}</Text>
-            <View style={styles.ctaDivider} />
-            <Text style={styles.ctaPrice}>{ctaPrice}</Text>
-          </View>
-        </TouchableOpacity>
-      </View>
-    </SafeAreaView>
+      </SafeAreaView>
     </View>
   );
 }
@@ -396,21 +512,23 @@ export default function PaywallScreen({ navigation }) {
 // ── Styles ────────────────────────────────────────────────────────────────────
 
 const BLUE = colors.bluePrimary;
-// Token cards sit inside: screen padding (20) + contentBox padding (16) on each side
-const TOKEN_CARD_W = (SCREEN_W - 2 * layout.screenPaddingH - 2 * space.base - 2 * space.sm) / 3;
 
 const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.45)',
-    paddingTop: 90,
-  },
   root: {
     flex: 1,
-    backgroundColor: C.white,
-    borderTopLeftRadius: 15,
-    borderTopRightRadius: 15,
-    overflow: 'hidden',
+    backgroundColor: '#000',
+  },
+  safeArea: {
+    flex: 1,
+  },
+
+  // ── Scroll
+  scroll: {
+    flex: 1,
+  },
+  scrollContent: {
+    paddingBottom: 16,
+    flexGrow: 1,
   },
 
   // ── Header
@@ -419,49 +537,49 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: layout.screenPaddingH,
-    paddingTop: space.sm,
-    paddingBottom: space.xs,
+    paddingTop: space['2xl'],
+    paddingBottom: space.sm,
   },
   wordmark: {
-    fontSize: 24,
+    fontSize: 38,
     fontWeight: fontWeight.xbold,
     fontFamily: 'Geist_700Bold',
-    color: '#111827',
+    color: '#FFFFFF',
     letterSpacing: -0.5,
   },
   closeBtn: {
     width: 40,
     height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255,255,255,0.15)',
     alignItems: 'center',
     justifyContent: 'center',
   },
   subtitle: {
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: fontWeight.regular,
     fontFamily: 'Geist_400Regular',
-    color: '#6B7280',
+    color: 'rgba(255,255,255,0.75)',
     textAlign: 'center',
-    paddingHorizontal: layout.screenPaddingH,
-    marginBottom: space.lg,
+    paddingHorizontal: layout.screenPaddingH + 16,
+    marginBottom: space['2xl'],
   },
 
-  // ── Progress card
+  // ── Progress card (Free Wishes Usage)
   progressCard: {
     marginHorizontal: layout.screenPaddingH,
     marginBottom: space.lg,
     paddingHorizontal: 16,
     paddingVertical: 14,
-    backgroundColor: '#F3F4F6',
-    borderRadius: 6,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.13,
-    shadowRadius: 6,
-    elevation: 4,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#D1D5DB',
   },
   progressLabelRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
     marginBottom: 8,
   },
   progressLabel: {
@@ -471,7 +589,7 @@ const styles = StyleSheet.create({
     color: '#6B7280',
   },
   progressCount: {
-    fontSize: 13,
+    fontSize: 14,
     fontWeight: fontWeight.bold,
     fontFamily: 'Geist_700Bold',
     color: '#111827',
@@ -479,8 +597,7 @@ const styles = StyleSheet.create({
   progressTrack: {
     height: 4,
     borderRadius: 2,
-    backgroundColor: '#D1D5DB',
-    // No overflow:hidden — allows the fill's glow shadow to render
+    backgroundColor: '#E5E7EB',
   },
   progressFill: {
     height: 4,
@@ -488,280 +605,150 @@ const styles = StyleSheet.create({
     backgroundColor: '#67ACE9',
     shadowColor: '#67ACE9',
     shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.95,
-    shadowRadius: 12,
+    shadowOpacity: 0.6,
+    shadowRadius: 6,
+    elevation: 4,
   },
 
-  // ── Toggle pill
+  // ── Toggle pill — matches mockup: blue filled active, transparent inactive
   toggleWrapper: {
-    paddingHorizontal: layout.screenPaddingH,
-    marginBottom: space.lg,
+    paddingHorizontal: layout.screenPaddingH + 56,
+    marginBottom: space.xl,
   },
   toggleContainer: {
     flexDirection: 'row',
-    backgroundColor: '#F3F4F6',
     borderRadius: 28,
+    backgroundColor: '#FFFFFF',
     padding: 3,
   },
   toggleTab: {
     flex: 1,
-    height: 38,
-    borderRadius: 25,
+    height: 34,
+    borderRadius: 22,
     alignItems: 'center',
     justifyContent: 'center',
   },
   toggleTabActive: {
-    backgroundColor: C.white,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
+    backgroundColor: '#67ACE9',
   },
   toggleText: {
-    fontSize: 14,
-    fontWeight: fontWeight.medium,
-    fontFamily: 'Geist_500Medium',
-    color: '#9CA3AF',
+    fontSize: 13,
+    fontWeight: fontWeight.semibold,
+    fontFamily: 'Geist_600SemiBold',
+    color: '#67ACE9',
   },
   toggleTextActive: {
-    color: BLUE,
+    color: '#FFFFFF',
     fontWeight: fontWeight.semibold,
     fontFamily: 'Geist_600SemiBold',
   },
 
-  // ── Referral banner
-  referralBanner: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginHorizontal: layout.screenPaddingH,
-    marginBottom: space.lg,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    backgroundColor: '#F9FAFB',
-    borderRadius: radius.md,
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
-  },
-  referralText: {
-    fontSize: 13,
-    fontWeight: fontWeight.regular,
-    fontFamily: 'Geist_400Regular',
-    color: '#6B7280',
-    lineHeight: 18,
-  },
-  referralHighlight: {
-    fontWeight: fontWeight.bold,
-    fontFamily: 'Geist_700Bold',
-    color: BLUE,
-  },
-  referralSub: {
-    fontSize: 13,
-    fontWeight: fontWeight.regular,
-    fontFamily: 'Geist_400Regular',
-    color: '#9CA3AF',
-    lineHeight: 18,
-  },
-  referralShareBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: '#F3F4F6',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginLeft: space.md,
-  },
-
-  // ── Scroll
-  scroll: {
-    flex: 1,
-  },
-  scrollContent: {
-    paddingBottom: 32,
-    flexGrow: 1,
-  },
-
-  // ── Gray content box
-  contentBox: {
-    backgroundColor: '#F6F7F9',
-    borderRadius: 16,
-    paddingTop: space.lg,
-    paddingBottom: space.xl,
-    paddingHorizontal: space.base,
-    marginHorizontal: layout.screenPaddingH,
-    marginBottom: space.sm,
-  },
-
-  // ── Section header
-  sectionTitle: {
-    fontSize: 15,
-    fontWeight: fontWeight.bold,
-    fontFamily: 'Geist_700Bold',
-    color: '#111827',
-    textAlign: 'center',
-    marginBottom: space.sm,
-  },
-  sectionDivider: {
-    height: 1,
-    backgroundColor: '#E5E7EB',
-    marginBottom: space.lg,
-  },
-
-  // ── Token grid
-  tokenGrid: {
+  // ── Card grid (2 columns)
+  cardGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: space.sm,
+    paddingHorizontal: layout.screenPaddingH,
+    gap: CARD_GAP,
+    marginBottom: space.lg,
   },
-  tokenCard: {
-    width: TOKEN_CARD_W,
-    paddingVertical: space.lg,
-    paddingHorizontal: space.sm,
-    borderRadius: 5,
-    borderWidth: 1,
-    borderColor: '#D1D5DB',
-    backgroundColor: C.white,
-    alignItems: 'center',
-    justifyContent: 'center',
+  gridCard: {
+    width: CARD_W,
+    backgroundColor: 'rgba(255,255,255,0.08)',
+    borderRadius: 16,
+    paddingVertical: 18,
+    paddingHorizontal: 14,
+    borderWidth: 1.5,
+    borderColor: 'rgba(255,255,255,0.25)',
   },
-  tokenCardSelected: {
-    borderColor: BLUE,
+  gridCardSelected: {
+    borderColor: '#67ACE9',
     borderWidth: 2,
-    backgroundColor: '#F0F7FF',
-    shadowColor: BLUE,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 6,
-    elevation: 4,
-  },
-  tokenCount: {
-    fontSize: 14,
-    fontWeight: fontWeight.semibold,
-    fontFamily: 'Geist_600SemiBold',
-    color: '#374151',
-    marginBottom: 4,
-  },
-  tokenCountSelected: {
-    color: BLUE,
-  },
-  tokenPrice: {
-    fontSize: 12,
-    fontWeight: fontWeight.regular,
-    fontFamily: 'Geist_400Regular',
-    color: '#9CA3AF',
-  },
-  tokenPriceSelected: {
-    color: '#6B7280',
+    backgroundColor: 'rgba(103,172,233,0.12)',
   },
 
-  // ── Subscription cards
-  subCard: {
-    borderRadius: 5,
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
-    backgroundColor: C.white,
-    paddingVertical: 10,
-    paddingHorizontal: space.base,
-    marginBottom: space.md,
-  },
-  subCardSelected: {
-    borderColor: BLUE,
+  // ── Checkmark badge (split on top-right corner edge)
+  checkBadge: {
+    position: 'absolute',
+    top: -10,
+    right: -10,
+    width: 26,
+    height: 26,
+    borderRadius: 13,
+    backgroundColor: '#67ACE9',
+    alignItems: 'center',
+    justifyContent: 'center',
     borderWidth: 2,
-    backgroundColor: '#F0F7FF',
-    shadowColor: BLUE,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 6,
-    elevation: 4,
+    borderColor: 'rgba(0,0,0,0.3)',
+    zIndex: 10,
   },
-  subCardHeader: {
+
+  // ── Card inner content
+  cardBrandLabel: {
+    fontSize: 11,
+    fontWeight: fontWeight.semibold,
+    fontFamily: 'Geist_600SemiBold',
+    color: 'rgba(255,255,255,0.6)',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+    marginBottom: 6,
+  },
+  cardCountRow: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    marginBottom: 6,
+  },
+  cardBigNumber: {
+    fontSize: 48,
+    fontWeight: fontWeight.bold,
+    fontFamily: 'Geist_700Bold',
+    color: '#FFFFFF',
+    lineHeight: 52,
+    letterSpacing: -1,
+  },
+  cardWishesLabel: {
+    fontSize: 14,
+    fontWeight: fontWeight.regular,
+    fontFamily: 'Geist_400Regular',
+    color: 'rgba(255,255,255,0.6)',
+    marginLeft: 6,
+  },
+  cardPrice: {
+    fontSize: 16,
+    fontWeight: fontWeight.semibold,
+    fontFamily: 'Geist_600SemiBold',
+    color: '#FFFFFF',
+  },
+
+  // ── Feature checklist (subscribe tab)
+  featuresSection: {
+    paddingHorizontal: layout.screenPaddingH,
+    marginBottom: space.lg,
+    gap: 12,
+  },
+  featureRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
   },
-  radio: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    borderWidth: 2,
-    borderColor: '#D1D5DB',
+  featureCheckCircle: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    backgroundColor: '#FFFFFF',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  radioSelected: {
-    borderColor: BLUE,
-  },
-  radioDot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: BLUE,
-  },
-  subTierName: {
-    fontSize: 13,
-    fontWeight: fontWeight.semibold,
-    fontFamily: 'Geist_600SemiBold',
-    color: '#111827',
-    marginBottom: 1,
-  },
-  subGenRow: {
-    flexDirection: 'row',
-    alignItems: 'baseline',
-  },
-  subGenCount: {
-    fontSize: 26,
-    fontWeight: fontWeight.semibold,
-    fontFamily: 'Geist_600SemiBold',
-    color: BLUE,
-    lineHeight: 30,
-  },
-  subGenCountUnlimited: {
-    fontSize: 22,
-    fontFamily: 'Geist_400Regular',
-  },
-  subGenLabel: {
-    fontSize: 12,
-    fontWeight: fontWeight.regular,
-    fontFamily: 'Geist_400Regular',
-    color: '#6B7280',
-    marginLeft: 2,
-  },
-  subTierPrice: {
+  featureText: {
     fontSize: 14,
-    fontWeight: fontWeight.semibold,
-    fontFamily: 'Geist_600SemiBold',
-    color: '#111827',
-  },
-  subTierPriceSelected: {
-    color: BLUE,
-  },
-
-  // ── Expandable features section
-  subFeaturesContainer: {
-    marginTop: space.sm,
-  },
-  subFeaturesDivider: {
-    height: 1,
-    backgroundColor: 'rgba(11,109,195,0.15)',
-    marginBottom: space.sm,
-  },
-  subFeatureRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    paddingVertical: 3,
-  },
-  subFeatureText: {
-    fontSize: 13,
     fontWeight: fontWeight.regular,
     fontFamily: 'Geist_400Regular',
-    color: '#374151',
+    color: 'rgba(255,255,255,0.85)',
     flex: 1,
   },
 
   // ── Legal section
   legalSection: {
-    marginTop: space.xl,
+    marginTop: space.lg,
     marginHorizontal: layout.screenPaddingH,
     paddingHorizontal: 4,
     gap: 10,
@@ -770,7 +757,7 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: fontWeight.regular,
     fontFamily: 'Geist_400Regular',
-    color: '#9CA3AF',
+    color: 'rgba(255,255,255,0.4)',
     textAlign: 'center',
     lineHeight: 16,
   },
@@ -778,33 +765,30 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
+    flexWrap: 'wrap',
     gap: 6,
   },
   legalLink: {
     fontSize: 12,
     fontWeight: fontWeight.medium,
     fontFamily: 'Geist_500Medium',
-    color: BLUE,
+    color: 'rgba(255,255,255,0.55)',
   },
   legalDot: {
     fontSize: 12,
-    fontFamily: 'Geist_400Regular',
-    color: '#9CA3AF',
+    color: 'rgba(255,255,255,0.3)',
   },
 
   // ── Sticky CTA bar
   stickyBar: {
     paddingHorizontal: layout.screenPaddingH,
     paddingTop: space.md,
-    paddingBottom: space.md,
-    borderTopWidth: 1,
-    borderTopColor: '#F3F4F6',
-    backgroundColor: C.white,
+    paddingBottom: space.xs,
   },
   cta: {
-    backgroundColor: BLUE,
+    backgroundColor: '#FFFFFF',
     borderRadius: 28,
-    height: 56,
+    height: 54,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -819,19 +803,47 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: fontWeight.bold,
     fontFamily: 'Geist_700Bold',
-    color: C.white,
+    color: '#67ACE9',
     letterSpacing: -0.2,
   },
   ctaDivider: {
     width: 1,
     height: 20,
-    backgroundColor: 'rgba(255,255,255,0.3)',
+    backgroundColor: 'rgba(103,172,233,0.3)',
     marginHorizontal: space.md,
   },
   ctaPrice: {
     fontSize: 16,
     fontWeight: fontWeight.bold,
     fontFamily: 'Geist_700Bold',
-    color: C.white,
+    color: '#67ACE9',
+  },
+
+  // ── Referral share button
+  referralBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    height: 50,
+    borderRadius: 28,
+    backgroundColor: '#67ACE9',
+    marginTop: space.sm,
+    paddingLeft: 24,
+    paddingRight: 6,
+  },
+  referralBtnText: {
+    fontSize: 14,
+    fontWeight: fontWeight.semibold,
+    fontFamily: 'Geist_600SemiBold',
+    color: '#FFFFFF',
+    flex: 1,
+  },
+  referralIconCircle: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    backgroundColor: '#FFFFFF',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });

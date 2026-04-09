@@ -27,7 +27,7 @@ const SECTIONS = [
     title: '1. Acceptance of Terms',
     body: `By downloading, installing, or using the HomeGenie mobile application ("App"), you agree to be bound by these Terms of Use ("Terms"). If you do not agree to these Terms, do not use the App.
 
-These Terms constitute a legally binding agreement between you and HomeGenie ("we," "us," or "our"). We reserve the right to update these Terms at any time by posting the revised version within the App and updating the "Last updated" date. Continued use of the App after changes are posted constitutes your acceptance of the revised Terms. If a change is material, we will notify you via in-app notification or email before it takes effect.`,
+These Terms constitute a legally binding agreement between you and HomeGenie, operated by SnapSpace Marketplace LLC ("we," "us," or "our"). We reserve the right to update these Terms at any time by posting the revised version within the App and updating the "Last updated" date. Continued use of the App after changes are posted constitutes your acceptance of the revised Terms. If a change is material, we will notify you via in-app notification or email before it takes effect.`,
   },
   {
     title: '2. Description of the App',
@@ -254,7 +254,7 @@ You may also request account deletion by emailing info@homegenie.app with the su
     title: '20. Contact Us',
     body: `If you have any questions, concerns, or feedback about these Terms of Use, please contact us:
 
-HomeGenie
+HomeGenie — operated by SnapSpace Marketplace LLC
 Email: info@homegenie.app
 Website: www.homegenie.app
 

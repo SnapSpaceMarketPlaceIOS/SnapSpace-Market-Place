@@ -1,5 +1,5 @@
 /**
- * SnapSpace — composite-products Edge Function (v6)
+ * HomeGenie — composite-products Edge Function (v6)
  *
  * Stitches up to 4 product images into a 512×512 2×2 panel JPEG so
  * flux-2-max receives 2 inputs (room + panel) instead of 4-5.

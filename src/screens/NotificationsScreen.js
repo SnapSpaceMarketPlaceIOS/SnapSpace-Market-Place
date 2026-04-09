@@ -15,8 +15,31 @@ import { space, radius, fontWeight, fontSize, uiColors, typeScale, shadow } from
 import { Button, Badge, SectionHeader } from '../components/ds';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const STORAGE_KEY_PREFS = '@snapspace_notif_prefs';
-const STORAGE_KEY_PUSH = '@snapspace_notif_push';
+const STORAGE_KEY_PREFS = '@homegenie_notif_prefs';
+const STORAGE_KEY_PUSH = '@homegenie_notif_push';
+
+// Legacy keys from the SnapSpace era — used for one-time migration
+const LEGACY_KEY_PREFS = '@snapspace_notif_prefs';
+const LEGACY_KEY_PUSH  = '@snapspace_notif_push';
+
+/**
+ * Migrates a single AsyncStorage key from the old SnapSpace prefix to the new
+ * HomeGenie prefix. No-op if the old key doesn't exist or migration already happened.
+ */
+async function migrateKey(legacyKey, newKey) {
+  try {
+    const [legacyValue, existingValue] = await Promise.all([
+      AsyncStorage.getItem(legacyKey),
+      AsyncStorage.getItem(newKey),
+    ]);
+    if (legacyValue !== null && existingValue === null) {
+      await AsyncStorage.setItem(newKey, legacyValue);
+      await AsyncStorage.removeItem(legacyKey);
+    }
+  } catch {
+    // Non-fatal
+  }
+}
 
 // ── Icons — all accept a `color` prop ─────────────────────────────────────────
 
@@ -134,6 +157,12 @@ export default function NotificationsScreen({ navigation }) {
   useEffect(() => {
     (async () => {
       try {
+        // Migrate legacy SnapSpace keys before reading
+        await Promise.all([
+          migrateKey(LEGACY_KEY_PREFS, STORAGE_KEY_PREFS),
+          migrateKey(LEGACY_KEY_PUSH, STORAGE_KEY_PUSH),
+        ]);
+
         const [storedPrefs, storedPush] = await Promise.all([
           AsyncStorage.getItem(STORAGE_KEY_PREFS),
           AsyncStorage.getItem(STORAGE_KEY_PUSH),
