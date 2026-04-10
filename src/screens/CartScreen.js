@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import CardImage from '../components/CardImage';
 import LensLoader from '../components/LensLoader';
-import Svg, { Path, Circle, Line, Polyline, Rect } from 'react-native-svg';
+import Svg, { Path, Circle, Line, Polyline, Rect, Ellipse } from 'react-native-svg';
 import theme from '../constants/theme';
 import { typeScale } from '../constants/tokens';
 import { useCart } from '../context/CartContext';
@@ -69,25 +69,113 @@ function PlusIcon() {
   );
 }
 
-function CheckoutCartIcon() {
+function CheckoutCartIcon({ color = '#FFFFFF' }) {
   return (
-    <Svg width={20} height={20} viewBox="0 0 24 24" fill="none"
-      stroke="#FFFFFF" strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round">
-      <Path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
-      <Circle cx={10} cy={20.5} r={1} fill="#FFFFFF" stroke="#FFFFFF" strokeWidth={1} />
-      <Circle cx={17} cy={20.5} r={1} fill="#FFFFFF" stroke="#FFFFFF" strokeWidth={1} />
+    <Svg width={18} height={18} viewBox="265.5 20.5 27 25" fill="none">
+      <Path
+        d="M267.104 22H270.08C270.756 22 271.094 22 271.353 22.1807C271.611 22.3614 271.727 22.6792 271.959 23.3149L272.937 26"
+        stroke={color} strokeWidth={1} strokeLinecap="round"
+      />
+      <Path
+        d="M287.521 39.3334H273.63C272.984 39.3334 272.661 39.3334 272.442 39.218C272.156 39.0675 271.961 38.7883 271.917 38.4684C271.884 38.2233 271.995 37.9197 272.216 37.3126C272.448 36.675 272.565 36.3562 272.755 36.1102C273.003 35.789 273.343 35.551 273.73 35.4278C274.026 35.3334 274.365 35.3334 275.044 35.3334H283.146"
+        stroke={color} strokeWidth={1} strokeLinecap="round" strokeLinejoin="round"
+      />
+      <Path
+        d="M283.846 35.3333H276.939C275.703 35.3333 275.085 35.3333 274.594 35.0212C274.103 34.7091 273.841 34.1497 273.317 33.0311L272.024 30.2733C271.123 28.3515 270.673 27.3906 271.115 26.6953C271.557 26 272.618 26 274.74 26H286.483C288.876 26 290.073 26 290.501 26.7728C290.93 27.5457 290.296 28.5605 289.027 30.59L287.238 33.4533C286.663 34.3724 286.376 34.8319 285.924 35.0826C285.471 35.3333 284.929 35.3333 283.846 35.3333Z"
+        stroke={color} strokeWidth={1} strokeLinecap="round"
+      />
+      <Ellipse cx={286.792} cy={42.6667} rx={1.45833} ry={1.33333} fill={color} />
+      <Ellipse cx={275.125} cy={42.6667} rx={1.45833} ry={1.33333} fill={color} />
     </Svg>
   );
 }
 
-function ShoppingBagIcon() {
+function CheckoutBar({ checkingOut, allAmazon, total, onPress }) {
+  const slideAnim = useRef(new Animated.Value(0)).current;
+  const [pressed, setPressed] = useState(false);
+
+  const handlePress = () => {
+    setPressed(true);
+    Animated.timing(slideAnim, {
+      toValue: 1,
+      duration: 350,
+      easing: Easing.out(Easing.cubic),
+      useNativeDriver: false,
+    }).start(() => {
+      onPress();
+      // Reset after navigation/action completes
+      setTimeout(() => {
+        setPressed(false);
+        slideAnim.setValue(0);
+      }, 600);
+    });
+  };
+
+  const slideWidth = slideAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['0%', '100%'],
+  });
+
+  const textColor = pressed ? C.primary : '#fff';
+  const dividerBg = pressed ? 'rgba(29,78,216,0.2)' : 'rgba(255,255,255,0.3)';
+  const iconColor = pressed ? C.primary : '#fff';
+
   return (
-    <Svg width={64} height={64} viewBox="0 0 24 24" fill="none"
-      stroke={C.textTertiary} strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round"
-      style={{ opacity: 0.5 }}>
-      <Path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
-      <Circle cx={10} cy={20.5} r={1} fill={C.textTertiary} stroke={C.textTertiary} strokeWidth={1} />
-      <Circle cx={17} cy={20.5} r={1} fill={C.textTertiary} stroke={C.textTertiary} strokeWidth={1} />
+    <View style={styles.checkoutWrap}>
+      <TouchableOpacity
+        style={[styles.checkoutBtn, checkingOut && { opacity: 0.7 }]}
+        activeOpacity={1}
+        disabled={checkingOut}
+        onPress={handlePress}
+        accessibilityLabel={`Checkout for $${total.toLocaleString()}`}
+      >
+        {/* White slide overlay */}
+        <Animated.View style={[styles.checkoutSlide, { width: slideWidth }]} />
+
+        {checkingOut ? (
+          <LensLoader size={20} color="#fff" light="#fff" />
+        ) : allAmazon ? (
+          <View style={styles.checkoutBtnInner}>
+            <View style={styles.checkoutLeft}>
+              <CheckoutCartIcon color={iconColor} />
+              <Text style={[styles.checkoutLabel, { color: textColor, marginLeft: 6 }]}>Buy on Amazon</Text>
+            </View>
+            <View style={[styles.checkoutDivider, { backgroundColor: dividerBg }]} />
+            <Text style={[styles.checkoutPrice, { color: textColor }]}>${total.toLocaleString()}</Text>
+          </View>
+        ) : (
+          <View style={styles.checkoutBtnInner}>
+            <View style={styles.checkoutLeft}>
+              <CheckoutCartIcon color={iconColor} />
+              <Text style={[styles.checkoutLabel, { color: textColor, marginLeft: 6 }]}>Checkout</Text>
+            </View>
+            <View style={[styles.checkoutDivider, { backgroundColor: dividerBg }]} />
+            <Text style={[styles.checkoutPrice, { color: textColor }]}>${total.toLocaleString()}</Text>
+          </View>
+        )}
+      </TouchableOpacity>
+    </View>
+  );
+}
+
+function ShoppingBagIcon() {
+  const color = C.textTertiary;
+  return (
+    <Svg width={64} height={64} viewBox="265.5 20.5 27 25" fill="none" style={{ opacity: 0.45 }}>
+      <Path
+        d="M267.104 22H270.08C270.756 22 271.094 22 271.353 22.1807C271.611 22.3614 271.727 22.6792 271.959 23.3149L272.937 26"
+        stroke={color} strokeWidth={0.8} strokeLinecap="round"
+      />
+      <Path
+        d="M287.521 39.3334H273.63C272.984 39.3334 272.661 39.3334 272.442 39.218C272.156 39.0675 271.961 38.7883 271.917 38.4684C271.884 38.2233 271.995 37.9197 272.216 37.3126C272.448 36.675 272.565 36.3562 272.755 36.1102C273.003 35.789 273.343 35.551 273.73 35.4278C274.026 35.3334 274.365 35.3334 275.044 35.3334H283.146"
+        stroke={color} strokeWidth={0.8} strokeLinecap="round" strokeLinejoin="round"
+      />
+      <Path
+        d="M283.846 35.3333H276.939C275.703 35.3333 275.085 35.3333 274.594 35.0212C274.103 34.7091 273.841 34.1497 273.317 33.0311L272.024 30.2733C271.123 28.3515 270.673 27.3906 271.115 26.6953C271.557 26 272.618 26 274.74 26H286.483C288.876 26 290.073 26 290.501 26.7728C290.93 27.5457 290.296 28.5605 289.027 30.59L287.238 33.4533C286.663 34.3724 286.376 34.8319 285.924 35.0826C285.471 35.3333 284.929 35.3333 283.846 35.3333Z"
+        stroke={color} strokeWidth={0.8} strokeLinecap="round"
+      />
+      <Ellipse cx={286.792} cy={42.6667} rx={1.45833} ry={1.33333} fill={color} />
+      <Ellipse cx={275.125} cy={42.6667} rx={1.45833} ry={1.33333} fill={color} />
     </Svg>
   );
 }
@@ -472,34 +560,12 @@ export default function CartScreen({ navigation }) {
       </ScrollView>
 
       {/* ── Section 2D: Checkout Bar ────────────────────────────────── */}
-      <View style={styles.checkoutWrap}>
-        {/* handleCheckout routing logic unchanged */}
-        <TouchableOpacity
-          style={[styles.checkoutBtn, checkingOut && { opacity: 0.7 }]}
-          activeOpacity={0.85}
-          disabled={checkingOut}
-          onPress={handleCheckout}
-          accessibilityLabel={`Checkout for $${total.toLocaleString()}`}
-        >
-          {checkingOut ? (
-            <LensLoader size={20} color="#fff" light="#fff" />
-          ) : allAmazon ? (
-            <View style={styles.checkoutBtnInnerCentered}>
-              <CheckoutCartIcon />
-              <Text style={styles.checkoutLabel}>  Buy on Amazon</Text>
-            </View>
-          ) : (
-            <View style={styles.checkoutBtnInner}>
-              <View style={styles.checkoutLeft}>
-                <CheckoutCartIcon />
-                <Text style={styles.checkoutLabel}>  Checkout</Text>
-              </View>
-              <View style={styles.checkoutDivider} />
-              <Text style={styles.checkoutPrice}>${total.toLocaleString()}</Text>
-            </View>
-          )}
-        </TouchableOpacity>
-      </View>
+      <CheckoutBar
+        checkingOut={checkingOut}
+        allAmazon={allAmazon}
+        total={total}
+        onPress={handleCheckout}
+      />
 
     </TabScreenFade>
   );
@@ -829,6 +895,14 @@ const styles = StyleSheet.create({
     shadowRadius: SH.md.shadowRadius,
     elevation: SH.md.elevation,
   },
+  checkoutSlide: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    bottom: 0,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 9999,
+  },
   checkoutBtnInner: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -845,6 +919,11 @@ const styles = StyleSheet.create({
   checkoutLeft: {
     flexDirection: 'row',
     alignItems: 'center',
+  },
+  checkoutRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
   },
   checkoutLabel: {
     ...typeScale.button,

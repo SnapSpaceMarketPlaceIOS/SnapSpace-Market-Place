@@ -327,6 +327,19 @@ export async function updateDesignVisibility(designId, visibility) {
 }
 
 /**
+ * Update the products snapshot on an existing design.
+ * Used to ensure products are always persisted even if auto-save
+ * fired before product matching completed.
+ */
+export async function updateDesignProducts(designId, products) {
+  const { error } = await supabase
+    .from('user_designs')
+    .update({ products })
+    .eq('id', designId);
+  if (error) throw error;
+}
+
+/**
  * Delete duplicate designs that share the same prompt+image within a short window.
  * Keeps the most recent entry for each unique prompt per user.
  */

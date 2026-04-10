@@ -25,7 +25,7 @@ import { useAuth } from '../context/AuthContext';
 import { useLiked } from '../context/LikedContext';
 import { getProductsForPrompt, getRecommendedProducts } from '../services/affiliateProducts';
 import { parseDesignPrompt } from '../utils/promptParser';
-import { saveUserDesign, updateDesignVisibility } from '../services/supabase';
+import { saveUserDesign, updateDesignVisibility, updateDesignProducts } from '../services/supabase';
 import * as FileSystem from 'expo-file-system/legacy';
 
 const { width } = Dimensions.get('window');
@@ -269,8 +269,11 @@ export default function RoomResultScreen({ route, navigation }) {
   }, [products, prompt, liked]);
 
   // ── Auto-save every generation to Supabase (private by default) ──
+  // Guard: wait until products are loaded before saving — otherwise we'd
+  // persist an empty products array and downstream screens would re-match
+  // with wrong products.
   useEffect(() => {
-    if (!resultUri || !user?.id || autoSaveAttempted.current) return;
+    if (!resultUri || !user?.id || autoSaveAttempted.current || products.length === 0) return;
     autoSaveAttempted.current = true;
     const styleTags = products.flatMap(p => p.styles || []).filter(Boolean);
     const uniqueTags = [...new Set(styleTags)];
@@ -362,17 +365,25 @@ export default function RoomResultScreen({ route, navigation }) {
     if (!resultUri || !user || posting) return;
     setPosting(true);
     try {
+      // Build a fresh product snapshot from the current (correct) products
+      const productSummary = products.map(p => ({
+        id: p.id, name: p.name, brand: p.brand,
+        price: p.priceValue ?? p.price, imageUrl: p.imageUrl,
+        rating: p.rating, reviewCount: p.reviewCount,
+        affiliateUrl: p.affiliateUrl, source: p.source,
+      }));
+
       if (autoSavedDesignId) {
+        // Update visibility + always re-save products to cover any race condition
         await updateDesignVisibility(autoSavedDesignId, postVisibility);
+        if (productSummary.length > 0) {
+          await updateDesignProducts(autoSavedDesignId, productSummary).catch(err =>
+            console.warn('[Post] Product patch failed:', err.message)
+          );
+        }
       } else {
         const styleTags = products.flatMap(p => p.styles || []).filter(Boolean);
         const uniqueTags = [...new Set(styleTags)];
-        const productSummary = products.map(p => ({
-          id: p.id, name: p.name, brand: p.brand,
-          price: p.priceValue ?? p.price, imageUrl: p.imageUrl,
-          rating: p.rating, reviewCount: p.reviewCount,
-          affiliateUrl: p.affiliateUrl, source: p.source,
-        }));
         const result = await saveUserDesign(user.id, {
           imageUrl: resultUri, prompt, styleTags: uniqueTags,
           products: productSummary, visibility: postVisibility,

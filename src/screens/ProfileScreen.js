@@ -27,6 +27,7 @@ import { useAuth } from '../context/AuthContext';
 import AuthGate from '../components/AuthGate';
 import { useFocusEffect } from '@react-navigation/native';
 import { updateProfile, uploadAvatar, getUserDesigns, getMyStats, deleteExpiredDesigns, getUserLikedDesigns } from '../services/supabase';
+import { parseDesignPrompt } from '../utils/promptParser';
 // DESIGNS import removed — profile only shows real user designs from Supabase
 import Skeleton from '../components/Skeleton';
 import PressableCard from '../components/PressableCard';
@@ -113,7 +114,7 @@ function ImagePlaceholderIcon({ size = 28 }) {
 
 function HeartIcon({ filled = false, size = 13 }) {
   return (
-    <Svg width={size} height={size} viewBox="0 0 24 24" fill={filled ? '#ef4444' : 'none'} stroke={filled ? '#ef4444' : '#444'} strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round">
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill={filled ? '#67ACE9' : 'none'} stroke={filled ? '#67ACE9' : '#444'} strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round">
       <Path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
     </Svg>
   );
@@ -333,17 +334,34 @@ export default function ProfileScreen({ navigation }) {
   const [socialStats, setSocialStats] = useState({ followers: 0, following: 0, designs: 0 });
   const [serverLikedDesigns, setServerLikedDesigns] = useState([]);
 
-  // Fetch real follower/following/design counts + liked designs
+  // Fetch all profile data in parallel with 5-min cache
+  const lastProfileFetch = useRef(0);
+  const PROFILE_CACHE_TTL = 5 * 60 * 1000;
   useFocusEffect(
     useCallback(() => {
-      if (!user?.id) return;
-      getMyStats(user.id)
-        .then(stats => { if (stats) setSocialStats(stats); })
-        .catch(() => {}); // fail silently — counts stay at 0
-      // Fetch designs the user has liked from Supabase
-      getUserLikedDesigns(user.id)
-        .then(rows => {
-          const normalized = (rows || []).map(d => ({
+      if (!user?.id) { setDesignsLoading(false); return; }
+      const now = Date.now();
+      if (myDesigns.length > 0 && now - lastProfileFetch.current < PROFILE_CACHE_TTL) return;
+      lastProfileFetch.current = now;
+      let cancelled = false;
+      setDesignsLoading(true);
+
+      // Fire-and-forget cleanup (don't block main fetches)
+      deleteExpiredDesigns(user.id).catch(() => {});
+
+      // Parallel fetches — stats, liked designs, own designs all at once
+      Promise.all([
+        getMyStats(user.id).catch(() => null),
+        getUserLikedDesigns(user.id).catch(() => []),
+        getUserDesigns(user.id).catch(() => []),
+      ]).then(([stats, likedRows, designs]) => {
+        if (cancelled) return;
+        if (stats) setSocialStats(stats);
+
+        // Normalize liked designs
+        const normalizedLiked = (likedRows || []).map(d => {
+          const parsed = d.prompt ? parseDesignPrompt(d.prompt) : {};
+          return {
             id: `liked-${d.id}`,
             _rawId: d.id,
             title: d.prompt || 'Liked Design',
@@ -353,32 +371,21 @@ export default function ProfileScreen({ navigation }) {
             imageUrl: d.image_url,
             description: d.prompt,
             prompt: d.prompt,
-            roomType: 'living-room',
-            styles: d.style_tags || [],
+            roomType: parsed.roomType || 'living-room',
+            styles: d.style_tags?.length ? d.style_tags : (parsed.styles || []),
             products: d.products || [],
             tags: (d.style_tags || []).map(s => `#${s}`),
             likes: d.likes || 0,
             shares: 0,
             isUserDesign: true,
-          }));
-          setServerLikedDesigns(normalized);
-        })
-        .catch(err => console.warn('[Profile] liked designs fetch failed:', err.message));
-    }, [user?.id])
-  );
+          };
+        });
+        setServerLikedDesigns(normalizedLiked);
 
-  // Fetch user's own designs from Supabase (cleanup expired rows first)
-  useFocusEffect(
-    useCallback(() => {
-      if (!user?.id) { setDesignsLoading(false); return; }
-      let cancelled = false;
-      setDesignsLoading(true);
-      // Silently purge any designs with expired CDN URLs before loading
-      deleteExpiredDesigns(user.id).catch(() => {});
-      getUserDesigns(user.id)
-        .then(designs => {
-          if (cancelled) return;
-          const normalized = designs.map(d => ({
+        // Normalize own designs
+        const normalizedDesigns = (designs || []).map(d => {
+          const parsed = d.prompt ? parseDesignPrompt(d.prompt) : {};
+          return {
             id: `user-${d.id}`,
             user_id: user.id,
             title: d.prompt || 'My Design',
@@ -388,22 +395,18 @@ export default function ProfileScreen({ navigation }) {
             imageUrl: d.image_url,
             description: d.prompt,
             prompt: d.prompt,
-            roomType: 'living-room',
-            styles: d.style_tags || [],
+            roomType: parsed.roomType || 'living-room',
+            styles: d.style_tags?.length ? d.style_tags : (parsed.styles || []),
             products: d.products || [],
             tags: (d.style_tags || []).map(s => `#${s}`),
             likes: d.likes || 0,
             shares: 0,
             visibility: d.visibility,
             isUserDesign: true,
-          }));
-          setMyDesigns(normalized);
-        })
-        .catch(err => {
-          console.warn('Profile designs load failed:', err.message);
-          // Don't clear existing designs on a failed refresh — keep whatever was loaded before
-        })
-        .finally(() => { if (!cancelled) setDesignsLoading(false); });
+          };
+        });
+        setMyDesigns(normalizedDesigns);
+      }).finally(() => { if (!cancelled) setDesignsLoading(false); });
       return () => { cancelled = true; };
     }, [user?.id])
   );

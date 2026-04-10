@@ -792,6 +792,14 @@ export default function HomeScreen({ navigation, route }) {
   const galleryScale = useRef(new Animated.Value(1)).current;
   const sendScale    = useRef(new Animated.Value(1)).current;
   const inputScale   = useRef(new Animated.Value(1)).current;
+  const mediaPermGranted = useRef(false);
+
+  // Pre-warm media library permission on mount so the picker opens instantly
+  useEffect(() => {
+    ImagePicker.requestMediaLibraryPermissionsAsync()
+      .then(({ status }) => { if (status === 'granted') mediaPermGranted.current = true; })
+      .catch(() => {});
+  }, []);
 
   const springIn  = (anim) => Animated.spring(anim, { toValue: 0.82, useNativeDriver: true, tension: 300, friction: 10 }).start();
   const springOut = (anim) => Animated.spring(anim, { toValue: 1,    useNativeDriver: true, tension: 200, friction: 7  }).start();
@@ -892,12 +900,16 @@ export default function HomeScreen({ navigation, route }) {
     }
   }, [route?.params?.capturedPhoto]);
 
-  const handlePickFromLibrary = async () => {
+  const handlePickFromLibrary = useCallback(async () => {
     if (generating) return;
-    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (status !== 'granted') {
-      Alert.alert('Permission Required', 'Please allow access to your photo library in Settings.');
-      return;
+    // Cache permission — avoid 2-3s system call on every tap
+    if (!mediaPermGranted.current) {
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Permission Required', 'Please allow access to your photo library in Settings.');
+        return;
+      }
+      mediaPermGranted.current = true;
     }
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -910,7 +922,7 @@ export default function HomeScreen({ navigation, route }) {
     setPhoto({ uri: asset.uri, base64: asset.base64, width: asset.width, height: asset.height });
     setPhotoSource('library');
     setImageLayout({ landscape: (asset.width || 0) > (asset.height || 0) });
-  };
+  }, [generating]);
 
   // Timed loading bar — 3-phase crawl matching real Replicate generation time
   const startLoadingBar = useCallback(() => {
@@ -1311,11 +1323,32 @@ export default function HomeScreen({ navigation, route }) {
 
       stopLoadingBar();
 
-      // ── Use the generation pipeline's matched products directly ─────────────
-      // The edge function returns the exact products used as BFL reference images.
-      // Those products ARE in the rendered room — no vision override needed.
-      // Vision matching was replacing these with wrong products, so it's removed.
-      const finalMatchedProducts = finalProducts;
+      // ── Vision-based product re-matching ──────────────────────────────────
+      // The AI model generates furniture that may not match the text-matched
+      // products we pre-selected. Use Claude Haiku vision to analyze what's
+      // ACTUALLY in the generated image, then re-match catalog products based
+      // on visual descriptions (color, material, shape, category).
+      // Cost: ~$0.001/call (Haiku). Falls back to text-matched if vision fails.
+      let finalMatchedProducts = finalProducts;
+      try {
+        setGenStatus('Matching products to your room…');
+        const visionResult = await analyzeRoomImage(resultUrl);
+        if (visionResult?.items?.length > 0) {
+          const visionMatched = rematchFromVision(
+            visionResult.items,
+            visionResult.roomType || 'living-room',
+            finalProducts,
+            6,
+            PRODUCT_CATALOG,
+          );
+          if (visionMatched.length > 0) {
+            finalMatchedProducts = visionMatched;
+            console.log('[Gen] Vision re-matched', visionMatched.length, 'products');
+          }
+        }
+      } catch (visionErr) {
+        console.warn('[Gen] Vision matching failed, using text-matched products:', visionErr.message);
+      }
 
       setGenerating(false);
       setGenStatus('');

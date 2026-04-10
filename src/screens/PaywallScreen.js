@@ -537,7 +537,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: layout.screenPaddingH,
-    paddingTop: space['2xl'],
+    paddingTop: space['4xl'],
     paddingBottom: space.sm,
   },
   wordmark: {

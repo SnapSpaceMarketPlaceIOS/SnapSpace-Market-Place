@@ -12,6 +12,7 @@ import {
   Animated,
   Easing,
   Alert,
+  Share,
   Switch,
   PanResponder,
 } from 'react-native';
@@ -29,6 +30,7 @@ import PressableCard from '../components/PressableCard';
 import Skeleton from '../components/Skeleton';
 import { SellerName } from '../components/VerifiedBadge';
 import { getProductsForDesign, getProductsForPrompt } from '../services/affiliateProducts';
+import { parseDesignPrompt } from '../utils/promptParser';
 import TabScreenFade from '../components/TabScreenFade';
 import * as ImagePicker from 'expo-image-picker';
 
@@ -55,7 +57,7 @@ const PRODUCT_IMG_SIZE = 88;
 
 function SearchIcon({ color = '#fff', size = 16 }) {
   return (
-    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round">
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round" style={{ transform: [{ scaleX: -1 }] }}>
       <Circle cx={11} cy={11} r={8} />
       <Line x1={21} y1={21} x2={16.65} y2={16.65} />
     </Svg>
@@ -73,7 +75,7 @@ function PlusIcon({ color = '#555', size = 18 }) {
 
 function HeartIcon({ filled = false, size = 18 }) {
   return (
-    <Svg width={size} height={size} viewBox="0 0 24 24" fill={filled ? '#ef4444' : 'none'} stroke={filled ? '#ef4444' : '#444'} strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round">
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill={filled ? '#67ACE9' : 'none'} stroke={filled ? '#67ACE9' : '#444'} strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round">
       <Path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
     </Svg>
   );
@@ -495,23 +497,75 @@ function searchAndFilter(designs, query, categoryIndex, roomTypeFilter, styleFil
 
 // ── Grid card with press-scale + animated heart ────────────────────────────────
 
-function GridCard({ design, onPress, cardRadius }) {
+const GridCard = React.memo(function GridCard({ design, onPress, cardRadius, isLiked, onToggleLike, onShare, cols = 1 }) {
   const r = cardRadius ?? radius.md;
+  const isSingle = cols === 1;
+
+  // 2-col / 3-col: image only, no user row
+  if (!isSingle) {
+    return (
+      <PressableCard
+        style={[styles.card, { borderRadius: r }]}
+        animStyle={{ width: '100%' }}
+        onPress={onPress}
+        activeOpacity={0.95}
+      >
+        <View style={[styles.cardImg, { borderRadius: r }]}>
+          <View style={styles.cardImgBg} />
+          <CardImage uri={design.imageUrl} style={styles.cardImgPhoto} resizeMode="cover" />
+        </View>
+      </PressableCard>
+    );
+  }
+
+  // 1-col: image + user row + action icons
+  const displayUser = design.user || 'HomeGenie User';
+  const displayInitial = design.initial || displayUser.charAt(0).toUpperCase();
   return (
-    <PressableCard
-      style={[styles.card, { borderRadius: r }]}
-      animStyle={{ width: '100%' }}
-      onPress={onPress}
-      activeOpacity={0.95}
-    >
-      {/* Image only — no buttons, no title */}
-      <View style={[styles.cardImg, { borderRadius: r }]}>
-        <View style={styles.cardImgBg} />
-        <CardImage uri={design.imageUrl} style={styles.cardImgPhoto} resizeMode="cover" />
+    <View style={[styles.feedCard, { borderRadius: r }]}>
+      <PressableCard
+        style={[styles.card, { borderTopLeftRadius: r, borderTopRightRadius: r, borderBottomLeftRadius: 0, borderBottomRightRadius: 0 }]}
+        animStyle={{ width: '100%' }}
+        onPress={onPress}
+        activeOpacity={0.95}
+      >
+        <View style={[styles.cardImg, { borderTopLeftRadius: r, borderTopRightRadius: r, borderBottomLeftRadius: 0, borderBottomRightRadius: 0 }]}>
+          <View style={styles.cardImgBg} />
+          <CardImage uri={design.imageUrl} style={styles.cardImgPhoto} resizeMode="cover" />
+        </View>
+      </PressableCard>
+      <View style={styles.feedUserRow}>
+        <TouchableOpacity style={styles.feedUserInfo} activeOpacity={0.7} onPress={onPress}>
+          <View style={styles.feedAvatar}>
+            <Text style={styles.feedAvatarText}>{displayInitial}</Text>
+          </View>
+          <Text style={styles.feedUsername} numberOfLines={1}>@{displayUser}</Text>
+        </TouchableOpacity>
+        <View style={styles.feedActions}>
+          <TouchableOpacity
+            style={[styles.feedActionBtn, isLiked && styles.feedActionBtnActive]}
+            onPress={onToggleLike}
+            activeOpacity={0.7}
+            hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+          >
+            <HeartIcon filled={isLiked} size={16} />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.feedActionBtn}
+            onPress={onShare}
+            activeOpacity={0.7}
+            hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+          >
+            <Svg width={16} height={16} viewBox="0 0 30 30" fill="none">
+              <Path d="M6.54815 18.5147C7.04668 20.3752 8.1452 22.0193 9.67334 23.1918C11.2015 24.3644 13.0738 25 15 25C16.9262 25 18.7985 24.3644 20.3267 23.1918C21.8548 22.0193 22.9533 20.3752 23.4519 18.5147" stroke="#9CA3AF" strokeWidth={1.2} strokeLinecap="round" />
+              <Path d="M15 5L14.6877 4.60957L15 4.35969L15.3123 4.60957L15 5ZM15.5 16.25C15.5 16.5261 15.2761 16.75 15 16.75C14.7239 16.75 14.5 16.5261 14.5 16.25L15 16.25L15.5 16.25ZM8.75 10L8.43765 9.60957L14.6877 4.60957L15 5L15.3123 5.39043L9.06235 10.3904L8.75 10ZM15 5L15.3123 4.60957L21.5623 9.60957L21.25 10L20.9377 10.3904L14.6877 5.39043L15 5ZM15 5L15.5 5L15.5 16.25L15 16.25L14.5 16.25L14.5 5L15 5Z" fill="#9CA3AF" />
+            </Svg>
+          </TouchableOpacity>
+        </View>
       </View>
-    </PressableCard>
+    </View>
   );
-}
+});
 
 // ── Style label map ──────────────────────────────────────────────────────────
 const STYLE_LABEL_MAP = {
@@ -535,6 +589,7 @@ const ROOM_LABEL_MAP = {
 export default function ExploreScreen({ navigation, route }) {
   const { liked, toggleLiked } = useLiked();
   const [activeTab, setActiveTab] = useState('spaces'); // 'spaces' | 'products'
+  const [deferredTab, setDeferredTab] = useState('spaces'); // deferred to avoid blocking animation
   const [activeCategory, setActiveCategory] = useState(0);
   const [activeProdCat, setActiveProdCat] = useState(0);
   const [search, setSearch] = useState('');
@@ -567,15 +622,21 @@ export default function ExploreScreen({ navigation, route }) {
   const [aiImageProducts, setAiImageProducts] = useState(null);
 
   // Tab-switch content animation — opacity fade only (GPU composited, no layout cost)
+  // Defers the heavy grid swap by one frame so the pill toggle feels instant.
   const contentOpacity = useRef(new Animated.Value(1)).current;
   useEffect(() => {
     contentOpacity.setValue(0);
-    Animated.timing(contentOpacity, {
-      toValue: 1,
-      duration: 150,
-      easing: Easing.out(Easing.ease),
-      useNativeDriver: true,
-    }).start();
+    // Defer grid swap by one frame — lets the pill animation paint first
+    const timer = setTimeout(() => {
+      setDeferredTab(activeTab);
+      Animated.timing(contentOpacity, {
+        toValue: 1,
+        duration: 120,
+        easing: Easing.out(Easing.ease),
+        useNativeDriver: true,
+      }).start();
+    }, 0);
+    return () => clearTimeout(timer);
   }, [activeTab]);
 
   // Apply params on every focus (handles tab-switch AND fresh navigation)
@@ -670,28 +731,38 @@ export default function ExploreScreen({ navigation, route }) {
     }
   }, []);
 
-  // Fetch community (user-posted) designs on screen focus
+  // Fetch community (user-posted) designs on screen focus (with 5-min cache)
+  const lastCommunityFetch = useRef(0);
+  const COMMUNITY_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
   useFocusEffect(
     useCallback(() => {
+      const now = Date.now();
+      if (communityDesigns.length > 0 && now - lastCommunityFetch.current < COMMUNITY_CACHE_TTL) return;
+      lastCommunityFetch.current = now;
       setCommunityLoading(true);
       getPublicDesigns(20, 0).then(designs => {
-        const normalized = designs.map(d => ({
-          id: `user-${d.id}`,
-          title: d.prompt || 'AI Generated Design',
-          user: d.author?.username || d.author?.full_name || 'HomeGenie User',
-          initial: (d.author?.full_name || 'U')[0],
-          verified: d.author?.is_verified_supplier || false,
-          imageUrl: d.image_url,
-          description: d.prompt,
-          prompt: d.prompt,
-          roomType: 'living-room',
-          styles: d.style_tags || [],
-          products: d.products || [],
-          tags: (d.style_tags || []).map(s => `#${s}`),
-          likes: d.likes || 0,
-          shares: 0,
-          isUserDesign: true,
-        })).filter(d => !!d.imageUrl);
+        const normalized = designs.map(d => {
+          // Parse room type from the prompt so the fallback product matcher
+          // picks the right category (instead of always defaulting to living-room)
+          const parsed = d.prompt ? parseDesignPrompt(d.prompt) : {};
+          return {
+            id: `user-${d.id}`,
+            title: d.prompt || 'AI Generated Design',
+            user: d.author?.username || d.author?.full_name || 'HomeGenie User',
+            initial: (d.author?.full_name || 'U')[0],
+            verified: d.author?.is_verified_supplier || false,
+            imageUrl: d.image_url,
+            description: d.prompt,
+            prompt: d.prompt,
+            roomType: parsed.roomType || 'living-room',
+            styles: d.style_tags?.length ? d.style_tags : (parsed.styles || []),
+            products: d.products || [],
+            tags: (d.style_tags || []).map(s => `#${s}`),
+            likes: d.likes || 0,
+            shares: 0,
+            isUserDesign: true,
+          };
+        }).filter(d => !!d.imageUrl);
         console.log('[Explore] Loaded', normalized.length, 'community designs');
         setCommunityDesigns(normalized);
       }).catch(err => console.warn('[Explore] Failed to load community designs:', err.message))
@@ -867,7 +938,7 @@ export default function ExploreScreen({ navigation, route }) {
           )}
 
           {/* ── Grid ── */}
-          {activeTab === 'products' ? (
+          {deferredTab === 'products' ? (
             filteredProducts.length === 0 ? (
               <View style={styles.emptyState}>
                 <Text style={styles.emptyStateTitle}>No products found</Text>
@@ -938,18 +1009,26 @@ export default function ExploreScreen({ navigation, route }) {
               </Text>
             </View>
           ) : (
-            <View style={styles.grid}>
+            <View style={[styles.grid, gridCols === 1 && { paddingHorizontal: space.lg }]}>
               {filteredDesigns.map((design) => (
-                <View key={design.id} style={{ width: colWidthPct(gridCols), padding: 1 }}>
+                <View key={design.id} style={{ width: colWidthPct(gridCols), padding: gridCols === 1 ? 0 : 1, marginBottom: gridCols === 1 ? space.lg : 0 }}>
                   <GridCard
                     design={design}
                     cardRadius={cardRadius}
+                    cols={gridCols}
+                    isLiked={liked[design.id?.replace?.('user-', '')] || liked[design.id]}
+                    onToggleLike={() => toggleLiked(design.id)}
+                    onShare={async () => {
+                      try {
+                        const msg = design.prompt
+                          ? `Check out this HomeGenie design: "${design.prompt}"`
+                          : 'Check out this HomeGenie design!';
+                        await Share.share({ message: msg, url: design.imageUrl || '' });
+                      } catch {}
+                    }}
                     onPress={() => {
-                      // Use saved products from DB; only re-compute if none were saved
-                      const savedProducts = design.products || [];
-                      const enrichedProducts = savedProducts.length ? savedProducts : getProductsForDesign(design, 4);
-                      const enriched = { ...design, products: enrichedProducts };
-                      navigation.navigate('ShopTheLook', { design: enriched });
+                      // Navigate immediately — ShopTheLookScreen handles fallback product matching
+                      navigation.navigate('ShopTheLook', { design });
                     }}
                   />
                 </View>
@@ -1446,6 +1525,68 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.06)',
     marginBottom: space.md,
     marginTop: space.xs,
+  },
+
+  // ── Feed card (image + user row) ──
+  feedCard: {
+    backgroundColor: TC.bg,
+    borderRadius: radius.md,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: 'rgba(0,0,0,0.06)',
+  },
+  feedUserRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: space.md,
+    paddingVertical: space.sm,
+  },
+  feedUserInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    flex: 1,
+  },
+  feedAvatar: {
+    width: 28,
+    height: 28,
+    borderRadius: radius.full,
+    backgroundColor: '#0B6DC3',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  feedAvatarText: {
+    fontSize: 11,
+    fontWeight: '700',
+    fontFamily: 'Geist_700Bold',
+    color: '#fff',
+  },
+  feedUsername: {
+    fontSize: 13,
+    fontWeight: '600',
+    fontFamily: 'Geist_600SemiBold',
+    color: TC.textPrimary,
+    flex: 1,
+  },
+  feedActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  feedActionBtn: {
+    width: 32,
+    height: 32,
+    borderRadius: radius.full,
+    borderWidth: 1,
+    borderColor: '#D1D5DB',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: TC.bg,
+  },
+  feedActionBtnActive: {
+    borderColor: 'rgba(103,172,233,0.5)',
+    backgroundColor: 'rgba(103,172,233,0.08)',
   },
 
   // Spaces / Products mode toggle

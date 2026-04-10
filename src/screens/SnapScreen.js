@@ -8,7 +8,7 @@ import {
 } from 'react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import * as ImagePicker from 'expo-image-picker';
-import Svg, { Path, Circle, Line, Polyline, Rect } from 'react-native-svg';
+import Svg, { Path, Line, Polyline } from 'react-native-svg';
 import { palette } from '../constants/tokens';
 import { useAuth } from '../context/AuthContext';
 import AuthGate from '../components/AuthGate';
@@ -25,16 +25,6 @@ function XIcon({ size = 16, color = '#fff' }) {
   );
 }
 
-function GalleryIcon({ size = 22, color = '#fff' }) {
-  return (
-    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-      <Rect x={3} y={3} width={18} height={18} rx={2} ry={2} />
-      <Circle cx={8.5} cy={8.5} r={1.5} />
-      <Polyline points="21 15 16 10 5 21" />
-    </Svg>
-  );
-}
-
 // ─── SnapScreen ───────────────────────────────────────────────────────────────
 
 export default function SnapScreen({ navigation }) {
@@ -43,6 +33,7 @@ export default function SnapScreen({ navigation }) {
   const [facing, setFacing] = useState('back');
   const [flash, setFlash] = useState(false);
   const cameraRef = useRef(null);
+  const mediaPermGranted = useRef(false);
 
   // ── Auth gate ──
   if (!user) {
@@ -62,10 +53,13 @@ export default function SnapScreen({ navigation }) {
   };
 
   const handlePickFromLibrary = async () => {
-    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (status !== 'granted') {
-      Alert.alert('Permission Required', 'Please allow access to your photo library in Settings.');
-      return;
+    if (!mediaPermGranted.current) {
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Permission Required', 'Please allow access to your photo library in Settings.');
+        return;
+      }
+      mediaPermGranted.current = true;
     }
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -128,12 +122,9 @@ export default function SnapScreen({ navigation }) {
           <View style={[s.corner, { bottom: 0, right: 0, borderBottomWidth: 2, borderRightWidth: 2 }]} />
         </View>
 
-        {/* Shutter + gallery */}
+        {/* Shutter */}
         <View style={s.bottomBar}>
-          <TouchableOpacity style={s.galleryBtn} onPress={handlePickFromLibrary} activeOpacity={0.7}>
-            <GalleryIcon size={26} />
-            <Text style={s.galleryLabel}>Library</Text>
-          </TouchableOpacity>
+          <View style={{ width: 70 }} />
 
           <TouchableOpacity style={s.shutter} onPress={handleCapture} activeOpacity={0.8}>
             <View style={s.shutterInner} />
@@ -172,6 +163,7 @@ const s = StyleSheet.create({
   corner: {
     position: 'absolute', width: 28, height: 28,
     borderColor: 'rgba(255,255,255,0.7)',
+    borderRadius: 3,
   },
   bottomBar: {
     flexDirection: 'row',
@@ -180,11 +172,9 @@ const s = StyleSheet.create({
     paddingBottom: 52,
     paddingHorizontal: 32,
   },
-  galleryBtn: { width: 70, alignItems: 'center', gap: 4 },
-  galleryLabel: { color: 'rgba(255,255,255,0.8)', fontSize: 11, fontWeight: '500', fontFamily: 'Geist_500Medium'},
   shutter: {
     width: 72, height: 72, borderRadius: 36,
-    borderWidth: 4, borderColor: '#fff',
+    borderWidth: 4, borderColor: '#67ACE9',
     alignItems: 'center', justifyContent: 'center',
   },
   shutterInner: { width: 56, height: 56, borderRadius: 28, backgroundColor: '#fff' },

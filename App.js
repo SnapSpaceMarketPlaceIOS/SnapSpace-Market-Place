@@ -193,6 +193,7 @@ function TabNavigator() {
     <Tab.Navigator
       screenOptions={{
         headerShown: false,
+        lazy: true,
         tabBarStyle: styles.tabBar,
         tabBarActiveTintColor: C.primary,
         tabBarInactiveTintColor: C.textPrimary,
@@ -227,7 +228,7 @@ function TabNavigator() {
         }}
       />
       <Tab.Screen
-        name="Snap"
+        name="Wish"
         component={SnapScreen}
         options={{
           tabBarIcon: ({ color }) => (
