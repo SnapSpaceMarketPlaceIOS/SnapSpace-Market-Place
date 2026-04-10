@@ -48,7 +48,8 @@ export default function SnapScreen({ navigation }) {
 
   const handleCapture = async () => {
     if (!cameraRef.current) return;
-    const photo = await cameraRef.current.takePictureAsync({ quality: 0.8, base64: true });
+    // base64 omitted — upload helper reads file on-demand, keeps capture snappy
+    const photo = await cameraRef.current.takePictureAsync({ quality: 0.8 });
     navigation.navigate('Home', { capturedPhoto: photo });
   };
 
@@ -65,12 +66,12 @@ export default function SnapScreen({ navigation }) {
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       quality: 0.8,
-      base64: true,
+      // base64: true removed — upload helper reads file on-demand
     });
     if (result.canceled || !result.assets?.length) return;
     const asset = result.assets[0];
     navigation.navigate('Home', {
-      capturedPhoto: { uri: asset.uri, base64: asset.base64, width: asset.width, height: asset.height },
+      capturedPhoto: { uri: asset.uri, base64: null, width: asset.width, height: asset.height },
     });
   };
 

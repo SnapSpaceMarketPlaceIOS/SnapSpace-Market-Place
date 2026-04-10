@@ -85,9 +85,14 @@ export function matchProducts(parsedPrompt, limit = 6, catalog = PRODUCT_CATALOG
   });
 
   // Cascade fallback: style-filtered → category-filtered → room-filtered
-  // Use the most restrictive set that still has enough candidates
-  const candidates = styleFiltered.length >= limit ? styleFiltered
-    : categoryFiltered.length >= limit ? categoryFiltered
+  // Widened from `>= limit` to `>= limit * 3` so the scoring phase has a
+  // richer candidate pool even when the strict style filter returns more
+  // than `limit` products. Scoring still dominates (style = 40 pts) so
+  // style-matching products still win; this just prevents the looser pool
+  // from being ignored when the strict pool is thin.
+  const MIN_POOL = limit * 3;
+  const candidates = styleFiltered.length >= MIN_POOL ? styleFiltered
+    : categoryFiltered.length >= MIN_POOL ? categoryFiltered
     : roomFiltered;
 
   const scored = candidates.map((product) => {

@@ -589,9 +589,10 @@ const ROOM_LABEL_MAP = {
 export default function ExploreScreen({ navigation, route }) {
   const { liked, toggleLiked } = useLiked();
   const [activeTab, setActiveTab] = useState('spaces'); // 'spaces' | 'products'
-  const [deferredTab, setDeferredTab] = useState('spaces'); // deferred to avoid blocking animation
   const [activeCategory, setActiveCategory] = useState(0);
   const [activeProdCat, setActiveProdCat] = useState(0);
+  // Progressive render for Products grid — start small, load more in chunks
+  const [productsVisibleCount, setProductsVisibleCount] = useState(24);
   const [search, setSearch] = useState('');
   const [selectedCard, setSelectedCard] = useState(null);
   const [showPostModal, setShowPostModal] = useState(false);
@@ -607,6 +608,7 @@ export default function ExploreScreen({ navigation, route }) {
   const [activeStyleFilter, setActiveStyleFilter] = useState(null);
   const [filterLabel, setFilterLabel] = useState(null);
   const [overrideDesigns, setOverrideDesigns] = useState(null);
+  const [overrideProducts, setOverrideProducts] = useState(null); // IDs from "Shop all" featured navigation
   const [communityDesigns, setCommunityDesigns] = useState([]);
   const [communityLoading, setCommunityLoading] = useState(true);
   const consumedParamsRef = useRef(null);
@@ -621,23 +623,9 @@ export default function ExploreScreen({ navigation, route }) {
   const [aiImageLoading, setAiImageLoading] = useState(false);
   const [aiImageProducts, setAiImageProducts] = useState(null);
 
-  // Tab-switch content animation — opacity fade only (GPU composited, no layout cost)
-  // Defers the heavy grid swap by one frame so the pill toggle feels instant.
-  const contentOpacity = useRef(new Animated.Value(1)).current;
-  useEffect(() => {
-    contentOpacity.setValue(0);
-    // Defer grid swap by one frame — lets the pill animation paint first
-    const timer = setTimeout(() => {
-      setDeferredTab(activeTab);
-      Animated.timing(contentOpacity, {
-        toValue: 1,
-        duration: 120,
-        easing: Easing.out(Easing.ease),
-        useNativeDriver: true,
-      }).start();
-    }, 0);
-    return () => clearTimeout(timer);
-  }, [activeTab]);
+  // No tab-switch animation — previously used opacity fade + deferred render,
+  // but the opacity-to-0 + setTimeout + re-render + fade-in chain added ~500ms
+  // of "invisible content" that looked like lag. Instant swap is snappier.
 
   // Apply params on every focus (handles tab-switch AND fresh navigation)
   useFocusEffect(
@@ -650,10 +638,15 @@ export default function ExploreScreen({ navigation, route }) {
       setActiveRoomFilter(null);
       setActiveStyleFilter(null);
       setOverrideDesigns(null);
+      setOverrideProducts(null);
       setActiveCategory(0);
       setSearch('');
 
-      if (params.filterRoomType) {
+      if (params.featuredProductIds) {
+        setActiveTab('products');
+        setOverrideProducts(params.featuredProductIds);
+        setFilterLabel(params.title || 'Featured');
+      } else if (params.filterRoomType) {
         setActiveRoomFilter(params.filterRoomType);
         setFilterLabel(params.title || ROOM_LABEL_MAP[params.filterRoomType] || params.filterRoomType);
       } else if (params.filterStyle) {
@@ -676,6 +669,7 @@ export default function ExploreScreen({ navigation, route }) {
     setActiveRoomFilter(null);
     setActiveStyleFilter(null);
     setOverrideDesigns(null);
+    setOverrideProducts(null);
     setFilterLabel(null);
     setActiveCategory(0);
     setSearch('');
@@ -685,6 +679,8 @@ export default function ExploreScreen({ navigation, route }) {
       filterStyle: undefined,
       designs: undefined,
       filterQuery: undefined,
+      featuredProductIds: undefined,
+      mode: undefined,
       title: undefined,
     });
     consumedParamsRef.current = null;
@@ -771,7 +767,7 @@ export default function ExploreScreen({ navigation, route }) {
   );
 
   // filterLabel is set when any param-driven filter is active (room, style, designs, or query)
-  const hasActiveFilter = !!(activeRoomFilter || activeStyleFilter || overrideDesigns || filterLabel);
+  const hasActiveFilter = !!(activeRoomFilter || activeStyleFilter || overrideDesigns || overrideProducts || filterLabel);
 
   const togglePostTag = (tag) => {
     setSelectedTags((prev) =>
@@ -779,17 +775,32 @@ export default function ExploreScreen({ navigation, route }) {
     );
   };
 
-  const baseDesigns = overrideDesigns || [...communityDesigns];
+  // CRITICAL: do NOT spread communityDesigns — a new array ref on every render
+  // would invalidate the filteredDesigns useMemo cache, causing expensive
+  // searchAndFilter scoring to re-run on every single render.
+  const baseDesigns = overrideDesigns || communityDesigns;
 
   const filteredDesigns = useMemo(
     () => searchAndFilter(baseDesigns, search, activeCategory, activeRoomFilter, activeStyleFilter),
     [search, activeCategory, activeRoomFilter, activeStyleFilter, baseDesigns],
   );
 
+  // Reset progressive render when the pool changes (tab/category/search/filter)
+  useEffect(() => {
+    setProductsVisibleCount(24);
+  }, [activeTab, activeProdCat, search]);
+
   const filteredProducts = useMemo(() => {
-    const catLabel = PRODUCT_CATEGORIES[activeProdCat];
-    const cats = PRODUCT_CAT_MAP[catLabel];
-    let pool = cats ? PRODUCT_CATALOG.filter((p) => cats.includes(p.category)) : PRODUCT_CATALOG;
+    let pool;
+    if (overrideProducts) {
+      // Override set by navigation (e.g. "Shop all" featured) — start from these IDs only
+      const idSet = new Set(overrideProducts);
+      pool = PRODUCT_CATALOG.filter(p => idSet.has(p.id));
+    } else {
+      const catLabel = PRODUCT_CATEGORIES[activeProdCat];
+      const cats = PRODUCT_CAT_MAP[catLabel];
+      pool = cats ? PRODUCT_CATALOG.filter((p) => cats.includes(p.category)) : PRODUCT_CATALOG;
+    }
     if (search.trim()) {
       const q = search.trim().toLowerCase();
       pool = pool.filter((p) =>
@@ -808,7 +819,25 @@ export default function ExploreScreen({ navigation, route }) {
       pool = pool.filter((p) => p.stock !== false);
     }
     return pool;
-  }, [activeProdCat, search, priceMin, priceMax, filterStyles, filterInStockOnly]);
+  }, [overrideProducts, activeProdCat, search, priceMin, priceMax, filterStyles, filterInStockOnly]);
+
+  // Progressively reveal more products after initial paint (chunks of 30)
+  // Keeps the Products tab opening fast — first 24 render instantly,
+  // remaining stream in at 100ms intervals without blocking interaction.
+  useEffect(() => {
+    if (activeTab !== 'products') return;
+    if (productsVisibleCount >= filteredProducts.length) return;
+    const timer = setTimeout(() => {
+      setProductsVisibleCount(c => Math.min(c + 30, filteredProducts.length));
+    }, 100);
+    return () => clearTimeout(timer);
+  }, [activeTab, productsVisibleCount, filteredProducts.length]);
+
+  // Slice applied at render time — stays stable until productsVisibleCount changes
+  const visibleProducts = useMemo(
+    () => filteredProducts.slice(0, productsVisibleCount),
+    [filteredProducts, productsVisibleCount],
+  );
 
   return (
     <TabScreenFade style={styles.container}>
@@ -917,8 +946,8 @@ export default function ExploreScreen({ navigation, route }) {
           </View>
           <View style={styles.tabBorder} />
 
-          {/* ── Animated content — fades + rises on tab switch ── */}
-          <Animated.View style={{ opacity: contentOpacity }}>
+          {/* ── Tab content — instant swap, no fade animation ── */}
+          <View>
 
           {/* ── Active Filter Banner ── */}
           {hasActiveFilter && (
@@ -928,7 +957,9 @@ export default function ExploreScreen({ navigation, route }) {
                   <Text style={styles.filterBannerTitle} numberOfLines={1}>{filterLabel}</Text>
                 )}
                 <Text style={styles.filterBannerCount}>
-                  {filteredDesigns.length} space{filteredDesigns.length !== 1 ? 's' : ''}
+                  {activeTab === 'products'
+                    ? `${filteredProducts.length} product${filteredProducts.length !== 1 ? 's' : ''}`
+                    : `${filteredDesigns.length} space${filteredDesigns.length !== 1 ? 's' : ''}`}
                 </Text>
               </View>
               <TouchableOpacity style={styles.filterClearBtn} onPress={clearFilters} activeOpacity={0.7}>
@@ -938,7 +969,7 @@ export default function ExploreScreen({ navigation, route }) {
           )}
 
           {/* ── Grid ── */}
-          {deferredTab === 'products' ? (
+          {activeTab === 'products' ? (
             filteredProducts.length === 0 ? (
               <View style={styles.emptyState}>
                 <Text style={styles.emptyStateTitle}>No products found</Text>
@@ -946,7 +977,7 @@ export default function ExploreScreen({ navigation, route }) {
               </View>
             ) : (
               <View style={[styles.grid, gridCols === 1 && { paddingHorizontal: 10 }]}>
-                {filteredProducts.map((product) => {
+                {visibleProducts.map((product) => {
                   const ratingVal = typeof product.rating === 'number' ? product.rating : parseFloat(product.rating) || 0;
                   const navProduct = { ...product, price: product.priceDisplay, priceValue: product.price, source: product.source };
                   const isOnCol = gridCols === 1;
@@ -1037,7 +1068,7 @@ export default function ExploreScreen({ navigation, route }) {
           )}
 
           <View style={{ height: space.lg }} />
-          </Animated.View>
+          </View>
         </ScrollView>
       </SafeAreaView>
 

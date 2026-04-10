@@ -384,6 +384,76 @@ const vb = StyleSheet.create({
   label: { fontSize: 13, fontWeight: T.w600, color: T.blue, lineHeight: 18, fontFamily: 'Geist_600SemiBold'},
 });
 
+// ─── S1b: MetaChips (surfaces roomType + styles from catalog) ────────────────
+// Read-only visual pills that show the product's design metadata so users
+// can see the full classification (e.g. "living-room · minimalist · japandi").
+// Not interactive — purely informative.
+
+const CHIP_LABELS = {
+  'living-room': 'Living Room',
+  'dining-room': 'Dining Room',
+  'bedroom': 'Bedroom',
+  'kitchen': 'Kitchen',
+  'office': 'Office',
+  'bathroom': 'Bathroom',
+  'outdoor': 'Outdoor',
+  'nursery': 'Nursery',
+  'entryway': 'Entryway',
+  'mid-century': 'Mid-Century',
+  'dark-luxe': 'Dark Luxe',
+  'art-deco': 'Art Deco',
+  'wabi-sabi': 'Wabi-Sabi',
+  'french-country': 'French Country',
+};
+
+function formatChip(s) {
+  if (!s) return '';
+  if (CHIP_LABELS[s]) return CHIP_LABELS[s];
+  // Title-case single words
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
+function MetaChips({ roomTypes, styles: productStyles }) {
+  const rooms = Array.isArray(roomTypes) ? roomTypes : (roomTypes ? [roomTypes] : []);
+  const styls = Array.isArray(productStyles) ? productStyles : [];
+  const combined = [...rooms, ...styls].filter(Boolean);
+  // Dedupe and cap at 5 visible chips
+  const unique = [...new Set(combined)].slice(0, 5);
+  if (unique.length === 0) return null;
+  return (
+    <View style={mc.wrap}>
+      {unique.map((t, i) => (
+        <View key={`${t}-${i}`} style={mc.chip}>
+          <Text style={mc.chipText}>{formatChip(t)}</Text>
+        </View>
+      ))}
+    </View>
+  );
+}
+
+const mc = StyleSheet.create({
+  wrap: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    paddingHorizontal: T.padH,
+    marginTop: 16,
+    gap: 6,
+  },
+  chip: {
+    backgroundColor: '#F1F5F9',
+    borderRadius: 6,
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+  },
+  chipText: {
+    fontSize: 11,
+    fontWeight: T.w600,
+    color: T.txtSec,
+    fontFamily: 'Geist_600SemiBold',
+    letterSpacing: 0.3,
+  },
+});
+
 // ─── S3: VariantSelector ──────────────────────────────────────────────────────
 
 // Detect variant type from data to show smart label
@@ -805,18 +875,32 @@ const kf = StyleSheet.create({
 
 // ─── S11: TrustBadges ────────────────────────────────────────────────────────
 
-const TRUST = [
-  { label: 'Free Shipping',   sub: 'On orders $49+', Icon: TruckIcon    },
-  { label: '30-Day Returns',  sub: 'Hassle-free',    Icon: ReturnIcon   },
-  { label: '2-Year Warranty', sub: 'Full coverage',  Icon: WarrantyIcon },
-];
+// Reads shipping flags from the catalog instead of hardcoded defaults.
+// Falls back to sensible defaults when fields are missing.
+function TrustBadges({ shipping, warranty }) {
+  const ship = shipping || {};
+  const freeShip = ship.freeShipping !== false;
+  const freeMin  = typeof ship.freeShippingMin === 'number' ? ship.freeShippingMin : 0;
+  const returns  = typeof ship.returnDays === 'number' ? ship.returnDays : 30;
+  const isPrime  = ship.prime === true;
 
-function TrustBadges() {
+  const badges = [
+    {
+      label: freeShip ? 'Free Shipping' : 'Shipping',
+      sub: freeShip
+        ? (freeMin > 0 ? `On orders $${freeMin}+` : (isPrime ? 'Prime eligible' : 'All orders'))
+        : 'Fast delivery',
+      Icon: TruckIcon,
+    },
+    { label: `${returns}-Day Returns`, sub: 'Hassle-free',   Icon: ReturnIcon  },
+    { label: warranty || '2-Year Warranty', sub: 'Full coverage', Icon: WarrantyIcon },
+  ];
+
   return (
     <View style={{ marginTop: 32 }}>
       <ScrollView horizontal showsHorizontalScrollIndicator={false}
         contentContainerStyle={{ paddingHorizontal: T.padH, gap: 12 }}>
-        {TRUST.map((b, i) => (
+        {badges.map((b, i) => (
           <View key={i} style={tb.tile}>
             <View style={tb.iconCircle}>
               <b.Icon />
@@ -1128,8 +1212,22 @@ export default function ProductDetailScreen({ route, navigation }) {
     : activeVariant?.mainImage
       ? [activeVariant.mainImage, ...images.slice(1)]
       : images;
-  // Deduplicate — remove any repeated URLs that cause same slide twice
-  const activeImages = rawActiveImages.filter((url, idx, arr) => arr.indexOf(url) === idx);
+  // Deduplicate — strips Amazon size suffixes (_AC_SL1500_, _AC_UL640_, etc.)
+  // before comparing so two different resolutions of the same image are
+  // recognized as duplicates. Non-Amazon URLs pass through unchanged.
+  const activeImages = (() => {
+    const normalize = (u) => (u || '').replace(/\._AC_[A-Z0-9_]+_\.jpg/i, '.jpg');
+    const seen = new Set();
+    const result = [];
+    for (const url of rawActiveImages) {
+      if (!url) continue;
+      const key = normalize(url);
+      if (seen.has(key)) continue;
+      seen.add(key);
+      result.push(url);
+    }
+    return result;
+  })();
 
   // Variant-aware price: if variant has its own price, use it
   const variantPrice = activeVariant?.price ?? null;
@@ -1225,6 +1323,9 @@ export default function ProductDetailScreen({ route, navigation }) {
             inStock={inStock}
           />
 
+          {/* S1b: Style / room metadata chips (surfaces catalog metadata) */}
+          <MetaChips roomTypes={product?.roomType} styles={product?.styles} />
+
           {/* S2: Best Seller badge */}
           <BestSellerBadge text={bestSellerBadge} />
 
@@ -1239,6 +1340,9 @@ export default function ProductDetailScreen({ route, navigation }) {
           {sizes && sizes.length > 0 && (
             <SizeSelector sizes={sizes} />
           )}
+
+          {/* S4: Full product description (from Amazon import, previously hidden) */}
+          <ProductDescription text={description} />
 
           {/* S5: FTC disclosure */}
           <FTCNote />
@@ -1268,8 +1372,8 @@ export default function ProductDetailScreen({ route, navigation }) {
           {/* S10: Key Features grid */}
           <KeyFeatures features={productFeatures} />
 
-          {/* S11: Trust badges strip */}
-          <TrustBadges />
+          {/* S11: Trust badges strip — reads shipping flags from catalog */}
+          <TrustBadges shipping={product?.shipping} warranty={details?.Warranty} />
 
           {/* S12: Similar Products */}
           <SimilarProducts

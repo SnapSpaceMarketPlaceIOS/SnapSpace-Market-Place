@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import {
   View,
   Text,
@@ -9,23 +9,20 @@ import {
   Platform,
   ScrollView,
   Animated,
+  Easing,
   Alert,
-  Image,
   Dimensions,
 } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
+import Svg, { Path, Line } from 'react-native-svg';
 import * as AppleAuthentication from 'expo-apple-authentication';
 import { useAuth } from '../context/AuthContext';
 import LensLoader from '../components/LensLoader';
+import CardImage from '../components/CardImage';
 import { applyReferralCode } from '../services/subscriptionService';
+import { PRODUCT_CATALOG } from '../data/productCatalog';
 
 const { width: SCREEN_W } = Dimensions.get('window');
-const HERO_H = 280;
-const HERO_PARALLAX = 100; // image slides 100px to create depth during scroll
-const BLUE = '#0B6DC3';
-
-// ── Hero image — same living room used on the landing page ────────────────────
-const HERO_IMG = require('../../assets/snap-bg.jpg');
+const BLUE = '#67ACE9';
 
 // ── Input Field ───────────────────────────────────────────────────────────────
 
@@ -84,16 +81,211 @@ const inputStyles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#fff',
-    borderRadius: 12,
+    borderRadius: 8,
     paddingHorizontal: 16,
     height: 52,
     marginBottom: 12,
     borderWidth: 1,
     borderColor: '#E5E7EB',
   },
-  wrapFocused: { borderColor: '#67ACE9' },
-  input: { flex: 1, fontSize: 15, color: '#111', fontFamily: 'Geist_400Regular'},
-  toggleText: { fontSize: 13, color: '#ABABAB', fontWeight: '500', marginLeft: 8, fontFamily: 'Geist_500Medium'},
+  wrapFocused: { borderColor: BLUE },
+  input: { flex: 1, fontSize: 15, color: '#111', fontFamily: 'Geist_400Regular' },
+  toggleText: { fontSize: 13, color: '#ABABAB', fontWeight: '500', marginLeft: 8, fontFamily: 'Geist_500Medium' },
+});
+
+// ── Product Marquee ───────────────────────────────────────────────────────────
+// Auto-scrolling horizontal strip of full product cards (image + name + brand
+// + rating + price + plus button), drifting left. Non-interactive (pointerEvents:
+// none). List is doubled for seamless loop.
+
+const MARQUEE_CARD_W = 170;
+const MARQUEE_IMG_H = 160;
+const MARQUEE_GAP = 12;
+// 5% corner radius — 170 * 0.05 ≈ 8.5
+const MARQUEE_CARD_R = Math.round(MARQUEE_CARD_W * 0.05);
+
+function StarSmall({ filled = true, size = 11 }) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24"
+      fill={filled ? '#67ACE9' : '#E5E7EB'} stroke={filled ? '#67ACE9' : '#D1D5DB'} strokeWidth={1}>
+      <Path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+    </Svg>
+  );
+}
+
+function PlusSmall() {
+  return (
+    <Svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth={1.5} strokeLinecap="round">
+      <Line x1={12} y1={5} x2={12} y2={19} />
+      <Line x1={5} y1={12} x2={19} y2={12} />
+    </Svg>
+  );
+}
+
+function MarqueeCard({ product }) {
+  const ratingVal = typeof product.rating === 'number' ? product.rating : parseFloat(product.rating) || 0;
+  const priceVal = typeof product.price === 'number' ? product.price : parseFloat(String(product.price).replace(/[^0-9.]/g, '')) || 0;
+  const priceStr = `$${priceVal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+  return (
+    <View style={marqueeStyles.card}>
+      <View style={marqueeStyles.imgWrap}>
+        <CardImage uri={product.imageUrl} style={marqueeStyles.img} placeholderColor="#E8EDF5" />
+      </View>
+      <View style={marqueeStyles.body}>
+        <Text style={marqueeStyles.name} numberOfLines={2}>{product.name}</Text>
+        <Text style={marqueeStyles.brand} numberOfLines={1}>{product.brand}</Text>
+        {ratingVal > 0 && (
+          <View style={marqueeStyles.rating}>
+            {[1,2,3,4,5].map(i => (
+              <StarSmall key={i} size={11} filled={i <= Math.round(ratingVal)} />
+            ))}
+            <Text style={marqueeStyles.ratingText}>{ratingVal.toFixed(1)}</Text>
+            {!!product.reviewCount && (
+              <Text style={marqueeStyles.reviews}>({product.reviewCount.toLocaleString()})</Text>
+            )}
+          </View>
+        )}
+        <View style={marqueeStyles.priceRow}>
+          <Text style={marqueeStyles.price}>{priceStr}</Text>
+          <View style={marqueeStyles.plusBtn}>
+            <PlusSmall />
+          </View>
+        </View>
+      </View>
+    </View>
+  );
+}
+
+function ProductMarquee({ products }) {
+  const translateX = useRef(new Animated.Value(0)).current;
+  const doubled = useMemo(() => [...products, ...products], [products]);
+  const totalW = products.length * (MARQUEE_CARD_W + MARQUEE_GAP);
+
+  useEffect(() => {
+    if (totalW === 0) return;
+    translateX.setValue(0);
+    const anim = Animated.loop(
+      Animated.timing(translateX, {
+        toValue: -totalW,
+        duration: 40000,
+        easing: Easing.linear,
+        useNativeDriver: true,
+      })
+    );
+    anim.start();
+    return () => anim.stop();
+  }, [totalW]);
+
+  if (products.length === 0) return null;
+
+  return (
+    <View style={marqueeStyles.wrap} pointerEvents="none">
+      <View style={marqueeStyles.sepLine} />
+      <View style={marqueeStyles.scrollArea}>
+        <Animated.View style={[marqueeStyles.row, { transform: [{ translateX }] }]}>
+          {doubled.map((p, i) => (
+            <MarqueeCard key={`${p.id || i}-${i}`} product={p} />
+          ))}
+        </Animated.View>
+      </View>
+      <View style={marqueeStyles.sepLine} />
+    </View>
+  );
+}
+
+const marqueeStyles = StyleSheet.create({
+  wrap: {
+    marginTop: 24,
+  },
+  sepLine: {
+    height: 1,
+    backgroundColor: '#E5E7EB',
+  },
+  scrollArea: {
+    overflow: 'hidden',
+    paddingVertical: 16,
+  },
+  row: {
+    flexDirection: 'row',
+    gap: MARQUEE_GAP,
+    paddingHorizontal: 20,
+  },
+  card: {
+    width: MARQUEE_CARD_W,
+    backgroundColor: '#fff',
+    borderRadius: MARQUEE_CARD_R,
+    borderWidth: 1,
+    borderColor: 'rgba(0,0,0,0.06)',
+    overflow: 'hidden',
+  },
+  imgWrap: {
+    width: '100%',
+    height: MARQUEE_IMG_H,
+    backgroundColor: '#F4F5F7',
+  },
+  img: {
+    width: '100%',
+    height: '100%',
+  },
+  body: {
+    padding: 10,
+    gap: 2,
+  },
+  name: {
+    fontSize: 13,
+    fontWeight: '600',
+    fontFamily: 'Geist_600SemiBold',
+    color: '#111',
+    lineHeight: 17,
+  },
+  brand: {
+    fontSize: 11,
+    fontFamily: 'Geist_400Regular',
+    color: '#9CA3AF',
+    marginTop: 1,
+  },
+  rating: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 1,
+    marginTop: 3,
+  },
+  ratingText: {
+    fontSize: 10,
+    fontWeight: '600',
+    fontFamily: 'Geist_600SemiBold',
+    color: '#111',
+    marginLeft: 2,
+  },
+  reviews: {
+    fontSize: 10,
+    fontFamily: 'Geist_400Regular',
+    color: '#9CA3AF',
+    marginLeft: 2,
+  },
+  priceRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: 6,
+  },
+  price: {
+    fontSize: 14,
+    fontWeight: '700',
+    fontFamily: 'Geist_700Bold',
+    color: BLUE,
+  },
+  plusBtn: {
+    width: 26,
+    height: 26,
+    borderRadius: 13,
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: '#D1D5DB',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
 });
 
 // ── Screen ────────────────────────────────────────────────────────────────────
@@ -111,27 +303,27 @@ export default function AuthScreen({ navigation }) {
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
 
-  // ── Parallax — plain JS setValue, no native driver needed
-  const heroScrollY  = React.useRef(new Animated.Value(0)).current;
-  const heroParallax = React.useRef(
-    heroScrollY.interpolate({ inputRange: [0, HERO_H], outputRange: [0, HERO_PARALLAX], extrapolate: 'clamp' }),
-  ).current;
-
-  // ── Button bounce animations ───────────────────────────────────────────────
-  const btnScale = React.useRef(new Animated.Value(1)).current;
-  const appleScale = React.useRef(new Animated.Value(1)).current;
+  // ── Button bounce animations ─────────────────────────────────────────────
+  const btnScale = useRef(new Animated.Value(1)).current;
+  const appleScale = useRef(new Animated.Value(1)).current;
   const pressIn  = (anim) => Animated.spring(anim, { toValue: 0.94, useNativeDriver: true, speed: 60, bounciness: 0 }).start();
   const pressOut = (anim) => Animated.spring(anim, { toValue: 1,    useNativeDriver: true, speed: 18, bounciness: 14 }).start();
 
-  // ── Form slide-up entrance ────────────────────────────────────────────────
-  const formSlideY = React.useRef(new Animated.Value(700)).current;
-  React.useEffect(() => {
-    Animated.spring(formSlideY, { toValue: 0, useNativeDriver: true, speed: 13, bounciness: 4 }).start();
+  // ── Top-quality catalog products for marquee ─────────────────────────────
+  // Only sofas, beds, and rugs (the visually impactful categories the user
+  // wants displayed). Sorted by quality score (rating * log(reviews)) so the
+  // best-reviewed items float to the top. Stable per mount via useMemo.
+  const marqueeProducts = useMemo(() => {
+    const allowedCats = new Set(['sofa', 'bed', 'rug']);
+    return PRODUCT_CATALOG
+      .filter(p => allowedCats.has(p.category) && (p.rating || 0) >= 4.0)
+      .map(p => ({ ...p, _qualityScore: (p.rating || 0) * Math.log((p.reviewCount || 1) + 1) }))
+      .sort((a, b) => b._qualityScore - a._qualityScore)
+      .slice(0, 12);
   }, []);
 
   // Safety net — force-clear the spinner after 16s so it can never get stuck.
-  // signIn/signUp timeout at 15s, so this fires 1s after as a backstop.
-  const loadingTimerRef = React.useRef(null);
+  const loadingTimerRef = useRef(null);
   const safeSetLoading = (val) => {
     if (val) {
       loadingTimerRef.current = setTimeout(() => setLoading(false), 16000);
@@ -221,33 +413,17 @@ export default function AuthScreen({ navigation }) {
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
           bounces={false}
-          scrollEventThrottle={16}
-          onScroll={(e) => heroScrollY.setValue(e.nativeEvent.contentOffset.y)}
         >
-          {/* ── Hero Image ─────────────────────────────────────────── */}
-          <View style={styles.heroWrap}>
-            <Animated.View style={[styles.heroImg, { transform: [{ translateY: heroParallax }] }]}>
-              <Image
-                source={HERO_IMG}
-                style={{ width: '100%', height: '100%' }}
-                resizeMode="cover"
-              />
-            </Animated.View>
-            {/* Dark gradient overlay for text legibility */}
-            <LinearGradient
-              colors={['rgba(0,0,0,0.15)', 'rgba(0,0,0,0.55)']}
-              style={StyleSheet.absoluteFill}
-            />
-            {/* Branding overlay — centered */}
-            <View style={styles.heroContent}>
-              <Text style={styles.heroWordmark}>HomeGenie</Text>
-              <Text style={styles.heroTagline}>Design your space with HomeGenie</Text>
-            </View>
+          {/* ── Top: Title + Subtitle ──────────────────────────────── */}
+          <View style={styles.header}>
+            <Text style={styles.title}>HomeGenie</Text>
+            <Text style={styles.subtitle}>
+              {isSignUp ? 'Shop and Design your room with AI' : 'Welcome Back, Ready To Shop?'}
+            </Text>
           </View>
 
-          {/* ── Form — slides up from bottom on mount ──────────────── */}
-          <Animated.View style={{ transform: [{ translateY: formSlideY }] }}>
-          <View style={styles.formSection}>
+          {/* ── Middle: Form card (light gray panel) ───────────────── */}
+          <View style={styles.formCard}>
             {isSignUp && (
               <>
                 <MinimalInput
@@ -348,7 +524,7 @@ export default function AuthScreen({ navigation }) {
               <AppleAuthentication.AppleAuthenticationButton
                 buttonType={AppleAuthentication.AppleAuthenticationButtonType.SIGN_IN}
                 buttonStyle={AppleAuthentication.AppleAuthenticationButtonStyle.BLACK}
-                cornerRadius={14}
+                cornerRadius={8}
                 style={styles.appleBtn}
                 onPress={async () => {
                   pressIn(appleScale);
@@ -369,13 +545,17 @@ export default function AuthScreen({ navigation }) {
             </Animated.View>
           </View>
 
+          {/* ── "Don't have an account? Sign Up" (below the card) ── */}
           <TouchableOpacity style={styles.switchBtn} onPress={switchMode} activeOpacity={0.7}>
             <Text style={styles.switchText}>
               {isSignUp ? 'Already have an account?  ' : "Dont have an account?  "}
               <Text style={styles.switchLink}>{isSignUp ? 'Sign in' : 'Sign Up'}</Text>
             </Text>
           </TouchableOpacity>
-          </Animated.View>
+
+          {/* ── Bottom: Auto-scrolling product marquee ─────────────── */}
+          <ProductMarquee products={marqueeProducts} />
+
         </ScrollView>
       </KeyboardAvoidingView>
     </View>
@@ -389,96 +569,65 @@ const styles = StyleSheet.create({
   flex: { flex: 1 },
   scroll: {
     flexGrow: 1,
-    paddingBottom: 40,
+    paddingBottom: 32,
   },
 
-  // ── Hero ──
-  heroWrap: {
-    width: SCREEN_W,
-    height: HERO_H,
-    position: 'relative',
-    overflow: 'hidden',
-  },
-  heroImg: {
-    width: '100%',
-    height: HERO_H + HERO_PARALLAX,
-    marginTop: -HERO_PARALLAX,
-  },
-  heroContent: {
-    position: 'absolute',
-    top: 0,
-    bottom: 0,
-    left: 0,
-    right: 0,
-    paddingHorizontal: 28,
+  // ── Header: title + subtitle ──
+  header: {
     alignItems: 'center',
-    justifyContent: 'center',
+    paddingTop: 80,
+    paddingHorizontal: 24,
+    marginBottom: 24,
   },
-  heroWordmark: {
-    fontSize: 38,
+  title: {
+    fontSize: 36,
     fontWeight: '800',
     fontFamily: 'Geist_700Bold',
-    color: '#fff',
+    color: '#111',
     letterSpacing: -0.5,
-    marginBottom: 8,
     textAlign: 'center',
-    textShadowColor: 'rgba(0,0,0,0.3)',
-    textShadowOffset: { width: 0, height: 2 },
-    textShadowRadius: 8,
   },
-  heroTagline: {
-    fontSize: 14,
+  subtitle: {
+    fontSize: 16,
     fontWeight: '500',
     fontFamily: 'Geist_500Medium',
-    color: 'rgba(255,255,255,0.88)',
-    letterSpacing: 0.2,
+    color: BLUE,
     textAlign: 'center',
-    textShadowColor: 'rgba(0,0,0,0.3)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 4,
+    marginTop: 10,
   },
 
-  // ── Form ──
-  formSection: {
-    backgroundColor: '#fff',
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    marginTop: -20,
-    paddingHorizontal: 28,
-    paddingTop: 28,
+  // ── Form card (gray panel) ──
+  formCard: {
+    backgroundColor: '#F4F5F7',
+    borderRadius: 12,
+    marginHorizontal: 20,
+    padding: 20,
   },
 
-  errorText: { fontSize: 12, color: '#E74C3C', marginTop: -8, marginBottom: 10, marginLeft: 4, fontFamily: 'Geist_400Regular'},
+  errorText: { fontSize: 12, color: '#E74C3C', marginTop: -8, marginBottom: 10, marginLeft: 4, fontFamily: 'Geist_400Regular' },
 
-  forgotBtn: { alignSelf: 'flex-end', marginBottom: 20, marginTop: -4 },
-  forgotText: { fontSize: 13, color: BLUE, fontWeight: '600', fontFamily: 'Geist_600SemiBold'},
+  forgotBtn: { alignSelf: 'flex-end', marginBottom: 16, marginTop: -4 },
+  forgotText: { fontSize: 13, color: BLUE, fontWeight: '600', fontFamily: 'Geist_600SemiBold' },
 
   primaryBtnDisabled: { opacity: 0.6 },
   primaryBtn: {
     height: 54,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 14,
-    backgroundColor: '#67ACE9',
+    borderRadius: 8,
+    backgroundColor: BLUE,
   },
-  primaryBtnText: { color: '#fff', fontSize: 16, fontWeight: '700', fontFamily: 'Geist_700Bold'},
+  primaryBtnText: { color: '#fff', fontSize: 16, fontWeight: '700', fontFamily: 'Geist_700Bold' },
 
   dividerRow: { flexDirection: 'row', alignItems: 'center', marginVertical: 18, gap: 12 },
-  dividerLine: { flex: 1, height: 1, backgroundColor: '#E5E7EB' },
-  dividerText: { fontSize: 12, color: '#BBBBBB', fontWeight: '500', fontFamily: 'Geist_500Medium'},
+  dividerLine: { flex: 1, height: 1, backgroundColor: '#D8DCE2' },
+  dividerText: { fontSize: 12, color: '#9CA3AF', fontWeight: '500', fontFamily: 'Geist_500Medium' },
 
   appleBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    backgroundColor: '#000',
-    borderRadius: 14,
     height: 54,
   },
-  appleBtnText: { color: '#fff', fontSize: 15, fontWeight: '700', fontFamily: 'Geist_700Bold'},
 
-  switchBtn: { marginTop: 28, alignItems: 'center' },
-  switchText: { fontSize: 14, color: '#ABABAB', fontFamily: 'Geist_400Regular'},
-  switchLink: { color: BLUE, fontWeight: '700', fontFamily: 'Geist_700Bold'},
+  switchBtn: { marginTop: 20, alignItems: 'center' },
+  switchText: { fontSize: 14, color: '#9CA3AF', fontFamily: 'Geist_400Regular' },
+  switchLink: { color: BLUE, fontWeight: '700', fontFamily: 'Geist_700Bold' },
 });

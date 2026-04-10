@@ -763,7 +763,6 @@ export default function HomeScreen({ navigation, route }) {
   // Design Your Space state
   const [photo, setPhoto] = useState(null);
   const [photoSource, setPhotoSource] = useState(null); // 'camera' | 'library'
-  const [imageLayout, setImageLayout] = useState(null);
   const [generating, setGenerating] = useState(false);
   const [genStatus, setGenStatus] = useState('');
   const [loadingMsgIndex, setLoadingMsgIndex] = useState(0);
@@ -894,8 +893,6 @@ export default function HomeScreen({ navigation, route }) {
       const captured = route.params.capturedPhoto;
       setPhoto(captured);
       setPhotoSource('camera');
-      const isLandscape = (captured.width || 0) > (captured.height || 0);
-      setImageLayout({ landscape: isLandscape });
       navigation.setParams({ capturedPhoto: undefined });
     }
   }, [route?.params?.capturedPhoto]);
@@ -913,15 +910,14 @@ export default function HomeScreen({ navigation, route }) {
     }
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      quality: 0.8,
-      base64: true,
+      // allowsEditing removed — the native crop UI is the 1-2s bottleneck on iOS simulator
+      quality: 0.6,
+      exif: false,
     });
     if (result.canceled || !result.assets?.length) return;
     const asset = result.assets[0];
-    setPhoto({ uri: asset.uri, base64: asset.base64, width: asset.width, height: asset.height });
+    setPhoto({ uri: asset.uri, base64: null, width: asset.width, height: asset.height });
     setPhotoSource('library');
-    setImageLayout({ landscape: (asset.width || 0) > (asset.height || 0) });
   }, [generating]);
 
   // Timed loading bar — 3-phase crawl matching real Replicate generation time
@@ -1616,7 +1612,7 @@ export default function HomeScreen({ navigation, route }) {
               <View>
                 <TouchableOpacity
                   style={styles.inputIconBtn}
-                  onPress={photo ? () => { setPhoto(null); setPhotoSource(null); setImageLayout(null); } : handlePickFromLibrary}
+                  onPress={photo ? () => { setPhoto(null); setPhotoSource(null); } : handlePickFromLibrary}
                   activeOpacity={1}
                   onPressIn={() => springIn(galleryScale)}
                   onPressOut={() => springOut(galleryScale)}
@@ -1861,10 +1857,10 @@ export default function HomeScreen({ navigation, route }) {
             noTopMargin
             title="FEATURED PRODUCTS"
             actionLabel="Shop all"
-            onAction={() => navigation?.navigate('Browse', {
+            onAction={() => navigation?.navigate('Explore', {
               mode: 'products',
-              title: 'Featured Products',
-              products: FEATURED_PRODUCTS,
+              title: 'Featured',
+              featuredProductIds: FEATURED_PRODUCTS.map(p => p.id),
             })}
           />
           <Text style={styles.affiliateDisclosure}>We may earn a commission on purchases.</Text>
@@ -2150,7 +2146,6 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
-    paddingBottom: 24,
   },
   overlay: {
     height: height - 88, // exactly fill visible content area above tab bar
