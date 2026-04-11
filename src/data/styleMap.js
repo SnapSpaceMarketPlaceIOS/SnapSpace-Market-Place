@@ -76,7 +76,11 @@ export const MATERIALS = [
 export const MATERIAL_KEYWORDS = {
   wood:     ['wood', 'wooden', 'timber', 'hardwood', 'plywood'],
   marble:   ['marble', 'stone', 'travertine', 'terrazzo'],
-  velvet:   ['velvet', 'plush', 'soft'],
+  // NOTE: 'plush' and 'soft' describe TEXTURE, not material — a soft leather
+  // couch is NOT a velvet couch. Previously these words caused "soft brown
+  // leather couch" to be tagged as {leather, velvet} which then let a velvet
+  // sofa win over the leather one. Only true velvet words belong here.
+  velvet:   ['velvet'],
   linen:    ['linen', 'natural fiber', 'flax'],
   leather:  ['leather', 'leather sofa', 'leather chair', 'genuine leather', 'faux leather'],
   rattan:   ['rattan', 'wicker', 'cane', 'bamboo'],

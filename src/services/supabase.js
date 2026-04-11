@@ -102,9 +102,14 @@ const SecureStoreAdapter = {
   },
 };
 
+// iOS 26.x beta simulators: keychain hangs without throwing, eating the 15s
+// auth timeout before SecureStore's own 2s fallback can fire.
+// Use AsyncStorage directly in __DEV__ to skip the keychain entirely.
+const authStorage = __DEV__ ? AsyncStorage : SecureStoreAdapter;
+
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   auth: {
-    storage: SecureStoreAdapter,
+    storage: authStorage,
     persistSession: true,
     autoRefreshToken: true,
     detectSessionInUrl: false,
@@ -178,10 +183,28 @@ export async function uploadAvatar(userId, uri) {
   return uploadImage('avatars', `${userId}/avatar.jpeg`, uri);
 }
 
-/** Upload a room photo for AI generation. Returns public URL. */
+/**
+ * Upload a room photo for AI generation. Returns a public URL that ALWAYS
+ * serves as JPEG regardless of the source bytes.
+ *
+ * ROOT CAUSE of flux-2-max E006 "invalid input" errors (fixed here):
+ * On iOS 26.x simulator, expo-image-picker/expo-camera return files whose
+ * raw bytes are AVIF even when the URI ends in .jpg/.jpeg. We upload those
+ * bytes verbatim, so Supabase Storage ends up holding an AVIF file under a
+ * .jpeg path. Cloudflare (in front of Supabase) then serves it with
+ * content-type: image/avif, and flux-2-max rejects anything that isn't
+ * jpeg/png/gif/webp, throwing E006 before generation even starts.
+ *
+ * Fix: return the Supabase /render/image/ transform endpoint instead of
+ * the raw /object/public/ endpoint. The render layer decodes whatever is
+ * stored (including AVIF) and re-emits a proper JPEG with the requested
+ * width/quality. flux-2-max sees a clean JPEG every time.
+ */
 export async function uploadRoomPhoto(userId, uri, base64Data = null) {
   const ts = Date.now();
-  return uploadImage('room-uploads', `${userId}/${ts}.jpeg`, uri, base64Data);
+  const storagePath = `${userId}/${ts}.jpeg`;
+  await uploadImage('room-uploads', storagePath, uri, base64Data);
+  return `${SUPABASE_URL}/storage/v1/render/image/public/room-uploads/${storagePath}?width=1024&quality=90`;
 }
 
 // ─── User Designs Helpers ────────────────────────────────────────────────────

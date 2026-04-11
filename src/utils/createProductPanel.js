@@ -30,6 +30,30 @@ const MIN_PRODUCTS  = 2;   // panel isn't worth building for < 2 images
 const SEND_LIMIT    = 6;   // send up to 6 URLs so edge fn has backup slots if any fail
 const MAX_RETRIES   = 2;   // retry once on failure (cold starts, transient errors)
 
+/**
+ * Rewrite a Supabase /storage/v1/object/public/... URL to the equivalent
+ * /storage/v1/render/image/public/... URL, which forces the server to
+ * decode and re-emit the image as JPEG (or a requested format) regardless
+ * of how the bytes are stored. This is the fix for the iOS 26 AVIF bug:
+ * Cloudflare serves stored bytes as AVIF to clients sending Accept headers
+ * that permit it, and flux-2-max rejects AVIF with E006. The render endpoint
+ * bypasses that entirely.
+ *
+ * Non-Supabase URLs are returned unchanged.
+ */
+function toRenderUrl(url) {
+  if (typeof url !== 'string') return url;
+  const marker = '/storage/v1/object/public/';
+  const idx = url.indexOf(marker);
+  if (idx === -1) return url; // not a Supabase object URL
+  const head = url.slice(0, idx);
+  const tail = url.slice(idx + marker.length); // "<bucket>/<path>?maybe=query"
+  // Strip any existing query so we can append our own deterministically
+  const [tailPath, tailQuery] = tail.split('?');
+  const sep = tailQuery ? '&' : '';
+  return `${head}/storage/v1/render/image/public/${tailPath}?width=1024&quality=90${sep}${tailQuery || ''}`;
+}
+
 export async function createProductPanel(products, userId) {
   // ── Guard: requires products with image URLs ──────────────────────────────
   if (!products || products.length === 0) {
@@ -46,14 +70,20 @@ export async function createProductPanel(products, userId) {
   // URL returns a non-image response (broken ASIN, etc.) the edge fn skips it
   // and fills the 2×2 grid from the remaining URLs. This guarantees 4 filled
   // cells as long as at least 4 of the 6 URLs are valid.
-  // Shrink Amazon _SL1500_ → _SL300_ so the edge function downloads 0.09 MP
-  // per image instead of 2.25 MP — faster fetch + smaller composite output.
+  //
+  // Use 1500px Amazon sources (not 300px) so the panel's 256×256 cells have
+  // sharp detail after Lanczos downsampling. The edge function resizes to
+  // 256×256 regardless, so the download is a one-time cost — and Replicate
+  // only sees the final 512×512 panel, so per-input MP billing is unchanged.
+  // Quality win: sharper product detail in attention map → sharper render.
   const productUrls = products
     .filter(p => p.imageUrl && typeof p.imageUrl === 'string' && p.imageUrl.startsWith('http'))
     .slice(0, SEND_LIMIT)
     .map(p => p.imageUrl
-      .replace(/_AC_SL\d+_/g,  '_AC_SL300_')
-      .replace(/_AC_UL\d+_/g,  '_AC_SL300_')
+      .replace(/_AC_SL\d+_/g,  '_AC_SL1500_')
+      .replace(/_AC_UL\d+_/g,  '_AC_SL1500_')
+      .replace(/_SX\d+_/g,     '_AC_SL1500_')
+      .replace(/_SR\d+,\d+_/g, '_AC_SL1500_')
     );
 
   if (productUrls.length < MIN_PRODUCTS) {
@@ -111,8 +141,15 @@ export async function createProductPanel(products, userId) {
         return null;
       }
 
-      console.log(`[Panel] Panel ready (attempt ${attempt}) | composited=${data.composited_count ?? '?'} | url=${data.url.substring(0, 80)}`);
-      return data.url;
+      // Force the panel URL through Supabase's /render/image/ transform endpoint
+      // so flux-2-max always receives clean JPEG bytes. Cloudflare occasionally
+      // serves stored JPEGs as AVIF based on client Accept headers, which
+      // flux-2-max rejects with E006 "invalid input". The render endpoint
+      // guarantees a JPEG regardless of the underlying storage format.
+      const renderUrl = toRenderUrl(data.url);
+
+      console.log(`[Panel] Panel ready (attempt ${attempt}) | composited=${data.composited_count ?? '?'} | url=${renderUrl.substring(0, 80)}`);
+      return renderUrl;
 
     } catch (err) {
       // Network failure, timeout, or Deno crash — retry once

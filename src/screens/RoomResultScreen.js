@@ -182,10 +182,21 @@ function ProductCard({ product, inCart, onAddToCart, onPress }) {
     ? `$${priceVal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
     : product.priceLabel || String(priceVal).replace(/^\$+/, '$');
   const ratingVal = typeof product.rating === 'number' ? product.rating : parseFloat(product.rating) || 0;
+  // Vision-verification badge: shown when the post-gen check could not fully
+  // confirm this product matches what's visible in the rendered room. The
+  // legal disclosure in the SHOP ROOM footer covers the whole section.
+  const showSimilarBadge = product.confidence && product.confidence !== 'verified';
 
   return (
     <TouchableOpacity style={s.hCard} activeOpacity={0.7} onPress={onPress}>
-      <CardImage uri={product.imageUrl} style={s.hCardImg} resizeMode="cover" placeholderColor="#D0D7E3" />
+      <View>
+        <CardImage uri={product.imageUrl} style={s.hCardImg} resizeMode="cover" placeholderColor="#D0D7E3" />
+        {showSimilarBadge && (
+          <View style={s.similarBadge}>
+            <Text style={s.similarBadgeText}>SIMILAR STYLE</Text>
+          </View>
+        )}
+      </View>
       <View style={s.hCardBody}>
         <Text style={s.hCardName} numberOfLines={2}>{product.name}</Text>
         <Text style={s.hCardBrand} numberOfLines={1}>{product.brand}</Text>
@@ -242,6 +253,10 @@ export default function RoomResultScreen({ route, navigation }) {
 
   const prompt = route?.params?.prompt || 'Modern minimalist redesign';
   const [resultUri, setResultUri] = useState(route?.params?.resultUri || null);
+
+  // Dev-only debug metadata from HomeScreen.runGeneration()
+  const debug = route?.params?.debug || null;
+  const [showDebug, setShowDebug] = useState(false);
 
   // ── Load products ──
   useEffect(() => {
@@ -402,6 +417,83 @@ export default function RoomResultScreen({ route, navigation }) {
 
   return (
     <View style={s.container}>
+      {__DEV__ && debug && (() => {
+        // ── Pipeline badge: instantly shows which path rendered the image ──
+        // PANEL (green)  — 2-image flux-2-max, visual refs, products match best
+        // INDIV (yellow) — 5-image flux-2-max, visual refs, products match best
+        // BFL   (red)    — fallback kontext, TEXT-ONLY refs → products may NOT
+        //                  visually match the catalog items shown below
+        const pipeline = debug.pipeline || 'unknown';
+        const pipelineLabel =
+          pipeline === 'panel'      ? 'PANEL' :
+          pipeline === 'individual' ? 'INDIV' :
+          pipeline === 'bfl'        ? 'BFL'   :
+          'UNK';
+        const pipelineColor =
+          pipeline === 'panel'      ? '#10B981' : // green
+          pipeline === 'individual' ? '#F59E0B' : // amber
+          pipeline === 'bfl'        ? '#EF4444' : // red — text-only refs
+          '#6B7280';                              // gray — unknown
+        const pipelineDesc =
+          pipeline === 'panel'      ? 'flux-2-max · room + 2×2 panel · visual refs' :
+          pipeline === 'individual' ? 'flux-2-max · room + 4 individual product refs · visual' :
+          pipeline === 'bfl'        ? 'BFL kontext · text-only refs (products may not visually match)' :
+          'unknown pipeline';
+
+        return (
+          <>
+            <TouchableOpacity
+              style={[s.debugToggle, { backgroundColor: pipelineColor }]}
+              activeOpacity={0.7}
+              onPress={() => setShowDebug(v => !v)}
+            >
+              <Text style={s.debugToggleText}>
+                {showDebug ? '×' : `DBG·${pipelineLabel}`}
+              </Text>
+            </TouchableOpacity>
+            {showDebug && (
+              <View style={s.debugPanel}>
+                {/* ── Prominent pipeline banner ────────────────────────── */}
+                <View style={[s.debugPipelineBanner, { backgroundColor: pipelineColor }]}>
+                  <Text style={s.debugPipelineLabel}>PIPELINE: {pipelineLabel}</Text>
+                  <Text style={s.debugPipelineDesc}>{pipelineDesc}</Text>
+                </View>
+
+                <Text style={s.debugTitle}>GENERATION DEBUG</Text>
+                <Text style={s.debugRow}>id: {debug.generationId || '—'}</Text>
+                <Text style={s.debugRow}>pipeline: {pipeline}</Text>
+                <Text style={s.debugRow}>prediction: {debug.predictionId ? debug.predictionId.substring(0, 16) + '…' : '—'}</Text>
+                <Text style={s.debugRow}>seed: {debug.seed ?? '—'}</Text>
+                <Text style={s.debugRow}>aspect: {debug.aspectRatio || '—'}</Text>
+                <Text style={s.debugRow}>photo: {debug.photoWidth}×{debug.photoHeight}</Text>
+                <Text style={s.debugRow}>duration: {debug.durationMs ? (debug.durationMs / 1000).toFixed(1) + 's' : '—'}</Text>
+                <View style={s.debugDivider} />
+                <Text style={s.debugRow}>verified: {debug.verifiedCount}/{products.length}</Text>
+                <Text style={s.debugRow}>room: {debug.roomType || '—'}</Text>
+                {debug.visionItems && debug.visionItems.length > 0 && (
+                  <>
+                    <View style={s.debugDivider} />
+                    <Text style={s.debugTitle}>VISION ITEMS</Text>
+                    {debug.visionItems.slice(0, 6).map((item, i) => (
+                      <Text key={i} style={s.debugRow}>
+                        {item.category}: {item.color} {item.material}
+                      </Text>
+                    ))}
+                  </>
+                )}
+                <View style={s.debugDivider} />
+                <Text style={s.debugTitle}>PRODUCT SCORES</Text>
+                {products.slice(0, 6).map((p, i) => (
+                  <Text key={p.id || i} style={s.debugRow} numberOfLines={1}>
+                    {(p.confidence === 'verified' ? '✓ ' : '~ ')}
+                    {(p._visionScore ?? 0).toFixed(0)} — {p.category}
+                  </Text>
+                ))}
+              </View>
+            )}
+          </>
+        );
+      })()}
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={s.scrollContent}>
 
         {/* ── Header ───────────────────────────────────────────────── */}
@@ -486,6 +578,11 @@ export default function RoomResultScreen({ route, navigation }) {
                 />
               ))}
             </ScrollView>
+            {/* Legal disclosure: the generated image is illustrative only. */}
+            <Text style={s.shopRoomDisclaimer}>
+              Room image is AI-generated for inspiration. Shown products are close matches —
+              actual colors, materials, and finishes may differ from the render.
+            </Text>
           </View>
         )}
 
@@ -777,6 +874,96 @@ const s = StyleSheet.create({
     width: '100%',
     height: 150,
     backgroundColor: '#F3F4F6',
+  },
+  similarBadge: {
+    position: 'absolute',
+    top: 8,
+    left: 8,
+    backgroundColor: 'rgba(17, 24, 39, 0.88)',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 4,
+  },
+  similarBadgeText: {
+    fontSize: 9,
+    fontWeight: '700',
+    fontFamily: 'Geist_700Bold',
+    letterSpacing: 0.5,
+    color: '#FFFFFF',
+  },
+  shopRoomDisclaimer: {
+    fontSize: 11,
+    lineHeight: 15,
+    fontFamily: 'Geist_400Regular',
+    color: C.textTertiary,
+    paddingRight: space.lg,
+    paddingTop: space.md,
+  },
+
+  // ── Dev-only debug overlay (gated by __DEV__) ──
+  debugToggle: {
+    position: 'absolute',
+    top: 60,
+    right: 12,
+    zIndex: 1000,
+    backgroundColor: 'rgba(17, 24, 39, 0.88)',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 6,
+  },
+  debugToggleText: {
+    color: '#FFFFFF',
+    fontSize: 11,
+    fontWeight: '700',
+    letterSpacing: 0.5,
+  },
+  debugPanel: {
+    position: 'absolute',
+    top: 96,
+    right: 12,
+    left: 12,
+    zIndex: 999,
+    backgroundColor: 'rgba(17, 24, 39, 0.94)',
+    borderRadius: 8,
+    padding: 12,
+    maxHeight: '70%',
+  },
+  debugTitle: {
+    color: '#67ACE9',
+    fontSize: 10,
+    fontWeight: '700',
+    letterSpacing: 1,
+    marginBottom: 6,
+  },
+  debugRow: {
+    color: '#FFFFFF',
+    fontSize: 11,
+    lineHeight: 15,
+    fontFamily: 'Courier',
+  },
+  debugDivider: {
+    height: 1,
+    backgroundColor: 'rgba(255,255,255,0.12)',
+    marginVertical: 6,
+  },
+  debugPipelineBanner: {
+    borderRadius: 6,
+    paddingVertical: 8,
+    paddingHorizontal: 10,
+    marginBottom: 10,
+  },
+  debugPipelineLabel: {
+    color: '#FFFFFF',
+    fontSize: 13,
+    fontWeight: '800',
+    letterSpacing: 1,
+    marginBottom: 2,
+  },
+  debugPipelineDesc: {
+    color: 'rgba(255,255,255,0.92)',
+    fontSize: 10,
+    lineHeight: 14,
+    fontFamily: 'Courier',
   },
   hCardBody: {
     padding: 10,

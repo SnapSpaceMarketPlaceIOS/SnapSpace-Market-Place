@@ -40,9 +40,9 @@ import { useCart } from '../context/CartContext';
 import { DESIGNS } from '../data/designs';
 import { SELLERS } from '../data/sellers';
 import { searchProducts, getSourceColor, getProductsForPrompt } from '../services/affiliateProducts';
-import { generateInteriorDesign, buildFinalPrompt, generateWithProductRefs, generateWithProductPanel } from '../services/replicate';
+import { buildFinalPrompt, generateWithProductRefs, generateWithProductPanel, pickAspectRatio } from '../services/replicate';
 import { createProductPanel } from '../utils/createProductPanel';
-import { analyzeRoomImage, rematchFromVision } from '../services/visionMatcher';
+import { verifyGeneratedProducts } from '../services/visionMatcher';
 import { PRODUCT_CATALOG } from '../data/productCatalog';
 import { saveUserDesign, updateDesignVisibility, uploadRoomPhoto } from '../services/supabase';
 import { useSubscription } from '../context/SubscriptionContext';
@@ -52,6 +52,60 @@ import { sendNotificationIfEnabled } from '../services/notifications';
 
 const { width, height } = Dimensions.get('window');
 
+// ── URL pre-flight ─────────────────────────────────────────────────────────
+// Flux-2-max fails the ENTIRE prediction if ANY input_images URL is either:
+//   1) non-200 (e.g. stale Amazon affiliate URL → 404), or
+//   2) served with a content-type it can't decode. flux-2-max accepts only
+//      jpeg, png, gif, and webp — anything else (notably AVIF, which iOS 26
+//      simulators return from the photo library) throws E006 "invalid input"
+//      at "Processing input image" before generation even starts.
+//
+// We check every URL in parallel with a tight timeout and drop any that fail
+// either check. Rejected products are still shown in the UI (the Shop Your
+// Room cards), but they aren't sent to flux so they can't crash the call.
+const PREFLIGHT_TIMEOUT_MS = 2500;
+const FLUX_SUPPORTED_MIMES = new Set([
+  'image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp',
+]);
+
+async function preflightUrl(url) {
+  try {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), PREFLIGHT_TIMEOUT_MS);
+    // HEAD is ideal but some CDNs don't implement it; fall back to GET with
+    // a Range header so we don't download the whole file.
+    const res = await fetch(url, {
+      method: 'GET',
+      headers: { 'Range': 'bytes=0-0' },
+      signal: ctrl.signal,
+    });
+    clearTimeout(timer);
+    const reachable = res.status === 200 || res.status === 206;
+    if (!reachable) return false;
+    // Verify the CDN is actually serving a flux-compatible format.
+    // Strip any "; charset=..." suffix before comparing.
+    const ct = (res.headers.get('content-type') || '').split(';')[0].trim().toLowerCase();
+    if (ct && !FLUX_SUPPORTED_MIMES.has(ct)) {
+      console.warn(`[preflight] ${url.substring(0, 80)} served as ${ct} — flux-2-max can't decode this`);
+      return false;
+    }
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+async function filterReachableProducts(products) {
+  if (!products || products.length === 0) return [];
+  const checks = await Promise.all(products.map(async p => {
+    if (!p?.imageUrl || typeof p.imageUrl !== 'string' || !p.imageUrl.startsWith('http')) {
+      return null;
+    }
+    const ok = await preflightUrl(p.imageUrl);
+    return ok ? p : null;
+  }));
+  return checks.filter(Boolean);
+}
 
 const CARD_W = width * 0.50;
 const COLL_CARD_W = (width - space.lg * 2 - space.sm) / 2;
@@ -1162,6 +1216,17 @@ export default function HomeScreen({ navigation, route }) {
     const designPrompt = prompt.trim();
     const savedPhoto = { ...photo };
     Keyboard.dismiss();
+
+    // ── Observability: one ID per generation attempt ───────────────────────
+    // Threaded through every log line below so a single Metro/Xcode log search
+    // surfaces the whole funnel: pre-match → panel → flux → verify → save.
+    // Short format (time + 4 random chars) — long UUIDs clutter logs.
+    const generationId = `g-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`;
+    const log = (...args) => console.log(`[gen:${generationId}]`, ...args);
+    const warn = (...args) => console.warn(`[gen:${generationId}]`, ...args);
+    const startedAt = Date.now();
+    log('start | prompt="' + designPrompt.substring(0, 80) + '"');
+
     // Initialize rotating loading messages tailored to the prompt
     const msgs = getLoadingMessages(designPrompt);
     setLoadingMessages(msgs);
@@ -1175,6 +1240,30 @@ export default function HomeScreen({ navigation, route }) {
       // ── Pre-match products from local catalog (before any generation call) ──
       setGenStatus('Finding products for your space…');
       const matchedProducts = getProductsForPrompt(designPrompt, 4);
+      log('pre-matched', matchedProducts.length, 'products:', matchedProducts.map(p => p.category).join(','));
+
+      // ── URL pre-flight: drop any matched product whose image 404s ────────
+      // Amazon image URLs occasionally rotate / expire. If a stale URL makes
+      // it into input_images, flux-2-max fails the whole prediction with
+      // "404 Client Error: Not Found for url: ...", which silently drops us
+      // onto BFL. Catch that here so only reachable products reach Replicate.
+      // The pre-match set is still shown in the UI regardless — pre-flight
+      // only affects which URLs get sent to the generation model.
+      const reachableProducts = await filterReachableProducts(matchedProducts);
+      const dropped = matchedProducts.length - reachableProducts.length;
+      if (dropped > 0) {
+        warn('preflight: dropped ' + dropped + '/' + matchedProducts.length + ' products with unreachable images');
+      } else {
+        log('preflight: all ' + matchedProducts.length + ' product URLs reachable');
+      }
+
+      // ── Derive aspect ratio from the room photo orientation ──────────────
+      // flux-2-max's 'match_input_image' is ambiguous with multi-image input,
+      // so we snap the room photo's native aspect to the closest supported
+      // bucket and pass it explicitly. Large rooms get landscape, narrow
+      // rooms get portrait — the generated render matches the source framing.
+      const aspectRatio = pickAspectRatio(savedPhoto.width, savedPhoto.height);
+      log('photo', savedPhoto.width + 'x' + savedPhoto.height, '→ aspect_ratio =', aspectRatio);
 
       // ── Quota waterfall: free → tokens → subscription → paywall ─────────
       let generationSource = null;
@@ -1198,6 +1287,15 @@ export default function HomeScreen({ navigation, route }) {
       // ──────────────────────────────────────────────────────────────────────
       let resultUrl;
       let finalProducts;
+      // Metadata captured from the generation call — surfaced in the dev
+      // debug overlay on RoomResultScreen and attached to the saved design.
+      let genMeta = {
+        generationId,
+        predictionId: null,
+        seed:         null,
+        aspectRatio,
+        pipeline:     null,  // 'panel' | 'individual' | 'bfl'
+      };
 
       if (user?.id) {
         // ── Step 1: Upload room photo to Supabase Storage ─────────────────
@@ -1236,54 +1334,86 @@ export default function HomeScreen({ navigation, route }) {
           // Cost: ~$0.10–0.20/generation
           let replicateSucceeded = false;
           try {
-            console.log('[Gen] Replicate flux-2-max | visual product refs | cost=~$0.10-0.20');
+            log('replicate flux-2-max | visual product refs');
 
             // ── Try panel approach: 2 images instead of 4 → ~50% less GPU compute ──
             // Creates a 512×512 2×2 product grid via edge function, then sends
             // [room, panel] to flux-2-max instead of [room, p1, p2, p3].
-            // Target cost: ~$0.15/gen vs $0.31 with individual images.
+            // Target cost: ~$0.13/gen vs $0.31 with individual images.
+            //
+            // Uses reachableProducts (pre-flighted) so a single stale Amazon
+            // URL can't take down the whole generation.
             let usedPanel = false;
-            try {
-              setGenStatus('Preparing product panel…');
-              const panelUrl = await createProductPanel(matchedProducts, user.id);
-              if (panelUrl) {
-                console.log('[Gen] Panel ready — using 2-image input (room + 2×2 panel)');
-                setGenStatus('Analyzing your room…');
-                resultUrl = await generateWithProductPanel(roomPhotoUrl, designPrompt, matchedProducts, panelUrl);
-                usedPanel = true;
-                console.log('[Gen] Panel generation complete');
+            if (reachableProducts.length >= 2) {
+              try {
+                setGenStatus('Preparing product panel…');
+                const panelUrl = await createProductPanel(reachableProducts, user.id);
+                if (panelUrl) {
+                  // Panel URL pre-flight: Supabase Storage is usually instant
+                  // but CDN propagation can briefly lag. Verify before sending
+                  // to flux-2-max so a 404 on the panel doesn't trigger E006.
+                  const panelOk = await preflightUrl(panelUrl);
+                  if (!panelOk) {
+                    warn('panel URL not yet reachable — skipping panel path');
+                  } else {
+                    log('panel ready — using 2-image input (room + 2×2 panel)');
+                    setGenStatus('Analyzing your room…');
+                    const panelResult = await generateWithProductPanel(
+                      roomPhotoUrl,
+                      designPrompt,
+                      reachableProducts,
+                      panelUrl,
+                      aspectRatio,
+                    );
+                    resultUrl = panelResult.url;
+                    genMeta.predictionId = panelResult.predictionId;
+                    genMeta.seed = panelResult.seed;
+                    genMeta.pipeline = 'panel';
+                    usedPanel = true;
+                    log('panel gen complete | prediction=' + panelResult.predictionId + ' seed=' + panelResult.seed);
+                  }
+                }
+              } catch (panelErr) {
+                warn('panel approach failed (' + panelErr.message + ') — falling back to individual refs');
               }
-            } catch (panelErr) {
-              console.warn(`[Gen] Panel approach failed (${panelErr.message}) — falling back to individual refs`);
+            } else {
+              warn('panel skipped — only ' + reachableProducts.length + ' reachable products (need 2+)');
             }
 
             // ── Fallback: individual product images (original 4-image approach) ──
-            if (!usedPanel) {
-              console.log('[Gen] Using individual product refs (room + 4 product images)');
+            if (!usedPanel && reachableProducts.length >= 1) {
+              log('using individual product refs (room + ' + Math.min(reachableProducts.length, 4) + ' product images)');
               setGenStatus('Analyzing your room…');
-              resultUrl = await generateWithProductRefs(roomPhotoUrl, designPrompt, matchedProducts);
+              resultUrl = await generateWithProductRefs(roomPhotoUrl, designPrompt, reachableProducts, aspectRatio);
+              genMeta.pipeline = 'individual';
+            } else if (!usedPanel) {
+              // No reachable product images — force the replicate path to fail
+              // so we drop to BFL (which doesn't need product URLs).
+              throw new Error('no reachable product images for replicate path');
             }
 
             finalProducts = matchedProducts;
             replicateSucceeded = true;
-            console.log('[Gen] Replicate complete | url=' + resultUrl.substring(0, 80));
+            log('replicate complete | url=' + resultUrl.substring(0, 80));
           } catch (repErr) {
-            console.warn(`[Gen] Replicate failed (${repErr.message}) — falling back to BFL`);
+            warn('replicate failed (' + repErr.message + ') — falling back to BFL');
           }
 
           // ── Fallback: BFL kontext (room photo, product names in prompt) ──
           // No visual product references — products matched by text only.
           // Cost: ~$0.04/generation
           if (!replicateSucceeded) {
-            console.log('[Gen] BFL kontext fallback | cost=~$0.04');
+            log('BFL kontext fallback | cost=~$0.04 | aspect=' + aspectRatio);
             resultUrl = await generateWithBFL(
               designPrompt,
               matchedProducts,
               (msg) => setGenStatus(msg),
               roomPhotoUrl,
+              aspectRatio,
             );
             finalProducts = matchedProducts;
-            console.log('[Gen] BFL complete');
+            genMeta.pipeline = 'bfl';
+            log('BFL complete');
           }
 
           // Record generation based on payment source
@@ -1319,32 +1449,33 @@ export default function HomeScreen({ navigation, route }) {
 
       stopLoadingBar();
 
-      // ── Vision-based product re-matching ──────────────────────────────────
-      // The AI model generates furniture that may not match the text-matched
-      // products we pre-selected. Use Claude Haiku vision to analyze what's
-      // ACTUALLY in the generated image, then re-match catalog products based
-      // on visual descriptions (color, material, shape, category).
-      // Cost: ~$0.001/call (Haiku). Falls back to text-matched if vision fails.
+      // ── Vision-based product VERIFICATION (not re-matching) ───────────────
+      // Legal-critical step: never swap products from the pre-matched set.
+      // Claude Haiku looks at the generated image and scores each of the 4
+      // already-committed products. Products with a strong visual match get
+      // tagged 'verified'; the rest get 'similar' and the UI shows a "Similar
+      // style" badge on them. The product IDs displayed ALWAYS match what we
+      // pre-committed, so users can't be shown a product that wasn't in the
+      // reference set. Cost: ~$0.001/call (Haiku). Falls back to unverified.
       let finalMatchedProducts = finalProducts;
+      let verifyMeta = { verifiedCount: 0, roomType: null, visionItems: [] };
       try {
-        setGenStatus('Matching products to your room…');
-        const visionResult = await analyzeRoomImage(resultUrl);
-        if (visionResult?.items?.length > 0) {
-          const visionMatched = rematchFromVision(
-            visionResult.items,
-            visionResult.roomType || 'living-room',
-            finalProducts,
-            6,
-            PRODUCT_CATALOG,
-          );
-          if (visionMatched.length > 0) {
-            finalMatchedProducts = visionMatched;
-            console.log('[Gen] Vision re-matched', visionMatched.length, 'products');
-          }
+        setGenStatus('Verifying your products…');
+        const verifyResult = await verifyGeneratedProducts(resultUrl, finalProducts);
+        if (verifyResult?.products?.length > 0) {
+          finalMatchedProducts = verifyResult.products;
+          verifyMeta.verifiedCount = finalMatchedProducts.filter(p => p.confidence === 'verified').length;
+          verifyMeta.roomType = verifyResult.roomType || null;
+          verifyMeta.visionItems = verifyResult.visionItems || [];
+          log('verify: ' + verifyMeta.verifiedCount + '/' + finalMatchedProducts.length + ' verified');
         }
       } catch (visionErr) {
-        console.warn('[Gen] Vision matching failed, using text-matched products:', visionErr.message);
+        warn('verify failed, showing pre-matched set unverified: ' + visionErr.message);
+        finalMatchedProducts = finalProducts.map(p => ({ ...p, confidence: 'unverified' }));
       }
+
+      const durationMs = Date.now() - startedAt;
+      log('done | ' + durationMs + 'ms | pipeline=' + genMeta.pipeline + ' | verified=' + verifyMeta.verifiedCount + '/' + finalMatchedProducts.length);
 
       setGenerating(false);
       setGenStatus('');
@@ -1368,6 +1499,14 @@ export default function HomeScreen({ navigation, route }) {
         prompt: designPrompt,
         resultUri: resultUrl,
         products: finalMatchedProducts,
+        // Dev-only debug metadata — RoomResultScreen renders an overlay when __DEV__
+        debug: {
+          ...genMeta,
+          ...verifyMeta,
+          durationMs,
+          photoWidth: savedPhoto.width,
+          photoHeight: savedPhoto.height,
+        },
       });
       setPhoto(null);
       setPhotoSource(null);
@@ -1382,6 +1521,9 @@ export default function HomeScreen({ navigation, route }) {
           price: p.priceValue ?? p.price, imageUrl: p.imageUrl,
           rating: p.rating, reviewCount: p.reviewCount,
           affiliateUrl: p.affiliateUrl, source: p.source,
+          // Persist vision-verification state so saved designs retain the
+          // "Similar style" badge when re-opened from Profile → My Designs.
+          confidence: p.confidence || 'unverified',
         }));
         saveUserDesign(user.id, {
           imageUrl: resultUrl,

@@ -118,22 +118,37 @@ function getColorMismatchPenalty(visionColor, product) {
   return 0;
 }
 
+// ── Size keyword map ──────────────────────────────────────────────────────
+// Matches the `size` field from vision analysis to keywords we expect to
+// find in product names. A "small" sofa is a loveseat/settee; a "large" sofa
+// is a sectional/3-4 seater. Scoring size match prevents a loveseat from
+// rubber-stamping a vision item that saw an oversized 3-seater.
+const SIZE_KEYWORDS = {
+  small:  ['loveseat', 'settee', '2-seater', 'compact', 'petite', 'small'],
+  medium: ['sofa', '3-seater', 'standard', 'medium'],
+  large:  ['sectional', 'oversized', '4-seater', '5-seater', 'large', 'l-shaped', 'u-shaped'],
+};
+
 // ── Score a single catalog product against a vision-identified item ───────────
 //
-// Scoring weights (total ~100 pts max before penalty):
-//   Category:  35 pts — must be the right type of furniture
-//   Color:     35 pts — equally important as category; wrong color = wrong product
-//   Material:  20 pts — linen vs velvet matters
+// Scoring weights (total ~110 pts max before penalty):
+//   Category:  30 pts — must be the right type of furniture
+//   Color:     30 pts — equally important as category; wrong color = wrong product
+//   Material:  18 pts — linen vs velvet matters
+//   Size:      12 pts — loveseat vs full sofa matters (NEW in Phase 2)
 //   Style:     10 pts — japandi vs farmhouse matters
-//   Shape:      5 pts — round vs rectangular, curved vs straight
-//   Penalty:  -12 pts per opposite-color word found (prevents rust sofa matching cream sofa)
+//   Shape:     10 pts — round vs rectangular (raised from 5 — shape matters)
+//   Penalty:  -12 pts per opposite-color word found
+//
+// Weights rebalanced so size+shape carry more signal: a Karkanic loveseat
+// and a 3-seater Rivet sofa should NOT score identically.
 //
 function scoreProductAgainstVisionItem(product, visionItem) {
   let score = 0;
 
-  // ── Category match (35 pts) ───────────────────────────────────────────────
+  // ── Category match (30 pts) ───────────────────────────────────────────────
   if (product.category === visionItem.category) {
-    score += 35;
+    score += 30;
   } else {
     const RELATED = {
       'sofa':          ['accent-chair', 'loveseat'],
@@ -148,7 +163,7 @@ function scoreProductAgainstVisionItem(product, visionItem) {
     if (related.includes(product.category)) score += 10;
   }
 
-  // ── Color match (35 pts) — equally important as category ─────────────────
+  // ── Color match (30 pts) ──────────────────────────────────────────────────
   // A cream sofa and a rust sofa are fundamentally different products.
   if (visionItem.color) {
     const synonyms = getColorSynonyms(visionItem.color);
@@ -159,21 +174,21 @@ function scoreProductAgainstVisionItem(product, visionItem) {
     ].join(' ').toLowerCase();
 
     const colorHits = synonyms.filter(s => searchText.includes(s)).length;
-    score += Math.min(colorHits * 8, 35);
+    score += Math.min(colorHits * 7, 30);
 
     // Apply opposite-color penalty — prevents wrong-color items from winning on category alone
     const penalty = getColorMismatchPenalty(visionItem.color, product);
     score -= penalty;
   }
 
-  // ── Material match (20 pts) ───────────────────────────────────────────────
+  // ── Material match (18 pts) ───────────────────────────────────────────────
   if (visionItem.material && product.materials) {
     const visionMat = visionItem.material.toLowerCase();
     const matHit = product.materials.some(m => {
       const ml = m.toLowerCase();
       return visionMat.includes(ml) || ml.includes(visionMat.split(' ')[0]);
     });
-    if (matHit) score += 20;
+    if (matHit) score += 18;
     // Penalty for opposite material — velvet ≠ linen, leather ≠ fabric
     const MATERIAL_OPPOSITES = {
       'linen':   ['velvet', 'leather', 'faux leather'],
@@ -190,6 +205,29 @@ function scoreProductAgainstVisionItem(product, visionItem) {
     }
   }
 
+  // ── Size match (12 pts) — NEW in Phase 2 ──────────────────────────────────
+  // Haiku vision returns a "size" field ("small" / "medium" / "large"). We
+  // match it against size keywords in the product name so a loveseat can't
+  // impersonate a 3-seater sofa (or vice versa).
+  if (visionItem.size) {
+    const visionSize = visionItem.size.toLowerCase();
+    const productName = (product.name || '').toLowerCase();
+    const productDesc = (product.description || '').toLowerCase();
+    const productText = `${productName} ${productDesc}`;
+    const expectedKeywords = SIZE_KEYWORDS[visionSize] || [];
+    const sizeHit = expectedKeywords.some(k => productText.includes(k));
+    if (sizeHit) {
+      score += 12;
+    } else {
+      // Penalty: vision saw a large sofa, product is a loveseat → -6
+      const allOtherSizeKeywords = Object.entries(SIZE_KEYWORDS)
+        .filter(([k]) => k !== visionSize)
+        .flatMap(([_, v]) => v);
+      const wrongSizeHit = allOtherSizeKeywords.some(k => productText.includes(k));
+      if (wrongSizeHit) score -= 6;
+    }
+  }
+
   // ── Style match (10 pts) ──────────────────────────────────────────────────
   if (visionItem.style && product.styles) {
     const vStyle = visionItem.style.toLowerCase().replace(/\s+/g, '-');
@@ -203,22 +241,194 @@ function scoreProductAgainstVisionItem(product, visionItem) {
     score += bestAffinity * 10;
   }
 
-  // ── Shape/description word match (5 pts) ──────────────────────────────────
+  // ── Shape/description word match (10 pts, was 5) ──────────────────────────
+  // Weight doubled in Phase 2 — shape disambiguates curved vs angular, round
+  // vs rectangular. A round coffee table and a rectangular one are very
+  // different products even if category/color/material match.
   if (visionItem.shape || visionItem.description) {
     const shapeWords = ((visionItem.shape || '') + ' ' + (visionItem.description || ''))
       .toLowerCase().split(/\s+/).filter(w => w.length >= 4);
     const productText = (product.name + ' ' + (product.description || '')).toLowerCase();
     const shapeHits = shapeWords.filter(w => productText.includes(w)).length;
-    score += Math.min(shapeHits * 1.5, 5);
+    score += Math.min(shapeHits * 2, 10);
   }
 
   return score;
 }
 
+// ── Category-specific verification thresholds ────────────────────────────
+// Rugs, coffee tables, and decor items have fewer visible features to score
+// on than sofas/beds, so their scores naturally land lower. Using a flat 50
+// threshold across all categories badges legitimately-matching rugs as
+// "similar" even when they're a good visual fit. These per-category floors
+// match what we've seen empirically in production logs.
+const VERIFY_THRESHOLDS = {
+  'sofa':          50,
+  'accent-chair':  50,
+  'bed':           50,
+  'dining-chair':  45,
+  'dining-table':  40,
+  'coffee-table':  35,
+  'side-table':    35,
+  'desk':          40,
+  'desk-chair':    40,
+  'dresser':       40,
+  'nightstand':    35,
+  'bookshelf':     35,
+  'floor-lamp':    30,
+  'table-lamp':    30,
+  'pendant-light': 30,
+  'chandelier':    30,
+  'mirror':        30,
+  'wall-art':      30,
+  'rug':           25,
+  'throw-pillow':  25,
+  'throw-blanket': 25,
+  'vase':          25,
+  'planter':       25,
+};
+const VERIFY_THRESHOLD_DEFAULT = 40;
+
+function verifyThresholdFor(category) {
+  return VERIFY_THRESHOLDS[category] ?? VERIFY_THRESHOLD_DEFAULT;
+}
+
+// ── Verify pre-matched products against vision analysis ─────────────────────
+/**
+ * Legal-critical function: validates that pre-matched products are actually
+ * visible in the generated image, and tags each with a confidence level.
+ *
+ * IMPORTANT contract: this function NEVER swaps products. The product IDs it
+ * returns are ALWAYS a subset of `referenceProducts` — the products the user
+ * saw as "matched candidates" before generation.
+ *
+ * Why this matters: the "Shop Your Room" panel must only display products
+ * that were already committed before the AI render. If we rescore from the
+ * whole catalog (as rematchFromVision did), a user can end up shown a
+ * product that differs from what's in the photo — a misrepresentation risk.
+ *
+ * Returns each reference product annotated with:
+ *   _visionScore: numeric score against the best-matching vision item
+ *   confidence:   'verified' (score ≥ 50) or 'similar' (anything else)
+ *
+ * The UI shows a "Similar style" badge on products tagged 'similar' so
+ * users understand those products are close matches, not exact replicas.
+ *
+ * @param {string}   imageUrl          - URL of the generated room image
+ * @param {object[]} referenceProducts - Products committed before generation (max 6)
+ * @returns {Promise<{products: object[], roomType: string|null, visionItems: object[]}>}
+ */
+export async function verifyGeneratedProducts(imageUrl, referenceProducts) {
+  if (!referenceProducts || referenceProducts.length === 0) {
+    return { products: [], roomType: null, visionItems: [] };
+  }
+
+  // If vision is unavailable or fails, return the reference products with
+  // 'unverified' confidence so the UI can show the disclosure banner.
+  const visionResult = await analyzeRoomImage(imageUrl);
+  if (!visionResult?.items?.length) {
+    console.log('[Verify] Vision unavailable — returning reference products as unverified');
+    return {
+      products: referenceProducts.map(p => ({ ...p, confidence: 'unverified', _visionScore: 0 })),
+      roomType: null,
+      visionItems: [],
+    };
+  }
+
+  const visionItems = visionResult.items;
+  const roomType = visionResult.roomType || null;
+
+  // For each reference product, find its best-matching vision item and score
+  // the pair. Never pull from outside referenceProducts — that's the contract.
+  const verified = referenceProducts.map(product => {
+    let bestScore = 0;
+    let bestMatch = null;
+
+    for (const item of visionItems) {
+      // Category gating: skip vision items whose category is unrelated to
+      // this product (otherwise a sofa could get "matched" to a rug item).
+      if (!categoriesAreRelated(product.category, item.category)) continue;
+
+      const score = scoreProductAgainstVisionItem(product, item);
+      if (score > bestScore) {
+        bestScore = score;
+        bestMatch = item;
+      }
+    }
+
+    // Confidence tiers — threshold is category-specific because rugs and
+    // decor items naturally score lower than big statement furniture.
+    // See VERIFY_THRESHOLDS above for per-category floors.
+    const threshold = verifyThresholdFor(product.category);
+    const confidence = bestScore >= threshold ? 'verified' : 'similar';
+
+    if (bestMatch) {
+      console.log(
+        `[Verify] "${product.name}" (${product.category}) vs vision "${bestMatch.category}" ` +
+        `(${bestMatch.color} ${bestMatch.material}${bestMatch.size ? ` ${bestMatch.size}` : ''}) ` +
+        `→ ${bestScore.toFixed(1)} / ${threshold} [${confidence}]`
+      );
+    } else {
+      console.log(`[Verify] "${product.name}" (${product.category}) — no matching vision item [similar]`);
+    }
+
+    return {
+      ...product,
+      _visionScore: bestScore,
+      _visionMatch: bestMatch ? {
+        category: bestMatch.category,
+        color: bestMatch.color,
+        material: bestMatch.material,
+      } : null,
+      confidence,
+    };
+  });
+
+  // Sort by confidence then score so verified products appear first in the UI
+  verified.sort((a, b) => {
+    if (a.confidence !== b.confidence) {
+      return a.confidence === 'verified' ? -1 : 1;
+    }
+    return (b._visionScore || 0) - (a._visionScore || 0);
+  });
+
+  const verifiedCount = verified.filter(p => p.confidence === 'verified').length;
+  console.log(`[Verify] ${verifiedCount}/${verified.length} reference products verified in image`);
+
+  return { products: verified, roomType, visionItems };
+}
+
+// Category relatedness for cross-checking vision items against products.
+// Used by verifyGeneratedProducts to avoid comparing e.g. a sofa to a rug.
+function categoriesAreRelated(productCat, visionCat) {
+  if (!productCat || !visionCat) return false;
+  if (productCat === visionCat) return true;
+
+  const GROUPS = [
+    ['sofa', 'accent-chair', 'loveseat'],
+    ['coffee-table', 'side-table'],
+    ['dining-table', 'dining-chair', 'bar-stool'],
+    ['bed', 'nightstand', 'dresser'],
+    ['desk', 'desk-chair', 'bookshelf'],
+    ['floor-lamp', 'table-lamp', 'pendant-light', 'chandelier'],
+    ['rug'],
+    ['mirror', 'wall-art'],
+    ['vase', 'planter'],
+    ['throw-pillow', 'throw-blanket'],
+    ['tv-stand'],
+  ];
+  return GROUPS.some(g => g.includes(productCat) && g.includes(visionCat));
+}
+
 // ── Re-match catalog products based on vision analysis ───────────────────────
 /**
- * Takes vision-identified furniture items and finds the best matching product
- * from the catalog for each item.
+ * DEPRECATED — kept only for reference while migrating callers.
+ *
+ * This function rescored the ENTIRE catalog from vision results, which meant
+ * the "Shop Your Room" panel could end up showing products that were never
+ * pre-matched — a legal risk if the image doesn't actually contain the swapped
+ * product. Use verifyGeneratedProducts() instead, which locks product identity
+ * to the pre-committed reference set.
  *
  * @param {object[]} visionItems  - Items returned by analyzeRoomImage()
  * @param {string}   roomType     - Detected room type for hard filtering

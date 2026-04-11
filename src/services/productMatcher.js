@@ -1,5 +1,20 @@
 import { PRODUCT_CATALOG } from '../data/productCatalog';
 import { STYLE_AFFINITY, ROOM_FURNITURE } from '../data/styleMap';
+import {
+  productHasColorFamily,
+  getColorOppositionPenalty,
+  getColorFamilyWords,
+} from '../utils/colorMap';
+
+// Phase 3: flip to true to see [match] diagnostic logs in Metro for each
+// generation. Leave false in production to keep logs tidy.
+const MATCH_DEBUG = typeof __DEV__ !== 'undefined' ? __DEV__ : true;
+
+// Minimum number of candidates to keep after a hard filter. If fewer than
+// this many products survive, we fall back to the unfiltered pool and let
+// scoring handle the trade-off. This prevents a thin catalog from dead-ending
+// the user on a highly-specific prompt.
+const MIN_HARD_FILTER_CANDIDATES = 2;
 
 // Max products per category in a single result set.
 // Limit to 1 per category to match what's actually in the AI-generated image —
@@ -32,79 +47,212 @@ const CATEGORY_ROOM_LOCK = {
  * Scores and ranks catalog products against a parsed design prompt.
  * Returns top N products, diversified across furniture categories.
  *
- * HARD FILTERS (applied before scoring — products that fail are excluded):
- *   1. Room type: product.roomType must include the detected room
- *   2. Category lock: bedroom-only items (bed, nightstand) can't appear in living room results
+ * PHASE 3 ARCHITECTURE:
+ *   1. Universal hard filters (room type + category lock) — same as before
+ *   2. NEW: Per-category attribute hard filter — if user said "brown leather
+ *      couch", require the sofa candidate to be brown AND leather. Fallback
+ *      to soft scoring if <2 candidates survive.
+ *   3. Style affinity filter (≥ 0.4) with cascade fallback
+ *   4. Score candidates with rebalanced weights (color + material now
+ *      collectively outweigh style)
+ *   5. Diversify across categories
  *
- * Scoring formula (applied to filtered candidates only):
- *   style match:      30 pts
- *   room type match:  20 pts
+ * Scoring formula (sum ≈ 120 max, before penalty):
+ *   color match:      25 pts  — NEW in Phase 3, opposes style dominance
+ *   style match:      25 pts  — reduced from 40
+ *   material match:   20 pts  — raised from 10
+ *   room type match:  15 pts
  *   tag match:        15 pts
- *   material match:   10 pts
- *   category match:   10 pts
- *   mood bonus:        5 pts
- *   rating bonus:      5 pts
- *   name match:        5 pts
+ *   name match:       15 pts  — raised from 8 for specificity
+ *   furniture cat:     5 pts  — reduced from 10
+ *   rating bonus:      2 pts  — reduced from 3
+ *   color mismatch:  -15 pts  — NEW penalty for opposite colors
  *
  * @param {object} parsedPrompt - Output from promptParser.parseDesignPrompt()
  * @param {number} limit        - Max products to return (default 6)
  * @returns {object[]}          - Sorted, diversified product array
  */
 export function matchProducts(parsedPrompt, limit = 6, catalog = PRODUCT_CATALOG) {
-  const { roomType, styles, materials, furnitureCategories = [], moods = [], promptTokens = [] } = parsedPrompt;
+  const {
+    roomType,
+    styles,
+    materials,
+    colors = [],
+    colorByCategory = {},
+    materialByCategory = {},
+    furnitureCategories = [],
+    moods = [],
+    promptTokens = [],
+  } = parsedPrompt;
+
+  if (MATCH_DEBUG) {
+    console.log(
+      `[match] parsed: room=${roomType} styles=[${styles.join(',')}] ` +
+      `materials=[${materials.join(',')}] colors=[${colors.join(',')}] ` +
+      `colorByCat=${JSON.stringify(colorByCategory)} matByCat=${JSON.stringify(materialByCategory)}`
+    );
+  }
 
   // ── HARD FILTER 1: Room type ──────────────────────────────────────────────
-  // Only consider products that list this room type in their roomType array.
-  // This prevents beds from appearing in living room results, dining tables
-  // in bedroom results, etc.
   const roomFiltered = catalog.filter((product) => {
     const productRooms = Array.isArray(product.roomType) ? product.roomType : [product.roomType];
     return productRooms.includes(roomType);
   });
 
   // ── HARD FILTER 2: Category lock ──────────────────────────────────────────
-  // Even if a product lists 'living-room' in its roomType, a bed category
-  // product should never show for a living room. This catches edge cases
-  // where products have overly broad roomType arrays.
   const categoryFiltered = roomFiltered.filter((product) => {
     const allowedRooms = CATEGORY_ROOM_LOCK[product.category];
-    if (!allowedRooms) return true; // universal category, always allowed
+    if (!allowedRooms) return true;
     return allowedRooms.includes(roomType);
   });
 
-  // ── HARD FILTER 3: Style affinity ─────────────────────────────────────────
-  // Only allow products that have >= 0.4 style affinity with the detected styles.
-  // This prevents farmhouse products from appearing in minimalist results,
-  // bohemian bean bags from appearing in modern results, etc.
-  // A product with style affinity 0 (completely unrelated style) should never
-  // be shown regardless of how well it scores on tags/rating/name.
-  const styleFiltered = categoryFiltered.filter((product) => {
-    if (!styles || styles.length === 0) return true; // no style detected, allow all
+  // ── HARD FILTER 3: Per-category color + material (Phase 3B) ──────────────
+  // When the user explicitly named a color/material for a category, REQUIRE
+  // products in that category to match. If fewer than MIN_HARD_FILTER_CANDIDATES
+  // survive, gracefully fall back to not filtering that category so the
+  // user always sees something. This is the biggest lever for "I said brown
+  // leather couch" → "I got a white boucle" problems.
+  //
+  // The set of "constrained categories" is the categories that the user
+  // specifically asked for — their products get to BYPASS the style filter
+  // below. A user who says "green velvet sofa" cares about color+material
+  // for the sofa much more than whether the sofa is tagged "glam".
+  const constrainedCategoriesSet = new Set([
+    ...Object.keys(colorByCategory || {}),
+    ...Object.keys(materialByCategory || {}),
+  ]);
+  const attrFiltered = applyAttributeHardFilter(
+    categoryFiltered,
+    colorByCategory,
+    materialByCategory,
+  );
+
+  // ── HARD FILTER 4: Style affinity (with constrained-category bypass) ─────
+  // Constrained-category products skip style filtering entirely so that a
+  // user-specified color+material can override a stylistic mismatch. Style
+  // still affects the SCORE for constrained products, it just doesn't filter
+  // them out of the pool.
+  const styleFiltered = attrFiltered.filter((product) => {
+    if (constrainedCategoriesSet.has(product.category)) return true;
+    if (!styles || styles.length === 0) return true;
     const affinity = computeStyleScore(product.styles, styles);
     return affinity >= 0.4;
   });
 
-  // Cascade fallback: style-filtered → category-filtered → room-filtered
-  // Widened from `>= limit` to `>= limit * 3` so the scoring phase has a
-  // richer candidate pool even when the strict style filter returns more
-  // than `limit` products. Scoring still dominates (style = 40 pts) so
-  // style-matching products still win; this just prevents the looser pool
-  // from being ignored when the strict pool is thin.
+  // Cascade fallback: style-filtered → attr-filtered → category-filtered → room-filtered
   const MIN_POOL = limit * 3;
   const candidates = styleFiltered.length >= MIN_POOL ? styleFiltered
+    : attrFiltered.length >= MIN_POOL ? attrFiltered
     : categoryFiltered.length >= MIN_POOL ? categoryFiltered
     : roomFiltered;
 
+  if (MATCH_DEBUG) {
+    console.log(
+      `[match] filters: room=${roomFiltered.length} cat=${categoryFiltered.length} ` +
+      `attr=${attrFiltered.length} style=${styleFiltered.length} → using ${candidates.length}`
+    );
+  }
+
   const scored = candidates.map((product) => {
-    const score = scoreProduct(product, roomType, styles, materials, furnitureCategories, moods, promptTokens);
-    // No random noise — deterministic scoring so the best-matched products
-    // always win for a given prompt, giving consistent product display every run.
-    return { ...product, _score: score };
+    const scoreBreakdown = scoreProduct(
+      product,
+      roomType,
+      styles,
+      materials,
+      colors,
+      colorByCategory,
+      materialByCategory,
+      furnitureCategories,
+      moods,
+      promptTokens,
+    );
+    return { ...product, _score: scoreBreakdown.total, _breakdown: scoreBreakdown };
   });
 
   scored.sort((a, b) => b._score - a._score);
 
-  return diversify(scored, limit, roomType);
+  const diversified = diversify(scored, limit, roomType);
+
+  if (MATCH_DEBUG && diversified.length > 0) {
+    console.log(`[match] top ${Math.min(diversified.length, 4)} results:`);
+    diversified.slice(0, 4).forEach((p, i) => {
+      const b = p._breakdown || {};
+      console.log(
+        `[match]   ${i + 1}. ${p.category} — ${(p.name || '').substring(0, 50)} | ` +
+        `total=${p._score?.toFixed(1)} ` +
+        `(color=${(b.color || 0).toFixed(1)} style=${(b.style || 0).toFixed(1)} ` +
+        `mat=${(b.material || 0).toFixed(1)} name=${(b.name || 0).toFixed(1)})`
+      );
+    });
+  }
+
+  return diversified;
+}
+
+/**
+ * Phase 3B — per-category hard filter. For each category that has an
+ * explicit color or material attached in the parsed prompt, require products
+ * in that category to match. If fewer than MIN_HARD_FILTER_CANDIDATES
+ * remain, relax the constraint for that category only.
+ */
+function applyAttributeHardFilter(products, colorByCategory, materialByCategory) {
+  // Only filter categories that have explicit attributes. Products in other
+  // categories pass through unchanged.
+  const constrainedCategories = new Set([
+    ...Object.keys(colorByCategory || {}),
+    ...Object.keys(materialByCategory || {}),
+  ]);
+
+  if (constrainedCategories.size === 0) return products;
+
+  // For each constrained category, compute which products pass AND count them.
+  const passingByCategory = {};
+  for (const cat of constrainedCategories) {
+    const userColor = colorByCategory[cat];
+    const userMat = materialByCategory[cat];
+    const inCategory = products.filter(p => p.category === cat);
+    const passing = inCategory.filter(p => {
+      if (userColor && !productHasColorFamily(p, userColor)) return false;
+      if (userMat && !productHasMaterial(p, userMat)) return false;
+      return true;
+    });
+    passingByCategory[cat] = passing;
+
+    if (MATCH_DEBUG) {
+      console.log(
+        `[match] hard-filter ${cat}: ${userColor || '-'}+${userMat || '-'} ` +
+        `→ ${passing.length}/${inCategory.length} pass`
+      );
+    }
+  }
+
+  // Build the final filtered list: for each category with a constraint,
+  // use passing products ONLY if there are ≥ MIN. Otherwise drop the
+  // constraint for that category and let soft scoring handle it.
+  return products.filter(p => {
+    if (!constrainedCategories.has(p.category)) return true; // unconstrained
+    const passing = passingByCategory[p.category] || [];
+    if (passing.length >= MIN_HARD_FILTER_CANDIDATES) {
+      return passing.includes(p);
+    }
+    return true; // graceful fallback — constraint too strict for this category
+  });
+}
+
+/**
+ * True if the product matches the named material. Checks both product.materials
+ * array AND free-text name/description/tags (for materials like "marble" that
+ * might only appear in the name).
+ */
+function productHasMaterial(product, material) {
+  const ml = material.toLowerCase();
+  if (Array.isArray(product.materials)) {
+    if (product.materials.some(m => m.toLowerCase() === ml)) return true;
+  }
+  const text = [product.name || '', product.description || '', ...(product.tags || [])]
+    .join(' ')
+    .toLowerCase();
+  return text.includes(ml);
 }
 
 // Moods that suggest higher-end / premium items — boosts rating weight
@@ -113,57 +261,129 @@ const COZY_MOODS   = ['cozy', 'warm', 'inviting', 'comfortable', 'relaxed'];
 
 /**
  * Score a single product against the detected design intent.
- * Scoring formula — style is dominant because visual coherence matters most:
- *   style match:            40 pts  (the #1 signal — determines visual fit)
- *   room type match:        15 pts
- *   tag match:              15 pts  (matches product.tags against raw prompt words)
- *   material match:         10 pts
- *   furniture category:     10 pts
- *   mood bonus:              5 pts
- *   rating bonus:            3 pts  (reduced — high rating ≠ visual fit)
- *   name match bonus:        2 pts  (reduced — name words ≠ visual fit)
+ *
+ * PHASE 3 REBALANCED WEIGHTS (sum ≈ 120 max, before penalty):
+ *   color match:           25 pts  — NEW: prevents white sofa winning for "brown"
+ *   style match:           25 pts  — reduced from 40 (still important but not dominant)
+ *   material match:        20 pts  — raised from 10
+ *   room type match:       15 pts
+ *   tag match:             15 pts
+ *   name match bonus:      15 pts  — raised from 8 (specific words matter)
+ *   furniture category:     5 pts  — reduced from 10 (room-essential already covers this)
+ *   mood bonus:             3 pts  — reduced from 5
+ *   rating bonus:           2 pts  — reduced from 3 (rating ≠ visual fit)
+ *   color mismatch:       -15 pts  — NEW penalty (white ≠ brown, light ≠ dark)
+ *
+ * Rationale: explicit user attributes (color + material + name) now total
+ * 60 pts, dominating style at 25. A non-specific user still gets style-
+ * appropriate picks; a specific user gets exactly what they asked for.
+ *
+ * Returns a breakdown object with per-dimension scores for debugging:
+ *   { total, style, color, material, room, tag, name, category, mood, rating }
  */
-function scoreProduct(product, roomType, styles, materials, furnitureCategories = [], moods = [], promptTokens = []) {
-  let score = 0;
+function scoreProduct(
+  product,
+  roomType,
+  styles,
+  materials,
+  colors = [],
+  colorByCategory = {},
+  materialByCategory = {},
+  furnitureCategories = [],
+  moods = [],
+  promptTokens = [],
+) {
+  const breakdown = {
+    total: 0, style: 0, color: 0, material: 0, room: 0,
+    tag: 0, name: 0, category: 0, mood: 0, rating: 0,
+  };
 
   // ── Room type match (15 points) ───────────────────────────────────────────
   const productRooms = Array.isArray(product.roomType) ? product.roomType : [product.roomType];
   if (productRooms.includes(roomType)) {
-    score += 15;
+    breakdown.room = 15;
   } else if (productRooms.includes('living-room')) {
-    score += 3;
+    breakdown.room = 3;
   }
 
-  // ── Style match (40 points — dominant signal) ─────────────────────────────
+  // ── Style match (25 points — reduced from 40) ────────────────────────────
   const styleScore = computeStyleScore(product.styles, styles);
-  score += styleScore * 40;
+  breakdown.style = styleScore * 25;
 
-  // ── Tag match (15 points) — matches product.tags against raw prompt words ─
+  // ── Color match (25 points — NEW in Phase 3) ─────────────────────────────
+  // Only apply color scoring if the user explicitly specified a color for
+  // this product's category (or unattached colors if no category binding).
+  // Using per-category color means "brown couch" won't penalize a white rug.
+  const userColorForCat = colorByCategory[product.category];
+  const relevantColors = userColorForCat ? [userColorForCat] : colors;
+  if (relevantColors.length > 0) {
+    let colorPoints = 0;
+    let penalty = 0;
+    for (const cf of relevantColors) {
+      if (productHasColorFamily(product, cf)) {
+        // Big reward for matching the requested family
+        colorPoints += 25;
+        break; // don't double-count multiple colors
+      }
+    }
+    // Opposition penalty — only if product DOESN'T match the family
+    if (colorPoints === 0 && userColorForCat) {
+      penalty = getColorOppositionPenalty(userColorForCat, product, 6);
+      penalty = Math.min(penalty, 15); // cap at -15
+    }
+    breakdown.color = colorPoints - penalty;
+  }
+
+  // ── Material match (20 points — raised from 10) ──────────────────────────
+  // Per-category material if specified, otherwise flat materials list.
+  const userMatForCat = materialByCategory[product.category];
+  if (userMatForCat) {
+    if (productHasMaterial(product, userMatForCat)) {
+      breakdown.material = 20;
+    }
+  } else if (materials && materials.length > 0) {
+    const productMats = (product.materials || []).map(m => m.toLowerCase());
+    const hits = materials.filter(m => productMats.includes(m.toLowerCase())).length;
+    breakdown.material = Math.min(hits / materials.length, 1) * 20;
+  }
+
+  // ── Tag match (15 points) ─────────────────────────────────────────────────
   if (product.tags && product.tags.length > 0 && promptTokens.length > 0) {
     const tokenSet = new Set(promptTokens);
-    // Also include parsed styles/materials/moods as matchable tokens
     for (const s of styles) tokenSet.add(s);
     for (const m of materials) tokenSet.add(m);
+    for (const c of colors) {
+      // Expand color to its family words so "brown" matches "cognac" tags
+      const words = getColorFamilyWords(c);
+      words.forEach(w => tokenSet.add(w));
+    }
     for (const mo of moods) tokenSet.add(mo);
     const tagHits = product.tags.filter(t => tokenSet.has(t)).length;
-    // 4+ tag hits = full 15 points
-    const tagScore = Math.min(tagHits / 4, 1);
-    score += tagScore * 15;
+    breakdown.tag = Math.min(tagHits / 4, 1) * 15;
   }
 
-  // ── Material match (10 points) ────────────────────────────────────────────
-  if (materials && materials.length > 0) {
-    const materialMatches = (product.materials || []).filter((m) =>
-      materials.includes(m)
-    ).length;
-    const materialScore = Math.min(materialMatches / materials.length, 1);
-    score += materialScore * 10;
+  // ── Name match bonus (15 points — raised from 8) ─────────────────────────
+  // Specific user words in the product name are powerful disambiguators.
+  if (promptTokens.length > 0) {
+    const nameLower = (product.name || '').toLowerCase();
+    let nameBonus = 0;
+    for (const t of promptTokens) {
+      if (t.length < 4 || !nameLower.includes(t)) continue;
+      // Longer, more specific tokens are worth more
+      nameBonus += t.length >= 6 ? 3 : 1.5;
+    }
+    // Color family words in name get extra weight
+    for (const cf of relevantColors) {
+      const words = getColorFamilyWords(cf);
+      if (words.some(w => nameLower.includes(w))) nameBonus += 2;
+    }
+    breakdown.name = Math.min(nameBonus, 15);
   }
 
-  // ── Furniture category match (10 points) ──────────────────────────────────
+  // ── Furniture category match (5 points — reduced from 10) ────────────────
   if (furnitureCategories && furnitureCategories.length > 0) {
     if (furnitureCategories.includes(product.category)) {
-      score += 10;
+      breakdown.category = 5;
     } else {
       const RELATED = {
         'sofa': ['accent-chair', 'loveseat'],
@@ -175,42 +395,39 @@ function scoreProduct(product, roomType, styles, materials, furnitureCategories 
       for (const requested of furnitureCategories) {
         const related = RELATED[requested] || [];
         if (related.includes(product.category)) {
-          score += 3;
+          breakdown.category = 2;
           break;
         }
       }
     }
   }
 
-  // ── Mood bonus (5 points) ─────────────────────────────────────────────────
+  // ── Mood bonus (3 points — reduced) ───────────────────────────────────────
   if (moods && moods.length > 0) {
     const isLuxury = moods.some((m) => LUXURY_MOODS.includes(m));
     const isCozy   = moods.some((m) => COZY_MOODS.includes(m));
-
-    if (isLuxury && product.rating && product.rating >= 4.5) {
-      score += 5;
-    } else if (isCozy && (product.materials || []).some((m) => ['velvet', 'linen', 'wool', 'cotton', 'rattan'].includes(m))) {
-      score += 5;
-    } else if (moods.length > 0) {
-      score += 1;
-    }
+    if (isLuxury && product.rating && product.rating >= 4.5) breakdown.mood = 3;
+    else if (isCozy && (product.materials || []).some((m) => ['velvet', 'linen', 'wool', 'cotton', 'rattan'].includes(m))) breakdown.mood = 3;
+    else breakdown.mood = 0.5;
   }
 
-  // ── Rating bonus (up to 3 points) ────────────────────────────────────────
-  // Reduced weight — high rating doesn't mean visual fit with the style
+  // ── Rating bonus (2 points — reduced) ────────────────────────────────────
   if (product.rating) {
-    score += ((product.rating - 3.5) / 1.5) * 3;
+    breakdown.rating = ((product.rating - 3.5) / 1.5) * 2;
   }
 
-  // ── Name match bonus (up to 2 points) ────────────────────────────────────
-  // Reduced weight — name word overlap is a weak visual signal
-  if (promptTokens.length > 0) {
-    const nameLower = (product.name || '').toLowerCase();
-    const nameHits = promptTokens.filter(t => t.length >= 4 && nameLower.includes(t)).length;
-    score += Math.min(nameHits, 2) * 1;
-  }
+  breakdown.total =
+    breakdown.room +
+    breakdown.style +
+    breakdown.color +
+    breakdown.material +
+    breakdown.tag +
+    breakdown.name +
+    breakdown.category +
+    breakdown.mood +
+    breakdown.rating;
 
-  return score;
+  return breakdown;
 }
 
 /**

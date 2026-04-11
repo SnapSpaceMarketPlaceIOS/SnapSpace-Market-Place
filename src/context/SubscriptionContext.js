@@ -42,17 +42,31 @@ export const TOKEN_PACKAGES = WISH_PACKAGES.map(w => ({ ...w, tokens: w.wishes }
 
 const ALL_TOKEN_PRODUCT_IDS = WISH_PACKAGES.map(p => p.id);
 
+// ── Dev override — set EXPO_PUBLIC_FORCE_PAID_TIER=true in .env to bypass quota ─
+const FORCE_PAID_TIER = process.env.EXPO_PUBLIC_FORCE_PAID_TIER === 'true';
+
 // ── Default free-tier state ─────────────────────────────────────────────────
-const DEFAULT_SUBSCRIPTION = {
-  tier: 'free',
-  quotaLimit: 5,
-  generationsUsed: 0,
-  generationsRemaining: 5,
-  canGenerate: true,
-  quotaResetDate: null,
-  subscriptionStatus: 'none',
-  subscriptionExpiresAt: null,
-};
+const DEFAULT_SUBSCRIPTION = FORCE_PAID_TIER
+  ? {
+      tier: 'premium',
+      quotaLimit: -1,
+      generationsUsed: 0,
+      generationsRemaining: 999,
+      canGenerate: true,
+      quotaResetDate: null,
+      subscriptionStatus: 'active',
+      subscriptionExpiresAt: null,
+    }
+  : {
+      tier: 'free',
+      quotaLimit: 5,
+      generationsUsed: 0,
+      generationsRemaining: 5,
+      canGenerate: true,
+      quotaResetDate: null,
+      subscriptionStatus: 'none',
+      subscriptionExpiresAt: null,
+    };
 
 // ── Context ─────────────────────────────────────────────────────────────────
 const SubscriptionContext = createContext(null);
@@ -69,7 +83,7 @@ export function SubscriptionProvider({ children }) {
   // Dev toggle — force-show paywall for UI iteration (off by default)
   const [devForcePaywall, setDevForcePaywall] = useState(false);
 
-  const shouldShowPaywall = devForcePaywall || (!subscription.canGenerate && tokenBalance <= 0);
+  const shouldShowPaywall = !FORCE_PAID_TIER && (devForcePaywall || (!subscription.canGenerate && tokenBalance <= 0));
 
   const purchaseUpdateSub = useRef(null);
   const purchaseErrorSub  = useRef(null);
@@ -173,6 +187,7 @@ export function SubscriptionProvider({ children }) {
 
   // ── Refresh quota from backend ──────────────────────────────────────────
   const refreshQuota = useCallback(async () => {
+    if (FORCE_PAID_TIER) return; // dev bypass — keep forced premium state
     if (!user?.id) return;
     try {
       const quota = await fetchQuota(user.id);
@@ -184,6 +199,7 @@ export function SubscriptionProvider({ children }) {
 
   // ── Record a generation (optimistic + persist to DB) ─────────────────────
   const recordGeneration = useCallback(async () => {
+    if (FORCE_PAID_TIER) return; // dev bypass — don't burn quota or hit DB
     // Optimistic UI update immediately
     setSubscription(prev => {
       if (prev.quotaLimit === -1) return prev; // unlimited — no change

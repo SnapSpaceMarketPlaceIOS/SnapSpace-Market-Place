@@ -1,8 +1,8 @@
 /**
- * HomeGenie — composite-products Edge Function (v6)
+ * HomeGenie — composite-products Edge Function (v8)
  *
- * Stitches up to 4 product images into a 512×512 2×2 panel JPEG so
- * flux-2-max receives 2 inputs (room + panel) instead of 4-5.
+ * Stitches up to 4 product images into a 768×768 2×2 panel JPEG (384×384 per
+ * cell) so flux-2-max receives 2 inputs (room + panel) instead of 4-5.
  *
  * Failure history — why previous versions crashed:
  *   v1: imagescript     — deno.land CDN cold-start import timeout → 500
@@ -13,13 +13,24 @@
  *   v6: backup URL pool — accepts up to 6 URLs, validates content-type before
  *       decode, fills cells from the pool; guarantees all 4 cells filled as
  *       long as ≥4 of the provided URLs are valid images.
+ *   v7: quality pass    — Lanczos3 resize (sharper than bilinear) + JPEG q95
+ *       (was q85). Client sends 1500px Amazon sources so the downsample has
+ *       more detail to work with.
+ *   v8: cell size bump  — 256×256 → 384×384 per cell, panel 512×512 → 768×768.
+ *       Each cell now carries 2.25× more pixels. The Lanczos downsample from
+ *       1500px source is 1500/384 = 3.9× instead of 5.8×, preserving ~33%
+ *       more high-frequency detail (leather grain, stitching, wood grain).
+ *       Flux-2-max sees 2.25× more attention patches per product reference so
+ *       the rendered item more closely matches the catalog silhouette.
+ *       Cost impact: $0 (Replicate bills per output MP, not input). Edge fn
+ *       compute ~2.25× more pixels to Lanczos — still sub-second.
  *
  * Supabase edge functions officially support `npm:` specifiers (Deno 1.31+).
  * With `npm:`, Deno loads the CJS module through its own Node.js compat layer
  * rather than relying on esm.sh's CJS→ESM transform which produces broken
  * default exports for some packages.
  *
- * Panel layout (each cell 256×256 px):
+ * Panel layout (each cell 384×384 px, panel 768×768):
  *   ┌──────────┬──────────┐
  *   │ product1 │ product2 │
  *   ├──────────┼──────────┤
@@ -38,8 +49,8 @@ const CORS = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-const CELL  = 256;
-const PANEL = 512;
+const CELL  = 384;
+const PANEL = 768;
 
 const POSITIONS = [
   { x: 0,    y: 0    },   // top-left
@@ -68,7 +79,7 @@ Deno.serve(async (req: Request) => {
   // and pull from the remaining pool, guaranteeing all 4 cells are filled as long
   // as at least 4 of the provided URLs are valid images.
   const candidateUrls = product_urls.slice(0, 6);
-  console.log(`[composite v6] ${candidateUrls.length} candidate URLs | user=${user_id}`);
+  console.log(`[composite v8] ${candidateUrls.length} candidate URLs | user=${user_id} | cell=${CELL}×${CELL} panel=${PANEL}×${PANEL}`);
 
   // ── Allocate 512×512 RGBA panel buffer — light gray background ─────────────
   const panelRGBA = new Uint8Array(PANEL * PANEL * 4);
@@ -106,8 +117,9 @@ Deno.serve(async (req: Request) => {
       const decoded = jpeg.decode(buf, { useTArray: true });
       // decoded.data is RGBA Uint8Array, decoded.width/decoded.height are dimensions
 
-      // Bilinear resize to CELL×CELL
-      const resized = bilinearResize(decoded.data, decoded.width, decoded.height, CELL, CELL);
+      // Lanczos3 resize to CELL×CELL — sharper than bilinear on photographic
+      // product shots, preserves edge detail that matters for flux attention.
+      const resized = lanczosResize(decoded.data, decoded.width, decoded.height, CELL, CELL);
 
       // Copy resized pixels into the panel at the next available 2×2 grid cell
       const { x: ox, y: oy } = POSITIONS[composited];
@@ -132,8 +144,10 @@ Deno.serve(async (req: Request) => {
   if (composited === 0) return errResp("All product image downloads/decodes failed", 500);
 
   // ── Encode panel RGBA → JPEG ───────────────────────────────────────────────
-  // jpeg.encode expects { data: Uint8Array|Buffer, width, height }, quality 0-100
-  const encoded   = jpeg.encode({ data: panelRGBA, width: PANEL, height: PANEL }, 85);
+  // jpeg.encode expects { data: Uint8Array|Buffer, width, height }, quality 0-100.
+  // q95 — near-lossless; ~2x size of q85 but sharper edges on the downsampled
+  // product thumbnails. Supabase storage bandwidth is not the bottleneck here.
+  const encoded   = jpeg.encode({ data: panelRGBA, width: PANEL, height: PANEL }, 95);
   const jpegBytes = new Uint8Array(encoded.data.buffer ?? encoded.data);
   console.log(`[composite] Encoded ${jpegBytes.length} bytes | ${composited}/${candidateUrls.length} composited`);
 
@@ -159,45 +173,110 @@ Deno.serve(async (req: Request) => {
   );
 });
 
-// ── Bilinear resize ────────────────────────────────────────────────────────────
+// ── Lanczos3 resize ────────────────────────────────────────────────────────────
+//
+// Separable 2-pass Lanczos3 (a=3). Sharper than bilinear on photo content —
+// preserves edge detail that's important for flux's attention map. Runs in
+// ~O((sw*dh + dw*dh) * 6) which is fine for 1500→256 per product cell.
+//
+// Implementation: horizontal pass (sw × sh → dw × sh), then vertical pass
+// (dw × sh → dw × dh). Alpha channel is forced to 255 on the output.
 
-function bilinearResize(
+const LANCZOS_A = 3;
+
+function lanczosKernel(x: number): number {
+  if (x === 0) return 1;
+  if (x <= -LANCZOS_A || x >= LANCZOS_A) return 0;
+  const pix = Math.PI * x;
+  return (LANCZOS_A * Math.sin(pix) * Math.sin(pix / LANCZOS_A)) / (pix * pix);
+}
+
+function lanczosResize(
   src: Uint8Array,
   sw: number, sh: number,
   dw: number, dh: number,
 ): Uint8Array {
-  const dst    = new Uint8Array(dw * dh * 4);
+  // Horizontal pass: sw × sh → dw × sh, 3 channels (alpha stripped)
+  const horiz = new Float32Array(dw * sh * 3);
   const xRatio = sw / dw;
+  const xSupport = Math.max(LANCZOS_A, LANCZOS_A * xRatio);
+
+  for (let dx = 0; dx < dw; dx++) {
+    const cx = (dx + 0.5) * xRatio - 0.5;
+    const lo = Math.max(0, Math.ceil(cx - xSupport));
+    const hi = Math.min(sw - 1, Math.floor(cx + xSupport));
+
+    // Pre-compute normalized weights for this destination column
+    const weights: number[] = [];
+    let wsum = 0;
+    for (let sx = lo; sx <= hi; sx++) {
+      const t = xRatio > 1 ? (sx - cx) / xRatio : sx - cx;
+      const w = lanczosKernel(t);
+      weights.push(w);
+      wsum += w;
+    }
+    const norm = wsum !== 0 ? 1 / wsum : 0;
+
+    for (let sy = 0; sy < sh; sy++) {
+      let r = 0, g = 0, b = 0;
+      for (let i = 0, sx = lo; sx <= hi; sx++, i++) {
+        const w = weights[i] * norm;
+        const si = (sy * sw + sx) * 4;
+        r += src[si]     * w;
+        g += src[si + 1] * w;
+        b += src[si + 2] * w;
+      }
+      const hi3 = (sy * dw + dx) * 3;
+      horiz[hi3]     = r;
+      horiz[hi3 + 1] = g;
+      horiz[hi3 + 2] = b;
+    }
+  }
+
+  // Vertical pass: dw × sh → dw × dh, 3 channels → RGBA output
+  const dst = new Uint8Array(dw * dh * 4);
   const yRatio = sh / dh;
+  const ySupport = Math.max(LANCZOS_A, LANCZOS_A * yRatio);
 
   for (let dy = 0; dy < dh; dy++) {
-    for (let dx = 0; dx < dw; dx++) {
-      const sx = dx * xRatio;
-      const sy = dy * yRatio;
-      const x0 = Math.floor(sx);
-      const y0 = Math.floor(sy);
-      const x1 = Math.min(x0 + 1, sw - 1);
-      const y1 = Math.min(y0 + 1, sh - 1);
-      const xf = sx - x0;
-      const yf = sy - y0;
-      const di = (dy * dw + dx) * 4;
+    const cy = (dy + 0.5) * yRatio - 0.5;
+    const lo = Math.max(0, Math.ceil(cy - ySupport));
+    const hi = Math.min(sh - 1, Math.floor(cy + ySupport));
 
-      for (let c = 0; c < 3; c++) {
-        const tl = src[(y0 * sw + x0) * 4 + c];
-        const tr = src[(y0 * sw + x1) * 4 + c];
-        const bl = src[(y1 * sw + x0) * 4 + c];
-        const br = src[(y1 * sw + x1) * 4 + c];
-        dst[di + c] = Math.round(
-          tl * (1 - xf) * (1 - yf) +
-          tr *      xf  * (1 - yf) +
-          bl * (1 - xf) *      yf  +
-          br *      xf  *      yf,
-        );
+    const weights: number[] = [];
+    let wsum = 0;
+    for (let sy = lo; sy <= hi; sy++) {
+      const t = yRatio > 1 ? (sy - cy) / yRatio : sy - cy;
+      const w = lanczosKernel(t);
+      weights.push(w);
+      wsum += w;
+    }
+    const norm = wsum !== 0 ? 1 / wsum : 0;
+
+    for (let dx = 0; dx < dw; dx++) {
+      let r = 0, g = 0, b = 0;
+      for (let i = 0, sy = lo; sy <= hi; sy++, i++) {
+        const w = weights[i] * norm;
+        const hi3 = (sy * dw + dx) * 3;
+        r += horiz[hi3]     * w;
+        g += horiz[hi3 + 1] * w;
+        b += horiz[hi3 + 2] * w;
       }
+      const di = (dy * dw + dx) * 4;
+      dst[di]     = clamp8(r);
+      dst[di + 1] = clamp8(g);
+      dst[di + 2] = clamp8(b);
       dst[di + 3] = 255;
     }
   }
+
   return dst;
+}
+
+function clamp8(v: number): number {
+  if (v <= 0) return 0;
+  if (v >= 255) return 255;
+  return Math.round(v);
 }
 
 // ── Error helper ───────────────────────────────────────────────────────────────
