@@ -388,6 +388,23 @@ const TRENDING_DESIGNS   = [...DESIGNS].sort((a, b) => b.likes - a.likes).slice(
 const NEW_ARRIVALS       = [...DESIGNS].reverse().slice(0, 8);
 const FEATURED_PRODUCTS  = searchProducts({ keywords: 'modern living room bedroom', limit: 8 });
 
+// ── Today's Highlight — premium sofa/seating pool, rotates every 3 hours ──────
+// Ordered by price descending so the most luxurious pieces get equal airtime.
+const HIGHLIGHT_IDS = [
+  'B0CDWS3291', // Acanva Luxury Curved Back Velvet Sofa — $1,797
+  'B0DSW5H4Z6', // YOPENG Luxury Curved Boucle Sectional — $1,598
+  'B0FP55743T', // KEIKI 126" Curved Oversized Boucle Sectional — $1,399
+  'B0D9BGNR7X', // JACH U-Shaped Modular Velvet Sectional — $1,390
+  'B0DYD79JC6', // KEIKI 103" Boucle Half Moon Sectional — $1,300
+  'B0FMR36SC4', // gaoyangjiaju Mid-Century Leather Sofa — $1,063
+  'B0DDQ3273X', // YOPENG 82" Modern Boucle Cloud Sofa — $879
+  'B0FB99BP2J', // Christopher Knight Modular Boucle Sofa — $724
+  'B0G7BT3HRC', // CHITA Curved Cloud Chenille Sofa — $600
+];
+const HIGHLIGHT_POOL = HIGHLIGHT_IDS
+  .map(id => PRODUCT_CATALOG.find(p => p.id === id))
+  .filter(Boolean);
+
 // ─── Icons ────────────────────────────────────────────────────────────────────
 
 function BellIcon() {
@@ -929,7 +946,16 @@ export default function HomeScreen({ navigation, route }) {
     [liked]
   );
 
-  const dealProduct = FEATURED_PRODUCTS[0] || null;
+  // Rotate Today's Highlight every 3 hours using a stable time-based index.
+  // slotIndex increments once per 3-hour window, cycling through HIGHLIGHT_POOL.
+  // useMemo with [] so it's computed once on mount (same slot for the whole session).
+  const dealProduct = useMemo(() => {
+    if (HIGHLIGHT_POOL.length > 0) {
+      const slotIndex = Math.floor(Date.now() / (3 * 60 * 60 * 1000));
+      return HIGHLIGHT_POOL[slotIndex % HIGHLIGHT_POOL.length];
+    }
+    return FEATURED_PRODUCTS[0] || null;
+  }, []);
 
   // ── Effects ─────────────────────────────────────────────────────────────────
 

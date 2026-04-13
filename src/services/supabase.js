@@ -409,10 +409,8 @@ export async function getUserDesigns(userId) {
   return (data || []).filter(d => d.image_url && (!supabaseHost || d.image_url.includes(supabaseHost)));
 }
 
-/** Get public designs for the Explore feed — permanent images only. */
+/** Get public designs for the Explore feed — any valid image URL. */
 export async function getPublicDesigns(limit = 20, offset = 0) {
-  const supabaseHost = (process.env.EXPO_PUBLIC_SUPABASE_URL || '').replace('https://', '');
-
   // First try with profiles join (richer data)
   const { data, error } = await supabase
     .from('user_designs')
@@ -431,9 +429,9 @@ export async function getPublicDesigns(limit = 20, offset = 0) {
       .order('created_at', { ascending: false })
       .range(offset, offset + limit - 1);
     if (plainErr) throw plainErr;
-    return (plain || []).filter(d => d.image_url && (!supabaseHost || d.image_url.includes(supabaseHost)));
+    return (plain || []).filter(d => !!d.image_url);
   }
-  return (data || []).filter(d => d.image_url && (!supabaseHost || d.image_url.includes(supabaseHost)));
+  return (data || []).filter(d => !!d.image_url);
 }
 
 // ─── Push Token Helpers ───────────────────────────────────────────────────────
