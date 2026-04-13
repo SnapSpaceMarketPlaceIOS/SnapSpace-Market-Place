@@ -418,7 +418,7 @@ export default function AuthScreen({ navigation }) {
           <View style={styles.header}>
             <Text style={styles.title}>HomeGenie</Text>
             <Text style={styles.subtitle}>
-              {isSignUp ? 'Shop and Design your room with AI' : 'Welcome Back, Ready To Shop?'}
+              {isSignUp ? 'Design your dream room with AI. Shop the look instantly.' : 'Welcome back — let\'s design your next room.'}
             </Text>
           </View>
 
@@ -508,7 +508,7 @@ export default function AuthScreen({ navigation }) {
                   <LensLoader size={20} color="#fff" light="#fff" />
                 ) : (
                   <Text style={styles.primaryBtnText}>
-                    {isSignUp ? 'Create Account' : 'Sign In'}
+                    {isSignUp ? 'Get Started — It\'s Free' : 'Sign In'}
                   </Text>
                 )}
               </TouchableOpacity>
@@ -548,7 +548,7 @@ export default function AuthScreen({ navigation }) {
           {/* ── "Don't have an account? Sign Up" (below the card) ── */}
           <TouchableOpacity style={styles.switchBtn} onPress={switchMode} activeOpacity={0.7}>
             <Text style={styles.switchText}>
-              {isSignUp ? 'Already have an account?  ' : "Dont have an account?  "}
+              {isSignUp ? 'Already have an account?  ' : "Don't have an account?  "}
               <Text style={styles.switchLink}>{isSignUp ? 'Sign in' : 'Sign Up'}</Text>
             </Text>
           </TouchableOpacity>

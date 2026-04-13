@@ -94,7 +94,7 @@ export default function SharedScreen({ navigation }) {
           contentContainerStyle={styles.scrollContent}
         >
           <Text style={styles.countLabel}>
-            {sharedItems.length} {sharedItems.length === 1 ? 'design' : 'designs'}
+            {sharedItems.length} {sharedItems.length === 1 ? 'wish' : 'wishes'}
           </Text>
 
           <View style={styles.grid}>

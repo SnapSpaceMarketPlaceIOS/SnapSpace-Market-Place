@@ -174,7 +174,7 @@ export default function RequestFeatureScreen({ navigation }) {
           </View>
           <Text style={styles.successTitle}>Idea Received!</Text>
           <Text style={styles.successSubtitle}>
-            Thanks for sharing. Our team reads every request and uses your feedback to shape the HomeGenie roadmap.
+            Thanks for the suggestion! We read every request and use your feedback to build better features.
           </Text>
           <TouchableOpacity style={styles.submitBtn} onPress={handleNewRequest} activeOpacity={0.85}>
             <Text style={styles.submitBtnText}>Submit Another Idea</Text>

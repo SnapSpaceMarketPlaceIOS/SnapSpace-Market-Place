@@ -40,7 +40,7 @@ export default function SnapScreen({ navigation }) {
     return (
       <AuthGate
         title="Design with AI"
-        subtitle="Snap your room and get AI-powered redesigns with shoppable products."
+        subtitle="Take a photo of your room and generate AI-powered wishes with shoppable products."
         navigation={navigation}
       />
     );
@@ -81,10 +81,10 @@ export default function SnapScreen({ navigation }) {
     return (
       <View style={[s.container, { justifyContent: 'center', alignItems: 'center', gap: 16 }]}>
         <Text style={{ color: '#fff', fontSize: 16, textAlign: 'center', paddingHorizontal: 32, fontFamily: 'Geist_400Regular' }}>
-          Camera access is required to snap your room.
+          Camera access is needed to photograph your room for AI design.
         </Text>
         <TouchableOpacity style={s.permBtn} onPress={requestPermission}>
-          <Text style={{ color: '#fff', fontWeight: '700', fontFamily: 'Geist_700Bold' }}>Grant Access</Text>
+          <Text style={{ color: '#fff', fontWeight: '700', fontFamily: 'Geist_700Bold' }}>Enable Camera</Text>
         </TouchableOpacity>
       </View>
     );

@@ -5,6 +5,7 @@ import {
   ScrollView,
   StyleSheet,
   TouchableOpacity,
+  Linking,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Polyline } from 'react-native-svg';
@@ -38,13 +39,13 @@ This Privacy Policy applies to all users of the App, including consumers, Verifi
 1. Your room photo is uploaded to our secure cloud storage (Supabase Storage) and transmitted over encrypted connections (TLS/SSL)
 2. Your photo and prompt are sent to third-party AI model providers (Replicate, Inc. and/or Black Forest Labs GmbH) for image generation
 3. The AI-generated result is returned to you and saved to your HomeGenie account
-4. Your original room photos are stored in our cloud storage for the purpose of displaying them in your "My Spaces" history
+4. Your original room photos are stored in our cloud storage for the purpose of displaying them in your "My Wishes" history
 
 Data Protection Commitments:
 • All photo transmissions use industry-standard TLS encryption
 • AI model providers process your images solely to generate the requested output — they do not use your images for model training under our data processing agreements
-• You can delete individual designs from your My Spaces at any time
-• Deleting your account permanently removes all associated photos and designs from our active storage within 30 days
+• You can delete individual wishes from your My Wishes at any time
+• Deleting your account permanently removes all associated photos and wishes from our active storage within 30 days
 
 We do not analyze, scan, or process your room photos for any purpose other than delivering the AI generation service you requested.`,
   },
@@ -81,10 +82,10 @@ We use Expo's push notification service to deliver notifications. Your device's 
 
 Core App Functionality
 • To create and maintain your account
-• To process your room photos and prompts through AI models and deliver generated designs
+• To process your room photos and prompts through AI models and deliver your AI wishes
 • To save your designs, liked content, and shopping cart to your account
 • To display your profile to other users (if you share content publicly)
-• To match furniture and décor products to your AI-generated designs
+• To match furniture and décor products to your AI wishes
 • To process subscription and token purchases through Apple's payment system
 
 Communication
@@ -123,7 +124,7 @@ Account Information (provided by you)
 Room Photos and Prompts (provided by you)
 • Photos you capture with your device camera or upload from your photo library for AI room generation
 • Text prompts describing your desired design style
-• Completed AI-generated designs saved to your account
+• Completed AI wishes saved to your account
 
 Usage and Interaction Data (collected automatically)
 • Designs you like, save, share, or view
@@ -161,7 +162,7 @@ Authentication and Database
 • Supabase, Inc. — Account authentication, profile storage, database, and file storage (room photos, avatars). Data is stored in Supabase's cloud infrastructure. Privacy policy: supabase.com/privacy
 
 AI Image Generation
-• Replicate, Inc. — Processes room photos and prompts to generate AI room designs. Receives your photo and prompt text; returns generated image. Privacy policy: replicate.com/privacy
+• Replicate, Inc. — Processes room photos and prompts to generate AI room wishes. Receives your photo and prompt text; returns generated image. Privacy policy: replicate.com/privacy
 • Black Forest Labs GmbH — Alternative AI image generation model. Same data handling as above. Privacy policy: blackforestlabs.ai/privacy
 
 Payment Processing
@@ -195,7 +196,7 @@ We never receive or store your payment card details, shipping address, or person
     body: `We retain your personal information according to the following schedule:
 
 • Account data (name, email, profile): Retained as long as your account is active
-• Room photos and AI-generated designs: Retained as long as your account is active or until you delete them individually
+• Room photos and AI wishes: Retained as long as your account is active or until you delete them individually
 • Usage data (likes, follows, cart history): Retained as long as your account is active
 • Notification preferences: Stored locally on your device; also retained on our servers as long as your account is active
 • Supplier application data: Retained for the duration of your supplier relationship, or for 1 year after rejection
@@ -214,7 +215,7 @@ After Account Deletion:
 All Users:
 • Access — Request a copy of the personal information we hold about you
 • Correction — Request correction of inaccurate or incomplete data
-• Deletion — Delete your account and all associated data from within the App (Profile → Settings → Delete Account) or by emailing info@homegenie.app
+• Deletion — Delete your account and all associated data from within the App (Profile → Settings → Delete Account) or by emailing info@homegenieios.com
 • Portability — Request your data in a commonly used, machine-readable format
 • Notification Opt-Out — Manage push notification preferences in the App or via your device settings
 • Marketing Opt-Out — Unsubscribe from promotional communications at any time
@@ -231,7 +232,7 @@ European Economic Area / UK Residents (GDPR):
 • Legal basis for processing: performance of a contract (providing the App), legitimate interests (improving the App), and consent (notifications, marketing)
 • You may lodge a complaint with your local data protection authority
 
-To exercise any of these rights, contact us at info@homegenie.app. We will verify your identity and respond to your request within 30 days (45 days if an extension is needed, with notice).`,
+To exercise any of these rights, contact us at info@homegenieios.com. We will verify your identity and respond to your request within 30 days (45 days if an extension is needed, with notice).`,
   },
   {
     title: '12. Children\'s Privacy',
@@ -239,7 +240,7 @@ To exercise any of these rights, contact us at info@homegenie.app. We will verif
 
 If we discover that we have collected personal information from a child under 13 without verified parental consent, we will promptly delete that information and terminate the associated account.
 
-If you are a parent or guardian and believe your child under 13 has provided us with personal information, please contact us immediately at info@homegenie.app and we will take appropriate action.
+If you are a parent or guardian and believe your child under 13 has provided us with personal information, please contact us immediately at info@homegenieios.com and we will take appropriate action.
 
 Users between 13 and 17 years of age may use the App only with the consent and supervision of a parent or legal guardian.`,
   },
@@ -290,11 +291,11 @@ We encourage you to review this Privacy Policy periodically to stay informed abo
     body: `You can delete your HomeGenie account at any time:
 
 In-App: Profile → Settings → Delete Account
-By Email: Send a request to info@homegenie.app with the subject "Account Deletion Request"
+By Email: Send a request to info@homegenieios.com with the subject "Account Deletion Request"
 
 When you delete your account:
 • Your profile, username, bio, and avatar are permanently deleted
-• All saved designs, liked content, and My Spaces history are permanently deleted
+• All saved wishes, liked content, and My Wishes history are permanently deleted
 • Your room photos are permanently deleted from our cloud storage
 • Your push notification token is invalidated
 • Your shopping cart and order history are cleared
@@ -310,8 +311,9 @@ Important:
     body: `If you have any questions, concerns, or requests regarding this Privacy Policy or our data practices, please contact us:
 
 HomeGenie — operated by SnapSpace Marketplace LLC
-Email: info@homegenie.app
-Website: www.homegenie.app
+Email: info@homegenieios.com
+Website: www.homegenieios.com
+Privacy Policy URL: www.homegenieios.com/privacy
 
 For privacy-specific inquiries, please include "Privacy Inquiry" in the subject line.
 
@@ -340,6 +342,14 @@ export default function PrivacyPolicyScreen({ navigation }) {
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
         <Text style={styles.lastUpdated}>Last updated: April 6, 2026</Text>
+
+        <TouchableOpacity
+          style={styles.webBanner}
+          onPress={() => Linking.openURL('https://www.homegenieios.com/privacy')}
+          activeOpacity={0.75}
+        >
+          <Text style={styles.webBannerText}>View latest version at homegenieios.com/privacy →</Text>
+        </TouchableOpacity>
 
         <Text style={styles.intro}>
           Your privacy matters to us. This policy explains exactly what data HomeGenie collects, why we collect it, who we share it with, and how we protect it — written in plain language.
@@ -398,7 +408,22 @@ const styles = StyleSheet.create({
     color: '#AAA',
     fontWeight: '500',
     fontFamily: 'Geist_500Medium',
+    marginBottom: 12,
+  },
+  webBanner: {
+    backgroundColor: '#EFF6FF',
+    borderRadius: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 14,
     marginBottom: 16,
+    borderWidth: 1,
+    borderColor: '#BFDBFE',
+  },
+  webBannerText: {
+    fontSize: 13,
+    color: '#1D4ED8',
+    fontWeight: '600',
+    fontFamily: 'Geist_600SemiBold',
   },
   intro: {
     fontSize: 14,

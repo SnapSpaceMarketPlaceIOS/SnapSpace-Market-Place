@@ -59,7 +59,7 @@ function PackageIcon() {
 
 const WHAT_GETS_RESTORED = [
   'Premium subscription & AI generation limits',
-  'All previously purchased design packs',
+  'All previously purchased wish packs',
   'Unlocked styles and room templates',
   'Pro account features and badges',
 ];

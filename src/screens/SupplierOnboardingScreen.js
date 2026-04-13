@@ -245,7 +245,7 @@ export default function SupplierOnboardingScreen({ navigation }) {
                   onChangeText={setSlug}
                   placeholder="acme-home-goods"
                   autoCapitalize="none"
-                  hint="homegenie.app/store/your-slug — lowercase letters, numbers and hyphens only."
+                  hint="homegenieios.com/store/your-slug — lowercase letters, numbers and hyphens only."
                   required
                 />
                 <Field
@@ -295,7 +295,7 @@ export default function SupplierOnboardingScreen({ navigation }) {
                 <View style={styles.doneCard}>
                   {[
                     { label: 'Store Name', value: storeName },
-                    { label: 'URL', value: `homegenie.app/store/${slug}` },
+                    { label: 'URL', value: `homegenieios.com/store/${slug}` },
                     { label: 'Tagline', value: tagline || 'Not set' },
                   ].map(r => (
                     <View key={r.label} style={styles.doneRow}>

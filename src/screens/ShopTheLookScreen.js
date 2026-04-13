@@ -237,8 +237,8 @@ export default function ShopTheLookScreen({ route, navigation }) {
     setShareActive(true);
     try {
       const msg = design.prompt
-        ? `Check out this HomeGenie design: "${design.prompt}"`
-        : 'Check out this HomeGenie design!';
+        ? `Check out this HomeGenie wish: "${design.prompt}"`
+        : 'Check out this HomeGenie wish!';
       await Share.share({ message: msg, url: design.imageUrl || '' });
     } catch {}
   };

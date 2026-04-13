@@ -75,24 +75,24 @@ function ShareIcon({ color = '#67ACE9', size = 20 }) {
 
 const TIER_FEATURES = {
   basic: [
-    '25 AI Room Designs per week',
+    '25 wishes per week',
     'Shop curated furniture matched to your style',
-    'Save, share & post your designs',
+    'Save, share & post your wishes',
     'Access to all room types & design styles',
     'New AI models as they release',
   ],
   pro: [
-    '50 AI Room Designs per week',
+    '50 wishes per week',
     'Shop curated furniture matched to your style',
-    'Save, share & post your designs',
-    'Priority generation queue — skip the line',
+    'Save, share & post your wishes',
+    'Priority generation — skip the line',
     'Access to all room types & design styles',
     'New AI models as they release',
   ],
   premium: [
-    'Unlimited AI Room Designs per week',
+    'Unlimited wishes',
     'Shop curated furniture matched to your style',
-    'Save, share & post your designs',
+    'Save, share & post your wishes',
     'Priority generation — fastest results',
     'Early access to new AI models & features',
     'Access to all room types & design styles',
@@ -246,8 +246,9 @@ export default function PaywallScreen({ navigation }) {
 
   // Quota progress
   const usedCount = subscription.generationsUsed;
-  const totalFree = subscription.tier === 'free' ? 5 : subscription.quotaLimit;
-  const progressPct = Math.min(1, usedCount / totalFree);
+  const isUnlimited = subscription.quotaLimit === -1;
+  const totalFree = subscription.tier === 'free' ? 5 : (isUnlimited ? 0 : subscription.quotaLimit);
+  const progressPct = totalFree > 0 ? Math.min(1, usedCount / totalFree) : 0;
 
   // Entrance animation — bar fills from 0 to actual value once on mount
   const progressAnim = useRef(new Animated.Value(0)).current;
@@ -388,12 +389,13 @@ export default function PaywallScreen({ navigation }) {
             </TouchableOpacity>
           </View>
 
-          <Text style={styles.subtitle}>Shop and Design your room with AI...</Text>
+          <Text style={styles.subtitle}>Generate stunning room designs and shop curated furniture.</Text>
 
           {/* ── Free Wishes Usage bar ──────────────────────────────── */}
+          {!isUnlimited && (
           <View style={styles.progressCard}>
             <View style={styles.progressLabelRow}>
-              <Text style={styles.progressLabel}>Free Wishes Usage</Text>
+              <Text style={styles.progressLabel}>Free Wishes Remaining</Text>
               <Text style={styles.progressCount}>{usedCount}/{totalFree}</Text>
             </View>
             <View style={styles.progressTrack}>
@@ -405,6 +407,7 @@ export default function PaywallScreen({ navigation }) {
               }]} />
             </View>
           </View>
+          )}
 
           {/* ── Toggle pill ───────────────────────────────────────── */}
           <View style={styles.toggleWrapper}>

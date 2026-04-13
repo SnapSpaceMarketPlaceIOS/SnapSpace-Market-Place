@@ -60,8 +60,8 @@ const FAQ_SECTIONS = [
         a: 'HomeGenie is an AI-powered interior design marketplace. Take a photo of any room, describe your style, and our AI instantly redesigns it with real furniture and decor from our curated catalog — all shoppable in one tap.',
       },
       {
-        q: 'How do I generate a room design?',
-        a: 'Tap the Snap tab (the camera icon with the blue sparkle) in the center of the tab bar. Take a photo or upload one from your gallery, write a style prompt — for example "Japandi bedroom with warm wood tones and soft lighting" — then tap Generate. Your AI redesign appears in seconds with matched products.',
+        q: 'How do I generate a room wish?',
+        a: 'Tap the Wish tab (the camera icon with the blue sparkle) in the center of the tab bar. Take a photo or upload one from your gallery, write a style prompt — for example "Japandi bedroom with warm wood tones and soft lighting" — then tap Generate. Your AI wish appears in seconds with matched products.',
       },
       {
         q: 'What kind of rooms can I redesign?',
@@ -69,7 +69,7 @@ const FAQ_SECTIONS = [
       },
       {
         q: 'Is HomeGenie free to use?',
-        a: 'Browsing designs, exploring the catalog, liking, and saving is completely free. AI room generation uses credits — free accounts include a set number of generations. Additional generations are available through token packs.',
+        a: 'Browsing wishes, exploring the catalog, liking, and saving is completely free. AI room generation uses wishes — free accounts include 5 wishes. Additional wishes are available through wish packs or a subscription.',
       },
     ],
   },
@@ -78,11 +78,11 @@ const FAQ_SECTIONS = [
     items: [
       {
         q: 'How does shopping work in HomeGenie?',
-        a: 'HomeGenie surfaces matching furniture and decor products alongside every AI design. All products are affiliate-linked — tapping "Buy on Amazon" opens Amazon\'s app or website where you complete your purchase directly. HomeGenie earns a small referral commission at no extra cost to you.',
+        a: 'HomeGenie surfaces matching furniture and decor products alongside every AI-generated wish. All products are affiliate-linked — tapping "Buy on Amazon" opens Amazon\'s app or website where you complete your purchase directly. HomeGenie earns a small referral commission at no extra cost to you.',
       },
       {
         q: 'How do I add items to my cart?',
-        a: 'Tap any product card to open its detail page, then tap "Add to Cart." You can also tap "Shop The Look" on any design to see and cart all matched products at once. Your cart saves items as you browse.',
+        a: 'Tap any product card to open its detail page, then tap "Add to Cart." You can also tap "Shop The Look" on any wish to see and cart all matched products at once. Your cart saves items as you browse.',
       },
       {
         q: 'What does "We may earn a commission" mean?',
@@ -95,7 +95,7 @@ const FAQ_SECTIONS = [
     ],
   },
   {
-    title: 'AI & Designs',
+    title: 'AI & Wishes',
     items: [
       {
         q: 'How do I write a better prompt?',
@@ -106,16 +106,16 @@ const FAQ_SECTIONS = [
         a: 'AI generation is creative and interpretive by nature. If the result misses the mark, try being more specific with your style name (e.g. "Wabi-Sabi" instead of "Japanese"), mention specific materials like "linen", "rattan", or "marble", and describe the lighting feel ("warm ambient" vs "bright and airy").',
       },
       {
-        q: 'Where do my generated designs get saved?',
-        a: 'Every design you generate is automatically saved to My Spaces — accessible from Profile → gear icon → My Spaces. Each saved space shows your photo, your prompt, and the matched products.',
+        q: 'Where do my wishes get saved?',
+        a: 'Every wish you generate is automatically saved to My Wishes — accessible from Profile → gear icon → My Wishes. Each saved wish shows your photo, your prompt, and the matched products.',
       },
       {
-        q: 'Can I like and save designs from the feed?',
-        a: 'Yes. Tap the heart icon on any design card in Home or Explore to like it. All liked designs are accessible from the Liked tab on your Profile page.',
+        q: 'Can I like and save wishes from the feed?',
+        a: 'Yes. Tap the heart icon on any wish card in Home or Explore to like it. All liked wishes are accessible from the Liked tab on your Profile page.',
       },
       {
-        q: 'How do I share a design?',
-        a: 'Tap the share icon on any design card or room result. You can share via Messages, Instagram, AirDrop, or any app on your device.',
+        q: 'How do I share a wish?',
+        a: 'Tap the share icon on any wish card or room result. You can share via Messages, Instagram, AirDrop, or any app on your device.',
       },
     ],
   },
@@ -135,7 +135,7 @@ const FAQ_SECTIONS = [
         a: 'Go to Profile → tap the gear icon → Payment Methods. You can add new cards and set a default for future use.',
       },
       {
-        q: 'How do I become a Verified Supplier?',
+        q: 'How do I sell my products on HomeGenie?',
         a: 'Go to Profile → tap the gear icon → Become a Supplier. Fill out the application form with your business details and our team will review it within 3–5 business days.',
       },
     ],
@@ -145,7 +145,7 @@ const FAQ_SECTIONS = [
     items: [
       {
         q: 'How do I contact the HomeGenie team?',
-        a: 'Email us at info@homegenie.app. Our team typically responds within 1–2 business days. For the fastest response, include your device model and a brief description of your issue.',
+        a: 'Email us at info@homegenieios.com. We respond within 24–48 hours. For the fastest reply, include your device model and a brief description of your issue.',
       },
       {
         q: 'How do I request a new feature?',
@@ -153,7 +153,7 @@ const FAQ_SECTIONS = [
       },
       {
         q: 'How do I report a bug?',
-        a: 'Email info@homegenie.app with a description of what happened, your device model (e.g. iPhone 15 Pro), your iOS version, and a screenshot if possible. This helps us reproduce and fix it quickly.',
+        a: 'Email info@homegenieios.com with a description of what happened, your device model (e.g. iPhone 15 Pro), your iOS version, and a screenshot if possible. This helps us reproduce and fix it quickly.',
       },
     ],
   },
@@ -225,7 +225,7 @@ export default function HelpScreen({ navigation }) {
           >
             <BackIcon />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Help & Support</Text>
+          <Text style={styles.headerTitle}>Help Center</Text>
           <View style={{ width: 40 }} />
         </View>
       </SafeAreaView>
@@ -282,10 +282,10 @@ export default function HelpScreen({ navigation }) {
         {/* Contact card */}
         <View style={styles.contactCard}>
           <Text style={styles.contactTitle}>Still need help?</Text>
-          <Text style={styles.contactSubtitle}>Our team is here for you. Send us an email and we'll get back to you within 1–2 business days.</Text>
+          <Text style={styles.contactSubtitle}>We're here to help. Send us an email and we'll respond within 24–48 hours.</Text>
           <TouchableOpacity
             style={styles.contactBtn}
-            onPress={() => Linking.openURL('mailto:info@homegenie.app?subject=HomeGenie Support')}
+            onPress={() => Linking.openURL('mailto:info@homegenieios.com?subject=HomeGenie Support')}
             activeOpacity={0.85}
           >
             <Text style={styles.contactBtnText}>Email Support</Text>

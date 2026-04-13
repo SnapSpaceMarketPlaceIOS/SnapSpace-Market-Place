@@ -202,7 +202,7 @@ function UploadIcon() {
 
 // ── Data ──────────────────────────────────────────────────────────────────────
 
-const CATEGORIES = ['All', 'Living Room', 'Bedroom', 'Kitchen', 'Office', 'Dining'];
+const CATEGORIES = ['All', 'Living Room', 'Dining Room', 'Bedroom', 'Kitchen', 'Office', 'Dorms', 'Outdoor'];
 
 // Product catalog category pills
 const PRODUCT_CATEGORIES = ['All', 'Sofas', 'Seating', 'Beds', 'Nightstands', 'Dressers', 'Desks', 'Desk Chairs', 'Bookshelves', 'Coffee Tables', 'Side Tables', 'Table/Chairs', 'Kitchen', 'TV Stands', 'Throw Pillows', 'Table Lamps', 'Floor Lamps', 'Pendant Lights', 'Chandeliers', 'Lighting', 'Rugs', 'Wall Art', 'Mirrors'];
@@ -240,12 +240,14 @@ const POST_TAGS = [
 // ── Category keyword map (index matches CATEGORIES array) ─────────────────────
 
 const CATEGORY_KEYWORDS = [
-  [],                                     // 0 — All (no filter)
-  ['livingroom', 'living room', 'living'],// 1 — Living Room
-  ['bedroom'],                            // 2 — Bedroom
-  ['kitchen'],                            // 3 — Kitchen
-  ['office'],                             // 4 — Office
-  ['dining'],                             // 5 — Dining
+  [],                                              // 0 — All (no filter)
+  ['livingroom', 'living room', 'living'],         // 1 — Living Room
+  ['dining', 'dining room'],                       // 2 — Dining Room
+  ['bedroom'],                                     // 3 — Bedroom
+  ['kitchen'],                                     // 4 — Kitchen
+  ['office'],                                      // 5 — Office
+  ['dorm', 'dormitory', 'college', 'student'],     // 6 — Dorms
+  ['outdoor', 'patio', 'garden', 'backyard', 'terrace'], // 7 — Outdoor
 ];
 
 // ── Product filter constants ──────────────────────────────────────────────────
@@ -423,6 +425,12 @@ const sliderS = StyleSheet.create({
 
 // ── Search engine ──────────────────────────────────────────────────────────────
 
+// Map room keys from HomeScreen nav to equivalent roomType values in designs data
+const ROOM_FILTER_ALIASES = {
+  'dorm': ['bedroom', 'office'],   // dorm rooms → show bedroom + office designs
+  'outdoor': ['outdoor'],
+};
+
 function searchAndFilter(designs, query, categoryIndex, roomTypeFilter, styleFilter) {
   const raw = query.trim().toLowerCase().replace(/^#/, '');
 
@@ -430,14 +438,23 @@ function searchAndFilter(designs, query, categoryIndex, roomTypeFilter, styleFil
   let pool = designs;
   if (roomTypeFilter) {
     const rt = roomTypeFilter.toLowerCase();
-    pool = pool.filter((d) => {
-      const dRoom = (d.roomType || '').toLowerCase();
-      // Match 'living-room' → 'living', 'bedroom' → 'bedroom', etc.
-      return dRoom === rt ||
-        dRoom === rt.replace('-room', '') ||
-        rt.replace('-room', '') === dRoom.replace('-room', '') ||
-        (d.tags || []).some(t => t.toLowerCase().includes(rt.replace('-room', '')));
-    });
+    const aliases = ROOM_FILTER_ALIASES[rt];
+    if (aliases) {
+      // Use alias mapping for room types not present in seed data (e.g. 'dorm')
+      pool = pool.filter((d) => {
+        const dRoom = (d.roomType || '').toLowerCase();
+        return aliases.some(a => dRoom === a || dRoom.includes(a));
+      });
+    } else {
+      pool = pool.filter((d) => {
+        const dRoom = (d.roomType || '').toLowerCase();
+        // Match 'living-room' → 'living', 'bedroom' → 'bedroom', etc.
+        return dRoom === rt ||
+          dRoom === rt.replace('-room', '') ||
+          rt.replace('-room', '') === dRoom.replace('-room', '') ||
+          (d.tags || []).some(t => t.toLowerCase().includes(rt.replace('-room', '')));
+      });
+    }
   }
 
   // Step 2: style filter (from route params or chip selection)
@@ -581,14 +598,14 @@ const ROOM_LABEL_MAP = {
   'living-room': 'Living Room', bedroom: 'Bedroom', kitchen: 'Kitchen',
   'dining-room': 'Dining Room', office: 'Office', outdoor: 'Outdoor',
   bathroom: 'Bathroom', entryway: 'Entryway', 'kids-room': 'Kids Room',
-  nursery: 'Nursery',
+  nursery: 'Nursery', dorm: 'Dorms',
 };
 
 // ── Main Component ─────────────────────────────────────────────────────────────
 
 export default function ExploreScreen({ navigation, route }) {
   const { liked, toggleLiked } = useLiked();
-  const [activeTab, setActiveTab] = useState('spaces'); // 'spaces' | 'products'
+  const [activeTab, setActiveTab] = useState('wishes'); // 'wishes' | 'products'
   const [activeCategory, setActiveCategory] = useState(0);
   const [activeProdCat, setActiveProdCat] = useState(0);
   // Progressive render for Products grid — start small, load more in chunks
@@ -612,6 +629,11 @@ export default function ExploreScreen({ navigation, route }) {
   const [communityDesigns, setCommunityDesigns] = useState([]);
   const [communityLoading, setCommunityLoading] = useState(true);
   const consumedParamsRef = useRef(null);
+  // Read route params via ref so useFocusEffect callback stays stable (no deps).
+  // Assigning during render (not useEffect) ensures the ref is always current
+  // before any effect fires, eliminating the "re-run while focused" freeze.
+  const routeParamsRef = useRef(route?.params);
+  routeParamsRef.current = route?.params;
 
   // ── Product filter state ───────────────────────────────────────────────────
   const [showFilterSheet, setShowFilterSheet] = useState(false);
@@ -627,10 +649,12 @@ export default function ExploreScreen({ navigation, route }) {
   // but the opacity-to-0 + setTimeout + re-render + fade-in chain added ~500ms
   // of "invisible content" that looked like lag. Instant swap is snappier.
 
-  // Apply params on every focus (handles tab-switch AND fresh navigation)
+  // Apply params on every focus (handles tab-switch AND fresh navigation).
+  // Stable callback (no deps) prevents useFocusEffect from re-running mid-render
+  // when route.params changes, which was causing navigation freeze.
   useFocusEffect(
     useCallback(() => {
-      const params = route?.params;
+      const params = routeParamsRef.current;
       if (!params || params === consumedParamsRef.current) return;
       consumedParamsRef.current = params;
 
@@ -662,7 +686,7 @@ export default function ExploreScreen({ navigation, route }) {
       } else if (params.title) {
         setFilterLabel(params.title);
       }
-    }, [route?.params]),
+    }, []),
   );
 
   const clearFilters = useCallback(() => {
@@ -852,8 +876,8 @@ export default function ExploreScreen({ navigation, route }) {
             {activeTab === 'products'
               ? `${filteredProducts.length} curated product${filteredProducts.length !== 1 ? 's' : ''}`
               : hasActiveFilter
-                ? `${filteredDesigns.length} AI-generated space${filteredDesigns.length !== 1 ? 's' : ''}`
-                : 'Shop AI-Generated Room Designs'}
+                ? `${filteredDesigns.length} AI-generated wish${filteredDesigns.length !== 1 ? 'es' : ''}`
+                : 'Browse AI-Generated Room Wishes'}
           </Text>
 
           {/* ── Search Row ── */}
@@ -894,15 +918,15 @@ export default function ExploreScreen({ navigation, route }) {
             </View>
           </View>
 
-          {/* ── Spaces / Products toggle ── */}
+          {/* ── Wishes / Products toggle ── */}
           <View style={styles.modeToggleRow}>
             <TouchableOpacity
-              style={[styles.modeToggleBtn, activeTab === 'spaces' && styles.modeToggleBtnActive]}
-              onPress={() => setActiveTab('spaces')}
+              style={[styles.modeToggleBtn, activeTab === 'wishes' && styles.modeToggleBtnActive]}
+              onPress={() => setActiveTab('wishes')}
               activeOpacity={0.8}
             >
-              <Text style={[styles.modeToggleLabel, activeTab === 'spaces' && styles.modeToggleLabelActive]}>
-                Spaces
+              <Text style={[styles.modeToggleLabel, activeTab === 'wishes' && styles.modeToggleLabelActive]}>
+                Wishes
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -959,7 +983,7 @@ export default function ExploreScreen({ navigation, route }) {
                 <Text style={styles.filterBannerCount}>
                   {activeTab === 'products'
                     ? `${filteredProducts.length} product${filteredProducts.length !== 1 ? 's' : ''}`
-                    : `${filteredDesigns.length} space${filteredDesigns.length !== 1 ? 's' : ''}`}
+                    : `${filteredDesigns.length} wish${filteredDesigns.length !== 1 ? 'es' : ''}`}
                 </Text>
               </View>
               <TouchableOpacity style={styles.filterClearBtn} onPress={clearFilters} activeOpacity={0.7}>
@@ -1053,7 +1077,7 @@ export default function ExploreScreen({ navigation, route }) {
                       try {
                         const msg = design.prompt
                           ? `Check out this HomeGenie design: "${design.prompt}"`
-                          : 'Check out this HomeGenie design!';
+                          : 'Check out this HomeGenie wish!';
                         await Share.share({ message: msg, url: design.imageUrl || '' });
                       } catch {}
                     }}
@@ -1620,7 +1644,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(103,172,233,0.08)',
   },
 
-  // Spaces / Products mode toggle
+  // Wishes / Products mode toggle
   modeToggleRow: {
     flexDirection: 'row',
     marginHorizontal: space.lg,

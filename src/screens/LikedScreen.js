@@ -129,7 +129,7 @@ export default function LikedScreen({ navigation }) {
         >
           {/* Count label */}
           <Text style={styles.countLabel}>
-            {likedItems.length} {likedItems.length === 1 ? 'design' : 'designs'}
+            {likedItems.length} {likedItems.length === 1 ? 'wish' : 'wishes'}
           </Text>
 
           {/* 3-column grid */}

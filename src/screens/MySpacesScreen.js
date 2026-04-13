@@ -131,7 +131,7 @@ function SpaceDetailModal({ design, visible, onClose, navigation }) {
 
   const handleShare = async () => {
     try {
-      await Share.share({ message: `Check out my AI room design on HomeGenie: "${design?.prompt}"` });
+      await Share.share({ message: `Check out my AI room wish on HomeGenie: "${design?.prompt}"` });
     } catch (e) {}
   };
 
@@ -240,7 +240,7 @@ export default function MySpacesScreen({ navigation }) {
         <TouchableOpacity style={s.backBtn} onPress={() => navigation.goBack()} activeOpacity={0.7}>
           <BackIcon />
         </TouchableOpacity>
-        <Text style={s.headerTitle}>My Spaces</Text>
+        <Text style={s.headerTitle}>My Wishes</Text>
         <View style={{ width: 44 }} />
       </View>
 
@@ -250,9 +250,9 @@ export default function MySpacesScreen({ navigation }) {
         </View>
       ) : designs.length === 0 ? (
         <View style={s.center}>
-          <Text style={s.emptyTitle}>No spaces yet</Text>
+          <Text style={s.emptyTitle}>No wishes yet</Text>
           <Text style={s.emptySubtitle}>
-            Generate a design from the Snap tab, then post it to see it here.
+            Generate a wish from the Wish tab, then post it to see it here.
           </Text>
         </View>
       ) : (

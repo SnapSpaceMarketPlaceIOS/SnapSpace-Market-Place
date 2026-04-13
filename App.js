@@ -55,6 +55,7 @@ import BrowseScreen from './src/screens/BrowseScreen';
 import AllCollectionsScreen from './src/screens/AllCollectionsScreen';
 import PaywallScreen from './src/screens/PaywallScreen';
 import FollowListScreen from './src/screens/FollowListScreen';
+import ConsentModal from './src/components/ConsentModal';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -346,6 +347,7 @@ export default function App() {
               <SharedProvider>
                 <NavigationContainer>
                   <RootNavigator />
+                  <ConsentModal />
                 </NavigationContainer>
               </SharedProvider>
             </LikedProvider>

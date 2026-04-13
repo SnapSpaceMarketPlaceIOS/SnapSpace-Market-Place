@@ -247,7 +247,7 @@ function InfoIcon() {
 
 const ACCOUNT_ITEMS = [
   { label: 'Subscription',           icon: <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="#444" strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round"><Path d="M2 4l3 12h14l3-12-6 7-4-9-4 9-6-7z" /><Path d="M5 16h14v2H5z" /></Svg>, screen: 'Paywall' },
-  { label: 'My Spaces',              icon: <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="#444" strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round"><Path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z" /><Line x1={4} y1={22} x2={4} y2={15} /></Svg>,  screen: 'MySpaces' },
+  { label: 'My Wishes',              icon: <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="#444" strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round"><Path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z" /><Line x1={4} y1={22} x2={4} y2={15} /></Svg>,  screen: 'MySpaces' },
   { label: 'Order History',          icon: <OrderIcon />, screen: 'OrderHistory' },
   { label: 'Payment Methods',        icon: <CardIcon />,  screen: 'PaymentMethods' },
   { label: 'Become a Supplier',       icon: <StarIcon />,  screen: 'SupplierApplication' },
@@ -287,7 +287,7 @@ const ABOUT_ITEMS = [
       try {
         await Share.share({
           title: 'HomeGenie — AI Interior Design',
-          message: `Check out HomeGenie! Design your dream space with AI and shop the look instantly.\n\nDownload it here: ${APP_STORE_URL}`,
+          message: `Check out HomeGenie! Wish your dream room with AI and shop the look instantly.\n\nDownload it here: ${APP_STORE_URL}`,
           url: APP_STORE_URL,
         });
       } catch {
@@ -388,7 +388,7 @@ export default function ProfileScreen({ navigation }) {
           return {
             id: `user-${d.id}`,
             user_id: user.id,
-            title: d.prompt || 'My Design',
+            title: d.prompt || 'My Wish',
             user: user.username || user.name || 'Me',
             initial: (user.name || 'M')[0],
             verified: false,
@@ -421,7 +421,7 @@ export default function ProfileScreen({ navigation }) {
     return (
       <AuthGate
         title="Your profile awaits"
-        subtitle="Sign in to access your profile, saved designs, and order history."
+        subtitle="Sign in to access your profile, saved wishes, and order history."
         navigation={navigation}
       />
     );
@@ -597,12 +597,12 @@ export default function ProfileScreen({ navigation }) {
             return (
               <View style={styles.emptyGrid}>
                 <Text style={styles.emptyGridTitle}>
-                  {activeTab === 0 ? 'No snaps yet' : 'No liked designs'}
+                  {activeTab === 0 ? 'No wishes yet' : 'No liked wishes'}
                 </Text>
                 <Text style={styles.emptyGridSub}>
                   {activeTab === 0
-                    ? 'Generate a design from the Snap tab and post it to see it here.'
-                    : 'Designs you like will appear here.'}
+                    ? 'Generate a wish from the Wish tab and post it to see it here.'
+                    : 'Wishes you like will appear here.'}
                 </Text>
               </View>
             );
@@ -825,7 +825,7 @@ export default function ProfileScreen({ navigation }) {
                 onPress={() => {
                   Alert.alert(
                     'Delete Account',
-                    'This will permanently delete your account, all saved designs, room photos, and personal data. This action cannot be undone.\n\nActive Apple subscriptions must be canceled separately in your Apple ID settings.',
+                    'This will permanently delete your account, all saved wishes, room photos, and personal data. This action cannot be undone.\n\nActive Apple subscriptions must be canceled separately in your Apple ID settings.',
                     [
                       { text: 'Cancel', style: 'cancel' },
                       {
@@ -845,7 +845,7 @@ export default function ProfileScreen({ navigation }) {
                                     setShowSettings(false);
                                     await deleteAccount();
                                   } catch (e) {
-                                    Alert.alert('Error', 'Could not delete account. Please try again or contact info@homegenie.app.');
+                                    Alert.alert('Error', 'Could not delete account. Please try again or contact info@homegenieios.com.');
                                   }
                                 },
                               },

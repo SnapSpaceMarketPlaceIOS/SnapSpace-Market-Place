@@ -132,13 +132,13 @@ export default function SupplierApplicationScreen({ navigation }) {
       `Submitted via HomeGenie iOS App`
     );
 
-    Linking.openURL(`mailto:info@homegenie.app?subject=${subject}&body=${body}`)
+    Linking.openURL(`mailto:info@homegenieios.com?subject=${subject}&body=${body}`)
       .then(() => {
         AsyncStorage.setItem(SUBMITTED_KEY, 'true');
         setSubmitted(true);
       })
       .catch(() => {
-        Alert.alert('Could not open email', 'Please email info@homegenie.app directly.');
+        Alert.alert('Could not open email', 'Please email info@homegenieios.com directly.');
       });
   };
 
@@ -163,8 +163,8 @@ export default function SupplierApplicationScreen({ navigation }) {
           </Text>
           <View style={s.confirmedNote}>
             <Text style={s.confirmedNoteText}>Questions? Email us at{' '}
-              <Text style={s.confirmedNoteLink} onPress={() => Linking.openURL('mailto:info@homegenie.app')}>
-                info@homegenie.app
+              <Text style={s.confirmedNoteLink} onPress={() => Linking.openURL('mailto:info@homegenieios.com')}>
+                info@homegenieios.com
               </Text>
             </Text>
           </View>
@@ -292,7 +292,7 @@ export default function SupplierApplicationScreen({ navigation }) {
         </TouchableOpacity>
 
         <Text style={s.footerNote}>
-          Your application will be sent to our team at info@homegenie.app. We review all applications within 3–5 business days.
+          Your application will be sent to our team at info@homegenieios.com. We review all applications within 3–5 business days.
         </Text>
 
         <View style={{ height: 48 }} />

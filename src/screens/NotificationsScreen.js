@@ -124,22 +124,22 @@ const NOTIFICATION_SECTIONS = [
     title: 'Activity',
     items: [
       { id: 'orders',     label: 'Order Updates',       desc: 'Shipping, delivery, and order status changes', Icon: CartBellIcon,  default: true  },
-      { id: 'likes',      label: 'Likes & Reactions',   desc: 'When someone likes your designs or posts',     Icon: HeartBellIcon, default: true  },
+      { id: 'likes',      label: 'Likes & Reactions',   desc: 'When someone likes your wishes or posts',      Icon: HeartBellIcon, default: true  },
       { id: 'followers',  label: 'New Followers',        desc: 'When someone starts following you',           Icon: UserPlusIcon,  default: true  },
     ],
   },
   {
-    title: 'AI & Design',
+    title: 'AI & Wishes',
     items: [
-      { id: 'ai_ready',   label: 'AI Generation Ready', desc: 'When your AI room design is finished',         Icon: AIIcon,        default: true  },
-      { id: 'ai_tips',    label: 'Design Tips',          desc: 'Personalized prompts and style suggestions',  Icon: BellIcon,      default: false },
+      { id: 'ai_ready',   label: 'AI Wish Ready',        desc: 'When your AI room wish is finished',           Icon: AIIcon,        default: true  },
+      { id: 'ai_tips',    label: 'Wish Tips',             desc: 'Personalized prompts and style suggestions',  Icon: BellIcon,      default: false },
     ],
   },
   {
     title: 'Promotions',
     items: [
       { id: 'deals',      label: 'Deals & Offers',      desc: 'Sales and discounts on items in your cart',   Icon: PromoIcon,     default: false },
-      { id: 'newsletter', label: 'HomeGenie Newsletter', desc: 'Weekly design inspiration and app updates',   Icon: EmailIcon,     default: false },
+      { id: 'newsletter', label: 'HomeGenie Newsletter', desc: 'Weekly inspiration and app updates',          Icon: EmailIcon,     default: false },
     ],
   },
 ];

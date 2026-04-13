@@ -125,7 +125,6 @@ const ROOM_TYPES = [
   { key: 'office',      label: 'Office',    bg: roomChipColors['office'] },
   { key: 'dorm',        label: 'Dorms',     bg: roomChipColors['dorm'] },
   { key: 'outdoor',     label: 'Outdoor',   bg: roomChipColors['outdoor'] },
-  { key: 'entryway',    label: 'Entryway',  bg: roomChipColors['entryway'] },
 ];
 
 const NEW_ROOM_KEYS = ['dorm'];
@@ -857,9 +856,10 @@ export default function HomeScreen({ navigation, route }) {
   const springIn  = (anim) => Animated.spring(anim, { toValue: 0.82, useNativeDriver: true, tension: 300, friction: 10 }).start();
   const springOut = (anim) => Animated.spring(anim, { toValue: 1,    useNativeDriver: true, tension: 200, friction: 7  }).start();
 
-  // ── Hero slideshow — sequential timeout chain (no setInterval race) ──────
-  // Uses setTimeout chaining so each transition completes fully before the
-  // next one starts. Prevents duplicate/skipped images from timer overlap.
+  // ── Hero slideshow — parallel crossfade (no z-order hiccup) ──────────────
+  // Fades OUT current AND fades IN next simultaneously. This avoids the
+  // z-order bug where image 0 (bottom of stack) couldn't visually fade in
+  // over image 5 (top of stack) — now image 5 fades OUT to reveal image 0.
   const heroOpacities = useRef(HERO_IMAGES.map((_, i) => new Animated.Value(i === 0 ? 1 : 0))).current;
   const heroCurrentIdx = useRef(0);
   const heroTimerRef = useRef(null);
@@ -873,15 +873,20 @@ export default function HomeScreen({ navigation, route }) {
         const currentIdx = heroCurrentIdx.current;
         const nextIdx = (currentIdx + 1) % HERO_IMAGES.length;
 
-        // Fade in next image on top of current
-        Animated.timing(heroOpacities[nextIdx], {
-          toValue: 1,
-          duration: HERO_FADE_MS,
-          useNativeDriver: true,
-        }).start(() => {
+        // Crossfade: fade out current + fade in next simultaneously
+        Animated.parallel([
+          Animated.timing(heroOpacities[nextIdx], {
+            toValue: 1,
+            duration: HERO_FADE_MS,
+            useNativeDriver: true,
+          }),
+          Animated.timing(heroOpacities[currentIdx], {
+            toValue: 0,
+            duration: HERO_FADE_MS,
+            useNativeDriver: true,
+          }),
+        ]).start(() => {
           if (cancelled) return;
-          // Hide old image, update index, schedule next
-          heroOpacities[currentIdx].setValue(0);
           heroCurrentIdx.current = nextIdx;
           scheduleNext();
         });
@@ -1152,10 +1157,10 @@ export default function HomeScreen({ navigation, route }) {
 
   const handleShare = async () => {
     if (!resultData?.resultUri) return;
-    const prompt = resultData.prompt || 'My AI design';
+    const prompt = resultData.prompt || 'My AI wish';
     try {
       await Share.share({
-        message: `Check out my AI room design on HomeGenie!\n\n"${prompt}"`,
+        message: `Check out my AI room wish on HomeGenie!\n\n"${prompt}"`,
         url: resultData.resultUri,
       });
     } catch (err) {
@@ -1193,8 +1198,8 @@ export default function HomeScreen({ navigation, route }) {
       Alert.alert(
         visibility === 'public' ? 'Posted to Explore!' : 'Saved to Profile',
         visibility === 'public'
-          ? 'Your design is now live on the Explore page.'
-          : 'Your design has been saved privately to your profile.'
+          ? 'Your wish is now live on the Explore page.'
+          : 'Your wish has been saved privately to your profile.'
       );
     } catch (e) {
       console.warn('Post failed:', e);
@@ -1430,7 +1435,7 @@ export default function HomeScreen({ navigation, route }) {
           setGenerating(false);
           Alert.alert(
             'Generation Failed',
-            `Could not generate your design. Please try again.\n\nDetails: ${genErr.message}`
+            `Could not generate your wish. Please try again.\n\nDetails: ${genErr.message}`
           );
           console.error('[Gen] Generation error:', genErr.message);
           return;
@@ -1489,7 +1494,7 @@ export default function HomeScreen({ navigation, route }) {
       // Fire local notification if user has AI Generation Ready enabled
       sendNotificationIfEnabled(
         'ai_ready',
-        '✨ Your design is ready!',
+        '✨ Your wish is ready!',
         'Tap to see your AI-redesigned room and matched products.',
         { screen: 'RoomResult' }
       ).catch(() => {});
@@ -1630,7 +1635,7 @@ export default function HomeScreen({ navigation, route }) {
           {/* Centered headline + subtitle — hidden during generation */}
           {!generating && (
             <View style={styles.heroCentered}>
-              <Text style={styles.headline}>Design Your Space</Text>
+              <Text style={styles.headline}>Wish Your Space</Text>
               <Text style={styles.heroSubtitle}>
                 Describe your style, then add your room photo
               </Text>
@@ -2212,7 +2217,7 @@ export default function HomeScreen({ navigation, route }) {
               />
               <View style={resultStyles.sheet}>
                 <View style={resultStyles.sheetHandle} />
-                <Text style={resultStyles.sheetTitle}>Post this design</Text>
+                <Text style={resultStyles.sheetTitle}>Post this wish</Text>
                 <Text style={resultStyles.sheetSubtitle}>Choose who can see it</Text>
 
                 <TouchableOpacity

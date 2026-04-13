@@ -368,9 +368,9 @@ export default function CartScreen({ navigation }) {
 
     // Non-Amazon items — not currently supported
     Alert.alert(
-      'Amazon Only',
-      'At this time, checkout is supported for Amazon items only. Non-Amazon items coming soon.',
-      [{ text: 'OK' }]
+      'Checkout with Amazon',
+      'All items check out directly through Amazon. Multi-vendor checkout is coming in a future update.',
+      [{ text: 'Got it' }]
     );
   }, [checkingOut, total, items, subtotal, shipping]);
 
@@ -379,7 +379,7 @@ export default function CartScreen({ navigation }) {
     return (
       <AuthGate
         title="Sign in to view your cart"
-        subtitle="Create a free account to save items, check out, and track your orders."
+        subtitle="Create a free account to generate AI room designs, save favorites, and shop curated furniture."
         navigation={navigation}
       />
     );
@@ -392,7 +392,7 @@ export default function CartScreen({ navigation }) {
         <ShoppingBagIcon />
         <Text style={styles.emptyTitle}>Your cart is empty</Text>
         <Text style={styles.emptySubtitle}>
-          Snap a room and discover furniture that matches your style.
+          Generate a room wish and discover furniture that matches your style.
         </Text>
         <TouchableOpacity
           style={styles.emptyBtn}

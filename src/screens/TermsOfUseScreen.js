@@ -5,6 +5,7 @@ import {
   ScrollView,
   StyleSheet,
   TouchableOpacity,
+  Linking,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Polyline } from 'react-native-svg';
@@ -58,7 +59,7 @@ You agree to:
 
 • Provide accurate, current, and complete information during registration
 • Maintain the security and confidentiality of your login credentials
-• Notify us immediately at info@homegenie.app of any unauthorized use of your account
+• Notify us immediately at info@homegenieios.com of any unauthorized use of your account
 • Accept sole responsibility for all activity that occurs under your account
 
 We reserve the right to suspend or terminate accounts that violate these Terms, remain inactive for an extended period, or are reasonably suspected of fraudulent activity.`,
@@ -248,15 +249,16 @@ Notwithstanding the above, either party may seek injunctive or equitable relief 
 • Content you have shared publicly may have been copied or re-shared by other users prior to deletion — we cannot control third-party copies
 • Certain data may be retained for up to 90 days after deletion for fraud prevention, legal compliance, or dispute resolution, after which it will be permanently purged
 
-You may also request account deletion by emailing info@homegenie.app with the subject line "Account Deletion Request."`,
+You may also request account deletion by emailing info@homegenieios.com with the subject line "Account Deletion Request."`,
   },
   {
     title: '20. Contact Us',
     body: `If you have any questions, concerns, or feedback about these Terms of Use, please contact us:
 
 HomeGenie — operated by SnapSpace Marketplace LLC
-Email: info@homegenie.app
-Website: www.homegenie.app
+Email: info@homegenieios.com
+Website: www.homegenieios.com
+Terms of Use URL: www.homegenieios.com/terms
 
 For legal inquiries, please include "Legal Inquiry" in the subject line of your email.`,
   },
@@ -281,6 +283,14 @@ export default function TermsOfUseScreen({ navigation }) {
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
         <Text style={styles.lastUpdated}>Last updated: April 6, 2026</Text>
+
+        <TouchableOpacity
+          style={styles.webBanner}
+          onPress={() => Linking.openURL('https://www.homegenieios.com/terms')}
+          activeOpacity={0.75}
+        >
+          <Text style={styles.webBannerText}>View latest version at homegenieios.com/terms →</Text>
+        </TouchableOpacity>
 
         <Text style={styles.intro}>
           Please read these Terms of Use carefully before using HomeGenie. These terms govern your access to and use of our AI-powered interior design platform, including all features, content, subscriptions, and affiliated services.
@@ -339,7 +349,22 @@ const styles = StyleSheet.create({
     color: '#AAA',
     fontWeight: '500',
     fontFamily: 'Geist_500Medium',
+    marginBottom: 12,
+  },
+  webBanner: {
+    backgroundColor: '#EFF6FF',
+    borderRadius: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 14,
     marginBottom: 16,
+    borderWidth: 1,
+    borderColor: '#BFDBFE',
+  },
+  webBannerText: {
+    fontSize: 13,
+    color: '#1D4ED8',
+    fontWeight: '600',
+    fontFamily: 'Geist_600SemiBold',
   },
   intro: {
     fontSize: 14,

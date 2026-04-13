@@ -447,7 +447,7 @@ export default function SupplierDashboardScreen({ navigation }) {
         <View>
           <Text style={styles.identityName}>{user.name}</Text>
           {storefront?.storefront_slug && (
-            <Text style={styles.identitySlug}>homegenie.app/store/{storefront.storefront_slug}</Text>
+            <Text style={styles.identitySlug}>homegenieios.com/store/{storefront.storefront_slug}</Text>
           )}
         </View>
       </View>
@@ -645,7 +645,7 @@ export default function SupplierDashboardScreen({ navigation }) {
             <SectionTitle>Storefront Settings</SectionTitle>
 
             {[
-              { label: 'Storefront Slug', value: editSlug, onChange: setEditSlug, placeholder: 'your-store', hint: 'homegenie.app/store/your-slug', cap: 'none' },
+              { label: 'Storefront Slug', value: editSlug, onChange: setEditSlug, placeholder: 'your-store', hint: 'homegenieios.com/store/your-slug', cap: 'none' },
               { label: 'Tagline', value: editTagline, onChange: setEditTagline, placeholder: 'What makes your store unique?' },
             ].map(f => (
               <View key={f.label} style={storeStyles.field}>

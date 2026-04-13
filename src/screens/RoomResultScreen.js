@@ -343,7 +343,7 @@ export default function RoomResultScreen({ route, navigation }) {
   const handleShare = async () => {
     setShareActive(true);
     try {
-      const msg = `Check out my AI room design on HomeGenie!\n\n"${prompt}"`;
+      const msg = `Check out my AI room wish on HomeGenie!\n\n"${prompt}"`;
       await Share.share(resultUri ? { message: msg, url: resultUri } : { message: msg });
     } catch {}
   };
@@ -362,7 +362,7 @@ export default function RoomResultScreen({ route, navigation }) {
       }
     } catch {
       try {
-        await Share.share({ message: `My HomeGenie AI design: "${prompt}"\n\n${resultUri}` });
+        await Share.share({ message: `My HomeGenie AI wish: "${prompt}"\n\n${resultUri}` });
       } catch {
         Alert.alert('Could Not Save', 'Please screenshot the image to save it.');
       }
@@ -407,7 +407,7 @@ export default function RoomResultScreen({ route, navigation }) {
       }
       setShowPostModal(false);
       setPosted(true);
-      Alert.alert('Posted!', `Your design has been saved to your profile${postVisibility === 'public' ? ' and is visible on Explore' : ''}.`);
+      Alert.alert('Wish Posted', `Your wish has been saved to your profile${postVisibility === 'public' ? ' and is visible on Explore' : ''}.`);
     } catch (e) {
       Alert.alert('Post Failed', e.message || 'Could not save. Please try again.');
     } finally {
@@ -656,7 +656,7 @@ export default function RoomResultScreen({ route, navigation }) {
         <View style={s.modalOverlay}>
           <View style={s.modalCard}>
             <Text style={s.modalTitle}>Post to Profile</Text>
-            <Text style={s.modalSubtitle}>Share your AI design with the community</Text>
+            <Text style={s.modalSubtitle}>Share your AI wish with the community</Text>
 
             {resultUri && (
               <Image source={{ uri: resultUri }} style={s.modalPreview} resizeMode="contain" />
