@@ -552,9 +552,6 @@ export default function CartScreen({ navigation }) {
 
         </View>
 
-        <Text style={styles.ftcDisclosure}>
-          We may earn a commission when you buy through links on this app.
-        </Text>
 
         <View style={{ height: 120 }} />
       </ScrollView>

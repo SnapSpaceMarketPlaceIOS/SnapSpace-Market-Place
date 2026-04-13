@@ -198,7 +198,6 @@ function SpaceDetailModal({ design, visible, onClose, navigation }) {
                 ))}
               </ScrollView>
 
-              <Text style={s.ftc}>We may earn a commission when you buy through links on this app.</Text>
             </View>
           )}
         </ScrollView>

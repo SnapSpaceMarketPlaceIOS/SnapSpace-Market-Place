@@ -1235,10 +1235,6 @@ export default function ExploreScreen({ navigation, route }) {
                   ))}
                 </ScrollView>
 
-                {/* FTC Disclosure */}
-                <Text style={styles.ftcDisclosure}>
-                  We may earn a commission when you buy through links on this app.
-                </Text>
 
                 {/* 3F: Tags */}
                 <Text style={[styles.sectionLabel, { marginTop: SP[5] }]}>TAGS</Text>

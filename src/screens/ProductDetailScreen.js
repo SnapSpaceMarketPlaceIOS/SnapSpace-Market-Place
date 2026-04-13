@@ -38,6 +38,7 @@ import {
 import Svg, { Path, Circle, Polyline, Line, Rect } from 'react-native-svg';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useCart } from '../context/CartContext';
+import { useLiked } from '../context/LikedContext';
 import CardImage from '../components/CardImage';
 import { SellerName } from '../components/VerifiedBadge';
 import {
@@ -1312,7 +1313,7 @@ export default function ProductDetailScreen({ route, navigation }) {
   const product = route?.params?.product;
   const insets  = useSafeAreaInsets();
   const { addToCart, items } = useCart();
-  const [isProductLiked, setIsProductLiked] = useState(false);
+  const { likedProducts, toggleLikedProduct } = useLiked();
 
   // ── Local state ──────────────────────────────────────────────────────────
   const [qty,         setQty]        = useState(1);
@@ -1481,11 +1482,8 @@ export default function ProductDetailScreen({ route, navigation }) {
             brand={brand}
             inStock={inStock}
             onCamera={() => {}}
-            isLiked={isProductLiked}
-            onLike={() => {
-              setIsProductLiked(prev => !prev);
-              navigation.navigate('Liked');
-            }}
+            isLiked={!!likedProducts[product?.id]}
+            onLike={() => toggleLikedProduct(product)}
             onShare={async () => {
               try {
                 await Share.share({

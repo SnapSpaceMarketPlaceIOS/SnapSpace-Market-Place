@@ -5,11 +5,42 @@ import { toggleLike as toggleLikeRPC, getUserLikedIds } from '../services/supaba
 
 const LikedContext = createContext(null);
 const STORAGE_KEY = '@snapspace_liked';
+const STORAGE_KEY_PRODUCTS = '@snapspace_liked_products';
 
 export function LikedProvider({ children }) {
   const { user } = useAuth();
   const [liked, setLiked] = useState({});
   const [hydrated, setHydrated] = useState(false);
+  const [likedProducts, setLikedProducts] = useState({});
+  const [productsHydrated, setProductsHydrated] = useState(false);
+
+  // Hydrate liked products from AsyncStorage (no Supabase — product IDs are not UUIDs)
+  useEffect(() => {
+    AsyncStorage.getItem(STORAGE_KEY_PRODUCTS)
+      .then(data => { if (data) { try { setLikedProducts(JSON.parse(data)); } catch {} } })
+      .catch(() => {})
+      .finally(() => setProductsHydrated(true));
+  }, []);
+
+  // Persist liked products
+  useEffect(() => {
+    if (!productsHydrated) return;
+    AsyncStorage.setItem(STORAGE_KEY_PRODUCTS, JSON.stringify(likedProducts)).catch(() => {});
+  }, [likedProducts, productsHydrated]);
+
+  // Toggle a product like — stores full product object for display in Liked tab
+  const toggleLikedProduct = useCallback((product) => {
+    if (!product?.id) return;
+    setLikedProducts(prev => {
+      const next = { ...prev };
+      if (next[product.id]) {
+        delete next[product.id];
+      } else {
+        next[product.id] = product;
+      }
+      return next;
+    });
+  }, []);
 
   // Hydrate: if logged in, fetch from Supabase; otherwise fall back to AsyncStorage
   useEffect(() => {
@@ -119,7 +150,7 @@ export function LikedProvider({ children }) {
   }, [liked]);
 
   return (
-    <LikedContext.Provider value={{ liked, toggleLiked, isLiked }}>
+    <LikedContext.Provider value={{ liked, toggleLiked, isLiked, likedProducts, toggleLikedProduct }}>
       {children}
     </LikedContext.Provider>
   );

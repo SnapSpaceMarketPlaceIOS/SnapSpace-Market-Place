@@ -2036,7 +2036,6 @@ export default function HomeScreen({ navigation, route }) {
               featuredProductIds: FEATURED_PRODUCTS.map(p => p.id),
             })}
           />
-          <Text style={styles.affiliateDisclosure}>We may earn a commission on purchases.</Text>
           <View style={styles.collectionsGrid}>
             {FEATURED_PRODUCTS.slice(0, 4).map((product, i) => (
               <TouchableOpacity
@@ -2227,10 +2226,6 @@ export default function HomeScreen({ navigation, route }) {
               />
             )}
 
-            {/* FTC disclosure */}
-            <Text style={resultStyles.disclosure}>
-              We may earn a commission when you buy through links on this app.
-            </Text>
           </ScrollView>
 
           {/* ── Post Visibility Sheet (inside result modal) ──────────────── */}

@@ -241,6 +241,8 @@ export default function RoomResultScreen({ route, navigation }) {
   const [posted, setPosted] = useState(false);
   const [autoSavedDesignId, setAutoSavedDesignId] = useState(null);
   const autoSaveAttempted = useRef(false);
+  const autoSavedDesignIdRef = useRef(null);   // ref for sync access (avoids stale closure)
+  const autoSavePromiseRef   = useRef(null);   // ref to await in-flight save before posting
 
   // Icon active states — grey by default, stay blue after first tap
   const [downloadActive, setDownloadActive] = useState(false);
@@ -298,12 +300,15 @@ export default function RoomResultScreen({ route, navigation }) {
       rating: p.rating, reviewCount: p.reviewCount,
       affiliateUrl: p.affiliateUrl, source: p.source,
     }));
-    saveUserDesign(user.id, {
+    autoSavePromiseRef.current = saveUserDesign(user.id, {
       imageUrl: resultUri, prompt, styleTags: uniqueTags,
       products: productSummary, visibility: 'private',
     })
       .then(result => {
-        if (result?.designId) setAutoSavedDesignId(result.designId);
+        if (result?.designId) {
+          autoSavedDesignIdRef.current = result.designId;
+          setAutoSavedDesignId(result.designId);
+        }
         if (result?.permanentUrl) setResultUri(result.permanentUrl);
       })
       .catch(err => console.warn('[AutoSave] Failed:', err.message));
@@ -380,6 +385,12 @@ export default function RoomResultScreen({ route, navigation }) {
     if (!resultUri || !user || posting) return;
     setPosting(true);
     try {
+      // If auto-save is still in flight, wait for it to finish before deciding
+      // whether to update or create — this prevents duplicate designs
+      if (autoSaveAttempted.current && autoSavePromiseRef.current) {
+        await autoSavePromiseRef.current.catch(() => {});
+      }
+
       // Build a fresh product snapshot from the current (correct) products
       const productSummary = products.map(p => ({
         id: p.id, name: p.name, brand: p.brand,
@@ -388,11 +399,14 @@ export default function RoomResultScreen({ route, navigation }) {
         affiliateUrl: p.affiliateUrl, source: p.source,
       }));
 
-      if (autoSavedDesignId) {
-        // Update visibility + always re-save products to cover any race condition
-        await updateDesignVisibility(autoSavedDesignId, postVisibility);
+      // Use ref for sync access — state may still be stale from the auto-save
+      const designId = autoSavedDesignIdRef.current || autoSavedDesignId;
+
+      if (designId) {
+        // Auto-save already created the record — just update visibility + products
+        await updateDesignVisibility(designId, postVisibility);
         if (productSummary.length > 0) {
-          await updateDesignProducts(autoSavedDesignId, productSummary).catch(err =>
+          await updateDesignProducts(designId, productSummary).catch(err =>
             console.warn('[Post] Product patch failed:', err.message)
           );
         }
@@ -403,7 +417,10 @@ export default function RoomResultScreen({ route, navigation }) {
           imageUrl: resultUri, prompt, styleTags: uniqueTags,
           products: productSummary, visibility: postVisibility,
         });
-        if (result?.designId) setAutoSavedDesignId(result.designId);
+        if (result?.designId) {
+          autoSavedDesignIdRef.current = result.designId;
+          setAutoSavedDesignId(result.designId);
+        }
       }
       setShowPostModal(false);
       setPosted(true);

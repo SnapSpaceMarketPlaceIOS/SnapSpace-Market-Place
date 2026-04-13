@@ -222,9 +222,6 @@ export default function BrowseScreen({ navigation, route }) {
         {products.length > 0 && (
           <View style={[styles.section, designs.length > 0 && styles.sectionAlt]}>
             <SectionHeader noTopMargin title="PRODUCTS" />
-            <Text style={styles.affiliateNote}>
-              We may earn a commission when you buy through links on this app.
-            </Text>
             <View style={styles.grid}>
               {products.map((product, i) => (
                 <TouchableOpacity

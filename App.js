@@ -1,4 +1,4 @@
-import React, { useRef, useCallback } from 'react';
+import React, { useRef, useCallback, useEffect } from 'react';
 import { View, Text, StyleSheet, Animated, Pressable } from 'react-native';
 import { useFonts } from 'expo-font';
 import {
@@ -154,9 +154,29 @@ function CartBadge() {
   );
 }
 
-// ─── Animated tab button — subtle scale bounce on press ──────────
-function AnimatedTabButton({ children, onPress, style, ...rest }) {
+// ─── Animated tab button — scale bounce on press + active indicator ─
+function AnimatedTabButton({ children, onPress, style, accessibilityState, ...rest }) {
   const scale = useRef(new Animated.Value(1)).current;
+  const isFocused = accessibilityState?.selected ?? false;
+  const indicatorOpacity = useRef(new Animated.Value(isFocused ? 1 : 0)).current;
+  const indicatorScaleX = useRef(new Animated.Value(isFocused ? 1 : 0.3)).current;
+
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(indicatorOpacity, {
+        toValue: isFocused ? 1 : 0,
+        duration: 180,
+        useNativeDriver: true,
+      }),
+      Animated.spring(indicatorScaleX, {
+        toValue: isFocused ? 1 : 0.3,
+        speed: 32,
+        bounciness: 6,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, [isFocused]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const handlePressIn = useCallback(() => {
     Animated.spring(scale, {
       toValue: 0.95,
@@ -173,6 +193,7 @@ function AnimatedTabButton({ children, onPress, style, ...rest }) {
       bounciness: 10,
     }).start();
   }, []);
+
   return (
     <Pressable
       onPress={onPress}
@@ -181,6 +202,15 @@ function AnimatedTabButton({ children, onPress, style, ...rest }) {
       style={style}
       {...rest}
     >
+      {/* Active indicator pill — top of tab, springs in on focus */}
+      <View style={styles.tabIndicatorWrap} pointerEvents="none">
+        <Animated.View
+          style={[
+            styles.tabIndicator,
+            { opacity: indicatorOpacity, transform: [{ scaleX: indicatorScaleX }] },
+          ]}
+        />
+      </View>
       <Animated.View style={{ transform: [{ scale }], alignItems: 'center', justifyContent: 'center' }}>
         {children}
       </Animated.View>
@@ -285,11 +315,11 @@ function RootNavigator() {
   }
 
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
+    <Stack.Navigator screenOptions={{ headerShown: false, animationDuration: 300 }}>
       <Stack.Screen name="Main" component={TabNavigator} />
-      <Stack.Screen name="Auth" component={AuthScreen} />
-      <Stack.Screen name="VerifyEmailSent" component={VerifyEmailSentScreen} />
-      <Stack.Screen name="RoomResult" component={RoomResultScreen} />
+      <Stack.Screen name="Auth" component={AuthScreen} options={{ animation: 'fade' }} />
+      <Stack.Screen name="VerifyEmailSent" component={VerifyEmailSentScreen} options={{ animation: 'fade' }} />
+      <Stack.Screen name="RoomResult" component={RoomResultScreen} options={{ animation: 'slide_from_bottom' }} />
       <Stack.Screen name="ProductDetail" component={ProductDetailScreen} />
       <Stack.Screen name="ShopTheLook" component={ShopTheLookScreen} />
       <Stack.Screen name="UserProfile" component={UserProfileScreen} />
@@ -368,6 +398,20 @@ const styles = StyleSheet.create({
     height: layout.tabBarHeight,
     paddingTop: space.sm,
     paddingBottom: 0,
+  },
+
+  tabIndicatorWrap: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+  },
+  tabIndicator: {
+    width: 20,
+    height: 2,
+    borderRadius: 2,
+    backgroundColor: C.primary,
   },
 
   badge: {

@@ -250,7 +250,7 @@ const ACCOUNT_ITEMS = [
   { label: 'My Wishes',              icon: <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="#444" strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round"><Path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z" /><Line x1={4} y1={22} x2={4} y2={15} /></Svg>,  screen: 'MySpaces' },
   { label: 'Order History',          icon: <OrderIcon />, screen: 'OrderHistory' },
   { label: 'Payment Methods',        icon: <CardIcon />,  screen: 'PaymentMethods' },
-  { label: 'Become a Supplier',       icon: <StarIcon />,  screen: 'SupplierApplication' },
+  { label: 'Work With Us',             icon: <StarIcon />,  url: 'https://www.homegenieios.com/work-with-us' },
 ];
 
 const SUPPORT_ITEMS = [
@@ -295,6 +295,7 @@ const ABOUT_ITEMS = [
       }
     },
   },
+  { label: 'Website',        icon: <GlobeIcon />,          url: 'https://www.homegenieios.com/' },
   { label: 'Terms of Use',   icon: <FileIcon />,          screen: 'TermsOfUse' },
   { label: 'Privacy Policy', icon: <LockSettingsIcon />,  screen: 'PrivacyPolicy' },
   { label: 'App Version',    icon: <InfoIcon />, value: 'v1.0.0' },
@@ -311,12 +312,18 @@ const getInitialProfile = (user) => ({
 });
 
 export default function ProfileScreen({ navigation }) {
-  const { liked, toggleLiked } = useLiked();
+  const { liked, toggleLiked, likedProducts } = useLiked();
   const { shared, addShared } = useShared();
   const { user, signOut, deleteAccount, refreshUser } = useAuth();
   const [activeTab, setActiveTab] = useState(0);
+  const [likedFilter, setLikedFilter] = useState(0); // 0 = Wishes, 1 = Products
   const [gridCols, setGridCols] = useState(2);
   const cycleGrid = () => setGridCols(c => c === 3 ? 1 : c + 1);
+
+  // Reset pill filter to Wishes whenever user leaves the Liked tab
+  React.useEffect(() => {
+    if (activeTab !== 1) setLikedFilter(0);
+  }, [activeTab]);
   const approxCardWidth = width / gridCols;
   const cardRadius = Math.min(Math.round(approxCardWidth * (gridCols === 3 ? 0.025 : 0.05)), 12);
 
@@ -577,6 +584,26 @@ export default function ProfileScreen({ navigation }) {
         </View>
         <View style={styles.tabBorder} />
 
+        {/* ── Wishes / Products pill bar (Liked tab only) ── */}
+        {activeTab === 1 && (
+          <View style={styles.likedPillRow}>
+            <View style={styles.likedPillTrack}>
+              {['Wishes', 'Products'].map((label, i) => (
+                <TouchableOpacity
+                  key={label}
+                  onPress={() => setLikedFilter(i)}
+                  activeOpacity={0.75}
+                  style={[styles.likedPill, likedFilter === i && styles.likedPillActive]}
+                >
+                  <Text style={[styles.likedPillTxt, likedFilter === i && styles.likedPillTxtActive]}>
+                    {label}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+        )}
+
         {/* ── Designs Grid ── */}
         {designsLoading ? (
           <View style={[styles.grid, { paddingHorizontal: space.lg, paddingTop: space.base }]}>
@@ -587,6 +614,38 @@ export default function ProfileScreen({ navigation }) {
             ))}
           </View>
         ) : (() => {
+          // Products tab inside Liked
+          if (activeTab === 1 && likedFilter === 1) {
+            const products = Object.values(likedProducts ?? {});
+            if (products.length === 0) {
+              return (
+                <View style={styles.emptyGrid}>
+                  <Text style={styles.emptyGridTitle}>No liked products yet</Text>
+                  <Text style={styles.emptyGridSub}>Tap the heart on any product page to save it here.</Text>
+                </View>
+              );
+            }
+            return (
+              <View style={[styles.grid, gridCols === 1 && { paddingHorizontal: 10 }]}>
+                {products.map(product => (
+                  <View key={product.id} style={{ width: colWidthPct(gridCols), padding: gridCols === 1 ? 5 : 1 }}>
+                    <PressableCard
+                      style={[styles.card, { borderRadius: cardRadius }, gridCols === 1 && styles.cardSingle]}
+                      animStyle={{ width: '100%' }}
+                      onPress={() => navigation.navigate('ProductDetail', { product })}
+                    >
+                      <View style={[styles.cardImg, { borderRadius: cardRadius }]}>
+                        <View style={styles.cardImgBg} />
+                        <CardImage uri={product.imageUrl} style={styles.cardImgPhoto} resizeMode="cover" />
+                      </View>
+                    </PressableCard>
+                  </View>
+                ))}
+              </View>
+            );
+          }
+
+          // Wishes / designs grid
           const filtered = (activeTab === 0
             ? myDesigns
             : activeTab === 1
@@ -690,7 +749,7 @@ export default function ProfileScreen({ navigation }) {
                   <TouchableOpacity
                     key={item.label}
                     style={[styles.settingsItem, i < ACCOUNT_ITEMS.length - 1 && styles.settingsItemBorder]}
-                    onPress={() => { setShowSettings(false); if (item.screen) navigation?.navigate(item.screen); }}
+                    onPress={() => { setShowSettings(false); if (item.url) { Linking.openURL(item.url).catch(() => null); } else if (item.screen) { navigation?.navigate(item.screen); } }}
                     activeOpacity={0.65}
                   >
                     <View style={styles.settingsLeft}>
@@ -776,6 +835,9 @@ export default function ProfileScreen({ navigation }) {
                       if (item.action) {
                         setShowSettings(false);
                         setTimeout(() => item.action(), 300);
+                      } else if (item.url) {
+                        setShowSettings(false);
+                        Linking.openURL(item.url).catch(() => null);
                       } else if (item.screen) {
                         setShowSettings(false);
                         navigation?.navigate(item.screen);
@@ -1209,6 +1271,61 @@ const styles = StyleSheet.create({
     height: 1,
     backgroundColor: 'rgba(0,0,0,0.06)',
     marginBottom: 0,
+  },
+
+  // Liked tab pill bar
+  likedPillRow: {
+    paddingHorizontal: space.lg + 40,
+    paddingVertical: space.sm,
+  },
+  likedPillTrack: {
+    flexDirection: 'row',
+    borderRadius: 28,
+    backgroundColor: '#F8F8F8',
+    padding: 3,
+    borderWidth: 1,
+    borderColor: '#F3F3F3',
+  },
+  likedPill: {
+    flex: 1,
+    height: 30,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  likedPillActive: {
+    backgroundColor: '#FFFFFF',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.08,
+    shadowRadius: 3,
+    elevation: 2,
+  },
+  likedPillTxt: {
+    fontSize: 13,
+    fontWeight: '600',
+    fontFamily: 'Geist_600SemiBold',
+    color: '#AAAAAA',
+  },
+  likedPillTxtActive: {
+    color: '#67ACE9',
+  },
+  productCardInfo: {
+    paddingHorizontal: space.sm,
+    paddingVertical: space.xs,
+  },
+  productCardName: {
+    fontSize: 12,
+    fontWeight: '600',
+    fontFamily: 'Geist_600SemiBold',
+    color: C.textPrimary,
+  },
+  productCardPrice: {
+    fontSize: 12,
+    fontWeight: '700',
+    fontFamily: 'Geist_700Bold',
+    color: '#1D4ED8',
+    marginTop: 2,
   },
 
   // Grid — spacing handled by per-card padding (matches Explore)
