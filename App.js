@@ -11,6 +11,7 @@ import {
 import { NavigationContainer } from '@react-navigation/native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import LensLoader from './src/components/LensLoader';
+import GenieLoader from './src/components/GenieLoader';
 import { LikedProvider } from './src/context/LikedContext';
 import { SharedProvider } from './src/context/SharedContext';
 import { CartProvider, useCart } from './src/context/CartContext';
@@ -309,7 +310,7 @@ function RootNavigator() {
     return (
       <View style={styles.loadingScreen}>
         <Text style={styles.loadingWordmark}>HomeGenie</Text>
-        <LensLoader size={48} style={{ marginTop: 24 }} />
+        <GenieLoader size={80} animating style={{ marginTop: 24 }} />
       </View>
     );
   }
@@ -362,7 +363,7 @@ export default function App() {
         <Text style={styles.loadingWordmark}>
           HomeGenie
         </Text>
-        <LensLoader size={48} style={{ marginTop: 24 }} />
+        <GenieLoader size={80} animating style={{ marginTop: 24 }} />
       </View>
     );
   }

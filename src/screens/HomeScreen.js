@@ -25,7 +25,7 @@ import * as ImagePicker from 'expo-image-picker';
 let MediaLibrary = null;
 try { MediaLibrary = require('expo-media-library'); } catch {} // optional — needs dev client rebuild
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import Svg, { Path, Circle, Line, Polyline, Rect, Ellipse, G } from 'react-native-svg';
+import Svg, { Path, Circle, Line, Polyline, Rect, Ellipse, G, Defs, LinearGradient as SvgLinearGradient, Stop } from 'react-native-svg';
 import LensLoader from '../components/LensLoader';
 import { LinearGradient } from 'expo-linear-gradient';
 import { fontSize, fontWeight, letterSpacing, palette, space, radius, shadow, typeScale, roomChipColors } from '../constants/tokens';
@@ -49,6 +49,7 @@ import { useSubscription } from '../context/SubscriptionContext';
 import { generateWithBFL } from '../services/bfl';
 import TabScreenFade from '../components/TabScreenFade';
 import ProductVisualizeModal from '../components/ProductVisualizeModal';
+import GenieLoader from '../components/GenieLoader';
 import { sendNotificationIfEnabled } from '../services/notifications';
 
 const { width, height } = Dimensions.get('window');
@@ -427,24 +428,46 @@ function UserIcon() {
 }
 
 function SendIcon() {
+  // White genie lamp silhouette — replaces paper plane in generate button
   return (
-    <Svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round">
-      <Line x1={22} y1={2} x2={11} y2={13} />
-      <Polyline points="22 2 15 22 11 13 2 9 22 2" />
+    <Svg width={18} height={18} viewBox="92 176 266 155" fill="none">
+      <Path d="M326.155 194.661C306.203 193.551 286.596 223.576 265.287 232.582C259.954 218.661 247.863 208.794 233.603 206.723C231.53 206.386 230.008 204.515 230.02 202.32V201.347C230.044 200.249 230.428 199.189 231.123 198.353C233.699 195.023 234.837 190.732 234.262 186.491C233.675 182.25 231.945 180 228 180C223.945 180 221.632 183.609 221.596 188.674C221.56 192.191 222.71 195.622 224.819 198.353C225.49 199.201 225.862 200.262 225.886 201.347V202.32C225.934 204.441 224.52 206.287 222.53 206.723C206.748 209.006 193.77 220.794 189.432 236.748C178 232.457 167.143 226.669 157.138 219.497C130.008 200.91 117.852 197.824 106.271 197.234C106.271 197.234 104.761 197.234 101.739 199.004L97.5928 201.372V201.385C96.2007 201.953 95.6735 205.674 96.2008 206.672C96.7161 207.67 99.1384 208.944 100.229 209.031C114.118 209.518 127.527 211.489 138.924 219.771C164.952 237.721 180.062 295.913 228.116 295.913C275.031 295.913 295.993 209.304 326.155 209.304C346.886 209.304 342.714 254.499 330.898 264.778C319.082 275.069 307.291 264.503 296.637 264.503C283.719 264.503 284.33 277.476 291.281 278.287C292.862 278.524 294.468 278.05 295.69 276.99C296.925 275.93 297.668 274.37 297.74 272.711C304.33 277.464 312.024 280.283 320.029 280.845C338.699 280.845 354 250.642 354 228.464C353.964 218.248 349.175 195.896 326.155 194.661ZM262.64 247.836C251.579 251.878 239.943 253.936 228.21 253.923C216.502 253.923 204.878 251.877 193.818 247.873C190.93 246.888 189.324 243.67 190.235 240.639C202.326 245.591 215.196 248.123 228.186 248.11C241.176 248.098 254.058 245.566 266.161 240.639C266.593 242.111 266.449 243.682 265.754 245.042C265.059 246.389 263.885 247.399 262.471 247.836H262.64ZM272.322 318.425V318.961C258.158 324.387 243.154 327.106 228.054 326.994C212.955 327.144 197.964 324.462 183.774 319.061V318.524C184.302 316.204 185.704 314.196 187.669 312.973C189.634 311.751 191.995 311.414 194.212 312.038C201.378 314.532 209.275 312.088 213.972 305.925C215.099 304.341 215.974 302.582 216.561 300.711C220.3 301.522 224.098 301.921 227.921 301.921C231.732 301.909 235.519 301.397 239.198 300.374C240.552 305.152 243.763 309.119 248.053 311.339C252.343 313.547 257.316 313.809 261.798 312.038C264.003 311.414 266.364 311.763 268.317 312.986C270.282 314.208 271.673 316.204 272.2 318.524L272.322 318.425Z" fill="#FFFFFF" />
+    </Svg>
+  );
+}
+
+// Full app logo icon — used next to "HomeGenie" text in header
+function HeaderLogoIcon({ size = 22 }) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 450 450">
+      <Defs>
+        <SvgLinearGradient id="hdrBgGrad" x1="225" y1="0" x2="225" y2="450" gradientUnits="userSpaceOnUse">
+          <Stop offset="0.144" stopColor="#67ACE9" />
+          <Stop offset="0.769" stopColor="#0B6DC3" />
+        </SvgLinearGradient>
+        <SvgLinearGradient id="hdrGenieGrad" x1="225.6" y1="176" x2="225.6" y2="327" gradientUnits="userSpaceOnUse">
+          <Stop offset="0.317" stopColor="#67ACE9" />
+          <Stop offset="0.861" stopColor="#0B6DC3" />
+        </SvgLinearGradient>
+      </Defs>
+      <Rect width="450" height="450" rx="100" fill="url(#hdrBgGrad)" />
+      <Path fillRule="evenodd" clipRule="evenodd" d="M197 74.5482L79.8429 154.709C69.2396 160.878 64 168.427 64 177.444V356.814C64 374.007 86.7806 388.057 114.655 388.057H334.344C362.219 388.057 385 374.007 385 356.814V177.444C385 168.427 379.74 160.878 369.136 154.709L256.5 74.5483C227.631 57.7131 224.313 57.9218 197 74.5482Z" fill="#FFFFFF" />
+      <Circle cx="225" cy="110.548" r="10" fill="#5AA4E4" />
+      <Path d="M326.155 194.661C306.203 193.551 286.596 223.576 265.287 232.582C259.954 218.661 247.863 208.794 233.603 206.723C231.53 206.386 230.008 204.515 230.02 202.32V201.347C230.044 200.249 230.428 199.189 231.123 198.353C233.699 195.023 234.837 190.732 234.262 186.491C233.675 182.25 231.945 180 228 180C223.945 180 221.632 183.609 221.596 188.674C221.56 192.191 222.71 195.622 224.819 198.353C225.49 199.201 225.862 200.262 225.886 201.347V202.32C225.934 204.441 224.52 206.287 222.53 206.723C206.748 209.006 193.77 220.794 189.432 236.748C178 232.457 167.143 226.669 157.138 219.497C130.008 200.91 117.852 197.824 106.271 197.234C106.271 197.234 104.761 197.234 101.739 199.004L97.5928 201.372V201.385C96.2007 201.953 95.6735 205.674 96.2008 206.672C96.7161 207.67 99.1384 208.944 100.229 209.031C114.118 209.518 127.527 211.489 138.924 219.771C164.952 237.721 180.062 295.913 228.116 295.913C275.031 295.913 295.993 209.304 326.155 209.304C346.886 209.304 342.714 254.499 330.898 264.778C319.082 275.069 307.291 264.503 296.637 264.503C283.719 264.503 284.33 277.476 291.281 278.287C292.862 278.524 294.468 278.05 295.69 276.99C296.925 275.93 297.668 274.37 297.74 272.711C304.33 277.464 312.024 280.283 320.029 280.845C338.699 280.845 354 250.642 354 228.464C353.964 218.248 349.175 195.896 326.155 194.661ZM262.64 247.836C251.579 251.878 239.943 253.936 228.21 253.923C216.502 253.923 204.878 251.877 193.818 247.873C190.93 246.888 189.324 243.67 190.235 240.639C202.326 245.591 215.196 248.123 228.186 248.11C241.176 248.098 254.058 245.566 266.161 240.639C266.593 242.111 266.449 243.682 265.754 245.042C265.059 246.389 263.885 247.399 262.471 247.836H262.64ZM272.322 318.425V318.961C258.158 324.387 243.154 327.106 228.054 326.994C212.955 327.144 197.964 324.462 183.774 319.061V318.524C184.302 316.204 185.704 314.196 187.669 312.973C189.634 311.751 191.995 311.414 194.212 312.038C201.378 314.532 209.275 312.088 213.972 305.925C215.099 304.341 215.974 302.582 216.561 300.711C220.3 301.522 224.098 301.921 227.921 301.921C231.732 301.909 235.519 301.397 239.198 300.374C240.552 305.152 243.763 309.119 248.053 311.339C252.343 313.547 257.316 313.809 261.798 312.038C264.003 311.414 266.364 311.763 268.317 312.986C270.282 314.208 271.673 316.204 272.2 318.524L272.322 318.425Z" fill="url(#hdrGenieGrad)" />
     </Svg>
   );
 }
 
 function CameraSmallIcon() {
   return (
-    <Svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.9)" strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round">
+    <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.9)" strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round">
       <Path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
       <Circle cx={12} cy={13} r={4} />
     </Svg>
   );
 }
 
-function GalleryIcon({ size = 18, color = 'rgba(255,255,255,0.9)' }) {
+function GalleryIcon({ size = 20, color = 'rgba(255,255,255,0.9)' }) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round">
       <Rect x={3} y={3} width={18} height={18} rx={2} ry={2} />
@@ -828,6 +851,7 @@ export default function HomeScreen({ navigation, route }) {
   const { addToCart, items: cartItems } = useCart();
   const { liked } = useLiked();
   const [prompt, setPrompt] = useState('');
+  const [inputExpanded, setInputExpanded] = useState(false);
   const [greeting, setGreeting] = useState(getGreeting());
   const [recentlyViewed, setRecentlyViewed] = useState([]);
 
@@ -857,11 +881,8 @@ export default function HomeScreen({ navigation, route }) {
   const loadingProgress = useRef(new Animated.Value(0)).current;
   const loadingAnim = useRef(null);
 
-  // Camera lens loader animation
-  const lensRotate  = useRef(new Animated.Value(0)).current;  // outer barrel rotation
-  const lensScale   = useRef(new Animated.Value(1)).current;  // aperture breathe
-  const lensDot     = useRef(new Animated.Value(0.5)).current; // center dot pulse
-  const lensAnim    = useRef(null);
+  // Camera lens loader animation (legacy refs kept for send-button mini spinner)
+  const lensRotate  = useRef(new Animated.Value(0)).current;
 
   // ── Spring press animations (tab-bar style) ──────────────────────────────
   const cameraScale  = useRef(new Animated.Value(1)).current;
@@ -1065,61 +1086,8 @@ export default function HomeScreen({ navigation, route }) {
     }
   }, [loadingProgress]);
 
-  // Camera lens loader — start/stop with generating
-  useEffect(() => {
-    if (generating) {
-      lensRotate.setValue(0);
-      lensScale.setValue(1);
-      lensDot.setValue(0.5);
-      lensAnim.current = Animated.loop(
-        Animated.parallel([
-          // Outer barrel: full rotation every 4s
-          Animated.timing(lensRotate, {
-            toValue: 1,
-            duration: 4000,
-            easing: Easing.linear,
-            useNativeDriver: true,
-          }),
-          // Aperture blades: breathe open → close
-          Animated.sequence([
-            Animated.timing(lensScale, {
-              toValue: 1.1,
-              duration: 1400,
-              easing: Easing.inOut(Easing.ease),
-              useNativeDriver: true,
-            }),
-            Animated.timing(lensScale, {
-              toValue: 0.88,
-              duration: 1400,
-              easing: Easing.inOut(Easing.ease),
-              useNativeDriver: true,
-            }),
-          ]),
-          // Center dot: glow pulse
-          Animated.sequence([
-            Animated.timing(lensDot, {
-              toValue: 1,
-              duration: 900,
-              easing: Easing.inOut(Easing.ease),
-              useNativeDriver: true,
-            }),
-            Animated.timing(lensDot, {
-              toValue: 0.25,
-              duration: 900,
-              easing: Easing.inOut(Easing.ease),
-              useNativeDriver: true,
-            }),
-          ]),
-        ])
-      );
-      lensAnim.current.start();
-    } else {
-      if (lensAnim.current) {
-        lensAnim.current.stop();
-        lensAnim.current = null;
-      }
-    }
-  }, [generating]);
+  // GenieLoader animation is self-contained — no manual start/stop needed here.
+  // The `generating` prop drives it directly via <GenieLoader animating={generating} />.
 
   // Rotating loading messages — cycle every 3s with fade
   useEffect(() => {
@@ -1754,28 +1722,15 @@ export default function HomeScreen({ navigation, route }) {
       >
         {/* ── Hero section — fills visible screen ─────────────────────── */}
         <View style={styles.overlay}>
-          {/* Top bar: logo + icons */}
+          {/* Top bar: centered logo */}
           <View style={styles.topBar}>
             <View style={styles.logoRow}>
               <Text style={styles.logo}>HomeGenie</Text>
-              <View style={styles.logoDot} />
+              <View style={styles.logoIcon}>
+                <HeaderLogoIcon size={44} />
+              </View>
             </View>
-            <View style={styles.topIcons}>
-              <TouchableOpacity
-                style={styles.iconBtn}
-                activeOpacity={0.75}
-                onPress={() => navigation?.navigate('Notifications')}
-              >
-                <BellIcon />
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.iconBtn}
-                onPress={() => navigation?.navigate('Profile')}
-                activeOpacity={0.75}
-              >
-                <UserIcon />
-              </TouchableOpacity>
-            </View>
+            <Text style={styles.wishTagline}>Your dream room, one wish away</Text>
           </View>
 
           {/* Blur overlay when generating */}
@@ -1783,70 +1738,10 @@ export default function HomeScreen({ navigation, route }) {
             <BlurView intensity={40} tint="dark" style={StyleSheet.absoluteFill} />
           )}
 
-          {/* Centered headline + subtitle — hidden during generation */}
-          {!generating && (
-            <View style={styles.heroCentered}>
-              <Text style={styles.headline}>Wish Your Space</Text>
-              <Text style={styles.heroSubtitle}>
-                Describe your style, then add your room photo
-              </Text>
-            </View>
-          )}
-
-          {/* Generation status — camera lens loader */}
+          {/* Generation status — GenieLoader animation */}
           {generating && (
             <View style={styles.heroCentered}>
-              <View style={{ width: 100, height: 100, alignItems: 'center', justifyContent: 'center' }}>
-
-                {/* Layer 1: outer barrel — dashed ring, slow CW rotation */}
-                <Animated.View style={{
-                  position: 'absolute',
-                  transform: [{ rotate: lensRotate.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '360deg'] }) }],
-                }}>
-                  <Svg width={100} height={100} viewBox="0 0 100 100">
-                    <Circle cx={50} cy={50} r={46} stroke="#67ACE9" strokeWidth={1.5}
-                      fill="none" strokeDasharray="5 7" strokeLinecap="round" />
-                  </Svg>
-                </Animated.View>
-
-                {/* Layer 2: middle ring — solid, slow CCW rotation */}
-                <Animated.View style={{
-                  position: 'absolute',
-                  transform: [{ rotate: lensRotate.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '-200deg'] }) }],
-                }}>
-                  <Svg width={100} height={100} viewBox="0 0 100 100">
-                    <Circle cx={50} cy={50} r={34} stroke="#0B6DC3" strokeWidth={1}
-                      fill="none" opacity={0.65} strokeDasharray="10 5" strokeLinecap="round" />
-                  </Svg>
-                </Animated.View>
-
-                {/* Layer 3: inner ring — static */}
-                <Svg width={100} height={100} viewBox="0 0 100 100" style={{ position: 'absolute' }}>
-                  <Circle cx={50} cy={50} r={22} stroke="#67ACE9" strokeWidth={0.8} fill="none" opacity={0.4} />
-                </Svg>
-
-                {/* Layer 4: aperture blades — 6 ellipses breathe with lensScale */}
-                <Animated.View style={{ position: 'absolute', transform: [{ scale: lensScale }] }}>
-                  <Svg width={100} height={100} viewBox="0 0 100 100">
-                    {[0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330].map((angle, i) => (
-                      <G key={i} rotation={angle} origin="50, 50">
-                        <Circle cx={50} cy={33} r={2.5} fill="#fff" opacity={0.88} />
-                      </G>
-                    ))}
-                    {/* Inner glass fill */}
-                    <Circle cx={50} cy={50} r={12} fill="rgba(11,109,195,0.2)" />
-                  </Svg>
-                </Animated.View>
-
-                {/* Layer 5: center dot — glows with lensDot */}
-                <Animated.View style={{ position: 'absolute', opacity: lensDot }}>
-                  <Svg width={100} height={100} viewBox="0 0 100 100">
-                    <Circle cx={50} cy={50} r={9} fill="rgba(255,255,255,0.12)" />
-                    <Circle cx={50} cy={50} r={4} fill="#fff" />
-                  </Svg>
-                </Animated.View>
-
-              </View>
+              <GenieLoader size={100} animating={generating} />
               <Animated.Text style={[styles.genStatusText, { opacity: loadingMsgOpacity }]}>
                 {loadingMessages[loadingMsgIndex] || genStatus || 'Designing your space…'}
               </Animated.Text>
@@ -1886,7 +1781,7 @@ export default function HomeScreen({ navigation, route }) {
                 ))}
               </ScrollView>
             )}
-            <Animated.View style={[styles.inputBar, { transform: [{ scale: inputScale }] }]}>
+            <Animated.View style={[styles.inputBar, { borderRadius: inputExpanded ? 16 : 36, transform: [{ scale: inputScale }] }]}>
               {/* Camera icon — badge only when photo came from camera */}
               <View>
                 <TouchableOpacity
@@ -1931,32 +1826,50 @@ export default function HomeScreen({ navigation, route }) {
                 placeholderTextColor="rgba(255,255,255,0.45)"
                 value={prompt}
                 onChangeText={setPrompt}
+                multiline
+                textAlignVertical="center"
+                blurOnSubmit
                 returnKeyType="send"
                 editable={!generating}
                 maxLength={200}
                 onSubmitEditing={runGeneration}
+                onContentSizeChange={(e) => setInputExpanded(e.nativeEvent.contentSize.height > 28)}
                 onFocus={() => springOut(inputScale)}
                 onBlur={() => Animated.spring(inputScale, { toValue: 1, useNativeDriver: true, tension: 200, friction: 7 }).start()}
               />
               <TouchableOpacity
-                style={[styles.inputSendBtn, (!prompt.trim() && !photo) && styles.inputSendBtnOff]}
+                style={styles.inputSendBtnWrap}
                 activeOpacity={1}
                 onPress={runGeneration}
                 disabled={generating}
                 onPressIn={() => !generating && springIn(sendScale)}
                 onPressOut={() => !generating && springOut(sendScale)}
               >
-                <Animated.View style={{ transform: [{ scale: sendScale }] }}>
-                  {generating ? (
-                    <Animated.View style={{ transform: [{ rotate: lensRotate.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '360deg'] }) }] }}>
-                      <Svg width={20} height={20} viewBox="0 0 24 24">
-                        <Circle cx={12} cy={12} r={10} stroke="#fff" strokeWidth={1.2} fill="none" strokeDasharray="6 4" strokeLinecap="round" />
-                        <Circle cx={12} cy={12} r={5}  stroke="rgba(255,255,255,0.55)" strokeWidth={1} fill="none" />
-                        <Circle cx={12} cy={12} r={2}  fill="#fff" />
-                      </Svg>
+                {(!prompt.trim() && !photo) ? (
+                  <View style={[styles.inputSendBtn, styles.inputSendBtnOff]}>
+                    <Animated.View style={{ transform: [{ scale: sendScale }] }}>
+                      <SendIcon />
                     </Animated.View>
-                  ) : <SendIcon />}
-                </Animated.View>
+                  </View>
+                ) : (
+                  <LinearGradient
+                    colors={['#67ACE9', '#0B6DC3']}
+                    locations={[0.32, 0.86]}
+                    style={styles.inputSendBtn}
+                  >
+                    <Animated.View style={{ transform: [{ scale: sendScale }] }}>
+                      {generating ? (
+                        <Animated.View style={{ transform: [{ rotate: lensRotate.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '360deg'] }) }] }}>
+                          <Svg width={20} height={20} viewBox="0 0 24 24">
+                            <Circle cx={12} cy={12} r={10} stroke="#fff" strokeWidth={1.2} fill="none" strokeDasharray="6 4" strokeLinecap="round" />
+                            <Circle cx={12} cy={12} r={5}  stroke="rgba(255,255,255,0.55)" strokeWidth={1} fill="none" />
+                            <Circle cx={12} cy={12} r={2}  fill="#fff" />
+                          </Svg>
+                        </Animated.View>
+                      ) : <SendIcon />}
+                    </Animated.View>
+                  </LinearGradient>
+                )}
               </TouchableOpacity>
             </Animated.View>
             {/* Loading progress bar */}
@@ -2458,30 +2371,32 @@ const styles = StyleSheet.create({
   // ── Top bar ──────────────────────────────────────────────────────────────────
   topBar: {
     position: 'absolute',
-    top: 60,
+    top: 80,
     left: 0,
     right: 0,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: 'column',
     alignItems: 'center',
     paddingHorizontal: space.lg,
     zIndex: 10,
   },
+  wishTagline: {
+    fontSize: fontSize.md,
+    fontWeight: fontWeight.semibold,
+    fontFamily: 'Geist_600SemiBold',
+    color: 'rgba(255,255,255,0.90)',
+    marginTop: 6,
+    letterSpacing: letterSpacing.normal,
+  },
   logoRow: { flexDirection: 'row', alignItems: 'center' },
   logo: {
-    fontSize: fontSize.lg,
+    fontSize: fontSize['3xl'],
     fontWeight: fontWeight.bold,
     fontFamily: 'Geist_700Bold',
     color: '#FFFFFF',
     letterSpacing: letterSpacing.tight,
   },
-  logoDot: {
-    width: space.sm,
-    height: space.sm,
-    borderRadius: space.xs,
-    backgroundColor: C.primary,
-    marginLeft: space.xs,
-    marginTop: 2,
+  logoIcon: {
+    marginLeft: 8,
   },
   topIcons: { flexDirection: 'row', gap: space.sm },
   iconBtn: {
@@ -2580,25 +2495,25 @@ const styles = StyleSheet.create({
     fontFamily: 'Geist_500Medium',
   },
 
-  // Input bar — pinned to hero bottom via absolute positioning
+  // Input bar — vertically centered in hero
   heroBottom: {
     position: 'absolute',
-    bottom: 56,
+    top: '58%',
     left: 16,
     right: 16,
+    transform: [{ translateY: -30 }],
   },
   inputBar: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     backgroundColor: 'rgba(255,255,255,0.22)',
-    borderRadius: 9999,
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.30)',
     paddingLeft: 8,
     paddingRight: 6,
-    paddingVertical: 4,
-    height: 44,
-    maxHeight: 44,
+    paddingVertical: 6,
+    minHeight: 44,
+    maxHeight: 120,
   },
   inputIconBtn: {
     width: 34, height: 34, borderRadius: 17,
@@ -2609,12 +2524,16 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontFamily: 'Geist_400Regular',
     color: '#fff',
-    paddingVertical: 0,
+    paddingTop: 8,
+    paddingBottom: 8,
     paddingHorizontal: 6,
+  },
+  inputSendBtnWrap: {
+    overflow: 'hidden',
+    borderRadius: 17,
   },
   inputSendBtn: {
     width: 34, height: 34, borderRadius: 17,
-    backgroundColor: C.primary,
     alignItems: 'center', justifyContent: 'center',
   },
   inputSendBtnOff: {
@@ -2638,7 +2557,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '400',
     fontFamily: 'Geist_400Regular',
-    marginTop: 20,
+    marginTop: 56,
     textAlign: 'center',
     textShadowColor: 'rgba(0,0,0,0.4)',
     textShadowOffset: { width: 0, height: 1 },

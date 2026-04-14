@@ -35,7 +35,8 @@ import {
   Share,
   Pressable,
 } from 'react-native';
-import Svg, { Path, Circle, Polyline, Line, Rect } from 'react-native-svg';
+import Svg, { Path, Circle, Polyline, Line, Rect, Defs, LinearGradient as SvgLinearGradient, Stop } from 'react-native-svg';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useCart } from '../context/CartContext';
 import { useLiked } from '../context/LikedContext';
@@ -137,11 +138,10 @@ const ChevRight = ({ size = 14, color = uiColors.textTertiary }) => (
 );
 
 // Supplier row icons — from custom SVG set (tight square viewBoxes for consistent sizing)
-const CameraIcon = ({ size = 25.5, color = uiColors.textSecondary }) => (
-  <Svg width={size} height={size} viewBox="3 0 30 30" fill="none">
-    <Path d="M6 12.819C6 11.446 7.113 10.333 8.486 10.333C9.416 10.333 10.268 9.814 10.695 8.988L11.778 6.889C12.098 6.269 12.257 5.96 12.491 5.732C12.706 5.523 12.966 5.365 13.25 5.27C13.559 5.167 13.908 5.167 14.605 5.167H21.395C22.092 5.167 22.441 5.167 22.75 5.27C23.035 5.365 23.294 5.523 23.509 5.732C23.743 5.96 23.903 6.269 24.222 6.889L25.306 8.988C25.732 9.814 26.584 10.333 27.514 10.333C28.887 10.333 30 11.446 30 12.819V19.833C30 22.662 30 24.076 29.121 24.955C28.243 25.833 26.828 25.833 24 25.833H12C9.172 25.833 7.757 25.833 6.879 24.955C6 24.076 6 22.662 6 19.833V12.819Z" stroke={color} strokeWidth={1}/>
-    <Circle cx="18" cy="16.792" r="4.667" stroke={color} strokeWidth={1}/>
-    <Path d="M28.9998 0L29.891 3.796L33 4.819L30.098 5.635L28.9999 9.886L27.9387 5.635L25 4.819L28.0756 3.796L28.9998 0Z" fill="#0B6DC3"/>
+// White genie lamp icon for the visualizer button
+const GenieLampIcon = ({ size = 20 }) => (
+  <Svg width={size} height={size} viewBox="92 176 266 155" fill="none">
+    <Path d="M326.155 194.661C306.203 193.551 286.596 223.576 265.287 232.582C259.954 218.661 247.863 208.794 233.603 206.723C231.53 206.386 230.008 204.515 230.02 202.32V201.347C230.044 200.249 230.428 199.189 231.123 198.353C233.699 195.023 234.837 190.732 234.262 186.491C233.675 182.25 231.945 180 228 180C223.945 180 221.632 183.609 221.596 188.674C221.56 192.191 222.71 195.622 224.819 198.353C225.49 199.201 225.862 200.262 225.886 201.347V202.32C225.934 204.441 224.52 206.287 222.53 206.723C206.748 209.006 193.77 220.794 189.432 236.748C178 232.457 167.143 226.669 157.138 219.497C130.008 200.91 117.852 197.824 106.271 197.234C106.271 197.234 104.761 197.234 101.739 199.004L97.5928 201.372V201.385C96.2007 201.953 95.6735 205.674 96.2008 206.672C96.7161 207.67 99.1384 208.944 100.229 209.031C114.118 209.518 127.527 211.489 138.924 219.771C164.952 237.721 180.062 295.913 228.116 295.913C275.031 295.913 295.993 209.304 326.155 209.304C346.886 209.304 342.714 254.499 330.898 264.778C319.082 275.069 307.291 264.503 296.637 264.503C283.719 264.503 284.33 277.476 291.281 278.287C292.862 278.524 294.468 278.05 295.69 276.99C296.925 275.93 297.668 274.37 297.74 272.711C304.33 277.464 312.024 280.283 320.029 280.845C338.699 280.845 354 250.642 354 228.464C353.964 218.248 349.175 195.896 326.155 194.661ZM262.64 247.836C251.579 251.878 239.943 253.936 228.21 253.923C216.502 253.923 204.878 251.877 193.818 247.873C190.93 246.888 189.324 243.67 190.235 240.639C202.326 245.591 215.196 248.123 228.186 248.11C241.176 248.098 254.058 245.566 266.161 240.639C266.593 242.111 266.449 243.682 265.754 245.042C265.059 246.389 263.885 247.399 262.471 247.836H262.64ZM272.322 318.425V318.961C258.158 324.387 243.154 327.106 228.054 326.994C212.955 327.144 197.964 324.462 183.774 319.061V318.524C184.302 316.204 185.704 314.196 187.669 312.973C189.634 311.751 191.995 311.414 194.212 312.038C201.378 314.532 209.275 312.088 213.972 305.925C215.099 304.341 215.974 302.582 216.561 300.711C220.3 301.522 224.098 301.921 227.921 301.921C231.732 301.909 235.519 301.397 239.198 300.374C240.552 305.152 243.763 309.119 248.053 311.339C252.343 313.547 257.316 313.809 261.798 312.038C264.003 311.414 266.364 311.763 268.317 312.986C270.282 314.208 271.673 316.204 272.2 318.524L272.322 318.425Z" fill="#FFFFFF" />
   </Svg>
 );
 
@@ -423,8 +423,14 @@ function SupplierRow({ brand, inStock, onCamera, onLike, isLiked, onShare }) {
         )}
       </View>
       <View style={sup.actions}>
-        <BouncyIconButton style={sup.iconBtnCamera} onPress={onCamera}>
-          <CameraIcon />
+        <BouncyIconButton style={sup.iconBtnGenie} onPress={onCamera}>
+          <LinearGradient
+            colors={['#67ACE9', '#0B6DC3']}
+            locations={[0.32, 0.86]}
+            style={sup.genieBtnGradient}
+          >
+            <GenieLampIcon size={22} />
+          </LinearGradient>
         </BouncyIconButton>
         <BouncyIconButton style={sup.iconBtn} onPress={onLike}>
           <HeartIcon size={22} filled={isLiked} />
@@ -494,19 +500,18 @@ const sup = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  iconBtnCamera: {
+  iconBtnGenie: {
     width: touchTargets.min,
     height: touchTargets.min,
     borderRadius: touchTargets.min / 2,
-    backgroundColor: uiColors.surface,
-    borderWidth: 1.5,
-    borderColor: '#67ACE9',
+    overflow: 'hidden',
+  },
+  genieBtnGradient: {
+    width: '100%',
+    height: '100%',
+    borderRadius: touchTargets.min / 2,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#67ACE9',
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.6,
-    shadowRadius: 8,
     elevation: 4,
   },
 });

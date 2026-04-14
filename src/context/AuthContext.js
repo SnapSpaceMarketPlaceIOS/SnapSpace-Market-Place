@@ -134,21 +134,11 @@ export function AuthProvider({ children }) {
     if (!process.env.EXPO_PUBLIC_SUPABASE_URL) {
       throw new Error('App is not configured. Please contact support.');
     }
-    // withRetry handles iOS 26.x beta cold-connection failures — first attempt
-    // often times out, second succeeds once the network is warmed up.
-    const { data, error } = await withRetry(
-      () => withTimeout(
-        supabase.auth.signUp({
-          email: email.trim().toLowerCase(),
-          password,
-          options: { data: { full_name: fullName.trim() } },
-        }),
-        12000,
-        'Connection timed out. Please check your internet connection and try again.',
-      ),
-      2,    // 2 total attempts (1 automatic retry)
-      1500, // 1.5s cool-down between attempts
-    );
+    const { data, error } = await supabase.auth.signUp({
+      email: email.trim().toLowerCase(),
+      password,
+      options: { data: { full_name: fullName.trim() } },
+    });
     if (error) throw new Error(error.message);
     // If Supabase requires email confirmation, session will be null here.
     // The user must verify their email before they can sign in.
@@ -157,26 +147,18 @@ export function AuthProvider({ children }) {
 
   /**
    * Sign in with email and password.
-   * - Times out after 15s to prevent an infinite spinner on slow networks.
+   * - Lets Supabase handle its own network timeout (no artificial cap).
    * - Eagerly sets user state after the Supabase call resolves so that
    *   any screen rendered after navigation.reset() immediately has a user.
    * Throws an Error with a user-friendly message on failure.
    */
   const signIn = async (email, password) => {
-    // withRetry handles iOS 26.x beta cold-connection failures — first attempt
-    // often times out, second succeeds once the network is warmed up.
-    const { data, error } = await withRetry(
-      () => withTimeout(
-        supabase.auth.signInWithPassword({
-          email: email.trim().toLowerCase(),
-          password,
-        }),
-        12000,
-        'Connection timed out. Please check your internet and try again.',
-      ),
-      2,    // 2 total attempts (1 automatic retry)
-      1500, // 1.5s cool-down between attempts
-    );
+    // Call Supabase directly — no withTimeout wrapper so iOS 26.x simulator
+    // cold TLS handshakes (which can take 30-60s) are not prematurely killed.
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: email.trim().toLowerCase(),
+      password,
+    });
 
     if (error) {
       if (error.message.includes('Email not confirmed')) {
