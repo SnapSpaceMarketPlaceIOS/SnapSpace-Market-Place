@@ -26,7 +26,6 @@ import theme from '../constants/theme';
 import { useLiked } from '../context/LikedContext';
 import { PRODUCT_CATALOG } from '../data/productCatalog';
 import { getPublicDesigns } from '../services/supabase';
-import { getImagesForRoom } from '../data/imagePool';
 import PressableCard from '../components/PressableCard';
 import Skeleton from '../components/Skeleton';
 import { SellerName } from '../components/VerifiedBadge';
@@ -602,36 +601,6 @@ const ROOM_LABEL_MAP = {
   nursery: 'Nursery', dorm: 'Dorms',
 };
 
-// ── Fallback preview designs (shown when Supabase is unreachable) ──────────────
-// Uses verified Unsplash images from imagePool so guests always see real rooms.
-const FALLBACK_DESIGNS = [
-  ...getImagesForRoom('living-room').slice(0, 4).map((url, i) => ({
-    id: `preview-lr-${i}`, title: 'Living Room Design', user: 'HomeGenie', initial: 'H',
-    verified: false, imageUrl: url, roomType: 'living-room',
-    styles: ['minimalist'], products: [], tags: [], likes: 0, shares: 0, isPreview: true,
-  })),
-  ...getImagesForRoom('bedroom').slice(0, 3).map((url, i) => ({
-    id: `preview-br-${i}`, title: 'Bedroom Design', user: 'HomeGenie', initial: 'H',
-    verified: false, imageUrl: url, roomType: 'bedroom',
-    styles: ['modern'], products: [], tags: [], likes: 0, shares: 0, isPreview: true,
-  })),
-  ...getImagesForRoom('kitchen').slice(0, 2).map((url, i) => ({
-    id: `preview-kr-${i}`, title: 'Kitchen Design', user: 'HomeGenie', initial: 'H',
-    verified: false, imageUrl: url, roomType: 'kitchen',
-    styles: ['contemporary'], products: [], tags: [], likes: 0, shares: 0, isPreview: true,
-  })),
-  ...getImagesForRoom('dining-room').slice(0, 2).map((url, i) => ({
-    id: `preview-dr-${i}`, title: 'Dining Room Design', user: 'HomeGenie', initial: 'H',
-    verified: false, imageUrl: url, roomType: 'dining-room',
-    styles: ['rustic'], products: [], tags: [], likes: 0, shares: 0, isPreview: true,
-  })),
-  ...getImagesForRoom('office').slice(0, 1).map((url, i) => ({
-    id: `preview-of-${i}`, title: 'Office Design', user: 'HomeGenie', initial: 'H',
-    verified: false, imageUrl: url, roomType: 'office',
-    styles: ['minimalist'], products: [], tags: [], likes: 0, shares: 0, isPreview: true,
-  })),
-];
-
 // ── Main Component ─────────────────────────────────────────────────────────────
 
 export default function ExploreScreen({ navigation, route }) {
@@ -659,7 +628,6 @@ export default function ExploreScreen({ navigation, route }) {
   const [overrideProducts, setOverrideProducts] = useState(null); // IDs from "Shop all" featured navigation
   const [communityDesigns, setCommunityDesigns] = useState([]);
   const [communityLoading, setCommunityLoading] = useState(true);
-  const [communityFailed, setCommunityFailed] = useState(false);
   const consumedParamsRef = useRef(null);
   // Read route params via ref so useFocusEffect callback stays stable (no deps).
   // Assigning during render (not useEffect) ensures the ref is always current
@@ -792,12 +760,10 @@ export default function ExploreScreen({ navigation, route }) {
       if (communityDesigns.length > 0 && now - lastCommunityFetch.current < COMMUNITY_CACHE_TTL) return;
       lastCommunityFetch.current = now;
       setCommunityLoading(true);
-      setCommunityFailed(false);
 
-      // Safety net: after 8s stop showing skeletons and fall back to preview images
+      // Safety net: after 8s stop showing the skeleton — show empty state instead
       const fetchTimeoutId = setTimeout(() => {
         setCommunityLoading(false);
-        setCommunityFailed(true);
       }, 8000);
 
       getPublicDesigns(20, 0).then(designs => {
@@ -829,7 +795,6 @@ export default function ExploreScreen({ navigation, route }) {
       }).catch(err => {
         clearTimeout(fetchTimeoutId);
         console.warn('[Explore] Failed to load community designs:', err.message);
-        setCommunityFailed(true);
       }).finally(() => {
         clearTimeout(fetchTimeoutId);
         setCommunityLoading(false);
@@ -851,14 +816,7 @@ export default function ExploreScreen({ navigation, route }) {
   // CRITICAL: do NOT spread communityDesigns — a new array ref on every render
   // would invalidate the filteredDesigns useMemo cache, causing expensive
   // searchAndFilter scoring to re-run on every single render.
-  //
-  // When Supabase is unreachable (communityFailed) and no real designs loaded,
-  // fall back to FALLBACK_DESIGNS (verified Unsplash images) so the grid is
-  // never empty — guests always see real room photos, view-only.
-  // Show fallback immediately when no community designs are loaded yet —
-  // don't wait for the loading state to clear. Real designs replace it on success.
-  const usingFallback = (communityFailed || communityDesigns.length === 0) && !overrideDesigns;
-  const baseDesigns = overrideDesigns || (usingFallback ? FALLBACK_DESIGNS : communityDesigns);
+  const baseDesigns = overrideDesigns || communityDesigns;
 
   const filteredDesigns = useMemo(
     () => searchAndFilter(baseDesigns, search, activeCategory, activeRoomFilter, activeStyleFilter),
@@ -1137,7 +1095,7 @@ export default function ExploreScreen({ navigation, route }) {
                         await Share.share({ message: msg, url: design.imageUrl || '' });
                       } catch {}
                     }}
-                    onPress={design.isPreview ? undefined : () => {
+                    onPress={() => {
                       // Navigate immediately — ShopTheLookScreen handles fallback product matching
                       navigation.navigate('ShopTheLook', { design });
                     }}
