@@ -11,13 +11,14 @@
  *                        Fallback when no room photo is available.
  *
  * Cost: ~$0.08–0.10/generation
- * Auth: X-Key header using EXPO_PUBLIC_BFL_API_KEY
+ * Auth: X-Key header (injected by ai-proxy edge function in production)
  */
 
 // Rich visual descriptor helper is shared with replicate.js so the panel
 // prompt and the BFL fallback both benefit from specific color/material/
 // shape/type tokens instead of generic category labels.
 import { describeProductForPrompt } from '../utils/productDescriptor';
+import { proxyFetch } from './apiProxy';
 
 const BFL_BASE_URL     = 'https://api.bfl.ai/v1';
 const BFL_MODEL_KONTEXT = 'flux-kontext-pro';   // image-to-image: transforms user's actual room
@@ -146,14 +147,10 @@ async function submitAndPoll(apiKey, model, body, onStatus) {
   console.log(`[BFL] Submitting | model=${model}`);
   onStatus('Submitting to Black Forest Labs…');
 
-  const submitRes = await fetch(endpoint, {
+  const submitRes = await proxyFetch('bfl', endpoint, {
     method: 'POST',
-    headers: {
-      'X-Key':        apiKey,
-      'Content-Type': 'application/json',
-      'Accept':       'application/json',
-    },
-    body: JSON.stringify(body),
+    headers: { 'Accept': 'application/json' },
+    body,
   });
 
   if (!submitRes.ok) {
@@ -178,8 +175,9 @@ async function submitAndPoll(apiKey, model, body, onStatus) {
   for (let i = 0; i < MAX_POLLS; i++) {
     await new Promise((r) => setTimeout(r, POLL_INTERVAL));
 
-    const pollRes = await fetch(pollingUrl, {
-      headers: { 'X-Key': apiKey, 'Accept': 'application/json' },
+    const pollRes = await proxyFetch('bfl', pollingUrl, {
+      method: 'GET',
+      headers: { 'Accept': 'application/json' },
     });
 
     if (!pollRes.ok) {
@@ -246,8 +244,8 @@ export async function generateWithBFL(
   roomPhotoUrl = null,
   aspectRatio  = null,
 ) {
-  const apiKey = process.env.EXPO_PUBLIC_BFL_API_KEY;
-  if (!apiKey) throw new Error('EXPO_PUBLIC_BFL_API_KEY is not configured in .env');
+  // Auth handled by apiProxy (server-side in production, EXPO_PUBLIC_ in dev)
+  const apiKey = 'proxy-handled'; // kept for function signature compatibility
 
   const bflAspect = snapBflAspectRatio(aspectRatio);
 

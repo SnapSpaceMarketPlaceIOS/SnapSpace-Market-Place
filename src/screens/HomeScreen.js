@@ -1040,7 +1040,7 @@ export default function HomeScreen({ navigation, route }) {
       mediaPermGranted.current = true;
     }
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: ['images'],
       // allowsEditing removed — the native crop UI is the 1-2s bottleneck on iOS simulator
       quality: 0.6,
       exif: false,
@@ -1722,13 +1722,15 @@ export default function HomeScreen({ navigation, route }) {
       >
         {/* ── Hero section — fills visible screen ─────────────────────── */}
         <View style={styles.overlay}>
-          {/* Top bar: centered logo */}
+          {/* Top bar: centered logo — icon hidden during generation */}
           <View style={styles.topBar}>
             <View style={styles.logoRow}>
               <Text style={styles.logo}>HomeGenie</Text>
-              <View style={styles.logoIcon}>
-                <HeaderLogoIcon size={44} />
-              </View>
+              {!generating && (
+                <View style={styles.logoIcon}>
+                  <HeaderLogoIcon size={44} />
+                </View>
+              )}
             </View>
             <Text style={styles.wishTagline}>Your dream room, one wish away</Text>
           </View>
@@ -1748,8 +1750,8 @@ export default function HomeScreen({ navigation, route }) {
             </View>
           )}
 
-          {/* Input bar — pinned to bottom of hero */}
-          <View style={styles.heroBottom}>
+          {/* Input bar — centered in hero, drops below loader during generation */}
+          <View style={[styles.heroBottom, generating && styles.heroBottomGenerating]}>
             {/* Suggested prompt chips */}
             {!generating && (
               <ScrollView
@@ -1858,15 +1860,7 @@ export default function HomeScreen({ navigation, route }) {
                     style={styles.inputSendBtn}
                   >
                     <Animated.View style={{ transform: [{ scale: sendScale }] }}>
-                      {generating ? (
-                        <Animated.View style={{ transform: [{ rotate: lensRotate.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '360deg'] }) }] }}>
-                          <Svg width={20} height={20} viewBox="0 0 24 24">
-                            <Circle cx={12} cy={12} r={10} stroke="#fff" strokeWidth={1.2} fill="none" strokeDasharray="6 4" strokeLinecap="round" />
-                            <Circle cx={12} cy={12} r={5}  stroke="rgba(255,255,255,0.55)" strokeWidth={1} fill="none" />
-                            <Circle cx={12} cy={12} r={2}  fill="#fff" />
-                          </Svg>
-                        </Animated.View>
-                      ) : <SendIcon />}
+                      <SendIcon />
                     </Animated.View>
                   </LinearGradient>
                 )}
@@ -2502,6 +2496,10 @@ const styles = StyleSheet.create({
     left: 16,
     right: 16,
     transform: [{ translateY: -30 }],
+  },
+  heroBottomGenerating: {
+    top: '78%',
+    transform: [{ translateY: 0 }],
   },
   inputBar: {
     flexDirection: 'row',

@@ -1334,7 +1334,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '700',
     fontFamily: 'Geist_700Bold',
-    color: '#1D4ED8',
+    color: '#0B6DC3',
     marginTop: 2,
   },
 

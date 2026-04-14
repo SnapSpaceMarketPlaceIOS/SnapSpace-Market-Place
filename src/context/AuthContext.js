@@ -58,14 +58,15 @@ export function AuthProvider({ children }) {
 
     const bootstrap = async () => {
       // Safety net: if getSession() hangs (e.g. no network, bad env vars),
-      // bail out after 5s so the app is never stuck on the loading screen.
+      // bail out after 2s so the app is never stuck on the loading screen.
       let settled = false;
       const timer = setTimeout(() => {
         if (!settled && mounted) {
+          console.log('[Auth] bootstrap timeout — proceeding as guest');
           settled = true;
           setLoading(false);
         }
-      }, 5000);
+      }, 2000);
 
       try {
         const { data: { session } } = await supabase.auth.getSession();
@@ -155,10 +156,13 @@ export function AuthProvider({ children }) {
   const signIn = async (email, password) => {
     // Call Supabase directly — no withTimeout wrapper so iOS 26.x simulator
     // cold TLS handshakes (which can take 30-60s) are not prematurely killed.
+    console.log('[Auth] signIn: calling Supabase...');
+    const start = Date.now();
     const { data, error } = await supabase.auth.signInWithPassword({
       email: email.trim().toLowerCase(),
       password,
     });
+    console.log(`[Auth] signIn: responded in ${Date.now() - start}ms`, error ? `error: ${error.message}` : 'success');
 
     if (error) {
       if (error.message.includes('Email not confirmed')) {

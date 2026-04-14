@@ -362,7 +362,7 @@ const styles = StyleSheet.create({
   },
   webBannerText: {
     fontSize: 13,
-    color: '#1D4ED8',
+    color: '#0B6DC3',
     fontWeight: '600',
     fontFamily: 'Geist_600SemiBold',
   },

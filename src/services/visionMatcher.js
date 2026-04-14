@@ -1,8 +1,8 @@
 import { PRODUCT_CATALOG } from '../data/productCatalog';
 import { STYLE_AFFINITY } from '../data/styleMap';
+import { proxyFetch } from './apiProxy';
 
 const ANTHROPIC_API_URL = 'https://api.anthropic.com/v1/messages';
-const ANTHROPIC_API_KEY = process.env.EXPO_PUBLIC_ANTHROPIC_API_KEY;
 // Haiku is 12× cheaper than Sonnet ($0.001 vs $0.013 per call) and
 // performs identically for furniture identification tasks.
 const VISION_MODEL = 'claude-haiku-4-5';
@@ -501,10 +501,7 @@ export function rematchFromVision(visionItems, roomType, fallbackProducts = [], 
  * @returns {Promise<{ roomType: string, items: object[] }>}
  */
 export async function analyzeRoomImage(imageUrl) {
-  if (!ANTHROPIC_API_KEY) {
-    console.warn('[Vision] EXPO_PUBLIC_ANTHROPIC_API_KEY not set — skipping vision analysis');
-    return null;
-  }
+  // Auth handled by apiProxy (server-side in production, .env keys in dev)
 
   if (!imageUrl || !imageUrl.startsWith('http')) {
     console.warn('[Vision] Invalid image URL:', imageUrl);
@@ -514,14 +511,9 @@ export async function analyzeRoomImage(imageUrl) {
   console.log('[Vision] Analyzing generated room with Claude Sonnet 4.6...');
 
   try {
-    const res = await fetch(ANTHROPIC_API_URL, {
+    const res = await proxyFetch('anthropic', ANTHROPIC_API_URL, {
       method: 'POST',
-      headers: {
-        'x-api-key': ANTHROPIC_API_KEY,
-        'anthropic-version': '2023-06-01',
-        'content-type': 'application/json',
-      },
-      body: JSON.stringify({
+      body: {
         model: VISION_MODEL,
         max_tokens: 1024,
         messages: [
@@ -542,7 +534,7 @@ export async function analyzeRoomImage(imageUrl) {
             ],
           },
         ],
-      }),
+      },
     });
 
     if (!res.ok) {

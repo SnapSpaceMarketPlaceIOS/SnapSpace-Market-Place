@@ -1,7 +1,7 @@
 import { describeProductForPrompt } from '../utils/productDescriptor';
+import { proxyFetch } from './apiProxy';
 
 const API_URL = 'https://api.replicate.com/v1';
-const TOKEN = process.env.EXPO_PUBLIC_REPLICATE_API_TOKEN;
 
 const POLL_INTERVAL_MS = 3000;
 const MAX_POLLS = 80; // 3s × 80 = 4 min timeout
@@ -30,13 +30,9 @@ async function submitFluxWithRetry(baseInput) {
     const input = { ...baseInput, seed };
 
     try {
-      const res = await fetch(`${API_URL}/models/black-forest-labs/flux-2-max/predictions`, {
+      const res = await proxyFetch('replicate', `${API_URL}/models/black-forest-labs/flux-2-max/predictions`, {
         method: 'POST',
-        headers: {
-          Authorization:  `Bearer ${TOKEN}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ input }),
+        body: { input },
       });
 
       const prediction = await res.json();
@@ -199,7 +195,7 @@ export function buildFlux2MaxPrompt(userPrompt, products) {
  * @returns {Promise<string>}     - URL of the generated room image
  */
 export async function generateWithProductRefs(roomPhotoUrl, userPrompt, products, aspectRatio) {
-  if (!TOKEN) throw new Error('Replicate API token is missing. Add EXPO_PUBLIC_REPLICATE_API_TOKEN to your .env file.');
+  // Auth handled by apiProxy (server-side in production, EXPO_PUBLIC_ in dev)
   if (!roomPhotoUrl) throw new Error('generateWithProductRefs requires a public room photo URL.');
 
   // Use full-resolution product images so flux sees maximum detail.
@@ -250,7 +246,7 @@ export async function generateWithProductRefs(roomPhotoUrl, userPrompt, products
  * @returns {Promise<string>}     - URL of the generated image
  */
 export async function generateSingleProductInRoom(roomPhotoUrl, product, aspectRatio) {
-  if (!TOKEN) throw new Error('Replicate API token is missing. Add EXPO_PUBLIC_REPLICATE_API_TOKEN to your .env file.');
+  // Auth handled by apiProxy (server-side in production, EXPO_PUBLIC_ in dev)
   if (!roomPhotoUrl) throw new Error('generateSingleProductInRoom requires a public room photo URL.');
   if (!product?.imageUrl) throw new Error('generateSingleProductInRoom requires a product with an imageUrl.');
 
@@ -376,7 +372,7 @@ export function buildPanelPrompt(userPrompt, products) {
  * @returns {Promise<{url: string, predictionId: string, seed: number}>}
  */
 export async function generateWithProductPanel(roomPhotoUrl, userPrompt, products, panelUrl, aspectRatio) {
-  if (!TOKEN) throw new Error('Replicate API token is missing. Add EXPO_PUBLIC_REPLICATE_API_TOKEN to your .env file.');
+  // Auth handled by apiProxy (server-side in production, EXPO_PUBLIC_ in dev)
   if (!roomPhotoUrl) throw new Error('generateWithProductPanel requires a public room photo URL.');
   if (!panelUrl)     throw new Error('generateWithProductPanel requires a product panel URL.');
 
@@ -447,8 +443,8 @@ async function pollUntilDone(id) {
   for (let i = 0; i < MAX_POLLS; i++) {
     await new Promise((r) => setTimeout(r, POLL_INTERVAL_MS));
 
-    const res = await fetch(`${API_URL}/predictions/${id}`, {
-      headers: { Authorization: `Bearer ${TOKEN}` },
+    const res = await proxyFetch('replicate', `${API_URL}/predictions/${id}`, {
+      method: 'GET',
     });
     const prediction = await res.json();
 

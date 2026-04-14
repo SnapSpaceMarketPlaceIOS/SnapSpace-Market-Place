@@ -22,10 +22,10 @@ const MIN_HARD_FILTER_CANDIDATES = 2;
 // a room typically has 1 sofa, 1 coffee table, 1 rug, etc.
 const MAX_PER_CATEGORY = 1;
 
-// How many top candidates per category to consider.
-// Set to 1 to always pick the highest-scored product — eliminates randomness
-// that caused different (wrong) products to display on each generation run.
-const RANDOM_POOL_SIZE = 3;
+// Always pick the highest-scored product per category — no randomness.
+// Previously set to 3 which caused the wrong sofa to appear when a lower-scored
+// candidate randomly beat the correct one.
+const RANDOM_POOL_SIZE = 1;
 
 // Categories that are ONLY appropriate for specific room types.
 // If a product's category is in this map, it can only appear for those rooms.

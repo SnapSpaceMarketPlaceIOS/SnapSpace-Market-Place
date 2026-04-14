@@ -191,11 +191,6 @@ function ProductCard({ product, inCart, onAddToCart, onPress }) {
     <TouchableOpacity style={s.hCard} activeOpacity={0.7} onPress={onPress}>
       <View>
         <CardImage uri={product.imageUrl} style={s.hCardImg} resizeMode="cover" placeholderColor="#D0D7E3" />
-        {showSimilarBadge && (
-          <View style={s.similarBadge}>
-            <Text style={s.similarBadgeText}>SIMILAR STYLE</Text>
-          </View>
-        )}
       </View>
       <View style={s.hCardBody}>
         <Text style={s.hCardName} numberOfLines={2}>{product.name}</Text>
@@ -457,59 +452,7 @@ export default function RoomResultScreen({ route, navigation }) {
           pipeline === 'bfl'        ? 'BFL kontext · text-only refs (products may not visually match)' :
           'unknown pipeline';
 
-        return (
-          <>
-            <TouchableOpacity
-              style={[s.debugToggle, { backgroundColor: pipelineColor }]}
-              activeOpacity={0.7}
-              onPress={() => setShowDebug(v => !v)}
-            >
-              <Text style={s.debugToggleText}>
-                {showDebug ? '×' : `DBG·${pipelineLabel}`}
-              </Text>
-            </TouchableOpacity>
-            {showDebug && (
-              <View style={s.debugPanel}>
-                {/* ── Prominent pipeline banner ────────────────────────── */}
-                <View style={[s.debugPipelineBanner, { backgroundColor: pipelineColor }]}>
-                  <Text style={s.debugPipelineLabel}>PIPELINE: {pipelineLabel}</Text>
-                  <Text style={s.debugPipelineDesc}>{pipelineDesc}</Text>
-                </View>
-
-                <Text style={s.debugTitle}>GENERATION DEBUG</Text>
-                <Text style={s.debugRow}>id: {debug.generationId || '—'}</Text>
-                <Text style={s.debugRow}>pipeline: {pipeline}</Text>
-                <Text style={s.debugRow}>prediction: {debug.predictionId ? debug.predictionId.substring(0, 16) + '…' : '—'}</Text>
-                <Text style={s.debugRow}>seed: {debug.seed ?? '—'}</Text>
-                <Text style={s.debugRow}>aspect: {debug.aspectRatio || '—'}</Text>
-                <Text style={s.debugRow}>photo: {debug.photoWidth}×{debug.photoHeight}</Text>
-                <Text style={s.debugRow}>duration: {debug.durationMs ? (debug.durationMs / 1000).toFixed(1) + 's' : '—'}</Text>
-                <View style={s.debugDivider} />
-                <Text style={s.debugRow}>verified: {debug.verifiedCount}/{products.length}</Text>
-                <Text style={s.debugRow}>room: {debug.roomType || '—'}</Text>
-                {debug.visionItems && debug.visionItems.length > 0 && (
-                  <>
-                    <View style={s.debugDivider} />
-                    <Text style={s.debugTitle}>VISION ITEMS</Text>
-                    {debug.visionItems.slice(0, 6).map((item, i) => (
-                      <Text key={i} style={s.debugRow}>
-                        {item.category}: {item.color} {item.material}
-                      </Text>
-                    ))}
-                  </>
-                )}
-                <View style={s.debugDivider} />
-                <Text style={s.debugTitle}>PRODUCT SCORES</Text>
-                {products.slice(0, 6).map((p, i) => (
-                  <Text key={p.id || i} style={s.debugRow} numberOfLines={1}>
-                    {(p.confidence === 'verified' ? '✓ ' : '~ ')}
-                    {(p._visionScore ?? 0).toFixed(0)} — {p.category}
-                  </Text>
-                ))}
-              </View>
-            )}
-          </>
-        );
+        return null;
       })()}
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={s.scrollContent}>
 
