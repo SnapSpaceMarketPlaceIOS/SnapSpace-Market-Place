@@ -855,7 +855,9 @@ export default function ExploreScreen({ navigation, route }) {
   // When Supabase is unreachable (communityFailed) and no real designs loaded,
   // fall back to FALLBACK_DESIGNS (verified Unsplash images) so the grid is
   // never empty — guests always see real room photos, view-only.
-  const usingFallback = !communityLoading && (communityFailed || communityDesigns.length === 0) && !overrideDesigns;
+  // Show fallback immediately when no community designs are loaded yet —
+  // don't wait for the loading state to clear. Real designs replace it on success.
+  const usingFallback = (communityFailed || communityDesigns.length === 0) && !overrideDesigns;
   const baseDesigns = overrideDesigns || (usingFallback ? FALLBACK_DESIGNS : communityDesigns);
 
   const filteredDesigns = useMemo(
