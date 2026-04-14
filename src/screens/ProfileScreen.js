@@ -353,6 +353,11 @@ export default function ProfileScreen({ navigation }) {
       let cancelled = false;
       setDesignsLoading(true);
 
+      // Safety net: never leave skeleton stuck longer than 8s (handles paused DB / slow network)
+      const fetchTimeoutId = setTimeout(() => {
+        if (!cancelled) setDesignsLoading(false);
+      }, 8000);
+
       // Fire-and-forget cleanup (don't block main fetches)
       deleteExpiredDesigns(user.id).catch(() => {});
 
@@ -362,6 +367,7 @@ export default function ProfileScreen({ navigation }) {
         getUserLikedDesigns(user.id).catch(() => []),
         getUserDesigns(user.id).catch(() => []),
       ]).then(([stats, likedRows, designs]) => {
+        clearTimeout(fetchTimeoutId);
         if (cancelled) return;
         if (stats) setSocialStats(stats);
 
@@ -413,8 +419,11 @@ export default function ProfileScreen({ navigation }) {
           };
         });
         setMyDesigns(normalizedDesigns);
-      }).finally(() => { if (!cancelled) setDesignsLoading(false); });
-      return () => { cancelled = true; };
+      }).finally(() => {
+        clearTimeout(fetchTimeoutId);
+        if (!cancelled) setDesignsLoading(false);
+      });
+      return () => { cancelled = true; clearTimeout(fetchTimeoutId); };
     }, [user?.id])
   );
 
@@ -605,7 +614,8 @@ export default function ProfileScreen({ navigation }) {
         )}
 
         {/* ── Designs Grid ── */}
-        {designsLoading ? (
+        {/* Products sub-tab uses local AsyncStorage — never block it with the Supabase skeleton */}
+        {designsLoading && !(activeTab === 1 && likedFilter === 1) ? (
           <View style={[styles.grid, { paddingHorizontal: space.lg, paddingTop: space.base }]}>
             {[0,1,2,3].map(i => (
               <View key={i} style={{ width: colWidthPct(gridCols), padding: 1 }}>

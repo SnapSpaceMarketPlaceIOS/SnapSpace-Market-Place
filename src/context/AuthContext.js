@@ -134,14 +134,20 @@ export function AuthProvider({ children }) {
     if (!process.env.EXPO_PUBLIC_SUPABASE_URL) {
       throw new Error('App is not configured. Please contact support.');
     }
-    const { data, error } = await withTimeout(
-      supabase.auth.signUp({
-        email: email.trim().toLowerCase(),
-        password,
-        options: { data: { full_name: fullName.trim() } },
-      }),
-      15000,
-      'Connection timed out. Please check your internet connection and try again.',
+    // withRetry handles iOS 26.x beta cold-connection failures — first attempt
+    // often times out, second succeeds once the network is warmed up.
+    const { data, error } = await withRetry(
+      () => withTimeout(
+        supabase.auth.signUp({
+          email: email.trim().toLowerCase(),
+          password,
+          options: { data: { full_name: fullName.trim() } },
+        }),
+        12000,
+        'Connection timed out. Please check your internet connection and try again.',
+      ),
+      2,    // 2 total attempts (1 automatic retry)
+      1500, // 1.5s cool-down between attempts
     );
     if (error) throw new Error(error.message);
     // If Supabase requires email confirmation, session will be null here.
@@ -157,14 +163,19 @@ export function AuthProvider({ children }) {
    * Throws an Error with a user-friendly message on failure.
    */
   const signIn = async (email, password) => {
-    // Single attempt with a 15s window — no retries so user gets fast feedback.
-    const { data, error } = await withTimeout(
-      supabase.auth.signInWithPassword({
-        email: email.trim().toLowerCase(),
-        password,
-      }),
-      15000,
-      'Connection timed out. Please check your internet and try again.',
+    // withRetry handles iOS 26.x beta cold-connection failures — first attempt
+    // often times out, second succeeds once the network is warmed up.
+    const { data, error } = await withRetry(
+      () => withTimeout(
+        supabase.auth.signInWithPassword({
+          email: email.trim().toLowerCase(),
+          password,
+        }),
+        12000,
+        'Connection timed out. Please check your internet and try again.',
+      ),
+      2,    // 2 total attempts (1 automatic retry)
+      1500, // 1.5s cool-down between attempts
     );
 
     if (error) {
