@@ -58,6 +58,36 @@ const TYPE_KEYWORDS = [
   'arc', 'tripod', 'task', 'torchiere', 'swing-arm',
 ];
 
+// Feature phrases that add visual specificity to the AI prompt.
+// We look for short phrases that describe visual attributes the model can render.
+const VISUAL_FEATURE_KEYWORDS = [
+  // More specific compound terms first — prevents "tufted" matching before "channel-tufted"
+  'channel-tufted', 'button-tufted', 'hand-woven', 'handwoven',
+  'hand-knotted', 'hand-painted', 'handcrafted', 'hand-carved',
+  'glass-top', 'marble-top', 'stone-top', 'open-shelf',
+  'tufted', 'pleated', 'fluted', 'ribbed', 'slatted', 'spindle', 'turned',
+  'tapered', 'hairpin', 'splayed', 'cabriole',
+  'adjustable', 'reversible', 'removable',
+  'woven', 'braided', 'macrame', 'lattice', 'cane',
+  'matte', 'glossy', 'distressed', 'weathered', 'antiqued',
+  'arched', 'dome', 'cylinder', 'conical', 'globe',
+  'frosted', 'smoked', 'clear', 'textured',
+];
+
+function extractVisualFeature(features) {
+  if (!Array.isArray(features) || features.length === 0) return '';
+  for (const feat of features) {
+    const lower = feat.toLowerCase();
+    for (const kw of VISUAL_FEATURE_KEYWORDS) {
+      if (lower.includes(kw)) {
+        // Return just the keyword, not the full feature sentence
+        return kw;
+      }
+    }
+  }
+  return '';
+}
+
 function extractTypeWord(name) {
   if (!name || typeof name !== 'string') return '';
   const lower = name.toLowerCase();
@@ -91,12 +121,18 @@ export function describeProductForPrompt(p) {
   const shapeWords  = tags.filter(t => SHAPE_TAG_WORDS.has(t));
   const materials   = Array.isArray(p.materials) ? p.materials : [];
 
-  const color    = colorWords[0]  || '';
-  const material = materials[0]   || '';
-  const shape    = shapeWords[0]  || '';
+  // Pick the most specific color — prefer longer/more-specific words
+  // "cognac" > "brown", "sage" > "green"
+  const sortedColors = [...colorWords].sort((a, b) => b.length - a.length);
+  const color    = sortedColors[0] || '';
+  const material = materials[0]    || '';
+  const shape    = shapeWords[0]   || '';
   const typeWord = extractTypeWord(p.name || '');
 
-  const parts = [color, material, shape, typeWord, category].filter(Boolean);
+  // Extract a visual feature for additional specificity
+  const visualFeature = extractVisualFeature(p.features || []);
+
+  const parts = [color, material, visualFeature, shape, typeWord, category].filter(Boolean);
   // Dedupe adjacent repeats (e.g. if typeWord matches category)
   const deduped = parts.filter((w, i) => w !== parts[i - 1]);
   return deduped.join(' ').trim();

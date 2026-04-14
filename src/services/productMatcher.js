@@ -5,6 +5,7 @@ import {
   getColorOppositionPenalty,
   getColorFamilyWords,
 } from '../utils/colorMap';
+import { computePreferenceBonus } from '../utils/userPreferences';
 
 // Phase 3: flip to true to see [match] diagnostic logs in Metro for each
 // generation. Leave false in production to keep logs tidy.
@@ -24,7 +25,7 @@ const MAX_PER_CATEGORY = 1;
 // How many top candidates per category to consider.
 // Set to 1 to always pick the highest-scored product — eliminates randomness
 // that caused different (wrong) products to display on each generation run.
-const RANDOM_POOL_SIZE = 1;
+const RANDOM_POOL_SIZE = 3;
 
 // Categories that are ONLY appropriate for specific room types.
 // If a product's category is in this map, it can only appear for those rooms.
@@ -43,6 +44,40 @@ const CATEGORY_ROOM_LOCK = {
   'desk-chair':     ['office'],
 };
 
+// Material affinity: related materials that should score partial credit.
+// "oak" and "walnut" are both wood, so requesting "oak" should partially
+// reward a "walnut" product instead of scoring 0.
+const MATERIAL_AFFINITY = {
+  // Wood subtypes — all related
+  wood:    ['oak', 'walnut', 'teak', 'bamboo', 'birch', 'pine', 'maple', 'ash', 'mahogany', 'cherry'],
+  oak:     ['wood', 'walnut', 'teak', 'birch', 'pine', 'maple', 'ash'],
+  walnut:  ['wood', 'oak', 'teak', 'birch', 'mahogany', 'cherry'],
+  teak:    ['wood', 'oak', 'walnut', 'bamboo'],
+  bamboo:  ['wood', 'rattan', 'teak'],
+  // Metal subtypes
+  brass:   ['gold', 'copper', 'bronze', 'metal'],
+  copper:  ['brass', 'bronze', 'gold', 'metal', 'rose gold'],
+  gold:    ['brass', 'copper', 'bronze', 'metal'],
+  bronze:  ['brass', 'copper', 'gold', 'metal'],
+  // Fabric subtypes
+  velvet:  ['linen', 'cotton', 'silk'],
+  linen:   ['cotton', 'velvet', 'wool'],
+  cotton:  ['linen', 'wool', 'canvas'],
+  silk:    ['velvet', 'satin'],
+  wool:    ['cotton', 'linen', 'cashmere'],
+  // Natural subtypes
+  rattan:  ['wicker', 'bamboo', 'jute', 'cane'],
+  wicker:  ['rattan', 'bamboo', 'jute', 'cane'],
+  jute:    ['rattan', 'wicker', 'sisal'],
+  // Stone subtypes
+  marble:  ['stone', 'travertine', 'terrazzo', 'concrete'],
+  concrete:['marble', 'stone', 'terrazzo'],
+  ceramic: ['terracotta', 'clay', 'pottery'],
+  // Transparent
+  glass:   ['acrylic', 'lucite', 'crystal'],
+  leather: [],  // leather is distinct — no partial credit
+};
+
 /**
  * Scores and ranks catalog products against a parsed design prompt.
  * Returns top N products, diversified across furniture categories.
@@ -52,27 +87,32 @@ const CATEGORY_ROOM_LOCK = {
  *   2. NEW: Per-category attribute hard filter — if user said "brown leather
  *      couch", require the sofa candidate to be brown AND leather. Fallback
  *      to soft scoring if <2 candidates survive.
- *   3. Style affinity filter (≥ 0.4) with cascade fallback
+ *   3. Style affinity filter (≥ 0.25, graduated scoring) with cascade fallback
  *   4. Score candidates with rebalanced weights (color + material now
  *      collectively outweigh style)
  *   5. Diversify across categories
  *
- * Scoring formula (sum ≈ 120 max, before penalty):
+ * Scoring formula (sum ≈ 143 max, before penalty):
  *   color match:      25 pts  — NEW in Phase 3, opposes style dominance
  *   style match:      25 pts  — reduced from 40
  *   material match:   20 pts  — raised from 10
  *   room type match:  15 pts
  *   tag match:        15 pts
  *   name match:       15 pts  — raised from 8 for specificity
+ *   description match:10 pts  — keywords in description/features
+ *   mood bonus:        8 pts  — raised from 3 (bold/earthy/cozy/luxury)
  *   furniture cat:     5 pts  — reduced from 10
- *   rating bonus:      2 pts  — reduced from 3
+ *   rating bonus:      5 pts  — raised from 2 (quality matters more)
+ *   preference bonus:  5 pts  — soft bonus from user cart/like history (Phase C)
  *   color mismatch:  -15 pts  — NEW penalty for opposite colors
  *
  * @param {object} parsedPrompt - Output from promptParser.parseDesignPrompt()
  * @param {number} limit        - Max products to return (default 6)
+ * @param {object[]} catalog    - Product catalog to search (default PRODUCT_CATALOG)
+ * @param {object|null} userPrefs - User preference data from getUserPreferences() (default null — no bonus)
  * @returns {object[]}          - Sorted, diversified product array
  */
-export function matchProducts(parsedPrompt, limit = 6, catalog = PRODUCT_CATALOG) {
+export function matchProducts(parsedPrompt, limit = 6, catalog = PRODUCT_CATALOG, userPrefs = null) {
   const {
     roomType,
     styles,
@@ -136,7 +176,7 @@ export function matchProducts(parsedPrompt, limit = 6, catalog = PRODUCT_CATALOG
     if (constrainedCategoriesSet.has(product.category)) return true;
     if (!styles || styles.length === 0) return true;
     const affinity = computeStyleScore(product.styles, styles);
-    return affinity >= 0.4;
+    return affinity >= 0.25;
   });
 
   // Cascade fallback: style-filtered → attr-filtered → category-filtered → room-filtered
@@ -166,12 +206,56 @@ export function matchProducts(parsedPrompt, limit = 6, catalog = PRODUCT_CATALOG
       moods,
       promptTokens,
     );
+    // Apply user preference bonus (soft tiebreaker, max 5 pts)
+    const prefBonus = userPrefs ? computePreferenceBonus(product, userPrefs) : 0;
+    scoreBreakdown.preference = prefBonus;
+    scoreBreakdown.total += prefBonus;
     return { ...product, _score: scoreBreakdown.total, _breakdown: scoreBreakdown };
   });
 
   scored.sort((a, b) => b._score - a._score);
 
   const diversified = diversify(scored, limit, roomType);
+
+  // ── Full-catalog expansion for thin room pools (Phase C2) ─────────────────
+  // bathroom/outdoor/nursery catalogs can't fill 6 diverse slots. Score the
+  // full catalog (minus already-picked products, respecting category locks)
+  // and append top picks to reach the limit.
+  if (diversified.length < limit) {
+    const usedIds = new Set(diversified.map(p => p.id));
+    const usedCats = {};
+    diversified.forEach(p => { usedCats[p.category] = (usedCats[p.category] || 0) + 1; });
+
+    const expansion = catalog
+      .filter(p => !usedIds.has(p.id))
+      .filter(p => (usedCats[p.category] || 0) < MAX_PER_CATEGORY)
+      .filter(p => {
+        const lock = CATEGORY_ROOM_LOCK[p.category];
+        return !lock || lock.includes(roomType);
+      })
+      .map(p => {
+        const b = scoreProduct(
+          p, roomType, styles, materials, colors, colorByCategory,
+          materialByCategory, furnitureCategories, moods, promptTokens,
+        );
+        const prefBonus = userPrefs ? computePreferenceBonus(p, userPrefs) : 0;
+        b.preference = prefBonus;
+        b.total += prefBonus;
+        return { ...p, _score: b.total, _breakdown: b };
+      })
+      .sort((a, b) => b._score - a._score);
+
+    for (const p of expansion) {
+      if (diversified.length >= limit) break;
+      if ((usedCats[p.category] || 0) >= MAX_PER_CATEGORY) continue;
+      diversified.push(p);
+      usedCats[p.category] = (usedCats[p.category] || 0) + 1;
+    }
+
+    if (MATCH_DEBUG) {
+      console.log(`[match] expansion: filled ${diversified.length}/${limit} from full catalog (room pool was thin)`);
+    }
+  }
 
   if (MATCH_DEBUG && diversified.length > 0) {
     console.log(`[match] top ${Math.min(diversified.length, 4)} results:`);
@@ -262,24 +346,25 @@ const COZY_MOODS   = ['cozy', 'warm', 'inviting', 'comfortable', 'relaxed'];
 /**
  * Score a single product against the detected design intent.
  *
- * PHASE 3 REBALANCED WEIGHTS (sum ≈ 120 max, before penalty):
+ * PHASE 3 REBALANCED WEIGHTS (sum ≈ 138 max, before penalty):
  *   color match:           25 pts  — NEW: prevents white sofa winning for "brown"
  *   style match:           25 pts  — reduced from 40 (still important but not dominant)
  *   material match:        20 pts  — raised from 10
  *   room type match:       15 pts
  *   tag match:             15 pts
  *   name match bonus:      15 pts  — raised from 8 (specific words matter)
+ *   description match:     10 pts  — NEW: keywords in description/features
+ *   mood bonus:             8 pts  — raised from 3 (bold/earthy/cozy/luxury)
  *   furniture category:     5 pts  — reduced from 10 (room-essential already covers this)
- *   mood bonus:             3 pts  — reduced from 5
- *   rating bonus:           2 pts  — reduced from 3 (rating ≠ visual fit)
+ *   rating bonus:           5 pts  — raised from 2 (quality matters more)
  *   color mismatch:       -15 pts  — NEW penalty (white ≠ brown, light ≠ dark)
  *
- * Rationale: explicit user attributes (color + material + name) now total
- * 60 pts, dominating style at 25. A non-specific user still gets style-
- * appropriate picks; a specific user gets exactly what they asked for.
+ * Rationale: explicit user attributes (color + material + name + description)
+ * now total 70 pts, dominating style at 25. A non-specific user still gets
+ * style-appropriate picks; a specific user gets exactly what they asked for.
  *
  * Returns a breakdown object with per-dimension scores for debugging:
- *   { total, style, color, material, room, tag, name, category, mood, rating }
+ *   { total, style, color, material, room, tag, name, category, mood, rating, description }
  */
 function scoreProduct(
   product,
@@ -295,7 +380,7 @@ function scoreProduct(
 ) {
   const breakdown = {
     total: 0, style: 0, color: 0, material: 0, room: 0,
-    tag: 0, name: 0, category: 0, mood: 0, rating: 0,
+    tag: 0, name: 0, category: 0, mood: 0, rating: 0, description: 0, preference: 0,
   };
 
   // ── Room type match (15 points) ───────────────────────────────────────────
@@ -340,26 +425,68 @@ function scoreProduct(
   if (userMatForCat) {
     if (productHasMaterial(product, userMatForCat)) {
       breakdown.material = 20;
+    } else {
+      // Partial credit for related materials
+      const related = MATERIAL_AFFINITY[userMatForCat.toLowerCase()] || [];
+      const productText = [product.name || '', product.description || '', ...(product.tags || []), ...(product.materials || [])].join(' ').toLowerCase();
+      if (related.some(r => productText.includes(r))) {
+        breakdown.material = 10; // half credit
+      }
     }
   } else if (materials && materials.length > 0) {
     const productMats = (product.materials || []).map(m => m.toLowerCase());
-    const hits = materials.filter(m => productMats.includes(m.toLowerCase())).length;
-    breakdown.material = Math.min(hits / materials.length, 1) * 20;
+    // Also check name/description for material mentions
+    const productText = [product.name || '', product.description || '', ...(product.tags || [])].join(' ').toLowerCase();
+
+    let materialScore = 0;
+    for (const reqMat of materials) {
+      const reqLower = reqMat.toLowerCase();
+      if (productMats.includes(reqLower) || productText.includes(reqLower)) {
+        // Exact match: full credit
+        materialScore += 1.0;
+      } else {
+        // Check affinity: partial credit for related materials
+        const related = MATERIAL_AFFINITY[reqLower] || [];
+        const hasRelated = related.some(r => productMats.includes(r) || productText.includes(r));
+        if (hasRelated) {
+          materialScore += 0.5; // half credit for related material
+        }
+      }
+    }
+    breakdown.material = Math.min(materialScore / materials.length, 1) * 20;
   }
 
   // ── Tag match (15 points) ─────────────────────────────────────────────────
+  // Exact tag match = full credit. Substring/partial = half credit.
+  // "modern" tag with "modern-farmhouse" token → half credit (prevents noise).
   if (product.tags && product.tags.length > 0 && promptTokens.length > 0) {
     const tokenSet = new Set(promptTokens);
     for (const s of styles) tokenSet.add(s);
     for (const m of materials) tokenSet.add(m);
     for (const c of colors) {
-      // Expand color to its family words so "brown" matches "cognac" tags
       const words = getColorFamilyWords(c);
       words.forEach(w => tokenSet.add(w));
     }
     for (const mo of moods) tokenSet.add(mo);
-    const tagHits = product.tags.filter(t => tokenSet.has(t)).length;
-    breakdown.tag = Math.min(tagHits / 4, 1) * 15;
+
+    let exactHits = 0;
+    let partialHits = 0;
+    for (const tag of product.tags) {
+      if (tokenSet.has(tag)) {
+        exactHits++;
+      } else {
+        // Check substring: does any token contain this tag, or vice versa?
+        const tagLower = tag.toLowerCase();
+        const isPartial = [...tokenSet].some(token => {
+          if (token.length < 3 || tagLower.length < 3) return false;
+          return token.toLowerCase().includes(tagLower) || tagLower.includes(token.toLowerCase());
+        });
+        if (isPartial) partialHits++;
+      }
+    }
+    // Exact hits worth 1.0 each, partial hits worth 0.5 each
+    const weightedHits = exactHits + (partialHits * 0.5);
+    breakdown.tag = Math.min(weightedHits / 4, 1) * 15;
   }
 
   // ── Name match bonus (15 points — raised from 8) ─────────────────────────
@@ -378,6 +505,25 @@ function scoreProduct(
       if (words.some(w => nameLower.includes(w))) nameBonus += 2;
     }
     breakdown.name = Math.min(nameBonus, 15);
+  }
+
+  // ── Description + features match (10 points — NEW) ───────────────────────
+  // Rich product descriptions and features contain keywords that might not
+  // appear in name/tags. "Kiln-dried hardwood frame" or "removable cushion
+  // covers" are purchase-intent signals when the user mentioned them.
+  if (promptTokens.length > 0 && (product.description || (product.features && product.features.length > 0))) {
+    const descText = [
+      product.description || '',
+      ...(product.features || []),
+    ].join(' ').toLowerCase();
+
+    let descHits = 0;
+    for (const token of promptTokens) {
+      if (token.length < 4) continue; // skip short generic words
+      if (descText.includes(token)) descHits++;
+    }
+    // Cap at 5 hits to prevent description-heavy products from over-scoring
+    breakdown.description = Math.min(descHits / 5, 1) * 10;
   }
 
   // ── Furniture category match (5 points — reduced from 10) ────────────────
@@ -402,18 +548,22 @@ function scoreProduct(
     }
   }
 
-  // ── Mood bonus (3 points — reduced) ───────────────────────────────────────
+  // ── Mood bonus (8 points — raised from 3) ─────────────────────────────────
   if (moods && moods.length > 0) {
     const isLuxury = moods.some((m) => LUXURY_MOODS.includes(m));
     const isCozy   = moods.some((m) => COZY_MOODS.includes(m));
-    if (isLuxury && product.rating && product.rating >= 4.5) breakdown.mood = 3;
-    else if (isCozy && (product.materials || []).some((m) => ['velvet', 'linen', 'wool', 'cotton', 'rattan'].includes(m))) breakdown.mood = 3;
-    else breakdown.mood = 0.5;
+    const isBold   = moods.some((m) => ['bold', 'vibrant', 'dramatic', 'striking'].includes(m));
+    const isEarthy = moods.some((m) => ['earthy', 'natural', 'organic', 'grounded'].includes(m));
+    if (isLuxury && product.rating && product.rating >= 4.5) breakdown.mood = 8;
+    else if (isCozy && (product.materials || []).some((m) => ['velvet', 'linen', 'wool', 'cotton', 'rattan'].includes(m))) breakdown.mood = 8;
+    else if (isBold && (product.materials || []).some((m) => ['velvet', 'marble', 'brass', 'glass'].includes(m))) breakdown.mood = 8;
+    else if (isEarthy && (product.materials || []).some((m) => ['wood', 'jute', 'rattan', 'bamboo', 'ceramic', 'cotton', 'linen'].includes(m))) breakdown.mood = 8;
+    else breakdown.mood = 1;
   }
 
-  // ── Rating bonus (2 points — reduced) ────────────────────────────────────
+  // ── Rating bonus (5 points — raised from 2) ──────────────────────────────
   if (product.rating) {
-    breakdown.rating = ((product.rating - 3.5) / 1.5) * 2;
+    breakdown.rating = ((product.rating - 3.5) / 1.5) * 5;
   }
 
   breakdown.total =
@@ -425,13 +575,17 @@ function scoreProduct(
     breakdown.name +
     breakdown.category +
     breakdown.mood +
-    breakdown.rating;
+    breakdown.rating +
+    breakdown.description;
 
   return breakdown;
 }
 
 /**
- * Computes a 0–1 style affinity score between product styles and detected styles.
+ * Computes a style affinity score between product styles and detected styles.
+ * Returns 0–1 with graduated scoring: affinity < 0.25 = 0, 0.25–0.4 = 60%
+ * credit, 0.4+ = full credit. This lets "adjacent" styles contribute partial
+ * score instead of being hard-cut at 0.4.
  */
 function computeStyleScore(productStyles, detectedStyles) {
   if (!detectedStyles || detectedStyles.length === 0) return 0;
@@ -450,6 +604,9 @@ function computeStyleScore(productStyles, detectedStyles) {
     }
   }
 
+  // Graduated scoring: affinity < 0.25 = 0, 0.25-0.4 = 60% credit, 0.4+ = full credit
+  if (best < 0.25) return 0;
+  if (best < 0.4) return best * 0.6;
   return best;
 }
 

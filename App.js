@@ -396,7 +396,7 @@ const styles = StyleSheet.create({
     borderTopWidth: 0.5,
     borderTopColor: palette.borderLight,
     height: layout.tabBarHeight,
-    paddingTop: space.sm,
+    paddingTop: 0,
     paddingBottom: 0,
   },
 

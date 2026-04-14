@@ -10,15 +10,15 @@ export const ROOM_TYPES = [
 
 // Keywords that indicate each room type
 export const ROOM_KEYWORDS = {
-  'living-room': ['living', 'lounge', 'sitting', 'family room', 'great room', 'den', 'tv room'],
-  'bedroom':     ['bedroom', 'master', 'sleeping', 'sleep', 'bed room', 'suite', 'boudoir'],
-  'kitchen':     ['kitchen', 'cooking', 'culinary', 'chef', 'pantry', 'galley'],
-  'dining-room': ['dining', 'dinner', 'eat', 'breakfast nook', 'banquet'],
-  'office':      ['office', 'workspace', 'study', 'home office', 'work from home', 'wfh', 'desk'],
-  'bathroom':    ['bathroom', 'bath', 'spa', 'powder room', 'ensuite'],
-  'outdoor':     ['outdoor', 'patio', 'garden', 'terrace', 'backyard', 'deck'],
-  'nursery':     ['nursery', 'baby', 'kids room', 'children', 'playroom'],
-  'entryway':    ['entryway', 'foyer', 'hallway', 'entrance', 'mudroom'],
+  'living-room': ['living', 'lounge', 'sitting', 'family room', 'great room', 'den', 'tv room', 'nook', 'reading nook', 'media room', 'sunroom', 'sun room', 'loft'],
+  'bedroom':     ['bedroom', 'master', 'sleeping', 'sleep', 'bed room', 'suite', 'boudoir', 'guest room', 'master bedroom', 'primary bedroom'],
+  'kitchen':     ['kitchen', 'cooking', 'culinary', 'chef', 'pantry', 'galley', 'breakfast area', 'kitchenette'],
+  'dining-room': ['dining', 'dinner', 'eat', 'breakfast nook', 'banquet', 'eating area', 'dining area', 'breakfast room'],
+  'office':      ['office', 'workspace', 'study', 'home office', 'work from home', 'wfh', 'desk', 'studio', 'library', 'craft room'],
+  'bathroom':    ['bathroom', 'bath', 'spa', 'powder room', 'ensuite', 'washroom', 'restroom', 'shower room', 'en-suite'],
+  'outdoor':     ['outdoor', 'patio', 'garden', 'terrace', 'backyard', 'deck', 'porch', 'balcony', 'veranda', 'lanai', 'poolside'],
+  'nursery':     ['nursery', 'baby', 'kids room', 'children', 'playroom', 'toddler room', 'kids bedroom', "child's room"],
+  'entryway':    ['entryway', 'foyer', 'hallway', 'entrance', 'mudroom', 'vestibule', 'front hall', 'lobby'],
 };
 
 // Default furniture categories for each room type

@@ -8,7 +8,7 @@ import {
 } from 'react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import * as ImagePicker from 'expo-image-picker';
-import Svg, { Path, Line, Polyline } from 'react-native-svg';
+import Svg, { Path, Line, Polyline, Rect, Circle } from 'react-native-svg';
 import { palette } from '../constants/tokens';
 import { useAuth } from '../context/AuthContext';
 import AuthGate from '../components/AuthGate';
@@ -25,15 +25,30 @@ function XIcon({ size = 16, color = '#fff' }) {
   );
 }
 
+function GalleryIcon({ size = 22, color = 'rgba(255,255,255,0.9)' }) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={1.4} strokeLinecap="round" strokeLinejoin="round">
+      <Rect x={3} y={3} width={18} height={18} rx={2} ry={2} />
+      <Circle cx={8.5} cy={8.5} r={1.5} />
+      <Polyline points="21 15 16 10 5 21" />
+    </Svg>
+  );
+}
+
 // ─── SnapScreen ───────────────────────────────────────────────────────────────
 
-export default function SnapScreen({ navigation }) {
+export default function SnapScreen({ navigation, route }) {
   const { user } = useAuth();
   const [permission, requestPermission] = useCameraPermissions();
   const [facing, setFacing] = useState('back');
   const [flash, setFlash] = useState(false);
   const cameraRef = useRef(null);
   const mediaPermGranted = useRef(false);
+
+  // Optional: product passed from ProductDetailScreen for single-product visualize flow.
+  // When present, the captured photo + product are forwarded to HomeScreen which runs
+  // the single-product generation pipeline instead of the full room redesign.
+  const singleProduct = route?.params?.product ?? null;
 
   // ── Auth gate ──
   if (!user) {
@@ -50,7 +65,12 @@ export default function SnapScreen({ navigation }) {
     if (!cameraRef.current) return;
     // base64 omitted — upload helper reads file on-demand, keeps capture snappy
     const photo = await cameraRef.current.takePictureAsync({ quality: 0.8 });
-    navigation.navigate('Home', { capturedPhoto: photo });
+    // Explicitly pass dimensions so the AI generation pipeline can derive
+    // the correct aspect ratio for both portrait and landscape photos.
+    navigation.navigate('Home', {
+      capturedPhoto: { uri: photo.uri, base64: null, width: photo.width, height: photo.height },
+      singleProduct,  // null for normal flow, product object for single-product visualize
+    });
   };
 
   const handlePickFromLibrary = async () => {
@@ -63,15 +83,14 @@ export default function SnapScreen({ navigation }) {
       mediaPermGranted.current = true;
     }
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
+      mediaTypes: ['images'],
       quality: 0.8,
-      // base64: true removed — upload helper reads file on-demand
     });
     if (result.canceled || !result.assets?.length) return;
     const asset = result.assets[0];
     navigation.navigate('Home', {
       capturedPhoto: { uri: asset.uri, base64: null, width: asset.width, height: asset.height },
+      singleProduct,  // null for normal flow, product object for single-product visualize
     });
   };
 
@@ -123,15 +142,17 @@ export default function SnapScreen({ navigation }) {
           <View style={[s.corner, { bottom: 0, right: 0, borderBottomWidth: 2, borderRightWidth: 2 }]} />
         </View>
 
-        {/* Shutter */}
+        {/* Shutter + gallery pick */}
         <View style={s.bottomBar}>
-          <View style={{ width: 70 }} />
+          <TouchableOpacity style={s.galleryBtn} onPress={handlePickFromLibrary} activeOpacity={0.7}>
+            <GalleryIcon />
+          </TouchableOpacity>
 
           <TouchableOpacity style={s.shutter} onPress={handleCapture} activeOpacity={0.8}>
             <View style={s.shutterInner} />
           </TouchableOpacity>
 
-          <View style={{ width: 70 }} />
+          <View style={{ width: 50 }} />
         </View>
       </View>
     </TabScreenFade>
@@ -179,4 +200,10 @@ const s = StyleSheet.create({
     alignItems: 'center', justifyContent: 'center',
   },
   shutterInner: { width: 56, height: 56, borderRadius: 28, backgroundColor: '#fff' },
+  galleryBtn: {
+    width: 50, height: 50, borderRadius: 12,
+    backgroundColor: 'rgba(255,255,255,0.12)',
+    borderWidth: 1, borderColor: 'rgba(255,255,255,0.25)',
+    alignItems: 'center', justifyContent: 'center',
+  },
 });

@@ -26,6 +26,7 @@ import theme from '../constants/theme';
 import { useLiked } from '../context/LikedContext';
 import { PRODUCT_CATALOG } from '../data/productCatalog';
 import { getPublicDesigns } from '../services/supabase';
+import { DESIGNS as LOCAL_DESIGNS } from '../data/designs';
 import PressableCard from '../components/PressableCard';
 import Skeleton from '../components/Skeleton';
 import { SellerName } from '../components/VerifiedBadge';
@@ -791,10 +792,13 @@ export default function ExploreScreen({ navigation, route }) {
           };
         }).filter(d => !!d.imageUrl);
         console.log('[Explore] Loaded', normalized.length, 'community designs');
-        setCommunityDesigns(normalized);
+        // Fallback to local seed designs if Supabase returned nothing
+        setCommunityDesigns(normalized.length > 0 ? normalized : LOCAL_DESIGNS);
       }).catch(err => {
         clearTimeout(fetchTimeoutId);
         console.warn('[Explore] Failed to load community designs:', err.message);
+        // Use local seed designs as graceful fallback
+        setCommunityDesigns(LOCAL_DESIGNS);
       }).finally(() => {
         clearTimeout(fetchTimeoutId);
         setCommunityLoading(false);
@@ -879,7 +883,7 @@ export default function ExploreScreen({ navigation, route }) {
 
   return (
     <TabScreenFade style={styles.container}>
-      <SafeAreaView style={styles.safeArea}>
+      <SafeAreaView style={styles.safeArea} edges={['top']}>
         <ScrollView
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.scrollContent}
@@ -1469,7 +1473,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingTop: space.md,
-    paddingBottom: space['2xl'],
+    paddingBottom: 0,
   },
 
   // Header

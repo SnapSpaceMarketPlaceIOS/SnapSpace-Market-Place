@@ -1481,7 +1481,7 @@ export default function ProductDetailScreen({ route, navigation }) {
           <SupplierRow
             brand={brand}
             inStock={inStock}
-            onCamera={() => {}}
+            onCamera={() => navigation.navigate('Main', { screen: 'Wish', params: { product } })}
             isLiked={!!likedProducts[product?.id]}
             onLike={() => toggleLikedProduct(product)}
             onShare={async () => {

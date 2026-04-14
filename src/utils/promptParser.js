@@ -58,12 +58,24 @@ export function parseDesignPrompt(promptText) {
 
   const text = promptText.toLowerCase();
 
-  const roomType = detectRoomType(text);
+  const allRoomTypes = detectAllRoomTypes(text);
+  const roomType = allRoomTypes[0] || 'living-room';
   const styles = detectStyles(text);
   const materials = detectMaterials(text);
   const colors = detectColorFamilies(text); // NEW in Phase 3
   const moods = detectMoods(text);
-  const furnitureCategories = ROOM_FURNITURE[roomType] || ROOM_FURNITURE['living-room'];
+  const baseFurniture = ROOM_FURNITURE[roomType] || ROOM_FURNITURE['living-room'];
+
+  // If there's a secondary room type, merge its furniture (deduped)
+  let furnitureCategories = [...baseFurniture];
+  if (allRoomTypes.length > 1) {
+    const secondaryFurniture = ROOM_FURNITURE[allRoomTypes[1]] || [];
+    for (const cat of secondaryFurniture) {
+      if (!furnitureCategories.includes(cat)) {
+        furnitureCategories.push(cat);
+      }
+    }
+  }
 
   // Attach each detected color/material to a specific category when possible.
   // "brown leather couch" → { sofa: 'brown', sofa (mat): 'leather' }
@@ -93,7 +105,7 @@ export function parseDesignPrompt(promptText) {
 
 /**
  * Scan the prompt text for each detected attribute (color or material) and
- * pair it with the nearest category word in a 5-token window. Returns a map
+ * pair it with the nearest category word in an 8/5-token window. Returns a map
  * of category → attribute.
  *
  * Example: "brown leather couch with white rug"
@@ -123,9 +135,9 @@ function attachAttributeToCategory(text, attributes, containsCheck) {
     }
     if (attrIdx === -1) continue;
 
-    // Look in a 5-word window AFTER the attribute for a category word.
+    // Look in an 8-word window AFTER the attribute for a category word.
     // "brown leather COUCH" — category comes after attribute
-    const windowEnd = Math.min(words.length, attrIdx + 6);
+    const windowEnd = Math.min(words.length, attrIdx + 9);
     let matchedCategory = null;
     for (let i = attrIdx + 1; i < windowEnd; i++) {
       const word = words[i].replace(/[^a-z]/g, '');
@@ -138,9 +150,9 @@ function attachAttributeToCategory(text, attributes, containsCheck) {
       if (matchedCategory) break;
     }
 
-    // Also check a 3-word window BEFORE the attribute (for "couch in brown")
+    // Also check a 5-word window BEFORE the attribute (for "couch in brown")
     if (!matchedCategory) {
-      const windowStart = Math.max(0, attrIdx - 3);
+      const windowStart = Math.max(0, attrIdx - 5);
       for (let i = attrIdx - 1; i >= windowStart; i--) {
         const word = words[i].replace(/[^a-z]/g, '');
         for (const [category, aliases] of Object.entries(CATEGORY_ALIASES)) {
@@ -161,13 +173,27 @@ function attachAttributeToCategory(text, attributes, containsCheck) {
   return result;
 }
 
-function detectRoomType(text) {
+/**
+ * Detect ALL matching room types from prompt text, sorted by keyword
+ * specificity (longest keyword match first). The first entry is the
+ * primary room type; the second (if any) is the secondary.
+ *
+ * Multi-word keywords are checked first so "breakfast nook" → dining-room
+ * (9 chars) wins over "nook" → living-room (4 chars).
+ */
+function detectAllRoomTypes(text) {
+  const matches = [];
   for (const [room, keywords] of Object.entries(ROOM_KEYWORDS)) {
-    if (keywords.some((kw) => text.includes(kw))) {
-      return room;
+    for (const kw of keywords) {
+      if (text.includes(kw)) {
+        matches.push({ room, keyword: kw, length: kw.length });
+        break; // only need one match per room
+      }
     }
   }
-  return 'living-room'; // default
+  // Sort by keyword length descending (longest/most specific match first)
+  matches.sort((a, b) => b.length - a.length);
+  return matches.map(m => m.room);
 }
 
 function detectStyles(text) {

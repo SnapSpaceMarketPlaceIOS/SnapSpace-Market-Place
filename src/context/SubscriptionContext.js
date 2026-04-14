@@ -188,6 +188,10 @@ export function SubscriptionProvider({ children }) {
   // ── Refresh quota from backend ──────────────────────────────────────────
   const refreshQuota = useCallback(async () => {
     if (FORCE_PAID_TIER) return; // dev bypass — keep forced premium state
+    // DEV: skip DB fetch — local state is the source of truth during dev.
+    // This prevents the DB's stale generations_used from overwriting the
+    // local count that recordGeneration() is incrementing correctly.
+    if (__DEV__) return;
     if (!user?.id) return;
     try {
       const quota = await fetchQuota(user.id);
@@ -205,6 +209,7 @@ export function SubscriptionProvider({ children }) {
       if (prev.quotaLimit === -1) return prev; // unlimited — no change
       const used      = prev.generationsUsed + 1;
       const remaining = Math.max(0, prev.quotaLimit - used);
+      console.log('[Subscription] recordGeneration: used=' + used + ' remaining=' + remaining);
       return {
         ...prev,
         generationsUsed:      used,
@@ -212,6 +217,9 @@ export function SubscriptionProvider({ children }) {
         canGenerate:          remaining > 0,
       };
     });
+
+    // DEV: skip DB persist — local state is source of truth
+    if (__DEV__) return;
 
     // Persist to database so refreshQuota doesn't overwrite back to 0
     if (user?.id) {
@@ -329,10 +337,35 @@ export function SubscriptionProvider({ children }) {
     }
   }, [iapReady, user?.id]);
 
+  // ── Dev-only: quota tracking uses local state only ────────────────────────
+  // In dev mode, we skip refreshQuota() entirely so the DB can't overwrite
+  // local counts. The local DEFAULT_SUBSCRIPTION starts at 0/5 and
+  // recordGeneration() increments it correctly. This means quota tracking
+  // is purely client-side during dev — no DB dependency.
+  const devResetQuota = useCallback(() => {
+    console.log('[Subscription] DEV: resetting quota to 0/5 (local only)');
+    setSubscription({
+      tier: 'free',
+      quotaLimit: 5,
+      generationsUsed: 0,
+      generationsRemaining: 5,
+      canGenerate: true,
+      quotaResetDate: null,
+      subscriptionStatus: 'none',
+      subscriptionExpiresAt: null,
+    });
+  }, []);
+
   // ── Refresh on user login ───────────────────────────────────────────────
   useEffect(() => {
     if (user?.id) {
-      refreshQuota();
+      if (__DEV__) {
+        // DEV: reset to fresh 5 wishes on app launch, skip DB fetch entirely.
+        // recordGeneration() will increment locally from 0.
+        devResetQuota();
+      } else {
+        refreshQuota();
+      }
       refreshTokenBalance();
     }
   }, [user?.id, refreshQuota, refreshTokenBalance]);
@@ -347,6 +380,7 @@ export function SubscriptionProvider({ children }) {
         tokenProducts,      // StoreKit token product metadata
         devForcePaywall,
         setDevForcePaywall: __DEV__ ? setDevForcePaywall : () => {},
+        devResetQuota: __DEV__ ? devResetQuota : () => {},
         refreshQuota,
         recordGeneration,
         purchaseSubscription,

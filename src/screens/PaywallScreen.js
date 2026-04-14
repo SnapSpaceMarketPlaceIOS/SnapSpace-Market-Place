@@ -244,11 +244,13 @@ export default function PaywallScreen({ navigation }) {
     return () => { cancelled = true; clearTimeout(heroTimerRef.current); };
   }, []);
 
-  // Quota progress
+  // Quota progress — show for free-tier users so they see remaining wishes
   const usedCount = subscription.generationsUsed;
-  const isUnlimited = subscription.quotaLimit === -1;
-  const totalFree = subscription.tier === 'free' ? 5 : (isUnlimited ? 0 : subscription.quotaLimit);
-  const progressPct = totalFree > 0 ? Math.min(1, usedCount / totalFree) : 0;
+  const isFree = subscription.tier === 'free';
+  const totalFree = isFree ? 5 : subscription.quotaLimit;
+  const remaining = Math.max(0, totalFree - usedCount);
+  // Bar starts full (100% = all wishes available) and depletes toward 0%
+  const progressPct = totalFree > 0 ? Math.min(1, remaining / totalFree) : 0;
 
   // Entrance animation — bar fills from 0 to actual value once on mount
   const progressAnim = useRef(new Animated.Value(0)).current;
@@ -392,11 +394,11 @@ export default function PaywallScreen({ navigation }) {
           <Text style={styles.subtitle}>Generate stunning room designs and shop curated furniture.</Text>
 
           {/* ── Free Wishes Usage bar ──────────────────────────────── */}
-          {!isUnlimited && (
+          {isFree && (
           <View style={styles.progressCard}>
             <View style={styles.progressLabelRow}>
-              <Text style={styles.progressLabel}>Free Wishes Remaining</Text>
-              <Text style={styles.progressCount}>{usedCount}/{totalFree}</Text>
+              <Text style={styles.progressLabel}>Free Wishes</Text>
+              <Text style={styles.progressCount}>{remaining} of {totalFree}</Text>
             </View>
             <View style={styles.progressTrack}>
               <Animated.View style={[styles.progressFill, {

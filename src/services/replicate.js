@@ -89,8 +89,11 @@ async function submitFluxWithRetry(baseInput) {
 const QUALITY_PREFIX =
   'Editorial architectural photography, ultra-sharp focus, crisp detail, natural light, magazine-quality interior, Architectural Digest style.';
 
-// Cap total prompt words (flux-2-max tokenizer starts dropping signal past ~150 words)
-const MAX_PROMPT_WORDS = 150;
+// Cap total prompt words. Raised to 200: flux-2-max retains useful signal up to
+// ~200 words; beyond that the tokenizer starts dropping late tokens. The smart
+// budget in buildFinalPrompt trims user text first (least specific) to keep
+// high-priority product hints and color palette intact.
+const MAX_PROMPT_WORDS = 200;
 
 /**
  * Build the enriched design-intent prompt that is passed INTO the final
@@ -118,14 +121,28 @@ export function buildFinalPrompt(userPrompt, productHints, colorPalette) {
     parts.push(`Color palette: ${colorPalette}.`);
   }
 
-  parts.push(userPrompt || 'Modern minimalist interior design.');
+  // Product hints and color palette are high-priority (early tokens get more
+  // attention from flux-2-max). User prompt is supplementary style intent.
+  const highPriority = parts.join(' ');
+  const highPriorityWords = highPriority.split(/\s+/).filter(Boolean);
 
-  const full = parts.join(' ');
-  const words = full.split(/\s+/);
-  if (words.length > MAX_PROMPT_WORDS) {
-    return words.slice(0, MAX_PROMPT_WORDS).join(' ');
+  const userText = userPrompt || 'Modern minimalist interior design.';
+  const userWords = userText.split(/\s+/).filter(Boolean);
+
+  // Budget: total cap minus high-priority content
+  const userBudget = MAX_PROMPT_WORDS - highPriorityWords.length;
+
+  if (userBudget <= 0) {
+    // Extremely rare: product hints alone exceed budget. Trim them.
+    return highPriorityWords.slice(0, MAX_PROMPT_WORDS).join(' ');
   }
-  return full;
+
+  // Trim user prompt if it exceeds remaining budget
+  const trimmedUser = userWords.length > userBudget
+    ? userWords.slice(0, userBudget).join(' ')
+    : userText;
+
+  return [highPriority, trimmedUser].filter(Boolean).join(' ');
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -209,6 +226,79 @@ export async function generateWithProductRefs(roomPhotoUrl, userPrompt, products
     resolution:       '0.5 MP',   // fixed — cost constraint
     output_format:    'webp',
     output_quality:   100,        // max WebP quality — no billing impact
+    safety_tolerance: 5,
+  });
+
+  return result.url;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// flux-2-max: Single-product placement (2 images: room + 1 product)
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Generate an image placing a SINGLE product into the user's room photo.
+ * Simpler than the multi-product paths — no panel compositing, no product
+ * matching, no style intent. Just: "put this product in that room."
+ *
+ * Uses the same flux-2-max model and retry wrapper as the full-room flow.
+ * Cost: ~$0.10/generation (2 input images at 0.5 MP).
+ *
+ * @param {string}   roomPhotoUrl - Public URL of the user's room photo
+ * @param {object}   product      - Product object with imageUrl, name, category, materials, tags
+ * @param {string}   [aspectRatio] - Explicit aspect ratio from pickAspectRatio(). Falls back to 'match_input_image'.
+ * @returns {Promise<string>}     - URL of the generated image
+ */
+export async function generateSingleProductInRoom(roomPhotoUrl, product, aspectRatio) {
+  if (!TOKEN) throw new Error('Replicate API token is missing. Add EXPO_PUBLIC_REPLICATE_API_TOKEN to your .env file.');
+  if (!roomPhotoUrl) throw new Error('generateSingleProductInRoom requires a public room photo URL.');
+  if (!product?.imageUrl) throw new Error('generateSingleProductInRoom requires a product with an imageUrl.');
+
+  const descriptor = describeProductForPrompt(product) || (product.category || 'furniture').replace(/-/g, ' ');
+
+  // Cap product image to 512px max dimension to reduce GPU preprocessing time.
+  // flux-2-max downsamples all inputs to match its 0.5 MP output anyway, so
+  // sending 512px vs 2000px produces identical quality — just costs less GPU-seconds.
+  //
+  // Amazon image URL formats:
+  //   ._AC_SL1500_.jpg   → auto-crop, scale-length 1500px (EXPENSIVE)
+  //   ._AC_UL640_.jpg    → auto-crop, upload-limit 640px
+  //   ._AC_SX522_.jpg    → auto-crop, scale-x 522px
+  //   ._SL1500_.jpg      → scale-length 1500px (no AC prefix)
+  //
+  // We replace the ENTIRE modifier block with ._AC_SL512_. to guarantee 512px.
+  let productImageUrl = product.imageUrl;
+  try {
+    const url = new URL(productImageUrl);
+    if (url.hostname.includes('amazon') || url.hostname.includes('media-amazon')) {
+      // Match: ._<any combo of letters, underscores, digits>_. before the extension
+      // Examples: ._AC_SL1500_.  ._AC_UL640_.  ._SL1500_.  ._AC_SX522_.
+      productImageUrl = productImageUrl.replace(/\._[A-Z0-9_]+_\./, '._AC_SL512_.');
+      console.log('[flux-2-max] resized Amazon image to 512px:', productImageUrl.substring(productImageUrl.lastIndexOf('/') + 1));
+    }
+  } catch {
+    // URL parsing failed — use original URL unchanged
+  }
+
+  const prompt = [
+    QUALITY_PREFIX,
+    'This is a precise scene edit, not a new generation.',
+    'Preserve image 1 exactly: same walls, floor, ceiling, windows, lighting, camera angle, perspective, and spatial layout. Do not alter any architecture.',
+    `Place this EXACT product reference (image 2) into the room: ${descriptor}. Match color, material, silhouette, and proportions precisely. Position it naturally where this type of furniture belongs in the room. Do not substitute with similar-looking alternatives.`,
+  ].join(' ');
+
+  console.log('[flux-2-max] single-product prompt:', prompt.substring(0, 200) + '...');
+  console.log('[flux-2-max] input_images: 2 (1 room + 1 product)');
+  console.log('[flux-2-max] product image:', productImageUrl.substring(0, 80));
+  console.log('[flux-2-max] aspect_ratio:', aspectRatio || 'match_input_image');
+
+  const result = await submitFluxWithRetry({
+    prompt,
+    input_images:     [roomPhotoUrl, productImageUrl],
+    aspect_ratio:     aspectRatio || 'match_input_image',
+    resolution:       '0.5 MP',
+    output_format:    'webp',
+    output_quality:   100,
     safety_tolerance: 5,
   });
 

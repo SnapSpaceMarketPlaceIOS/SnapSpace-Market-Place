@@ -40,7 +40,7 @@ import { useCart } from '../context/CartContext';
 import { DESIGNS } from '../data/designs';
 import { SELLERS } from '../data/sellers';
 import { searchProducts, getSourceColor, getProductsForPrompt } from '../services/affiliateProducts';
-import { buildFinalPrompt, generateWithProductRefs, generateWithProductPanel, pickAspectRatio } from '../services/replicate';
+import { buildFinalPrompt, generateWithProductRefs, generateWithProductPanel, generateSingleProductInRoom, pickAspectRatio } from '../services/replicate';
 import { createProductPanel } from '../utils/createProductPanel';
 import { verifyGeneratedProducts } from '../services/visionMatcher';
 import { PRODUCT_CATALOG } from '../data/productCatalog';
@@ -48,6 +48,7 @@ import { saveUserDesign, updateDesignVisibility, uploadRoomPhoto } from '../serv
 import { useSubscription } from '../context/SubscriptionContext';
 import { generateWithBFL } from '../services/bfl';
 import TabScreenFade from '../components/TabScreenFade';
+import ProductVisualizeModal from '../components/ProductVisualizeModal';
 import { sendNotificationIfEnabled } from '../services/notifications';
 
 const { width, height } = Dimensions.get('window');
@@ -844,6 +845,12 @@ export default function HomeScreen({ navigation, route }) {
   const [posting, setPosting] = useState(false);
   const [autoSavedDesignId, setAutoSavedDesignId] = useState(null);
 
+  // ── Single-product visualize mode ─────────────────────────────────────────
+  // Set when user navigates from ProductDetailScreen → SnapScreen → Home
+  // with a specific product to place in their room photo.
+  const [singleProduct, setSingleProduct] = useState(null);
+  const [visualizeResult, setVisualizeResult] = useState(null);
+
   // ── Generation quota (managed by SubscriptionContext) ────────────────────
 
   // Loading bar animation
@@ -972,15 +979,33 @@ export default function HomeScreen({ navigation, route }) {
     });
   }, []);
 
-  // Receive photo captured from Snap tab
+  // Receive photo captured from Snap tab (and optional single product for visualize flow)
   useEffect(() => {
     if (route?.params?.capturedPhoto) {
       const captured = route.params.capturedPhoto;
       setPhoto(captured);
       setPhotoSource('camera');
-      navigation.setParams({ capturedPhoto: undefined });
+      // Single-product visualize: product passed from ProductDetailScreen → SnapScreen → here
+      if (route.params.singleProduct) {
+        setSingleProduct(route.params.singleProduct);
+      }
+      navigation.setParams({ capturedPhoto: undefined, singleProduct: undefined });
     }
   }, [route?.params?.capturedPhoto]);
+
+  // Auto-trigger generation when single-product mode is active (photo + product both set).
+  // The user doesn't type a prompt — the product IS the intent.
+  const singleProductTriggered = useRef(false);
+  useEffect(() => {
+    if (photo && singleProduct && !generating && !singleProductTriggered.current) {
+      singleProductTriggered.current = true;
+      // Small delay so the HomeScreen has time to render the loading UI
+      setTimeout(() => runGeneration(), 300);
+    }
+    if (!singleProduct) {
+      singleProductTriggered.current = false;
+    }
+  }, [photo, singleProduct, generating]);
 
   const handlePickFromLibrary = useCallback(async () => {
     if (generating) return;
@@ -1236,30 +1261,32 @@ export default function HomeScreen({ navigation, route }) {
   };
 
   const runGeneration = async () => {
+    const isSingleProductMode = !!singleProduct;
+
     if (!photo) {
       Alert.alert('Add a Room Photo', 'Tap the camera icon to snap your room, or pick from your library.');
       return;
     }
-    if (!prompt.trim()) {
+    // Prompt is only required for the full-room flow — single-product skips it
+    if (!isSingleProductMode && !prompt.trim()) {
       Alert.alert('Describe Your Style', 'Add a style description so the AI knows what to create.');
       return;
     }
-    const designPrompt = prompt.trim();
+    const designPrompt = isSingleProductMode ? '' : prompt.trim();
     const savedPhoto = { ...photo };
     Keyboard.dismiss();
 
     // ── Observability: one ID per generation attempt ───────────────────────
-    // Threaded through every log line below so a single Metro/Xcode log search
-    // surfaces the whole funnel: pre-match → panel → flux → verify → save.
-    // Short format (time + 4 random chars) — long UUIDs clutter logs.
     const generationId = `g-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`;
     const log = (...args) => console.log(`[gen:${generationId}]`, ...args);
     const warn = (...args) => console.warn(`[gen:${generationId}]`, ...args);
     const startedAt = Date.now();
-    log('start | prompt="' + designPrompt.substring(0, 80) + '"');
+    log('start | mode=' + (isSingleProductMode ? 'single-product' : 'full-room') + ' | prompt="' + designPrompt.substring(0, 80) + '"');
 
-    // Initialize rotating loading messages tailored to the prompt
-    const msgs = getLoadingMessages(designPrompt);
+    // Initialize rotating loading messages
+    const msgs = isSingleProductMode
+      ? ['Placing product in your space…', 'Matching lighting and perspective…', 'Almost there…']
+      : getLoadingMessages(designPrompt);
     setLoadingMessages(msgs);
     setLoadingMsgIndex(0);
     loadingMsgOpacity.setValue(1);
@@ -1268,33 +1295,56 @@ export default function HomeScreen({ navigation, route }) {
     try {
       setGenStatus('');
 
-      // ── Pre-match products from local catalog (before any generation call) ──
-      setGenStatus('Finding products for your space…');
-      const matchedProducts = getProductsForPrompt(designPrompt, 4);
-      log('pre-matched', matchedProducts.length, 'products:', matchedProducts.map(p => p.category).join(','));
+      // ── Pre-match products (full-room only — single-product already has one) ──
+      let matchedProducts = [];
+      if (!isSingleProductMode) {
+        setGenStatus('Finding products for your space…');
+        matchedProducts = getProductsForPrompt(designPrompt, 4);
+        log('pre-matched', matchedProducts.length, 'products:', matchedProducts.map(p => p.category).join(','));
+      }
 
-      // ── URL pre-flight: drop any matched product whose image 404s ────────
-      // Amazon image URLs occasionally rotate / expire. If a stale URL makes
-      // it into input_images, flux-2-max fails the whole prediction with
-      // "404 Client Error: Not Found for url: ...", which silently drops us
-      // onto BFL. Catch that here so only reachable products reach Replicate.
-      // The pre-match set is still shown in the UI regardless — pre-flight
-      // only affects which URLs get sent to the generation model.
-      const reachableProducts = await filterReachableProducts(matchedProducts);
-      const dropped = matchedProducts.length - reachableProducts.length;
-      if (dropped > 0) {
-        warn('preflight: dropped ' + dropped + '/' + matchedProducts.length + ' products with unreachable images');
-      } else {
-        log('preflight: all ' + matchedProducts.length + ' product URLs reachable');
+      // ── URL pre-flight (full-room only — single-product does its own check) ──
+      let reachableProducts = [];
+      if (!isSingleProductMode) {
+        reachableProducts = await filterReachableProducts(matchedProducts);
+        const dropped = matchedProducts.length - reachableProducts.length;
+        if (dropped > 0) {
+          warn('preflight: dropped ' + dropped + '/' + matchedProducts.length + ' products with unreachable images');
+        } else {
+          log('preflight: all ' + matchedProducts.length + ' product URLs reachable');
+        }
       }
 
       // ── Derive aspect ratio from the room photo orientation ──────────────
       // flux-2-max's 'match_input_image' is ambiguous with multi-image input,
       // so we snap the room photo's native aspect to the closest supported
-      // bucket and pass it explicitly. Large rooms get landscape, narrow
-      // rooms get portrait — the generated render matches the source framing.
-      const aspectRatio = pickAspectRatio(savedPhoto.width, savedPhoto.height);
-      log('photo', savedPhoto.width + 'x' + savedPhoto.height, '→ aspect_ratio =', aspectRatio);
+      // bucket and pass it explicitly. Portrait photos get tall ratios (3:4,
+      // 9:16), landscape get wide ratios (4:3, 16:9) — the generated render
+      // matches the source framing regardless of device orientation.
+      let photoW = savedPhoto.width;
+      let photoH = savedPhoto.height;
+
+      // Safety net: if dimensions are missing (rare edge case — older devices,
+      // corrupted EXIF), resolve them from the image file before proceeding.
+      if (!photoW || !photoH) {
+        try {
+          const dims = await new Promise((resolve, reject) => {
+            Image.getSize(
+              savedPhoto.uri,
+              (w, h) => resolve({ w, h }),
+              reject
+            );
+          });
+          photoW = dims.w;
+          photoH = dims.h;
+          log('resolved photo dimensions via Image.getSize:', photoW + 'x' + photoH);
+        } catch {
+          warn('could not resolve photo dimensions — using match_input_image fallback');
+        }
+      }
+
+      const aspectRatio = pickAspectRatio(photoW, photoH);
+      log('photo', photoW + 'x' + photoH, '→ aspect_ratio =', aspectRatio);
 
       // ── Quota waterfall: free → tokens → subscription → paywall ─────────
       let generationSource = null;
@@ -1306,6 +1356,14 @@ export default function HomeScreen({ navigation, route }) {
       } else {
         stopLoadingBar(false);
         setGenerating(false);
+        // Clean up single-product state so HomeScreen returns to a clean
+        // state when the user dismisses the paywall.
+        if (isSingleProductMode) {
+          setSingleProduct(null);
+          singleProductTriggered.current = false;
+          setPhoto(null);
+          setPhotoSource(null);
+        }
         navigation.navigate('Paywall');
         return;
       }
@@ -1344,18 +1402,85 @@ export default function HomeScreen({ navigation, route }) {
           return;
         }
 
-        // ── Step 2: BFL Generation with Product Image References ──────────
-        //
-        // BFL flux-kontext-pro now sends catalog product images via
-        // experimental input_image_2/3/4 parameters so the AI can VISUALLY
-        // SEE what each product looks like before rendering.
-        //
-        // Products passed in = products shown in "Shop Your Room".
-        // If BFL silently ignores the params, products are still
-        // text-matched (same as before — no regression).
-        //
-        // Cost: ~$0.04/generation (same as before)
-        //
+        // ── Step 2: Generation ──────────────────────────────────────────────
+
+        if (isSingleProductMode) {
+          // ── SINGLE-PRODUCT PATH ─────────────────────────────────────────
+          // Skip product matching, panel compositing, and vision verification.
+          // Just place one product in the user's room photo.
+          try {
+            setGenStatus('Placing product in your space…');
+            log('single-product mode | product=' + singleProduct.name?.substring(0, 50));
+
+            // Pre-flight the product image URL
+            const productOk = await preflightUrl(singleProduct.imageUrl);
+            if (!productOk) {
+              throw new Error('Product image is not reachable — it may have expired.');
+            }
+
+            resultUrl = await generateSingleProductInRoom(
+              roomPhotoUrl,
+              singleProduct,
+              aspectRatio,
+            );
+            finalProducts = [singleProduct];
+            genMeta.pipeline = 'single-product';
+            log('single-product gen complete | url=' + resultUrl?.substring(0, 80));
+
+            // ── Cost tracking (same as full-room) ─────────────────────────
+            if (generationSource === 'token') {
+              await deductToken();
+              refreshTokenBalance();
+            } else {
+              await recordGeneration();
+              refreshQuota();
+            }
+
+          } catch (genErr) {
+            stopLoadingBar(false);
+            setGenerating(false);
+            setSingleProduct(null);
+            Alert.alert(
+              'Generation Failed',
+              `Could not place this product in your room. Please try again.\n\nDetails: ${genErr.message}`
+            );
+            console.error('[Gen] Single-product error:', genErr.message);
+            return;
+          }
+
+          // ── Single-product complete: auto-save + show popup modal ────
+          const durationMs = Date.now() - startedAt;
+          log('done | single-product | ' + durationMs + 'ms');
+
+          // Auto-save to user_designs so the Like button can reference a real designId
+          let savedDesignId = null;
+          if (user?.id) {
+            try {
+              const saved = await saveUserDesign(user.id, {
+                imageUrl: resultUrl,
+                prompt: `Product visualize: ${singleProduct.name || 'product'}`,
+                styleTags: singleProduct.styles || [],
+                products: [{ id: singleProduct.id, name: singleProduct.name, brand: singleProduct.brand, price: singleProduct.price, imageUrl: singleProduct.imageUrl, affiliateUrl: singleProduct.affiliateUrl, source: singleProduct.source }],
+                visibility: 'private',
+              });
+              savedDesignId = saved?.id || null;
+              log('auto-saved single-product design:', savedDesignId);
+            } catch (saveErr) {
+              warn('auto-save failed (non-blocking):', saveErr.message);
+            }
+          }
+
+          stopLoadingBar();
+          setGenerating(false);
+          setGenStatus('');
+          setVisualizeResult({ resultUri: resultUrl, product: singleProduct, designId: savedDesignId });
+          setSingleProduct(null);
+          setPhoto(null);
+          setPhotoSource(null);
+          return; // Exit early — don't run full-room post-processing
+        }
+
+        // ── FULL-ROOM PATH (existing flow, unchanged) ─────────────────────
 
         try {
           // ── Primary: Replicate flux-2-max (visual product matching) ─────
@@ -2288,6 +2413,16 @@ export default function HomeScreen({ navigation, route }) {
           )}
         </View>
       </Modal>
+      {/* ── Single-product visualize result popup ───────────────────── */}
+      <ProductVisualizeModal
+        visible={!!visualizeResult}
+        resultUri={visualizeResult?.resultUri}
+        product={visualizeResult?.product}
+        designId={visualizeResult?.designId}
+        onClose={() => setVisualizeResult(null)}
+        onAddToCart={(p) => { addToCart(p); setVisualizeResult(null); }}
+        onNavigateToProduct={(p) => { setVisualizeResult(null); navigation.navigate('ProductDetail', { product: p }); }}
+      />
     </TabScreenFade>
   );
 }
