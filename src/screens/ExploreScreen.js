@@ -24,6 +24,9 @@ import Svg, { Circle, Line, Path, Rect, Polyline } from 'react-native-svg';
 import { fontSize, fontWeight, letterSpacing, space, radius, shadow, typeScale } from '../constants/tokens';
 import theme from '../constants/theme';
 import { useLiked } from '../context/LikedContext';
+import { useAuth } from '../context/AuthContext';
+import { useOnboarding, ONBOARDING_STEPS } from '../context/OnboardingContext';
+import OnboardingOverlay from '../components/OnboardingOverlay';
 import { PRODUCT_CATALOG } from '../data/productCatalog';
 import { getPublicDesigns } from '../services/supabase';
 import { DESIGNS as LOCAL_DESIGNS } from '../data/designs';
@@ -605,7 +608,10 @@ const ROOM_LABEL_MAP = {
 // ── Main Component ─────────────────────────────────────────────────────────────
 
 export default function ExploreScreen({ navigation, route }) {
+  const { user } = useAuth();
   const { liked, toggleLiked } = useLiked();
+  // onboarding hooks kept for potential future use
+  const _onboarding = useOnboarding();
   const [activeTab, setActiveTab] = useState('wishes'); // 'wishes' | 'products'
   const [activeCategory, setActiveCategory] = useState(0);
   const [activeProdCat, setActiveProdCat] = useState(0);
@@ -880,6 +886,12 @@ export default function ExploreScreen({ navigation, route }) {
     () => filteredProducts.slice(0, productsVisibleCount),
     [filteredProducts, productsVisibleCount],
   );
+
+  // ── Auth wall — show full Auth screen inline if not signed in ──────────────
+  if (!user) {
+    const AuthScreen = require('./AuthScreen').default;
+    return <AuthScreen navigation={navigation} />;
+  }
 
   return (
     <TabScreenFade style={styles.container}>
@@ -2565,4 +2577,5 @@ const styles = StyleSheet.create({
     color: TC.textTertiary,
     textAlign: 'center',
   },
+
 });

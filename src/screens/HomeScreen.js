@@ -51,6 +51,8 @@ import TabScreenFade from '../components/TabScreenFade';
 import ProductVisualizeModal from '../components/ProductVisualizeModal';
 import GenieLoader from '../components/GenieLoader';
 import { sendNotificationIfEnabled } from '../services/notifications';
+import { useOnboarding, ONBOARDING_STEPS } from '../context/OnboardingContext';
+import OnboardingOverlay, { OnboardingGlow } from '../components/OnboardingOverlay';
 
 const { width, height } = Dimensions.get('window');
 
@@ -850,6 +852,7 @@ export default function HomeScreen({ navigation, route }) {
   } = useSubscription();
   const { addToCart, items: cartItems } = useCart();
   const { liked } = useLiked();
+  const { isStepActive, nextStep, prevStep, finishOnboarding, startOnboarding, active: onboardingActive } = useOnboarding();
   const [prompt, setPrompt] = useState('');
   const [inputExpanded, setInputExpanded] = useState(false);
   const [greeting, setGreeting] = useState(getGreeting());
@@ -897,6 +900,15 @@ export default function HomeScreen({ navigation, route }) {
       .then(({ status }) => { if (status === 'granted') mediaPermGranted.current = true; })
       .catch(() => {});
   }, []);
+
+  // Auto-start onboarding on first visit after sign-up
+  useEffect(() => {
+    if (user && !onboardingActive) {
+      // Small delay so the home screen finishes rendering first
+      const t = setTimeout(() => startOnboarding(), 800);
+      return () => clearTimeout(t);
+    }
+  }, [user]);
 
   const springIn  = (anim) => Animated.spring(anim, { toValue: 0.82, useNativeDriver: true, tension: 300, friction: 10 }).start();
   const springOut = (anim) => Animated.spring(anim, { toValue: 1,    useNativeDriver: true, tension: 200, friction: 7  }).start();
@@ -1783,6 +1795,7 @@ export default function HomeScreen({ navigation, route }) {
                 ))}
               </ScrollView>
             )}
+            <OnboardingGlow visible={isStepActive('chat_bar')} borderRadius={inputExpanded ? 20 : 40} style={isStepActive('chat_bar') ? { padding: 4 } : undefined}>
             <Animated.View style={[styles.inputBar, { borderRadius: inputExpanded ? 16 : 36, transform: [{ scale: inputScale }] }]}>
               {/* Camera icon — badge only when photo came from camera */}
               <View>
@@ -1866,6 +1879,21 @@ export default function HomeScreen({ navigation, route }) {
                 )}
               </TouchableOpacity>
             </Animated.View>
+            </OnboardingGlow>
+            {/* Onboarding Step 1 tooltip */}
+            {isStepActive('chat_bar') && (
+              <OnboardingOverlay
+                visible
+                step={ONBOARDING_STEPS.CHAT_BAR}
+                onNext={() => {
+                  nextStep();
+                  navigation.navigate('Main', { screen: 'Wish' });
+                }}
+                onSkip={finishOnboarding}
+                tooltipPosition="below"
+                style={{ position: 'relative', marginTop: 24 }}
+              />
+            )}
             {/* Loading progress bar */}
             {generating && (
               <View style={styles.loadingBarTrack}>

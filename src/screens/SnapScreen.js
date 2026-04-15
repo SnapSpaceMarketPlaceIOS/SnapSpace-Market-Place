@@ -13,6 +13,8 @@ import { palette } from '../constants/tokens';
 import { useAuth } from '../context/AuthContext';
 import AuthGate from '../components/AuthGate';
 import TabScreenFade from '../components/TabScreenFade';
+import { useOnboarding, ONBOARDING_STEPS } from '../context/OnboardingContext';
+import OnboardingOverlay from '../components/OnboardingOverlay';
 
 // ─── Icons ───────────────────────────────────────────────────────────────────
 
@@ -39,6 +41,7 @@ function GalleryIcon({ size = 22, color = 'rgba(255,255,255,0.9)' }) {
 
 export default function SnapScreen({ navigation, route }) {
   const { user } = useAuth();
+  const { isStepActive, nextStep, prevStep, finishOnboarding } = useOnboarding();
   const [permission, requestPermission] = useCameraPermissions();
   const [facing, setFacing] = useState('back');
   const [flash, setFlash] = useState(false);
@@ -155,6 +158,37 @@ export default function SnapScreen({ navigation, route }) {
           <View style={{ width: 50 }} />
         </View>
       </View>
+
+      {/* Onboarding Step 2 tooltip */}
+      {isStepActive('camera') && (
+        <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, justifyContent: 'center', zIndex: 1000 }}>
+          <OnboardingOverlay
+            visible
+            step={ONBOARDING_STEPS.CAMERA}
+            onNext={() => {
+              nextStep();
+              // Auto-navigate: Explore → first product → PDP for step 3
+              navigation.navigate('Main', { screen: 'Explore' });
+              setTimeout(() => {
+                // Navigate to first product in catalog for the genie lamp tutorial
+                const CATALOG = require('../data/productCatalog').PRODUCT_CATALOG;
+                const firstProduct = CATALOG[0];
+                if (firstProduct) {
+                  const navProduct = { ...firstProduct, price: firstProduct.priceDisplay || `$${firstProduct.price}`, priceValue: firstProduct.price, source: firstProduct.source };
+                  navigation.navigate('ProductDetail', { product: navProduct });
+                }
+              }, 600);
+            }}
+            onBack={() => {
+              prevStep();
+              navigation.navigate('Main', { screen: 'Home' });
+            }}
+            onSkip={finishOnboarding}
+            tooltipPosition="below"
+            style={{ position: 'relative', marginHorizontal: 16 }}
+          />
+        </View>
+      )}
     </TabScreenFade>
   );
 }

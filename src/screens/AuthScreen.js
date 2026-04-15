@@ -16,6 +16,7 @@ import {
 import Svg, { Path, Line } from 'react-native-svg';
 import * as AppleAuthentication from 'expo-apple-authentication';
 import { useAuth } from '../context/AuthContext';
+import { useOnboarding } from '../context/OnboardingContext';
 import LensLoader from '../components/LensLoader';
 import CardImage from '../components/CardImage';
 import { applyReferralCode } from '../services/subscriptionService';
@@ -292,6 +293,7 @@ const marqueeStyles = StyleSheet.create({
 
 export default function AuthScreen({ navigation }) {
   const { signUp, signIn, signInWithApple, resetPassword } = useAuth();
+  const { enableOnboarding } = useOnboarding();
 
   const [isSignUp, setIsSignUp] = useState(false);
   const [name, setName] = useState('');
@@ -349,6 +351,9 @@ export default function AuthScreen({ navigation }) {
     try {
       if (isSignUp) {
         const result = await signUp(name, email, password);
+
+        // Enable onboarding for new accounts
+        enableOnboarding();
 
         // Apply referral code if provided (non-blocking — don't fail signup)
         if (referralCode.trim()) {

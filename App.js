@@ -18,6 +18,7 @@ import { CartProvider, useCart } from './src/context/CartContext';
 import { OrderHistoryProvider } from './src/context/OrderHistoryContext';
 import { AuthProvider, useAuth } from './src/context/AuthContext';
 import { SubscriptionProvider } from './src/context/SubscriptionContext';
+import { OnboardingProvider } from './src/context/OnboardingContext';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Svg, { Path, Circle, Polyline, Line, Ellipse } from 'react-native-svg';
@@ -376,10 +377,12 @@ export default function App() {
           <OrderHistoryProvider>
             <LikedProvider>
               <SharedProvider>
-                <NavigationContainer>
-                  <RootNavigator />
-                  <ConsentModal />
-                </NavigationContainer>
+                <OnboardingProvider>
+                  <NavigationContainer>
+                    <RootNavigator />
+                    <ConsentModal />
+                  </NavigationContainer>
+                </OnboardingProvider>
               </SharedProvider>
             </LikedProvider>
           </OrderHistoryProvider>
@@ -397,7 +400,7 @@ const styles = StyleSheet.create({
     borderTopWidth: 0.5,
     borderTopColor: palette.borderLight,
     height: layout.tabBarHeight,
-    paddingTop: 0,
+    paddingTop: 6,
     paddingBottom: 0,
   },
 

@@ -20,7 +20,7 @@
  *   CTABar        — always-visible: FTC note + affiliate link + "Add to Cart"
  */
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   View,
   Text,
@@ -42,6 +42,8 @@ import { useCart } from '../context/CartContext';
 import { useLiked } from '../context/LikedContext';
 import CardImage from '../components/CardImage';
 import { SellerName } from '../components/VerifiedBadge';
+import { useOnboarding, ONBOARDING_STEPS } from '../context/OnboardingContext';
+import OnboardingOverlay, { OnboardingGlow } from '../components/OnboardingOverlay';
 import {
   uiColors,
   space,
@@ -405,7 +407,7 @@ function BouncyIconButton({ onPress, children, style }) {
   );
 }
 
-function SupplierRow({ brand, inStock, onCamera, onLike, isLiked, onShare }) {
+function SupplierRow({ brand, inStock, onCamera, onLike, isLiked, onShare, genieGlow }) {
   return (
     <View style={sup.wrap}>
       <View style={sup.left}>
@@ -423,15 +425,17 @@ function SupplierRow({ brand, inStock, onCamera, onLike, isLiked, onShare }) {
         )}
       </View>
       <View style={sup.actions}>
-        <BouncyIconButton style={sup.iconBtnGenie} onPress={onCamera}>
-          <LinearGradient
-            colors={['#67ACE9', '#0B6DC3']}
-            locations={[0.32, 0.86]}
-            style={sup.genieBtnGradient}
-          >
-            <GenieLampIcon size={22} />
-          </LinearGradient>
-        </BouncyIconButton>
+        <OnboardingGlow visible={genieGlow} borderRadius={28} style={genieGlow ? { padding: 5 } : undefined} bold>
+          <BouncyIconButton style={sup.iconBtnGenie} onPress={onCamera}>
+            <LinearGradient
+              colors={['#67ACE9', '#0B6DC3']}
+              locations={[0.32, 0.86]}
+              style={sup.genieBtnGradient}
+            >
+              <GenieLampIcon size={22} />
+            </LinearGradient>
+          </BouncyIconButton>
+        </OnboardingGlow>
         <BouncyIconButton style={sup.iconBtn} onPress={onLike}>
           <HeartIcon size={22} filled={isLiked} />
         </BouncyIconButton>
@@ -1319,6 +1323,7 @@ export default function ProductDetailScreen({ route, navigation }) {
   const insets  = useSafeAreaInsets();
   const { addToCart, items } = useCart();
   const { likedProducts, toggleLikedProduct } = useLiked();
+  const { isStepActive, nextStep, prevStep, finishOnboarding } = useOnboarding();
 
   // ── Local state ──────────────────────────────────────────────────────────
   const [qty,         setQty]        = useState(1);
@@ -1327,6 +1332,18 @@ export default function ProductDetailScreen({ route, navigation }) {
   const scrollY           = useRef(new Animated.Value(0)).current;
   const cartLabelOpacity  = useRef(new Animated.Value(1)).current;
   const addedLabelOpacity = useRef(new Animated.Value(0)).current;
+  const mainScrollRef     = useRef(null);
+  const supplierRowY      = useRef(0);
+
+  // Auto-scroll to genie lamp section during onboarding
+  useEffect(() => {
+    if (isStepActive('genie_lamp') && mainScrollRef.current) {
+      const timer = setTimeout(() => {
+        mainScrollRef.current.scrollTo({ y: supplierRowY.current + 100, animated: true });
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [isStepActive('genie_lamp')]);
 
   // ── Product data (from route, with fallbacks) ─────────────────────────────
   const name         = product?.name         ?? 'Vento Sofa, Italian Leather';
@@ -1451,6 +1468,7 @@ export default function ProductDetailScreen({ route, navigation }) {
 
       {/* ── Scrollable content ─────────────────────────────────────────── */}
       <Animated.ScrollView
+        ref={mainScrollRef}
         showsVerticalScrollIndicator={false}
         onScroll={Animated.event(
           [{ nativeEvent: { contentOffset: { y: scrollY } } }],
@@ -1483,12 +1501,14 @@ export default function ProductDetailScreen({ route, navigation }) {
           <Divider />
 
           {/* S4: Supplier Row */}
+          <View onLayout={(e) => { supplierRowY.current = e.nativeEvent.layout.y; }}>
           <SupplierRow
             brand={brand}
             inStock={inStock}
             onCamera={() => navigation.navigate('Main', { screen: 'Wish', params: { product } })}
             isLiked={!!likedProducts[product?.id]}
             onLike={() => toggleLikedProduct(product)}
+            genieGlow={isStepActive('genie_lamp')}
             onShare={async () => {
               try {
                 await Share.share({
@@ -1497,6 +1517,24 @@ export default function ProductDetailScreen({ route, navigation }) {
               } catch (_) {}
             }}
           />
+
+          {/* Onboarding Step 4: genie lamp tooltip */}
+          {isStepActive('genie_lamp') && (
+            <OnboardingOverlay
+              visible
+              step={ONBOARDING_STEPS.GENIE_LAMP}
+              onNext={finishOnboarding}
+              onBack={() => {
+                prevStep();
+                navigation.goBack(); // back to Explore, then Wish
+                setTimeout(() => navigation.navigate('Main', { screen: 'Wish' }), 300);
+              }}
+              onSkip={finishOnboarding}
+              tooltipPosition="below"
+              style={{ position: 'relative', marginHorizontal: 16, marginTop: -4, marginBottom: 8 }}
+            />
+          )}
+          </View>
 
           {/* ── divider ── */}
           <Divider />
