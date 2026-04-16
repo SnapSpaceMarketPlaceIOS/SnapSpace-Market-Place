@@ -1349,7 +1349,9 @@ export default function ProductDetailScreen({ route, navigation }) {
   const name         = product?.name         ?? 'Vento Sofa, Italian Leather';
   const brand        = product?.brand        ?? 'POLY & BARK';
   const imageUrl     = product?.imageUrl     ?? null;
-  const images       = product?.images       ?? [];
+  const images       = product?.images?.length ? product.images
+                     : product?.gallery?.length ? product.gallery
+                     : [];
   const affiliateUrl = product?.affiliateUrl ?? null;
   const source       = product?.source       ?? 'amazon';
   const description  = product?.description  ??
