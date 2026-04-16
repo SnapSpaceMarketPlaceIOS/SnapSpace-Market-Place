@@ -353,7 +353,7 @@ export default function RoomResultScreen({ route, navigation }) {
     setDownloadActive(true);
     setSaving(true);
     try {
-      const fileUri = FileSystem.cacheDirectory + 'snapspace_design_' + Date.now() + '.jpg';
+      const fileUri = FileSystem.cacheDirectory + 'homegenie_design_' + Date.now() + '.jpg';
       const { status } = await FileSystem.downloadAsync(resultUri, fileUri);
       if (status === 200) {
         await Share.share({ url: fileUri });

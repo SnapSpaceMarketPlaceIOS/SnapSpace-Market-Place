@@ -224,7 +224,7 @@ export function getAffiliateUrl(product) {
   if (product.affiliateUrl) return product.affiliateUrl;
 
   // Amazon fallback: construct search URL with partner tag
-  const partnerTag = process.env.EXPO_PUBLIC_AMAZON_PARTNER_TAG || 'snapspace20-20';
+  const partnerTag = process.env.EXPO_PUBLIC_AMAZON_PARTNER_TAG || 'snapspacemkt-20';
   if (product.source === 'amazon' && product.name) {
     const query = encodeURIComponent(product.name);
     return `https://www.amazon.com/s?k=${query}&tag=${partnerTag}`;

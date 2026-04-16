@@ -591,7 +591,7 @@ const styles = StyleSheet.create({
   },
   closeBtnCorner: {
     position: 'absolute',
-    top: 16,
+    top: 52,
     left: space.lg,
     padding: 8,
     zIndex: 10,

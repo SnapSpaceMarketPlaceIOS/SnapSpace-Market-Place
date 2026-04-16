@@ -9,7 +9,7 @@
  *   - Returns [] on network errors (edge function returns source: "error")
  *   - Falls back to local catalog in affiliateProducts.js async variants
  *
- * Partner tag: snapspacemkt-20
+ * Partner tag: set via EXPO_PUBLIC_AMAZON_PARTNER_TAG env var
  */
 
 import { supabase } from './supabase';

@@ -23,7 +23,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const SUPABASE_URL        = Deno.env.get('SUPABASE_URL')!;
 const SUPABASE_SERVICE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-const BUNDLE_ID           = 'com.anthonyrivera.snapspace';
+const BUNDLE_ID           = 'com.anthonyrivera.homegenie';
 
 // Apple root CA — used to verify the x5c chain in the JWS header.
 // We fetch it once at cold start. In local StoreKit testing, Apple

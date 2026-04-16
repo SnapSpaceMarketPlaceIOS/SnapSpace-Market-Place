@@ -14,7 +14,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
  *   - Deal of the Day selection
  */
 
-const STORAGE_KEY   = 'snapspace_style_dna';
+const STORAGE_KEY   = 'homegenie_style_dna';
 const MAX_STYLES    = 5;   // rolling window of top styles
 const DEFAULT_STYLE = 'modern';
 

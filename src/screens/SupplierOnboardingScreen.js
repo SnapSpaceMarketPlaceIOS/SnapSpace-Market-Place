@@ -263,7 +263,7 @@ export default function SupplierOnboardingScreen({ navigation }) {
                   </Svg>
                   <View style={{ flex: 1 }}>
                     <Text style={styles.payoutTitle}>Payout Setup</Text>
-                    <Text style={styles.payoutBody}>Stripe Connect integration — configure from your dashboard after setup.</Text>
+                    <Text style={styles.payoutBody}>Payout integration — configure from your dashboard after setup.</Text>
                   </View>
                 </View>
               </View>

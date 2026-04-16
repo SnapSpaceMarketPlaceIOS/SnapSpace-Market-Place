@@ -23,9 +23,9 @@ try {
  *   3. trackEvent()   ← available after initialize()
  */
 
-const AFFILIATE_ID_KEY = 'snapspace_affiliate_id';
-const INITIALIZED_KEY  = 'snapspace_tracking_initialized';
-const FIRST_OPEN_KEY   = 'snapspace_first_open_seen';
+const AFFILIATE_ID_KEY = 'homegenie_affiliate_id';
+const INITIALIZED_KEY  = 'homegenie_tracking_initialized';
+const FIRST_OPEN_KEY   = 'homegenie_first_open_seen';
 
 let _initialized = false;
 
@@ -85,7 +85,7 @@ export function trackEvent(eventName, properties = {}) {
   const payload = {
     event: eventName,
     timestamp: new Date().toISOString(),
-    app: 'snapspace',
+    app: 'homegenie',
     ...properties,
   };
 

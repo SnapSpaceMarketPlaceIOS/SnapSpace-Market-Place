@@ -687,8 +687,8 @@ export default function SupplierDashboardScreen({ navigation }) {
             <View style={storeStyles.payoutPlaceholder}>
               <Icon d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" size={20} color="#6B7280" />
               <View style={{ flex: 1 }}>
-                <Text style={storeStyles.payoutTitle}>Stripe Connect</Text>
-                <Text style={storeStyles.payoutBody}>Connect your Stripe account to receive payouts. Configure in the Stripe Dashboard.</Text>
+                <Text style={storeStyles.payoutTitle}>Payout Setup</Text>
+                <Text style={storeStyles.payoutBody}>Payout integration coming soon. Configure from your supplier dashboard.</Text>
               </View>
             </View>
 
