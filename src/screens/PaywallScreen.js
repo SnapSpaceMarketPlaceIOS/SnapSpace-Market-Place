@@ -326,8 +326,12 @@ export default function PaywallScreen({ navigation }) {
   const handleShareReferral = async () => {
     try {
       const code = await getReferralCode(user?.id);
+      const appStoreId = process.env.EXPO_PUBLIC_APP_STORE_ID;
+      const downloadLine = /^\d+$/.test(appStoreId || '')
+        ? `\nDownload: https://apps.apple.com/app/id${appStoreId}`
+        : '';
       await Share.share({
-        message: `Join me on HomeGenie! Use my referral code ${code} when you sign up and we both get 2 free design credits. Download: https://apps.apple.com/app/homegenie`,
+        message: `Join me on HomeGenie! Use my referral code ${code} when you sign up and we both get 2 free design credits.${downloadLine}`,
       });
     } catch (e) {
       if (e.message !== 'User did not share') {

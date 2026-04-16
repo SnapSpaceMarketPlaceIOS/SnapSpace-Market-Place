@@ -1422,7 +1422,7 @@ export default function HomeScreen({ navigation, route }) {
             setSingleProduct(null);
             Alert.alert(
               'Generation Failed',
-              `Could not place this product in your room. Please try again.\n\nDetails: ${genErr.message}`
+              'We couldn\'t place this product in your room. Please try again in a moment.'
             );
             console.error('[Gen] Single-product error:', genErr.message);
             return;
@@ -1566,7 +1566,7 @@ export default function HomeScreen({ navigation, route }) {
           setGenerating(false);
           Alert.alert(
             'Generation Failed',
-            `Could not generate your wish. Please try again.\n\nDetails: ${genErr.message}`
+            'We couldn\'t generate your wish right now. Please try again in a moment.'
           );
           console.error('[Gen] Generation error:', genErr.message);
           return;

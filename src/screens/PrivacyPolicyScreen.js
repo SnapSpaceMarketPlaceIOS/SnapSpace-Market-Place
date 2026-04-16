@@ -189,6 +189,8 @@ We require all service providers to:
 • We receive anonymized confirmation when a qualifying purchase is made (product category and commission amount) — we do not receive your Amazon order details, payment information, or shipping address
 • We may use cookie-based affiliate tracking as required by the Amazon Associates Program operating agreement
 
+Attribution Identifiers for Promotional Credits: When you tap an affiliate product link while signed in, we may append an anonymous, non-personally-identifiable identifier tied to your account to the destination URL. This enables us to attribute promotional credits (as described in our Terms of Use) to your account when a qualifying purchase occurs. This identifier is an opaque internal code and does not contain your name, email, device ID, or any other personally identifiable information. It is passed only to the affiliate retailer's standard referral tracking system and is used solely to administer Promotional Credits. You can sign out of your account at any time to prevent this identifier from being appended.
+
 We never receive or store your payment card details, shipping address, or personal purchase history from any affiliate retailer.`,
   },
   {

@@ -5,6 +5,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   Alert,
+  Linking,
 } from 'react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import * as ImagePicker from 'expo-image-picker';
@@ -64,37 +65,74 @@ export default function SnapScreen({ navigation, route }) {
     );
   }
 
+  // Simple in-flight guard so rapid double-taps on the shutter / library
+  // button don't queue two navigations.
+  const tapInFlight = useRef(false);
+
   const handleCapture = async () => {
-    if (!cameraRef.current) return;
-    // base64 omitted — upload helper reads file on-demand, keeps capture snappy
-    const photo = await cameraRef.current.takePictureAsync({ quality: 0.8 });
-    // Explicitly pass dimensions so the AI generation pipeline can derive
-    // the correct aspect ratio for both portrait and landscape photos.
-    navigation.navigate('Home', {
-      capturedPhoto: { uri: photo.uri, base64: null, width: photo.width, height: photo.height },
-      singleProduct,  // null for normal flow, product object for single-product visualize
-    });
+    if (!cameraRef.current || tapInFlight.current) return;
+    tapInFlight.current = true;
+    try {
+      // base64 omitted — upload helper reads file on-demand, keeps capture snappy
+      const photo = await cameraRef.current.takePictureAsync({ quality: 0.8 });
+      if (!photo?.uri) {
+        Alert.alert('Capture Failed', 'We couldn\'t capture that photo. Please try again.');
+        return;
+      }
+      // Explicitly pass dimensions so the AI generation pipeline can derive
+      // the correct aspect ratio for both portrait and landscape photos.
+      navigation.navigate('Home', {
+        capturedPhoto: { uri: photo.uri, base64: null, width: photo.width, height: photo.height },
+        singleProduct,  // null for normal flow, product object for single-product visualize
+      });
+    } catch (err) {
+      console.warn('[Snap] capture failed:', err?.message || err);
+      Alert.alert('Capture Failed', 'We couldn\'t take that photo. Please try again.');
+    } finally {
+      // release the guard after a brief delay so the next tap has to be intentional
+      setTimeout(() => { tapInFlight.current = false; }, 800);
+    }
   };
 
   const handlePickFromLibrary = async () => {
-    if (!mediaPermGranted.current) {
-      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      if (status !== 'granted') {
-        Alert.alert('Permission Required', 'Please allow access to your photo library in Settings.');
+    if (tapInFlight.current) return;
+    tapInFlight.current = true;
+    try {
+      if (!mediaPermGranted.current) {
+        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        if (status !== 'granted') {
+          Alert.alert(
+            'Photo Access Needed',
+            'Allow HomeGenie to access your photos to pick a room image.',
+            [
+              { text: 'Cancel', style: 'cancel' },
+              { text: 'Open Settings', onPress: () => Linking.openSettings?.() },
+            ]
+          );
+          return;
+        }
+        mediaPermGranted.current = true;
+      }
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ['images'],
+        quality: 0.8,
+      });
+      if (result.canceled || !result.assets?.length) return;
+      const asset = result.assets[0];
+      if (!asset?.uri) {
+        Alert.alert('Could Not Load Photo', 'Please try picking a different photo.');
         return;
       }
-      mediaPermGranted.current = true;
+      navigation.navigate('Home', {
+        capturedPhoto: { uri: asset.uri, base64: null, width: asset.width, height: asset.height },
+        singleProduct,  // null for normal flow, product object for single-product visualize
+      });
+    } catch (err) {
+      console.warn('[Snap] library pick failed:', err?.message || err);
+      Alert.alert('Photo Unavailable', 'We couldn\'t load that photo. Please try again.');
+    } finally {
+      setTimeout(() => { tapInFlight.current = false; }, 800);
     }
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ['images'],
-      quality: 0.8,
-    });
-    if (result.canceled || !result.assets?.length) return;
-    const asset = result.assets[0];
-    navigation.navigate('Home', {
-      capturedPhoto: { uri: asset.uri, base64: null, width: asset.width, height: asset.height },
-      singleProduct,  // null for normal flow, product object for single-product visualize
-    });
   };
 
   if (!permission) return <View style={s.container} />;

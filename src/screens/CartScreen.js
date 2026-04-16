@@ -20,6 +20,7 @@ import { useOrderHistory } from '../context/OrderHistoryContext';
 import { useAuth } from '../context/AuthContext';
 import AuthGate from '../components/AuthGate';
 import { supabase } from '../services/supabase';
+import { trackAffiliateClickAndTagUrl } from '../services/purchaseTracking';
 import { PRODUCT_CATALOG } from '../data/productCatalog';
 import TabScreenFade from '../components/TabScreenFade';
 
@@ -340,14 +341,42 @@ export default function CartScreen({ navigation }) {
   // ── ALL checkout logic unchanged ─────────────────────────────────────────────
   const handleCheckout = useCallback(async () => {
     if (checkingOut) return;
+    setCheckingOut(true);
+    // Always clear the guard after the URL open resolves so a second tap
+    // can still work (e.g. user returns from Amazon and taps again).
+    const releaseGuard = () => setTimeout(() => setCheckingOut(false), 1200);
 
     // All curated products are Amazon affiliate items — build a single multi-cart URL
     const amazonItems = items.filter((i) => i.source === 'amazon');
     if (amazonItems.length === items.length && items.length > 0) {
       // Amazon multi-cart URL: adds ALL items to the user's Amazon cart in one tap
-      // Format: /gp/aws/cart/add.html?ASIN.1=XXX&Quantity.1=1&ASIN.2=YYY&Quantity.2=2&tag=snapspacemkt-20
-      const AFFILIATE_TAG = 'snapspace20-20';
+      // Format: /gp/aws/cart/add.html?ASIN.1=XXX&Quantity.1=1&...&tag=<partner>
+      // Use the same partner tag as the individual product URLs in the catalog
+      // so commissions bucket cleanly into a single Associates account.
+      const AFFILIATE_TAG = process.env.EXPO_PUBLIC_AMAZON_PARTNER_TAG || 'snapspacemkt-20';
       const itemsWithAsin = amazonItems.filter((i) => i.asin);
+
+      // Resolve user id once for attribution tagging. A short timeout
+      // prevents a hung auth call from blocking the checkout tap.
+      let userId = null;
+      try {
+        const AUTH_TIMEOUT = 800;
+        const r = await Promise.race([
+          supabase.auth.getUser(),
+          new Promise((resolve) => setTimeout(() => resolve(null), AUTH_TIMEOUT)),
+        ]);
+        userId = r?.data?.user?.id ?? null;
+      } catch { userId = null; }
+
+      // Wrap URL opens so a tag/log failure never blocks revenue
+      const tagAndOpen = async (url, product) => {
+        let tagged = url;
+        try {
+          tagged = await trackAffiliateClickAndTagUrl({ userId, url, product });
+        } catch { tagged = url; }
+        try { await Linking.openURL(tagged); }
+        catch { await Linking.openURL(url).catch(() => null); }
+      };
 
       if (itemsWithAsin.length > 0) {
         // Build multi-cart URL with all ASINs + quantities
@@ -355,16 +384,15 @@ export default function CartScreen({ navigation }) {
           `ASIN.${idx + 1}=${item.asin}&Quantity.${idx + 1}=${item.quantity}`
         ).join('&');
         const multiCartUrl = `https://www.amazon.com/gp/aws/cart/add.html?${params}&tag=${AFFILIATE_TAG}`;
-        try { await Linking.openURL(multiCartUrl); } catch (e) {
-          // Fallback: open first item's affiliate URL
-          if (amazonItems[0]?.affiliateUrl) {
-            await Linking.openURL(amazonItems[0].affiliateUrl);
-          }
-        }
+        // First cart item is the click's "product" context for logging purposes.
+        // The ascsubtag we append flows through to each ASIN row in Amazon's
+        // report, so each confirmed item grants 10 wishes independently.
+        await tagAndOpen(multiCartUrl, itemsWithAsin[0]);
       } else if (amazonItems[0]?.affiliateUrl) {
         // No ASINs stored yet — fall back to first item's affiliate URL
-        await Linking.openURL(amazonItems[0].affiliateUrl);
+        await tagAndOpen(amazonItems[0].affiliateUrl, amazonItems[0]);
       }
+      releaseGuard();
       return;
     }
 
@@ -374,6 +402,7 @@ export default function CartScreen({ navigation }) {
       'All items check out directly through Amazon. Multi-vendor checkout is coming in a future update.',
       [{ text: 'Got it' }]
     );
+    releaseGuard();
   }, [checkingOut, total, items, subtotal, shipping]);
 
   // ── Guest gate ───────────────────────────────────────────────────────────────

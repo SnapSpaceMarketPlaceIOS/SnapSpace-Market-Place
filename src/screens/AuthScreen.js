@@ -375,7 +375,10 @@ export default function AuthScreen({ navigation }) {
         navigation.reset({ index: 0, routes: [{ name: 'Main' }] });
       }
     } catch (err) {
-      Alert.alert('Sign In Failed', err.message);
+      Alert.alert(
+        isSignUp ? 'Sign Up Failed' : 'Sign In Failed',
+        err.message || 'Something went wrong. Please try again.'
+      );
     } finally {
       safeSetLoading(false);
     }

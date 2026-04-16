@@ -86,7 +86,20 @@ Consumable Token Packs
 • Tokens are consumed one per AI room generation
 • Token balances are tied to your account and cannot be transferred
 
-All prices are in USD and may vary by region. Prices are subject to change, but changes will not affect active subscription periods.`,
+All prices are in USD and may vary by region. Prices are subject to change, but changes will not affect active subscription periods.
+
+Promotional Credits (Separate from In-App Purchases)
+
+From time to time, HomeGenie may grant promotional wishes ("Promotional Credits") to your account at our sole discretion, based on account activity, app usage, affiliate partnerships, referrals, milestones, or other qualifying criteria we determine. Promotional Credits:
+
+• Have no cash value and cannot be exchanged for money or refunded
+• Are non-transferable between accounts
+• May expire, be reduced, or be revoked at our discretion, including for account inactivity, violation of these Terms, suspected fraud, or termination of your account
+• Are separate from, and do not replace, any in-app purchases you make through Apple's In-App Purchase system
+• Are not sold to you — they are a promotional benefit we provide at no cost
+• Are granted silently; HomeGenie is not obligated to notify you of any grant
+
+Nothing in this section obligates us to grant any Promotional Credits, and we may modify or discontinue the program at any time without notice.`,
   },
   {
     title: '6. AI-Generated Content',
@@ -144,7 +157,9 @@ You acknowledge and agree that:
 • HomeGenie is not responsible or liable for the quality, safety, legality, or availability of any products purchased through affiliate links
 • Product listings and availability may change without notice
 
-FTC Disclosure: In accordance with the Federal Trade Commission's Guidelines Concerning the Use of Endorsements and Testimonials in Advertising, HomeGenie discloses that we may earn a commission when you buy through links on this app.`,
+FTC Disclosure: In accordance with the Federal Trade Commission's Guidelines Concerning the Use of Endorsements and Testimonials in Advertising, HomeGenie discloses that we may earn a commission when you buy through links on this app.
+
+Attribution Identifiers: To administer Promotional Credits described in Section 5, we may append an anonymous, non-personally-identifiable identifier tied to your account to the destination URL when you tap affiliate product links while signed in. This allows us to attribute qualifying activity to your account. This identifier does not contain your name, email, device ID, or any other personal information. It is not shared with any third party other than the retailer's referral tracking system, and it is used solely to administer Promotional Credits.`,
   },
   {
     title: '10. Prohibited Conduct',

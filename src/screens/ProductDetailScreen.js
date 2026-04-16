@@ -42,6 +42,7 @@ import { useCart } from '../context/CartContext';
 import { useLiked } from '../context/LikedContext';
 import CardImage from '../components/CardImage';
 import { SellerName } from '../components/VerifiedBadge';
+import { handleShopNow } from '../services/productTapHandler';
 import { useOnboarding, ONBOARDING_STEPS } from '../context/OnboardingContext';
 import OnboardingOverlay, { OnboardingGlow } from '../components/OnboardingOverlay';
 import {
@@ -1199,7 +1200,7 @@ const sth = StyleSheet.create({
 
 // ─── Fixed: CTABar ───────────────────────────────────────────────────────────
 
-function CTABar({ inCart, onAddToCart, affiliateUrl, source, cartLabelOpacity, addedLabelOpacity, bottomInset }) {
+function CTABar({ inCart, onAddToCart, affiliateUrl, source, cartLabelOpacity, addedLabelOpacity, bottomInset, product }) {
   const [isPressed, setIsPressed] = useState(false);
   const btnScale = useRef(new Animated.Value(1)).current;
 
@@ -1217,10 +1218,11 @@ function CTABar({ inCart, onAddToCart, affiliateUrl, source, cartLabelOpacity, a
   return (
     <View style={[cta.bar, { paddingBottom: pb }]}>
 
-      {/* Affiliate link */}
+      {/* Affiliate link — routes through handleShopNow so the click is
+          attributed for promotional wish credits (see PROMOTIONAL_CREDITS_*) */}
       {!!affiliateUrl && (
         <TouchableOpacity
-          onPress={() => Linking.openURL(affiliateUrl).catch(() => null)}
+          onPress={() => handleShopNow(product ?? { affiliateUrl, source }).catch(() => null)}
           activeOpacity={0.7}
           style={cta.affiliateRow}>
           <Text style={cta.affiliateTxt}>
@@ -1611,6 +1613,7 @@ export default function ProductDetailScreen({ route, navigation }) {
         cartLabelOpacity={cartLabelOpacity}
         addedLabelOpacity={addedLabelOpacity}
         bottomInset={insets.bottom}
+        product={product}
       />
 
     </View>

@@ -241,27 +241,48 @@ const PREFERENCE_ITEMS = [
   { label: 'Language',      icon: <GlobeIcon />,        screen: 'Language' },
 ];
 
-// App Store ID — update this once the app is live on the App Store
-const APP_STORE_ID = '123456789';
-const APP_STORE_REVIEW_URL = `itms-apps://itunes.apple.com/app/id${APP_STORE_ID}?action=write-review`;
-const APP_STORE_URL = `https://apps.apple.com/app/id${APP_STORE_ID}`;
+// App Store ID — populate via EXPO_PUBLIC_APP_STORE_ID once the app is live.
+// Until then, Rate Us / Share Our App show a friendly "Coming Soon" alert
+// instead of opening a broken App Store link.
+const APP_STORE_ID = process.env.EXPO_PUBLIC_APP_STORE_ID || '';
+const HAS_APP_STORE_ID = /^\d+$/.test(APP_STORE_ID);
+const APP_STORE_REVIEW_URL = HAS_APP_STORE_ID
+  ? `itms-apps://itunes.apple.com/app/id${APP_STORE_ID}?action=write-review`
+  : null;
+const APP_STORE_URL = HAS_APP_STORE_ID
+  ? `https://apps.apple.com/app/id${APP_STORE_ID}`
+  : null;
 
 const ABOUT_ITEMS = [
   {
     label: 'Rate Us',
     icon: <StarIcon />,
     action: () => {
+      if (!APP_STORE_REVIEW_URL) {
+        Alert.alert(
+          'Thanks for wanting to rate us!',
+          "HomeGenie isn't quite on the App Store yet — ratings will be available soon."
+        );
+        return;
+      }
       Linking.canOpenURL(APP_STORE_REVIEW_URL)
         .then((supported) => {
           Linking.openURL(supported ? APP_STORE_REVIEW_URL : APP_STORE_URL);
         })
-        .catch(() => Linking.openURL(APP_STORE_URL));
+        .catch(() => APP_STORE_URL && Linking.openURL(APP_STORE_URL));
     },
   },
   {
     label: 'Share Our App',
     icon: <ShareSettingsIcon />,
     action: async () => {
+      if (!APP_STORE_URL) {
+        Alert.alert(
+          'Coming Soon',
+          'Sharing will be available once HomeGenie is live on the App Store.'
+        );
+        return;
+      }
       try {
         await Share.share({
           title: 'HomeGenie — AI Interior Design',
