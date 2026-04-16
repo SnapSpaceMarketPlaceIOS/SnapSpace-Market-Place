@@ -13,7 +13,7 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.anthonyrivera.homegenie",
+      "bundleIdentifier": "com.anthonyrivera.snapspace",
       "buildNumber": "1",
       "usesAppleSignIn": true,
       "infoPlist": {
@@ -31,9 +31,16 @@
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
       "permissions": [
-        "android.permission.CAMERA"
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.READ_MEDIA_VISUAL_USER_SELECTED",
+        "android.permission.READ_MEDIA_IMAGES",
+        "android.permission.READ_MEDIA_VIDEO",
+        "android.permission.READ_MEDIA_AUDIO"
       ],
-      "package": "com.anthonyrivera.homegenie"
+      "package": "com.anthonyrivera.snapspace"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -81,19 +88,30 @@
               "NSPrivacyAccessedAPITypes": [
                 {
                   "NSPrivacyAccessedAPIType": "NSPrivacyAccessedAPICategoryFileTimestamp",
-                  "NSPrivacyAccessedAPITypeReasons": ["C617.1", "0A2A.1", "3B52.1"]
+                  "NSPrivacyAccessedAPITypeReasons": [
+                    "C617.1",
+                    "0A2A.1",
+                    "3B52.1"
+                  ]
                 },
                 {
                   "NSPrivacyAccessedAPIType": "NSPrivacyAccessedAPICategoryUserDefaults",
-                  "NSPrivacyAccessedAPITypeReasons": ["CA92.1"]
+                  "NSPrivacyAccessedAPITypeReasons": [
+                    "CA92.1"
+                  ]
                 },
                 {
                   "NSPrivacyAccessedAPIType": "NSPrivacyAccessedAPICategorySystemBootTime",
-                  "NSPrivacyAccessedAPITypeReasons": ["35F9.1"]
+                  "NSPrivacyAccessedAPITypeReasons": [
+                    "35F9.1"
+                  ]
                 },
                 {
                   "NSPrivacyAccessedAPIType": "NSPrivacyAccessedAPICategoryDiskSpace",
-                  "NSPrivacyAccessedAPITypeReasons": ["E174.1", "85F4.1"]
+                  "NSPrivacyAccessedAPITypeReasons": [
+                    "E174.1",
+                    "85F4.1"
+                  ]
                 }
               ],
               "NSPrivacyCollectedDataTypes": [
@@ -101,37 +119,49 @@
                   "NSPrivacyCollectedDataType": "NSPrivacyCollectedDataTypeEmailAddress",
                   "NSPrivacyCollectedDataTypeLinked": true,
                   "NSPrivacyCollectedDataTypeTracking": false,
-                  "NSPrivacyCollectedDataTypePurposes": ["NSPrivacyCollectedDataTypePurposeAppFunctionality"]
+                  "NSPrivacyCollectedDataTypePurposes": [
+                    "NSPrivacyCollectedDataTypePurposeAppFunctionality"
+                  ]
                 },
                 {
                   "NSPrivacyCollectedDataType": "NSPrivacyCollectedDataTypeName",
                   "NSPrivacyCollectedDataTypeLinked": true,
                   "NSPrivacyCollectedDataTypeTracking": false,
-                  "NSPrivacyCollectedDataTypePurposes": ["NSPrivacyCollectedDataTypePurposeAppFunctionality"]
+                  "NSPrivacyCollectedDataTypePurposes": [
+                    "NSPrivacyCollectedDataTypePurposeAppFunctionality"
+                  ]
                 },
                 {
                   "NSPrivacyCollectedDataType": "NSPrivacyCollectedDataTypeUserID",
                   "NSPrivacyCollectedDataTypeLinked": true,
                   "NSPrivacyCollectedDataTypeTracking": false,
-                  "NSPrivacyCollectedDataTypePurposes": ["NSPrivacyCollectedDataTypePurposeAppFunctionality"]
+                  "NSPrivacyCollectedDataTypePurposes": [
+                    "NSPrivacyCollectedDataTypePurposeAppFunctionality"
+                  ]
                 },
                 {
                   "NSPrivacyCollectedDataType": "NSPrivacyCollectedDataTypePhotos",
                   "NSPrivacyCollectedDataTypeLinked": true,
                   "NSPrivacyCollectedDataTypeTracking": false,
-                  "NSPrivacyCollectedDataTypePurposes": ["NSPrivacyCollectedDataTypePurposeAppFunctionality"]
+                  "NSPrivacyCollectedDataTypePurposes": [
+                    "NSPrivacyCollectedDataTypePurposeAppFunctionality"
+                  ]
                 },
                 {
                   "NSPrivacyCollectedDataType": "NSPrivacyCollectedDataTypePurchaseHistory",
                   "NSPrivacyCollectedDataTypeLinked": true,
                   "NSPrivacyCollectedDataTypeTracking": false,
-                  "NSPrivacyCollectedDataTypePurposes": ["NSPrivacyCollectedDataTypePurposeAppFunctionality"]
+                  "NSPrivacyCollectedDataTypePurposes": [
+                    "NSPrivacyCollectedDataTypePurposeAppFunctionality"
+                  ]
                 },
                 {
                   "NSPrivacyCollectedDataType": "NSPrivacyCollectedDataTypeProductInteraction",
                   "NSPrivacyCollectedDataTypeLinked": false,
                   "NSPrivacyCollectedDataTypeTracking": false,
-                  "NSPrivacyCollectedDataTypePurposes": ["NSPrivacyCollectedDataTypePurposeAnalytics"]
+                  "NSPrivacyCollectedDataTypePurposes": [
+                    "NSPrivacyCollectedDataTypePurposeAnalytics"
+                  ]
                 }
               ],
               "NSPrivacyTracking": false
@@ -139,6 +169,12 @@
           }
         }
       ]
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "7afcfa4f-9871-488e-be9d-98020e7787e4"
+      }
+    },
+    "owner": "snapspacemarketplace"
   }
 }

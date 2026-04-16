@@ -47,3 +47,6 @@ yarn-error.*
 
 # Supabase CLI temp files
 supabase/.temp/
+
+# Apple credentials — never commit
+keys/
