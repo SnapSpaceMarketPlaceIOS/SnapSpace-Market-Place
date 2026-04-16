@@ -33,7 +33,7 @@ const BANNER_HEIGHT = 210;
 
 function BackIcon() {
   return (
-    <Svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke="#111" strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round">
+    <Svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke="#111" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round">
       <Polyline points="15 18 9 12 15 6" />
     </Svg>
   );

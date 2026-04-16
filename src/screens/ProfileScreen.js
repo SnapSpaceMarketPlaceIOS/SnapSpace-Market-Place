@@ -120,16 +120,6 @@ function HeartIcon({ filled = false, size = 13 }) {
   );
 }
 
-function ShareIcon() {
-  return (
-    <Svg width={13} height={13} viewBox="0 0 24 24" fill="none" stroke="#444" strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round">
-      <Path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
-      <Polyline points="16 6 12 2 8 6" />
-      <Line x1={12} y1={2} x2={12} y2={15} />
-    </Svg>
-  );
-}
-
 function ChevronRight() {
   return (
     <Svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="#CCC" strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round">
@@ -155,18 +145,6 @@ function RepostIcon() {
       <Path d="M3 11V9a4 4 0 0 1 4-4h14" />
       <Polyline points="7 23 3 19 7 15" />
       <Path d="M21 13v2a4 4 0 0 1-4 4H3" />
-    </Svg>
-  );
-}
-
-function SharedIcon() {
-  return (
-    <Svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="#444" strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round">
-      <Circle cx={18} cy={5} r={3} />
-      <Circle cx={6} cy={12} r={3} />
-      <Circle cx={18} cy={19} r={3} />
-      <Line x1={8.59} y1={13.51} x2={15.42} y2={17.49} />
-      <Line x1={15.41} y1={6.51} x2={8.59} y2={10.49} />
     </Svg>
   );
 }

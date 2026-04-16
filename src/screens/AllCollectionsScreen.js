@@ -8,7 +8,7 @@ import {
 } from 'react-native';
 import CardImage from '../components/CardImage';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import Svg, { Path, Polyline } from 'react-native-svg';
+import Svg, { Polyline } from 'react-native-svg';
 import { space, radius, shadow, typeScale, fontWeight, letterSpacing } from '../constants/tokens';
 import { colors } from '../constants/colors';
 import { Badge } from '../components/ds';
@@ -88,8 +88,7 @@ function BackIcon() {
   return (
     <Svg width={20} height={20} viewBox="0 0 24 24" fill="none"
       stroke="#111827" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round">
-      <Path d="M19 12H5" />
-      <Polyline points="12 19 5 12 12 5" />
+      <Polyline points="15 18 9 12 15 6" />
     </Svg>
   );
 }

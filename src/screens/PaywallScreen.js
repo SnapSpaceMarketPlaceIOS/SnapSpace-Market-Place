@@ -758,6 +758,11 @@ const styles = StyleSheet.create({
     color: 'rgba(255,255,255,0.6)',
     marginLeft: 6,
   },
+  cardPriceRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
   cardPrice: {
     fontSize: 16,
     fontWeight: fontWeight.semibold,

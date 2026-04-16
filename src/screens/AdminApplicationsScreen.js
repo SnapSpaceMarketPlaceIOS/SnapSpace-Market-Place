@@ -9,7 +9,7 @@ import {
   TextInput,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import Svg, { Path, Circle } from 'react-native-svg';
+import Svg, { Path, Circle, Polyline } from 'react-native-svg';
 import LensLoader from '../components/LensLoader';
 import { useAuth } from '../context/AuthContext';
 import { space, radius, fontWeight, fontSize, uiColors, typeScale, shadow } from '../constants/tokens';
@@ -24,8 +24,8 @@ const BLUE_DARK = colors.bluePrimary;
 
 function BackIcon() {
   return (
-    <Svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke="#111" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-      <Path d="M19 12H5M12 5l-7 7 7 7" />
+    <Svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke="#111" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round">
+      <Polyline points="15 18 9 12 15 6" />
     </Svg>
   );
 }

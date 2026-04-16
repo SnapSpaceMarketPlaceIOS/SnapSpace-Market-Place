@@ -95,7 +95,7 @@ function deliveryDate(offsetDays = 4) {
 
 const BackIcon = () => (
   <Svg width={18} height={18} viewBox="0 0 24 24" fill="none"
-    stroke={uiColors.textPrimary} strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
+    stroke={uiColors.textPrimary} strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round">
     <Polyline points="15 18 9 12 15 6" />
   </Svg>
 );
@@ -103,16 +103,22 @@ const BackIcon = () => (
 const HeartIcon = ({ filled = false, size = 22 }) => (
   <Svg width={size} height={size} viewBox="0 0 24 24" fill="none"
     stroke={filled ? '#67ACE9' : uiColors.textSecondary}
-    strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
+    strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round">
     <Path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
       fill={filled ? '#67ACE9' : 'none'} />
   </Svg>
 );
 
-const ShareIcon = ({ size = 22.5, color = uiColors.textSecondary }) => (
-  <Svg width={size} height={size} viewBox="-1 10.5 18 18" fill="none">
-    <Path d="M1.238 22.812C1.637 24.3 2.516 25.615 3.739 26.554C4.961 27.492 6.459 28 8 28C9.541 28 11.039 27.492 12.261 26.554C13.484 25.615 14.363 24.3 14.762 22.812" stroke={color} strokeWidth={0.9}/>
-    <Path d="M8 12L7.688 11.61L8 11.36L8.312 11.61L8 12ZM8.5 21C8.5 21.276 8.276 21.5 8 21.5C7.724 21.5 7.5 21.276 7.5 21L8 21L8.5 21ZM3 16L2.688 15.61L7.688 11.61L8 12L8.312 12.39L3.312 16.39L3 16ZM8 12L8.312 11.61L13.312 15.61L13 16L12.688 16.39L7.688 12.39L8 12ZM8 12L8.5 12L8.5 21L8 21L7.5 21L7.5 12L8 12Z" fill={color}/>
+const ShareIcon = ({ size = 22, color = uiColors.textSecondary }) => (
+  <Svg width={size} height={size} viewBox="0 0 30 30" fill="none">
+    <Path
+      d="M6.54815 18.5147C7.04668 20.3752 8.1452 22.0193 9.67334 23.1918C11.2015 24.3644 13.0738 25 15 25C16.9262 25 18.7985 24.3644 20.3267 23.1918C21.8548 22.0193 22.9533 20.3752 23.4519 18.5147"
+      stroke={color} strokeWidth={1.4} strokeLinecap="round"
+    />
+    <Path
+      d="M15 5L14.6877 4.60957L15 4.35969L15.3123 4.60957L15 5ZM15.5 16.25C15.5 16.5261 15.2761 16.75 15 16.75C14.7239 16.75 14.5 16.5261 14.5 16.25L15 16.25L15.5 16.25ZM8.75 10L8.43765 9.60957L14.6877 4.60957L15 5L15.3123 5.39043L9.06235 10.3904L8.75 10ZM15 5L15.3123 4.60957L21.5623 9.60957L21.25 10L20.9377 10.3904L14.6877 5.39043L15 5ZM15 5L15.5 5L15.5 16.25L15 16.25L14.5 16.25L14.5 5L15 5Z"
+      fill={color}
+    />
   </Svg>
 );
 
@@ -144,13 +150,6 @@ const ChevRight = ({ size = 14, color = uiColors.textTertiary }) => (
 const GenieLampIcon = ({ size = 20 }) => (
   <Svg width={size} height={size} viewBox="92 176 266 155" fill="none">
     <Path d="M326.155 194.661C306.203 193.551 286.596 223.576 265.287 232.582C259.954 218.661 247.863 208.794 233.603 206.723C231.53 206.386 230.008 204.515 230.02 202.32V201.347C230.044 200.249 230.428 199.189 231.123 198.353C233.699 195.023 234.837 190.732 234.262 186.491C233.675 182.25 231.945 180 228 180C223.945 180 221.632 183.609 221.596 188.674C221.56 192.191 222.71 195.622 224.819 198.353C225.49 199.201 225.862 200.262 225.886 201.347V202.32C225.934 204.441 224.52 206.287 222.53 206.723C206.748 209.006 193.77 220.794 189.432 236.748C178 232.457 167.143 226.669 157.138 219.497C130.008 200.91 117.852 197.824 106.271 197.234C106.271 197.234 104.761 197.234 101.739 199.004L97.5928 201.372V201.385C96.2007 201.953 95.6735 205.674 96.2008 206.672C96.7161 207.67 99.1384 208.944 100.229 209.031C114.118 209.518 127.527 211.489 138.924 219.771C164.952 237.721 180.062 295.913 228.116 295.913C275.031 295.913 295.993 209.304 326.155 209.304C346.886 209.304 342.714 254.499 330.898 264.778C319.082 275.069 307.291 264.503 296.637 264.503C283.719 264.503 284.33 277.476 291.281 278.287C292.862 278.524 294.468 278.05 295.69 276.99C296.925 275.93 297.668 274.37 297.74 272.711C304.33 277.464 312.024 280.283 320.029 280.845C338.699 280.845 354 250.642 354 228.464C353.964 218.248 349.175 195.896 326.155 194.661ZM262.64 247.836C251.579 251.878 239.943 253.936 228.21 253.923C216.502 253.923 204.878 251.877 193.818 247.873C190.93 246.888 189.324 243.67 190.235 240.639C202.326 245.591 215.196 248.123 228.186 248.11C241.176 248.098 254.058 245.566 266.161 240.639C266.593 242.111 266.449 243.682 265.754 245.042C265.059 246.389 263.885 247.399 262.471 247.836H262.64ZM272.322 318.425V318.961C258.158 324.387 243.154 327.106 228.054 326.994C212.955 327.144 197.964 324.462 183.774 319.061V318.524C184.302 316.204 185.704 314.196 187.669 312.973C189.634 311.751 191.995 311.414 194.212 312.038C201.378 314.532 209.275 312.088 213.972 305.925C215.099 304.341 215.974 302.582 216.561 300.711C220.3 301.522 224.098 301.921 227.921 301.921C231.732 301.909 235.519 301.397 239.198 300.374C240.552 305.152 243.763 309.119 248.053 311.339C252.343 313.547 257.316 313.809 261.798 312.038C264.003 311.414 266.364 311.763 268.317 312.986C270.282 314.208 271.673 316.204 272.2 318.524L272.322 318.425Z" fill="#FFFFFF" />
-  </Svg>
-);
-
-const DownloadIcon = ({ size = 22.5, color = uiColors.textSecondary }) => (
-  <Svg width={size} height={size} viewBox="-1 10.5 18 18" fill="none">
-    <Path d="M1.238 22.812C1.637 24.3 2.516 25.615 3.739 26.554C4.961 27.492 6.459 28 8 28C9.541 28 11.039 27.492 12.261 26.554C13.484 25.615 14.363 24.3 14.762 22.812" stroke={color} strokeWidth={0.9}/>
-    <Path d="M8 21L7.688 21.39L8 21.64L8.312 21.39L8 21ZM8.5 12C8.5 11.724 8.276 11.5 8 11.5C7.724 11.5 7.5 11.724 7.5 12L8 12L8.5 12ZM3 17L2.688 17.39L7.688 21.39L8 21L8.312 20.61L3.312 16.61L3 17ZM8 21L8.312 21.39L13.312 17.39L13 17L12.688 16.61L7.688 20.61L8 21ZM8 21L8.5 21L8.5 12L8 12L7.5 12L7.5 21L8 21Z" fill={color}/>
   </Svg>
 );
 
@@ -199,10 +198,11 @@ const pb = StyleSheet.create({
 
 // ─── S0: ProductHero (padded, rounded, with progress bar) ───────────────────
 
-function ProductHero({ images, imageUrl, onBack, topInset }) {
+function ProductHero({ images, imageUrl, onBack, topInset, heroResizeMode }) {
   const [activeIdx, setActiveIdx] = useState(0);
   const heroImages = (images && images.length > 0) ? images : (imageUrl ? [imageUrl] : [null]);
   const flatListRef = useRef(null);
+  const resMode = heroResizeMode || 'cover';
 
   const onViewableChanged = useRef(({ viewableItems }) => {
     if (viewableItems.length > 0) setActiveIdx(viewableItems[0].index ?? 0);
@@ -238,7 +238,7 @@ function ProductHero({ images, imageUrl, onBack, topInset }) {
             <CardImage
               uri={uri}
               style={hs.img}
-              resizeMode="cover"
+              resizeMode={resMode}
               placeholderColor={uiColors.surface}
             />
           )}
@@ -271,7 +271,7 @@ const hs = StyleSheet.create({
     borderRadius: IMAGE_R,
     overflow: 'hidden',
     alignSelf: 'center',
-    backgroundColor: uiColors.surface,
+    backgroundColor: '#F4F5F7',
   },
   img: {
     width: IMAGE_W,
@@ -554,7 +554,7 @@ function VariantSelector({ variants, selectedId, onSelect }) {
                   <CardImage
                     uri={v.swatchImage}
                     style={va.swatchImg}
-                    resizeMode="contain"
+                    resizeMode="cover"
                     placeholderColor={uiColors.surface}
                   />
                 ) : v.mainImage ? (
@@ -1423,6 +1423,13 @@ export default function ProductDetailScreen({ route, navigation }) {
     ? deliveryDate(parseInt(product.shipping.estimatedDays))
     : deliveryDate(4);
 
+  // Categories where the full product (including frame/border) should be visible
+  // instead of cropping to fill — e.g. artwork, mirrors, chandeliers
+  const CONTAIN_CATEGORIES = new Set([
+    'wall-art', 'mirror', 'chandelier', 'pendant-light', 'vase', 'planter',
+  ]);
+  const heroResizeMode = CONTAIN_CATEGORIES.has(product?.category) ? 'contain' : 'cover';
+
   // ── Cart logic ────────────────────────────────────────────────────────────
   const cartKey = `${name}__${brand}`;
   const inCart  = items.some(i => i.key === cartKey);
@@ -1484,6 +1491,7 @@ export default function ProductDetailScreen({ route, navigation }) {
           imageUrl={imageUrl}
           onBack={() => navigation?.goBack()}
           topInset={insets.top}
+          heroResizeMode={heroResizeMode}
         />
 
         {/* White content card (overlaps hero) */}

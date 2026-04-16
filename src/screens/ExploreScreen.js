@@ -85,16 +85,6 @@ function HeartIcon({ filled = false, size = 18 }) {
   );
 }
 
-function ShareIcon({ color = '#444', size = 18 }) {
-  return (
-    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round">
-      <Path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
-      <Polyline points="16 6 12 2 8 6" />
-      <Line x1={12} y1={2} x2={12} y2={15} />
-    </Svg>
-  );
-}
-
 function ImagePlaceholderIcon() {
   return (
     <Svg width={36} height={36} viewBox="0 0 24 24" fill="none" stroke="#aaa" strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round">
@@ -174,6 +164,28 @@ function StarIconSmall({ filled = true, size = 11, amber = false }) {
     <Svg width={size} height={size} viewBox="0 0 24 24"
       fill={filled ? filledColor : emptyColor} stroke={filled ? filledColor : '#D1D5DB'} strokeWidth={1}>
       <Path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+    </Svg>
+  );
+}
+
+function ChevDown({ size = 12, color = '#666' }) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none"
+      stroke={color} strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
+      <Polyline points="6 9 12 15 18 9" />
+    </Svg>
+  );
+}
+
+function SortIcon({ size = 16, color = '#555' }) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none"
+      stroke={color} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
+      <Path d="M3 6h8" />
+      <Path d="M3 12h5" />
+      <Path d="M3 18h3" />
+      <Path d="M18 6v12" />
+      <Path d="M15 15l3 3 3-3" />
     </Svg>
   );
 }
@@ -267,6 +279,28 @@ const FILTER_STYLES = [
 
 // Source is Amazon-only for now — no source filter UI needed
 const FILTER_SOURCES = ['amazon'];
+
+// ── Sort options ──────────────────────────────────────────────────────────────
+const PRODUCT_SORT_OPTIONS = [
+  { key: 'best_match', label: 'Best Match' },
+  { key: 'price_low',  label: 'Price: Low → High' },
+  { key: 'price_high', label: 'Price: High → Low' },
+  { key: 'top_rated',  label: 'Top Rated' },
+  { key: 'most_reviewed', label: 'Most Reviewed' },
+  { key: 'newest',     label: 'Newest' },
+];
+
+const WISH_SORT_OPTIONS = [
+  { key: 'most_popular', label: 'Most Popular' },
+  { key: 'newest',       label: 'Newest' },
+];
+
+// Room type chips for the filter sheet (Products tab)
+const FILTER_ROOM_TYPES = [
+  'living-room', 'bedroom', 'kitchen', 'dining-room', 'office', 'bathroom', 'outdoor',
+];
+
+const FILTER_RATINGS = [3, 3.5, 4, 4.5];
 
 // ── Price range slider ────────────────────────────────────────────────────────
 // FIX: trackWRef (not state) so PanResponder closures always read current width.
@@ -649,6 +683,14 @@ export default function ExploreScreen({ navigation, route }) {
   const [filterStyles, setFilterStyles] = useState([]);
   // Source filter removed — Amazon-only for now
   const [filterInStockOnly, setFilterInStockOnly] = useState(false);
+  const [filterRoomTypes, setFilterRoomTypes] = useState([]);
+  const [filterMinRating, setFilterMinRating] = useState(0);
+  const [productSort, setProductSort] = useState('best_match');
+  // Wish-specific filters
+  const [wishSort, setWishSort] = useState('most_popular');
+  const [wishFilterStyles, setWishFilterStyles] = useState([]);
+  const [wishFilterRoomTypes, setWishFilterRoomTypes] = useState([]);
+  const [showSortPicker, setShowSortPicker] = useState(false);
   const [aiImageLoading, setAiImageLoading] = useState(false);
   const [aiImageProducts, setAiImageProducts] = useState(null);
 
@@ -722,13 +764,38 @@ export default function ExploreScreen({ navigation, route }) {
     setPriceMax(PRICE_ABSOLUTE_MAX);
     setFilterStyles([]);
     setFilterInStockOnly(false);
+    setFilterRoomTypes([]);
+    setFilterMinRating(0);
+    setProductSort('best_match');
   }, []);
+
+  const clearWishFilters = useCallback(() => {
+    setWishSort('most_popular');
+    setWishFilterStyles([]);
+    setWishFilterRoomTypes([]);
+  }, []);
+
+  const clearAllFilters = useCallback(() => {
+    if (activeTab === 'products') clearProductFilters();
+    else clearWishFilters();
+  }, [activeTab, clearProductFilters, clearWishFilters]);
 
   const activeProductFilterCount = [
     priceMin > PRICE_ABSOLUTE_MIN || priceMax < PRICE_ABSOLUTE_MAX,
     filterStyles.length > 0,
     filterInStockOnly,
+    filterRoomTypes.length > 0,
+    filterMinRating > 0,
+    productSort !== 'best_match',
   ].filter(Boolean).length;
+
+  const activeWishFilterCount = [
+    wishFilterStyles.length > 0,
+    wishFilterRoomTypes.length > 0,
+    wishSort !== 'most_popular',
+  ].filter(Boolean).length;
+
+  const activeFilterCount = activeTab === 'products' ? activeProductFilterCount : activeWishFilterCount;
 
   const handleAiImageFilter = useCallback(async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -828,20 +895,32 @@ export default function ExploreScreen({ navigation, route }) {
   // searchAndFilter scoring to re-run on every single render.
   const baseDesigns = overrideDesigns || communityDesigns;
 
-  const filteredDesigns = useMemo(
-    () => searchAndFilter(baseDesigns, search, activeCategory, activeRoomFilter, activeStyleFilter),
-    [search, activeCategory, activeRoomFilter, activeStyleFilter, baseDesigns],
-  );
+  const filteredDesigns = useMemo(() => {
+    let pool = searchAndFilter(baseDesigns, search, activeCategory, activeRoomFilter, activeStyleFilter);
+    // Apply wish-specific filters from filter sheet
+    if (wishFilterStyles.length > 0) {
+      pool = pool.filter((d) => (d.styles || []).some((s) => wishFilterStyles.includes(s)));
+    }
+    if (wishFilterRoomTypes.length > 0) {
+      pool = pool.filter((d) => wishFilterRoomTypes.includes(d.roomType));
+    }
+    // Sort
+    if (wishSort === 'newest') {
+      // Reverse the default order — newest (highest id or most recently created) first
+      pool = [...pool].reverse();
+    }
+    // 'most_popular' is already the default sort from searchAndFilter (by likes)
+    return pool;
+  }, [search, activeCategory, activeRoomFilter, activeStyleFilter, baseDesigns, wishFilterStyles, wishFilterRoomTypes, wishSort]);
 
-  // Reset progressive render when the pool changes (tab/category/search/filter)
+  // Reset progressive render when the pool changes (tab/category/search/filter/sort)
   useEffect(() => {
     setProductsVisibleCount(24);
-  }, [activeTab, activeProdCat, search]);
+  }, [activeTab, activeProdCat, search, productSort, filterRoomTypes, filterMinRating]);
 
   const filteredProducts = useMemo(() => {
     let pool;
     if (overrideProducts) {
-      // Override set by navigation (e.g. "Shop all" featured) — start from these IDs only
       const idSet = new Set(overrideProducts);
       pool = PRODUCT_CATALOG.filter(p => idSet.has(p.id));
     } else {
@@ -866,8 +945,34 @@ export default function ExploreScreen({ navigation, route }) {
     if (filterInStockOnly) {
       pool = pool.filter((p) => p.stock !== false);
     }
+    if (filterRoomTypes.length > 0) {
+      pool = pool.filter((p) => filterRoomTypes.includes(p.roomType));
+    }
+    if (filterMinRating > 0) {
+      pool = pool.filter((p) => (p.rating || 0) >= filterMinRating);
+    }
+    // Sort
+    switch (productSort) {
+      case 'price_low':
+        pool = [...pool].sort((a, b) => (a.price || 0) - (b.price || 0));
+        break;
+      case 'price_high':
+        pool = [...pool].sort((a, b) => (b.price || 0) - (a.price || 0));
+        break;
+      case 'top_rated':
+        pool = [...pool].sort((a, b) => (b.rating || 0) - (a.rating || 0));
+        break;
+      case 'most_reviewed':
+        pool = [...pool].sort((a, b) => (b.reviewCount || 0) - (a.reviewCount || 0));
+        break;
+      case 'newest':
+        pool = [...pool].reverse();
+        break;
+      default: // best_match — keep current order
+        break;
+    }
     return pool;
-  }, [overrideProducts, activeProdCat, search, priceMin, priceMax, filterStyles, filterInStockOnly]);
+  }, [overrideProducts, activeProdCat, search, priceMin, priceMax, filterStyles, filterInStockOnly, filterRoomTypes, filterMinRating, productSort]);
 
   // Progressively reveal more products after initial paint (chunks of 30)
   // Keeps the Products tab opening fast — first 24 render instantly,
@@ -899,6 +1004,7 @@ export default function ExploreScreen({ navigation, route }) {
         <ScrollView
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.scrollContent}
+          onScrollBeginDrag={() => showSortPicker && setShowSortPicker(false)}
         >
           {/* ── Header ── */}
           <Text style={styles.title}>{filterLabel && hasActiveFilter ? filterLabel : 'Explore'}</Text>
@@ -920,10 +1026,10 @@ export default function ExploreScreen({ navigation, route }) {
                 activeOpacity={0.7}
                 hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
               >
-                <SlidersIcon size={17} color={activeProductFilterCount > 0 ? TC.primary : '#999'} />
-                {activeProductFilterCount > 0 && (
+                <SlidersIcon size={17} color={activeFilterCount > 0 ? TC.primary : '#999'} />
+                {activeFilterCount > 0 && (
                   <View style={styles.filterBadge}>
-                    <Text style={styles.filterBadgeText}>{activeProductFilterCount}</Text>
+                    <Text style={styles.filterBadgeText}>{activeFilterCount}</Text>
                   </View>
                 )}
               </TouchableOpacity>
@@ -952,7 +1058,7 @@ export default function ExploreScreen({ navigation, route }) {
           <View style={styles.modeToggleRow}>
             <TouchableOpacity
               style={[styles.modeToggleBtn, activeTab === 'wishes' && styles.modeToggleBtnActive]}
-              onPress={() => setActiveTab('wishes')}
+              onPress={() => { setActiveTab('wishes'); setShowSortPicker(false); }}
               activeOpacity={0.8}
             >
               <Text style={[styles.modeToggleLabel, activeTab === 'wishes' && styles.modeToggleLabelActive]}>
@@ -961,7 +1067,7 @@ export default function ExploreScreen({ navigation, route }) {
             </TouchableOpacity>
             <TouchableOpacity
               style={[styles.modeToggleBtn, activeTab === 'products' && styles.modeToggleBtnActive]}
-              onPress={() => setActiveTab('products')}
+              onPress={() => { setActiveTab('products'); setShowSortPicker(false); }}
               activeOpacity={0.8}
             >
               <Text style={[styles.modeToggleLabel, activeTab === 'products' && styles.modeToggleLabelActive]}>
@@ -999,6 +1105,64 @@ export default function ExploreScreen({ navigation, route }) {
             </TouchableOpacity>
           </View>
           <View style={styles.tabBorder} />
+
+          {/* ── Sort Row ── */}
+          <View style={styles.sortRow}>
+            <TouchableOpacity
+              style={styles.sortTouchable}
+              onPress={() => setShowSortPicker(v => !v)}
+              activeOpacity={0.6}
+            >
+              <Text style={styles.sortLabel}>Sort by</Text>
+              <Text style={[
+                styles.sortValue,
+                (activeTab === 'products' ? productSort !== 'best_match' : wishSort !== 'most_popular') && styles.sortValueActive,
+              ]}>
+                {activeTab === 'products'
+                  ? (PRODUCT_SORT_OPTIONS.find(o => o.key === productSort)?.label ?? 'Best Match')
+                  : (WISH_SORT_OPTIONS.find(o => o.key === wishSort)?.label ?? 'Most Popular')
+                }
+              </Text>
+              <ChevDown size={10} color="#999" />
+            </TouchableOpacity>
+            <Text style={styles.sortCount}>
+              {activeTab === 'products'
+                ? `${filteredProducts.length} result${filteredProducts.length !== 1 ? 's' : ''}`
+                : `${filteredDesigns.length} result${filteredDesigns.length !== 1 ? 's' : ''}`
+              }
+            </Text>
+          </View>
+
+          {/* ── Sort Picker Dropdown ── */}
+          {showSortPicker && (
+            <View style={styles.sortDropdown}>
+              {(activeTab === 'products' ? PRODUCT_SORT_OPTIONS : WISH_SORT_OPTIONS).map((opt, idx, arr) => {
+                const isActive = activeTab === 'products' ? productSort === opt.key : wishSort === opt.key;
+                return (
+                  <TouchableOpacity
+                    key={opt.key}
+                    style={[styles.sortOption, idx === arr.length - 1 && { borderBottomWidth: 0 }]}
+                    onPress={() => {
+                      if (activeTab === 'products') setProductSort(opt.key);
+                      else setWishSort(opt.key);
+                      setShowSortPicker(false);
+                    }}
+                    activeOpacity={0.6}
+                  >
+                    <Text style={[styles.sortOptionText, isActive && styles.sortOptionTextActive]}>
+                      {opt.label}
+                    </Text>
+                    {isActive && (
+                      <Svg width={14} height={14} viewBox="0 0 24 24" fill="none"
+                        stroke={TC.primary} strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
+                        <Polyline points="20 6 9 17 4 12" />
+                      </Svg>
+                    )}
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+          )}
 
           {/* ── Tab content — instant swap, no fade animation ── */}
           <View>
@@ -1386,7 +1550,7 @@ export default function ExploreScreen({ navigation, route }) {
         </View>
       </Modal>
       {/* ══════════════════════════════
-          PRODUCT FILTER SHEET
+          TAB-AWARE FILTER SHEET
       ══════════════════════════════ */}
       <Modal
         visible={showFilterSheet}
@@ -1405,10 +1569,10 @@ export default function ExploreScreen({ navigation, route }) {
 
             {/* Header */}
             <View style={styles.filterSheetHeader}>
-              <TouchableOpacity onPress={clearProductFilters} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
-                <Text style={styles.filterSheetClearAll}>Clear All</Text>
+              <TouchableOpacity onPress={clearAllFilters} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+                <Text style={styles.filterSheetClearAll}>Reset</Text>
               </TouchableOpacity>
-              <Text style={styles.filterSheetTitle}>Filters</Text>
+              <Text style={styles.filterSheetTitle}>Filter & Sort</Text>
               <TouchableOpacity onPress={() => setShowFilterSheet(false)} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
                 <CloseIcon size={16} />
               </TouchableOpacity>
@@ -1416,51 +1580,144 @@ export default function ExploreScreen({ navigation, route }) {
 
             <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.filterSheetBody} keyboardShouldPersistTaps="handled">
 
-              {/* ── Price Range Slider ── */}
-              <Text style={styles.filterSectionLabel}>BUDGET</Text>
-              <PriceRangeSlider
-                minVal={priceMin}
-                maxVal={priceMax}
-                onChangeMin={setPriceMin}
-                onChangeMax={setPriceMax}
-              />
+              {/* ════════ PRODUCTS TAB FILTERS ════════ */}
+              {activeTab === 'products' ? (
+                <>
+                  {/* ── Sort By ── */}
+                  <Text style={styles.fsSectionTitle}>Sort by</Text>
+                  <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.fsHScroll}>
+                    {PRODUCT_SORT_OPTIONS.map((opt) => {
+                      const on = productSort === opt.key;
+                      return (
+                        <TouchableOpacity key={opt.key} style={[styles.fsChip, on && styles.fsChipOn]} onPress={() => setProductSort(opt.key)} activeOpacity={0.6}>
+                          <Text style={[styles.fsChipText, on && styles.fsChipTextOn]}>{opt.label}</Text>
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </ScrollView>
+                  <View style={styles.fsDivider} />
 
-              {/* ── Style ── */}
-              <Text style={[styles.filterSectionLabel, { marginTop: space.lg }]}>STYLE</Text>
-              <View style={styles.filterChipWrap}>
-                {FILTER_STYLES.map((s) => (
-                  <TouchableOpacity
-                    key={s}
-                    style={[styles.filterChip, filterStyles.includes(s) && styles.filterChipActive]}
-                    onPress={() => setFilterStyles(prev => prev.includes(s) ? prev.filter(x => x !== s) : [...prev, s])}
-                    activeOpacity={0.75}
-                  >
-                    <Text style={[styles.filterChipText, filterStyles.includes(s) && styles.filterChipTextActive]}>
-                      {STYLE_LABEL_MAP[s] || s}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
+                  {/* ── Budget ── */}
+                  <Text style={styles.fsSectionTitle}>Budget</Text>
+                  <PriceRangeSlider
+                    minVal={priceMin}
+                    maxVal={priceMax}
+                    onChangeMin={setPriceMin}
+                    onChangeMax={setPriceMax}
+                  />
+                  <View style={styles.fsDivider} />
 
-              {/* ── In Stock Only ── */}
-              <View style={styles.filterToggleRow}>
-                <Text style={styles.filterToggleLabel}>In Stock Only</Text>
-                <Switch
-                  value={filterInStockOnly}
-                  onValueChange={setFilterInStockOnly}
-                  trackColor={{ false: '#E5E7EB', true: '#0B6DC3' }}
-                  thumbColor="#FFFFFF"
-                />
-              </View>
+                  {/* ── Room Type ── */}
+                  <Text style={styles.fsSectionTitle}>Room</Text>
+                  <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.fsHScroll}>
+                    {FILTER_ROOM_TYPES.map((rt) => {
+                      const on = filterRoomTypes.includes(rt);
+                      return (
+                        <TouchableOpacity key={rt} style={[styles.fsChip, on && styles.fsChipOn]} onPress={() => setFilterRoomTypes(prev => prev.includes(rt) ? prev.filter(x => x !== rt) : [...prev, rt])} activeOpacity={0.6}>
+                          <Text style={[styles.fsChipText, on && styles.fsChipTextOn]}>{ROOM_LABEL_MAP[rt] || rt}</Text>
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </ScrollView>
+                  <View style={styles.fsDivider} />
 
-              {/* ── Apply Button ── */}
+                  {/* ── Style ── */}
+                  <Text style={styles.fsSectionTitle}>Style</Text>
+                  <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.fsHScroll}>
+                    {FILTER_STYLES.map((s) => {
+                      const on = filterStyles.includes(s);
+                      return (
+                        <TouchableOpacity key={s} style={[styles.fsChip, on && styles.fsChipOn]} onPress={() => setFilterStyles(prev => prev.includes(s) ? prev.filter(x => x !== s) : [...prev, s])} activeOpacity={0.6}>
+                          <Text style={[styles.fsChipText, on && styles.fsChipTextOn]}>{STYLE_LABEL_MAP[s] || s}</Text>
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </ScrollView>
+                  <View style={styles.fsDivider} />
+
+                  {/* ── Min Rating ── */}
+                  <Text style={styles.fsSectionTitle}>Rating</Text>
+                  <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.fsHScroll}>
+                    {FILTER_RATINGS.map((r) => {
+                      const on = filterMinRating === r;
+                      return (
+                        <TouchableOpacity key={r} style={[styles.fsChip, on && styles.fsChipOn]} onPress={() => setFilterMinRating(prev => prev === r ? 0 : r)} activeOpacity={0.6}>
+                          <StarIconSmall size={11} filled amber />
+                          <Text style={[styles.fsChipText, on && styles.fsChipTextOn]}>{r}+ stars</Text>
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </ScrollView>
+                  <View style={styles.fsDivider} />
+
+                  {/* ── In Stock Only ── */}
+                  <View style={styles.fsToggleRow}>
+                    <Text style={styles.fsToggleLabel}>In Stock Only</Text>
+                    <Switch
+                      value={filterInStockOnly}
+                      onValueChange={setFilterInStockOnly}
+                      trackColor={{ false: '#E5E7EB', true: '#0B6DC3' }}
+                      thumbColor="#FFFFFF"
+                    />
+                  </View>
+                </>
+              ) : (
+                /* ════════ WISHES TAB FILTERS ════════ */
+                <>
+                  {/* ── Sort By ── */}
+                  <Text style={styles.fsSectionTitle}>Sort by</Text>
+                  <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.fsHScroll}>
+                    {WISH_SORT_OPTIONS.map((opt) => {
+                      const on = wishSort === opt.key;
+                      return (
+                        <TouchableOpacity key={opt.key} style={[styles.fsChip, on && styles.fsChipOn]} onPress={() => setWishSort(opt.key)} activeOpacity={0.6}>
+                          <Text style={[styles.fsChipText, on && styles.fsChipTextOn]}>{opt.label}</Text>
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </ScrollView>
+                  <View style={styles.fsDivider} />
+
+                  {/* ── Room Type ── */}
+                  <Text style={styles.fsSectionTitle}>Room</Text>
+                  <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.fsHScroll}>
+                    {FILTER_ROOM_TYPES.map((rt) => {
+                      const on = wishFilterRoomTypes.includes(rt);
+                      return (
+                        <TouchableOpacity key={rt} style={[styles.fsChip, on && styles.fsChipOn]} onPress={() => setWishFilterRoomTypes(prev => prev.includes(rt) ? prev.filter(x => x !== rt) : [...prev, rt])} activeOpacity={0.6}>
+                          <Text style={[styles.fsChipText, on && styles.fsChipTextOn]}>{ROOM_LABEL_MAP[rt] || rt}</Text>
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </ScrollView>
+                  <View style={styles.fsDivider} />
+
+                  {/* ── Style ── */}
+                  <Text style={styles.fsSectionTitle}>Style</Text>
+                  <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.fsHScroll}>
+                    {FILTER_STYLES.map((s) => {
+                      const on = wishFilterStyles.includes(s);
+                      return (
+                        <TouchableOpacity key={s} style={[styles.fsChip, on && styles.fsChipOn]} onPress={() => setWishFilterStyles(prev => prev.includes(s) ? prev.filter(x => x !== s) : [...prev, s])} activeOpacity={0.6}>
+                          <Text style={[styles.fsChipText, on && styles.fsChipTextOn]}>{STYLE_LABEL_MAP[s] || s}</Text>
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </ScrollView>
+                </>
+              )}
+
+              {/* ── Apply Button (both tabs) ── */}
               <TouchableOpacity
                 style={styles.filterApplyBtn}
                 onPress={() => setShowFilterSheet(false)}
                 activeOpacity={0.85}
               >
                 <Text style={styles.filterApplyBtnText}>
-                  Show {filteredProducts.length} Result{filteredProducts.length !== 1 ? 's' : ''}
+                  {activeTab === 'products'
+                    ? `Show ${filteredProducts.length} Result${filteredProducts.length !== 1 ? 's' : ''}`
+                    : `Show ${filteredDesigns.length} Result${filteredDesigns.length !== 1 ? 's' : ''}`
+                  }
                 </Text>
               </TouchableOpacity>
 
@@ -2418,18 +2675,20 @@ const styles = StyleSheet.create({
     borderBottomColor: 'rgba(0,0,0,0.06)',
   },
   filterSheetTitle: {
-    ...typeScale.title,
-    fontFamily: 'Geist_700Bold',
+    fontSize: 16,
+    fontWeight: '600',
+    fontFamily: 'Geist_600SemiBold',
     color: TC.textPrimary,
   },
   filterSheetClearAll: {
-    ...typeScale.button,
-    fontFamily: 'Geist_600SemiBold',
+    fontSize: 14,
+    fontWeight: '500',
+    fontFamily: 'Geist_500Medium',
     color: TC.textTertiary,
   },
   filterSheetBody: {
     paddingHorizontal: space.lg,
-    paddingTop: space.sm,
+    paddingTop: space.base,
     paddingBottom: space['3xl'],
   },
   filterHScrollContent: {
@@ -2556,6 +2815,136 @@ const styles = StyleSheet.create({
     color: TC.white,
     fontSize: 15,
     fontFamily: 'Geist_600SemiBold',
+  },
+
+  // ── Sort row ──────────────────────────────────────────────────────────────
+  sortRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: space.lg,
+    paddingTop: 10,
+    paddingBottom: 8,
+  },
+  sortTouchable: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+  },
+  sortLabel: {
+    fontSize: 13,
+    fontWeight: '400',
+    fontFamily: 'Geist_400Regular',
+    color: TC.textTertiary,
+  },
+  sortValue: {
+    fontSize: 13,
+    fontWeight: '500',
+    fontFamily: 'Geist_500Medium',
+    color: TC.textPrimary,
+  },
+  sortValueActive: {
+    color: TC.primary,
+    fontWeight: '600',
+    fontFamily: 'Geist_600SemiBold',
+  },
+  sortCount: {
+    fontSize: 12,
+    fontWeight: '400',
+    fontFamily: 'Geist_400Regular',
+    color: TC.textTertiary,
+  },
+  // ── Sort dropdown ────────────────────────────────────────────────────────
+  sortDropdown: {
+    marginHorizontal: space.lg,
+    marginBottom: space.sm,
+    backgroundColor: TC.bg,
+    borderRadius: radius.md,
+    borderWidth: 1,
+    borderColor: 'rgba(0,0,0,0.08)',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    elevation: 3,
+    overflow: 'hidden',
+  },
+  sortOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingVertical: 13,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: 'rgba(0,0,0,0.06)',
+  },
+  sortOptionText: {
+    fontSize: 14,
+    fontWeight: '400',
+    fontFamily: 'Geist_400Regular',
+    color: TC.textPrimary,
+  },
+  sortOptionTextActive: {
+    fontWeight: '600',
+    fontFamily: 'Geist_600SemiBold',
+    color: TC.primary,
+  },
+
+  // ── Filter sheet sections (fs* = filter sheet) ───────────────────────────
+  fsSectionTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    fontFamily: 'Geist_600SemiBold',
+    color: TC.textPrimary,
+    marginBottom: 10,
+    marginTop: 4,
+  },
+  fsHScroll: {
+    gap: 8,
+    paddingBottom: 2,
+  },
+  fsChip: {
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: radius.full,
+    borderWidth: 1,
+    borderColor: 'rgba(0,0,0,0.12)',
+    backgroundColor: TC.bg,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  fsChipOn: {
+    borderColor: TC.primary,
+    backgroundColor: 'rgba(29,78,216,0.06)',
+  },
+  fsChipText: {
+    fontSize: 13,
+    fontWeight: '400',
+    fontFamily: 'Geist_400Regular',
+    color: TC.textSecondary,
+  },
+  fsChipTextOn: {
+    color: TC.primary,
+    fontWeight: '600',
+    fontFamily: 'Geist_600SemiBold',
+  },
+  fsDivider: {
+    height: 1,
+    backgroundColor: 'rgba(0,0,0,0.06)',
+    marginVertical: 16,
+  },
+  fsToggleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 4,
+  },
+  fsToggleLabel: {
+    fontSize: 14,
+    fontWeight: '500',
+    fontFamily: 'Geist_500Medium',
+    color: TC.textPrimary,
   },
 
   // Empty state

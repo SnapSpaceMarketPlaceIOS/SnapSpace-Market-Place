@@ -28,8 +28,8 @@ const RED = '#DC2626';
 
 function BackIcon() {
   return (
-    <Svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke="#111" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-      <Path d="M19 12H5M12 5l-7 7 7 7" />
+    <Svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke="#111" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round">
+      <Polyline points="15 18 9 12 15 6" />
     </Svg>
   );
 }

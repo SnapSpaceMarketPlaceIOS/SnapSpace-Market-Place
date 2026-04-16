@@ -16,7 +16,7 @@ import {
 import CardImage from '../components/CardImage';
 import LensLoader from '../components/LensLoader';
 import AutoImage from '../components/AutoImage';
-import Svg, { Path, Circle, Polyline, Line, G } from 'react-native-svg';
+import Svg, { Path, Circle, Polyline, Line, G, Ellipse } from 'react-native-svg';
 import { colors } from '../constants/colors';
 import { colors as C } from '../constants/theme';
 import { space, radius, shadow, typeScale, letterSpacing } from '../constants/tokens';
@@ -43,20 +43,42 @@ function BackIcon() {
 
 function CartNavIcon() {
   return (
-    <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="#111" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
-      <Circle cx={9} cy={21} r={1} />
-      <Circle cx={20} cy={21} r={1} />
-      <Path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+    <Svg width={20} height={20} viewBox="265.5 20.5 27 25" fill="none">
+      <Path
+        d="M267.104 22H270.08C270.756 22 271.094 22 271.353 22.1807C271.611 22.3614 271.727 22.6792 271.959 23.3149L272.937 26"
+        stroke="#111" strokeWidth={1} strokeLinecap="round"
+      />
+      <Path
+        d="M287.521 39.3334H273.63C272.984 39.3334 272.661 39.3334 272.442 39.218C272.156 39.0675 271.961 38.7883 271.917 38.4684C271.884 38.2233 271.995 37.9197 272.216 37.3126C272.448 36.675 272.565 36.3562 272.755 36.1102C273.003 35.789 273.343 35.551 273.73 35.4278C274.026 35.3334 274.365 35.3334 275.044 35.3334H283.146"
+        stroke="#111" strokeWidth={1} strokeLinecap="round" strokeLinejoin="round"
+      />
+      <Path
+        d="M283.846 35.3333H276.939C275.703 35.3333 275.085 35.3333 274.594 35.0212C274.103 34.7091 273.841 34.1497 273.317 33.0311L272.024 30.2733C271.123 28.3515 270.673 27.3906 271.115 26.6953C271.557 26 272.618 26 274.74 26H286.483C288.876 26 290.073 26 290.501 26.7728C290.93 27.5457 290.296 28.5605 289.027 30.59L287.238 33.4533C286.663 34.3724 286.376 34.8319 285.924 35.0826C285.471 35.3333 284.929 35.3333 283.846 35.3333Z"
+        stroke="#111" strokeWidth={1} strokeLinecap="round"
+      />
+      <Ellipse cx={286.792} cy={42.6667} rx={1.45833} ry={1.33333} fill="#111" />
+      <Ellipse cx={275.125} cy={42.6667} rx={1.45833} ry={1.33333} fill="#111" />
     </Svg>
   );
 }
 
 function CartWhiteIcon() {
   return (
-    <Svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-      <Circle cx={9} cy={21} r={1} />
-      <Circle cx={20} cy={21} r={1} />
-      <Path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+    <Svg width={18} height={18} viewBox="265.5 20.5 27 25" fill="none">
+      <Path
+        d="M267.104 22H270.08C270.756 22 271.094 22 271.353 22.1807C271.611 22.3614 271.727 22.6792 271.959 23.3149L272.937 26"
+        stroke="#fff" strokeWidth={1} strokeLinecap="round"
+      />
+      <Path
+        d="M287.521 39.3334H273.63C272.984 39.3334 272.661 39.3334 272.442 39.218C272.156 39.0675 271.961 38.7883 271.917 38.4684C271.884 38.2233 271.995 37.9197 272.216 37.3126C272.448 36.675 272.565 36.3562 272.755 36.1102C273.003 35.789 273.343 35.551 273.73 35.4278C274.026 35.3334 274.365 35.3334 275.044 35.3334H283.146"
+        stroke="#fff" strokeWidth={1} strokeLinecap="round" strokeLinejoin="round"
+      />
+      <Path
+        d="M283.846 35.3333H276.939C275.703 35.3333 275.085 35.3333 274.594 35.0212C274.103 34.7091 273.841 34.1497 273.317 33.0311L272.024 30.2733C271.123 28.3515 270.673 27.3906 271.115 26.6953C271.557 26 272.618 26 274.74 26H286.483C288.876 26 290.073 26 290.501 26.7728C290.93 27.5457 290.296 28.5605 289.027 30.59L287.238 33.4533C286.663 34.3724 286.376 34.8319 285.924 35.0826C285.471 35.3333 284.929 35.3333 283.846 35.3333Z"
+        stroke="#fff" strokeWidth={1} strokeLinecap="round"
+      />
+      <Ellipse cx={286.792} cy={42.6667} rx={1.45833} ry={1.33333} fill="#fff" />
+      <Ellipse cx={275.125} cy={42.6667} rx={1.45833} ry={1.33333} fill="#fff" />
     </Svg>
   );
 }
@@ -85,7 +107,7 @@ function DownloadIcon({ color = '#9CA3AF' }) {
     <Svg width={18} height={18} viewBox="0 0 30 30" fill="none">
       <Path
         d="M6.54815 18.5147C7.04668 20.3752 8.1452 22.0193 9.67334 23.1918C11.2015 24.3644 13.0738 25 15 25C16.9262 25 18.7985 24.3644 20.3267 23.1918C21.8548 22.0193 22.9533 20.3752 23.4519 18.5147"
-        stroke={color} strokeWidth={1.6} strokeLinecap="round"
+        stroke={color} strokeWidth={1.4} strokeLinecap="round"
       />
       <Path
         d="M15 16.25L14.6877 16.6404L15 16.8903L15.3123 16.6404L15 16.25ZM15.5 5C15.5 4.72386 15.2761 4.5 15 4.5C14.7239 4.5 14.5 4.72386 14.5 5L15 5L15.5 5ZM8.75 11.25L8.43765 11.6404L14.6877 16.6404L15 16.25L15.3123 15.8596L9.06235 10.8596L8.75 11.25ZM15 16.25L15.3123 16.6404L21.5623 11.6404L21.25 11.25L20.9377 10.8596L14.6877 15.8596L15 16.25ZM15 16.25L15.5 16.25L15.5 5L15 5L14.5 5L14.5 16.25L15 16.25Z"
@@ -101,7 +123,7 @@ function ShareIcon({ color = '#9CA3AF' }) {
     <Svg width={18} height={18} viewBox="0 0 30 30" fill="none">
       <Path
         d="M6.54815 18.5147C7.04668 20.3752 8.1452 22.0193 9.67334 23.1918C11.2015 24.3644 13.0738 25 15 25C16.9262 25 18.7985 24.3644 20.3267 23.1918C21.8548 22.0193 22.9533 20.3752 23.4519 18.5147"
-        stroke={color} strokeWidth={1.6} strokeLinecap="round"
+        stroke={color} strokeWidth={1.4} strokeLinecap="round"
       />
       <Path
         d="M15 5L14.6877 4.60957L15 4.35969L15.3123 4.60957L15 5ZM15.5 16.25C15.5 16.5261 15.2761 16.75 15 16.75C14.7239 16.75 14.5 16.5261 14.5 16.25L15 16.25L15.5 16.25ZM8.75 10L8.43765 9.60957L14.6877 4.60957L15 5L15.3123 5.39043L9.06235 10.3904L8.75 10ZM15 5L15.3123 4.60957L21.5623 9.60957L21.25 10L20.9377 10.3904L14.6877 5.39043L15 5ZM15 5L15.5 5L15.5 16.25L15 16.25L14.5 16.25L14.5 5L15 5Z"

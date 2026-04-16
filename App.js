@@ -311,7 +311,7 @@ function RootNavigator() {
     return (
       <View style={styles.loadingScreen}>
         <Text style={styles.loadingWordmark}>HomeGenie</Text>
-        <GenieLoader size={80} animating style={{ marginTop: 24 }} />
+        <GenieLoader size={80} animating style={{ marginTop: 48 }} />
       </View>
     );
   }
@@ -364,7 +364,7 @@ export default function App() {
         <Text style={styles.loadingWordmark}>
           HomeGenie
         </Text>
-        <GenieLoader size={80} animating style={{ marginTop: 24 }} />
+        <GenieLoader size={80} animating style={{ marginTop: 48 }} />
       </View>
     );
   }
