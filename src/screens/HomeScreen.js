@@ -39,7 +39,7 @@ import { useLiked } from '../context/LikedContext';
 import { useCart } from '../context/CartContext';
 import { DESIGNS } from '../data/designs';
 import { SELLERS } from '../data/sellers';
-import { searchProducts, getSourceColor, getProductsForPrompt } from '../services/affiliateProducts';
+import { searchProducts, getSourceColor, getProductsForPrompt, getNormalizedProductsByIds } from '../services/affiliateProducts';
 import { buildFinalPrompt, generateWithProductRefs, generateWithProductPanel, generateSingleProductInRoom, pickAspectRatio } from '../services/replicate';
 import { createProductPanel } from '../utils/createProductPanel';
 import { verifyGeneratedProducts } from '../services/visionMatcher';
@@ -391,7 +391,24 @@ const STYLE_LABEL_MAP = {
 // ── Derived static data ────────────────────────────────────────────────────────
 const TRENDING_DESIGNS   = [...DESIGNS].sort((a, b) => b.likes - a.likes).slice(0, 8);
 const NEW_ARRIVALS       = [...DESIGNS].reverse().slice(0, 8);
-const FEATURED_PRODUCTS  = searchProducts({ keywords: 'modern living room bedroom', limit: 8 });
+// ── Featured Products — hand-curated premium picks with lifestyle photography ──
+// Only expensive, hero-worthy items: sofas, beds, rugs, coffee/dining tables,
+// and accent chairs that show the product in a fully-furnished room context.
+// Keyword search is too loose (leaks cheap white-background items); use explicit
+// ASINs so the section stays on-brand as new products are added to the catalog.
+const FEATURED_PRODUCT_IDS = [
+  'B0CDWS3291', // Acanva Luxury Curved Back Velvet Sofa — $1,797
+  'B0DBZ467LQ', // Homary Curva King Boucle Upholstered Platform Bed — $1,429
+  'B0DSW5H4Z6', // YOPENG Luxury Curved Boucle Sectional — $1,598
+  'B0DYJVQBHH', // Homedot 47" Round Dining Table Set — $999
+  'B0FP55743T', // KEIKI 126" Curved Oversized Boucle Sectional — $1,399
+  'B0F9KV76QL', // Glintee 49.2" Oval Faux Marble Coffee Table — $416
+  'B0D9BGNR7X', // JACH U-Shaped Modular Velvet Sectional — $1,390
+  'B0DSM1TXLY', // CAMILSON Swirl Luxury Micro Loop 9x12 Area Rug — $259
+];
+// Safety rail: drop anything under $200 even if manually added above.
+const FEATURED_PRODUCTS = getNormalizedProductsByIds(FEATURED_PRODUCT_IDS)
+  .filter((p) => (p.priceValue ?? 0) >= 200);
 
 // ── Today's Highlight — premium sofa/seating pool, rotates every 3 hours ──────
 // Ordered by price descending so the most luxurious pieces get equal airtime.

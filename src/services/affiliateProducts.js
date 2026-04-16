@@ -254,6 +254,27 @@ export function getProductsByDesign(designId) {
   return [];
 }
 
+/**
+ * Fetch UI-ready (normalized) products by an explicit ordered list of IDs.
+ * Missing IDs are silently filtered out. Use for hand-curated sections
+ * like Featured Products where keyword search is too loose.
+ *
+ * Different from the raw `getProductsByIds` exported by productCatalog.js:
+ *   - Pulls from the combined catalog (includes curatedProducts.js)
+ *   - Returns normalized shape (name/brand/price/imageUrl/... UI fields)
+ *
+ * @param {string[]} ids  ASINs or catalog IDs
+ * @returns {object[]}    normalized products in input order
+ */
+export function getNormalizedProductsByIds(ids = []) {
+  if (!Array.isArray(ids) || ids.length === 0) return [];
+  const catalog = getCombinedCatalog();
+  return ids
+    .map((id) => catalog.find((p) => p.id === id || p.asin === id))
+    .filter(Boolean)
+    .map(normalizeProduct);
+}
+
 // ── "You Might Also Like" recommendation engine ──────────────────────────────
 
 // Accent/decor categories targeted for recommendations.
