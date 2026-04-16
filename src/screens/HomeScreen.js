@@ -314,14 +314,14 @@ function RoomIcon({ roomKey, size = 28 }) {
   }
 }
 
-// ── Hero slideshow images — 786px wide, best-fit for portrait phone screen ────
+// ── Hero slideshow images — swap URLs here anytime, no other code changes needed ─
 const HERO_IMAGES = [
-  require('../../assets/hero-slideshow-1.jpg'),   // minimalist white living room
-  require('../../assets/hero-slideshow-9.jpg'),   // warm modern interior
-  require('../../assets/hero-slideshow-6.jpg'),   // cozy gallery wall living room
-  require('../../assets/hero-slideshow-3.jpg'),   // B&W living room with lanterns
-  require('../../assets/hero-slideshow-5.jpg'),   // blush pink bedroom
-  require('../../assets/hero-slideshow-2.jpg'),   // elegant warm living space
+  { uri: 'https://images.unsplash.com/photo-1598928506311-c55ded91a20c?w=1200&q=90' }, // warm luxury organic living room
+  { uri: 'https://images.unsplash.com/photo-1565182999561-18d7dc61c393?w=1200&q=90' }, // architectural double-height interior
+  { uri: 'https://images.unsplash.com/photo-1615873968403-89e068629265?w=1200&q=90' }, // arched Mediterranean living room
+  { uri: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=1200&q=90' }, // bold warm living room, yellow accent
+  { uri: 'https://images.unsplash.com/photo-1616046229478-9901c5536a45?w=1200&q=90' }, // modern organic furnished interior
+  { uri: 'https://images.unsplash.com/photo-1550581190-9c1c48d21d6c?w=1200&q=90' }, // sculptural warm living space
 ];
 const HERO_INTERVAL = 5500;  // 5.5 seconds between transitions
 const HERO_FADE_MS  = 1200;  // 1.2 second smooth crossfade
