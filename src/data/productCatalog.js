@@ -2095,8 +2095,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'wall26', Size: '16"×24"×3 panels', Style: 'Minimalist Botanical', Material: 'Canvas', Frame: 'Black' },
     variants: [
-      { id: 'B0GRGK3J3W', asin: 'B0GRGK3J3W', label: 'Black Frame', mainImage: 'https://m.media-amazon.com/images/I/71zAggJCWWL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71zAggJCWWL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0GRGK3J3W?tag=snapspacemkt-20' },
-      { id: 'B0GRGDNV4P', asin: 'B0GRGDNV4P', label: 'Natural Frame', mainImage: 'https://m.media-amazon.com/images/I/71zAggJCWWL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71zAggJCWWL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0GRGDNV4P?tag=snapspacemkt-20' },
+      { id: 'B0GRGK3J3W', asin: 'B0GRGK3J3W', label: 'Black Frame', mainImage: 'https://m.media-amazon.com/images/I/71zAggJCWWL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71zAggJCWWL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0GRGK3J3W?tag=snapspacemkt-20' },
+      { id: 'B0GRGDNV4P', asin: 'B0GRGDNV4P', label: 'Natural Frame', mainImage: 'https://m.media-amazon.com/images/I/71zAggJCWWL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71zAggJCWWL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0GRGDNV4P?tag=snapspacemkt-20' },
       { id: 'B0GRGGGM9P', asin: 'B0GRGGGM9P', label: 'White Frame', mainImage: 'https://m.media-amazon.com/images/I/71zAggJCWWL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71zAggJCWWL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0GRGGGM9P?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '3-5', prime: true, returnDays: 30 },
@@ -2129,8 +2129,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'SIGNLEADER', Size: '24"×36"×3 panels', Style: 'Minimal Brush Stroke', Material: 'Canvas', Frame: 'Black' },
     variants: [
-      { id: 'B09Y5SB61L', asin: 'B09Y5SB61L', label: 'Black Frame', mainImage: 'https://m.media-amazon.com/images/I/71Yn9MEJyAL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71Yn9MEJyAL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B09Y5SB61L?tag=snapspacemkt-20' },
-      { id: 'B09Y5QDRHN', asin: 'B09Y5QDRHN', label: 'Natural Frame', mainImage: 'https://m.media-amazon.com/images/I/71Yn9MEJyAL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71Yn9MEJyAL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B09Y5QDRHN?tag=snapspacemkt-20' },
+      { id: 'B09Y5SB61L', asin: 'B09Y5SB61L', label: 'Black Frame', mainImage: 'https://m.media-amazon.com/images/I/71Yn9MEJyAL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71Yn9MEJyAL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B09Y5SB61L?tag=snapspacemkt-20' },
+      { id: 'B09Y5QDRHN', asin: 'B09Y5QDRHN', label: 'Natural Frame', mainImage: 'https://m.media-amazon.com/images/I/71Yn9MEJyAL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71Yn9MEJyAL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B09Y5QDRHN?tag=snapspacemkt-20' },
       { id: 'B09Y5RCJ5M', asin: 'B09Y5RCJ5M', label: 'White Frame', mainImage: 'https://m.media-amazon.com/images/I/71Yn9MEJyAL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71Yn9MEJyAL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B09Y5RCJ5M?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '3-5', prime: true, returnDays: 30 },
@@ -2163,8 +2163,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'Zessonic', Size: '20"×28"×2 panels', Style: 'Abstract Gold Textured', Material: 'Canvas', Frame: 'Black Edge' },
     variants: [
-      { id: 'B0DNLWN98Q', asin: 'B0DNLWN98Q', label: 'Gold Diptych', mainImage: 'https://m.media-amazon.com/images/I/71PKIIu+nUL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71PKIIu+nUL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0DNLWN98Q?tag=snapspacemkt-20' },
-      { id: 'B0FD7CDD4R', asin: 'B0FD7CDD4R', label: 'Black and Gold', mainImage: 'https://m.media-amazon.com/images/I/71PKIIu+nUL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71PKIIu+nUL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0FD7CDD4R?tag=snapspacemkt-20' },
+      { id: 'B0DNLWN98Q', asin: 'B0DNLWN98Q', label: 'Gold Diptych', mainImage: 'https://m.media-amazon.com/images/I/71PKIIu+nUL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71PKIIu+nUL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DNLWN98Q?tag=snapspacemkt-20' },
+      { id: 'B0FD7CDD4R', asin: 'B0FD7CDD4R', label: 'Black and Gold', mainImage: 'https://m.media-amazon.com/images/I/71PKIIu+nUL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71PKIIu+nUL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FD7CDD4R?tag=snapspacemkt-20' },
       { id: 'B09W8NBH73', asin: 'B09W8NBH73', label: 'Gold & Gray', mainImage: 'https://m.media-amazon.com/images/I/71PKIIu+nUL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71PKIIu+nUL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B09W8NBH73?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '3-5', prime: true, returnDays: 30 },
@@ -2197,8 +2197,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'Kate and Laurel', Size: '18"×24"×2 panels', Style: 'Abstract Geometric', Material: 'Linen Canvas', Artist: 'Teju Reval' },
     variants: [
-      { id: 'B085RSRZ4N', asin: 'B085RSRZ4N', label: 'Gold Frame', mainImage: 'https://m.media-amazon.com/images/I/815siu6+1OL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/815siu6+1OL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B085RSRZ4N?tag=snapspacemkt-20' },
-      { id: 'B084YXC996', asin: 'B084YXC996', label: 'Black Frame', mainImage: 'https://m.media-amazon.com/images/I/815siu6+1OL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/815siu6+1OL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B084YXC996?tag=snapspacemkt-20' },
+      { id: 'B085RSRZ4N', asin: 'B085RSRZ4N', label: 'Gold Frame', mainImage: 'https://m.media-amazon.com/images/I/815siu6+1OL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/815siu6+1OL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B085RSRZ4N?tag=snapspacemkt-20' },
+      { id: 'B084YXC996', asin: 'B084YXC996', label: 'Black Frame', mainImage: 'https://m.media-amazon.com/images/I/815siu6+1OL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/815siu6+1OL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B084YXC996?tag=snapspacemkt-20' },
       { id: 'B09L5CQP7G', asin: 'B09L5CQP7G', label: 'Gray Frame', mainImage: 'https://m.media-amazon.com/images/I/815siu6+1OL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/815siu6+1OL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B09L5CQP7G?tag=snapspacemkt-20' },
       { id: 'B09L5D9K15', asin: 'B09L5D9K15', label: 'Walnut Brown Frame', mainImage: 'https://m.media-amazon.com/images/I/815siu6+1OL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/815siu6+1OL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B09L5D9K15?tag=snapspacemkt-20' },
       { id: 'B0CV61QXP4', asin: 'B0CV61QXP4', label: 'Bright Gold Frame', mainImage: 'https://m.media-amazon.com/images/I/815siu6+1OL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/815siu6+1OL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CV61QXP4?tag=snapspacemkt-20' },
@@ -2233,8 +2233,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'AREBOLO', Size: '12"×16"×4 panels', Style: 'Abstract Marble', Material: 'Canvas', Finish: 'Framed' },
     variants: [
-      { id: 'B0FKT23N71', asin: 'B0FKT23N71', label: 'Abstract', mainImage: 'https://m.media-amazon.com/images/I/81w-NY4SNQL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81w-NY4SNQL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0FKT23N71?tag=snapspacemkt-20' },
-      { id: 'B0F5W4ZM96', asin: 'B0F5W4ZM96', label: 'Aurora', mainImage: 'https://m.media-amazon.com/images/I/81w-NY4SNQL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81w-NY4SNQL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0F5W4ZM96?tag=snapspacemkt-20' },
+      { id: 'B0FKT23N71', asin: 'B0FKT23N71', label: 'Abstract', mainImage: 'https://m.media-amazon.com/images/I/81w-NY4SNQL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81w-NY4SNQL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FKT23N71?tag=snapspacemkt-20' },
+      { id: 'B0F5W4ZM96', asin: 'B0F5W4ZM96', label: 'Aurora', mainImage: 'https://m.media-amazon.com/images/I/81w-NY4SNQL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81w-NY4SNQL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0F5W4ZM96?tag=snapspacemkt-20' },
       { id: 'B0F5W5TPW9', asin: 'B0F5W5TPW9', label: 'Beach', mainImage: 'https://m.media-amazon.com/images/I/81w-NY4SNQL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81w-NY4SNQL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0F5W5TPW9?tag=snapspacemkt-20' },
       { id: 'B0FKT4QN5H', asin: 'B0FKT4QN5H', label: 'Bouquet', mainImage: 'https://m.media-amazon.com/images/I/81w-NY4SNQL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81w-NY4SNQL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FKT4QN5H?tag=snapspacemkt-20' },
     ],
@@ -2268,8 +2268,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'AJAZIKO', Size: '20"×40"', Style: 'Abstract Minimalist', Material: 'Canvas', Frame: 'Solid Wood' },
     variants: [
-      { id: 'B0CN6CM291', asin: 'B0CN6CM291', label: 'Brown', mainImage: 'https://m.media-amazon.com/images/I/81qezc2OdBL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81qezc2OdBL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0CN6CM291?tag=snapspacemkt-20' },
-      { id: 'B0FDQK8C64', asin: 'B0FDQK8C64', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/81qezc2OdBL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81qezc2OdBL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0FDQK8C64?tag=snapspacemkt-20' },
+      { id: 'B0CN6CM291', asin: 'B0CN6CM291', label: 'Brown', mainImage: 'https://m.media-amazon.com/images/I/81qezc2OdBL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81qezc2OdBL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CN6CM291?tag=snapspacemkt-20' },
+      { id: 'B0FDQK8C64', asin: 'B0FDQK8C64', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/81qezc2OdBL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81qezc2OdBL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FDQK8C64?tag=snapspacemkt-20' },
       { id: 'B0FDQKXMPK', asin: 'B0FDQKXMPK', label: 'Blue', mainImage: 'https://m.media-amazon.com/images/I/81qezc2OdBL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81qezc2OdBL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FDQKXMPK?tag=snapspacemkt-20' },
       { id: 'B0FDQJDZW6', asin: 'B0FDQJDZW6', label: 'Brown', mainImage: 'https://m.media-amazon.com/images/I/81qezc2OdBL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81qezc2OdBL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FDQJDZW6?tag=snapspacemkt-20' },
       { id: 'B0FDQS7V1Q', asin: 'B0FDQS7V1Q', label: 'Beach', mainImage: 'https://m.media-amazon.com/images/I/81qezc2OdBL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81qezc2OdBL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FDQS7V1Q?tag=snapspacemkt-20' },
@@ -2304,8 +2304,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'Yihui Arts', Style: 'Abstract Tree / Nature', Material: 'Hand-Painted Canvas', Palette: 'Grey / White / Beige' },
     variants: [
-      { id: 'B07PR8KP5G', asin: 'B07PR8KP5G', label: 'Abstract Tree (Grey/Beige)', mainImage: 'https://m.media-amazon.com/images/I/8184cO7BG+L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/8184cO7BG+L._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B07PR8KP5G?tag=snapspacemkt-20' },
-      { id: 'B09MQP25MF', asin: 'B09MQP25MF', label: 'Floral Abstract', mainImage: 'https://m.media-amazon.com/images/I/8184cO7BG+L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/8184cO7BG+L._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B09MQP25MF?tag=snapspacemkt-20' },
+      { id: 'B07PR8KP5G', asin: 'B07PR8KP5G', label: 'Abstract Tree (Grey/Beige)', mainImage: 'https://m.media-amazon.com/images/I/8184cO7BG+L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/8184cO7BG+L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B07PR8KP5G?tag=snapspacemkt-20' },
+      { id: 'B09MQP25MF', asin: 'B09MQP25MF', label: 'Floral Abstract', mainImage: 'https://m.media-amazon.com/images/I/8184cO7BG+L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/8184cO7BG+L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B09MQP25MF?tag=snapspacemkt-20' },
       { id: 'B09MQR27D8', asin: 'B09MQR27D8', label: 'Modern Landscape', mainImage: 'https://m.media-amazon.com/images/I/8184cO7BG+L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/8184cO7BG+L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B09MQR27D8?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '3-5', prime: true, returnDays: 30 },
@@ -2338,8 +2338,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'InSimSea', Size: '10"×8"', Style: 'Vintage Sketch / Farmhouse', Material: 'Canvas', Frame: 'Oak Effect' },
     variants: [
-      { id: 'B0GFN1CCRP', asin: 'B0GFN1CCRP', label: 'Countryside Cottage', mainImage: 'https://m.media-amazon.com/images/I/81NXB9Cnw+L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81NXB9Cnw+L._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0GFN1CCRP?tag=snapspacemkt-20' },
-      { id: 'B0BHLG7BWP', asin: 'B0BHLG7BWP', label: 'A Bed of Poppies', mainImage: 'https://m.media-amazon.com/images/I/81NXB9Cnw+L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81NXB9Cnw+L._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0BHLG7BWP?tag=snapspacemkt-20' },
+      { id: 'B0GFN1CCRP', asin: 'B0GFN1CCRP', label: 'Countryside Cottage', mainImage: 'https://m.media-amazon.com/images/I/81NXB9Cnw+L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81NXB9Cnw+L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0GFN1CCRP?tag=snapspacemkt-20' },
+      { id: 'B0BHLG7BWP', asin: 'B0BHLG7BWP', label: 'A Bed of Poppies', mainImage: 'https://m.media-amazon.com/images/I/81NXB9Cnw+L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81NXB9Cnw+L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0BHLG7BWP?tag=snapspacemkt-20' },
       { id: 'B0BHL7V9VQ', asin: 'B0BHL7V9VQ', label: 'Champ Fleuri', mainImage: 'https://m.media-amazon.com/images/I/81NXB9Cnw+L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81NXB9Cnw+L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0BHL7V9VQ?tag=snapspacemkt-20' },
       { id: 'B0BJV63176', asin: 'B0BJV63176', label: 'Cloud Study', mainImage: 'https://m.media-amazon.com/images/I/81NXB9Cnw+L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81NXB9Cnw+L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0BJV63176?tag=snapspacemkt-20' },
       { id: 'B0GDCL2G28', asin: 'B0GDCL2G28', label: 'Coastal Cliffs', mainImage: 'https://m.media-amazon.com/images/I/81NXB9Cnw+L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81NXB9Cnw+L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0GDCL2G28?tag=snapspacemkt-20' },
@@ -2377,8 +2377,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'SAFERRYHOME', Size: '16"×24"×2 panels', Style: 'Neutral Abstract', Material: 'Textured Canvas', Finish: 'Framed' },
     variants: [
-      { id: 'B0DSJ47KCN', asin: 'B0DSJ47KCN', label: 'Neutral', mainImage: 'https://m.media-amazon.com/images/I/71hBH85UdLL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71hBH85UdLL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0DSJ47KCN?tag=snapspacemkt-20' },
-      { id: 'B0DCY8S5C5', asin: 'B0DCY8S5C5', label: 'Black Gold 1', mainImage: 'https://m.media-amazon.com/images/I/71hBH85UdLL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71hBH85UdLL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0DCY8S5C5?tag=snapspacemkt-20' },
+      { id: 'B0DSJ47KCN', asin: 'B0DSJ47KCN', label: 'Neutral', mainImage: 'https://m.media-amazon.com/images/I/71hBH85UdLL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71hBH85UdLL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DSJ47KCN?tag=snapspacemkt-20' },
+      { id: 'B0DCY8S5C5', asin: 'B0DCY8S5C5', label: 'Black Gold 1', mainImage: 'https://m.media-amazon.com/images/I/71hBH85UdLL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71hBH85UdLL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DCY8S5C5?tag=snapspacemkt-20' },
       { id: 'B0DCYH821N', asin: 'B0DCYH821N', label: 'Black Gold 2', mainImage: 'https://m.media-amazon.com/images/I/71hBH85UdLL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71hBH85UdLL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DCYH821N?tag=snapspacemkt-20' },
       { id: 'B0DD6ZVK4L', asin: 'B0DD6ZVK4L', label: 'Black Grey', mainImage: 'https://m.media-amazon.com/images/I/71hBH85UdLL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71hBH85UdLL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DD6ZVK4L?tag=snapspacemkt-20' },
       { id: 'B0FD7HG5RN', asin: 'B0FD7HG5RN', label: 'Grey Abstract', mainImage: 'https://m.media-amazon.com/images/I/71hBH85UdLL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71hBH85UdLL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FD7HG5RN?tag=snapspacemkt-20' },
@@ -2414,8 +2414,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'Marllifenney', Size: '12"×16"×3 panels', Style: 'Matisse Botanical Vintage', Material: 'Canvas', Frame: 'Wood' },
     variants: [
-      { id: 'B0DJFKHN8Y', asin: 'B0DJFKHN8Y', label: 'Pastel Matisse', mainImage: 'https://m.media-amazon.com/images/I/71jEC+a-X0L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71jEC+a-X0L._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0DJFKHN8Y?tag=snapspacemkt-20' },
-      { id: 'B0DJFLC74M', asin: 'B0DJFLC74M', label: 'Light Blue Poster', mainImage: 'https://m.media-amazon.com/images/I/71jEC+a-X0L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71jEC+a-X0L._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0DJFLC74M?tag=snapspacemkt-20' },
+      { id: 'B0DJFKHN8Y', asin: 'B0DJFKHN8Y', label: 'Pastel Matisse', mainImage: 'https://m.media-amazon.com/images/I/71jEC+a-X0L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71jEC+a-X0L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DJFKHN8Y?tag=snapspacemkt-20' },
+      { id: 'B0DJFLC74M', asin: 'B0DJFLC74M', label: 'Light Blue Poster', mainImage: 'https://m.media-amazon.com/images/I/71jEC+a-X0L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71jEC+a-X0L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DJFLC74M?tag=snapspacemkt-20' },
       { id: 'B0DDTQC8X4', asin: 'B0DDTQC8X4', label: 'Pink Balloon Dog', mainImage: 'https://m.media-amazon.com/images/I/71jEC+a-X0L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71jEC+a-X0L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DDTQC8X4?tag=snapspacemkt-20' },
       { id: 'B0DDTR39WV', asin: 'B0DDTR39WV', label: 'Green Boho Poster', mainImage: 'https://m.media-amazon.com/images/I/71jEC+a-X0L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71jEC+a-X0L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DDTR39WV?tag=snapspacemkt-20' },
     ],
@@ -2449,8 +2449,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'YOOOAHU', Size: '12"×12"×4 panels', Style: 'Boho Abstract Geometric', Material: 'Canvas', Palette: 'Burnt Orange / Beige' },
     variants: [
-      { id: 'B0D8SDN617', asin: 'B0D8SDN617', label: 'Boho', mainImage: 'https://m.media-amazon.com/images/I/81ZSp7-XIAL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81ZSp7-XIAL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0D8SDN617?tag=snapspacemkt-20' },
-      { id: 'B0D8SBPJBW', asin: 'B0D8SBPJBW', label: 'Abstract Purple', mainImage: 'https://m.media-amazon.com/images/I/81ZSp7-XIAL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81ZSp7-XIAL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0D8SBPJBW?tag=snapspacemkt-20' },
+      { id: 'B0D8SDN617', asin: 'B0D8SDN617', label: 'Boho', mainImage: 'https://m.media-amazon.com/images/I/81ZSp7-XIAL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81ZSp7-XIAL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0D8SDN617?tag=snapspacemkt-20' },
+      { id: 'B0D8SBPJBW', asin: 'B0D8SBPJBW', label: 'Abstract Purple', mainImage: 'https://m.media-amazon.com/images/I/81ZSp7-XIAL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81ZSp7-XIAL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0D8SBPJBW?tag=snapspacemkt-20' },
       { id: 'B0D8SBLR3R', asin: 'B0D8SBLR3R', label: 'Abstract Rainbow', mainImage: 'https://m.media-amazon.com/images/I/81ZSp7-XIAL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81ZSp7-XIAL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0D8SBLR3R?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '3-5', prime: true, returnDays: 30 },
@@ -2483,8 +2483,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: '1 KINGO', Size: '12"×24"×2 + 12"×32"×2', Style: 'Abstract Geometric', Material: 'Canvas', Finish: 'Gallery Wrapped' },
     variants: [
-      { id: 'B09SZ1CDH3', asin: 'B09SZ1CDH3', label: 'Black & Blue', mainImage: 'https://m.media-amazon.com/images/I/71k00RaXBLL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71k00RaXBLL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B09SZ1CDH3?tag=snapspacemkt-20' },
-      { id: 'B0BKFXMQX9', asin: 'B0BKFXMQX9', label: 'Color Variant 2', mainImage: 'https://m.media-amazon.com/images/I/71k00RaXBLL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71k00RaXBLL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0BKFXMQX9?tag=snapspacemkt-20' },
+      { id: 'B09SZ1CDH3', asin: 'B09SZ1CDH3', label: 'Black & Blue', mainImage: 'https://m.media-amazon.com/images/I/71k00RaXBLL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71k00RaXBLL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B09SZ1CDH3?tag=snapspacemkt-20' },
+      { id: 'B0BKFXMQX9', asin: 'B0BKFXMQX9', label: 'Color Variant 2', mainImage: 'https://m.media-amazon.com/images/I/71k00RaXBLL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71k00RaXBLL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0BKFXMQX9?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '3-5', prime: true, returnDays: 30 },
   },
@@ -2957,8 +2957,8 @@ export const PRODUCT_CATALOG = [
     rating: 4.4,
     reviewCount: 95,
     variants: [
-      { id: 'v1', label: 'Beige', color: '#D4C5A9', mainImage: 'https://m.media-amazon.com/images/I/81rj2cvh3JL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81rj2cvh3JL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0CM3JHFY6?tag=snapspacemkt-20' },
-      { id: 'v2', label: 'Green', color: '#7A9E7E', mainImage: 'https://m.media-amazon.com/images/I/41PciuXGEsL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41PciuXGEsL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0CM3JHFY6?tag=snapspacemkt-20' },
+      { id: 'v1', label: 'Beige', color: '#D4C5A9', mainImage: 'https://m.media-amazon.com/images/I/81rj2cvh3JL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81rj2cvh3JL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CM3JHFY6?tag=snapspacemkt-20' },
+      { id: 'v2', label: 'Green', color: '#7A9E7E', mainImage: 'https://m.media-amazon.com/images/I/41PciuXGEsL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41PciuXGEsL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CM3JHFY6?tag=snapspacemkt-20' },
       { id: 'v3', label: 'Grey', color: '#808080', mainImage: 'https://m.media-amazon.com/images/I/41sLHmhqWtL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41sLHmhqWtL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CM3JHFY6?tag=snapspacemkt-20&th=3', asin: 'B0CM3JHFY6' },
       { id: 'v4', label: 'Orange', color: '#D4833A', mainImage: 'https://m.media-amazon.com/images/I/41Hzx3hVLdL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41Hzx3hVLdL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CM3JHFY6?tag=snapspacemkt-20&th=4', asin: 'B0CM3JHFY6' },
     ],
@@ -3027,8 +3027,8 @@ export const PRODUCT_CATALOG = [
     rating: 4.7,
     reviewCount: 290,
     variants: [
-      { id: 'v1', label: 'Tangerine', color: '#E8713A', mainImage: 'https://m.media-amazon.com/images/I/71OfL+a4CLL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71OfL+a4CLL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0D8TDK33F?tag=snapspacemkt-20' },
-      { id: 'v2', label: 'Cream', color: '#F5ECD7', mainImage: 'https://m.media-amazon.com/images/I/41Sk0Jt8UNL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41Sk0Jt8UNL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0D8TDK33F?tag=snapspacemkt-20' },
+      { id: 'v1', label: 'Tangerine', color: '#E8713A', mainImage: 'https://m.media-amazon.com/images/I/71OfL+a4CLL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71OfL+a4CLL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0D8TDK33F?tag=snapspacemkt-20' },
+      { id: 'v2', label: 'Cream', color: '#F5ECD7', mainImage: 'https://m.media-amazon.com/images/I/41Sk0Jt8UNL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41Sk0Jt8UNL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0D8TDK33F?tag=snapspacemkt-20' },
     ],
     sizes: [
       { id: 's1', label: '4 Seater Modular Sectional', price: 1529.15, compareAt: 1799.00, inStock: true },
@@ -3094,8 +3094,8 @@ export const PRODUCT_CATALOG = [
     rating: 4.4,
     reviewCount: 21,
     variants: [
-      { id: 'v1', label: 'Brown', color: '#8B7355', mainImage: 'https://m.media-amazon.com/images/I/81U6yUUsOXL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81U6yUUsOXL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0DYDGGMM1?tag=snapspacemkt-20' },
-      { id: 'v2', label: 'Orange', color: '#D4783A', mainImage: 'https://m.media-amazon.com/images/I/418GBINDNoL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/418GBINDNoL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0DYDGGMM1?tag=snapspacemkt-20' },
+      { id: 'v1', label: 'Brown', color: '#8B7355', mainImage: 'https://m.media-amazon.com/images/I/81U6yUUsOXL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81U6yUUsOXL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DYDGGMM1?tag=snapspacemkt-20' },
+      { id: 'v2', label: 'Orange', color: '#D4783A', mainImage: 'https://m.media-amazon.com/images/I/418GBINDNoL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/418GBINDNoL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DYDGGMM1?tag=snapspacemkt-20' },
     ],
     sizes: [
       { id: 's1', label: '94"', price: 1063.24, compareAt: 1289.99, inStock: true },
@@ -3159,7 +3159,7 @@ export const PRODUCT_CATALOG = [
     rating: 4.2,
     reviewCount: 477,
     variants: [
-      { id: 'v1', label: 'Warm White', color: '#F5F0E8', mainImage: 'https://m.media-amazon.com/images/I/71HuA4RYrzL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71HuA4RYrzL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0FK57WSBD?tag=snapspacemkt-20' },
+      { id: 'v1', label: 'Warm White', color: '#F5F0E8', mainImage: 'https://m.media-amazon.com/images/I/71HuA4RYrzL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71HuA4RYrzL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FK57WSBD?tag=snapspacemkt-20' },
     ],
     sizes: [
       { id: 's1', label: '3 Seater + 2 Ottoman', price: 725.87, compareAt: 897.96, inStock: true },
@@ -3221,7 +3221,7 @@ export const PRODUCT_CATALOG = [
     rating: null,
     reviewCount: null,
     variants: [
-      { id: 'v1', label: 'Green', color: '#6B8F6B', mainImage: 'https://m.media-amazon.com/images/I/91ktb2Ru8SL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/91ktb2Ru8SL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0GKG2F82J?tag=snapspacemkt-20' },
+      { id: 'v1', label: 'Green', color: '#6B8F6B', mainImage: 'https://m.media-amazon.com/images/I/91ktb2Ru8SL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/91ktb2Ru8SL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0GKG2F82J?tag=snapspacemkt-20' },
     ],
     sizes: [
       { id: 's1', label: '6 Seat + Left Chaise', price: 755.98, inStock: true },
@@ -3284,7 +3284,7 @@ export const PRODUCT_CATALOG = [
     rating: 4.4,
     reviewCount: 13,
     variants: [
-      { id: 'v1', label: 'Brown', color: '#7B5C3A', mainImage: 'https://m.media-amazon.com/images/I/81Jb-5oxMlL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81Jb-5oxMlL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0FJM1TLKC?tag=snapspacemkt-20' },
+      { id: 'v1', label: 'Brown', color: '#7B5C3A', mainImage: 'https://m.media-amazon.com/images/I/81Jb-5oxMlL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81Jb-5oxMlL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FJM1TLKC?tag=snapspacemkt-20' },
     ],
     sizes: [
       { id: 's1', label: '5 Seat + Left Chaise', price: 1964.82, inStock: true },
@@ -4217,7 +4217,7 @@ export const PRODUCT_CATALOG = [
     rating: 4.8,
     reviewCount: 42,
     variants: [
-      { id: 'v1', label: 'Walnut', color: '#7B5835', mainImage: 'https://m.media-amazon.com/images/I/81uAmDDyxQL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81uAmDDyxQL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0DT7Y3XHR?tag=snapspacemkt-20' },
+      { id: 'v1', label: 'Walnut', color: '#7B5835', mainImage: 'https://m.media-amazon.com/images/I/81uAmDDyxQL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81uAmDDyxQL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DT7Y3XHR?tag=snapspacemkt-20' },
     ],
     sizes: [
       { id: 's1', label: '47.2"–81.8" Adjustable', price: 225.24, compareAt: 264.99, inStock: true },
@@ -4282,7 +4282,7 @@ export const PRODUCT_CATALOG = [
     rating: 4.2,
     reviewCount: 12,
     variants: [
-      { id: 'v1', label: 'Walnut', color: '#7B5835', mainImage: 'https://m.media-amazon.com/images/I/81hTwFDlbnL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81hTwFDlbnL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0G52CMJ5F?tag=snapspacemkt-20' },
+      { id: 'v1', label: 'Walnut', color: '#7B5835', mainImage: 'https://m.media-amazon.com/images/I/81hTwFDlbnL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81hTwFDlbnL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0G52CMJ5F?tag=snapspacemkt-20' },
     ],
     sizes: [
       { id: 's1', label: '86.61"W × 15.94"D × 17.51"H', price: 460.27, compareAt: 541.49, inStock: true },
@@ -4346,7 +4346,7 @@ export const PRODUCT_CATALOG = [
     rating: 4.8,
     reviewCount: 7,
     variants: [
-      { id: 'v1', label: 'Black', color: '#2B2B2B', mainImage: 'https://m.media-amazon.com/images/I/71XhFBHWGuL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71XhFBHWGuL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0FMDQHCY2?tag=snapspacemkt-20' },
+      { id: 'v1', label: 'Black', color: '#2B2B2B', mainImage: 'https://m.media-amazon.com/images/I/71XhFBHWGuL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71XhFBHWGuL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FMDQHCY2?tag=snapspacemkt-20' },
     ],
     sizes: [
       { id: 's1', label: '94.49"', price: 1274.15, compareAt: 1499.00, inStock: true },
@@ -4410,7 +4410,7 @@ export const PRODUCT_CATALOG = [
     rating: 4.2,
     reviewCount: 139,
     variants: [
-      { id: 'v1', label: 'Walnut', color: '#7B5835', mainImage: 'https://m.media-amazon.com/images/I/61Ny2V6-iWL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61Ny2V6-iWL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0D52B73TS?tag=snapspacemkt-20' },
+      { id: 'v1', label: 'Walnut', color: '#7B5835', mainImage: 'https://m.media-amazon.com/images/I/61Ny2V6-iWL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61Ny2V6-iWL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0D52B73TS?tag=snapspacemkt-20' },
     ],
     sizes: [
       { id: 's1', label: '70.9"–110.2" Adjustable', price: 411.05, compareAt: 483.59, inStock: true },
@@ -4474,7 +4474,7 @@ export const PRODUCT_CATALOG = [
     rating: 4.1,
     reviewCount: 40,
     variants: [
-      { id: 'v1', label: 'Walnut', color: '#7B5835', mainImage: 'https://m.media-amazon.com/images/I/714xGcYJ3pL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/714xGcYJ3pL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0FX2L76N2?tag=snapspacemkt-20' },
+      { id: 'v1', label: 'Walnut', color: '#7B5835', mainImage: 'https://m.media-amazon.com/images/I/714xGcYJ3pL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/714xGcYJ3pL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FX2L76N2?tag=snapspacemkt-20' },
     ],
     sizes: [
       { id: 's1', label: '70"', price: 152.99, compareAt: 179.99, inStock: true },
@@ -4539,7 +4539,7 @@ export const PRODUCT_CATALOG = [
     rating: 4.3,
     reviewCount: 204,
     variants: [
-      { id: 'v1', label: 'Natural', color: '#C8A96E', mainImage: 'https://m.media-amazon.com/images/I/81xisi2mTrL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81xisi2mTrL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0FP1Y3525?tag=snapspacemkt-20' },
+      { id: 'v1', label: 'Natural', color: '#C8A96E', mainImage: 'https://m.media-amazon.com/images/I/81xisi2mTrL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81xisi2mTrL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FP1Y3525?tag=snapspacemkt-20' },
     ],
     sizes: [
       { id: 's1', label: 'Set of 2 (TV Stand + Coffee Table)', price: 339.99, compareAt: 399.99, inStock: true },
@@ -4602,7 +4602,7 @@ export const PRODUCT_CATALOG = [
     rating: 5.0,
     reviewCount: 2,
     variants: [
-      { id: 'v1', label: 'White & Walnut', color: '#C8A96E', mainImage: 'https://m.media-amazon.com/images/I/91OzIjw5b7L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/91OzIjw5b7L._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0FF9X61KS?tag=snapspacemkt-20' },
+      { id: 'v1', label: 'White & Walnut', color: '#C8A96E', mainImage: 'https://m.media-amazon.com/images/I/91OzIjw5b7L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/91OzIjw5b7L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FF9X61KS?tag=snapspacemkt-20' },
     ],
     sizes: [
       { id: 's1', label: 'TV Stand + Coffee Table Set', price: 999.99, inStock: true },
@@ -4664,7 +4664,7 @@ export const PRODUCT_CATALOG = [
     rating: 4.2,
     reviewCount: 30,
     variants: [
-      { id: 'v1', label: 'Stone Travertine', color: '#C8B8A2', mainImage: 'https://m.media-amazon.com/images/I/71ACVWqJ8xL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71ACVWqJ8xL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0GH6YX6FR?tag=snapspacemkt-20' },
+      { id: 'v1', label: 'Stone Travertine', color: '#C8B8A2', mainImage: 'https://m.media-amazon.com/images/I/71ACVWqJ8xL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71ACVWqJ8xL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0GH6YX6FR?tag=snapspacemkt-20' },
     ],
     sizes: [
       { id: 's1', label: '46"', price: 214.99, inStock: true },
@@ -4726,7 +4726,7 @@ export const PRODUCT_CATALOG = [
     rating: 5.0,
     reviewCount: 4,
     variants: [
-      { id: 'v1', label: 'Brown Burl', color: '#5C3D1E', mainImage: 'https://m.media-amazon.com/images/I/71iINUEWvDL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71iINUEWvDL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0G8F36LXD?tag=snapspacemkt-20' },
+      { id: 'v1', label: 'Brown Burl', color: '#5C3D1E', mainImage: 'https://m.media-amazon.com/images/I/71iINUEWvDL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71iINUEWvDL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0G8F36LXD?tag=snapspacemkt-20' },
     ],
     sizes: [
       { id: 's1', label: 'Set of 2 (Large + Small)', price: 199.99, inStock: true },
@@ -4789,7 +4789,7 @@ export const PRODUCT_CATALOG = [
     rating: null,
     reviewCount: null,
     variants: [
-      { id: 'v1', label: 'Black', color: '#1C1C1C', mainImage: 'https://m.media-amazon.com/images/I/7140EQfeqIL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/7140EQfeqIL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0GQVHBNR9?tag=snapspacemkt-20' },
+      { id: 'v1', label: 'Black', color: '#1C1C1C', mainImage: 'https://m.media-amazon.com/images/I/7140EQfeqIL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/7140EQfeqIL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0GQVHBNR9?tag=snapspacemkt-20' },
     ],
     sizes: [
       { id: 's1', label: '31.5" Round', price: 199.99, compareAt: 209.99, inStock: true },
@@ -4853,7 +4853,7 @@ export const PRODUCT_CATALOG = [
     rating: 5.0,
     reviewCount: 3,
     variants: [
-      { id: 'v1', label: 'Walnut', color: '#7B5835', mainImage: 'https://m.media-amazon.com/images/I/91YmkGqzXzL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/91YmkGqzXzL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0G6C8XG92?tag=snapspacemkt-20' },
+      { id: 'v1', label: 'Walnut', color: '#7B5835', mainImage: 'https://m.media-amazon.com/images/I/91YmkGqzXzL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/91YmkGqzXzL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0G6C8XG92?tag=snapspacemkt-20' },
     ],
     sizes: [
       { id: 's1', label: 'Set of 2 (Large + Small)', price: 199.20, compareAt: 249.00, inStock: true },
@@ -4916,8 +4916,8 @@ export const PRODUCT_CATALOG = [
     rating: 4.7,
     reviewCount: 1057,
     variants: [
-      { id: 'v1', label: 'White', color: '#F5F0EB', mainImage: 'https://m.media-amazon.com/images/I/71ielDQgBaL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71ielDQgBaL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B09JZ2QJSJ?tag=snapspacemkt-20' },
-      { id: 'v2', label: 'Black', color: '#1C1C1C', mainImage: 'https://m.media-amazon.com/images/I/51KwYhTGnEL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51KwYhTGnEL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B09JZ2QJSJ?tag=snapspacemkt-20' },
+      { id: 'v1', label: 'White', color: '#F5F0EB', mainImage: 'https://m.media-amazon.com/images/I/71ielDQgBaL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71ielDQgBaL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B09JZ2QJSJ?tag=snapspacemkt-20' },
+      { id: 'v2', label: 'Black', color: '#1C1C1C', mainImage: 'https://m.media-amazon.com/images/I/51KwYhTGnEL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51KwYhTGnEL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B09JZ2QJSJ?tag=snapspacemkt-20' },
     ],
     sizes: [
       { id: 's1', label: '39.5" × 23.5" × 17.5"', price: 96.99, compareAt: 109.99, inStock: true },
@@ -4980,8 +4980,8 @@ export const PRODUCT_CATALOG = [
     rating: 4.0,
     reviewCount: 72,
     variants: [
-      { id: 'v1', label: 'Black', color: '#1C1C1C', mainImage: 'https://m.media-amazon.com/images/I/51QBC4H3BSL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51QBC4H3BSL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0FKT56B95?tag=snapspacemkt-20' },
-      { id: 'v2', label: 'Stone', color: '#C4B9A0', mainImage: 'https://m.media-amazon.com/images/I/51qbj38V0CL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51qbj38V0CL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0FKT56B95?tag=snapspacemkt-20' },
+      { id: 'v1', label: 'Black', color: '#1C1C1C', mainImage: 'https://m.media-amazon.com/images/I/51QBC4H3BSL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51QBC4H3BSL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FKT56B95?tag=snapspacemkt-20' },
+      { id: 'v2', label: 'Stone', color: '#C4B9A0', mainImage: 'https://m.media-amazon.com/images/I/51qbj38V0CL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51qbj38V0CL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FKT56B95?tag=snapspacemkt-20' },
       { id: 'v3', label: 'Walnut', color: '#7B5835', mainImage: 'https://m.media-amazon.com/images/I/51ePRduwonL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51ePRduwonL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FKGKL7WQ?tag=snapspacemkt-20', asin: 'B0FKGKL7WQ', price: 189.99 },
     ],
     sizes: [
@@ -5589,8 +5589,8 @@ export const PRODUCT_CATALOG = [
     rating: 4.6,
     reviewCount: 182,
     variants: [
-      { id: 'v1', label: 'Cloud', color: '#E8E8E8', mainImage: 'https://m.media-amazon.com/images/I/41BhstxaZVL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41BhstxaZVL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0CTCCT53C?tag=snapspacemkt-20' },
-      { id: 'v2', label: 'Cloud + Bracket', color: '#E8E8E8', mainImage: 'https://m.media-amazon.com/images/I/41nLRKOyo7L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41nLRKOyo7L._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0CTCCT53C?tag=snapspacemkt-20' },
+      { id: 'v1', label: 'Cloud', color: '#E8E8E8', mainImage: 'https://m.media-amazon.com/images/I/41BhstxaZVL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41BhstxaZVL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CTCCT53C?tag=snapspacemkt-20' },
+      { id: 'v2', label: 'Cloud + Bracket', color: '#E8E8E8', mainImage: 'https://m.media-amazon.com/images/I/41nLRKOyo7L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41nLRKOyo7L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CTCCT53C?tag=snapspacemkt-20' },
       { id: 'v3', label: 'Cloud-2', color: '#DCDCDC', mainImage: 'https://m.media-amazon.com/images/I/41bx1T1PgRL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41bx1T1PgRL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0F8NBQT4H?tag=snapspacemkt-20', asin: 'B0F8NBQT4H', price: 145.99 },
       { id: 'v4', label: 'Star', color: '#D8D8D8', mainImage: 'https://m.media-amazon.com/images/I/41b++EzgGIL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41b++EzgGIL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0F8MT8WVF?tag=snapspacemkt-20', asin: 'B0F8MT8WVF', price: 139.99 },
       { id: 'v5', label: 'Vase', color: '#E0E0E0', mainImage: 'https://m.media-amazon.com/images/I/41ov70evR8L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41ov70evR8L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0F8M76FH8?tag=snapspacemkt-20', asin: 'B0F8M76FH8', price: 135.99 },
@@ -5659,8 +5659,8 @@ export const PRODUCT_CATALOG = [
     rating: 4.6,
     reviewCount: 504,
     variants: [
-      { id: 'v1', label: 'Beige',       color: '#C8B49A', mainImage: 'https://m.media-amazon.com/images/I/31f6Di3q+dL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/31f6Di3q+dL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0DM8GDFY2?tag=snapspacemkt-20' },
-      { id: 'v2', label: 'Black Brown', color: '#3D2B1F', mainImage: 'https://m.media-amazon.com/images/I/51Mi6K778pL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51Mi6K778pL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0DM8GDFY2?tag=snapspacemkt-20' },
+      { id: 'v1', label: 'Beige',       color: '#C8B49A', mainImage: 'https://m.media-amazon.com/images/I/31f6Di3q+dL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/31f6Di3q+dL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DM8GDFY2?tag=snapspacemkt-20' },
+      { id: 'v2', label: 'Black Brown', color: '#3D2B1F', mainImage: 'https://m.media-amazon.com/images/I/51Mi6K778pL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51Mi6K778pL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DM8GDFY2?tag=snapspacemkt-20' },
       { id: 'v3', label: 'Blue',        color: '#4A6FA5', mainImage: 'https://m.media-amazon.com/images/I/51agn6Fi9zL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51agn6Fi9zL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DYVGW7DW?tag=snapspacemkt-20', asin: 'B0DYVGW7DW', price: 99.99  },
       { id: 'v4', label: 'Green Brown', color: '#4A6741', mainImage: 'https://m.media-amazon.com/images/I/419NbIUg4QL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/419NbIUg4QL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FDWPJR3P?tag=snapspacemkt-20', asin: 'B0FDWPJR3P', price: 119.99 },
       { id: 'v5', label: 'Blue Brown',  color: '#5B7A8A', mainImage: 'https://m.media-amazon.com/images/I/51WvEsEqeRL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51WvEsEqeRL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FDWQ82PQ?tag=snapspacemkt-20', asin: 'B0FDWQ82PQ', price: 99.99  },
@@ -5727,8 +5727,8 @@ export const PRODUCT_CATALOG = [
     rating: 4.6,
     reviewCount: 330,
     variants: [
-      { id: 'v1', label: 'Beige',       color: '#C8B49A', mainImage: 'https://m.media-amazon.com/images/I/51pxikAeNwL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51pxikAeNwL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0DTJR8TVF?tag=snapspacemkt-20' },
-      { id: 'v2', label: 'Grey',        color: '#909090', mainImage: 'https://m.media-amazon.com/images/I/51lqFPjPwVL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51lqFPjPwVL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0DTJR8TVF?tag=snapspacemkt-20' },
+      { id: 'v1', label: 'Beige',       color: '#C8B49A', mainImage: 'https://m.media-amazon.com/images/I/51pxikAeNwL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51pxikAeNwL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DTJR8TVF?tag=snapspacemkt-20' },
+      { id: 'v2', label: 'Grey',        color: '#909090', mainImage: 'https://m.media-amazon.com/images/I/51lqFPjPwVL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51lqFPjPwVL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DTJR8TVF?tag=snapspacemkt-20' },
       { id: 'v3', label: 'Ivory Beige', color: '#EDE8DA', mainImage: 'https://m.media-amazon.com/images/I/41emazXmvVL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41emazXmvVL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0F9XRSNNK?tag=snapspacemkt-20', asin: 'B0F9XRSNNK', price: 76.49 },
       { id: 'v4', label: 'Light Brown', color: '#A07850', mainImage: 'https://m.media-amazon.com/images/I/51jDhxQ17hL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51jDhxQ17hL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0F9XQSZPP?tag=snapspacemkt-20', asin: 'B0F9XQSZPP', price: 76.49 },
       { id: 'v5', label: 'Camel',       color: '#C19A6B', mainImage: 'https://m.media-amazon.com/images/I/51vFY3BL3TL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51vFY3BL3TL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0G1SY2TQZ?tag=snapspacemkt-20', asin: 'B0G1SY2TQZ', price: 76.49 },
@@ -5795,8 +5795,8 @@ export const PRODUCT_CATALOG = [
     rating: 4.4,
     reviewCount: 1372,
     variants: [
-      { id: 'v1', label: 'Black/Brown',              color: '#3D2B1F', mainImage: 'https://m.media-amazon.com/images/I/519VRjdyT6L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/519VRjdyT6L._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0CD7BGYQY?tag=snapspacemkt-20' },
-      { id: 'v2', label: 'Black/Red/Brown/Cream',    color: '#8B2020', mainImage: 'https://m.media-amazon.com/images/I/51i8cgx3enL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51i8cgx3enL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0CD7BGYQY?tag=snapspacemkt-20' },
+      { id: 'v1', label: 'Black/Brown',              color: '#3D2B1F', mainImage: 'https://m.media-amazon.com/images/I/519VRjdyT6L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/519VRjdyT6L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CD7BGYQY?tag=snapspacemkt-20' },
+      { id: 'v2', label: 'Black/Red/Brown/Cream',    color: '#8B2020', mainImage: 'https://m.media-amazon.com/images/I/51i8cgx3enL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51i8cgx3enL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CD7BGYQY?tag=snapspacemkt-20' },
       { id: 'v3', label: 'Black/White',              color: '#2A2A2A', mainImage: 'https://m.media-amazon.com/images/I/51KVDCg4JgL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51KVDCg4JgL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FBSQ5DR8?tag=snapspacemkt-20',  asin: 'B0FBSQ5DR8',  price: 119.99 },
       { id: 'v4', label: 'Blue/Brown',               color: '#4A6FA5', mainImage: 'https://m.media-amazon.com/images/I/51gXk7Mlj5L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51gXk7Mlj5L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CD7BGYQY?tag=snapspacemkt-20',  asin: 'B0CD7BGYQY',  price: 104.49 },
       { id: 'v5', label: 'Cream/Brown/Pink',         color: '#D4A9A1', mainImage: 'https://m.media-amazon.com/images/I/51fCZJnsa6L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51fCZJnsa6L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CD79DHRH?tag=snapspacemkt-20',  asin: 'B0CD79DHRH',  price: 94.99  },
@@ -5865,8 +5865,8 @@ export const PRODUCT_CATALOG = [
     rating: 4.4,
     reviewCount: 233,
     variants: [
-      { id: 'v1',  label: 'Beige',        color: '#C8B49A', mainImage: 'https://m.media-amazon.com/images/I/51tq-X7LfpL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51tq-X7LfpL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0D7928FM3?tag=snapspacemkt-20' },
-      { id: 'v2',  label: 'Brown',        color: '#7B4F2E', mainImage: 'https://m.media-amazon.com/images/I/51leaWb7KML._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51leaWb7KML._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0D7928FM3?tag=snapspacemkt-20' },
+      { id: 'v1',  label: 'Beige',        color: '#C8B49A', mainImage: 'https://m.media-amazon.com/images/I/51tq-X7LfpL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51tq-X7LfpL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0D7928FM3?tag=snapspacemkt-20' },
+      { id: 'v2',  label: 'Brown',        color: '#7B4F2E', mainImage: 'https://m.media-amazon.com/images/I/51leaWb7KML._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51leaWb7KML._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0D7928FM3?tag=snapspacemkt-20' },
       { id: 'v3',  label: 'Burnt Orange', color: '#CC5500', mainImage: 'https://m.media-amazon.com/images/I/5177fYGrJBL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/5177fYGrJBL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0D796YZGL?tag=snapspacemkt-20', asin: 'B0D796YZGL', price: 110.49 },
       { id: 'v4',  label: 'Cyan Blue',    color: '#5BA4A4', mainImage: 'https://m.media-amazon.com/images/I/51UrdYsoLkL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51UrdYsoLkL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0D794VH4Q?tag=snapspacemkt-20', asin: 'B0D794VH4Q', price: 139.99 },
       { id: 'v5',  label: 'Dusty Blue',   color: '#7C9EB2', mainImage: 'https://m.media-amazon.com/images/I/51ZDhvX7G3L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51ZDhvX7G3L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0D795YFZV?tag=snapspacemkt-20', asin: 'B0D795YFZV', price: 110.49 },
@@ -5938,7 +5938,7 @@ export const PRODUCT_CATALOG = [
     rating: 4.4,
     reviewCount: 40,
     variants: [
-      { id: 'v1', label: 'Caramel', color: '#C68642', mainImage: 'https://m.media-amazon.com/images/I/51eoizGQsUL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51eoizGQsUL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B09YCPRTC7?tag=snapspacemkt-20' },
+      { id: 'v1', label: 'Caramel', color: '#C68642', mainImage: 'https://m.media-amazon.com/images/I/51eoizGQsUL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51eoizGQsUL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B09YCPRTC7?tag=snapspacemkt-20' },
     ],
     sizes: [
       { id: 's1', label: 'Single', price: 169.43, compareAt: 188.88, inStock: true },
@@ -6002,8 +6002,8 @@ export const PRODUCT_CATALOG = [
     rating: 4.6,
     reviewCount: 150,
     variants: [
-      { id: 'v1', label: 'Beige', color: '#C8B49A', mainImage: 'https://m.media-amazon.com/images/I/31fR3nbzWZL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/31fR3nbzWZL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0C3VPPHBB?tag=snapspacemkt-20' },
-      { id: 'v2', label: 'Brown', color: '#7B4F2E', mainImage: 'https://m.media-amazon.com/images/I/41XGZT9I6dL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41XGZT9I6dL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0C3VPPHBB?tag=snapspacemkt-20' },
+      { id: 'v1', label: 'Beige', color: '#C8B49A', mainImage: 'https://m.media-amazon.com/images/I/31fR3nbzWZL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/31fR3nbzWZL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0C3VPPHBB?tag=snapspacemkt-20' },
+      { id: 'v2', label: 'Brown', color: '#7B4F2E', mainImage: 'https://m.media-amazon.com/images/I/41XGZT9I6dL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41XGZT9I6dL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0C3VPPHBB?tag=snapspacemkt-20' },
       { id: 'v3', label: 'Green', color: '#4A6741', mainImage: 'https://m.media-amazon.com/images/I/41LFZNOVoCL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41LFZNOVoCL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DHCWLLD1?tag=snapspacemkt-20', asin: 'B0DHCWLLD1', price: 212.99 },
       { id: 'v4', label: 'Grey', color: '#808080', mainImage: 'https://m.media-amazon.com/images/I/416-WOCLuYL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/416-WOCLuYL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0C3VPXCN9?tag=snapspacemkt-20', asin: 'B0C3VPXCN9', price: 189.99 },
       { id: 'v5', label: 'White', color: '#F0EDE8', mainImage: 'https://m.media-amazon.com/images/I/317PABnI80L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/317PABnI80L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0C3VQMWN5?tag=snapspacemkt-20', asin: 'B0C3VQMWN5', price: 209.99 },
@@ -6070,7 +6070,7 @@ export const PRODUCT_CATALOG = [
     rating: 5.0,
     reviewCount: 2,
     variants: [
-      { id: 'v1', label: 'Natural', color: '#D4C4A8', mainImage: 'https://m.media-amazon.com/images/I/51aLdqES4GL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51aLdqES4GL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0GGXB9ZL2?tag=snapspacemkt-20' },
+      { id: 'v1', label: 'Natural', color: '#D4C4A8', mainImage: 'https://m.media-amazon.com/images/I/51aLdqES4GL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51aLdqES4GL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0GGXB9ZL2?tag=snapspacemkt-20' },
     ],
     sizes: [
       { id: 's1', label: 'One Size', price: 189.99, compareAt: 209.99, inStock: true },
@@ -6134,7 +6134,7 @@ export const PRODUCT_CATALOG = [
     rating: 4.4,
     reviewCount: 40,
     variants: [
-      { id: 'v1', label: 'Brown (Set of 2)', color: '#7B4F2E', mainImage: 'https://m.media-amazon.com/images/I/41IzVrgC+fL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41IzVrgC+fL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0BRNDV91G?tag=snapspacemkt-20' },
+      { id: 'v1', label: 'Brown (Set of 2)', color: '#7B4F2E', mainImage: 'https://m.media-amazon.com/images/I/41IzVrgC+fL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41IzVrgC+fL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0BRNDV91G?tag=snapspacemkt-20' },
     ],
     sizes: [
       { id: 's1', label: 'Set of 2', price: 336.28, compareAt: null, inStock: true },
@@ -6200,8 +6200,8 @@ export const PRODUCT_CATALOG = [
     rating: 4.4,
     reviewCount: 178,
     variants: [
-      { id: 'v1', label: 'Apricot', color: '#E8B98A', mainImage: 'https://m.media-amazon.com/images/I/512EGlfVmdL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/512EGlfVmdL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0FVF89LJ2?tag=snapspacemkt-20' },
-      { id: 'v2', label: 'Black', color: '#1C1C1C', mainImage: 'https://m.media-amazon.com/images/I/51zn8QpUhGL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51zn8QpUhGL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0FVF89LJ2?tag=snapspacemkt-20' },
+      { id: 'v1', label: 'Apricot', color: '#E8B98A', mainImage: 'https://m.media-amazon.com/images/I/512EGlfVmdL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/512EGlfVmdL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FVF89LJ2?tag=snapspacemkt-20' },
+      { id: 'v2', label: 'Black', color: '#1C1C1C', mainImage: 'https://m.media-amazon.com/images/I/51zn8QpUhGL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51zn8QpUhGL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FVF89LJ2?tag=snapspacemkt-20' },
       { id: 'v3', label: 'Brown (Set of 2)', color: '#7B4F2E', mainImage: 'https://m.media-amazon.com/images/I/41yk+0MJcKL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41yk+0MJcKL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B096V3CSFX?tag=snapspacemkt-20', asin: 'B096V3CSFX', price: 176.99 },
       { id: 'v4', label: 'Brown', color: '#8B5E3C', mainImage: 'https://m.media-amazon.com/images/I/41N3hiGfRzL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41N3hiGfRzL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FVF89LJ2?tag=snapspacemkt-20', asin: 'B0FVF89LJ2', price: 104.30 },
       { id: 'v5', label: 'Grey', color: '#808080', mainImage: 'https://m.media-amazon.com/images/I/51T2igLqoAL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51T2igLqoAL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FSK44M62?tag=snapspacemkt-20', asin: 'B0FSK44M62', price: 125.99 },
@@ -6270,8 +6270,8 @@ export const PRODUCT_CATALOG = [
     rating: 4.0,
     reviewCount: 298,
     variants: [
-      { id: 'v1', label: 'Beige', color: '#C8B49A', mainImage: 'https://m.media-amazon.com/images/I/4144UalqbTL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/4144UalqbTL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0DP2J3VNN?tag=snapspacemkt-20' },
-      { id: 'v2', label: 'Black', color: '#1C1C1C', mainImage: 'https://m.media-amazon.com/images/I/51NOIxM1P8L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51NOIxM1P8L._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0DP2J3VNN?tag=snapspacemkt-20' },
+      { id: 'v1', label: 'Beige', color: '#C8B49A', mainImage: 'https://m.media-amazon.com/images/I/4144UalqbTL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/4144UalqbTL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DP2J3VNN?tag=snapspacemkt-20' },
+      { id: 'v2', label: 'Black', color: '#1C1C1C', mainImage: 'https://m.media-amazon.com/images/I/51NOIxM1P8L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51NOIxM1P8L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DP2J3VNN?tag=snapspacemkt-20' },
       { id: 'v3', label: 'Dark Grey', color: '#4A4A4A', mainImage: 'https://m.media-amazon.com/images/I/51eifgQzUSL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51eifgQzUSL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DP2J3VNN?tag=snapspacemkt-20', asin: 'B0DP2J3VNN', price: 168.99 },
       { id: 'v4', label: 'Green', color: '#4A6741', mainImage: 'https://m.media-amazon.com/images/I/51Xig1XrcYL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51Xig1XrcYL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FNCSGJVK?tag=snapspacemkt-20', asin: 'B0FNCSGJVK', price: 168.99 },
       { id: 'v5', label: 'Navy', color: '#1B2A4A', mainImage: 'https://m.media-amazon.com/images/I/51U637GYW1L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51U637GYW1L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FNCQ6Q51?tag=snapspacemkt-20', asin: 'B0FNCQ6Q51', price: 168.99 },
@@ -6337,8 +6337,8 @@ export const PRODUCT_CATALOG = [
     rating: 4.4,
     reviewCount: 125,
     variants: [
-      { id: 'v1', label: 'White', color: '#F5F5F5', mainImage: 'https://m.media-amazon.com/images/I/41hrGFBOKKL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41hrGFBOKKL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0FP1YPLXJ?tag=snapspacemkt-20' },
-      { id: 'v2', label: 'White + LED', color: '#FFFDE7', mainImage: 'https://m.media-amazon.com/images/I/41nR-w8iiyL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41nR-w8iiyL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0FP1YPLXJ?tag=snapspacemkt-20' },
+      { id: 'v1', label: 'White', color: '#F5F5F5', mainImage: 'https://m.media-amazon.com/images/I/41hrGFBOKKL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41hrGFBOKKL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FP1YPLXJ?tag=snapspacemkt-20' },
+      { id: 'v2', label: 'White + LED', color: '#FFFDE7', mainImage: 'https://m.media-amazon.com/images/I/41nR-w8iiyL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41nR-w8iiyL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FP1YPLXJ?tag=snapspacemkt-20' },
     ],
     sizes: [
       { id: 's1', label: '78.7"×31.4"', price: 199.99, compareAt: null, inStock: true },
@@ -6400,8 +6400,8 @@ export const PRODUCT_CATALOG = [
     rating: 4.5,
     reviewCount: 1542,
     variants: [
-      { id: 'v1', label: 'Black', color: '#1C1C1C', mainImage: 'https://m.media-amazon.com/images/I/41CCyaKxTlL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41CCyaKxTlL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0DL5H96DL?tag=snapspacemkt-20' },
-      { id: 'v2', label: 'Gold', color: '#B8960C', mainImage: 'https://m.media-amazon.com/images/I/516gZoTpyoL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/516gZoTpyoL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0DL5H96DL?tag=snapspacemkt-20' },
+      { id: 'v1', label: 'Black', color: '#1C1C1C', mainImage: 'https://m.media-amazon.com/images/I/41CCyaKxTlL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41CCyaKxTlL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DL5H96DL?tag=snapspacemkt-20' },
+      { id: 'v2', label: 'Gold', color: '#B8960C', mainImage: 'https://m.media-amazon.com/images/I/516gZoTpyoL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/516gZoTpyoL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DL5H96DL?tag=snapspacemkt-20' },
       { id: 'v3', label: 'White', color: '#F5F5F5', mainImage: 'https://m.media-amazon.com/images/I/41x+7OkhWZL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41x+7OkhWZL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CSCT5ZCG?tag=snapspacemkt-20', asin: 'B0CSCT5ZCG', price: 199.99 },
     ],
     sizes: [
@@ -6504,9 +6504,9 @@ export const PRODUCT_CATALOG = [
     rating: 4.8,
     reviewCount: 1833,
     variants: [
-      { id: 'v1', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/01ymqaSdLzL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/01ymqaSdLzL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B08K8YQMKL?tag=snapspacemkt-20' },
-      { id: 'v2', label: 'Brushed Gold', mainImage: 'https://m.media-amazon.com/images/I/3154lCLPAvL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/3154lCLPAvL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B08K8YQMKL?tag=snapspacemkt-20' },
-      { id: 'v3', label: 'Brushed Nickel', mainImage: 'https://m.media-amazon.com/images/I/31TAEoymnuL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/31TAEoymnuL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B08K8YQMKL?tag=snapspacemkt-20' },
+      { id: 'v1', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/01ymqaSdLzL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/01ymqaSdLzL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B08K8YQMKL?tag=snapspacemkt-20' },
+      { id: 'v2', label: 'Brushed Gold', mainImage: 'https://m.media-amazon.com/images/I/3154lCLPAvL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/3154lCLPAvL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B08K8YQMKL?tag=snapspacemkt-20' },
+      { id: 'v3', label: 'Brushed Nickel', mainImage: 'https://m.media-amazon.com/images/I/31TAEoymnuL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/31TAEoymnuL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B08K8YQMKL?tag=snapspacemkt-20' },
       { id: 'v4', label: 'Chrome', mainImage: 'https://m.media-amazon.com/images/I/217h8IVQpfL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/217h8IVQpfL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B08MT1K467?tag=snapspacemkt-20', asin: 'B08MT1K467' },
       { id: 'v5', label: 'Brushed Bronze', mainImage: 'https://m.media-amazon.com/images/I/31TEBycdyUL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/31TEBycdyUL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B09MDYSC9J?tag=snapspacemkt-20', asin: 'B09MDYSC9J' },
     ],
@@ -6553,9 +6553,9 @@ export const PRODUCT_CATALOG = [
     rating: 4.8,
     reviewCount: 1547,
     variants: [
-      { id: 'v1', label: 'Bronze', mainImage: 'https://m.media-amazon.com/images/I/317gYmwWiiL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/317gYmwWiiL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B07B4JPV9X?tag=snapspacemkt-20' },
-      { id: 'v2', label: 'Antique Bronze', mainImage: 'https://m.media-amazon.com/images/I/31RA4LbYaTL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/31RA4LbYaTL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B07B4JPV9X?tag=snapspacemkt-20' },
-      { id: 'v3', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/31dQiPS5HTL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/31dQiPS5HTL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B07B4JPV9X?tag=snapspacemkt-20' },
+      { id: 'v1', label: 'Bronze', mainImage: 'https://m.media-amazon.com/images/I/317gYmwWiiL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/317gYmwWiiL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B07B4JPV9X?tag=snapspacemkt-20' },
+      { id: 'v2', label: 'Antique Bronze', mainImage: 'https://m.media-amazon.com/images/I/31RA4LbYaTL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/31RA4LbYaTL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B07B4JPV9X?tag=snapspacemkt-20' },
+      { id: 'v3', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/31dQiPS5HTL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/31dQiPS5HTL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B07B4JPV9X?tag=snapspacemkt-20' },
       { id: 'v4', label: 'Gold', mainImage: 'https://m.media-amazon.com/images/I/41lH978LF7L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41lH978LF7L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B07NLDGKWC?tag=snapspacemkt-20', asin: 'B07NLDGKWC' },
       { id: 'v5', label: 'Grey', mainImage: 'https://m.media-amazon.com/images/I/31FHz4wCjkL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/31FHz4wCjkL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B086Q4P3CX?tag=snapspacemkt-20', asin: 'B086Q4P3CX' },
     ],
@@ -6602,8 +6602,8 @@ export const PRODUCT_CATALOG = [
     rating: 4.8,
     reviewCount: 1525,
     variants: [
-      { id: 'v1', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/618WeR9NxlL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/618WeR9NxlL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0C9BYSHHT?tag=snapspacemkt-20' },
-      { id: 'v2', label: 'Gold', mainImage: 'https://m.media-amazon.com/images/I/21ROI9W7hrL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/21ROI9W7hrL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0C9BYSHHT?tag=snapspacemkt-20' },
+      { id: 'v1', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/618WeR9NxlL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/618WeR9NxlL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0C9BYSHHT?tag=snapspacemkt-20' },
+      { id: 'v2', label: 'Gold', mainImage: 'https://m.media-amazon.com/images/I/21ROI9W7hrL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/21ROI9W7hrL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0C9BYSHHT?tag=snapspacemkt-20' },
     ],
     features: [
       'Slim metal frame in black or gold finish',
@@ -6648,9 +6648,9 @@ export const PRODUCT_CATALOG = [
     rating: 4.8,
     reviewCount: 1056,
     variants: [
-      { id: 'v1', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/212CaGVP29L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/212CaGVP29L._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B07V44MJ6D?tag=snapspacemkt-20' },
-      { id: 'v2', label: 'Bronze', mainImage: 'https://m.media-amazon.com/images/I/51txZuwebyL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51txZuwebyL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B07V44MJ6D?tag=snapspacemkt-20' },
-      { id: 'v3', label: 'Chrome', mainImage: 'https://m.media-amazon.com/images/I/21Sz-fB0xsL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/21Sz-fB0xsL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B07V44MJ6D?tag=snapspacemkt-20' },
+      { id: 'v1', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/212CaGVP29L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/212CaGVP29L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B07V44MJ6D?tag=snapspacemkt-20' },
+      { id: 'v2', label: 'Bronze', mainImage: 'https://m.media-amazon.com/images/I/51txZuwebyL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51txZuwebyL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B07V44MJ6D?tag=snapspacemkt-20' },
+      { id: 'v3', label: 'Chrome', mainImage: 'https://m.media-amazon.com/images/I/21Sz-fB0xsL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/21Sz-fB0xsL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B07V44MJ6D?tag=snapspacemkt-20' },
       { id: 'v4', label: 'Gold', mainImage: 'https://m.media-amazon.com/images/I/41UEC-dIvXL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41UEC-dIvXL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B07V44MJ6D?tag=snapspacemkt-20', asin: 'B07V44MJ6D' },
       { id: 'v5', label: 'Silver', mainImage: 'https://m.media-amazon.com/images/I/01a4qGsCCsL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/01a4qGsCCsL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B08BNC3C3M?tag=snapspacemkt-20', asin: 'B08BNC3C3M' },
     ],
@@ -6697,9 +6697,9 @@ export const PRODUCT_CATALOG = [
     rating: 4.8,
     reviewCount: 851,
     variants: [
-      { id: 'v1', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/51xJc8fZskL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51xJc8fZskL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0B99WTJLK?tag=snapspacemkt-20' },
-      { id: 'v2', label: 'Gold', mainImage: 'https://m.media-amazon.com/images/I/41zwIcca2ML._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41zwIcca2ML._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0B99WTJLK?tag=snapspacemkt-20' },
-      { id: 'v3', label: 'Silver', mainImage: 'https://m.media-amazon.com/images/I/41upFg8C5ML._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41upFg8C5ML._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0B99WTJLK?tag=snapspacemkt-20' },
+      { id: 'v1', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/51xJc8fZskL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51xJc8fZskL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0B99WTJLK?tag=snapspacemkt-20' },
+      { id: 'v2', label: 'Gold', mainImage: 'https://m.media-amazon.com/images/I/41zwIcca2ML._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41zwIcca2ML._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0B99WTJLK?tag=snapspacemkt-20' },
+      { id: 'v3', label: 'Silver', mainImage: 'https://m.media-amazon.com/images/I/41upFg8C5ML._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41upFg8C5ML._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0B99WTJLK?tag=snapspacemkt-20' },
     ],
     features: [
       'Slim metal frame in black, gold, or silver — works in modern and minimalist spaces',
@@ -6743,9 +6743,9 @@ export const PRODUCT_CATALOG = [
     rating: 4.8,
     reviewCount: 690,
     variants: [
-      { id: 'v1', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/01ymqaSdLzL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/01ymqaSdLzL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B087B3QGLN?tag=snapspacemkt-20' },
-      { id: 'v2', label: 'Brushed Bronze', mainImage: 'https://m.media-amazon.com/images/I/31TEBycdyUL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/31TEBycdyUL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B087B3QGLN?tag=snapspacemkt-20' },
-      { id: 'v3', label: 'Brushed Nickel', mainImage: 'https://m.media-amazon.com/images/I/2143KxBykmL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/2143KxBykmL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B087B3QGLN?tag=snapspacemkt-20' },
+      { id: 'v1', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/01ymqaSdLzL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/01ymqaSdLzL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B087B3QGLN?tag=snapspacemkt-20' },
+      { id: 'v2', label: 'Brushed Bronze', mainImage: 'https://m.media-amazon.com/images/I/31TEBycdyUL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/31TEBycdyUL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B087B3QGLN?tag=snapspacemkt-20' },
+      { id: 'v3', label: 'Brushed Nickel', mainImage: 'https://m.media-amazon.com/images/I/2143KxBykmL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/2143KxBykmL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B087B3QGLN?tag=snapspacemkt-20' },
       { id: 'v4', label: 'Chrome', mainImage: 'https://m.media-amazon.com/images/I/01a4qGsCCsL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/01a4qGsCCsL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B09KXGGL9X?tag=snapspacemkt-20', asin: 'B09KXGGL9X' },
       { id: 'v5', label: 'Gold', mainImage: 'https://m.media-amazon.com/images/I/31i8QZ3ieVL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/31i8QZ3ieVL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B087B3QGLN?tag=snapspacemkt-20', asin: 'B087B3QGLN' },
     ],
@@ -6792,9 +6792,9 @@ export const PRODUCT_CATALOG = [
     rating: 4.8,
     reviewCount: 680,
     variants: [
-      { id: 'v1', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/31ofz0+MQHL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/31ofz0+MQHL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0725PLBS4?tag=snapspacemkt-20' },
-      { id: 'v2', label: 'Gold', mainImage: 'https://m.media-amazon.com/images/I/31LKY22nl2L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/31LKY22nl2L._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0725PLBS4?tag=snapspacemkt-20' },
-      { id: 'v3', label: 'Silver', mainImage: 'https://m.media-amazon.com/images/I/31UEXDyvGIL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/31UEXDyvGIL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0725PLBS4?tag=snapspacemkt-20' },
+      { id: 'v1', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/31ofz0+MQHL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/31ofz0+MQHL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0725PLBS4?tag=snapspacemkt-20' },
+      { id: 'v2', label: 'Gold', mainImage: 'https://m.media-amazon.com/images/I/31LKY22nl2L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/31LKY22nl2L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0725PLBS4?tag=snapspacemkt-20' },
+      { id: 'v3', label: 'Silver', mainImage: 'https://m.media-amazon.com/images/I/31UEXDyvGIL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/31UEXDyvGIL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0725PLBS4?tag=snapspacemkt-20' },
       { id: 'v4', label: 'White', mainImage: 'https://m.media-amazon.com/images/I/21SJtJo8eyL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/21SJtJo8eyL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0BLT54Z3Y?tag=snapspacemkt-20', asin: 'B0BLT54Z3Y' },
     ],
     features: [
@@ -6840,9 +6840,9 @@ export const PRODUCT_CATALOG = [
     rating: 4.8,
     reviewCount: 678,
     variants: [
-      { id: 'v1', label: 'Gold', mainImage: 'https://m.media-amazon.com/images/I/21YKh+50MwL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/21YKh+50MwL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0CNSK3V5F?tag=snapspacemkt-20' },
-      { id: 'v2', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/21q4BtdQAXL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/21q4BtdQAXL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0CNSK3V5F?tag=snapspacemkt-20' },
-      { id: 'v3', label: 'Black (Alt)', mainImage: 'https://m.media-amazon.com/images/I/21q4BtdQAXL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/21q4BtdQAXL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0CNSK3V5F?tag=snapspacemkt-20' },
+      { id: 'v1', label: 'Gold', mainImage: 'https://m.media-amazon.com/images/I/21YKh+50MwL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/21YKh+50MwL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CNSK3V5F?tag=snapspacemkt-20' },
+      { id: 'v2', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/21q4BtdQAXL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/21q4BtdQAXL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CNSK3V5F?tag=snapspacemkt-20' },
+      { id: 'v3', label: 'Black (Alt)', mainImage: 'https://m.media-amazon.com/images/I/21q4BtdQAXL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/21q4BtdQAXL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CNSK3V5F?tag=snapspacemkt-20' },
     ],
     features: [
       'Slim metal frame in gold and black finishes',
@@ -6887,8 +6887,8 @@ export const PRODUCT_CATALOG = [
     rating: 4.8,
     reviewCount: 675,
     variants: [
-      { id: 'v1', label: 'White', mainImage: 'https://m.media-amazon.com/images/I/31foLF9tTcL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/31foLF9tTcL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B07VNTR77S?tag=snapspacemkt-20' },
-      { id: 'v2', label: 'Grey', mainImage: 'https://m.media-amazon.com/images/I/41BmKgpxSPL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41BmKgpxSPL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B07VNTR77S?tag=snapspacemkt-20' },
+      { id: 'v1', label: 'White', mainImage: 'https://m.media-amazon.com/images/I/31foLF9tTcL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/31foLF9tTcL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B07VNTR77S?tag=snapspacemkt-20' },
+      { id: 'v2', label: 'Grey', mainImage: 'https://m.media-amazon.com/images/I/41BmKgpxSPL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41BmKgpxSPL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B07VNTR77S?tag=snapspacemkt-20' },
     ],
     features: [
       'Painted wood frame in white or grey — cottage-door panel design',
@@ -6976,8 +6976,8 @@ export const PRODUCT_CATALOG = [
     rating: 4.9,
     reviewCount: 105,
     variants: [
-      { id: 'v1', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/51YQZXRQAYL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51YQZXRQAYL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0CTCJCFNS?tag=snapspacemkt-20' },
-      { id: 'v2', label: 'Gold', mainImage: 'https://m.media-amazon.com/images/I/51auu4y1BjL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51auu4y1BjL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0CTCJCFNS?tag=snapspacemkt-20' },
+      { id: 'v1', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/51YQZXRQAYL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51YQZXRQAYL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CTCJCFNS?tag=snapspacemkt-20' },
+      { id: 'v2', label: 'Gold', mainImage: 'https://m.media-amazon.com/images/I/51auu4y1BjL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51auu4y1BjL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CTCJCFNS?tag=snapspacemkt-20' },
     ],
     features: [
       'Multi-paned arched window design in black or gold metal frame',
@@ -7024,9 +7024,9 @@ export const PRODUCT_CATALOG = [
     rating: 4.8,
     reviewCount: 360,
     variants: [
-      { id: 'v1', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/51xxZG9gAVL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51xxZG9gAVL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0CQZRGC9H?tag=snapspacemkt-20' },
-      { id: 'v2', label: 'Grey', mainImage: 'https://m.media-amazon.com/images/I/71dRj4CvGxL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71dRj4CvGxL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0CQZRGC9H?tag=snapspacemkt-20' },
-      { id: 'v3', label: 'Rustic Brown', mainImage: 'https://m.media-amazon.com/images/I/71n70QrB-9L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71n70QrB-9L._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0CQZRGC9H?tag=snapspacemkt-20' },
+      { id: 'v1', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/51xxZG9gAVL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51xxZG9gAVL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CQZRGC9H?tag=snapspacemkt-20' },
+      { id: 'v2', label: 'Grey', mainImage: 'https://m.media-amazon.com/images/I/71dRj4CvGxL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71dRj4CvGxL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CQZRGC9H?tag=snapspacemkt-20' },
+      { id: 'v3', label: 'Rustic Brown', mainImage: 'https://m.media-amazon.com/images/I/71n70QrB-9L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71n70QrB-9L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CQZRGC9H?tag=snapspacemkt-20' },
     ],
     features: [
       '59.8" solid wood tabletop supports TVs up to 65" and up to 176 lbs',
@@ -7069,9 +7069,9 @@ export const PRODUCT_CATALOG = [
     rating: 4.8,
     reviewCount: 277,
     variants: [
-      { id: 'v1', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/516wKKTrflL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/516wKKTrflL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0CL6T3V3W?tag=snapspacemkt-20' },
-      { id: 'v2', label: 'White', mainImage: 'https://m.media-amazon.com/images/I/51iGah89fiL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51iGah89fiL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0CL6T3V3W?tag=snapspacemkt-20' },
-      { id: 'v3', label: 'Rustic Brown', mainImage: 'https://m.media-amazon.com/images/I/71iKO-pLu5L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71iKO-pLu5L._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0CL6T3V3W?tag=snapspacemkt-20' },
+      { id: 'v1', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/516wKKTrflL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/516wKKTrflL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CL6T3V3W?tag=snapspacemkt-20' },
+      { id: 'v2', label: 'White', mainImage: 'https://m.media-amazon.com/images/I/51iGah89fiL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51iGah89fiL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CL6T3V3W?tag=snapspacemkt-20' },
+      { id: 'v3', label: 'Rustic Brown', mainImage: 'https://m.media-amazon.com/images/I/71iKO-pLu5L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71iKO-pLu5L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CL6T3V3W?tag=snapspacemkt-20' },
       { id: 'v4', label: 'Grey', mainImage: 'https://m.media-amazon.com/images/I/51kZLVSIH6L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51kZLVSIH6L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CZRJDFXJ?tag=snapspacemkt-20', asin: 'B0CZRJDFXJ' },
     ],
     features: [
@@ -7115,8 +7115,8 @@ export const PRODUCT_CATALOG = [
     rating: 4.8,
     reviewCount: 230,
     variants: [
-      { id: 'v1', label: 'Rustic Oak', mainImage: 'https://m.media-amazon.com/images/I/71RL0O9REIL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71RL0O9REIL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0BZ77VCH9?tag=snapspacemkt-20' },
-      { id: 'v2', label: 'Black Oak', mainImage: 'https://m.media-amazon.com/images/I/41R1Yu9bMbL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41R1Yu9bMbL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0BZ77VCH9?tag=snapspacemkt-20' },
+      { id: 'v1', label: 'Rustic Oak', mainImage: 'https://m.media-amazon.com/images/I/71RL0O9REIL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71RL0O9REIL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0BZ77VCH9?tag=snapspacemkt-20' },
+      { id: 'v2', label: 'Black Oak', mainImage: 'https://m.media-amazon.com/images/I/41R1Yu9bMbL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41R1Yu9bMbL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0BZ77VCH9?tag=snapspacemkt-20' },
     ],
     features: [
       '32" tall design maximizes vertical storage — great for smaller living spaces',
@@ -7159,8 +7159,8 @@ export const PRODUCT_CATALOG = [
     rating: 4.8,
     reviewCount: 200,
     variants: [
-      { id: 'v1', label: 'Rustic Brown', mainImage: 'https://m.media-amazon.com/images/I/71C-I8NJ5ZL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71C-I8NJ5ZL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0CKW5V2C7?tag=snapspacemkt-20' },
-      { id: 'v2', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/815ph1eZ1rL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/815ph1eZ1rL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0CKW5V2C7?tag=snapspacemkt-20' },
+      { id: 'v1', label: 'Rustic Brown', mainImage: 'https://m.media-amazon.com/images/I/71C-I8NJ5ZL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71C-I8NJ5ZL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CKW5V2C7?tag=snapspacemkt-20' },
+      { id: 'v2', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/815ph1eZ1rL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/815ph1eZ1rL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CKW5V2C7?tag=snapspacemkt-20' },
     ],
     features: [
       'Open shelf design displays media equipment and decor without concealment',
@@ -7203,9 +7203,9 @@ export const PRODUCT_CATALOG = [
     rating: 4.8,
     reviewCount: 124,
     variants: [
-      { id: 'v1', label: 'Natural Oak', mainImage: 'https://m.media-amazon.com/images/I/71JIbaRZb2L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71JIbaRZb2L._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0FWD7QH7C?tag=snapspacemkt-20' },
-      { id: 'v2', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/51APj6UdEQL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51APj6UdEQL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0FWD7QH7C?tag=snapspacemkt-20' },
-      { id: 'v3', label: 'Walnut', mainImage: 'https://m.media-amazon.com/images/I/419Rt5Sn9gL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/419Rt5Sn9gL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0FWD7QH7C?tag=snapspacemkt-20' },
+      { id: 'v1', label: 'Natural Oak', mainImage: 'https://m.media-amazon.com/images/I/71JIbaRZb2L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71JIbaRZb2L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FWD7QH7C?tag=snapspacemkt-20' },
+      { id: 'v2', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/51APj6UdEQL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51APj6UdEQL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FWD7QH7C?tag=snapspacemkt-20' },
+      { id: 'v3', label: 'Walnut', mainImage: 'https://m.media-amazon.com/images/I/419Rt5Sn9gL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/419Rt5Sn9gL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FWD7QH7C?tag=snapspacemkt-20' },
       { id: 'v4', label: 'White Oak', mainImage: 'https://m.media-amazon.com/images/I/41LbZe5v4dL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41LbZe5v4dL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FWD9FZ6L?tag=snapspacemkt-20', asin: 'B0FWD9FZ6L' },
     ],
     features: [
@@ -7250,8 +7250,8 @@ export const PRODUCT_CATALOG = [
     rating: 4.8,
     reviewCount: 116,
     variants: [
-      { id: 'v1', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/81C+0gygq-L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81C+0gygq-L._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0D874SS18?tag=snapspacemkt-20' },
-      { id: 'v2', label: 'Rustic Brown', mainImage: 'https://m.media-amazon.com/images/I/61ysS04vsVL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61ysS04vsVL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0D874SS18?tag=snapspacemkt-20' },
+      { id: 'v1', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/81C+0gygq-L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81C+0gygq-L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0D874SS18?tag=snapspacemkt-20' },
+      { id: 'v2', label: 'Rustic Brown', mainImage: 'https://m.media-amazon.com/images/I/61ysS04vsVL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61ysS04vsVL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0D874SS18?tag=snapspacemkt-20' },
     ],
     features: [
       'Built-in LED strip lighting creates an immersive gaming and home theater atmosphere',
@@ -7294,9 +7294,9 @@ export const PRODUCT_CATALOG = [
     rating: 4.7,
     reviewCount: 4711,
     variants: [
-      { id: 'v1', label: 'Sawcut Espresso', mainImage: 'https://m.media-amazon.com/images/I/81tdBGaAIoL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81tdBGaAIoL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B06XY21ZHQ?tag=snapspacemkt-20' },
-      { id: 'v2', label: 'White', mainImage: 'https://m.media-amazon.com/images/I/71Gk1UUdgcL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71Gk1UUdgcL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B06XY21ZHQ?tag=snapspacemkt-20' },
-      { id: 'v3', label: 'Grey', mainImage: 'https://m.media-amazon.com/images/I/71TZ8RWU4FL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71TZ8RWU4FL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B06XY21ZHQ?tag=snapspacemkt-20' },
+      { id: 'v1', label: 'Sawcut Espresso', mainImage: 'https://m.media-amazon.com/images/I/81tdBGaAIoL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81tdBGaAIoL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B06XY21ZHQ?tag=snapspacemkt-20' },
+      { id: 'v2', label: 'White', mainImage: 'https://m.media-amazon.com/images/I/71Gk1UUdgcL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71Gk1UUdgcL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B06XY21ZHQ?tag=snapspacemkt-20' },
+      { id: 'v3', label: 'Grey', mainImage: 'https://m.media-amazon.com/images/I/71TZ8RWU4FL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71TZ8RWU4FL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B06XY21ZHQ?tag=snapspacemkt-20' },
       { id: 'v4', label: 'Natural', mainImage: 'https://m.media-amazon.com/images/I/71f0jS1IONL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71f0jS1IONL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DLWT6PYY?tag=snapspacemkt-20', asin: 'B0DLWT6PYY' },
     ],
     features: [
@@ -7340,9 +7340,9 @@ export const PRODUCT_CATALOG = [
     rating: 4.7,
     reviewCount: 4071,
     variants: [
-      { id: 'v1', label: 'Dark Rustic Oak', mainImage: 'https://m.media-amazon.com/images/I/91dDIgGL7CL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/91dDIgGL7CL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0CC8W4V2Z?tag=snapspacemkt-20' },
-      { id: 'v2', label: 'White Oak', mainImage: 'https://m.media-amazon.com/images/I/81g3cxjrxUL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81g3cxjrxUL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0CC8W4V2Z?tag=snapspacemkt-20' },
-      { id: 'v3', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/81YSFkRRobL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81YSFkRRobL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0CC8W4V2Z?tag=snapspacemkt-20' },
+      { id: 'v1', label: 'Dark Rustic Oak', mainImage: 'https://m.media-amazon.com/images/I/91dDIgGL7CL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/91dDIgGL7CL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CC8W4V2Z?tag=snapspacemkt-20' },
+      { id: 'v2', label: 'White Oak', mainImage: 'https://m.media-amazon.com/images/I/81g3cxjrxUL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81g3cxjrxUL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CC8W4V2Z?tag=snapspacemkt-20' },
+      { id: 'v3', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/81YSFkRRobL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81YSFkRRobL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CC8W4V2Z?tag=snapspacemkt-20' },
       { id: 'v4', label: 'Grey Oak', mainImage: 'https://m.media-amazon.com/images/I/91+0hbkuDuL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/91+0hbkuDuL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DKY87326?tag=snapspacemkt-20', asin: 'B0DKY87326' },
     ],
     features: [
@@ -7387,9 +7387,9 @@ export const PRODUCT_CATALOG = [
     rating: 4.7,
     reviewCount: 1038,
     variants: [
-      { id: 'v1', label: 'Rustic Brown', mainImage: 'https://m.media-amazon.com/images/I/71bTErF+hTL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71bTErF+hTL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0D8BNZ8KJ?tag=snapspacemkt-20' },
-      { id: 'v2', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/517p86aHs1L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/517p86aHs1L._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0D8BNZ8KJ?tag=snapspacemkt-20' },
-      { id: 'v3', label: 'Grey', mainImage: 'https://m.media-amazon.com/images/I/41+urXLtdUL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41+urXLtdUL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0D8BNZ8KJ?tag=snapspacemkt-20' },
+      { id: 'v1', label: 'Rustic Brown', mainImage: 'https://m.media-amazon.com/images/I/71bTErF+hTL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71bTErF+hTL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0D8BNZ8KJ?tag=snapspacemkt-20' },
+      { id: 'v2', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/517p86aHs1L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/517p86aHs1L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0D8BNZ8KJ?tag=snapspacemkt-20' },
+      { id: 'v3', label: 'Grey', mainImage: 'https://m.media-amazon.com/images/I/41+urXLtdUL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41+urXLtdUL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0D8BNZ8KJ?tag=snapspacemkt-20' },
     ],
     features: [
       'Fits TVs up to 65" on a wide, reinforced tabletop',
@@ -7432,9 +7432,9 @@ export const PRODUCT_CATALOG = [
     rating: 4.8,
     reviewCount: 72,
     variants: [
-      { id: 'v1', label: 'Rustic Brown', mainImage: 'https://m.media-amazon.com/images/I/814XhhAv5cL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/814XhhAv5cL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0DQY23V7Q?tag=snapspacemkt-20' },
-      { id: 'v2', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/51biQ85YLtL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51biQ85YLtL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0DQY23V7Q?tag=snapspacemkt-20' },
-      { id: 'v3', label: 'Natural Wood', mainImage: 'https://m.media-amazon.com/images/I/51lOVg9SYgL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51lOVg9SYgL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0DQY23V7Q?tag=snapspacemkt-20' },
+      { id: 'v1', label: 'Rustic Brown', mainImage: 'https://m.media-amazon.com/images/I/814XhhAv5cL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/814XhhAv5cL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DQY23V7Q?tag=snapspacemkt-20' },
+      { id: 'v2', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/51biQ85YLtL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51biQ85YLtL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DQY23V7Q?tag=snapspacemkt-20' },
+      { id: 'v3', label: 'Natural Wood', mainImage: 'https://m.media-amazon.com/images/I/51lOVg9SYgL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51lOVg9SYgL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DQY23V7Q?tag=snapspacemkt-20' },
     ],
     features: [
       'Wide 70.9" tabletop handles TVs up to 80" — ideal for large living rooms',
@@ -7486,8 +7486,8 @@ export const PRODUCT_CATALOG = [
     rating: 4.6,
     reviewCount: 543,
     variants: [
-      { id: 'v1', label: 'Beige', color: '#C9B79C', mainImage: 'https://m.media-amazon.com/images/I/410T5xhZxpL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/410T5xhZxpL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0DXDXTBNS?tag=snapspacemkt-20' },
-      { id: 'v2', label: 'Blue', color: '#6B8EAD', mainImage: 'https://m.media-amazon.com/images/I/51l-QHZ3h5L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51l-QHZ3h5L._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0DXDXTBNS?tag=snapspacemkt-20' },
+      { id: 'v1', label: 'Beige', color: '#C9B79C', mainImage: 'https://m.media-amazon.com/images/I/410T5xhZxpL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/410T5xhZxpL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DXDXTBNS?tag=snapspacemkt-20' },
+      { id: 'v2', label: 'Blue', color: '#6B8EAD', mainImage: 'https://m.media-amazon.com/images/I/51l-QHZ3h5L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51l-QHZ3h5L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DXDXTBNS?tag=snapspacemkt-20' },
       { id: 'v3', label: 'Brown', color: '#8B6355', mainImage: 'https://m.media-amazon.com/images/I/51z9VXCeJZL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51z9VXCeJZL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DXDTGNJ8?tag=snapspacemkt-20', asin: 'B0DXDTGNJ8', price: 76.49 },
       { id: 'v4', label: 'Grey', color: '#9B9B9B', mainImage: 'https://m.media-amazon.com/images/I/51KS8+agz6L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51KS8+agz6L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0G1SXSM51?tag=snapspacemkt-20', asin: 'B0G1SXSM51', price: 76.49 },
       { id: 'v5', label: 'Sage Green', color: '#8BAF8A', mainImage: 'https://m.media-amazon.com/images/I/51IeMvlBcyL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51IeMvlBcyL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0G1SX1ZQY?tag=snapspacemkt-20', asin: 'B0G1SX1ZQY', price: 76.49 },
@@ -7563,8 +7563,8 @@ export const PRODUCT_CATALOG = [
     rating: 4.7,
     reviewCount: 465,
     variants: [
-      { id: 'v1', label: 'Dark Grey', color: '#555555', mainImage: 'https://m.media-amazon.com/images/I/51C0NAWf6GL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51C0NAWf6GL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0DDQK3F5C?tag=snapspacemkt-20' },
-      { id: 'v2', label: 'Grey', color: '#9B9B9B', mainImage: 'https://m.media-amazon.com/images/I/51FiOHBalzL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51FiOHBalzL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0DDQK3F5C?tag=snapspacemkt-20' },
+      { id: 'v1', label: 'Dark Grey', color: '#555555', mainImage: 'https://m.media-amazon.com/images/I/51C0NAWf6GL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51C0NAWf6GL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DDQK3F5C?tag=snapspacemkt-20' },
+      { id: 'v2', label: 'Grey', color: '#9B9B9B', mainImage: 'https://m.media-amazon.com/images/I/51FiOHBalzL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51FiOHBalzL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DDQK3F5C?tag=snapspacemkt-20' },
       { id: 'v3', label: 'White Gray', color: '#D8D8D8', mainImage: 'https://m.media-amazon.com/images/I/51rOsZGoYkL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51rOsZGoYkL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DDQM15HV?tag=snapspacemkt-20', asin: 'B0DDQM15HV', price: 88.00 },
       { id: 'v4', label: 'Black Gray', color: '#3A3A3A', mainImage: 'https://m.media-amazon.com/images/I/51ZNL4zF2RL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51ZNL4zF2RL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0GHL5268Y?tag=snapspacemkt-20', asin: 'B0GHL5268Y', price: 88.00 },
       { id: 'v5', label: 'Black Gold', color: '#B8960C', mainImage: 'https://m.media-amazon.com/images/I/51YDza4wlhL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51YDza4wlhL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0F7HYMW2J?tag=snapspacemkt-20', asin: 'B0F7HYMW2J', price: 88.00 },
@@ -7641,8 +7641,8 @@ export const PRODUCT_CATALOG = [
     rating: 4.3,
     reviewCount: 142,
     variants: [
-      { id: 'v1', label: 'Cream', color: '#E8DCC8', mainImage: 'https://m.media-amazon.com/images/I/51PhlU9U2bL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51PhlU9U2bL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0FSMY7B3N?tag=snapspacemkt-20' },
-      { id: 'v2', label: 'Grey', color: '#9B9B9B', mainImage: 'https://m.media-amazon.com/images/I/51EyuhH+8oL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51EyuhH+8oL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0FSMY7B3N?tag=snapspacemkt-20' },
+      { id: 'v1', label: 'Cream', color: '#E8DCC8', mainImage: 'https://m.media-amazon.com/images/I/51PhlU9U2bL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51PhlU9U2bL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FSMY7B3N?tag=snapspacemkt-20' },
+      { id: 'v2', label: 'Grey', color: '#9B9B9B', mainImage: 'https://m.media-amazon.com/images/I/51EyuhH+8oL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51EyuhH+8oL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FSMY7B3N?tag=snapspacemkt-20' },
     ],
     sizes: [
       { label: "2'x3'",  price: 24.99, compareAt: null, inStock: true },
@@ -7708,8 +7708,8 @@ export const PRODUCT_CATALOG = [
     rating: 4.5,
     reviewCount: 1034,
     variants: [
-      { id: 'v1', label: 'Beige/Grey', color: '#C8BEA8', mainImage: 'https://m.media-amazon.com/images/I/51ADGFD1l8L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51ADGFD1l8L._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0D87DV4GQ?tag=snapspacemkt-20' },
-      { id: 'v2', label: 'Beige/Blue', color: '#A8B4C8', mainImage: 'https://m.media-amazon.com/images/I/51KEVzqWmqL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51KEVzqWmqL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0D87DV4GQ?tag=snapspacemkt-20' },
+      { id: 'v1', label: 'Beige/Grey', color: '#C8BEA8', mainImage: 'https://m.media-amazon.com/images/I/51ADGFD1l8L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51ADGFD1l8L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0D87DV4GQ?tag=snapspacemkt-20' },
+      { id: 'v2', label: 'Beige/Blue', color: '#A8B4C8', mainImage: 'https://m.media-amazon.com/images/I/51KEVzqWmqL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51KEVzqWmqL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0D87DV4GQ?tag=snapspacemkt-20' },
       { id: 'v3', label: 'Blue/Cream', color: '#6B8EAD', mainImage: 'https://m.media-amazon.com/images/I/618Iw6kpDvL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/618Iw6kpDvL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FBRCQRLN?tag=snapspacemkt-20', asin: 'B0FBRCQRLN', price: 89.24 },
       { id: 'v4', label: 'Brown/Grey', color: '#8B7355', mainImage: 'https://m.media-amazon.com/images/I/510665CM9UL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/510665CM9UL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DG2N169N?tag=snapspacemkt-20', asin: 'B0DG2N169N', price: 89.24 },
       { id: 'v5', label: 'Light Green', color: '#A8C4A0', mainImage: 'https://m.media-amazon.com/images/I/51-VsofwX8L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51-VsofwX8L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0F53K3F1R?tag=snapspacemkt-20', asin: 'B0F53K3F1R', price: 89.24 },
@@ -7914,8 +7914,8 @@ export const PRODUCT_CATALOG = [
     rating: 5.0,
     reviewCount: 4,
     variants: [
-      { id: 'v1', label: 'Beige', color: '#D8CDBF', mainImage: 'https://m.media-amazon.com/images/I/31pEYH3bC+L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/31pEYH3bC+L._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0GNJ3V133?tag=snapspacemkt-20' },
-      { id: 'v2', label: 'White', color: '#F5F5F5', mainImage: 'https://m.media-amazon.com/images/I/317EmSAXynL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/317EmSAXynL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0GNJ3V133?tag=snapspacemkt-20' },
+      { id: 'v1', label: 'Beige', color: '#D8CDBF', mainImage: 'https://m.media-amazon.com/images/I/31pEYH3bC+L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/31pEYH3bC+L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0GNJ3V133?tag=snapspacemkt-20' },
+      { id: 'v2', label: 'White', color: '#F5F5F5', mainImage: 'https://m.media-amazon.com/images/I/317EmSAXynL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/317EmSAXynL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0GNJ3V133?tag=snapspacemkt-20' },
     ],
     sizes: [
       { label: 'Queen', price: 350.99, compareAt: 389.99, inStock: true },
@@ -7979,8 +7979,8 @@ export const PRODUCT_CATALOG = [
     rating: 4.6,
     reviewCount: 224,
     variants: [
-      { id: 'v1', label: 'Cream', color: '#E8DCC8', mainImage: 'https://m.media-amazon.com/images/I/41J5XN-GloL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41J5XN-GloL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0DFTL8F7G?tag=snapspacemkt-20' },
-      { id: 'v2', label: 'Black', color: '#1C1C1C', mainImage: 'https://m.media-amazon.com/images/I/41si7Jm3EnL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41si7Jm3EnL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0DFTL8F7G?tag=snapspacemkt-20' },
+      { id: 'v1', label: 'Cream', color: '#E8DCC8', mainImage: 'https://m.media-amazon.com/images/I/41J5XN-GloL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41J5XN-GloL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DFTL8F7G?tag=snapspacemkt-20' },
+      { id: 'v2', label: 'Black', color: '#1C1C1C', mainImage: 'https://m.media-amazon.com/images/I/41si7Jm3EnL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41si7Jm3EnL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DFTL8F7G?tag=snapspacemkt-20' },
       { id: 'v3', label: 'Green', color: '#5A7A5A', mainImage: 'https://m.media-amazon.com/images/I/41D83AhOvZL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41D83AhOvZL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DFTL8JV8?tag=snapspacemkt-20', asin: 'B0DFTL8JV8', price: 331.49 },
       { id: 'v4', label: 'Grey', color: '#8A8A8A', mainImage: 'https://m.media-amazon.com/images/I/41xRqpgDkGL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41xRqpgDkGL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DFTL8721?tag=snapspacemkt-20', asin: 'B0DFTL8721', price: 331.49 },
     ],
@@ -8108,8 +8108,8 @@ export const PRODUCT_CATALOG = [
     rating: 3.9,
     reviewCount: 20,
     variants: [
-      { id: 'v1', label: 'Beige Chenille', color: '#D4C5B0', mainImage: 'https://m.media-amazon.com/images/I/5162XjaWsDL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/5162XjaWsDL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0GD2159L8?tag=snapspacemkt-20' },
-      { id: 'v2', label: 'Moon Grey', color: '#A8A8B0', mainImage: 'https://m.media-amazon.com/images/I/51+HuTTCnSL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51+HuTTCnSL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0GD2159L8?tag=snapspacemkt-20' },
+      { id: 'v1', label: 'Beige Chenille', color: '#D4C5B0', mainImage: 'https://m.media-amazon.com/images/I/5162XjaWsDL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/5162XjaWsDL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0GD2159L8?tag=snapspacemkt-20' },
+      { id: 'v2', label: 'Moon Grey', color: '#A8A8B0', mainImage: 'https://m.media-amazon.com/images/I/51+HuTTCnSL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51+HuTTCnSL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0GD2159L8?tag=snapspacemkt-20' },
     ],
     sizes: [
       { label: 'Full',  price: 297.49, compareAt: 349.99, inStock: true },
@@ -8174,8 +8174,8 @@ export const PRODUCT_CATALOG = [
     rating: 2.2,
     reviewCount: 9,
     variants: [
-      { id: 'v1', label: 'Beige', color: '#D4C5B0', mainImage: 'https://m.media-amazon.com/images/I/4182k5xbw4L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/4182k5xbw4L._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0GGB42BYR?tag=snapspacemkt-20' },
-      { id: 'v2', label: 'Charcoal Grey', color: '#4A4A4A', mainImage: 'https://m.media-amazon.com/images/I/51VjoBa6pEL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51VjoBa6pEL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0GGB42BYR?tag=snapspacemkt-20' },
+      { id: 'v1', label: 'Beige', color: '#D4C5B0', mainImage: 'https://m.media-amazon.com/images/I/4182k5xbw4L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/4182k5xbw4L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0GGB42BYR?tag=snapspacemkt-20' },
+      { id: 'v2', label: 'Charcoal Grey', color: '#4A4A4A', mainImage: 'https://m.media-amazon.com/images/I/51VjoBa6pEL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51VjoBa6pEL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0GGB42BYR?tag=snapspacemkt-20' },
     ],
     sizes: [
       { label: 'Full',  price: 297.49, compareAt: null,   inStock: true },
@@ -8241,8 +8241,8 @@ export const PRODUCT_CATALOG = [
     rating: 5.0,
     reviewCount: 1,
     variants: [
-      { id: 'v1', label: 'Cream Boucle + Headboard', color: '#E8E0D5', mainImage: 'https://m.media-amazon.com/images/I/41tw42jrRVL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41tw42jrRVL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0GR426KHJ?tag=snapspacemkt-20' },
-      { id: 'v2', label: 'Cream Boucle No Headboard', color: '#E8E0D5', mainImage: 'https://m.media-amazon.com/images/I/41zCyL48BBL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41zCyL48BBL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0GR426KHJ?tag=snapspacemkt-20' },
+      { id: 'v1', label: 'Cream Boucle + Headboard', color: '#E8E0D5', mainImage: 'https://m.media-amazon.com/images/I/41tw42jrRVL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41tw42jrRVL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0GR426KHJ?tag=snapspacemkt-20' },
+      { id: 'v2', label: 'Cream Boucle No Headboard', color: '#E8E0D5', mainImage: 'https://m.media-amazon.com/images/I/41zCyL48BBL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41zCyL48BBL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0GR426KHJ?tag=snapspacemkt-20' },
       { id: 'v3', label: 'Beige Velvet + Headboard', color: '#C8B89A', mainImage: 'https://m.media-amazon.com/images/I/4137FFGTQsL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/4137FFGTQsL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0GR3LCL5K?tag=snapspacemkt-20', asin: 'B0GR3LCL5K', price: 339.99 },
       { id: 'v4', label: 'Beige Velvet No Headboard', color: '#C8B89A', mainImage: 'https://m.media-amazon.com/images/I/41xGT8+7nOL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41xGT8+7nOL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0GR3NGX58?tag=snapspacemkt-20', asin: 'B0GR3NGX58', price: 289.99 },
     ],
@@ -8375,8 +8375,8 @@ export const PRODUCT_CATALOG = [
     rating: 4.3,
     reviewCount: 61,
     variants: [
-      { id: 'v1',  label: 'Textured Ivory',           color: '#EDE8DF', mainImage: 'https://m.media-amazon.com/images/I/41sz-yhgG5L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41sz-yhgG5L._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0FHBF4DPF?tag=snapspacemkt-20' },
-      { id: 'v2',  label: 'Textured Ivory Canvas',    color: '#E8E2D6', mainImage: 'https://m.media-amazon.com/images/I/413lxTRLcsL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/413lxTRLcsL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0FHBF4DPF?tag=snapspacemkt-20' },
+      { id: 'v1',  label: 'Textured Ivory',           color: '#EDE8DF', mainImage: 'https://m.media-amazon.com/images/I/41sz-yhgG5L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41sz-yhgG5L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FHBF4DPF?tag=snapspacemkt-20' },
+      { id: 'v2',  label: 'Textured Ivory Canvas',    color: '#E8E2D6', mainImage: 'https://m.media-amazon.com/images/I/413lxTRLcsL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/413lxTRLcsL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FHBF4DPF?tag=snapspacemkt-20' },
       { id: 'v3',  label: 'Ivory Chenille',           color: '#E5DDD0', mainImage: 'https://m.media-amazon.com/images/I/41g6qeA0xvL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41g6qeA0xvL._AC_SL300_.jpg',  affiliateUrl: 'https://www.amazon.com/dp/B0DM91B8X5?tag=snapspacemkt-20',  asin: 'B0DM91B8X5',  price: 319.99 },
       { id: 'v4',  label: 'Ivory Boucle',             color: '#EAE5DC', mainImage: 'https://m.media-amazon.com/images/I/41kXXTclwoL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41kXXTclwoL._AC_SL300_.jpg',  affiliateUrl: 'https://www.amazon.com/dp/B0FWRVMLSR?tag=snapspacemkt-20',  asin: 'B0FWRVMLSR',  price: 319.99 },
       { id: 'v5',  label: 'Ivory Velvet',             color: '#E8E0D0', mainImage: 'https://m.media-amazon.com/images/I/41t4WetJmUL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41t4WetJmUL._AC_SL300_.jpg',  affiliateUrl: 'https://www.amazon.com/dp/B0DYJTGSLY?tag=snapspacemkt-20',  asin: 'B0DYJTGSLY',  price: 319.99 },
@@ -8515,8 +8515,8 @@ export const PRODUCT_CATALOG = [
     rating: 4.8,
     reviewCount: 5,
     variants: [
-      { id: 'v1', label: 'Wheat', color: '#C8A87A', mainImage: 'https://m.media-amazon.com/images/I/51Y+9YJL4iL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51Y+9YJL4iL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0FQTSKTQY?tag=snapspacemkt-20' },
-      { id: 'v2', label: 'White Boucle', color: '#F0EDE8', mainImage: 'https://m.media-amazon.com/images/I/51h-sh2ryDL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51h-sh2ryDL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0FQTSKTQY?tag=snapspacemkt-20' },
+      { id: 'v1', label: 'Wheat', color: '#C8A87A', mainImage: 'https://m.media-amazon.com/images/I/51Y+9YJL4iL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51Y+9YJL4iL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FQTSKTQY?tag=snapspacemkt-20' },
+      { id: 'v2', label: 'White Boucle', color: '#F0EDE8', mainImage: 'https://m.media-amazon.com/images/I/51h-sh2ryDL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51h-sh2ryDL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FQTSKTQY?tag=snapspacemkt-20' },
     ],
     sizes: [
       { label: 'Queen', price: 259.99, compareAt: null, inStock: true },
@@ -8580,8 +8580,8 @@ export const PRODUCT_CATALOG = [
     rating: 4.6,
     reviewCount: 385,
     variants: [
-      { id: 'v1', label: 'Beige',      color: '#D4C5B0', mainImage: 'https://m.media-amazon.com/images/I/41AJ6SWdxyL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41AJ6SWdxyL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0DTYMNWT4?tag=snapspacemkt-20' },
-      { id: 'v2', label: 'Cream',      color: '#EDE8DC', mainImage: 'https://m.media-amazon.com/images/I/41bDgb-85LL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41bDgb-85LL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0DTYMNWT4?tag=snapspacemkt-20' },
+      { id: 'v1', label: 'Beige',      color: '#D4C5B0', mainImage: 'https://m.media-amazon.com/images/I/41AJ6SWdxyL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41AJ6SWdxyL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DTYMNWT4?tag=snapspacemkt-20' },
+      { id: 'v2', label: 'Cream',      color: '#EDE8DC', mainImage: 'https://m.media-amazon.com/images/I/41bDgb-85LL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41bDgb-85LL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DTYMNWT4?tag=snapspacemkt-20' },
       { id: 'v3', label: 'White',      color: '#F2F0EC', mainImage: 'https://m.media-amazon.com/images/I/41CmyvaJMML._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41CmyvaJMML._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DHLHDJYD?tag=snapspacemkt-20', asin: 'B0DHLHDJYD', price: 289.99 },
       { id: 'v4', label: 'Pure White', color: '#F8F8F8', mainImage: 'https://m.media-amazon.com/images/I/41mIYXKfBcL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41mIYXKfBcL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FH777Z82?tag=snapspacemkt-20', asin: 'B0FH777Z82', price: 289.99 },
       { id: 'v5', label: 'Grey',       color: '#9B9B9B', mainImage: 'https://m.media-amazon.com/images/I/41jkRKVGMFL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41jkRKVGMFL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DFG9ZNDM?tag=snapspacemkt-20', asin: 'B0DFG9ZNDM', price: 289.99 },
@@ -8650,8 +8650,8 @@ export const PRODUCT_CATALOG = [
     rating: 4.4,
     reviewCount: 6,
     variants: [
-      { id: 'v1', label: 'White', color: '#F5F2ED', mainImage: 'https://m.media-amazon.com/images/I/31f8I2SpBHL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/31f8I2SpBHL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0DBZ467LQ?tag=snapspacemkt-20' },
-      { id: 'v2', label: 'White With Light', color: '#F5F2ED', mainImage: 'https://m.media-amazon.com/images/I/41b6SPnzfrL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41b6SPnzfrL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0DBZ467LQ?tag=snapspacemkt-20' },
+      { id: 'v1', label: 'White', color: '#F5F2ED', mainImage: 'https://m.media-amazon.com/images/I/31f8I2SpBHL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/31f8I2SpBHL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DBZ467LQ?tag=snapspacemkt-20' },
+      { id: 'v2', label: 'White With Light', color: '#F5F2ED', mainImage: 'https://m.media-amazon.com/images/I/41b6SPnzfrL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41b6SPnzfrL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DBZ467LQ?tag=snapspacemkt-20' },
     ],
     sizes: [
       { label: 'King', price: 1429.99, compareAt: 1599.99, inStock: true },
@@ -8715,8 +8715,8 @@ export const PRODUCT_CATALOG = [
     rating: 5.0,
     reviewCount: 1,
     variants: [
-      { id: 'v1', label: 'Cream', color: '#EDE8DC', mainImage: 'https://m.media-amazon.com/images/I/41i3Nm+pnWL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41i3Nm+pnWL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0GC5QHP8W?tag=snapspacemkt-20' },
-      { id: 'v2', label: 'Green', color: '#6A8A6A', mainImage: 'https://m.media-amazon.com/images/I/51CFJ+4rngL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51CFJ+4rngL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0GC5QHP8W?tag=snapspacemkt-20' },
+      { id: 'v1', label: 'Cream', color: '#EDE8DC', mainImage: 'https://m.media-amazon.com/images/I/41i3Nm+pnWL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41i3Nm+pnWL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0GC5QHP8W?tag=snapspacemkt-20' },
+      { id: 'v2', label: 'Green', color: '#6A8A6A', mainImage: 'https://m.media-amazon.com/images/I/51CFJ+4rngL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51CFJ+4rngL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0GC5QHP8W?tag=snapspacemkt-20' },
     ],
     sizes: [
       { label: 'Queen', price: 399.99, compareAt: null, inStock: true },
@@ -8905,8 +8905,8 @@ export const PRODUCT_CATALOG = [
     rating: 4.3,
     reviewCount: 1306,
     variants: [
-      { id: 'v1', label: '3 Globe Gold',           color: '#B8960C', mainImage: 'https://m.media-amazon.com/images/I/31ir37gpxUL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/31ir37gpxUL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B09N188CC2?tag=snapspacemkt-20' },
-      { id: 'v2', label: '3 Globe Dimmable Gold',  color: '#C9A84C', mainImage: 'https://m.media-amazon.com/images/I/41M0jw+9xwL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41M0jw+9xwL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B09N188CC2?tag=snapspacemkt-20' },
+      { id: 'v1', label: '3 Globe Gold',           color: '#B8960C', mainImage: 'https://m.media-amazon.com/images/I/31ir37gpxUL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/31ir37gpxUL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B09N188CC2?tag=snapspacemkt-20' },
+      { id: 'v2', label: '3 Globe Dimmable Gold',  color: '#C9A84C', mainImage: 'https://m.media-amazon.com/images/I/41M0jw+9xwL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41M0jw+9xwL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B09N188CC2?tag=snapspacemkt-20' },
       { id: 'v3', label: '3 Globe Dimmable Black', color: '#2C2C2C', mainImage: 'https://m.media-amazon.com/images/I/31kZUeSdfIL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/31kZUeSdfIL._AC_SL300_.jpg',  affiliateUrl: 'https://www.amazon.com/dp/B0DP4Y446K?tag=snapspacemkt-20',  asin: 'B0DP4Y446K',  price: 44.99 },
       { id: 'v4', label: '3 Globe Dimmable Pink',  color: '#D4A0A0', mainImage: 'https://m.media-amazon.com/images/I/31V52S+V+bL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/31V52S+V+bL._AC_SL300_.jpg',  affiliateUrl: 'https://www.amazon.com/dp/B0FWCKJVTY?tag=snapspacemkt-20',  asin: 'B0FWCKJVTY',  price: 44.99 },
       { id: 'v5', label: 'Tripod 3 Globe Gold',    color: '#B8960C', mainImage: 'https://m.media-amazon.com/images/I/41w5sdzyZuL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41w5sdzyZuL._AC_SL300_.jpg',  affiliateUrl: 'https://www.amazon.com/dp/B0DTHWMGD1?tag=snapspacemkt-20',  asin: 'B0DTHWMGD1',  price: 52.99 },
@@ -12612,8 +12612,8 @@ export const PRODUCT_CATALOG = [
       'Weight Capacity': '44 lbs per tier', Assembly: 'Required (4 steps)',
     },
     variants: [
-      { id: 'B097XXCZ3P', asin: 'B097XXCZ3P', label: 'Classic Black', mainImage: 'https://m.media-amazon.com/images/I/71A-+JRUMfL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71A-+JRUMfL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B097XXCZ3P?tag=snapspacemkt-20' },
-      { id: 'B09YTNJPYQ', asin: 'B09YTNJPYQ', label: 'White', mainImage: 'https://m.media-amazon.com/images/I/71A-+JRUMfL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71A-+JRUMfL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B09YTNJPYQ?tag=snapspacemkt-20' },
+      { id: 'B097XXCZ3P', asin: 'B097XXCZ3P', label: 'Classic Black', mainImage: 'https://m.media-amazon.com/images/I/71A-+JRUMfL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71A-+JRUMfL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B097XXCZ3P?tag=snapspacemkt-20' },
+      { id: 'B09YTNJPYQ', asin: 'B09YTNJPYQ', label: 'White', mainImage: 'https://m.media-amazon.com/images/I/71A-+JRUMfL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71A-+JRUMfL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B09YTNJPYQ?tag=snapspacemkt-20' },
       { id: 'B0C2Z1D4HZ', asin: 'B0C2Z1D4HZ', label: 'Camel Brown + Classic Black', mainImage: 'https://m.media-amazon.com/images/I/71A-+JRUMfL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71A-+JRUMfL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0C2Z1D4HZ?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '2-5', prime: true, returnDays: 30 },
@@ -12655,8 +12655,8 @@ export const PRODUCT_CATALOG = [
       Shape: 'Round', Assembly: 'Required', 'Weight Capacity': '22 lbs',
     },
     variants: [
-      { id: 'B09YTNJPYQ', asin: 'B09YTNJPYQ', label: 'White', mainImage: 'https://m.media-amazon.com/images/I/71A-+JRUMfL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71A-+JRUMfL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B09YTNJPYQ?tag=snapspacemkt-20' },
-      { id: 'B097XXCZ3P', asin: 'B097XXCZ3P', label: 'Classic Black', mainImage: 'https://m.media-amazon.com/images/I/71A-+JRUMfL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71A-+JRUMfL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B097XXCZ3P?tag=snapspacemkt-20' },
+      { id: 'B09YTNJPYQ', asin: 'B09YTNJPYQ', label: 'White', mainImage: 'https://m.media-amazon.com/images/I/71A-+JRUMfL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71A-+JRUMfL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B09YTNJPYQ?tag=snapspacemkt-20' },
+      { id: 'B097XXCZ3P', asin: 'B097XXCZ3P', label: 'Classic Black', mainImage: 'https://m.media-amazon.com/images/I/71A-+JRUMfL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71A-+JRUMfL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B097XXCZ3P?tag=snapspacemkt-20' },
       { id: 'B0C2Z1D4HZ', asin: 'B0C2Z1D4HZ', label: 'Camel Brown + Classic Black', mainImage: 'https://m.media-amazon.com/images/I/71A-+JRUMfL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71A-+JRUMfL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0C2Z1D4HZ?tag=snapspacemkt-20' },
       { id: 'B0C3FXVX2C', asin: 'B0C3FXVX2C', label: 'Chestnut Brown + Classic Black', mainImage: 'https://m.media-amazon.com/images/I/71A-+JRUMfL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71A-+JRUMfL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0C3FXVX2C?tag=snapspacemkt-20' },
       { id: 'B097XJW28C', asin: 'B097XJW28C', label: 'Greige + Classic Black', mainImage: 'https://m.media-amazon.com/images/I/71A-+JRUMfL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71A-+JRUMfL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B097XJW28C?tag=snapspacemkt-20' },
@@ -12698,8 +12698,8 @@ export const PRODUCT_CATALOG = [
       Dimensions: '10"W × 23.5"D × 24"H', Weight: '22 lbs', Assembly: 'Required',
     },
     variants: [
-      { id: 'B002D1E37A', asin: 'B002D1E37A', label: 'Medium Oak — Rectangular', mainImage: 'https://m.media-amazon.com/images/I/81lQpxJ8x3L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81lQpxJ8x3L._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B002D1E37A?tag=snapspacemkt-20' },
-      { id: 'B002D1C8OU', asin: 'B002D1C8OU', label: 'Slate — Square', mainImage: 'https://m.media-amazon.com/images/I/81lQpxJ8x3L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81lQpxJ8x3L._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B002D1C8OU?tag=snapspacemkt-20' },
+      { id: 'B002D1E37A', asin: 'B002D1E37A', label: 'Medium Oak — Rectangular', mainImage: 'https://m.media-amazon.com/images/I/81lQpxJ8x3L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81lQpxJ8x3L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B002D1E37A?tag=snapspacemkt-20' },
+      { id: 'B002D1C8OU', asin: 'B002D1C8OU', label: 'Slate — Square', mainImage: 'https://m.media-amazon.com/images/I/81lQpxJ8x3L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81lQpxJ8x3L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B002D1C8OU?tag=snapspacemkt-20' },
       { id: 'B001OM4WG6', asin: 'B001OM4WG6', label: 'Slate — Oval', mainImage: 'https://m.media-amazon.com/images/I/81lQpxJ8x3L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81lQpxJ8x3L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B001OM4WG6?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '3-5', prime: true, returnDays: 30 },
@@ -12737,8 +12737,8 @@ export const PRODUCT_CATALOG = [
       Finish: 'Distressed', Assembly: 'Required',
     },
     variants: [
-      { id: 'B07KGNFVS2', asin: 'B07KGNFVS2', label: 'Dark Brown & White', mainImage: 'https://m.media-amazon.com/images/I/61GNlyH4NIL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61GNlyH4NIL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B07KGNFVS2?tag=snapspacemkt-20' },
-      { id: 'B07P3G58NK', asin: 'B07P3G58NK', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/61GNlyH4NIL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61GNlyH4NIL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B07P3G58NK?tag=snapspacemkt-20' },
+      { id: 'B07KGNFVS2', asin: 'B07KGNFVS2', label: 'Dark Brown & White', mainImage: 'https://m.media-amazon.com/images/I/61GNlyH4NIL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61GNlyH4NIL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B07KGNFVS2?tag=snapspacemkt-20' },
+      { id: 'B07P3G58NK', asin: 'B07P3G58NK', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/61GNlyH4NIL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61GNlyH4NIL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B07P3G58NK?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '3-7', prime: true, returnDays: 30 },
   },
@@ -12775,8 +12775,8 @@ export const PRODUCT_CATALOG = [
       Material: 'Veneers, Wood, Engineered Wood', Style: 'Farmhouse', Assembly: 'Required',
     },
     variants: [
-      { id: 'B0DBL994S4', asin: 'B0DBL994S4', label: 'Light Brown & Dark Brown', mainImage: 'https://m.media-amazon.com/images/I/71a9pepOkbL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71a9pepOkbL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0DBL994S4?tag=snapspacemkt-20' },
-      { id: 'B07DKQS49P', asin: 'B07DKQS49P', label: 'Blackish Brown', mainImage: 'https://m.media-amazon.com/images/I/71a9pepOkbL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71a9pepOkbL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B07DKQS49P?tag=snapspacemkt-20' },
+      { id: 'B0DBL994S4', asin: 'B0DBL994S4', label: 'Light Brown & Dark Brown', mainImage: 'https://m.media-amazon.com/images/I/71a9pepOkbL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71a9pepOkbL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DBL994S4?tag=snapspacemkt-20' },
+      { id: 'B07DKQS49P', asin: 'B07DKQS49P', label: 'Blackish Brown', mainImage: 'https://m.media-amazon.com/images/I/71a9pepOkbL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71a9pepOkbL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B07DKQS49P?tag=snapspacemkt-20' },
       { id: 'B07DKQS31H', asin: 'B07DKQS31H', label: 'Whitewash', mainImage: 'https://m.media-amazon.com/images/I/71a9pepOkbL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71a9pepOkbL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B07DKQS31H?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '3-7', prime: true, returnDays: 30 },
@@ -12813,8 +12813,8 @@ export const PRODUCT_CATALOG = [
       Shape: 'Round', Diameter: '15.75"', Assembly: 'Required',
     },
     variants: [
-      { id: 'B000W9Y046', asin: 'B000W9Y046', label: 'Glass / Chrome', mainImage: 'https://m.media-amazon.com/images/I/41tH566RvQL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41tH566RvQL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B000W9Y046?tag=snapspacemkt-20' },
-      { id: 'B005QLTPKO', asin: 'B005QLTPKO', label: 'Black Glass', mainImage: 'https://m.media-amazon.com/images/I/41tH566RvQL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41tH566RvQL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B005QLTPKO?tag=snapspacemkt-20' },
+      { id: 'B000W9Y046', asin: 'B000W9Y046', label: 'Glass / Chrome', mainImage: 'https://m.media-amazon.com/images/I/41tH566RvQL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41tH566RvQL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B000W9Y046?tag=snapspacemkt-20' },
+      { id: 'B005QLTPKO', asin: 'B005QLTPKO', label: 'Black Glass', mainImage: 'https://m.media-amazon.com/images/I/41tH566RvQL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41tH566RvQL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B005QLTPKO?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '2-5', prime: true, returnDays: 30 },
   },
@@ -12858,8 +12858,8 @@ export const PRODUCT_CATALOG = [
       Finish: 'Faux Marble', Style: 'Contemporary/Glam', Assembly: 'Required',
     },
     variants: [
-      { id: 'B0DBYF4GQB', asin: 'B0DBYF4GQB', label: '1-Pack — White & Gold', mainImage: 'https://m.media-amazon.com/images/I/81ut1Qt8JXL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81ut1Qt8JXL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0DBYF4GQB?tag=snapspacemkt-20' },
-      { id: 'B0DBZ3HRLM', asin: 'B0DBZ3HRLM', label: '2-Pack — White & Gold', mainImage: 'https://m.media-amazon.com/images/I/81ut1Qt8JXL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81ut1Qt8JXL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0DBZ3HRLM?tag=snapspacemkt-20' },
+      { id: 'B0DBYF4GQB', asin: 'B0DBYF4GQB', label: '1-Pack — White & Gold', mainImage: 'https://m.media-amazon.com/images/I/81ut1Qt8JXL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81ut1Qt8JXL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DBYF4GQB?tag=snapspacemkt-20' },
+      { id: 'B0DBZ3HRLM', asin: 'B0DBZ3HRLM', label: '2-Pack — White & Gold', mainImage: 'https://m.media-amazon.com/images/I/81ut1Qt8JXL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81ut1Qt8JXL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DBZ3HRLM?tag=snapspacemkt-20' },
       { id: 'B0D494R8H8', asin: 'B0D494R8H8', label: '2-Pack — Rustic Brown', mainImage: 'https://m.media-amazon.com/images/I/81ut1Qt8JXL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81ut1Qt8JXL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0D494R8H8?tag=snapspacemkt-20' },
       { id: 'B0D65N34TV', asin: 'B0D65N34TV', label: '1-Pack — Rustic Brown', mainImage: 'https://m.media-amazon.com/images/I/81ut1Qt8JXL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81ut1Qt8JXL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0D65N34TV?tag=snapspacemkt-20' },
       { id: 'B0GSDZTR2H', asin: 'B0GSDZTR2H', label: '1-Pack — Black', mainImage: 'https://m.media-amazon.com/images/I/81ut1Qt8JXL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81ut1Qt8JXL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0GSDZTR2H?tag=snapspacemkt-20' },
@@ -12910,8 +12910,8 @@ export const PRODUCT_CATALOG = [
       'Weight Capacity': '79.5 lbs',
     },
     variants: [
-      { id: 'B0BXPLS8PP', asin: 'B0BXPLS8PP', label: 'Caramel — Nightstand', mainImage: 'https://m.media-amazon.com/images/I/61b5jWE5kfL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61b5jWE5kfL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0BXPLS8PP?tag=snapspacemkt-20' },
-      { id: 'B0DJGJTXVM', asin: 'B0DJGJTXVM', label: 'Dark Chocolate — Nightstand', mainImage: 'https://m.media-amazon.com/images/I/61b5jWE5kfL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61b5jWE5kfL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0DJGJTXVM?tag=snapspacemkt-20' },
+      { id: 'B0BXPLS8PP', asin: 'B0BXPLS8PP', label: 'Caramel — Nightstand', mainImage: 'https://m.media-amazon.com/images/I/61b5jWE5kfL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61b5jWE5kfL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0BXPLS8PP?tag=snapspacemkt-20' },
+      { id: 'B0DJGJTXVM', asin: 'B0DJGJTXVM', label: 'Dark Chocolate — Nightstand', mainImage: 'https://m.media-amazon.com/images/I/61b5jWE5kfL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61b5jWE5kfL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DJGJTXVM?tag=snapspacemkt-20' },
       { id: 'B0BXPMHQRR', asin: 'B0BXPMHQRR', label: 'Teak Brown — Nightstand', mainImage: 'https://m.media-amazon.com/images/I/61b5jWE5kfL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61b5jWE5kfL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0BXPMHQRR?tag=snapspacemkt-20' },
       { id: 'B0DJGK78FC', asin: 'B0DJGK78FC', label: 'Mocha — Nightstand', mainImage: 'https://m.media-amazon.com/images/I/61b5jWE5kfL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61b5jWE5kfL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DJGK78FC?tag=snapspacemkt-20' },
       { id: 'B0BXPM94F6', asin: 'B0BXPM94F6', label: 'Walnut — Nightstand', mainImage: 'https://m.media-amazon.com/images/I/61b5jWE5kfL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61b5jWE5kfL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0BXPM94F6?tag=snapspacemkt-20' },
@@ -12961,8 +12961,8 @@ export const PRODUCT_CATALOG = [
       Shape: 'Round', Dimensions: '12"D × 12"W × 21.3"H', Assembly: 'Required',
     },
     variants: [
-      { id: 'B0CBMFTJGR', asin: 'B0CBMFTJGR', label: 'Walnut — 1-Drawer', mainImage: 'https://m.media-amazon.com/images/I/61b5jWE5kfL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61b5jWE5kfL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0CBMFTJGR?tag=snapspacemkt-20' },
-      { id: 'B0BXPLS8PP', asin: 'B0BXPLS8PP', label: 'Caramel — Nightstand', mainImage: 'https://m.media-amazon.com/images/I/61b5jWE5kfL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61b5jWE5kfL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0BXPLS8PP?tag=snapspacemkt-20' },
+      { id: 'B0CBMFTJGR', asin: 'B0CBMFTJGR', label: 'Walnut — 1-Drawer', mainImage: 'https://m.media-amazon.com/images/I/61b5jWE5kfL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61b5jWE5kfL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CBMFTJGR?tag=snapspacemkt-20' },
+      { id: 'B0BXPLS8PP', asin: 'B0BXPLS8PP', label: 'Caramel — Nightstand', mainImage: 'https://m.media-amazon.com/images/I/61b5jWE5kfL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61b5jWE5kfL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0BXPLS8PP?tag=snapspacemkt-20' },
       { id: 'B0BXPM94F6', asin: 'B0BXPM94F6', label: 'Walnut — Nightstand', mainImage: 'https://m.media-amazon.com/images/I/61b5jWE5kfL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61b5jWE5kfL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0BXPM94F6?tag=snapspacemkt-20' },
       { id: 'B0BXPMHQRR', asin: 'B0BXPMHQRR', label: 'Teak Brown — Nightstand', mainImage: 'https://m.media-amazon.com/images/I/61b5jWE5kfL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61b5jWE5kfL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0BXPMHQRR?tag=snapspacemkt-20' },
       { id: 'B0DJGJTXVM', asin: 'B0DJGJTXVM', label: 'Dark Chocolate — Nightstand', mainImage: 'https://m.media-amazon.com/images/I/61b5jWE5kfL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61b5jWE5kfL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DJGJTXVM?tag=snapspacemkt-20' },
@@ -13005,8 +13005,8 @@ export const PRODUCT_CATALOG = [
       Dimensions: '16"L × 16"W × 24.5"H', Style: 'Industrial', Assembly: 'Required',
     },
     variants: [
-      { id: 'B099WQJLGK', asin: 'B099WQJLGK', label: '1-Pack — Grey', mainImage: 'https://m.media-amazon.com/images/I/816a41CR8wL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/816a41CR8wL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B099WQJLGK?tag=snapspacemkt-20' },
-      { id: 'B09B1PTSKD', asin: 'B09B1PTSKD', label: '2-Pack — Grey', mainImage: 'https://m.media-amazon.com/images/I/816a41CR8wL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/816a41CR8wL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B09B1PTSKD?tag=snapspacemkt-20' },
+      { id: 'B099WQJLGK', asin: 'B099WQJLGK', label: '1-Pack — Grey', mainImage: 'https://m.media-amazon.com/images/I/816a41CR8wL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/816a41CR8wL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B099WQJLGK?tag=snapspacemkt-20' },
+      { id: 'B09B1PTSKD', asin: 'B09B1PTSKD', label: '2-Pack — Grey', mainImage: 'https://m.media-amazon.com/images/I/816a41CR8wL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/816a41CR8wL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B09B1PTSKD?tag=snapspacemkt-20' },
       { id: 'B08G8CFGVV', asin: 'B08G8CFGVV', label: '1-Pack — Rustic Brown', mainImage: 'https://m.media-amazon.com/images/I/816a41CR8wL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/816a41CR8wL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B08G8CFGVV?tag=snapspacemkt-20' },
       { id: 'B08H52B24S', asin: 'B08H52B24S', label: '2-Pack — Rustic Brown', mainImage: 'https://m.media-amazon.com/images/I/816a41CR8wL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/816a41CR8wL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B08H52B24S?tag=snapspacemkt-20' },
     ],
@@ -13046,8 +13046,8 @@ export const PRODUCT_CATALOG = [
       Dimensions: '15"D × 15"W × 17.5"H', 'Weight Capacity': '5.5 lbs', Assembly: 'Required',
     },
     variants: [
-      { id: 'B09B1PTSKD', asin: 'B09B1PTSKD', label: '2-Pack — Grey', mainImage: 'https://m.media-amazon.com/images/I/816a41CR8wL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/816a41CR8wL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B09B1PTSKD?tag=snapspacemkt-20' },
-      { id: 'B099WQJLGK', asin: 'B099WQJLGK', label: '1-Pack — Grey', mainImage: 'https://m.media-amazon.com/images/I/816a41CR8wL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/816a41CR8wL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B099WQJLGK?tag=snapspacemkt-20' },
+      { id: 'B09B1PTSKD', asin: 'B09B1PTSKD', label: '2-Pack — Grey', mainImage: 'https://m.media-amazon.com/images/I/816a41CR8wL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/816a41CR8wL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B09B1PTSKD?tag=snapspacemkt-20' },
+      { id: 'B099WQJLGK', asin: 'B099WQJLGK', label: '1-Pack — Grey', mainImage: 'https://m.media-amazon.com/images/I/816a41CR8wL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/816a41CR8wL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B099WQJLGK?tag=snapspacemkt-20' },
       { id: 'B08G8CFGVV', asin: 'B08G8CFGVV', label: '1-Pack — Rustic Brown', mainImage: 'https://m.media-amazon.com/images/I/816a41CR8wL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/816a41CR8wL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B08G8CFGVV?tag=snapspacemkt-20' },
       { id: 'B08H52B24S', asin: 'B08H52B24S', label: '2-Pack — Rustic Brown', mainImage: 'https://m.media-amazon.com/images/I/816a41CR8wL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/816a41CR8wL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B08H52B24S?tag=snapspacemkt-20' },
     ],
@@ -13091,8 +13091,8 @@ export const PRODUCT_CATALOG = [
       Style: 'Vintage / Transitional', Assembly: 'None (fully assembled)', Drawers: '2',
     },
     variants: [
-      { id: 'B0CS9V1L91', asin: 'B0CS9V1L91', label: '1-Pc — 2 Drawers', mainImage: 'https://m.media-amazon.com/images/I/919ldqEh9TL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/919ldqEh9TL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0CS9V1L91?tag=snapspacemkt-20' },
-      { id: 'B0DJ6XYBCN', asin: 'B0DJ6XYBCN', label: '1-Pc — 2 Drawers (White)', mainImage: 'https://m.media-amazon.com/images/I/919ldqEh9TL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/919ldqEh9TL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0DJ6XYBCN?tag=snapspacemkt-20' },
+      { id: 'B0CS9V1L91', asin: 'B0CS9V1L91', label: '1-Pc — 2 Drawers', mainImage: 'https://m.media-amazon.com/images/I/919ldqEh9TL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/919ldqEh9TL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CS9V1L91?tag=snapspacemkt-20' },
+      { id: 'B0DJ6XYBCN', asin: 'B0DJ6XYBCN', label: '1-Pc — 2 Drawers (White)', mainImage: 'https://m.media-amazon.com/images/I/919ldqEh9TL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/919ldqEh9TL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DJ6XYBCN?tag=snapspacemkt-20' },
       { id: 'B0DLV4XJ1W', asin: 'B0DLV4XJ1W', label: '2-Pcs — 3 Drawers', mainImage: 'https://m.media-amazon.com/images/I/919ldqEh9TL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/919ldqEh9TL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DLV4XJ1W?tag=snapspacemkt-20' },
       { id: 'B0DLV4X1KX', asin: 'B0DLV4X1KX', label: '1-Pc — 3 Drawers', mainImage: 'https://m.media-amazon.com/images/I/919ldqEh9TL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/919ldqEh9TL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DLV4X1KX?tag=snapspacemkt-20' },
       { id: 'B0GHZ9P3V4', asin: 'B0GHZ9P3V4', label: '1-Pc — 3 Drawers (Alt)', mainImage: 'https://m.media-amazon.com/images/I/919ldqEh9TL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/919ldqEh9TL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0GHZ9P3V4?tag=snapspacemkt-20' },
@@ -13172,8 +13172,8 @@ export const PRODUCT_CATALOG = [
       'Charging': '110V outlet + 2 USB ports', Assembly: 'Required',
     },
     variants: [
-      { id: 'B0958X4G4C', asin: 'B0958X4G4C', label: 'Whitewash', mainImage: 'https://m.media-amazon.com/images/I/61D6hfKAJOL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61D6hfKAJOL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0958X4G4C?tag=snapspacemkt-20' },
-      { id: 'B0DBLCZQV6', asin: 'B0DBLCZQV6', label: 'Light Brown & Black', mainImage: 'https://m.media-amazon.com/images/I/61D6hfKAJOL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61D6hfKAJOL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0DBLCZQV6?tag=snapspacemkt-20' },
+      { id: 'B0958X4G4C', asin: 'B0958X4G4C', label: 'Whitewash', mainImage: 'https://m.media-amazon.com/images/I/61D6hfKAJOL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61D6hfKAJOL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0958X4G4C?tag=snapspacemkt-20' },
+      { id: 'B0DBLCZQV6', asin: 'B0DBLCZQV6', label: 'Light Brown & Black', mainImage: 'https://m.media-amazon.com/images/I/61D6hfKAJOL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61D6hfKAJOL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DBLCZQV6?tag=snapspacemkt-20' },
       { id: 'B095989MJ5', asin: 'B095989MJ5', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/61D6hfKAJOL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61D6hfKAJOL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B095989MJ5?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '3-7', prime: true, returnDays: 30 },
@@ -13256,8 +13256,8 @@ export const PRODUCT_CATALOG = [
       Shape: 'Round', Dimensions: '12"D × 12"W × 23"H', Assembly: 'None (fully assembled)',
     },
     variants: [
-      { id: 'B0CV622VQF', asin: 'B0CV622VQF', label: 'White — 12x12', mainImage: 'https://m.media-amazon.com/images/I/61ib8i5h9mL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61ib8i5h9mL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0CV622VQF?tag=snapspacemkt-20' },
-      { id: 'B0C41644H8', asin: 'B0C41644H8', label: 'Natural — 8x8', mainImage: 'https://m.media-amazon.com/images/I/61ib8i5h9mL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61ib8i5h9mL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0C41644H8?tag=snapspacemkt-20' },
+      { id: 'B0CV622VQF', asin: 'B0CV622VQF', label: 'White — 12x12', mainImage: 'https://m.media-amazon.com/images/I/61ib8i5h9mL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61ib8i5h9mL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CV622VQF?tag=snapspacemkt-20' },
+      { id: 'B0C41644H8', asin: 'B0C41644H8', label: 'Natural — 8x8', mainImage: 'https://m.media-amazon.com/images/I/61ib8i5h9mL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61ib8i5h9mL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0C41644H8?tag=snapspacemkt-20' },
       { id: 'B0CV615FVY', asin: 'B0CV615FVY', label: 'Natural — 12x12', mainImage: 'https://m.media-amazon.com/images/I/61ib8i5h9mL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61ib8i5h9mL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CV615FVY?tag=snapspacemkt-20' },
       { id: 'B0C414Q1ZW', asin: 'B0C414Q1ZW', label: 'Whitewash — 8x8', mainImage: 'https://m.media-amazon.com/images/I/61ib8i5h9mL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61ib8i5h9mL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0C414Q1ZW?tag=snapspacemkt-20' },
       { id: 'B0CSLTPQVC', asin: 'B0CSLTPQVC', label: 'Walnut Brown — 8x8', mainImage: 'https://m.media-amazon.com/images/I/61ib8i5h9mL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61ib8i5h9mL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CSLTPQVC?tag=snapspacemkt-20' },
@@ -13312,8 +13312,8 @@ export const PRODUCT_CATALOG = [
       Style: 'Industrial / Contemporary', Assembly: 'Required',
     },
     variants: [
-      { id: 'B08R41LNFT', asin: 'B08R41LNFT', label: 'Pink — 1-Pack', mainImage: 'https://m.media-amazon.com/images/I/81fPxOj8O3L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81fPxOj8O3L._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B08R41LNFT?tag=snapspacemkt-20' },
-      { id: 'B08R41GYY5', asin: 'B08R41GYY5', label: 'Aqua — 1-Pack', mainImage: 'https://m.media-amazon.com/images/I/81fPxOj8O3L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81fPxOj8O3L._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B08R41GYY5?tag=snapspacemkt-20' },
+      { id: 'B08R41LNFT', asin: 'B08R41LNFT', label: 'Pink — 1-Pack', mainImage: 'https://m.media-amazon.com/images/I/81fPxOj8O3L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81fPxOj8O3L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B08R41LNFT?tag=snapspacemkt-20' },
+      { id: 'B08R41GYY5', asin: 'B08R41GYY5', label: 'Aqua — 1-Pack', mainImage: 'https://m.media-amazon.com/images/I/81fPxOj8O3L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81fPxOj8O3L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B08R41GYY5?tag=snapspacemkt-20' },
       { id: 'B08R41ZD9Z', asin: 'B08R41ZD9Z', label: 'Blue Tie-dye — 1-Pack', mainImage: 'https://m.media-amazon.com/images/I/81fPxOj8O3L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81fPxOj8O3L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B08R41ZD9Z?tag=snapspacemkt-20' },
       { id: 'B094XM84XW', asin: 'B094XM84XW', label: 'Pink Tie-dye — 1-Pack', mainImage: 'https://m.media-amazon.com/images/I/81fPxOj8O3L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81fPxOj8O3L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B094XM84XW?tag=snapspacemkt-20' },
       { id: 'B094X1RQ6R', asin: 'B094X1RQ6R', label: 'Purple Tie-dye — 1-Pack', mainImage: 'https://m.media-amazon.com/images/I/81fPxOj8O3L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81fPxOj8O3L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B094X1RQ6R?tag=snapspacemkt-20' },
@@ -13359,8 +13359,8 @@ export const PRODUCT_CATALOG = [
       Dimensions: '24"W × 16"D × 27"H', Assembly: 'Required',
     },
     variants: [
-      { id: 'B07MHJLSPT', asin: 'B07MHJLSPT', label: 'Chipped White — 1 Drawer', mainImage: 'https://m.media-amazon.com/images/I/71sDhys5JRL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71sDhys5JRL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B07MHJLSPT?tag=snapspacemkt-20' },
-      { id: 'B07KGMVC9Z', asin: 'B07KGMVC9Z', label: 'Chipped White — 3 Drawers', mainImage: 'https://m.media-amazon.com/images/I/71sDhys5JRL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71sDhys5JRL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B07KGMVC9Z?tag=snapspacemkt-20' },
+      { id: 'B07MHJLSPT', asin: 'B07MHJLSPT', label: 'Chipped White — 1 Drawer', mainImage: 'https://m.media-amazon.com/images/I/71sDhys5JRL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71sDhys5JRL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B07MHJLSPT?tag=snapspacemkt-20' },
+      { id: 'B07KGMVC9Z', asin: 'B07KGMVC9Z', label: 'Chipped White — 3 Drawers', mainImage: 'https://m.media-amazon.com/images/I/71sDhys5JRL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71sDhys5JRL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B07KGMVC9Z?tag=snapspacemkt-20' },
       { id: 'B09BDCJ18Q', asin: 'B09BDCJ18Q', label: 'Dark Brown & Gray — 3 Drawers', mainImage: 'https://m.media-amazon.com/images/I/71sDhys5JRL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71sDhys5JRL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B09BDCJ18Q?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '3-7', prime: true, returnDays: 30 },
@@ -13398,8 +13398,8 @@ export const PRODUCT_CATALOG = [
       Style: 'Farmhouse / Bohemian', Quantity: 'Set of 2', Assembly: 'Required',
     },
     variants: [
-      { id: 'B0CF2BB66C', asin: 'B0CF2BB66C', label: 'Reclaimed Light Oak — Set of 2', mainImage: 'https://m.media-amazon.com/images/I/71x70FxMxoL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71x70FxMxoL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0CF2BB66C?tag=snapspacemkt-20' },
-      { id: 'B0CF2HJNJ3', asin: 'B0CF2HJNJ3', label: 'Reclaimed Light Oak — Single', mainImage: 'https://m.media-amazon.com/images/I/71x70FxMxoL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71x70FxMxoL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0CF2HJNJ3?tag=snapspacemkt-20' },
+      { id: 'B0CF2BB66C', asin: 'B0CF2BB66C', label: 'Reclaimed Light Oak — Set of 2', mainImage: 'https://m.media-amazon.com/images/I/71x70FxMxoL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71x70FxMxoL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CF2BB66C?tag=snapspacemkt-20' },
+      { id: 'B0CF2HJNJ3', asin: 'B0CF2HJNJ3', label: 'Reclaimed Light Oak — Single', mainImage: 'https://m.media-amazon.com/images/I/71x70FxMxoL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71x70FxMxoL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CF2HJNJ3?tag=snapspacemkt-20' },
       { id: 'B0B9XTR821', asin: 'B0B9XTR821', label: 'Reclaimed Caramel Oak — Set of 2', mainImage: 'https://m.media-amazon.com/images/I/71x70FxMxoL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71x70FxMxoL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0B9XTR821?tag=snapspacemkt-20' },
       { id: 'B0BR6ZKYTL', asin: 'B0BR6ZKYTL', label: 'Reclaimed Caramel Oak — Single', mainImage: 'https://m.media-amazon.com/images/I/71x70FxMxoL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71x70FxMxoL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0BR6ZKYTL?tag=snapspacemkt-20' },
       { id: 'B0CF256V4M', asin: 'B0CF256V4M', label: 'Black Oak — Set of 2', mainImage: 'https://m.media-amazon.com/images/I/71x70FxMxoL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71x70FxMxoL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CF256V4M?tag=snapspacemkt-20' },
@@ -13445,8 +13445,8 @@ export const PRODUCT_CATALOG = [
       Charging: '1 AC outlet + 2 USB-A ports', Assembly: 'Required',
     },
     variants: [
-      { id: 'B0FWSFDD4G', asin: 'B0FWSFDD4G', label: 'Saddle Brown — Farmhouse', mainImage: 'https://m.media-amazon.com/images/I/714epnyxPFL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/714epnyxPFL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0FWSFDD4G?tag=snapspacemkt-20' },
-      { id: 'B0FWT42B9G', asin: 'B0FWT42B9G', label: 'Honey Brown + Rustic White — Farmhouse', mainImage: 'https://m.media-amazon.com/images/I/714epnyxPFL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/714epnyxPFL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0FWT42B9G?tag=snapspacemkt-20' },
+      { id: 'B0FWSFDD4G', asin: 'B0FWSFDD4G', label: 'Saddle Brown — Farmhouse', mainImage: 'https://m.media-amazon.com/images/I/714epnyxPFL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/714epnyxPFL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FWSFDD4G?tag=snapspacemkt-20' },
+      { id: 'B0FWT42B9G', asin: 'B0FWT42B9G', label: 'Honey Brown + Rustic White — Farmhouse', mainImage: 'https://m.media-amazon.com/images/I/714epnyxPFL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/714epnyxPFL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FWT42B9G?tag=snapspacemkt-20' },
       { id: 'B097XLJH9C', asin: 'B097XLJH9C', label: 'Walnut + Black — Industrial', mainImage: 'https://m.media-amazon.com/images/I/714epnyxPFL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/714epnyxPFL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B097XLJH9C?tag=snapspacemkt-20' },
       { id: 'B08PCKYHR4', asin: 'B08PCKYHR4', label: 'Rustic Brown + Black — Industrial', mainImage: 'https://m.media-amazon.com/images/I/714epnyxPFL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/714epnyxPFL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B08PCKYHR4?tag=snapspacemkt-20' },
       { id: 'B0B8GJKT72', asin: 'B0B8GJKT72', label: 'Ebonized Oak + Black — Industrial', mainImage: 'https://m.media-amazon.com/images/I/714epnyxPFL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/714epnyxPFL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0B8GJKT72?tag=snapspacemkt-20' },
@@ -13533,8 +13533,8 @@ export const PRODUCT_CATALOG = [
       Assembly: 'None (fully assembled)', Mounting: 'Wall-mounted',
     },
     variants: [
-      { id: 'B07ZPCNXZZ', asin: 'B07ZPCNXZZ', label: 'Ashwood White', mainImage: 'https://m.media-amazon.com/images/I/61sk+cbrFZL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61sk+cbrFZL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B07ZPCNXZZ?tag=snapspacemkt-20' },
-      { id: 'B07ZPBRJJR', asin: 'B07ZPBRJJR', label: 'Oak', mainImage: 'https://m.media-amazon.com/images/I/61sk+cbrFZL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61sk+cbrFZL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B07ZPBRJJR?tag=snapspacemkt-20' },
+      { id: 'B07ZPCNXZZ', asin: 'B07ZPCNXZZ', label: 'Ashwood White', mainImage: 'https://m.media-amazon.com/images/I/61sk+cbrFZL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61sk+cbrFZL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B07ZPCNXZZ?tag=snapspacemkt-20' },
+      { id: 'B07ZPBRJJR', asin: 'B07ZPBRJJR', label: 'Oak', mainImage: 'https://m.media-amazon.com/images/I/61sk+cbrFZL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61sk+cbrFZL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B07ZPBRJJR?tag=snapspacemkt-20' },
       { id: 'B0C8NM8MYD', asin: 'B0C8NM8MYD', label: 'Dark Walnut', mainImage: 'https://m.media-amazon.com/images/I/61sk+cbrFZL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61sk+cbrFZL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0C8NM8MYD?tag=snapspacemkt-20' },
       { id: 'B08XBFP4CW', asin: 'B08XBFP4CW', label: 'Pearled Elm', mainImage: 'https://m.media-amazon.com/images/I/61sk+cbrFZL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61sk+cbrFZL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B08XBFP4CW?tag=snapspacemkt-20' },
       { id: 'B086N3RDX5', asin: 'B086N3RDX5', label: 'Ashwood Black', mainImage: 'https://m.media-amazon.com/images/I/61sk+cbrFZL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61sk+cbrFZL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B086N3RDX5?tag=snapspacemkt-20' },
@@ -13584,8 +13584,8 @@ export const PRODUCT_CATALOG = [
       Assembly: 'Required',
     },
     variants: [
-      { id: 'B0BF5TJD8H', asin: 'B0BF5TJD8H', label: 'Brown Walnut — Set of 2', mainImage: 'https://m.media-amazon.com/images/I/81XB+oDLEPL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81XB+oDLEPL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0BF5TJD8H?tag=snapspacemkt-20' },
-      { id: 'B0BF61QDDD', asin: 'B0BF61QDDD', label: 'Light Oak — Set of 2', mainImage: 'https://m.media-amazon.com/images/I/81XB+oDLEPL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81XB+oDLEPL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0BF61QDDD?tag=snapspacemkt-20' },
+      { id: 'B0BF5TJD8H', asin: 'B0BF5TJD8H', label: 'Brown Walnut — Set of 2', mainImage: 'https://m.media-amazon.com/images/I/81XB+oDLEPL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81XB+oDLEPL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0BF5TJD8H?tag=snapspacemkt-20' },
+      { id: 'B0BF61QDDD', asin: 'B0BF61QDDD', label: 'Light Oak — Set of 2', mainImage: 'https://m.media-amazon.com/images/I/81XB+oDLEPL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81XB+oDLEPL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0BF61QDDD?tag=snapspacemkt-20' },
       { id: 'B0BF5STS19', asin: 'B0BF5STS19', label: 'White — Set of 2', mainImage: 'https://m.media-amazon.com/images/I/81XB+oDLEPL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81XB+oDLEPL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0BF5STS19?tag=snapspacemkt-20' },
       { id: 'B0C633C7B9', asin: 'B0C633C7B9', label: 'Light Oak/Rattan — Set of 2', mainImage: 'https://m.media-amazon.com/images/I/81XB+oDLEPL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81XB+oDLEPL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0C633C7B9?tag=snapspacemkt-20' },
       { id: 'B09ZFJXS92', asin: 'B09ZFJXS92', label: 'Light Oak — Single', mainImage: 'https://m.media-amazon.com/images/I/81XB+oDLEPL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81XB+oDLEPL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B09ZFJXS92?tag=snapspacemkt-20' },
@@ -13630,8 +13630,8 @@ export const PRODUCT_CATALOG = [
       Charging: '2 AC outlets + 2 USB ports', Mounting: 'Wall-mounted', Assembly: 'Required',
     },
     variants: [
-      { id: 'B0D95SSQSG', asin: 'B0D95SSQSG', label: 'Brown', mainImage: 'https://m.media-amazon.com/images/I/71ioavLyBYL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71ioavLyBYL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0D95SSQSG?tag=snapspacemkt-20' },
-      { id: 'B0D3GD4T1W', asin: 'B0D3GD4T1W', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/71ioavLyBYL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71ioavLyBYL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0D3GD4T1W?tag=snapspacemkt-20' },
+      { id: 'B0D95SSQSG', asin: 'B0D95SSQSG', label: 'Brown', mainImage: 'https://m.media-amazon.com/images/I/71ioavLyBYL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71ioavLyBYL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0D95SSQSG?tag=snapspacemkt-20' },
+      { id: 'B0D3GD4T1W', asin: 'B0D3GD4T1W', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/71ioavLyBYL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71ioavLyBYL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0D3GD4T1W?tag=snapspacemkt-20' },
       { id: 'B0BXDQNJY1', asin: 'B0BXDQNJY1', label: 'Grey', mainImage: 'https://m.media-amazon.com/images/I/71ioavLyBYL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71ioavLyBYL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0BXDQNJY1?tag=snapspacemkt-20' },
       { id: 'B0BXDNZHTR', asin: 'B0BXDNZHTR', label: 'White', mainImage: 'https://m.media-amazon.com/images/I/71ioavLyBYL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71ioavLyBYL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0BXDNZHTR?tag=snapspacemkt-20' },
     ],
@@ -13674,8 +13674,8 @@ export const PRODUCT_CATALOG = [
       Mounting: 'Wall-mounted', Assembly: 'Required',
     },
     variants: [
-      { id: 'B0CF54DGTZ', asin: 'B0CF54DGTZ', label: 'Vintage Brown — Single', mainImage: 'https://m.media-amazon.com/images/I/714ANzncJnL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/714ANzncJnL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0CF54DGTZ?tag=snapspacemkt-20' },
-      { id: 'B0CF58J2WW', asin: 'B0CF58J2WW', label: 'Vintage Brown — Set of 2', mainImage: 'https://m.media-amazon.com/images/I/714ANzncJnL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/714ANzncJnL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0CF58J2WW?tag=snapspacemkt-20' },
+      { id: 'B0CF54DGTZ', asin: 'B0CF54DGTZ', label: 'Vintage Brown — Single', mainImage: 'https://m.media-amazon.com/images/I/714ANzncJnL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/714ANzncJnL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CF54DGTZ?tag=snapspacemkt-20' },
+      { id: 'B0CF58J2WW', asin: 'B0CF58J2WW', label: 'Vintage Brown — Set of 2', mainImage: 'https://m.media-amazon.com/images/I/714ANzncJnL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/714ANzncJnL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CF58J2WW?tag=snapspacemkt-20' },
       { id: 'B0D66K9S1X', asin: 'B0D66K9S1X', label: 'Vintage Gray — Single', mainImage: 'https://m.media-amazon.com/images/I/714ANzncJnL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/714ANzncJnL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0D66K9S1X?tag=snapspacemkt-20' },
       { id: 'B0D675X67W', asin: 'B0D675X67W', label: 'Vintage Gray — Set of 2', mainImage: 'https://m.media-amazon.com/images/I/714ANzncJnL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/714ANzncJnL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0D675X67W?tag=snapspacemkt-20' },
       { id: 'B0F9YFTQFD', asin: 'B0F9YFTQFD', label: 'Vintage Black — Single', mainImage: 'https://m.media-amazon.com/images/I/714ANzncJnL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/714ANzncJnL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0F9YFTQFD?tag=snapspacemkt-20' },
@@ -13717,8 +13717,8 @@ export const PRODUCT_CATALOG = [
       Style: 'Mid-Century / Minimalist', Mounting: 'Wall-mounted', Assembly: 'Required',
     },
     variants: [
-      { id: 'B086XHYHQF', asin: 'B086XHYHQF', label: 'Natural Walnut', mainImage: 'https://m.media-amazon.com/images/I/514MR2G0YmL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/514MR2G0YmL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B086XHYHQF?tag=snapspacemkt-20' },
-      { id: 'B07WWZ4HFC', asin: 'B07WWZ4HFC', label: 'Weathered Oak', mainImage: 'https://m.media-amazon.com/images/I/514MR2G0YmL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/514MR2G0YmL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B07WWZ4HFC?tag=snapspacemkt-20' },
+      { id: 'B086XHYHQF', asin: 'B086XHYHQF', label: 'Natural Walnut', mainImage: 'https://m.media-amazon.com/images/I/514MR2G0YmL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/514MR2G0YmL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B086XHYHQF?tag=snapspacemkt-20' },
+      { id: 'B07WWZ4HFC', asin: 'B07WWZ4HFC', label: 'Weathered Oak', mainImage: 'https://m.media-amazon.com/images/I/514MR2G0YmL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/514MR2G0YmL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B07WWZ4HFC?tag=snapspacemkt-20' },
       { id: 'B086XHW69C', asin: 'B086XHW69C', label: 'Gray Oak', mainImage: 'https://m.media-amazon.com/images/I/514MR2G0YmL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/514MR2G0YmL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B086XHW69C?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '2-5', prime: true, returnDays: 30 },
@@ -13798,8 +13798,8 @@ export const PRODUCT_CATALOG = [
       Style: 'Bohemian / Mid-Century', Assembly: 'Required',
     },
     variants: [
-      { id: 'B0C98MQW5T', asin: 'B0C98MQW5T', label: 'Natural Rattan', mainImage: 'https://m.media-amazon.com/images/I/61Ac6NSilRL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61Ac6NSilRL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0C98MQW5T?tag=snapspacemkt-20' },
-      { id: 'B0C98FZWKD', asin: 'B0C98FZWKD', label: 'Black Rattan', mainImage: 'https://m.media-amazon.com/images/I/61Ac6NSilRL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61Ac6NSilRL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0C98FZWKD?tag=snapspacemkt-20' },
+      { id: 'B0C98MQW5T', asin: 'B0C98MQW5T', label: 'Natural Rattan', mainImage: 'https://m.media-amazon.com/images/I/61Ac6NSilRL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61Ac6NSilRL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0C98MQW5T?tag=snapspacemkt-20' },
+      { id: 'B0C98FZWKD', asin: 'B0C98FZWKD', label: 'Black Rattan', mainImage: 'https://m.media-amazon.com/images/I/61Ac6NSilRL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61Ac6NSilRL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0C98FZWKD?tag=snapspacemkt-20' },
       { id: 'B0C98FRKCX', asin: 'B0C98FRKCX', label: 'Brown Rattan', mainImage: 'https://m.media-amazon.com/images/I/61Ac6NSilRL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61Ac6NSilRL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0C98FRKCX?tag=snapspacemkt-20' },
       { id: 'B0C98GDFP6', asin: 'B0C98GDFP6', label: 'White Rattan', mainImage: 'https://m.media-amazon.com/images/I/61Ac6NSilRL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61Ac6NSilRL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0C98GDFP6?tag=snapspacemkt-20' },
       { id: 'B0F32RLT2V', asin: 'B0F32RLT2V', label: 'Brown Fluted', mainImage: 'https://m.media-amazon.com/images/I/61Ac6NSilRL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61Ac6NSilRL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0F32RLT2V?tag=snapspacemkt-20' },
@@ -13888,8 +13888,8 @@ export const PRODUCT_CATALOG = [
       Style: 'Contemporary / Glam', Assembly: 'Required',
     },
     variants: [
-      { id: 'B0FZFV8682', asin: 'B0FZFV8682', label: '1-Pack — White & Gold', mainImage: 'https://m.media-amazon.com/images/I/61vYs1rvreL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61vYs1rvreL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0FZFV8682?tag=snapspacemkt-20' },
-      { id: 'B0FZFVFC9L', asin: 'B0FZFVFC9L', label: '2-Pack — White & Gold', mainImage: 'https://m.media-amazon.com/images/I/61vYs1rvreL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61vYs1rvreL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0FZFVFC9L?tag=snapspacemkt-20' },
+      { id: 'B0FZFV8682', asin: 'B0FZFV8682', label: '1-Pack — White & Gold', mainImage: 'https://m.media-amazon.com/images/I/61vYs1rvreL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61vYs1rvreL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FZFV8682?tag=snapspacemkt-20' },
+      { id: 'B0FZFVFC9L', asin: 'B0FZFVFC9L', label: '2-Pack — White & Gold', mainImage: 'https://m.media-amazon.com/images/I/61vYs1rvreL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61vYs1rvreL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FZFVFC9L?tag=snapspacemkt-20' },
       { id: 'B0CCJD7M6F', asin: 'B0CCJD7M6F', label: '1-Pack — Black', mainImage: 'https://m.media-amazon.com/images/I/61vYs1rvreL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61vYs1rvreL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CCJD7M6F?tag=snapspacemkt-20' },
       { id: 'B0BTLJN4HQ', asin: 'B0BTLJN4HQ', label: '2-Pack — Black', mainImage: 'https://m.media-amazon.com/images/I/61vYs1rvreL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61vYs1rvreL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0BTLJN4HQ?tag=snapspacemkt-20' },
       { id: 'B0D12MNJN4', asin: 'B0D12MNJN4', label: '1-Pack — White', mainImage: 'https://m.media-amazon.com/images/I/61vYs1rvreL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61vYs1rvreL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0D12MNJN4?tag=snapspacemkt-20' },
@@ -13942,8 +13942,8 @@ export const PRODUCT_CATALOG = [
       Style: 'Minimalist / Contemporary', Assembly: 'Tool-free snap',
     },
     variants: [
-      { id: 'B092V9BL6S', asin: 'B092V9BL6S', label: 'White/White — 1-Pack', mainImage: 'https://m.media-amazon.com/images/I/61w7vsoNkbL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61w7vsoNkbL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B092V9BL6S?tag=snapspacemkt-20' },
-      { id: 'B0DG87Y58P', asin: 'B0DG87Y58P', label: 'White/White — 2-Pack', mainImage: 'https://m.media-amazon.com/images/I/61w7vsoNkbL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61w7vsoNkbL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0DG87Y58P?tag=snapspacemkt-20' },
+      { id: 'B092V9BL6S', asin: 'B092V9BL6S', label: 'White/White — 1-Pack', mainImage: 'https://m.media-amazon.com/images/I/61w7vsoNkbL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61w7vsoNkbL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B092V9BL6S?tag=snapspacemkt-20' },
+      { id: 'B0DG87Y58P', asin: 'B0DG87Y58P', label: 'White/White — 2-Pack', mainImage: 'https://m.media-amazon.com/images/I/61w7vsoNkbL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61w7vsoNkbL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DG87Y58P?tag=snapspacemkt-20' },
       { id: 'B0CM322GM7', asin: 'B0CM322GM7', label: 'Columbia Walnut/Black — 1-Pack', mainImage: 'https://m.media-amazon.com/images/I/61w7vsoNkbL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61w7vsoNkbL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CM322GM7?tag=snapspacemkt-20' },
       { id: 'B0CV7SVBD7', asin: 'B0CV7SVBD7', label: 'Columbia Walnut/Black — 2-Pack', mainImage: 'https://m.media-amazon.com/images/I/61w7vsoNkbL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61w7vsoNkbL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CV7SVBD7?tag=snapspacemkt-20' },
       { id: 'B0CM32GDW3', asin: 'B0CM32GDW3', label: 'French Oak/Black — 1-Pack', mainImage: 'https://m.media-amazon.com/images/I/61w7vsoNkbL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61w7vsoNkbL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CM32GDW3?tag=snapspacemkt-20' },
@@ -13991,8 +13991,8 @@ export const PRODUCT_CATALOG = [
       Charging: '2 AC outlets + 2 USB ports', Assembly: 'Required',
     },
     variants: [
-      { id: 'B0CRYTBS5G', asin: 'B0CRYTBS5G', label: 'Dark Rustic Oak — Single', mainImage: 'https://m.media-amazon.com/images/I/71FwjsprUtL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71FwjsprUtL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0CRYTBS5G?tag=snapspacemkt-20' },
-      { id: 'B0FZKS63FZ', asin: 'B0FZKS63FZ', label: 'Dark Rustic Oak — Set of 2', mainImage: 'https://m.media-amazon.com/images/I/71FwjsprUtL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71FwjsprUtL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0FZKS63FZ?tag=snapspacemkt-20' },
+      { id: 'B0CRYTBS5G', asin: 'B0CRYTBS5G', label: 'Dark Rustic Oak — Single', mainImage: 'https://m.media-amazon.com/images/I/71FwjsprUtL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71FwjsprUtL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CRYTBS5G?tag=snapspacemkt-20' },
+      { id: 'B0FZKS63FZ', asin: 'B0FZKS63FZ', label: 'Dark Rustic Oak — Set of 2', mainImage: 'https://m.media-amazon.com/images/I/71FwjsprUtL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71FwjsprUtL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FZKS63FZ?tag=snapspacemkt-20' },
       { id: 'B0G2PYTLJ7', asin: 'B0G2PYTLJ7', label: 'Rustic Oak Antique Blue — Single', mainImage: 'https://m.media-amazon.com/images/I/71FwjsprUtL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71FwjsprUtL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0G2PYTLJ7?tag=snapspacemkt-20' },
       { id: 'B0CRYN5H37', asin: 'B0CRYN5H37', label: 'Reclaimed Barnwood — Single', mainImage: 'https://m.media-amazon.com/images/I/71FwjsprUtL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71FwjsprUtL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CRYN5H37?tag=snapspacemkt-20' },
     ],
@@ -14039,8 +14039,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'WLIVE', Material: 'Steel, Engineered Wood, Non-Woven Fabric', Style: 'Contemporary', Assembly: 'Required', Dimensions: '31.7"L × 11.7"W × 38.6"H' },
     variants: [
-      { id: 'B09F98V13W', asin: 'B09F98V13W', label: 'Rustic Brown Wood Grain', mainImage: 'https://m.media-amazon.com/images/I/81FaL4YM7yL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81FaL4YM7yL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B09F98V13W?tag=snapspacemkt-20' },
-      { id: 'B09F97ZKRM', asin: 'B09F97ZKRM', label: 'Charcoal Black Wood Grain', mainImage: 'https://m.media-amazon.com/images/I/81FaL4YM7yL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81FaL4YM7yL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B09F97ZKRM?tag=snapspacemkt-20' },
+      { id: 'B09F98V13W', asin: 'B09F98V13W', label: 'Rustic Brown Wood Grain', mainImage: 'https://m.media-amazon.com/images/I/81FaL4YM7yL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81FaL4YM7yL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B09F98V13W?tag=snapspacemkt-20' },
+      { id: 'B09F97ZKRM', asin: 'B09F97ZKRM', label: 'Charcoal Black Wood Grain', mainImage: 'https://m.media-amazon.com/images/I/81FaL4YM7yL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81FaL4YM7yL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B09F97ZKRM?tag=snapspacemkt-20' },
       { id: 'B0BRPWXL8L', asin: 'B0BRPWXL8L', label: 'White', mainImage: 'https://m.media-amazon.com/images/I/81FaL4YM7yL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81FaL4YM7yL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0BRPWXL8L?tag=snapspacemkt-20' },
       { id: 'B08FSK4S39', asin: 'B08FSK4S39', label: 'Light Grey', mainImage: 'https://m.media-amazon.com/images/I/81FaL4YM7yL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81FaL4YM7yL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B08FSK4S39?tag=snapspacemkt-20' },
       { id: 'B0C491V6SX', asin: 'B0C491V6SX', label: 'Greige', mainImage: 'https://m.media-amazon.com/images/I/81FaL4YM7yL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81FaL4YM7yL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0C491V6SX?tag=snapspacemkt-20' },
@@ -14089,8 +14089,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'Sorbus', Material: 'Steel, MDF, Non-Woven Fabric', Style: 'Contemporary', Assembly: 'Required', Dimensions: '15.75"L × 11.8"W × 45"H' },
     variants: [
-      { id: 'B0DSLQRQRT', asin: 'B0DSLQRQRT', label: 'White — 6 Drawer', mainImage: 'https://m.media-amazon.com/images/I/81SIB1t1kYL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81SIB1t1kYL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0DSLQRQRT?tag=snapspacemkt-20' },
-      { id: 'B0DSLRXT6T', asin: 'B0DSLRXT6T', label: 'Black — 6 Drawer', mainImage: 'https://m.media-amazon.com/images/I/81YRGsehz4L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81YRGsehz4L._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0DSLRXT6T?tag=snapspacemkt-20' },
+      { id: 'B0DSLQRQRT', asin: 'B0DSLQRQRT', label: 'White — 6 Drawer', mainImage: 'https://m.media-amazon.com/images/I/81SIB1t1kYL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81SIB1t1kYL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DSLQRQRT?tag=snapspacemkt-20' },
+      { id: 'B0DSLRXT6T', asin: 'B0DSLRXT6T', label: 'Black — 6 Drawer', mainImage: 'https://m.media-amazon.com/images/I/81YRGsehz4L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81YRGsehz4L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DSLRXT6T?tag=snapspacemkt-20' },
       { id: 'B0DSLPSWHK', asin: 'B0DSLPSWHK', label: 'Greige — 6 Drawer', mainImage: 'https://m.media-amazon.com/images/I/81NEYlCtCEL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81NEYlCtCEL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DSLPSWHK?tag=snapspacemkt-20' },
       { id: 'B096YNWBKP', asin: 'B096YNWBKP', label: 'White — 5 Drawer', mainImage: 'https://m.media-amazon.com/images/I/81ul90N7wXS._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81ul90N7wXS._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B096YNWBKP?tag=snapspacemkt-20' },
       { id: 'B096YP8Y9T', asin: 'B096YP8Y9T', label: 'Black — 5 Drawer', mainImage: 'https://m.media-amazon.com/images/I/81CbS3pg6QL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81CbS3pg6QL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B096YP8Y9T?tag=snapspacemkt-20' },
@@ -14134,8 +14134,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'Sorbus', Material: 'Steel, MDF, Non-Woven Fabric', Style: 'Rustic / Contemporary', Assembly: 'Required', Dimensions: '39.5"L × 11.5"W × 39.5"H' },
     variants: [
-      { id: 'B08HR6J2NT', asin: 'B08HR6J2NT', label: 'Brown — 9 Drawers', mainImage: 'https://m.media-amazon.com/images/I/81E8t5fhdEL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81E8t5fhdEL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B08HR6J2NT?tag=snapspacemkt-20' },
-      { id: 'B088P5G41C', asin: 'B088P5G41C', label: 'Black — 9 Drawers', mainImage: 'https://m.media-amazon.com/images/I/81E8t5fhdEL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81E8t5fhdEL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B088P5G41C?tag=snapspacemkt-20' },
+      { id: 'B08HR6J2NT', asin: 'B08HR6J2NT', label: 'Brown — 9 Drawers', mainImage: 'https://m.media-amazon.com/images/I/81E8t5fhdEL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81E8t5fhdEL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B08HR6J2NT?tag=snapspacemkt-20' },
+      { id: 'B088P5G41C', asin: 'B088P5G41C', label: 'Black — 9 Drawers', mainImage: 'https://m.media-amazon.com/images/I/81E8t5fhdEL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81E8t5fhdEL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B088P5G41C?tag=snapspacemkt-20' },
       { id: 'B08HR37Q43', asin: 'B08HR37Q43', label: 'Gray White — 9 Drawers', mainImage: 'https://m.media-amazon.com/images/I/81E8t5fhdEL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81E8t5fhdEL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B08HR37Q43?tag=snapspacemkt-20' },
       { id: 'B0BH99KP1V', asin: 'B0BH99KP1V', label: 'Gray Wood — 9 Drawers', mainImage: 'https://m.media-amazon.com/images/I/81E8t5fhdEL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81E8t5fhdEL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0BH99KP1V?tag=snapspacemkt-20' },
       { id: 'B09N4535ZB', asin: 'B09N4535ZB', label: 'Rustic Wood — 9 Drawers', mainImage: 'https://m.media-amazon.com/images/I/81E8t5fhdEL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81E8t5fhdEL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B09N4535ZB?tag=snapspacemkt-20' },
@@ -14179,8 +14179,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'Sorbus', Material: 'Steel, MDF, Non-Woven Fabric', Style: 'Playful / Contemporary', Assembly: 'Required', Dimensions: '39.5"L × 11.87"W × 24.62"H' },
     variants: [
-      { id: 'B0D1GPHCW7', asin: 'B0D1GPHCW7', label: 'Rainbow Sparkle', mainImage: 'https://m.media-amazon.com/images/I/81107D-oIkL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81107D-oIkL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0D1GPHCW7?tag=snapspacemkt-20' },
-      { id: 'B0D1GM3G1W', asin: 'B0D1GM3G1W', label: 'Watercolor', mainImage: 'https://m.media-amazon.com/images/I/81emZ1HWdBL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81emZ1HWdBL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0D1GM3G1W?tag=snapspacemkt-20' },
+      { id: 'B0D1GPHCW7', asin: 'B0D1GPHCW7', label: 'Rainbow Sparkle', mainImage: 'https://m.media-amazon.com/images/I/81107D-oIkL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81107D-oIkL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0D1GPHCW7?tag=snapspacemkt-20' },
+      { id: 'B0D1GM3G1W', asin: 'B0D1GM3G1W', label: 'Watercolor', mainImage: 'https://m.media-amazon.com/images/I/81emZ1HWdBL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81emZ1HWdBL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0D1GM3G1W?tag=snapspacemkt-20' },
       { id: 'B094YPR93Y', asin: 'B094YPR93Y', label: 'Tie-dye Pink', mainImage: 'https://m.media-amazon.com/images/I/81MkWU72iDL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81MkWU72iDL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B094YPR93Y?tag=snapspacemkt-20' },
       { id: 'B08BZVHFMT', asin: 'B08BZVHFMT', label: 'Tye-dye Blue', mainImage: 'https://m.media-amazon.com/images/I/81HORhM3boL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81HORhM3boL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B08BZVHFMT?tag=snapspacemkt-20' },
       { id: 'B08BWSS7MG', asin: 'B08BWSS7MG', label: 'Pastel Aqua', mainImage: 'https://m.media-amazon.com/images/I/81tiAYXdDtL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81tiAYXdDtL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B08BWSS7MG?tag=snapspacemkt-20' },
@@ -14221,8 +14221,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'Furnulem', Material: 'Steel, Engineered Wood, Non-Woven Fabric', Style: 'Vintage / Bohemian', Assembly: 'Required', Dimensions: '39.4"L × 11.8"W × 31.5"H' },
     variants: [
-      { id: 'B0C4T5D72R', asin: 'B0C4T5D72R', label: '8 Drawers — Wide', mainImage: 'https://m.media-amazon.com/images/I/71shwH2CWCL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71shwH2CWCL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0C4T5D72R?tag=snapspacemkt-20' },
-      { id: 'B0CBLR1VGS', asin: 'B0CBLR1VGS', label: '6 Drawers — Tall', mainImage: 'https://m.media-amazon.com/images/I/71shwH2CWCL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71shwH2CWCL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0CBLR1VGS?tag=snapspacemkt-20' },
+      { id: 'B0C4T5D72R', asin: 'B0C4T5D72R', label: '8 Drawers — Wide', mainImage: 'https://m.media-amazon.com/images/I/71shwH2CWCL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71shwH2CWCL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0C4T5D72R?tag=snapspacemkt-20' },
+      { id: 'B0CBLR1VGS', asin: 'B0CBLR1VGS', label: '6 Drawers — Tall', mainImage: 'https://m.media-amazon.com/images/I/71shwH2CWCL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71shwH2CWCL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CBLR1VGS?tag=snapspacemkt-20' },
       { id: 'B0CBLRVQFP', asin: 'B0CBLRVQFP', label: '5 Drawers', mainImage: 'https://m.media-amazon.com/images/I/71shwH2CWCL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71shwH2CWCL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CBLRVQFP?tag=snapspacemkt-20' },
       { id: 'B0C7ZWZNBV', asin: 'B0C7ZWZNBV', label: '4 Drawers', mainImage: 'https://m.media-amazon.com/images/I/71shwH2CWCL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71shwH2CWCL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0C7ZWZNBV?tag=snapspacemkt-20' },
       { id: 'B0DWNCDVLL', asin: 'B0DWNCDVLL', label: '7 Drawers — Extra Wide', mainImage: 'https://m.media-amazon.com/images/I/71shwH2CWCL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71shwH2CWCL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DWNCDVLL?tag=snapspacemkt-20' },
@@ -14261,8 +14261,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'Furnulem', Material: 'Steel, Engineered Wood, Non-Woven Fabric', Style: 'Vintage / Retro', Assembly: 'Required', Dimensions: '15.8"L × 11.8"W × 45.9"H' },
     variants: [
-      { id: 'B0CBLR1VGS', asin: 'B0CBLR1VGS', label: '6 Drawers — Tall', mainImage: 'https://m.media-amazon.com/images/I/71shwH2CWCL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71shwH2CWCL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0CBLR1VGS?tag=snapspacemkt-20' },
-      { id: 'B0C4T5D72R', asin: 'B0C4T5D72R', label: '8 Drawers — Wide', mainImage: 'https://m.media-amazon.com/images/I/71shwH2CWCL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71shwH2CWCL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0C4T5D72R?tag=snapspacemkt-20' },
+      { id: 'B0CBLR1VGS', asin: 'B0CBLR1VGS', label: '6 Drawers — Tall', mainImage: 'https://m.media-amazon.com/images/I/71shwH2CWCL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71shwH2CWCL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CBLR1VGS?tag=snapspacemkt-20' },
+      { id: 'B0C4T5D72R', asin: 'B0C4T5D72R', label: '8 Drawers — Wide', mainImage: 'https://m.media-amazon.com/images/I/71shwH2CWCL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71shwH2CWCL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0C4T5D72R?tag=snapspacemkt-20' },
       { id: 'B0CBLRVQFP', asin: 'B0CBLRVQFP', label: '5 Drawers', mainImage: 'https://m.media-amazon.com/images/I/71shwH2CWCL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71shwH2CWCL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CBLRVQFP?tag=snapspacemkt-20' },
       { id: 'B0C7ZWZNBV', asin: 'B0C7ZWZNBV', label: '4 Drawers', mainImage: 'https://m.media-amazon.com/images/I/71shwH2CWCL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71shwH2CWCL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0C7ZWZNBV?tag=snapspacemkt-20' },
     ],
@@ -14302,8 +14302,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'LUMTOK', Material: 'Steel, Engineered Wood, Non-Woven Fabric', Style: 'Contemporary', Assembly: 'Required', Dimensions: '39"W × 11.8"D × 39.4"H' },
     variants: [
-      { id: 'B0B6PGXJY3', asin: 'B0B6PGXJY3', label: 'White', mainImage: 'https://m.media-amazon.com/images/I/71MeBQ2NV5L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71MeBQ2NV5L._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0B6PGXJY3?tag=snapspacemkt-20' },
-      { id: 'B09P6ZYCXW', asin: 'B09P6ZYCXW', label: 'Grey', mainImage: 'https://m.media-amazon.com/images/I/71MeBQ2NV5L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71MeBQ2NV5L._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B09P6ZYCXW?tag=snapspacemkt-20' },
+      { id: 'B0B6PGXJY3', asin: 'B0B6PGXJY3', label: 'White', mainImage: 'https://m.media-amazon.com/images/I/71MeBQ2NV5L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71MeBQ2NV5L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0B6PGXJY3?tag=snapspacemkt-20' },
+      { id: 'B09P6ZYCXW', asin: 'B09P6ZYCXW', label: 'Grey', mainImage: 'https://m.media-amazon.com/images/I/71MeBQ2NV5L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71MeBQ2NV5L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B09P6ZYCXW?tag=snapspacemkt-20' },
       { id: 'B09P6XX9DX', asin: 'B09P6XX9DX', label: 'Rustic Brown', mainImage: 'https://m.media-amazon.com/images/I/71MeBQ2NV5L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71MeBQ2NV5L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B09P6XX9DX?tag=snapspacemkt-20' },
       { id: 'B0B6PFJ3PH', asin: 'B0B6PFJ3PH', label: 'Greige', mainImage: 'https://m.media-amazon.com/images/I/71MeBQ2NV5L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71MeBQ2NV5L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0B6PFJ3PH?tag=snapspacemkt-20' },
       { id: 'B0B6PG88XK', asin: 'B0B6PG88XK', label: 'Black Wood Veins', mainImage: 'https://m.media-amazon.com/images/I/71nbbv2eBNL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71nbbv2eBNL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0B6PG88XK?tag=snapspacemkt-20' },
@@ -14343,8 +14343,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'Lulive', Material: 'Steel, Wood, Cationic Fabric', Style: 'Industrial / Contemporary', Assembly: 'Required', Color: 'Black' },
     variants: [
-      { id: 'B0CM31TXVK', asin: 'B0CM31TXVK', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/91GTtpbrd+L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/91GTtpbrd+L._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0CM31TXVK?tag=snapspacemkt-20' },
-      { id: 'B09YRKDSVK', asin: 'B09YRKDSVK', label: 'White', mainImage: 'https://m.media-amazon.com/images/I/71slxO00MRL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71slxO00MRL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B09YRKDSVK?tag=snapspacemkt-20' },
+      { id: 'B0CM31TXVK', asin: 'B0CM31TXVK', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/91GTtpbrd+L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/91GTtpbrd+L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CM31TXVK?tag=snapspacemkt-20' },
+      { id: 'B09YRKDSVK', asin: 'B09YRKDSVK', label: 'White', mainImage: 'https://m.media-amazon.com/images/I/71slxO00MRL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71slxO00MRL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B09YRKDSVK?tag=snapspacemkt-20' },
       { id: 'B0C5D5K734', asin: 'B0C5D5K734', label: 'Rustic Brown', mainImage: 'https://m.media-amazon.com/images/I/81m4i9EmoOL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81m4i9EmoOL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0C5D5K734?tag=snapspacemkt-20' },
       { id: 'B0D5BJPP3T', asin: 'B0D5BJPP3T', label: 'Black White Stripes', mainImage: 'https://m.media-amazon.com/images/I/91VKZTJHUYL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/91VKZTJHUYL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0D5BJPP3T?tag=snapspacemkt-20' },
     ],
@@ -14385,8 +14385,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'Tohomeor', Material: 'Iron, Particleboard, Non-Woven Fabric', Style: 'Retro / Bohemian', Assembly: 'Required', Dimensions: '39"W × 11.8"D × 31.3"H' },
     variants: [
-      { id: 'B0BX718F43', asin: 'B0BX718F43', label: '7 Drawers', mainImage: 'https://m.media-amazon.com/images/I/81392HFaKaL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81392HFaKaL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0BX718F43?tag=snapspacemkt-20' },
-      { id: 'B0BX72MJ5X', asin: 'B0BX72MJ5X', label: '9 Drawers — Tall', mainImage: 'https://m.media-amazon.com/images/I/81392HFaKaL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81392HFaKaL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0BX72MJ5X?tag=snapspacemkt-20' },
+      { id: 'B0BX718F43', asin: 'B0BX718F43', label: '7 Drawers', mainImage: 'https://m.media-amazon.com/images/I/81392HFaKaL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81392HFaKaL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0BX718F43?tag=snapspacemkt-20' },
+      { id: 'B0BX72MJ5X', asin: 'B0BX72MJ5X', label: '9 Drawers — Tall', mainImage: 'https://m.media-amazon.com/images/I/81392HFaKaL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81392HFaKaL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0BX72MJ5X?tag=snapspacemkt-20' },
       { id: 'B0BX73VXC9', asin: 'B0BX73VXC9', label: '5 Drawers — Short', mainImage: 'https://m.media-amazon.com/images/I/81392HFaKaL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81392HFaKaL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0BX73VXC9?tag=snapspacemkt-20' },
       { id: 'B0CHXVSY6K', asin: 'B0CHXVSY6K', label: '12 Drawers — Extra Tall', mainImage: 'https://m.media-amazon.com/images/I/81392HFaKaL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81392HFaKaL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CHXVSY6K?tag=snapspacemkt-20' },
       { id: 'B0CHXXP6N9', asin: 'B0CHXXP6N9', label: '14 Drawers — Max Storage', mainImage: 'https://m.media-amazon.com/images/I/81392HFaKaL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81392HFaKaL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CHXXP6N9?tag=snapspacemkt-20' },
@@ -14424,8 +14424,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'Lulive', Material: 'Steel, Wood, Cationic Fabric', Style: 'Contemporary / Minimalist', Assembly: 'Required', Color: 'White' },
     variants: [
-      { id: 'B09YRKDSVK', asin: 'B09YRKDSVK', label: 'White', mainImage: 'https://m.media-amazon.com/images/I/71slxO00MRL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71slxO00MRL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B09YRKDSVK?tag=snapspacemkt-20' },
-      { id: 'B0CM31TXVK', asin: 'B0CM31TXVK', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/91GTtpbrd+L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/91GTtpbrd+L._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0CM31TXVK?tag=snapspacemkt-20' },
+      { id: 'B09YRKDSVK', asin: 'B09YRKDSVK', label: 'White', mainImage: 'https://m.media-amazon.com/images/I/71slxO00MRL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71slxO00MRL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B09YRKDSVK?tag=snapspacemkt-20' },
+      { id: 'B0CM31TXVK', asin: 'B0CM31TXVK', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/91GTtpbrd+L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/91GTtpbrd+L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CM31TXVK?tag=snapspacemkt-20' },
       { id: 'B0C5D5K734', asin: 'B0C5D5K734', label: 'Rustic Brown', mainImage: 'https://m.media-amazon.com/images/I/81m4i9EmoOL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81m4i9EmoOL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0C5D5K734?tag=snapspacemkt-20' },
       { id: 'B0D5BJPP3T', asin: 'B0D5BJPP3T', label: 'Black White Stripes', mainImage: 'https://m.media-amazon.com/images/I/91VKZTJHUYL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/91VKZTJHUYL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0D5BJPP3T?tag=snapspacemkt-20' },
     ],
@@ -14463,8 +14463,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'EnHomee', Material: 'Metal, Engineered Wood, Fabric', Style: 'Industrial / Contemporary', Assembly: 'Required', Dimensions: '50"W × 11.4"D × 40"H' },
     variants: [
-      { id: 'B0CWVHZVXT', asin: 'B0CWVHZVXT', label: 'Black — 11 Drawers + Shelves', mainImage: 'https://m.media-amazon.com/images/I/91ggZ9MXT7L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/91ggZ9MXT7L._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0CWVHZVXT?tag=snapspacemkt-20' },
-      { id: 'B0CWVKHSHX', asin: 'B0CWVKHSHX', label: 'Grey — 11 Drawers + Shelves', mainImage: 'https://m.media-amazon.com/images/I/91ggZ9MXT7L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/91ggZ9MXT7L._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0CWVKHSHX?tag=snapspacemkt-20' },
+      { id: 'B0CWVHZVXT', asin: 'B0CWVHZVXT', label: 'Black — 11 Drawers + Shelves', mainImage: 'https://m.media-amazon.com/images/I/91ggZ9MXT7L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/91ggZ9MXT7L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CWVHZVXT?tag=snapspacemkt-20' },
+      { id: 'B0CWVKHSHX', asin: 'B0CWVKHSHX', label: 'Grey — 11 Drawers + Shelves', mainImage: 'https://m.media-amazon.com/images/I/91ggZ9MXT7L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/91ggZ9MXT7L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CWVKHSHX?tag=snapspacemkt-20' },
       { id: 'B0CWVJ5H7C', asin: 'B0CWVJ5H7C', label: 'Brown — 11 Drawers + Shelves', mainImage: 'https://m.media-amazon.com/images/I/91ggZ9MXT7L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/91ggZ9MXT7L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CWVJ5H7C?tag=snapspacemkt-20' },
       { id: 'B0B4F4STSL', asin: 'B0B4F4STSL', label: 'Grey — 9 Drawers (Narrow)', mainImage: 'https://m.media-amazon.com/images/I/91ggZ9MXT7L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/91ggZ9MXT7L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0B4F4STSL?tag=snapspacemkt-20' },
     ],
@@ -14500,8 +14500,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'VASICAR', Material: 'Metal, Engineered Wood, Fabric', Style: 'Contemporary / Farmhouse', Assembly: 'Required', Dimensions: '43.3"L × 11.8"W × 29.9"H' },
     variants: [
-      { id: 'B0D813DLBW', asin: 'B0D813DLBW', label: 'White — Retro Top', mainImage: 'https://m.media-amazon.com/images/I/6177m1Ea0kL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/6177m1Ea0kL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0D813DLBW?tag=snapspacemkt-20' },
-      { id: 'B0D814BJPD', asin: 'B0D814BJPD', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/81MWZOkspYL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81MWZOkspYL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0D814BJPD?tag=snapspacemkt-20' },
+      { id: 'B0D813DLBW', asin: 'B0D813DLBW', label: 'White — Retro Top', mainImage: 'https://m.media-amazon.com/images/I/6177m1Ea0kL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/6177m1Ea0kL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0D813DLBW?tag=snapspacemkt-20' },
+      { id: 'B0D814BJPD', asin: 'B0D814BJPD', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/81MWZOkspYL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81MWZOkspYL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0D814BJPD?tag=snapspacemkt-20' },
       { id: 'B0CZTYP4DW', asin: 'B0CZTYP4DW', label: 'Pattern', mainImage: 'https://m.media-amazon.com/images/I/71by4tl5JjL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71by4tl5JjL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CZTYP4DW?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '2-5', prime: true, returnDays: 30 },
@@ -14538,8 +14538,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'EXOTICA', Material: 'Steel, Wood, Non-Woven Fabric', Style: 'Art Deco / Bohemian', Assembly: 'Required', Dimensions: '26.6"L × 11.8"W × 39.4"H' },
     variants: [
-      { id: 'B0CHR7S5YV', asin: 'B0CHR7S5YV', label: '8 Drawers — Tall Narrow', mainImage: 'https://m.media-amazon.com/images/I/81logYKMn6L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81logYKMn6L._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0CHR7S5YV?tag=snapspacemkt-20' },
-      { id: 'B0CHR81YLB', asin: 'B0CHR81YLB', label: '6 Drawers — Wide Short', mainImage: 'https://m.media-amazon.com/images/I/81logYKMn6L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81logYKMn6L._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0CHR81YLB?tag=snapspacemkt-20' },
+      { id: 'B0CHR7S5YV', asin: 'B0CHR7S5YV', label: '8 Drawers — Tall Narrow', mainImage: 'https://m.media-amazon.com/images/I/81logYKMn6L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81logYKMn6L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CHR7S5YV?tag=snapspacemkt-20' },
+      { id: 'B0CHR81YLB', asin: 'B0CHR81YLB', label: '6 Drawers — Wide Short', mainImage: 'https://m.media-amazon.com/images/I/81logYKMn6L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81logYKMn6L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CHR81YLB?tag=snapspacemkt-20' },
       { id: 'B0CHR8F85S', asin: 'B0CHR8F85S', label: '9 Drawers', mainImage: 'https://m.media-amazon.com/images/I/81logYKMn6L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81logYKMn6L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CHR8F85S?tag=snapspacemkt-20' },
       { id: 'B0CHR79B6L', asin: 'B0CHR79B6L', label: '12 Drawers — Extra Wide', mainImage: 'https://m.media-amazon.com/images/I/81logYKMn6L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81logYKMn6L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CHR79B6L?tag=snapspacemkt-20' },
       { id: 'B0CHR6X8XY', asin: 'B0CHR6X8XY', label: '15 Drawers — Max Storage', mainImage: 'https://m.media-amazon.com/images/I/91E8OMcPOiL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/91E8OMcPOiL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CHR6X8XY?tag=snapspacemkt-20' },
@@ -14578,8 +14578,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'EXOTICA', Material: 'Steel, Wood, Non-Woven Fabric', Style: 'Art Deco / Bohemian', Assembly: 'Required', Dimensions: '39"L × 11.8"W × 21.7"H' },
     variants: [
-      { id: 'B0CHR81YLB', asin: 'B0CHR81YLB', label: '6 Drawers — Wide Short', mainImage: 'https://m.media-amazon.com/images/I/81logYKMn6L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81logYKMn6L._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0CHR81YLB?tag=snapspacemkt-20' },
-      { id: 'B0CHR7S5YV', asin: 'B0CHR7S5YV', label: '8 Drawers — Tall Narrow', mainImage: 'https://m.media-amazon.com/images/I/81logYKMn6L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81logYKMn6L._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0CHR7S5YV?tag=snapspacemkt-20' },
+      { id: 'B0CHR81YLB', asin: 'B0CHR81YLB', label: '6 Drawers — Wide Short', mainImage: 'https://m.media-amazon.com/images/I/81logYKMn6L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81logYKMn6L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CHR81YLB?tag=snapspacemkt-20' },
+      { id: 'B0CHR7S5YV', asin: 'B0CHR7S5YV', label: '8 Drawers — Tall Narrow', mainImage: 'https://m.media-amazon.com/images/I/81logYKMn6L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81logYKMn6L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CHR7S5YV?tag=snapspacemkt-20' },
       { id: 'B0CHR8F85S', asin: 'B0CHR8F85S', label: '9 Drawers', mainImage: 'https://m.media-amazon.com/images/I/81logYKMn6L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81logYKMn6L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CHR8F85S?tag=snapspacemkt-20' },
       { id: 'B0CHR79B6L', asin: 'B0CHR79B6L', label: '12 Drawers — Extra Wide', mainImage: 'https://m.media-amazon.com/images/I/81logYKMn6L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81logYKMn6L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CHR79B6L?tag=snapspacemkt-20' },
     ],
@@ -14620,8 +14620,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'COZAYH', Material: 'MDF, Solid Wood Legs', Style: 'Farmhouse / French Country', Assembly: 'Legs only', Dimensions: '26"L × 13.5"D × 28.25"H', Weight: '40.15 lbs' },
     variants: [
-      { id: 'B0CCNTKHR6', asin: 'B0CCNTKHR6', label: '3-drawer White — 1-pack', mainImage: 'https://m.media-amazon.com/images/I/71HSVUG9zDL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71HSVUG9zDL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0CCNTKHR6?tag=snapspacemkt-20' },
-      { id: 'B0CCNQYLKX', asin: 'B0CCNQYLKX', label: '3-drawer Black — 1-pack', mainImage: 'https://m.media-amazon.com/images/I/81JZxSE7SOL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81JZxSE7SOL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0CCNQYLKX?tag=snapspacemkt-20' },
+      { id: 'B0CCNTKHR6', asin: 'B0CCNTKHR6', label: '3-drawer White — 1-pack', mainImage: 'https://m.media-amazon.com/images/I/71HSVUG9zDL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71HSVUG9zDL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CCNTKHR6?tag=snapspacemkt-20' },
+      { id: 'B0CCNQYLKX', asin: 'B0CCNQYLKX', label: '3-drawer Black — 1-pack', mainImage: 'https://m.media-amazon.com/images/I/81JZxSE7SOL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81JZxSE7SOL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CCNQYLKX?tag=snapspacemkt-20' },
       { id: 'B0CCNSFP5B', asin: 'B0CCNSFP5B', label: '3-drawer White — 2-pack', mainImage: 'https://m.media-amazon.com/images/I/81PM5AWY7dL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81PM5AWY7dL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CCNSFP5B?tag=snapspacemkt-20' },
       { id: 'B0CCNR8V6F', asin: 'B0CCNR8V6F', label: '3-drawer Black — 2-pack', mainImage: 'https://m.media-amazon.com/images/I/917inRacD+L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/917inRacD+L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CCNR8V6F?tag=snapspacemkt-20' },
       { id: 'B0BRPYPZVS', asin: 'B0BRPYPZVS', label: '2-drawer White — 1-pack', mainImage: 'https://m.media-amazon.com/images/I/716rY+R3pQL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/716rY+R3pQL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0BRPYPZVS?tag=snapspacemkt-20' },
@@ -14670,8 +14670,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'Sorbus', Material: 'Steel, MDF, Non-Woven Fabric', Style: 'Playful / Contemporary', Assembly: 'Required', Dimensions: '18"L × 11.87"W × 46"H' },
     variants: [
-      { id: 'B09LVW83S5', asin: 'B09LVW83S5', label: 'Pink — 5 Drawer', mainImage: 'https://m.media-amazon.com/images/I/81TNEJSupqL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81TNEJSupqL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B09LVW83S5?tag=snapspacemkt-20' },
-      { id: 'B09LVYKLJ4', asin: 'B09LVYKLJ4', label: 'Aqua — 5 Drawer', mainImage: 'https://m.media-amazon.com/images/I/81OZuDPqXXL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81OZuDPqXXL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B09LVYKLJ4?tag=snapspacemkt-20' },
+      { id: 'B09LVW83S5', asin: 'B09LVW83S5', label: 'Pink — 5 Drawer', mainImage: 'https://m.media-amazon.com/images/I/81TNEJSupqL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81TNEJSupqL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B09LVW83S5?tag=snapspacemkt-20' },
+      { id: 'B09LVYKLJ4', asin: 'B09LVYKLJ4', label: 'Aqua — 5 Drawer', mainImage: 'https://m.media-amazon.com/images/I/81OZuDPqXXL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81OZuDPqXXL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B09LVYKLJ4?tag=snapspacemkt-20' },
       { id: 'B09LVWJ3HD', asin: 'B09LVWJ3HD', label: 'Blue Tie-dye — 5 Drawer', mainImage: 'https://m.media-amazon.com/images/I/81+dmiYgceL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81+dmiYgceL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B09LVWJ3HD?tag=snapspacemkt-20' },
       { id: 'B0DSLRQDPT', asin: 'B0DSLRQDPT', label: 'Pink — 6 Drawer', mainImage: 'https://m.media-amazon.com/images/I/814EKw7iE+L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/814EKw7iE+L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DSLRQDPT?tag=snapspacemkt-20' },
       { id: 'B08RJ65SQT', asin: 'B08RJ65SQT', label: 'Pink — 4 Drawer', mainImage: 'https://m.media-amazon.com/images/I/81JL7d-aWyL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81JL7d-aWyL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B08RJ65SQT?tag=snapspacemkt-20' },
@@ -14715,8 +14715,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'GreenForest', Material: 'Wood, Metal', Assembly: 'No Assembly Required', Style: 'Contemporary' },
     variants: [
-      { id: 'B09TW72GQ9', asin: 'B09TW72GQ9', label: '22×27.3" — Oak', mainImage: 'https://m.media-amazon.com/images/I/71KDnzOlOcL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71KDnzOlOcL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B09TW72GQ9?tag=snapspacemkt-20' },
-      { id: 'B09TW8RKTH', asin: 'B09TW8RKTH', label: '22×27.3" — Walnut', mainImage: 'https://m.media-amazon.com/images/I/71DSMfpNbCL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71DSMfpNbCL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B09TW8RKTH?tag=snapspacemkt-20' },
+      { id: 'B09TW72GQ9', asin: 'B09TW72GQ9', label: '22×27.3" — Oak', mainImage: 'https://m.media-amazon.com/images/I/71KDnzOlOcL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71KDnzOlOcL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B09TW72GQ9?tag=snapspacemkt-20' },
+      { id: 'B09TW8RKTH', asin: 'B09TW8RKTH', label: '22×27.3" — Walnut', mainImage: 'https://m.media-amazon.com/images/I/71DSMfpNbCL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71DSMfpNbCL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B09TW8RKTH?tag=snapspacemkt-20' },
       { id: 'B09TW8KPGB', asin: 'B09TW8KPGB', label: '22×27.3" — Brown', mainImage: 'https://m.media-amazon.com/images/I/7172EyV2fNL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/7172EyV2fNL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B09TW8KPGB?tag=snapspacemkt-20' },
       { id: 'B09TW8Z7R5', asin: 'B09TW8Z7R5', label: '22×27.3" — Black', mainImage: 'https://m.media-amazon.com/images/I/61xD-1dkvoL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61xD-1dkvoL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B09TW8Z7R5?tag=snapspacemkt-20' },
       { id: 'B0CRK7BHFS', asin: 'B0CRK7BHFS', label: '22×27.3" — White', mainImage: 'https://m.media-amazon.com/images/I/61Ru99amqkL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61Ru99amqkL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CRK7BHFS?tag=snapspacemkt-20' },
@@ -14760,8 +14760,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'Need', Material: 'Steel, MDF', Assembly: 'No Assembly Required', Style: 'Contemporary' },
     variants: [
-      { id: 'B00UV7AQQK', asin: 'B00UV7AQQK', label: '31.5" — Teak & Black Frame', mainImage: 'https://m.media-amazon.com/images/I/611zeTspTsL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/611zeTspTsL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B00UV7AQQK?tag=snapspacemkt-20' },
-      { id: 'B06XT13CGV', asin: 'B06XT13CGV', label: '31.5" — Black & Black Frame', mainImage: 'https://m.media-amazon.com/images/I/611zeTspTsL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/611zeTspTsL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B06XT13CGV?tag=snapspacemkt-20' },
+      { id: 'B00UV7AQQK', asin: 'B00UV7AQQK', label: '31.5" — Teak & Black Frame', mainImage: 'https://m.media-amazon.com/images/I/611zeTspTsL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/611zeTspTsL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B00UV7AQQK?tag=snapspacemkt-20' },
+      { id: 'B06XT13CGV', asin: 'B06XT13CGV', label: '31.5" — Black & Black Frame', mainImage: 'https://m.media-amazon.com/images/I/611zeTspTsL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/611zeTspTsL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B06XT13CGV?tag=snapspacemkt-20' },
       { id: 'B0BPS8BLBS', asin: 'B0BPS8BLBS', label: '31.5" — White & White Frame', mainImage: 'https://m.media-amazon.com/images/I/611zeTspTsL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/611zeTspTsL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0BPS8BLBS?tag=snapspacemkt-20' },
       { id: 'B07ZCM3KQL', asin: 'B07ZCM3KQL', label: '47" — Black & Black Frame', mainImage: 'https://m.media-amazon.com/images/I/61SowBK-H1L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61SowBK-H1L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B07ZCM3KQL?tag=snapspacemkt-20' },
       { id: 'B0CHMST8P8', asin: 'B0CHMST8P8', label: '60" — White & White Frame', mainImage: 'https://m.media-amazon.com/images/I/71tCFjJiogL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71tCFjJiogL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CHMST8P8?tag=snapspacemkt-20' },
@@ -14800,8 +14800,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'Teraves', Material: 'P2 Particle Board, Steel', Assembly: 'Required', Style: 'Modern' },
     variants: [
-      { id: 'B07VYJMDHT', asin: 'B07VYJMDHT', label: 'Black Oak', mainImage: 'https://m.media-amazon.com/images/I/71nXdjNlnqL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71nXdjNlnqL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B07VYJMDHT?tag=snapspacemkt-20' },
-      { id: 'B07YXM9NC9', asin: 'B07YXM9NC9', label: 'Beige + White Frame', mainImage: 'https://m.media-amazon.com/images/I/71v0weldFpL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71v0weldFpL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B07YXM9NC9?tag=snapspacemkt-20' },
+      { id: 'B07VYJMDHT', asin: 'B07VYJMDHT', label: 'Black Oak', mainImage: 'https://m.media-amazon.com/images/I/71nXdjNlnqL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71nXdjNlnqL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B07VYJMDHT?tag=snapspacemkt-20' },
+      { id: 'B07YXM9NC9', asin: 'B07YXM9NC9', label: 'Beige + White Frame', mainImage: 'https://m.media-amazon.com/images/I/71v0weldFpL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71v0weldFpL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B07YXM9NC9?tag=snapspacemkt-20' },
       { id: 'B093F6D2QQ', asin: 'B093F6D2QQ', label: 'White + Gold Frame', mainImage: 'https://m.media-amazon.com/images/I/61vUw4VI+xL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61vUw4VI+xL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B093F6D2QQ?tag=snapspacemkt-20' },
       { id: 'B07VYH8RZV', asin: 'B07VYH8RZV', label: 'Teak', mainImage: 'https://m.media-amazon.com/images/I/71qwwPHp-UL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71qwwPHp-UL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B07VYH8RZV?tag=snapspacemkt-20' },
     ],
@@ -14840,8 +14840,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'VASAGLE', Material: 'Engineered Wood, Steel', Assembly: 'Required', Style: 'Industrial' },
     variants: [
-      { id: 'B0895KHLNF', asin: 'B0895KHLNF', label: 'Rustic Brown — 47.2"', mainImage: 'https://m.media-amazon.com/images/I/71zk3BWuhoL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71zk3BWuhoL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0895KHLNF?tag=snapspacemkt-20' },
-      { id: 'B0895NDM1H', asin: 'B0895NDM1H', label: 'Rustic Brown — 39.4"', mainImage: 'https://m.media-amazon.com/images/I/71ZUhk44kZL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71ZUhk44kZL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0895NDM1H?tag=snapspacemkt-20' },
+      { id: 'B0895KHLNF', asin: 'B0895KHLNF', label: 'Rustic Brown — 47.2"', mainImage: 'https://m.media-amazon.com/images/I/71zk3BWuhoL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71zk3BWuhoL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0895KHLNF?tag=snapspacemkt-20' },
+      { id: 'B0895NDM1H', asin: 'B0895NDM1H', label: 'Rustic Brown — 39.4"', mainImage: 'https://m.media-amazon.com/images/I/71ZUhk44kZL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71ZUhk44kZL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0895NDM1H?tag=snapspacemkt-20' },
       { id: 'B08239Z945', asin: 'B08239Z945', label: 'Rustic Brown — 55.1"', mainImage: 'https://m.media-amazon.com/images/I/7179Xr11YpL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/7179Xr11YpL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B08239Z945?tag=snapspacemkt-20' },
       { id: 'B08JLYX8L8', asin: 'B08JLYX8L8', label: 'Greige — 39.4"', mainImage: 'https://m.media-amazon.com/images/I/71ARkys2TIS._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71ARkys2TIS._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B08JLYX8L8?tag=snapspacemkt-20' },
       { id: 'B08K2TYFVG', asin: 'B08K2TYFVG', label: 'Greige — 55.1"', mainImage: 'https://m.media-amazon.com/images/I/612WM-E-SrL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/612WM-E-SrL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B08K2TYFVG?tag=snapspacemkt-20' },
@@ -14878,8 +14878,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'Teraves', Material: 'P2 Particle Board, Metal', Assembly: 'Required', Style: 'Modern' },
     variants: [
-      { id: 'B08N3SXMCK', asin: 'B08N3SXMCK', label: 'Beige + White Frame — 55.11"', mainImage: 'https://m.media-amazon.com/images/I/61wRXed1pQS._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61wRXed1pQS._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B08N3SXMCK?tag=snapspacemkt-20' },
-      { id: 'B07ZCWVPN7', asin: 'B07ZCWVPN7', label: 'Beige + White Frame — 47.24"', mainImage: 'https://m.media-amazon.com/images/I/61wRXed1pQS._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61wRXed1pQS._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B07ZCWVPN7?tag=snapspacemkt-20' },
+      { id: 'B08N3SXMCK', asin: 'B08N3SXMCK', label: 'Beige + White Frame — 55.11"', mainImage: 'https://m.media-amazon.com/images/I/61wRXed1pQS._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61wRXed1pQS._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B08N3SXMCK?tag=snapspacemkt-20' },
+      { id: 'B07ZCWVPN7', asin: 'B07ZCWVPN7', label: 'Beige + White Frame — 47.24"', mainImage: 'https://m.media-amazon.com/images/I/61wRXed1pQS._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61wRXed1pQS._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B07ZCWVPN7?tag=snapspacemkt-20' },
       { id: 'B083HYX89W', asin: 'B083HYX89W', label: 'Beige + White Frame — 39.37"', mainImage: 'https://m.media-amazon.com/images/I/61wRXed1pQS._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61wRXed1pQS._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B083HYX89W?tag=snapspacemkt-20' },
       { id: 'B0882T8XFJ', asin: 'B0882T8XFJ', label: 'White — 39.37"', mainImage: 'https://m.media-amazon.com/images/I/61wRXed1pQS._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61wRXed1pQS._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0882T8XFJ?tag=snapspacemkt-20' },
     ],
@@ -14920,7 +14920,7 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'Cubiker', Material: 'Wood, Metal', Assembly: 'Required', Style: 'Rustic' },
     variants: [
-      { id: 'B08BXSXXDF', asin: 'B08BXSXXDF', label: '47" — Rustic Brown', mainImage: 'https://m.media-amazon.com/images/I/81pOPYngWBL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81pOPYngWBL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B08BXSXXDF?tag=snapspacemkt-20' },
+      { id: 'B08BXSXXDF', asin: 'B08BXSXXDF', label: '47" — Rustic Brown', mainImage: 'https://m.media-amazon.com/images/I/81pOPYngWBL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81pOPYngWBL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B08BXSXXDF?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '2-5', prime: true, returnDays: 30 },
   },
@@ -14961,8 +14961,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'Bestier', Material: 'CARB P2 Board, Steel', Assembly: 'Required', Style: 'Modern Gaming' },
     variants: [
-      { id: 'B0BXP2PP6K', asin: 'B0BXP2PP6K', label: '61" — Black Grained', mainImage: 'https://m.media-amazon.com/images/I/61piAJUh7QL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61piAJUh7QL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0BXP2PP6K?tag=snapspacemkt-20' },
-      { id: 'B0B795RN5L', asin: 'B0B795RN5L', label: '51" — Black Grained', mainImage: 'https://m.media-amazon.com/images/I/81qU-bwLiWL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81qU-bwLiWL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0B795RN5L?tag=snapspacemkt-20' },
+      { id: 'B0BXP2PP6K', asin: 'B0BXP2PP6K', label: '61" — Black Grained', mainImage: 'https://m.media-amazon.com/images/I/61piAJUh7QL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61piAJUh7QL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0BXP2PP6K?tag=snapspacemkt-20' },
+      { id: 'B0B795RN5L', asin: 'B0B795RN5L', label: '51" — Black Grained', mainImage: 'https://m.media-amazon.com/images/I/81qU-bwLiWL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81qU-bwLiWL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0B795RN5L?tag=snapspacemkt-20' },
       { id: 'B09B8M69RK', asin: 'B09B8M69RK', label: '44" — Black Grained', mainImage: 'https://m.media-amazon.com/images/I/71o-EXbtUSL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71o-EXbtUSL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B09B8M69RK?tag=snapspacemkt-20' },
       { id: 'B0BXP3ZW4B', asin: 'B0BXP3ZW4B', label: '61" — Black 3D Carbon Fiber', mainImage: 'https://m.media-amazon.com/images/I/61piAJUh7QL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61piAJUh7QL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0BXP3ZW4B?tag=snapspacemkt-20' },
       { id: 'B0B791BCP3', asin: 'B0B791BCP3', label: '51" — Black 3D Carbon Fiber', mainImage: 'https://m.media-amazon.com/images/I/81KnGqtJ+xL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81KnGqtJ+xL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0B791BCP3?tag=snapspacemkt-20' },
@@ -15006,8 +15006,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'Aquzee', Material: 'FSC Wood, Metal', Assembly: 'Required (~20 min)', Style: 'Contemporary' },
     variants: [
-      { id: 'B08JLSZPGB', asin: 'B08JLSZPGB', label: 'Brown — 47"', mainImage: 'https://m.media-amazon.com/images/I/713xCcESYtL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/713xCcESYtL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B08JLSZPGB?tag=snapspacemkt-20' },
-      { id: 'B08JLTW9RP', asin: 'B08JLTW9RP', label: 'Black — 47"', mainImage: 'https://m.media-amazon.com/images/I/71gCPD2ftcL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71gCPD2ftcL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B08JLTW9RP?tag=snapspacemkt-20' },
+      { id: 'B08JLSZPGB', asin: 'B08JLSZPGB', label: 'Brown — 47"', mainImage: 'https://m.media-amazon.com/images/I/713xCcESYtL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/713xCcESYtL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B08JLSZPGB?tag=snapspacemkt-20' },
+      { id: 'B08JLTW9RP', asin: 'B08JLTW9RP', label: 'Black — 47"', mainImage: 'https://m.media-amazon.com/images/I/71gCPD2ftcL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71gCPD2ftcL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B08JLTW9RP?tag=snapspacemkt-20' },
       { id: 'B08JLRNNS5', asin: 'B08JLRNNS5', label: 'Grey — 47"', mainImage: 'https://m.media-amazon.com/images/I/71uJlsnFgwL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71uJlsnFgwL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B08JLRNNS5?tag=snapspacemkt-20' },
       { id: 'B08JLRCZMM', asin: 'B08JLRCZMM', label: 'White — 47"', mainImage: 'https://m.media-amazon.com/images/I/716zVC6-mvL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/716zVC6-mvL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B08JLRCZMM?tag=snapspacemkt-20' },
       { id: 'B0B4MRLZ36', asin: 'B0B4MRLZ36', label: 'Brown — 55"', mainImage: 'https://m.media-amazon.com/images/I/71Hxkp6W2TL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71Hxkp6W2TL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0B4MRLZ36?tag=snapspacemkt-20' },
@@ -15052,7 +15052,7 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'FATORRI', Material: 'FSC MDF, Metal', Assembly: 'Required (~40 min)', Style: 'Industrial' },
     variants: [
-      { id: 'B09F664SX4', asin: 'B09F664SX4', label: 'Walnut Brown — 59"', mainImage: 'https://m.media-amazon.com/images/I/61y-fwiAYsL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61y-fwiAYsL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B09F664SX4?tag=snapspacemkt-20' },
+      { id: 'B09F664SX4', asin: 'B09F664SX4', label: 'Walnut Brown — 59"', mainImage: 'https://m.media-amazon.com/images/I/61y-fwiAYsL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61y-fwiAYsL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B09F664SX4?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '2-5', prime: true, returnDays: 30 },
   },
@@ -15089,8 +15089,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'BON AUGURE', Material: 'FSC MDF, Metal', Assembly: 'Required (~20 min)', Style: 'Industrial' },
     variants: [
-      { id: 'B09QMBGBFN', asin: 'B09QMBGBFN', label: 'Grey Oak — 60"', mainImage: 'https://m.media-amazon.com/images/I/71IcU78CsGL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71IcU78CsGL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B09QMBGBFN?tag=snapspacemkt-20' },
-      { id: 'B0BXNC4BRN', asin: 'B0BXNC4BRN', label: 'Rustic Oak — 60"', mainImage: 'https://m.media-amazon.com/images/I/71IcU78CsGL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71IcU78CsGL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0BXNC4BRN?tag=snapspacemkt-20' },
+      { id: 'B09QMBGBFN', asin: 'B09QMBGBFN', label: 'Grey Oak — 60"', mainImage: 'https://m.media-amazon.com/images/I/71IcU78CsGL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71IcU78CsGL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B09QMBGBFN?tag=snapspacemkt-20' },
+      { id: 'B0BXNC4BRN', asin: 'B0BXNC4BRN', label: 'Rustic Oak — 60"', mainImage: 'https://m.media-amazon.com/images/I/71IcU78CsGL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71IcU78CsGL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0BXNC4BRN?tag=snapspacemkt-20' },
       { id: 'B07Y81C58L', asin: 'B07Y81C58L', label: 'Vintage Oak — 60"', mainImage: 'https://m.media-amazon.com/images/I/71IcU78CsGL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71IcU78CsGL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B07Y81C58L?tag=snapspacemkt-20' },
       { id: 'B0D9XQFWSQ', asin: 'B0D9XQFWSQ', label: 'Rustic Oak — 54"', mainImage: 'https://m.media-amazon.com/images/I/71IcU78CsGL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71IcU78CsGL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0D9XQFWSQ?tag=snapspacemkt-20' },
       { id: 'B0D9XD9G11', asin: 'B0D9XD9G11', label: 'Black — 54"', mainImage: 'https://m.media-amazon.com/images/I/71IcU78CsGL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71IcU78CsGL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0D9XD9G11?tag=snapspacemkt-20' },
@@ -15128,8 +15128,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'EUREKA ERGONOMIC', Material: 'P2 Particle Board, Metal', Assembly: 'Required', Style: 'Modern' },
     variants: [
-      { id: 'B08GQ23SLN', asin: 'B08GQ23SLN', label: 'Cool Black — 60" Right Side', mainImage: 'https://m.media-amazon.com/images/I/71gPyW01jNL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71gPyW01jNL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B08GQ23SLN?tag=snapspacemkt-20' },
-      { id: 'B085ZRZZFT', asin: 'B085ZRZZFT', label: 'Black — Left Side', mainImage: 'https://m.media-amazon.com/images/I/71aO5ctYsfL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71aO5ctYsfL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B085ZRZZFT?tag=snapspacemkt-20' },
+      { id: 'B08GQ23SLN', asin: 'B08GQ23SLN', label: 'Cool Black — 60" Right Side', mainImage: 'https://m.media-amazon.com/images/I/71gPyW01jNL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71gPyW01jNL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B08GQ23SLN?tag=snapspacemkt-20' },
+      { id: 'B085ZRZZFT', asin: 'B085ZRZZFT', label: 'Black — Left Side', mainImage: 'https://m.media-amazon.com/images/I/71aO5ctYsfL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71aO5ctYsfL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B085ZRZZFT?tag=snapspacemkt-20' },
       { id: 'B09D3SRPF2', asin: 'B09D3SRPF2', label: 'Pink — Left Side', mainImage: 'https://m.media-amazon.com/images/I/61yCiY6tUuL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61yCiY6tUuL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B09D3SRPF2?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '2-5', prime: true, returnDays: 30 },
@@ -15171,8 +15171,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'FOLUBAN', Material: 'MDF, Metal', Assembly: 'Required (~15 min)', Style: 'Industrial' },
     variants: [
-      { id: 'B0CTK8QCB5', asin: 'B0CTK8QCB5', label: 'Oak — 47"', mainImage: 'https://m.media-amazon.com/images/I/71ymCLFXczL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71ymCLFXczL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0CTK8QCB5?tag=snapspacemkt-20' },
-      { id: 'B0D4M3PP97', asin: 'B0D4M3PP97', label: 'Oak — 53"', mainImage: 'https://m.media-amazon.com/images/I/71hz+e18RhL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71hz+e18RhL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0D4M3PP97?tag=snapspacemkt-20' },
+      { id: 'B0CTK8QCB5', asin: 'B0CTK8QCB5', label: 'Oak — 47"', mainImage: 'https://m.media-amazon.com/images/I/71ymCLFXczL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71ymCLFXczL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CTK8QCB5?tag=snapspacemkt-20' },
+      { id: 'B0D4M3PP97', asin: 'B0D4M3PP97', label: 'Oak — 53"', mainImage: 'https://m.media-amazon.com/images/I/71hz+e18RhL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71hz+e18RhL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0D4M3PP97?tag=snapspacemkt-20' },
       { id: 'B0C73BXBTS', asin: 'B0C73BXBTS', label: 'Oak — 60"', mainImage: 'https://m.media-amazon.com/images/I/81qayRBPHYL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81qayRBPHYL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0C73BXBTS?tag=snapspacemkt-20' },
       { id: 'B0D31GR3Z3', asin: 'B0D31GR3Z3', label: 'Walnut — 47"', mainImage: 'https://m.media-amazon.com/images/I/71hgLdKmk0L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71hgLdKmk0L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0D31GR3Z3?tag=snapspacemkt-20' },
       { id: 'B0D4LGXHCS', asin: 'B0D4LGXHCS', label: 'Walnut — 53"', mainImage: 'https://m.media-amazon.com/images/I/71u-z2YhZuL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71u-z2YhZuL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0D4LGXHCS?tag=snapspacemkt-20' },
@@ -15219,8 +15219,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'LVB', Material: 'Engineered Wood, Metal', Assembly: 'Required (~30 min)', Style: 'Industrial' },
     variants: [
-      { id: 'B0CHNLRV6F', asin: 'B0CHNLRV6F', label: 'Rustic Brown — 55"', mainImage: 'https://m.media-amazon.com/images/I/715jlFDO2pL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/715jlFDO2pL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0CHNLRV6F?tag=snapspacemkt-20' },
-      { id: 'B0BY7VS5ZM', asin: 'B0BY7VS5ZM', label: 'Rustic Oak — 55"', mainImage: 'https://m.media-amazon.com/images/I/71QQKfRReuL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71QQKfRReuL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0BY7VS5ZM?tag=snapspacemkt-20' },
+      { id: 'B0CHNLRV6F', asin: 'B0CHNLRV6F', label: 'Rustic Brown — 55"', mainImage: 'https://m.media-amazon.com/images/I/715jlFDO2pL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/715jlFDO2pL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CHNLRV6F?tag=snapspacemkt-20' },
+      { id: 'B0BY7VS5ZM', asin: 'B0BY7VS5ZM', label: 'Rustic Oak — 55"', mainImage: 'https://m.media-amazon.com/images/I/71QQKfRReuL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71QQKfRReuL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0BY7VS5ZM?tag=snapspacemkt-20' },
       { id: 'B0BY7WW6PD', asin: 'B0BY7WW6PD', label: 'White Oak — 55"', mainImage: 'https://m.media-amazon.com/images/I/71t0p2vNbBL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71t0p2vNbBL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0BY7WW6PD?tag=snapspacemkt-20' },
       { id: 'B0BY7X5G8D', asin: 'B0BY7X5G8D', label: 'Black Oak — 55"', mainImage: 'https://m.media-amazon.com/images/I/71GhsXQuoYL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71GhsXQuoYL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0BY7X5G8D?tag=snapspacemkt-20' },
       { id: 'B0BY7YSYDL', asin: 'B0BY7YSYDL', label: 'Light Grey Oak — 55"', mainImage: 'https://m.media-amazon.com/images/I/716PMldvgxL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/716PMldvgxL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0BY7YSYDL?tag=snapspacemkt-20' },
@@ -15259,8 +15259,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'TOPSKY', Material: 'CARB P2 Board, Steel', Assembly: 'Required (~20 min)', Style: 'Industrial' },
     variants: [
-      { id: 'B083HDTB3H', asin: 'B083HDTB3H', label: 'Rustic Brown', mainImage: 'https://m.media-amazon.com/images/I/71-RJHGtg5L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71-RJHGtg5L._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B083HDTB3H?tag=snapspacemkt-20' },
-      { id: 'B08FWXKHGB', asin: 'B08FWXKHGB', label: 'White Marble Texture', mainImage: 'https://m.media-amazon.com/images/I/51T9R3HySBL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51T9R3HySBL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B08FWXKHGB?tag=snapspacemkt-20' },
+      { id: 'B083HDTB3H', asin: 'B083HDTB3H', label: 'Rustic Brown', mainImage: 'https://m.media-amazon.com/images/I/71-RJHGtg5L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71-RJHGtg5L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B083HDTB3H?tag=snapspacemkt-20' },
+      { id: 'B08FWXKHGB', asin: 'B08FWXKHGB', label: 'White Marble Texture', mainImage: 'https://m.media-amazon.com/images/I/51T9R3HySBL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51T9R3HySBL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B08FWXKHGB?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '2-5', prime: true, returnDays: 30 },
   },
@@ -15299,8 +15299,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'Pamray', Material: 'Wood, Metal', Assembly: 'Required (~5 min)', Style: 'Contemporary' },
     variants: [
-      { id: 'B0CRHDPJG6', asin: 'B0CRHDPJG6', label: 'Teak — 32"', mainImage: 'https://m.media-amazon.com/images/I/71cCobh2fkL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71cCobh2fkL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0CRHDPJG6?tag=snapspacemkt-20' },
-      { id: 'B0C4H2SXN1', asin: 'B0C4H2SXN1', label: 'Brown — 32"', mainImage: 'https://m.media-amazon.com/images/I/811xB7gXyjL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/811xB7gXyjL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0C4H2SXN1?tag=snapspacemkt-20' },
+      { id: 'B0CRHDPJG6', asin: 'B0CRHDPJG6', label: 'Teak — 32"', mainImage: 'https://m.media-amazon.com/images/I/71cCobh2fkL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71cCobh2fkL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CRHDPJG6?tag=snapspacemkt-20' },
+      { id: 'B0C4H2SXN1', asin: 'B0C4H2SXN1', label: 'Brown — 32"', mainImage: 'https://m.media-amazon.com/images/I/811xB7gXyjL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/811xB7gXyjL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0C4H2SXN1?tag=snapspacemkt-20' },
       { id: 'B0C4H3Z7Q9', asin: 'B0C4H3Z7Q9', label: 'Grey — 32"', mainImage: 'https://m.media-amazon.com/images/I/716-1P7LkIL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/716-1P7LkIL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0C4H3Z7Q9?tag=snapspacemkt-20' },
       { id: 'B0C4H2M3PR', asin: 'B0C4H2M3PR', label: 'Vintage — 32"', mainImage: 'https://m.media-amazon.com/images/I/71dZdL8c1rL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71dZdL8c1rL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0C4H2M3PR?tag=snapspacemkt-20' },
       { id: 'B0C4GZDP5G', asin: 'B0C4GZDP5G', label: 'Marble — 32"', mainImage: 'https://m.media-amazon.com/images/I/811FnlKZN1L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/811FnlKZN1L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0C4GZDP5G?tag=snapspacemkt-20' },
@@ -15345,8 +15345,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'WOHOMO', Material: 'Wood, Steel', Assembly: 'Required (partial)', Style: 'Contemporary' },
     variants: [
-      { id: 'B08M3W6SML', asin: 'B08M3W6SML', label: 'Beige — 31.5"', mainImage: 'https://m.media-amazon.com/images/I/71plY-qWJGL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71plY-qWJGL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B08M3W6SML?tag=snapspacemkt-20' },
-      { id: 'B095Y224RS', asin: 'B095Y224RS', label: 'Brown — 31.5"', mainImage: 'https://m.media-amazon.com/images/I/71SXtEMZS9L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71SXtEMZS9L._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B095Y224RS?tag=snapspacemkt-20' },
+      { id: 'B08M3W6SML', asin: 'B08M3W6SML', label: 'Beige — 31.5"', mainImage: 'https://m.media-amazon.com/images/I/71plY-qWJGL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71plY-qWJGL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B08M3W6SML?tag=snapspacemkt-20' },
+      { id: 'B095Y224RS', asin: 'B095Y224RS', label: 'Brown — 31.5"', mainImage: 'https://m.media-amazon.com/images/I/71SXtEMZS9L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71SXtEMZS9L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B095Y224RS?tag=snapspacemkt-20' },
       { id: 'B093XLJZRV', asin: 'B093XLJZRV', label: 'Grey — 31.5"', mainImage: 'https://m.media-amazon.com/images/I/71plY-qWJGL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71plY-qWJGL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B093XLJZRV?tag=snapspacemkt-20' },
       { id: 'B08M3RFK32', asin: 'B08M3RFK32', label: 'Black — 31.5"', mainImage: 'https://m.media-amazon.com/images/I/81GD4fl294L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81GD4fl294L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B08M3RFK32?tag=snapspacemkt-20' },
       { id: 'B0C5HWX6WM', asin: 'B0C5HWX6WM', label: 'White & Gold — 31.5"', mainImage: 'https://m.media-amazon.com/images/I/61K1OgGGbbL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61K1OgGGbbL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0C5HWX6WM?tag=snapspacemkt-20' },
@@ -15390,8 +15390,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'MUXX.STIL', Material: 'Mesh, Metal', Style: 'Contemporary' },
     variants: [
-      { id: 'B0CQLJ32TC', asin: 'B0CQLJ32TC', label: 'Khaki — Fabric Seat', mainImage: 'https://m.media-amazon.com/images/I/41dV0wQ6iPL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41dV0wQ6iPL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0CQLJ32TC?tag=snapspacemkt-20' },
-      { id: 'B0BM81QGRB', asin: 'B0BM81QGRB', label: 'White — Fabric Seat', mainImage: 'https://m.media-amazon.com/images/I/41dV0wQ6iPL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41dV0wQ6iPL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0BM81QGRB?tag=snapspacemkt-20' },
+      { id: 'B0CQLJ32TC', asin: 'B0CQLJ32TC', label: 'Khaki — Fabric Seat', mainImage: 'https://m.media-amazon.com/images/I/41dV0wQ6iPL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41dV0wQ6iPL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CQLJ32TC?tag=snapspacemkt-20' },
+      { id: 'B0BM81QGRB', asin: 'B0BM81QGRB', label: 'White — Fabric Seat', mainImage: 'https://m.media-amazon.com/images/I/41dV0wQ6iPL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41dV0wQ6iPL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0BM81QGRB?tag=snapspacemkt-20' },
       { id: 'B0BTXZM8PM', asin: 'B0BTXZM8PM', label: 'Grey — Fabric Seat', mainImage: 'https://m.media-amazon.com/images/I/41dV0wQ6iPL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41dV0wQ6iPL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0BTXZM8PM?tag=snapspacemkt-20' },
       { id: 'B0B66JRT4T', asin: 'B0B66JRT4T', label: 'Black — Fabric Seat', mainImage: 'https://m.media-amazon.com/images/I/41dV0wQ6iPL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41dV0wQ6iPL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0B66JRT4T?tag=snapspacemkt-20' },
       { id: 'B0F9YL42H8', asin: 'B0F9YL42H8', label: 'Khaki — PU Seat', mainImage: 'https://m.media-amazon.com/images/I/41dV0wQ6iPL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41dV0wQ6iPL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0F9YL42H8?tag=snapspacemkt-20' },
@@ -15433,8 +15433,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'ELABEST', Material: 'Mesh, Metal', Style: 'Contemporary', 'Weight Capacity': '280 lbs' },
     variants: [
-      { id: 'B0CH3P8KGT', asin: 'B0CH3P8KGT', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/71+fcWd65nL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71+fcWd65nL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0CH3P8KGT?tag=snapspacemkt-20' },
-      { id: 'B0BKT1NR68', asin: 'B0BKT1NR68', label: 'Charcoal', mainImage: 'https://m.media-amazon.com/images/I/71+fcWd65nL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71+fcWd65nL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0BKT1NR68?tag=snapspacemkt-20' },
+      { id: 'B0CH3P8KGT', asin: 'B0CH3P8KGT', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/71+fcWd65nL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71+fcWd65nL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CH3P8KGT?tag=snapspacemkt-20' },
+      { id: 'B0BKT1NR68', asin: 'B0BKT1NR68', label: 'Charcoal', mainImage: 'https://m.media-amazon.com/images/I/71+fcWd65nL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71+fcWd65nL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0BKT1NR68?tag=snapspacemkt-20' },
       { id: 'B0BKTFVYPN', asin: 'B0BKTFVYPN', label: 'Grey Frame Grey Mesh', mainImage: 'https://m.media-amazon.com/images/I/71+fcWd65nL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71+fcWd65nL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0BKTFVYPN?tag=snapspacemkt-20' },
       { id: 'B0BKT2BYSS', asin: 'B0BKT2BYSS', label: 'Blue', mainImage: 'https://m.media-amazon.com/images/I/71+fcWd65nL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71+fcWd65nL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0BKT2BYSS?tag=snapspacemkt-20' },
       { id: 'B0F1MHQG7Y', asin: 'B0F1MHQG7Y', label: 'Dusty Sage', mainImage: 'https://m.media-amazon.com/images/I/71+fcWd65nL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71+fcWd65nL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0F1MHQG7Y?tag=snapspacemkt-20' },
@@ -15477,8 +15477,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'ELABEST', Material: 'Mesh, Metal', Style: 'Contemporary', 'Weight Capacity': '330 lbs' },
     variants: [
-      { id: 'B0DPHLWNBG', asin: 'B0DPHLWNBG', label: 'Midnight Mist', mainImage: 'https://m.media-amazon.com/images/I/81vXeRdDeNL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81vXeRdDeNL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0DPHLWNBG?tag=snapspacemkt-20' },
-      { id: 'B0FDVXF8PW', asin: 'B0FDVXF8PW', label: 'Coffee Break', mainImage: 'https://m.media-amazon.com/images/I/81vXeRdDeNL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81vXeRdDeNL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0FDVXF8PW?tag=snapspacemkt-20' },
+      { id: 'B0DPHLWNBG', asin: 'B0DPHLWNBG', label: 'Midnight Mist', mainImage: 'https://m.media-amazon.com/images/I/81vXeRdDeNL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81vXeRdDeNL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DPHLWNBG?tag=snapspacemkt-20' },
+      { id: 'B0FDVXF8PW', asin: 'B0FDVXF8PW', label: 'Coffee Break', mainImage: 'https://m.media-amazon.com/images/I/81vXeRdDeNL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81vXeRdDeNL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FDVXF8PW?tag=snapspacemkt-20' },
       { id: 'B0FDVG54ZS', asin: 'B0FDVG54ZS', label: 'Foggy Morning', mainImage: 'https://m.media-amazon.com/images/I/81vXeRdDeNL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81vXeRdDeNL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FDVG54ZS?tag=snapspacemkt-20' },
       { id: 'B0FDVZN14B', asin: 'B0FDVZN14B', label: 'Tangerine Burst', mainImage: 'https://m.media-amazon.com/images/I/81vXeRdDeNL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81vXeRdDeNL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FDVZN14B?tag=snapspacemkt-20' },
     ],
@@ -15518,8 +15518,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'GABRYLLY', Material: 'Mesh, Metal', Style: 'Contemporary', 'Model': 'GY1108' },
     variants: [
-      { id: 'B0CWTZ2PHM', asin: 'B0CWTZ2PHM', label: 'White Mesh', mainImage: 'https://m.media-amazon.com/images/I/81TIRoUQCIL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81TIRoUQCIL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0CWTZ2PHM?tag=snapspacemkt-20' },
-      { id: 'B0CWV2GRLX', asin: 'B0CWV2GRLX', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/81TIRoUQCIL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81TIRoUQCIL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0CWV2GRLX?tag=snapspacemkt-20' },
+      { id: 'B0CWTZ2PHM', asin: 'B0CWTZ2PHM', label: 'White Mesh', mainImage: 'https://m.media-amazon.com/images/I/81TIRoUQCIL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81TIRoUQCIL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CWTZ2PHM?tag=snapspacemkt-20' },
+      { id: 'B0CWV2GRLX', asin: 'B0CWV2GRLX', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/81TIRoUQCIL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81TIRoUQCIL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CWV2GRLX?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '2-5', prime: true, returnDays: 30 },
   },
@@ -15557,8 +15557,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'GABRYLLY', Material: 'Mesh, Metal', Style: 'Contemporary', 'Weight Capacity': '300 lbs' },
     variants: [
-      { id: 'B0FL7NTDGC', asin: 'B0FL7NTDGC', label: 'Onyx Black', mainImage: 'https://m.media-amazon.com/images/I/91XzCPhL2XL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/91XzCPhL2XL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0FL7NTDGC?tag=snapspacemkt-20' },
-      { id: 'B0F48CSHCG', asin: 'B0F48CSHCG', label: 'Black Frame Dark Woodgrain', mainImage: 'https://m.media-amazon.com/images/I/91XzCPhL2XL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/91XzCPhL2XL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0F48CSHCG?tag=snapspacemkt-20' },
+      { id: 'B0FL7NTDGC', asin: 'B0FL7NTDGC', label: 'Onyx Black', mainImage: 'https://m.media-amazon.com/images/I/91XzCPhL2XL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/91XzCPhL2XL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FL7NTDGC?tag=snapspacemkt-20' },
+      { id: 'B0F48CSHCG', asin: 'B0F48CSHCG', label: 'Black Frame Dark Woodgrain', mainImage: 'https://m.media-amazon.com/images/I/91XzCPhL2XL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/91XzCPhL2XL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0F48CSHCG?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '2-5', prime: true, returnDays: 30 },
   },
@@ -15596,8 +15596,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'SIHOO', Model: 'M59AS', Material: 'Mesh, Metal', Style: 'Contemporary' },
     variants: [
-      { id: 'B0DFGLMM6L', asin: 'B0DFGLMM6L', label: 'Grey', mainImage: 'https://m.media-amazon.com/images/I/71iwfBYkZWL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71iwfBYkZWL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0DFGLMM6L?tag=snapspacemkt-20' },
-      { id: 'B0DFGB4YRG', asin: 'B0DFGB4YRG', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/71iwfBYkZWL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71iwfBYkZWL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0DFGB4YRG?tag=snapspacemkt-20' },
+      { id: 'B0DFGLMM6L', asin: 'B0DFGLMM6L', label: 'Grey', mainImage: 'https://m.media-amazon.com/images/I/71iwfBYkZWL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71iwfBYkZWL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DFGLMM6L?tag=snapspacemkt-20' },
+      { id: 'B0DFGB4YRG', asin: 'B0DFGB4YRG', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/71iwfBYkZWL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71iwfBYkZWL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DFGB4YRG?tag=snapspacemkt-20' },
       { id: 'B0DWSMJWNG', asin: 'B0DWSMJWNG', label: 'Dark Black', mainImage: 'https://m.media-amazon.com/images/I/71iwfBYkZWL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71iwfBYkZWL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DWSMJWNG?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '2-5', prime: true, returnDays: 30 },
@@ -15636,8 +15636,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'Modway', Material: 'Mesh, Metal', Style: 'Contemporary', Type: 'Drafting Chair' },
     variants: [
-      { id: 'B07BK25JJZ', asin: 'B07BK25JJZ', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/71VXyLuHyIL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71VXyLuHyIL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B07BK25JJZ?tag=snapspacemkt-20' },
-      { id: 'B07BK3YZGL', asin: 'B07BK3YZGL', label: 'Blue', mainImage: 'https://m.media-amazon.com/images/I/71VXyLuHyIL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71VXyLuHyIL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B07BK3YZGL?tag=snapspacemkt-20' },
+      { id: 'B07BK25JJZ', asin: 'B07BK25JJZ', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/71VXyLuHyIL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71VXyLuHyIL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B07BK25JJZ?tag=snapspacemkt-20' },
+      { id: 'B07BK3YZGL', asin: 'B07BK3YZGL', label: 'Blue', mainImage: 'https://m.media-amazon.com/images/I/71VXyLuHyIL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71VXyLuHyIL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B07BK3YZGL?tag=snapspacemkt-20' },
       { id: 'B07BK27FB6', asin: 'B07BK27FB6', label: 'Orange', mainImage: 'https://m.media-amazon.com/images/I/71VXyLuHyIL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71VXyLuHyIL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B07BK27FB6?tag=snapspacemkt-20' },
       { id: 'B07BK2NZLL', asin: 'B07BK2NZLL', label: 'Red', mainImage: 'https://m.media-amazon.com/images/I/71VXyLuHyIL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71VXyLuHyIL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B07BK2NZLL?tag=snapspacemkt-20' },
       { id: 'B07BK45RHW', asin: 'B07BK45RHW', label: 'Grey', mainImage: 'https://m.media-amazon.com/images/I/71VXyLuHyIL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71VXyLuHyIL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B07BK45RHW?tag=snapspacemkt-20' },
@@ -15678,8 +15678,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'amseatec', Material: 'Mesh, Metal', Style: 'Contemporary', 'Weight Capacity': '300 lbs', Certification: 'BIFMA' },
     variants: [
-      { id: 'B0F91TJL3D', asin: 'B0F91TJL3D', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/71PcqF5ljdL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71PcqF5ljdL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0F91TJL3D?tag=snapspacemkt-20' },
-      { id: 'B0F91TQQQ9', asin: 'B0F91TQQQ9', label: 'Grey', mainImage: 'https://m.media-amazon.com/images/I/71PcqF5ljdL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71PcqF5ljdL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0F91TQQQ9?tag=snapspacemkt-20' },
+      { id: 'B0F91TJL3D', asin: 'B0F91TJL3D', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/71PcqF5ljdL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71PcqF5ljdL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0F91TJL3D?tag=snapspacemkt-20' },
+      { id: 'B0F91TQQQ9', asin: 'B0F91TQQQ9', label: 'Grey', mainImage: 'https://m.media-amazon.com/images/I/71PcqF5ljdL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71PcqF5ljdL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0F91TQQQ9?tag=snapspacemkt-20' },
       { id: 'B0F91TMVRM', asin: 'B0F91TMVRM', label: 'Pink', mainImage: 'https://m.media-amazon.com/images/I/71PcqF5ljdL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71PcqF5ljdL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0F91TMVRM?tag=snapspacemkt-20' },
       { id: 'B0F91VLNNT', asin: 'B0F91VLNNT', label: 'Blue', mainImage: 'https://m.media-amazon.com/images/I/71PcqF5ljdL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71PcqF5ljdL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0F91VLNNT?tag=snapspacemkt-20' },
       { id: 'B0F91VHCPG', asin: 'B0F91VHCPG', label: 'Beige', mainImage: 'https://m.media-amazon.com/images/I/71PcqF5ljdL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71PcqF5ljdL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0F91VHCPG?tag=snapspacemkt-20' },
@@ -15720,8 +15720,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'CYKOV', Material: 'Mesh, Metal', Style: 'Contemporary', 'Weight Capacity': '350 lbs' },
     variants: [
-      { id: 'B0FXMJ6DDK', asin: 'B0FXMJ6DDK', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/81iGibLxLxL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81iGibLxLxL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0FXMJ6DDK?tag=snapspacemkt-20' },
-      { id: 'B0FXMC32S4', asin: 'B0FXMC32S4', label: 'Beige', mainImage: 'https://m.media-amazon.com/images/I/81iGibLxLxL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81iGibLxLxL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0FXMC32S4?tag=snapspacemkt-20' },
+      { id: 'B0FXMJ6DDK', asin: 'B0FXMJ6DDK', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/81iGibLxLxL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81iGibLxLxL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FXMJ6DDK?tag=snapspacemkt-20' },
+      { id: 'B0FXMC32S4', asin: 'B0FXMC32S4', label: 'Beige', mainImage: 'https://m.media-amazon.com/images/I/81iGibLxLxL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81iGibLxLxL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FXMC32S4?tag=snapspacemkt-20' },
       { id: 'B0G5MPFZ9G', asin: 'B0G5MPFZ9G', label: 'Black-white Frame', mainImage: 'https://m.media-amazon.com/images/I/81iGibLxLxL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81iGibLxLxL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0G5MPFZ9G?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '2-5', prime: true, returnDays: 30 },
@@ -15760,8 +15760,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'CASASIO', Material: 'Mesh, Metal', Style: 'Contemporary/Glam' },
     variants: [
-      { id: 'B0FN4GFBRF', asin: 'B0FN4GFBRF', label: 'Black & Silver', mainImage: 'https://m.media-amazon.com/images/I/71r6fcbYFcL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71r6fcbYFcL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0FN4GFBRF?tag=snapspacemkt-20' },
-      { id: 'B0GH6FN42Z', asin: 'B0GH6FN42Z', label: 'White + Champagne', mainImage: 'https://m.media-amazon.com/images/I/71r6fcbYFcL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71r6fcbYFcL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0GH6FN42Z?tag=snapspacemkt-20' },
+      { id: 'B0FN4GFBRF', asin: 'B0FN4GFBRF', label: 'Black & Silver', mainImage: 'https://m.media-amazon.com/images/I/71r6fcbYFcL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71r6fcbYFcL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FN4GFBRF?tag=snapspacemkt-20' },
+      { id: 'B0GH6FN42Z', asin: 'B0GH6FN42Z', label: 'White + Champagne', mainImage: 'https://m.media-amazon.com/images/I/71r6fcbYFcL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71r6fcbYFcL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0GH6FN42Z?tag=snapspacemkt-20' },
       { id: 'B0FZZWCYNM', asin: 'B0FZZWCYNM', label: 'Black & Gold', mainImage: 'https://m.media-amazon.com/images/I/71r6fcbYFcL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71r6fcbYFcL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FZZWCYNM?tag=snapspacemkt-20' },
       { id: 'B0FN4GG7VV', asin: 'B0FN4GG7VV', label: 'Grey + Silver', mainImage: 'https://m.media-amazon.com/images/I/71r6fcbYFcL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71r6fcbYFcL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FN4GG7VV?tag=snapspacemkt-20' },
       { id: 'B0FXRC79BZ', asin: 'B0FXRC79BZ', label: 'White + Marble', mainImage: 'https://m.media-amazon.com/images/I/71r6fcbYFcL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71r6fcbYFcL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FXRC79BZ?tag=snapspacemkt-20' },
@@ -15802,7 +15802,7 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'X XISHE', Material: 'Mesh, PU Leather, Metal', Style: 'Contemporary' },
     variants: [
-      { id: 'B0B41NM71X', asin: 'B0B41NM71X', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/71a-ERBxUGL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71a-ERBxUGL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0B41NM71X?tag=snapspacemkt-20' },
+      { id: 'B0B41NM71X', asin: 'B0B41NM71X', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/71a-ERBxUGL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71a-ERBxUGL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0B41NM71X?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '2-5', prime: true, returnDays: 30 },
   },
@@ -15840,8 +15840,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'TRALT', Material: 'Mesh, Leather, Metal', Style: 'Contemporary' },
     variants: [
-      { id: 'B0F8VPWGLS', asin: 'B0F8VPWGLS', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/71K-pGGUR3L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71K-pGGUR3L._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0F8VPWGLS?tag=snapspacemkt-20' },
-      { id: 'B0F8VSV7YG', asin: 'B0F8VSV7YG', label: 'Grey', mainImage: 'https://m.media-amazon.com/images/I/71K-pGGUR3L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71K-pGGUR3L._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0F8VSV7YG?tag=snapspacemkt-20' },
+      { id: 'B0F8VPWGLS', asin: 'B0F8VPWGLS', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/71K-pGGUR3L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71K-pGGUR3L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0F8VPWGLS?tag=snapspacemkt-20' },
+      { id: 'B0F8VSV7YG', asin: 'B0F8VSV7YG', label: 'Grey', mainImage: 'https://m.media-amazon.com/images/I/71K-pGGUR3L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71K-pGGUR3L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0F8VSV7YG?tag=snapspacemkt-20' },
       { id: 'B0F8VKS8KZ', asin: 'B0F8VKS8KZ', label: 'Angel White', mainImage: 'https://m.media-amazon.com/images/I/71K-pGGUR3L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71K-pGGUR3L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0F8VKS8KZ?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '2-5', prime: true, returnDays: 30 },
@@ -15880,8 +15880,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'Fizzin', Material: 'Mesh, Metal', Style: 'Contemporary', 'Weight Capacity': '400 lbs' },
     variants: [
-      { id: 'B0F62NG547', asin: 'B0F62NG547', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/81kXYU79wKL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81kXYU79wKL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0F62NG547?tag=snapspacemkt-20' },
-      { id: 'B0F62KRH1D', asin: 'B0F62KRH1D', label: 'Pink', mainImage: 'https://m.media-amazon.com/images/I/81kXYU79wKL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81kXYU79wKL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0F62KRH1D?tag=snapspacemkt-20' },
+      { id: 'B0F62NG547', asin: 'B0F62NG547', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/81kXYU79wKL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81kXYU79wKL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0F62NG547?tag=snapspacemkt-20' },
+      { id: 'B0F62KRH1D', asin: 'B0F62KRH1D', label: 'Pink', mainImage: 'https://m.media-amazon.com/images/I/81kXYU79wKL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81kXYU79wKL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0F62KRH1D?tag=snapspacemkt-20' },
       { id: 'B0F62NJZF1', asin: 'B0F62NJZF1', label: 'Lavender', mainImage: 'https://m.media-amazon.com/images/I/81kXYU79wKL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81kXYU79wKL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0F62NJZF1?tag=snapspacemkt-20' },
       { id: 'B0FCY98PYF', asin: 'B0FCY98PYF', label: 'Deep Black', mainImage: 'https://m.media-amazon.com/images/I/81kXYU79wKL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81kXYU79wKL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FCY98PYF?tag=snapspacemkt-20' },
       { id: 'B0G3TMDV9P', asin: 'B0G3TMDV9P', label: 'Lake Blue', mainImage: 'https://m.media-amazon.com/images/I/81kXYU79wKL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81kXYU79wKL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0G3TMDV9P?tag=snapspacemkt-20' },
@@ -15922,8 +15922,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'Ergalithic', Material: 'Mesh, PU Leather, Metal', Style: 'Contemporary/Industrial' },
     variants: [
-      { id: 'B0F5X1SMN4', asin: 'B0F5X1SMN4', label: 'Black — with Headrest', mainImage: 'https://m.media-amazon.com/images/I/71apPL11nML._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71apPL11nML._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0F5X1SMN4?tag=snapspacemkt-20' },
-      { id: 'B0F5X5J85G', asin: 'B0F5X5J85G', label: 'Grey — no Headrest', mainImage: 'https://m.media-amazon.com/images/I/71apPL11nML._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71apPL11nML._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0F5X5J85G?tag=snapspacemkt-20' },
+      { id: 'B0F5X1SMN4', asin: 'B0F5X1SMN4', label: 'Black — with Headrest', mainImage: 'https://m.media-amazon.com/images/I/71apPL11nML._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71apPL11nML._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0F5X1SMN4?tag=snapspacemkt-20' },
+      { id: 'B0F5X5J85G', asin: 'B0F5X5J85G', label: 'Grey — no Headrest', mainImage: 'https://m.media-amazon.com/images/I/71apPL11nML._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71apPL11nML._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0F5X5J85G?tag=snapspacemkt-20' },
       { id: 'B0FY1BTNKC', asin: 'B0FY1BTNKC', label: 'Dark Green', mainImage: 'https://m.media-amazon.com/images/I/71apPL11nML._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71apPL11nML._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FY1BTNKC?tag=snapspacemkt-20' },
       { id: 'B0FPF75DSS', asin: 'B0FPF75DSS', label: 'Light Black — no Headrest', mainImage: 'https://m.media-amazon.com/images/I/71apPL11nML._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71apPL11nML._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FPF75DSS?tag=snapspacemkt-20' },
     ],
@@ -15963,8 +15963,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'Soohow', Material: 'Mesh, Metal', Style: 'Contemporary' },
     variants: [
-      { id: 'B0C8LYPQ3L', asin: 'B0C8LYPQ3L', label: 'White-Khaki', mainImage: 'https://m.media-amazon.com/images/I/61wqlB3rgkL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61wqlB3rgkL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0C8LYPQ3L?tag=snapspacemkt-20' },
-      { id: 'B0C8M7XP15', asin: 'B0C8M7XP15', label: 'White-Black', mainImage: 'https://m.media-amazon.com/images/I/61wqlB3rgkL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61wqlB3rgkL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0C8M7XP15?tag=snapspacemkt-20' },
+      { id: 'B0C8LYPQ3L', asin: 'B0C8LYPQ3L', label: 'White-Khaki', mainImage: 'https://m.media-amazon.com/images/I/61wqlB3rgkL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61wqlB3rgkL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0C8LYPQ3L?tag=snapspacemkt-20' },
+      { id: 'B0C8M7XP15', asin: 'B0C8M7XP15', label: 'White-Black', mainImage: 'https://m.media-amazon.com/images/I/61wqlB3rgkL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61wqlB3rgkL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0C8M7XP15?tag=snapspacemkt-20' },
       { id: 'B0C8M98HRR', asin: 'B0C8M98HRR', label: 'Black-Black', mainImage: 'https://m.media-amazon.com/images/I/61wqlB3rgkL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61wqlB3rgkL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0C8M98HRR?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '2-5', prime: true, returnDays: 30 },
@@ -16003,8 +16003,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'SICHY AGE', Material: 'Mesh, Metal', Style: 'Contemporary' },
     variants: [
-      { id: 'B0BDYN9N2R', asin: 'B0BDYN9N2R', label: 'Khaki', mainImage: 'https://m.media-amazon.com/images/I/71R3lrdI0hL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71R3lrdI0hL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0BDYN9N2R?tag=snapspacemkt-20' },
-      { id: 'B0F13C6CT6', asin: 'B0F13C6CT6', label: 'White-Black', mainImage: 'https://m.media-amazon.com/images/I/71R3lrdI0hL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71R3lrdI0hL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0F13C6CT6?tag=snapspacemkt-20' },
+      { id: 'B0BDYN9N2R', asin: 'B0BDYN9N2R', label: 'Khaki', mainImage: 'https://m.media-amazon.com/images/I/71R3lrdI0hL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71R3lrdI0hL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0BDYN9N2R?tag=snapspacemkt-20' },
+      { id: 'B0F13C6CT6', asin: 'B0F13C6CT6', label: 'White-Black', mainImage: 'https://m.media-amazon.com/images/I/71R3lrdI0hL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71R3lrdI0hL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0F13C6CT6?tag=snapspacemkt-20' },
       { id: 'B0F13C84YP', asin: 'B0F13C84YP', label: 'Grey', mainImage: 'https://m.media-amazon.com/images/I/71R3lrdI0hL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71R3lrdI0hL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0F13C84YP?tag=snapspacemkt-20' },
       { id: 'B0D1MP2JCY', asin: 'B0D1MP2JCY', label: 'Khaki — Style 2', mainImage: 'https://m.media-amazon.com/images/I/71R3lrdI0hL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71R3lrdI0hL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0D1MP2JCY?tag=snapspacemkt-20' },
     ],
@@ -16046,8 +16046,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'IRONCK', Material: 'Wood, Metal', Style: 'Industrial', Dimensions: '23.6"W x 11.8"D x 64.2"H' },
     variants: [
-      { id: 'B08X28THSZ', asin: 'B08X28THSZ', label: 'Rustic Brown', mainImage: 'https://m.media-amazon.com/images/I/71abiqKPyQL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71abiqKPyQL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B08X28THSZ?tag=snapspacemkt-20' },
-      { id: 'B0FCFRXDY9', asin: 'B0FCFRXDY9', label: 'White', mainImage: 'https://m.media-amazon.com/images/I/71abiqKPyQL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71abiqKPyQL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0FCFRXDY9?tag=snapspacemkt-20' },
+      { id: 'B08X28THSZ', asin: 'B08X28THSZ', label: 'Rustic Brown', mainImage: 'https://m.media-amazon.com/images/I/71abiqKPyQL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71abiqKPyQL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B08X28THSZ?tag=snapspacemkt-20' },
+      { id: 'B0FCFRXDY9', asin: 'B0FCFRXDY9', label: 'White', mainImage: 'https://m.media-amazon.com/images/I/71abiqKPyQL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71abiqKPyQL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FCFRXDY9?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '2-5', prime: true, returnDays: 30 },
   },
@@ -16084,8 +16084,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'IRONCK', Material: 'Wood, Metal', Style: 'Industrial', Dimensions: '69.3"W x 11.8"D x 69.3"H' },
     variants: [
-      { id: 'B0B188DN36', asin: 'B0B188DN36', label: 'Vintage Brown', mainImage: 'https://m.media-amazon.com/images/I/81ViSNPymwL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81ViSNPymwL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0B188DN36?tag=snapspacemkt-20' },
-      { id: 'B0DNSQ57ZH', asin: 'B0DNSQ57ZH', label: 'Industrial White', mainImage: 'https://m.media-amazon.com/images/I/81ViSNPymwL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81ViSNPymwL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0DNSQ57ZH?tag=snapspacemkt-20' },
+      { id: 'B0B188DN36', asin: 'B0B188DN36', label: 'Vintage Brown', mainImage: 'https://m.media-amazon.com/images/I/81ViSNPymwL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81ViSNPymwL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0B188DN36?tag=snapspacemkt-20' },
+      { id: 'B0DNSQ57ZH', asin: 'B0DNSQ57ZH', label: 'Industrial White', mainImage: 'https://m.media-amazon.com/images/I/81ViSNPymwL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81ViSNPymwL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DNSQ57ZH?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '2-5', prime: true, returnDays: 30 },
   },
@@ -16123,7 +16123,7 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'IRONCK', Material: 'Wood, Metal', Style: 'Industrial/Vintage', Dimensions: '27.6"W x 13.8"D x 68.9"H' },
     variants: [
-      { id: 'B096ZX329L', asin: 'B096ZX329L', label: 'Industrial Vintage Brown', mainImage: 'https://m.media-amazon.com/images/I/81-bhMITI3S._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81-bhMITI3S._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B096ZX329L?tag=snapspacemkt-20' },
+      { id: 'B096ZX329L', asin: 'B096ZX329L', label: 'Industrial Vintage Brown', mainImage: 'https://m.media-amazon.com/images/I/81-bhMITI3S._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81-bhMITI3S._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B096ZX329L?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '2-5', prime: true, returnDays: 30 },
   },
@@ -16160,8 +16160,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'HOMISSUE', Material: 'Wood, Metal', Style: 'Industrial/Rustic', Dimensions: '23.6"W x 11.8"D x 70.9"H' },
     variants: [
-      { id: 'B0CQX91KJQ', asin: 'B0CQX91KJQ', label: 'Vintage Brown — 7 Tier', mainImage: 'https://m.media-amazon.com/images/I/81cHAYc2ecL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81cHAYc2ecL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0CQX91KJQ?tag=snapspacemkt-20' },
-      { id: 'B0BRK5S8HP', asin: 'B0BRK5S8HP', label: 'Vintage Brown — 6 Tier', mainImage: 'https://m.media-amazon.com/images/I/81cHAYc2ecL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81cHAYc2ecL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0BRK5S8HP?tag=snapspacemkt-20' },
+      { id: 'B0CQX91KJQ', asin: 'B0CQX91KJQ', label: 'Vintage Brown — 7 Tier', mainImage: 'https://m.media-amazon.com/images/I/81cHAYc2ecL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81cHAYc2ecL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CQX91KJQ?tag=snapspacemkt-20' },
+      { id: 'B0BRK5S8HP', asin: 'B0BRK5S8HP', label: 'Vintage Brown — 6 Tier', mainImage: 'https://m.media-amazon.com/images/I/81cHAYc2ecL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81cHAYc2ecL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0BRK5S8HP?tag=snapspacemkt-20' },
       { id: 'B0DBZNTJNV', asin: 'B0DBZNTJNV', label: 'Black — 7 Tier', mainImage: 'https://m.media-amazon.com/images/I/81cHAYc2ecL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81cHAYc2ecL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DBZNTJNV?tag=snapspacemkt-20' },
       { id: 'B0CFKGX2H2', asin: 'B0CFKGX2H2', label: 'Black — 6 Tier', mainImage: 'https://m.media-amazon.com/images/I/81cHAYc2ecL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81cHAYc2ecL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CFKGX2H2?tag=snapspacemkt-20' },
       { id: 'B0FSRJ2F6L', asin: 'B0FSRJ2F6L', label: 'White — 7 Tier', mainImage: 'https://m.media-amazon.com/images/I/81cHAYc2ecL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81cHAYc2ecL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FSRJ2F6L?tag=snapspacemkt-20' },
@@ -16201,8 +16201,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: '4NM', Material: 'Wood, Metal', Style: 'Industrial', Dimensions: '23.6"W x 11.8"D x 51.2"H' },
     variants: [
-      { id: 'B0DJ78VY6K', asin: 'B0DJ78VY6K', label: 'Rustic Brown — 5 Tier', mainImage: 'https://m.media-amazon.com/images/I/81i667q+B0L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81i667q+B0L._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0DJ78VY6K?tag=snapspacemkt-20' },
-      { id: 'B0DY7G94J6', asin: 'B0DY7G94J6', label: 'All White — 6 Tier', mainImage: 'https://m.media-amazon.com/images/I/81i667q+B0L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81i667q+B0L._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0DY7G94J6?tag=snapspacemkt-20' },
+      { id: 'B0DJ78VY6K', asin: 'B0DJ78VY6K', label: 'Rustic Brown — 5 Tier', mainImage: 'https://m.media-amazon.com/images/I/81i667q+B0L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81i667q+B0L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DJ78VY6K?tag=snapspacemkt-20' },
+      { id: 'B0DY7G94J6', asin: 'B0DY7G94J6', label: 'All White — 6 Tier', mainImage: 'https://m.media-amazon.com/images/I/81i667q+B0L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81i667q+B0L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DY7G94J6?tag=snapspacemkt-20' },
       { id: 'B0FN7LSST5', asin: 'B0FN7LSST5', label: 'Natural White — 7 Tier', mainImage: 'https://m.media-amazon.com/images/I/81i667q+B0L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81i667q+B0L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FN7LSST5?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '2-5', prime: true, returnDays: 30 },
@@ -16241,8 +16241,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'FATORRI', Material: 'Wood, Metal', Style: 'Industrial/Rustic', Dimensions: '35.4"W x 11.8"D x 27.6"H' },
     variants: [
-      { id: 'B0FN3ZYC5L', asin: 'B0FN3ZYC5L', label: 'Dark Walnut — Without Drawer', mainImage: 'https://m.media-amazon.com/images/I/71pytDzNCHL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71pytDzNCHL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0FN3ZYC5L?tag=snapspacemkt-20' },
-      { id: 'B0FN3ZMFMP', asin: 'B0FN3ZMFMP', label: 'Dark Walnut — With Drawer', mainImage: 'https://m.media-amazon.com/images/I/71pytDzNCHL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71pytDzNCHL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0FN3ZMFMP?tag=snapspacemkt-20' },
+      { id: 'B0FN3ZYC5L', asin: 'B0FN3ZYC5L', label: 'Dark Walnut — Without Drawer', mainImage: 'https://m.media-amazon.com/images/I/71pytDzNCHL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71pytDzNCHL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FN3ZYC5L?tag=snapspacemkt-20' },
+      { id: 'B0FN3ZMFMP', asin: 'B0FN3ZMFMP', label: 'Dark Walnut — With Drawer', mainImage: 'https://m.media-amazon.com/images/I/71pytDzNCHL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71pytDzNCHL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FN3ZMFMP?tag=snapspacemkt-20' },
       { id: 'B0BYNBFT6G', asin: 'B0BYNBFT6G', label: 'Rustic Oak — Without Drawer', mainImage: 'https://m.media-amazon.com/images/I/71pytDzNCHL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71pytDzNCHL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0BYNBFT6G?tag=snapspacemkt-20' },
       { id: 'B0B1ZRNZ8D', asin: 'B0B1ZRNZ8D', label: 'Walnut Brown — Without Drawer', mainImage: 'https://m.media-amazon.com/images/I/71pytDzNCHL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71pytDzNCHL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0B1ZRNZ8D?tag=snapspacemkt-20' },
     ],
@@ -16282,8 +16282,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'IDEALHOUSE', Material: 'Wood, Metal', Style: 'Modern/Contemporary', Dimensions: '17.7"W x 9.8"D x 59"H' },
     variants: [
-      { id: 'B0BVQQB5V9', asin: 'B0BVQQB5V9', label: 'White / Gold', mainImage: 'https://m.media-amazon.com/images/I/71RudUxkAXL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71RudUxkAXL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0BVQQB5V9?tag=snapspacemkt-20' },
-      { id: 'B0C6WZ331Q', asin: 'B0C6WZ331Q', label: 'Grey', mainImage: 'https://m.media-amazon.com/images/I/71RudUxkAXL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71RudUxkAXL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0C6WZ331Q?tag=snapspacemkt-20' },
+      { id: 'B0BVQQB5V9', asin: 'B0BVQQB5V9', label: 'White / Gold', mainImage: 'https://m.media-amazon.com/images/I/71RudUxkAXL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71RudUxkAXL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0BVQQB5V9?tag=snapspacemkt-20' },
+      { id: 'B0C6WZ331Q', asin: 'B0C6WZ331Q', label: 'Grey', mainImage: 'https://m.media-amazon.com/images/I/71RudUxkAXL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71RudUxkAXL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0C6WZ331Q?tag=snapspacemkt-20' },
       { id: 'B0C6WNWYHL', asin: 'B0C6WNWYHL', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/71RudUxkAXL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71RudUxkAXL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0C6WNWYHL?tag=snapspacemkt-20' },
       { id: 'B0DPKB9H7R', asin: 'B0DPKB9H7R', label: 'Rustic Brown', mainImage: 'https://m.media-amazon.com/images/I/71RudUxkAXL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71RudUxkAXL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DPKB9H7R?tag=snapspacemkt-20' },
     ],
@@ -16322,8 +16322,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'IRONCK', Material: 'Wood, Metal', Style: 'Industrial', Dimensions: '55.12"D x 13.3"W x 30.12"H' },
     variants: [
-      { id: 'B08TZVZ7RS', asin: 'B08TZVZ7RS', label: '55 Inch', mainImage: 'https://m.media-amazon.com/images/I/919Gl+3FwVL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/919Gl+3FwVL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B08TZVZ7RS?tag=snapspacemkt-20' },
-      { id: 'B097D76KNT', asin: 'B097D76KNT', label: '47 Inch', mainImage: 'https://m.media-amazon.com/images/I/919Gl+3FwVL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/919Gl+3FwVL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B097D76KNT?tag=snapspacemkt-20' },
+      { id: 'B08TZVZ7RS', asin: 'B08TZVZ7RS', label: '55 Inch', mainImage: 'https://m.media-amazon.com/images/I/919Gl+3FwVL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/919Gl+3FwVL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B08TZVZ7RS?tag=snapspacemkt-20' },
+      { id: 'B097D76KNT', asin: 'B097D76KNT', label: '47 Inch', mainImage: 'https://m.media-amazon.com/images/I/919Gl+3FwVL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/919Gl+3FwVL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B097D76KNT?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '2-5', prime: true, returnDays: 30 },
   },
@@ -16361,8 +16361,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'IBF', Material: 'Wood, Metal', Style: 'Farmhouse/Industrial', Dimensions: '47"W x 11.8"D x 24.8"H' },
     variants: [
-      { id: 'B0BX8HD3QY', asin: 'B0BX8HD3QY', label: 'Rustic Brown — 47"', mainImage: 'https://m.media-amazon.com/images/I/81F83ofWnpL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81F83ofWnpL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0BX8HD3QY?tag=snapspacemkt-20' },
-      { id: 'B0BX8LFDF5', asin: 'B0BX8LFDF5', label: 'White Oak — 47"', mainImage: 'https://m.media-amazon.com/images/I/81F83ofWnpL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81F83ofWnpL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0BX8LFDF5?tag=snapspacemkt-20' },
+      { id: 'B0BX8HD3QY', asin: 'B0BX8HD3QY', label: 'Rustic Brown — 47"', mainImage: 'https://m.media-amazon.com/images/I/81F83ofWnpL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81F83ofWnpL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0BX8HD3QY?tag=snapspacemkt-20' },
+      { id: 'B0BX8LFDF5', asin: 'B0BX8LFDF5', label: 'White Oak — 47"', mainImage: 'https://m.media-amazon.com/images/I/81F83ofWnpL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81F83ofWnpL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0BX8LFDF5?tag=snapspacemkt-20' },
       { id: 'B0BX8JBCBQ', asin: 'B0BX8JBCBQ', label: 'Black Oak — 47"', mainImage: 'https://m.media-amazon.com/images/I/81F83ofWnpL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81F83ofWnpL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0BX8JBCBQ?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '2-5', prime: true, returnDays: 30 },
@@ -16399,8 +16399,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'NUMENN', Material: 'Wood, Metal', Style: 'Industrial/Rustic', Dimensions: '47.2"W x 11.8"D x 70.9"H' },
     variants: [
-      { id: 'B0C7H2YMD9', asin: 'B0C7H2YMD9', label: 'Vintage — 5 Tier Large', mainImage: 'https://m.media-amazon.com/images/I/71ECNOPC-mL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71ECNOPC-mL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0C7H2YMD9?tag=snapspacemkt-20' },
-      { id: 'B0CGDY259D', asin: 'B0CGDY259D', label: 'Vintage — 6 Tier Large', mainImage: 'https://m.media-amazon.com/images/I/71ECNOPC-mL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71ECNOPC-mL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0CGDY259D?tag=snapspacemkt-20' },
+      { id: 'B0C7H2YMD9', asin: 'B0C7H2YMD9', label: 'Vintage — 5 Tier Large', mainImage: 'https://m.media-amazon.com/images/I/71ECNOPC-mL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71ECNOPC-mL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0C7H2YMD9?tag=snapspacemkt-20' },
+      { id: 'B0CGDY259D', asin: 'B0CGDY259D', label: 'Vintage — 6 Tier Large', mainImage: 'https://m.media-amazon.com/images/I/71ECNOPC-mL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71ECNOPC-mL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CGDY259D?tag=snapspacemkt-20' },
       { id: 'B0G62PKPRH', asin: 'B0G62PKPRH', label: 'Black — 6 Tier Regular', mainImage: 'https://m.media-amazon.com/images/I/71ECNOPC-mL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71ECNOPC-mL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0G62PKPRH?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '2-5', prime: true, returnDays: 30 },
@@ -16439,8 +16439,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'CAPHAUS', Material: 'Wood, Metal', Style: 'Industrial', Dimensions: '24"W x 9.5"D x 70.9"H' },
     variants: [
-      { id: 'B0B5FXQDSX', asin: 'B0B5FXQDSX', label: 'Rustic Oak — 5 Tier', mainImage: 'https://m.media-amazon.com/images/I/613F8uCItbL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/613F8uCItbL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0B5FXQDSX?tag=snapspacemkt-20' },
-      { id: 'B0CJTCCJZS', asin: 'B0CJTCCJZS', label: 'Gold — 5 Tier', mainImage: 'https://m.media-amazon.com/images/I/613F8uCItbL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/613F8uCItbL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0CJTCCJZS?tag=snapspacemkt-20' },
+      { id: 'B0B5FXQDSX', asin: 'B0B5FXQDSX', label: 'Rustic Oak — 5 Tier', mainImage: 'https://m.media-amazon.com/images/I/613F8uCItbL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/613F8uCItbL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0B5FXQDSX?tag=snapspacemkt-20' },
+      { id: 'B0CJTCCJZS', asin: 'B0CJTCCJZS', label: 'Gold — 5 Tier', mainImage: 'https://m.media-amazon.com/images/I/613F8uCItbL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/613F8uCItbL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CJTCCJZS?tag=snapspacemkt-20' },
       { id: 'B0CJT7S5CN', asin: 'B0CJT7S5CN', label: 'Dark Grey — 4 Tier', mainImage: 'https://m.media-amazon.com/images/I/613F8uCItbL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/613F8uCItbL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CJT7S5CN?tag=snapspacemkt-20' },
       { id: 'B0BS18TSYJ', asin: 'B0BS18TSYJ', label: 'Black — 4 Tier', mainImage: 'https://m.media-amazon.com/images/I/613F8uCItbL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/613F8uCItbL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0BS18TSYJ?tag=snapspacemkt-20' },
     ],
@@ -16479,8 +16479,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'FOTOSOK', Material: 'Particleboard', Style: 'Contemporary', Dimensions: '23.6"W x 11.8"D x 70.9"H' },
     variants: [
-      { id: 'B0C5RK4NBT', asin: 'B0C5RK4NBT', label: 'White', mainImage: 'https://m.media-amazon.com/images/I/81fUuSuZkAL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81fUuSuZkAL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0C5RK4NBT?tag=snapspacemkt-20' },
-      { id: 'B09NR3LDTV', asin: 'B09NR3LDTV', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/81fUuSuZkAL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81fUuSuZkAL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B09NR3LDTV?tag=snapspacemkt-20' },
+      { id: 'B0C5RK4NBT', asin: 'B0C5RK4NBT', label: 'White', mainImage: 'https://m.media-amazon.com/images/I/81fUuSuZkAL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81fUuSuZkAL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0C5RK4NBT?tag=snapspacemkt-20' },
+      { id: 'B09NR3LDTV', asin: 'B09NR3LDTV', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/81fUuSuZkAL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81fUuSuZkAL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B09NR3LDTV?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '2-5', prime: true, returnDays: 30 },
   },
@@ -16517,8 +16517,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'VECELO', Material: 'Wood, Metal', Style: 'Industrial', Dimensions: '23.6"W x 11.8"D x 64.2"H' },
     variants: [
-      { id: 'B0CWNMSV2M', asin: 'B0CWNMSV2M', label: 'Antique Brown — 1 Set', mainImage: 'https://m.media-amazon.com/images/I/71UO8l0WQWL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71UO8l0WQWL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0CWNMSV2M?tag=snapspacemkt-20' },
-      { id: 'B0CTZD68S4', asin: 'B0CTZD68S4', label: 'Brown — 2 Set', mainImage: 'https://m.media-amazon.com/images/I/71UO8l0WQWL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71UO8l0WQWL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0CTZD68S4?tag=snapspacemkt-20' },
+      { id: 'B0CWNMSV2M', asin: 'B0CWNMSV2M', label: 'Antique Brown — 1 Set', mainImage: 'https://m.media-amazon.com/images/I/71UO8l0WQWL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71UO8l0WQWL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CWNMSV2M?tag=snapspacemkt-20' },
+      { id: 'B0CTZD68S4', asin: 'B0CTZD68S4', label: 'Brown — 2 Set', mainImage: 'https://m.media-amazon.com/images/I/71UO8l0WQWL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71UO8l0WQWL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CTZD68S4?tag=snapspacemkt-20' },
       { id: 'B0F8HJ5HPL', asin: 'B0F8HJ5HPL', label: 'Antique Brown — 1 Set (Alt)', mainImage: 'https://m.media-amazon.com/images/I/71UO8l0WQWL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71UO8l0WQWL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0F8HJ5HPL?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '2-5', prime: true, returnDays: 30 },
@@ -16556,7 +16556,7 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'IRONCK', Material: 'Wood, Metal', Style: 'Industrial/Vintage', Dimensions: '23.6"W x 11.8"D x 70.9"H' },
     variants: [
-      { id: 'B07NYGYH16', asin: 'B07NYGYH16', label: 'Vintage Brown', mainImage: 'https://m.media-amazon.com/images/I/710+fhspHRL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/710+fhspHRL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B07NYGYH16?tag=snapspacemkt-20' },
+      { id: 'B07NYGYH16', asin: 'B07NYGYH16', label: 'Vintage Brown', mainImage: 'https://m.media-amazon.com/images/I/710+fhspHRL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/710+fhspHRL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B07NYGYH16?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '2-5', prime: true, returnDays: 30 },
   },
@@ -16599,8 +16599,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'Sheetea', Material: 'Metal', Style: 'Farmhouse/Industrial', 'Bulb Base': 'E26 (max 60W, not included)', 'Cord Length': '49.4"' },
     variants: [
-      { id: 'B0D1YLCN14', asin: 'B0D1YLCN14', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/71tsz66ZDSL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71tsz66ZDSL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0D1YLCN14?tag=snapspacemkt-20' },
-      { id: 'B0DNNCTRF1', asin: 'B0DNNCTRF1', label: 'Brown', mainImage: 'https://m.media-amazon.com/images/I/71harpKEZ5L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71harpKEZ5L._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0DNNCTRF1?tag=snapspacemkt-20' },
+      { id: 'B0D1YLCN14', asin: 'B0D1YLCN14', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/71tsz66ZDSL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71tsz66ZDSL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0D1YLCN14?tag=snapspacemkt-20' },
+      { id: 'B0DNNCTRF1', asin: 'B0DNNCTRF1', label: 'Brown', mainImage: 'https://m.media-amazon.com/images/I/71harpKEZ5L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71harpKEZ5L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DNNCTRF1?tag=snapspacemkt-20' },
       { id: 'B0DNNG6S9W', asin: 'B0DNNG6S9W', label: 'Gold', mainImage: 'https://m.media-amazon.com/images/I/71MwJnRbfvL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71MwJnRbfvL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DNNG6S9W?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '2-5', prime: true, returnDays: 30 },
@@ -16641,7 +16641,7 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'SGLfarmty', Material: 'Metal, Glass', Style: 'Industrial/Farmhouse', 'Dimensions': '9.8"L x 7"W x 7"H', 'Max Hang': '45"' },
     variants: [
-      { id: 'B09MK731BY', asin: 'B09MK731BY', label: 'Black/Wood', mainImage: 'https://m.media-amazon.com/images/I/71QmRfg5DfL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71QmRfg5DfL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B09MK731BY?tag=snapspacemkt-20' },
+      { id: 'B09MK731BY', asin: 'B09MK731BY', label: 'Black/Wood', mainImage: 'https://m.media-amazon.com/images/I/71QmRfg5DfL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71QmRfg5DfL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B09MK731BY?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '2-5', prime: true, returnDays: 30 },
   },
@@ -16680,7 +16680,7 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'KCO Lighting', Material: 'Glass, Metal', Style: 'Mid Century Modern', Dimensions: '9.8"W x 8.7"H', 'Bulb Base': 'E26' },
     variants: [
-      { id: 'B0968B7S51', asin: 'B0968B7S51', label: 'Gradient Gold', mainImage: 'https://m.media-amazon.com/images/I/51qTGXgxQ0L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51qTGXgxQ0L._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0968B7S51?tag=snapspacemkt-20' },
+      { id: 'B0968B7S51', asin: 'B0968B7S51', label: 'Gradient Gold', mainImage: 'https://m.media-amazon.com/images/I/51qTGXgxQ0L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51qTGXgxQ0L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0968B7S51?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '2-5', prime: true, returnDays: 30 },
   },
@@ -16720,7 +16720,7 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'DEWENWILS', Material: 'Metal', Style: 'Farmhouse', 'Max Height': '48"', Certification: 'ETL Listed' },
     variants: [
-      { id: 'B08TC8KWJ9', asin: 'B08TC8KWJ9', label: 'Wood Grain / Black', mainImage: 'https://m.media-amazon.com/images/I/71ccJJMhCXL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71ccJJMhCXL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B08TC8KWJ9?tag=snapspacemkt-20' },
+      { id: 'B08TC8KWJ9', asin: 'B08TC8KWJ9', label: 'Wood Grain / Black', mainImage: 'https://m.media-amazon.com/images/I/71ccJJMhCXL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71ccJJMhCXL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B08TC8KWJ9?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '2-5', prime: true, returnDays: 30 },
   },
@@ -16760,7 +16760,7 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'IHENGYANLT', Material: 'Metal, Glass', Style: 'Industrial', 'Cord Length': '55"', 'Quantity': '2 Pack' },
     variants: [
-      { id: 'B0BRV2M1QB', asin: 'B0BRV2M1QB', label: 'Black / Clear Glass', mainImage: 'https://m.media-amazon.com/images/I/61+UJGSvoIL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61+UJGSvoIL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0BRV2M1QB?tag=snapspacemkt-20' },
+      { id: 'B0BRV2M1QB', asin: 'B0BRV2M1QB', label: 'Black / Clear Glass', mainImage: 'https://m.media-amazon.com/images/I/61+UJGSvoIL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61+UJGSvoIL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0BRV2M1QB?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '2-5', prime: true, returnDays: 30 },
   },
@@ -16800,7 +16800,7 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'Trustwoods', Material: 'Hand-Blown Glass, Metal', Style: 'Contemporary/Farmhouse', Dimensions: '9.2"W x 9.2"D x 6.1"H', 'Cord': '70" max' },
     variants: [
-      { id: 'B08JH56T5M', asin: 'B08JH56T5M', label: 'Grey Blue / Brushed Nickel', mainImage: 'https://m.media-amazon.com/images/I/81-kAgI-AHL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81-kAgI-AHL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B08JH56T5M?tag=snapspacemkt-20' },
+      { id: 'B08JH56T5M', asin: 'B08JH56T5M', label: 'Grey Blue / Brushed Nickel', mainImage: 'https://m.media-amazon.com/images/I/81-kAgI-AHL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81-kAgI-AHL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B08JH56T5M?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '2-5', prime: true, returnDays: 30 },
   },
@@ -16840,7 +16840,7 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'ELYONA', Material: 'Hammered Metal, FSC Solid Wood', Style: 'Mid Century/Industrial', Dimensions: 'Max 54.5"H x 10"W', Certification: 'ETL Listed' },
     variants: [
-      { id: 'B0C62DMSSF', asin: 'B0C62DMSSF', label: 'Brushed Brass / Wood', mainImage: 'https://m.media-amazon.com/images/I/71zfSX2Yl9L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71zfSX2Yl9L._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0C62DMSSF?tag=snapspacemkt-20' },
+      { id: 'B0C62DMSSF', asin: 'B0C62DMSSF', label: 'Brushed Brass / Wood', mainImage: 'https://m.media-amazon.com/images/I/71zfSX2Yl9L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71zfSX2Yl9L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0C62DMSSF?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '2-5', prime: true, returnDays: 30 },
   },
@@ -16879,7 +16879,7 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'LOG BARN', Material: 'Iron, Wood', Style: 'Farmhouse/Rustic', Dimensions: '16"D x 17.5"H', 'Canopy': '5" round' },
     variants: [
-      { id: 'B0F7KBBQV8', asin: 'B0F7KBBQV8', label: 'Distressed Wood', mainImage: 'https://m.media-amazon.com/images/I/71rPAgO-x5L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71rPAgO-x5L._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0F7KBBQV8?tag=snapspacemkt-20' },
+      { id: 'B0F7KBBQV8', asin: 'B0F7KBBQV8', label: 'Distressed Wood', mainImage: 'https://m.media-amazon.com/images/I/71rPAgO-x5L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71rPAgO-x5L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0F7KBBQV8?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '2-5', prime: true, returnDays: 30 },
   },
@@ -16919,7 +16919,7 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'Osimir', Material: 'Metal, Glass', Style: 'Industrial/Farmhouse', 'Shade': '5"W x 7"H', 'Quantity': '2 Pack' },
     variants: [
-      { id: 'B089GGTMY5', asin: 'B089GGTMY5', label: 'Black / Clear Glass', mainImage: 'https://m.media-amazon.com/images/I/613b9-rxOsL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/613b9-rxOsL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B089GGTMY5?tag=snapspacemkt-20' },
+      { id: 'B089GGTMY5', asin: 'B089GGTMY5', label: 'Black / Clear Glass', mainImage: 'https://m.media-amazon.com/images/I/613b9-rxOsL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/613b9-rxOsL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B089GGTMY5?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '2-5', prime: true, returnDays: 30 },
   },
@@ -16958,7 +16958,7 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'SADUENFR', Material: 'Hand-Blown Glass, Metal', Style: 'Farmhouse/Contemporary', 'Cord': '55" adjustable', 'Bulb Base': 'E26' },
     variants: [
-      { id: 'B0D2LQR5MR', asin: 'B0D2LQR5MR', label: 'Black / Clear Glass', mainImage: 'https://m.media-amazon.com/images/I/71+VYQ+fItL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71+VYQ+fItL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0D2LQR5MR?tag=snapspacemkt-20' },
+      { id: 'B0D2LQR5MR', asin: 'B0D2LQR5MR', label: 'Black / Clear Glass', mainImage: 'https://m.media-amazon.com/images/I/71+VYQ+fItL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71+VYQ+fItL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0D2LQR5MR?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '2-5', prime: true, returnDays: 30 },
   },
@@ -16998,7 +16998,7 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'Doraimi Lighting', Material: 'Metal', Style: 'Industrial', Dimensions: '7"H x 6.5"D, 50" cord', Certification: 'UL Listed' },
     variants: [
-      { id: 'B0855Q471W', asin: 'B0855Q471W', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/51jKO-xPcYL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51jKO-xPcYL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0855Q471W?tag=snapspacemkt-20' },
+      { id: 'B0855Q471W', asin: 'B0855Q471W', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/51jKO-xPcYL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51jKO-xPcYL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0855Q471W?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '2-5', prime: true, returnDays: 30 },
   },
@@ -17038,7 +17038,7 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'DUHU', Material: 'Metal, Natural Wood', Style: 'Industrial/Contemporary', Diameter: '3.94"', 'Bulb Base': 'E26' },
     variants: [
-      { id: 'B0CJPYVZ54', asin: 'B0CJPYVZ54', label: 'Black / Wood', mainImage: 'https://m.media-amazon.com/images/I/41zTg+zUIbL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41zTg+zUIbL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0CJPYVZ54?tag=snapspacemkt-20' },
+      { id: 'B0CJPYVZ54', asin: 'B0CJPYVZ54', label: 'Black / Wood', mainImage: 'https://m.media-amazon.com/images/I/41zTg+zUIbL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41zTg+zUIbL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CJPYVZ54?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '2-5', prime: true, returnDays: 30 },
   },
@@ -17078,7 +17078,7 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'LMSOD', Material: 'Metal', Style: 'Industrial/Farmhouse', 'Body Size': '6.29"L x 8.66"H', 'Max Height': '40"' },
     variants: [
-      { id: 'B08PVKQ7JW', asin: 'B08PVKQ7JW', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/51hLd6gHRHL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51hLd6gHRHL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B08PVKQ7JW?tag=snapspacemkt-20' },
+      { id: 'B08PVKQ7JW', asin: 'B08PVKQ7JW', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/51hLd6gHRHL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51hLd6gHRHL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B08PVKQ7JW?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '2-5', prime: true, returnDays: 30 },
   },
@@ -17117,7 +17117,7 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'Murkluz', Material: 'Metal, Glass', Style: 'Industrial/Contemporary', 'Max Height': '66.9"', Certification: 'UL Listed' },
     variants: [
-      { id: 'B0DG64P38P', asin: 'B0DG64P38P', label: 'Black / Seeded Glass', mainImage: 'https://m.media-amazon.com/images/I/71hr4b8B73L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71hr4b8B73L._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0DG64P38P?tag=snapspacemkt-20' },
+      { id: 'B0DG64P38P', asin: 'B0DG64P38P', label: 'Black / Seeded Glass', mainImage: 'https://m.media-amazon.com/images/I/71hr4b8B73L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71hr4b8B73L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DG64P38P?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '2-5', prime: true, returnDays: 30 },
   },
@@ -17157,7 +17157,7 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'GOEBLESON', Material: 'Metal, Glass', Style: 'Farmhouse/Industrial', Lights: '5', 'Bulb Base': 'E26 (x5)' },
     variants: [
-      { id: 'B0D14HVKNS', asin: 'B0D14HVKNS', label: 'Black / Clear Glass', mainImage: 'https://m.media-amazon.com/images/I/61jZPYKuzQL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61jZPYKuzQL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0D14HVKNS?tag=snapspacemkt-20' },
+      { id: 'B0D14HVKNS', asin: 'B0D14HVKNS', label: 'Black / Clear Glass', mainImage: 'https://m.media-amazon.com/images/I/61jZPYKuzQL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61jZPYKuzQL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0D14HVKNS?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '2-5', prime: true, returnDays: 30 },
   },
@@ -17196,7 +17196,7 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'JWLUYN', Material: 'Glass, Metal', Style: 'Farmhouse/Rustic', 'Cord Length': '30"', 'Bulb Base': 'E26' },
     variants: [
-      { id: 'B0CJJ6JS44', asin: 'B0CJJ6JS44', label: 'Clear / Black', mainImage: 'https://m.media-amazon.com/images/I/61SOzn0c+4L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61SOzn0c+4L._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0CJJ6JS44?tag=snapspacemkt-20' },
+      { id: 'B0CJJ6JS44', asin: 'B0CJJ6JS44', label: 'Clear / Black', mainImage: 'https://m.media-amazon.com/images/I/61SOzn0c+4L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61SOzn0c+4L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CJJ6JS44?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '2-5', prime: true, returnDays: 30 },
   },
@@ -17236,7 +17236,7 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'CmnVmn', Material: 'Wood, Metal, Glass', Style: 'Farmhouse/Rustic', 'Number of Lights': '5', 'Bulb Base': 'E26' },
     variants: [
-      { id: 'B0D1TXPLRX', asin: 'B0D1TXPLRX', label: 'Black + Wood + Clear Glass', mainImage: 'https://m.media-amazon.com/images/I/411a7ZbBj7L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/411a7ZbBj7L._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0D1TXPLRX?tag=snapspacemkt-20' },
+      { id: 'B0D1TXPLRX', asin: 'B0D1TXPLRX', label: 'Black + Wood + Clear Glass', mainImage: 'https://m.media-amazon.com/images/I/411a7ZbBj7L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/411a7ZbBj7L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0D1TXPLRX?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '3-7', prime: true, returnDays: 30 },
   },
@@ -17276,7 +17276,7 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'Corlaceling', Material: 'Metal, Wood', Style: 'Farmhouse/Industrial', 'Number of Lights': '5', 'Bulb Base': 'E26' },
     variants: [
-      { id: 'B0CJRD6111', asin: 'B0CJRD6111', label: 'Black + Wood', mainImage: 'https://m.media-amazon.com/images/I/81jqkn84tFL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81jqkn84tFL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0CJRD6111?tag=snapspacemkt-20' },
+      { id: 'B0CJRD6111', asin: 'B0CJRD6111', label: 'Black + Wood', mainImage: 'https://m.media-amazon.com/images/I/81jqkn84tFL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81jqkn84tFL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CJRD6111?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '3-7', prime: true, returnDays: 30 },
   },
@@ -17316,7 +17316,7 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'SupMaka', Material: 'Rattan, Wicker, Metal', Style: 'Bohemian/Coastal', 'Number of Lights': '4', 'Bulb Base': 'E12' },
     variants: [
-      { id: 'B0DKT3B4RX', asin: 'B0DKT3B4RX', label: 'Natural Rattan', mainImage: 'https://m.media-amazon.com/images/I/81HfWecZviL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81HfWecZviL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0DKT3B4RX?tag=snapspacemkt-20' },
+      { id: 'B0DKT3B4RX', asin: 'B0DKT3B4RX', label: 'Natural Rattan', mainImage: 'https://m.media-amazon.com/images/I/81HfWecZviL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81HfWecZviL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DKT3B4RX?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '3-7', prime: true, returnDays: 30 },
   },
@@ -17355,7 +17355,7 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'HMVPL', Material: 'Rattan, Wicker, Metal', Style: 'Bohemian', 'Number of Lights': '5', 'Bulb Base': 'E12', Diameter: '22"' },
     variants: [
-      { id: 'B0CJPNH4YR', asin: 'B0CJPNH4YR', label: 'Natural Rattan / Black', mainImage: 'https://m.media-amazon.com/images/I/81ftrbGvVSL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81ftrbGvVSL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0CJPNH4YR?tag=snapspacemkt-20' },
+      { id: 'B0CJPNH4YR', asin: 'B0CJPNH4YR', label: 'Natural Rattan / Black', mainImage: 'https://m.media-amazon.com/images/I/81ftrbGvVSL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81ftrbGvVSL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CJPNH4YR?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '2-5', prime: true, returnDays: 30 },
   },
@@ -17394,7 +17394,7 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'TWIG', Material: 'Wood, Glass, Metal', Style: 'Farmhouse/Rustic', 'Number of Lights': '5', 'Bulb Base': 'E26', 'Span': '48"' },
     variants: [
-      { id: 'B0BCWMX2TQ', asin: 'B0BCWMX2TQ', label: 'Natural Wood + Clear Glass', mainImage: 'https://m.media-amazon.com/images/I/71kfL+n4taL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71kfL+n4taL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0BCWMX2TQ?tag=snapspacemkt-20' },
+      { id: 'B0BCWMX2TQ', asin: 'B0BCWMX2TQ', label: 'Natural Wood + Clear Glass', mainImage: 'https://m.media-amazon.com/images/I/71kfL+n4taL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71kfL+n4taL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0BCWMX2TQ?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '2-5', prime: true, returnDays: 30 },
   },
@@ -17433,7 +17433,7 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'SANTOSTOCK', Material: 'Metal, Wood', Style: 'Farmhouse', 'Number of Lights': '4', 'Bulb Base': 'E26', Diameter: '18"' },
     variants: [
-      { id: 'B0BZSXRG92', asin: 'B0BZSXRG92', label: 'Black + White Oak', mainImage: 'https://m.media-amazon.com/images/I/71EBo+zT42L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71EBo+zT42L._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0BZSXRG92?tag=snapspacemkt-20' },
+      { id: 'B0BZSXRG92', asin: 'B0BZSXRG92', label: 'Black + White Oak', mainImage: 'https://m.media-amazon.com/images/I/71EBo+zT42L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71EBo+zT42L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0BZSXRG92?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '2-5', prime: true, returnDays: 30 },
   },
@@ -17473,7 +17473,7 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'Maxax', Material: 'Crystal, Metal', Style: 'Glam/Vintage', 'Number of Lights': '5', 'Bulb Base': 'E12', Diameter: '22"' },
     variants: [
-      { id: 'B0G5292QM8', asin: 'B0G5292QM8', label: 'Bronze + Crystal', mainImage: 'https://m.media-amazon.com/images/I/814hI3+FiVL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/814hI3+FiVL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0G5292QM8?tag=snapspacemkt-20' },
+      { id: 'B0G5292QM8', asin: 'B0G5292QM8', label: 'Bronze + Crystal', mainImage: 'https://m.media-amazon.com/images/I/814hI3+FiVL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/814hI3+FiVL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0G5292QM8?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '2-5', prime: true, returnDays: 30 },
   },
@@ -17511,7 +17511,7 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'ZEDSUN', Material: 'Capiz Shell, Metal', Style: 'Coastal/Bohemian', 'Number of Tiers': '5', 'Bulb Base': 'E12' },
     variants: [
-      { id: 'B0DFPC28JB', asin: 'B0DFPC28JB', label: 'Natural Shell', mainImage: 'https://m.media-amazon.com/images/I/61THyknp7vL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61THyknp7vL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0DFPC28JB?tag=snapspacemkt-20' },
+      { id: 'B0DFPC28JB', asin: 'B0DFPC28JB', label: 'Natural Shell', mainImage: 'https://m.media-amazon.com/images/I/61THyknp7vL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61THyknp7vL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DFPC28JB?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '3-7', prime: true, returnDays: 30 },
   },
@@ -17550,7 +17550,7 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'CATINER', Material: 'Crystal, Metal', Style: 'Glam/Modern', 'Bulb Base': 'E12', Diameter: '12"', Finish: 'Matte Black' },
     variants: [
-      { id: 'B0D9V7Y8QF', asin: 'B0D9V7Y8QF', label: 'Black + Crystal', mainImage: 'https://m.media-amazon.com/images/I/71dpXyvNY2L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71dpXyvNY2L._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0D9V7Y8QF?tag=snapspacemkt-20' },
+      { id: 'B0D9V7Y8QF', asin: 'B0D9V7Y8QF', label: 'Black + Crystal', mainImage: 'https://m.media-amazon.com/images/I/71dpXyvNY2L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71dpXyvNY2L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0D9V7Y8QF?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '2-5', prime: true, returnDays: 30 },
   },
@@ -17590,7 +17590,7 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'HMVPL', Material: 'Rattan, Wicker, Metal', Style: 'Bohemian', 'Number of Lights': '3', 'Bulb Base': 'E12', Diameter: '16"' },
     variants: [
-      { id: 'B0D17C4S2Z', asin: 'B0D17C4S2Z', label: 'Black + Natural Rattan', mainImage: 'https://m.media-amazon.com/images/I/710CygpSC4L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/710CygpSC4L._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0D17C4S2Z?tag=snapspacemkt-20' },
+      { id: 'B0D17C4S2Z', asin: 'B0D17C4S2Z', label: 'Black + Natural Rattan', mainImage: 'https://m.media-amazon.com/images/I/710CygpSC4L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/710CygpSC4L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0D17C4S2Z?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '2-5', prime: true, returnDays: 30 },
   },
@@ -17629,7 +17629,7 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'NSRCE', Material: 'Metal', Style: 'Rustic/Farmhouse', 'Number of Lights': '6', 'Bulb Base': 'E12', Diameter: '28"' },
     variants: [
-      { id: 'B0B93SNYQ8', asin: 'B0B93SNYQ8', label: 'Matte Black + Wood', mainImage: 'https://m.media-amazon.com/images/I/61z1ut1bF0L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61z1ut1bF0L._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0B93SNYQ8?tag=snapspacemkt-20' },
+      { id: 'B0B93SNYQ8', asin: 'B0B93SNYQ8', label: 'Matte Black + Wood', mainImage: 'https://m.media-amazon.com/images/I/61z1ut1bF0L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61z1ut1bF0L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0B93SNYQ8?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '3-7', prime: true, returnDays: 30 },
   },
@@ -17668,7 +17668,7 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'JKLX', Material: 'Metal', Style: 'Mid-Century/Modern', 'Number of Lights': '18', 'Bulb Base': 'E12', Diameter: '24"', Finish: 'Brushed Gold' },
     variants: [
-      { id: 'B093CSBWH4', asin: 'B093CSBWH4', label: 'Gold', mainImage: 'https://m.media-amazon.com/images/I/71YJiNh+pXS._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71YJiNh+pXS._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B093CSBWH4?tag=snapspacemkt-20' },
+      { id: 'B093CSBWH4', asin: 'B093CSBWH4', label: 'Gold', mainImage: 'https://m.media-amazon.com/images/I/71YJiNh+pXS._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71YJiNh+pXS._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B093CSBWH4?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '2-5', prime: true, returnDays: 30 },
   },
@@ -17709,7 +17709,7 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'MIULEE', Material: 'Corduroy', Size: '18x18 inch', 'Pack Size': '2', Care: 'Machine Wash' },
     variants: [
-      { id: 'B0BFVVKVSK', asin: 'B0BFVVKVSK', label: 'Cream White', mainImage: 'https://m.media-amazon.com/images/I/81RwIClSl0L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81RwIClSl0L._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0BFVVKVSK?tag=snapspacemkt-20' },
+      { id: 'B0BFVVKVSK', asin: 'B0BFVVKVSK', label: 'Cream White', mainImage: 'https://m.media-amazon.com/images/I/81RwIClSl0L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81RwIClSl0L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0BFVVKVSK?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '2-5', prime: true, returnDays: 30 },
   },
@@ -17749,7 +17749,7 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'Topfinel', Material: 'Velvet', Size: '18x18 inch', 'Pack Size': '4', Care: 'Machine Wash' },
     variants: [
-      { id: 'B0D1CBGMKP', asin: 'B0D1CBGMKP', label: 'Orange/Teal', mainImage: 'https://m.media-amazon.com/images/I/81Bu0nsrbHL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81Bu0nsrbHL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0D1CBGMKP?tag=snapspacemkt-20' },
+      { id: 'B0D1CBGMKP', asin: 'B0D1CBGMKP', label: 'Orange/Teal', mainImage: 'https://m.media-amazon.com/images/I/81Bu0nsrbHL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81Bu0nsrbHL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0D1CBGMKP?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '2-5', prime: true, returnDays: 30 },
   },
@@ -17789,7 +17789,7 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'Fancy Homi', Material: 'Corduroy', Size: '18x18 inch', 'Pack Size': '4', Care: 'Machine Wash' },
     variants: [
-      { id: 'B0C2PS76FG', asin: 'B0C2PS76FG', label: 'Neutral', mainImage: 'https://m.media-amazon.com/images/I/71YAboIsyAL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71YAboIsyAL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0C2PS76FG?tag=snapspacemkt-20' },
+      { id: 'B0C2PS76FG', asin: 'B0C2PS76FG', label: 'Neutral', mainImage: 'https://m.media-amazon.com/images/I/71YAboIsyAL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71YAboIsyAL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0C2PS76FG?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '2-5', prime: true, returnDays: 30 },
   },
@@ -17828,7 +17828,7 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'Fancy Homi', Material: 'Corduroy', Size: '18x18 inch', 'Pack Size': '2', Care: 'Machine Wash', Color: 'Rust/Terracotta' },
     variants: [
-      { id: 'B0C3B5BZ5Y', asin: 'B0C3B5BZ5Y', label: 'Rust / Terracotta', mainImage: 'https://m.media-amazon.com/images/I/81CqZf7jRvL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81CqZf7jRvL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0C3B5BZ5Y?tag=snapspacemkt-20' },
+      { id: 'B0C3B5BZ5Y', asin: 'B0C3B5BZ5Y', label: 'Rust / Terracotta', mainImage: 'https://m.media-amazon.com/images/I/81CqZf7jRvL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81CqZf7jRvL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0C3B5BZ5Y?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '2-5', prime: true, returnDays: 30 },
   },
@@ -17867,7 +17867,7 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'MIULEE', Material: 'Corduroy', Size: '18x18 inch', 'Pack Size': '2', Care: 'Machine Wash', Color: 'Beige' },
     variants: [
-      { id: 'B0BLSN6FTZ', asin: 'B0BLSN6FTZ', label: 'Beige', mainImage: 'https://m.media-amazon.com/images/I/81MAdJ9Xb0L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81MAdJ9Xb0L._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0BLSN6FTZ?tag=snapspacemkt-20' },
+      { id: 'B0BLSN6FTZ', asin: 'B0BLSN6FTZ', label: 'Beige', mainImage: 'https://m.media-amazon.com/images/I/81MAdJ9Xb0L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81MAdJ9Xb0L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0BLSN6FTZ?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '2-5', prime: true, returnDays: 30 },
   },
@@ -17906,7 +17906,7 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'HPUK', Material: 'Linen', Size: '18x18 inch', 'Pack Size': '4', Care: 'Machine Wash', Color: 'Blue' },
     variants: [
-      { id: 'B07FXDS1DD', asin: 'B07FXDS1DD', label: 'Blue', mainImage: 'https://m.media-amazon.com/images/I/91pX3XgEejL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/91pX3XgEejL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B07FXDS1DD?tag=snapspacemkt-20' },
+      { id: 'B07FXDS1DD', asin: 'B07FXDS1DD', label: 'Blue', mainImage: 'https://m.media-amazon.com/images/I/91pX3XgEejL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/91pX3XgEejL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B07FXDS1DD?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '2-5', prime: true, returnDays: 30 },
   },
@@ -17945,7 +17945,7 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'Aegero', Material: 'Corduroy', Size: '18x18 inch', 'Pack Size': '2', Care: 'Machine Wash', Color: 'Cream White' },
     variants: [
-      { id: 'B0D3HRF8NT', asin: 'B0D3HRF8NT', label: 'Cream White', mainImage: 'https://m.media-amazon.com/images/I/81XpsL1phCL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81XpsL1phCL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0D3HRF8NT?tag=snapspacemkt-20' },
+      { id: 'B0D3HRF8NT', asin: 'B0D3HRF8NT', label: 'Cream White', mainImage: 'https://m.media-amazon.com/images/I/81XpsL1phCL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81XpsL1phCL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0D3HRF8NT?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '2-5', prime: true, returnDays: 30 },
   },
@@ -17985,7 +17985,7 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'MIULEE', Material: 'Linen', Size: '20x20 inch', 'Pack Size': '2', Care: 'Machine Wash', Color: 'Natural Beige' },
     variants: [
-      { id: 'B0D14RSYDD', asin: 'B0D14RSYDD', label: 'Natural Beige', mainImage: 'https://m.media-amazon.com/images/I/81g-wfGYICL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81g-wfGYICL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0D14RSYDD?tag=snapspacemkt-20' },
+      { id: 'B0D14RSYDD', asin: 'B0D14RSYDD', label: 'Natural Beige', mainImage: 'https://m.media-amazon.com/images/I/81g-wfGYICL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81g-wfGYICL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0D14RSYDD?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '2-5', prime: true, returnDays: 30 },
   },
@@ -18025,7 +18025,7 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'MIULEE', Material: 'Linen', Size: '20x20 inch', 'Pack Size': '2', Care: 'Machine Wash', Color: 'Natural Beige' },
     variants: [
-      { id: 'B0FFB9PPKB', asin: 'B0FFB9PPKB', label: 'Natural Beige Check', mainImage: 'https://m.media-amazon.com/images/I/71jiMXKnZtL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71jiMXKnZtL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0FFB9PPKB?tag=snapspacemkt-20' },
+      { id: 'B0FFB9PPKB', asin: 'B0FFB9PPKB', label: 'Natural Beige Check', mainImage: 'https://m.media-amazon.com/images/I/71jiMXKnZtL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71jiMXKnZtL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FFB9PPKB?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '2-5', prime: true, returnDays: 30 },
   },
@@ -18065,7 +18065,7 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'LANANAS', Material: 'Corduroy', Size: '18x18 inch', 'Pack Size': '4', Care: 'Machine Wash', Color: 'Neutral Brown' },
     variants: [
-      { id: 'B0D93LQ8V6', asin: 'B0D93LQ8V6', label: 'Neutral Brown', mainImage: 'https://m.media-amazon.com/images/I/61ZfQOgagOL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61ZfQOgagOL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0D93LQ8V6?tag=snapspacemkt-20' },
+      { id: 'B0D93LQ8V6', asin: 'B0D93LQ8V6', label: 'Neutral Brown', mainImage: 'https://m.media-amazon.com/images/I/61ZfQOgagOL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61ZfQOgagOL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0D93LQ8V6?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '2-5', prime: true, returnDays: 30 },
   },
@@ -18105,7 +18105,7 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'Cozoomy', Material: 'Corduroy', Size: '18x18 inch', 'Pack Size': '4', Care: 'Machine Wash' },
     variants: [
-      { id: 'B0CPC1NCZS', asin: 'B0CPC1NCZS', label: 'Neutral', mainImage: 'https://m.media-amazon.com/images/I/91KVnhHfYXL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/91KVnhHfYXL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0CPC1NCZS?tag=snapspacemkt-20' },
+      { id: 'B0CPC1NCZS', asin: 'B0CPC1NCZS', label: 'Neutral', mainImage: 'https://m.media-amazon.com/images/I/91KVnhHfYXL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/91KVnhHfYXL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CPC1NCZS?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '2-5', prime: true, returnDays: 30 },
   },
@@ -18144,7 +18144,7 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'decorUhome', Material: 'Faux Wool / Plush', Size: '18x18 inch', 'Pack Size': '2', Care: 'Machine Wash', Color: 'Beige' },
     variants: [
-      { id: 'B09J2454PV', asin: 'B09J2454PV', label: 'Beige', mainImage: 'https://m.media-amazon.com/images/I/81kW7+ZQKtL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81kW7+ZQKtL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B09J2454PV?tag=snapspacemkt-20' },
+      { id: 'B09J2454PV', asin: 'B09J2454PV', label: 'Beige', mainImage: 'https://m.media-amazon.com/images/I/81kW7+ZQKtL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81kW7+ZQKtL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B09J2454PV?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '2-5', prime: true, returnDays: 30 },
   },
@@ -18183,7 +18183,7 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'MIULEE', Material: 'Linen', Size: '18x18 inch', 'Pack Size': '4', Care: 'Machine Wash', Color: 'Natural' },
     variants: [
-      { id: 'B0DBPFH621', asin: 'B0DBPFH621', label: 'Natural', mainImage: 'https://m.media-amazon.com/images/I/81Ez4LqQS2L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81Ez4LqQS2L._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0DBPFH621?tag=snapspacemkt-20' },
+      { id: 'B0DBPFH621', asin: 'B0DBPFH621', label: 'Natural', mainImage: 'https://m.media-amazon.com/images/I/81Ez4LqQS2L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81Ez4LqQS2L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DBPFH621?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '2-5', prime: true, returnDays: 30 },
   },
@@ -18222,7 +18222,7 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'decorUhome', Material: 'Faux Fur / Velvet', Size: '18x18 inch', 'Pack Size': '2', Care: 'Machine Wash', Color: 'Cream White' },
     variants: [
-      { id: 'B0D1YCNL1G', asin: 'B0D1YCNL1G', label: 'Cream White', mainImage: 'https://m.media-amazon.com/images/I/712dyHtRwaL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/712dyHtRwaL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0D1YCNL1G?tag=snapspacemkt-20' },
+      { id: 'B0D1YCNL1G', asin: 'B0D1YCNL1G', label: 'Cream White', mainImage: 'https://m.media-amazon.com/images/I/712dyHtRwaL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/712dyHtRwaL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0D1YCNL1G?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '2-5', prime: true, returnDays: 30 },
   },
@@ -18261,7 +18261,7 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'Pallene', Material: 'Faux Fur', Size: '18x18 inch', 'Pack Size': '2', Care: 'Machine Wash', Color: 'Cream White' },
     variants: [
-      { id: 'B0BJ97M41F', asin: 'B0BJ97M41F', label: 'Cream White', mainImage: 'https://m.media-amazon.com/images/I/71NnhT0BU8L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71NnhT0BU8L._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0BJ97M41F?tag=snapspacemkt-20' },
+      { id: 'B0BJ97M41F', asin: 'B0BJ97M41F', label: 'Cream White', mainImage: 'https://m.media-amazon.com/images/I/71NnhT0BU8L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71NnhT0BU8L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0BJ97M41F?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '2-5', prime: true, returnDays: 30 },
   },
@@ -18300,7 +18300,7 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'MIULEE', Material: 'Corduroy', Size: '18x18 inch', 'Pack Size': '4', Care: 'Machine Wash', Color: 'Teal/Orange' },
     variants: [
-      { id: 'B0DZ71KMJJ', asin: 'B0DZ71KMJJ', label: 'Teal / Orange', mainImage: 'https://m.media-amazon.com/images/I/81yautWrxzL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81yautWrxzL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0DZ71KMJJ?tag=snapspacemkt-20' },
+      { id: 'B0DZ71KMJJ', asin: 'B0DZ71KMJJ', label: 'Teal / Orange', mainImage: 'https://m.media-amazon.com/images/I/81yautWrxzL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81yautWrxzL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DZ71KMJJ?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '2-5', prime: true, returnDays: 30 },
   },
@@ -18340,7 +18340,7 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'Foindtower', Material: 'Linen', Size: '18x18 inch', 'Pack Size': '2', Care: 'Machine Wash', Color: 'Tan/Taupe' },
     variants: [
-      { id: 'B0DGPWKWV9', asin: 'B0DGPWKWV9', label: 'Tan Taupe', mainImage: 'https://m.media-amazon.com/images/I/81bNyG1kWeL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81bNyG1kWeL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0DGPWKWV9?tag=snapspacemkt-20' },
+      { id: 'B0DGPWKWV9', asin: 'B0DGPWKWV9', label: 'Tan Taupe', mainImage: 'https://m.media-amazon.com/images/I/81bNyG1kWeL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81bNyG1kWeL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DGPWKWV9?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '2-5', prime: true, returnDays: 30 },
   },
@@ -18379,7 +18379,7 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'MIULEE', Material: 'Linen', Size: '18x18 inch', 'Pack Size': '2', Care: 'Machine Wash', Color: 'Natural Beige' },
     variants: [
-      { id: 'B0D1K6L555', asin: 'B0D1K6L555', label: 'Natural Beige', mainImage: 'https://m.media-amazon.com/images/I/71FS7P4+KOL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71FS7P4+KOL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0D1K6L555?tag=snapspacemkt-20' },
+      { id: 'B0D1K6L555', asin: 'B0D1K6L555', label: 'Natural Beige', mainImage: 'https://m.media-amazon.com/images/I/71FS7P4+KOL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71FS7P4+KOL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0D1K6L555?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '2-5', prime: true, returnDays: 30 },
   },
@@ -18418,7 +18418,7 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'MIULEE', Material: 'Corduroy', Size: '18x18 inch', 'Pack Size': '4', Care: 'Machine Wash', Color: 'Blue' },
     variants: [
-      { id: 'B0DBM3Q198', asin: 'B0DBM3Q198', label: 'Blue', mainImage: 'https://m.media-amazon.com/images/I/81HYZGdNrqL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81HYZGdNrqL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0DBM3Q198?tag=snapspacemkt-20' },
+      { id: 'B0DBM3Q198', asin: 'B0DBM3Q198', label: 'Blue', mainImage: 'https://m.media-amazon.com/images/I/81HYZGdNrqL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81HYZGdNrqL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DBM3Q198?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '2-5', prime: true, returnDays: 30 },
   },
@@ -18457,7 +18457,7 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'Hckot', Material: 'Linen', Size: '20x20 inch', 'Pack Size': '2', Care: 'Machine Wash', Color: 'Grey' },
     variants: [
-      { id: 'B0DC3V6RD1', asin: 'B0DC3V6RD1', label: 'Grey', mainImage: 'https://m.media-amazon.com/images/I/91avAb-WAbL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/91avAb-WAbL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0DC3V6RD1?tag=snapspacemkt-20' },
+      { id: 'B0DC3V6RD1', asin: 'B0DC3V6RD1', label: 'Grey', mainImage: 'https://m.media-amazon.com/images/I/91avAb-WAbL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/91avAb-WAbL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DC3V6RD1?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '2-5', prime: true, returnDays: 30 },
   },
@@ -18497,8 +18497,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'EXQ Home', Material: 'Polyester Flannel', Size: '50×60 inch', Color: 'Beige', Care: 'Machine Wash' },
     variants: [
-      { id: 'B0BNBGZQ6B', asin: 'B0BNBGZQ6B', label: 'Beige', mainImage: 'https://m.media-amazon.com/images/I/91brxXR1OYL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/91brxXR1OYL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0BNBGZQ6B?tag=snapspacemkt-20' },
-      { id: 'B0FNWRYBPK', asin: 'B0FNWRYBPK', label: 'Cream', mainImage: 'https://m.media-amazon.com/images/I/31V7uM6y0PL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/31V7uM6y0PL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0FNWRYBPK?tag=snapspacemkt-20' },
+      { id: 'B0BNBGZQ6B', asin: 'B0BNBGZQ6B', label: 'Beige', mainImage: 'https://m.media-amazon.com/images/I/91brxXR1OYL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/91brxXR1OYL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0BNBGZQ6B?tag=snapspacemkt-20' },
+      { id: 'B0FNWRYBPK', asin: 'B0FNWRYBPK', label: 'Cream', mainImage: 'https://m.media-amazon.com/images/I/31V7uM6y0PL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/31V7uM6y0PL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FNWRYBPK?tag=snapspacemkt-20' },
       { id: 'B0DCVF773F', asin: 'B0DCVF773F', label: 'Terracotta', mainImage: 'https://m.media-amazon.com/images/I/51GXV0zG18L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51GXV0zG18L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DCVF773F?tag=snapspacemkt-20' },
       { id: 'B0C89VPJ2X', asin: 'B0C89VPJ2X', label: 'Sage Green', mainImage: 'https://m.media-amazon.com/images/I/51AVdIrhaxL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51AVdIrhaxL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0C89VPJ2X?tag=snapspacemkt-20' },
       { id: 'B0BNBFYCQ9', asin: 'B0BNBFYCQ9', label: 'Moss Green', mainImage: 'https://m.media-amazon.com/images/I/41UAYXhdfQL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41UAYXhdfQL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0BNBFYCQ9?tag=snapspacemkt-20' },
@@ -18542,8 +18542,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'BEDELITE', Material: 'Fleece', Size: '50×60 inch', Color: 'Cream White', GSM: '300', Care: 'Machine Wash' },
     variants: [
-      { id: 'B0CSFJR66V', asin: 'B0CSFJR66V', label: 'Cream', mainImage: 'https://m.media-amazon.com/images/I/31gkyhJcdZL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/31gkyhJcdZL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0CSFJR66V?tag=snapspacemkt-20' },
-      { id: 'B0D59WNGWF', asin: 'B0D59WNGWF', label: 'Beige', mainImage: 'https://m.media-amazon.com/images/I/31IVuKQM4+L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/31IVuKQM4+L._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0D59WNGWF?tag=snapspacemkt-20' },
+      { id: 'B0CSFJR66V', asin: 'B0CSFJR66V', label: 'Cream', mainImage: 'https://m.media-amazon.com/images/I/31gkyhJcdZL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/31gkyhJcdZL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CSFJR66V?tag=snapspacemkt-20' },
+      { id: 'B0D59WNGWF', asin: 'B0D59WNGWF', label: 'Beige', mainImage: 'https://m.media-amazon.com/images/I/31IVuKQM4+L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/31IVuKQM4+L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0D59WNGWF?tag=snapspacemkt-20' },
       { id: 'B0DQXMYBNT', asin: 'B0DQXMYBNT', label: 'Linen', mainImage: 'https://m.media-amazon.com/images/I/41zAoQy-TKL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41zAoQy-TKL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DQXMYBNT?tag=snapspacemkt-20' },
       { id: 'B0FMRF13YP', asin: 'B0FMRF13YP', label: 'Charcoal Grey', mainImage: 'https://m.media-amazon.com/images/I/411Ck6oYCsL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/411Ck6oYCsL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FMRF13YP?tag=snapspacemkt-20' },
       { id: 'B0D83BYZT9', asin: 'B0D83BYZT9', label: 'Burnt Orange', mainImage: 'https://m.media-amazon.com/images/I/41ehoFRsYqL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41ehoFRsYqL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0D83BYZT9?tag=snapspacemkt-20' },
@@ -18587,8 +18587,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'BOURINA', Material: 'Acrylic Knit', Size: '50×60 inch', Color: 'Beige', Care: 'Machine Wash' },
     variants: [
-      { id: 'B01JEAKSN0', asin: 'B01JEAKSN0', label: 'Beige', mainImage: 'https://m.media-amazon.com/images/I/51YIJAKcLqL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51YIJAKcLqL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B01JEAKSN0?tag=snapspacemkt-20' },
-      { id: 'B07C3L6QSX', asin: 'B07C3L6QSX', label: 'Off White', mainImage: 'https://m.media-amazon.com/images/I/41sjYz4UzLL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41sjYz4UzLL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B07C3L6QSX?tag=snapspacemkt-20' },
+      { id: 'B01JEAKSN0', asin: 'B01JEAKSN0', label: 'Beige', mainImage: 'https://m.media-amazon.com/images/I/51YIJAKcLqL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51YIJAKcLqL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B01JEAKSN0?tag=snapspacemkt-20' },
+      { id: 'B07C3L6QSX', asin: 'B07C3L6QSX', label: 'Off White', mainImage: 'https://m.media-amazon.com/images/I/41sjYz4UzLL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41sjYz4UzLL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B07C3L6QSX?tag=snapspacemkt-20' },
       { id: 'B01MAW1T9I', asin: 'B01MAW1T9I', label: 'Dark Grey', mainImage: 'https://m.media-amazon.com/images/I/51xIhAL-uML._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51xIhAL-uML._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B01MAW1T9I?tag=snapspacemkt-20' },
       { id: 'B07QBJCF5Y', asin: 'B07QBJCF5Y', label: 'Rust', mainImage: 'https://m.media-amazon.com/images/I/51FeQ7AT7NL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51FeQ7AT7NL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B07QBJCF5Y?tag=snapspacemkt-20' },
       { id: 'B07BGVZ84Z', asin: 'B07BGVZ84Z', label: 'Navy', mainImage: 'https://m.media-amazon.com/images/I/51Y0BV1skAL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51Y0BV1skAL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B07BGVZ84Z?tag=snapspacemkt-20' },
@@ -18632,8 +18632,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'Lussena', Material: 'Fleece', Size: '50×70 inch', Color: 'Rust', Care: 'Machine Wash' },
     variants: [
-      { id: 'B0DPLYNHK5', asin: 'B0DPLYNHK5', label: 'Rust', mainImage: 'https://m.media-amazon.com/images/I/41vFFNsbD-L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41vFFNsbD-L._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0DPLYNHK5?tag=snapspacemkt-20' },
-      { id: 'B0DPLYQZBG', asin: 'B0DPLYQZBG', label: 'Beige', mainImage: 'https://m.media-amazon.com/images/I/312GkTHIQ6L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/312GkTHIQ6L._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0DPLYQZBG?tag=snapspacemkt-20' },
+      { id: 'B0DPLYNHK5', asin: 'B0DPLYNHK5', label: 'Rust', mainImage: 'https://m.media-amazon.com/images/I/41vFFNsbD-L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41vFFNsbD-L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DPLYNHK5?tag=snapspacemkt-20' },
+      { id: 'B0DPLYQZBG', asin: 'B0DPLYQZBG', label: 'Beige', mainImage: 'https://m.media-amazon.com/images/I/312GkTHIQ6L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/312GkTHIQ6L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DPLYQZBG?tag=snapspacemkt-20' },
       { id: 'B0FSD2CGCF', asin: 'B0FSD2CGCF', label: 'Grey', mainImage: 'https://m.media-amazon.com/images/I/41mDbOEDvxL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41mDbOEDvxL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FSD2CGCF?tag=snapspacemkt-20' },
       { id: 'B0F7K899R7', asin: 'B0F7K899R7', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/418XsD3B6AL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/418XsD3B6AL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0F7K899R7?tag=snapspacemkt-20' },
       { id: 'B0GJHP39N3', asin: 'B0GJHP39N3', label: 'Knit Beige', mainImage: 'https://m.media-amazon.com/images/I/41+GoLjguYL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41+GoLjguYL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0GJHP39N3?tag=snapspacemkt-20' },
@@ -18677,8 +18677,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'Linecooo', Material: 'Microfiber Flannel', Size: '50×60 inch', Color: 'Sage Green', Care: 'Machine Wash' },
     variants: [
-      { id: 'B0D14WQFZ9', asin: 'B0D14WQFZ9', label: 'Sage Green', mainImage: 'https://m.media-amazon.com/images/I/41GGBXrEqwL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41GGBXrEqwL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0D14WQFZ9?tag=snapspacemkt-20' },
-      { id: 'B0D14VN5KW', asin: 'B0D14VN5KW', label: 'Cream White', mainImage: 'https://m.media-amazon.com/images/I/31cwdjZWFqL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/31cwdjZWFqL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0D14VN5KW?tag=snapspacemkt-20' },
+      { id: 'B0D14WQFZ9', asin: 'B0D14WQFZ9', label: 'Sage Green', mainImage: 'https://m.media-amazon.com/images/I/41GGBXrEqwL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41GGBXrEqwL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0D14WQFZ9?tag=snapspacemkt-20' },
+      { id: 'B0D14VN5KW', asin: 'B0D14VN5KW', label: 'Cream White', mainImage: 'https://m.media-amazon.com/images/I/31cwdjZWFqL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/31cwdjZWFqL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0D14VN5KW?tag=snapspacemkt-20' },
       { id: 'B0D14WLXFZ', asin: 'B0D14WLXFZ', label: 'Grey', mainImage: 'https://m.media-amazon.com/images/I/41AMnSLPrEL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41AMnSLPrEL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0D14WLXFZ?tag=snapspacemkt-20' },
       { id: 'B0D8H3KRQ4', asin: 'B0D8H3KRQ4', label: 'Burnt Orange', mainImage: 'https://m.media-amazon.com/images/I/41GNTo0+ixL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41GNTo0+ixL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0D8H3KRQ4?tag=snapspacemkt-20' },
       { id: 'B0D8H3MNVC', asin: 'B0D8H3MNVC', label: 'Mustard Yellow', mainImage: 'https://m.media-amazon.com/images/I/41cU+NuXYIL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41cU+NuXYIL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0D8H3MNVC?tag=snapspacemkt-20' },
@@ -18722,8 +18722,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'lifein', Material: 'Chenille / Cotton', Size: '50×60 inch', Color: 'White/Cream', Care: 'Hand Wash Recommended' },
     variants: [
-      { id: 'B095WHFT8S', asin: 'B095WHFT8S', label: 'Cream', mainImage: 'https://m.media-amazon.com/images/I/41nOjaugxvL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41nOjaugxvL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B095WHFT8S?tag=snapspacemkt-20' },
-      { id: 'B0FBQQXPN4', asin: 'B0FBQQXPN4', label: 'White', mainImage: 'https://m.media-amazon.com/images/I/41UEnjBD4hL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41UEnjBD4hL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0FBQQXPN4?tag=snapspacemkt-20' },
+      { id: 'B095WHFT8S', asin: 'B095WHFT8S', label: 'Cream', mainImage: 'https://m.media-amazon.com/images/I/41nOjaugxvL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41nOjaugxvL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B095WHFT8S?tag=snapspacemkt-20' },
+      { id: 'B0FBQQXPN4', asin: 'B0FBQQXPN4', label: 'White', mainImage: 'https://m.media-amazon.com/images/I/41UEnjBD4hL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41UEnjBD4hL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FBQQXPN4?tag=snapspacemkt-20' },
       { id: 'B095VYB71Y', asin: 'B095VYB71Y', label: 'Orange Rust', mainImage: 'https://m.media-amazon.com/images/I/51fvTZ4onYL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51fvTZ4onYL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B095VYB71Y?tag=snapspacemkt-20' },
       { id: 'B09NPZF6V9', asin: 'B09NPZF6V9', label: 'Tan/Beige', mainImage: 'https://m.media-amazon.com/images/I/519hVCngd3L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/519hVCngd3L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B09NPZF6V9?tag=snapspacemkt-20' },
       { id: 'B09NPZDZLX', asin: 'B09NPZDZLX', label: 'Dark Green', mainImage: 'https://m.media-amazon.com/images/I/51kVgfOwKPL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51kVgfOwKPL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B09NPZDZLX?tag=snapspacemkt-20' },
@@ -18769,8 +18769,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'Americanflat', Material: '100% Cotton', Size: '50×60 inch', Color: 'Cream & Beige', Pattern: 'Zig Zag', Care: 'Machine Wash' },
     variants: [
-      { id: 'B0B32ZXMTV', asin: 'B0B32ZXMTV', label: 'Cream Beige Zig Zag', mainImage: 'https://m.media-amazon.com/images/I/51lilY8j6lL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51lilY8j6lL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0B32ZXMTV?tag=snapspacemkt-20' },
-      { id: 'B0B32V1KGR', asin: 'B0B32V1KGR', label: 'Cream & Beige Plaid', mainImage: 'https://m.media-amazon.com/images/I/41ZISJLQx4L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41ZISJLQx4L._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0B32V1KGR?tag=snapspacemkt-20' },
+      { id: 'B0B32ZXMTV', asin: 'B0B32ZXMTV', label: 'Cream Beige Zig Zag', mainImage: 'https://m.media-amazon.com/images/I/51lilY8j6lL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51lilY8j6lL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0B32ZXMTV?tag=snapspacemkt-20' },
+      { id: 'B0B32V1KGR', asin: 'B0B32V1KGR', label: 'Cream & Beige Plaid', mainImage: 'https://m.media-amazon.com/images/I/41ZISJLQx4L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41ZISJLQx4L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0B32V1KGR?tag=snapspacemkt-20' },
       { id: 'B0B33DJ36M', asin: 'B0B33DJ36M', label: 'Cream Beige Houndstooth', mainImage: 'https://m.media-amazon.com/images/I/51J3zJ+cjZL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51J3zJ+cjZL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0B33DJ36M?tag=snapspacemkt-20' },
       { id: 'B0B333FN61', asin: 'B0B333FN61', label: 'Black Cream & Beige Plaid', mainImage: 'https://m.media-amazon.com/images/I/519qvDfDV2L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/519qvDfDV2L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0B333FN61?tag=snapspacemkt-20' },
       { id: 'B08Z36G6R6', asin: 'B08Z36G6R6', label: 'Black Striped', mainImage: 'https://m.media-amazon.com/images/I/414G5RvyOML._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/414G5RvyOML._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B08Z36G6R6?tag=snapspacemkt-20' },
@@ -18813,8 +18813,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'COOVA', Material: 'Faux Fur (Polyester)', Size: '50×60 inch', Color: 'Tie Dye Brown', Care: 'Gentle Machine Wash' },
     variants: [
-      { id: 'B0D1XJTV1N', asin: 'B0D1XJTV1N', label: 'Tie Dye Brown', mainImage: 'https://m.media-amazon.com/images/I/41fDPtZv3dL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41fDPtZv3dL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0D1XJTV1N?tag=snapspacemkt-20' },
-      { id: 'B0D1XPVL6D', asin: 'B0D1XPVL6D', label: 'Tie Dye Light Grey', mainImage: 'https://m.media-amazon.com/images/I/41I5om+HAbL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41I5om+HAbL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0D1XPVL6D?tag=snapspacemkt-20' },
+      { id: 'B0D1XJTV1N', asin: 'B0D1XJTV1N', label: 'Tie Dye Brown', mainImage: 'https://m.media-amazon.com/images/I/41fDPtZv3dL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41fDPtZv3dL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0D1XJTV1N?tag=snapspacemkt-20' },
+      { id: 'B0D1XPVL6D', asin: 'B0D1XPVL6D', label: 'Tie Dye Light Grey', mainImage: 'https://m.media-amazon.com/images/I/41I5om+HAbL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41I5om+HAbL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0D1XPVL6D?tag=snapspacemkt-20' },
       { id: 'B0D1XTSSX8', asin: 'B0D1XTSSX8', label: 'Tie Dye Black', mainImage: 'https://m.media-amazon.com/images/I/4198y6R-z+L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/4198y6R-z+L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0D1XTSSX8?tag=snapspacemkt-20' },
       { id: 'B0D9F9LFCW', asin: 'B0D9F9LFCW', label: 'Tie Dye Blue', mainImage: 'https://m.media-amazon.com/images/I/41H3Nw5ahRL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41H3Nw5ahRL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0D9F9LFCW?tag=snapspacemkt-20' },
       { id: 'B0DNSV5XVH', asin: 'B0DNSV5XVH', label: 'Tie Dye Magenta', mainImage: 'https://m.media-amazon.com/images/I/41bh4FSWaxL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41bh4FSWaxL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DNSV5XVH?tag=snapspacemkt-20' },
@@ -18858,8 +18858,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: "L'AGRATY", Material: 'Chenille Yarn', Size: '50×60 inch', Style: 'Chunky Knit / Cable Knit', Care: 'Hand Wash Cold' },
     variants: [
-      { id: 'B0BR728TB6', asin: 'B0BR728TB6', label: 'Ivory', mainImage: 'https://m.media-amazon.com/images/I/51zFJaDG9FL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51zFJaDG9FL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0BR728TB6?tag=snapspacemkt-20' },
-      { id: 'B0D6VXYSK3', asin: 'B0D6VXYSK3', label: 'Cream White', mainImage: 'https://m.media-amazon.com/images/I/51q-2tb02NL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51q-2tb02NL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0D6VXYSK3?tag=snapspacemkt-20' },
+      { id: 'B0BR728TB6', asin: 'B0BR728TB6', label: 'Ivory', mainImage: 'https://m.media-amazon.com/images/I/51zFJaDG9FL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51zFJaDG9FL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0BR728TB6?tag=snapspacemkt-20' },
+      { id: 'B0D6VXYSK3', asin: 'B0D6VXYSK3', label: 'Cream White', mainImage: 'https://m.media-amazon.com/images/I/51q-2tb02NL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51q-2tb02NL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0D6VXYSK3?tag=snapspacemkt-20' },
       { id: 'B0DJTWSV8Y', asin: 'B0DJTWSV8Y', label: 'Grey', mainImage: 'https://m.media-amazon.com/images/I/51Lrv-4IeIL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51Lrv-4IeIL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DJTWSV8Y?tag=snapspacemkt-20' },
       { id: 'B0FMY9ZYLK', asin: 'B0FMY9ZYLK', label: 'Charcoal Grey', mainImage: 'https://m.media-amazon.com/images/I/51a31xv-aIL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51a31xv-aIL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FMY9ZYLK?tag=snapspacemkt-20' },
       { id: 'B0DJTJYJF9', asin: 'B0DJTJYJF9', label: 'Brown', mainImage: 'https://m.media-amazon.com/images/I/51lR+cUmDTL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51lR+cUmDTL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DJTJYJF9?tag=snapspacemkt-20' },
@@ -18903,8 +18903,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'Aganear', Material: 'Fleece (Polyester)', Size: '50×60 inch', Color: 'Khaki', Care: 'Machine Wash' },
     variants: [
-      { id: 'B0C7V67VVV', asin: 'B0C7V67VVV', label: 'Khaki', mainImage: 'https://m.media-amazon.com/images/I/51tWmpGnhBL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51tWmpGnhBL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0C7V67VVV?tag=snapspacemkt-20' },
-      { id: 'B0C7V422BN', asin: 'B0C7V422BN', label: 'White', mainImage: 'https://m.media-amazon.com/images/I/41zf0OF5EML._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41zf0OF5EML._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0C7V422BN?tag=snapspacemkt-20' },
+      { id: 'B0C7V67VVV', asin: 'B0C7V67VVV', label: 'Khaki', mainImage: 'https://m.media-amazon.com/images/I/51tWmpGnhBL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51tWmpGnhBL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0C7V67VVV?tag=snapspacemkt-20' },
+      { id: 'B0C7V422BN', asin: 'B0C7V422BN', label: 'White', mainImage: 'https://m.media-amazon.com/images/I/41zf0OF5EML._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41zf0OF5EML._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0C7V422BN?tag=snapspacemkt-20' },
       { id: 'B0C7VF8WCL', asin: 'B0C7VF8WCL', label: 'Gray', mainImage: 'https://m.media-amazon.com/images/I/51v2jqjB74L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51v2jqjB74L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0C7VF8WCL?tag=snapspacemkt-20' },
       { id: 'B0C7V7KQPD', asin: 'B0C7V7KQPD', label: 'Sage Green', mainImage: 'https://m.media-amazon.com/images/I/51wZuCIZLYL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51wZuCIZLYL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0C7V7KQPD?tag=snapspacemkt-20' },
       { id: 'B0D91LZ8DQ', asin: 'B0D91LZ8DQ', label: 'Burnt Orange', mainImage: 'https://m.media-amazon.com/images/I/51kLNFYJFOL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51kLNFYJFOL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0D91LZ8DQ?tag=snapspacemkt-20' },
@@ -18948,8 +18948,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'LUTBM', Material: '100% Cotton', Size: '50×60 inch', Pattern: 'Butterfly & Floral Embroidery', Care: 'Machine Wash Cold' },
     variants: [
-      { id: 'B0DP4NMTFT', asin: 'B0DP4NMTFT', label: 'Boho Floral', mainImage: 'https://m.media-amazon.com/images/I/41scnYAQDbL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41scnYAQDbL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0DP4NMTFT?tag=snapspacemkt-20' },
-      { id: 'B0FWBT2JL9', asin: 'B0FWBT2JL9', label: 'Butterfly Beige', mainImage: 'https://m.media-amazon.com/images/I/41incpLNuQL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41incpLNuQL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0FWBT2JL9?tag=snapspacemkt-20' },
+      { id: 'B0DP4NMTFT', asin: 'B0DP4NMTFT', label: 'Boho Floral', mainImage: 'https://m.media-amazon.com/images/I/41scnYAQDbL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41scnYAQDbL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DP4NMTFT?tag=snapspacemkt-20' },
+      { id: 'B0FWBT2JL9', asin: 'B0FWBT2JL9', label: 'Butterfly Beige', mainImage: 'https://m.media-amazon.com/images/I/41incpLNuQL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41incpLNuQL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FWBT2JL9?tag=snapspacemkt-20' },
       { id: 'B0BN9Z9NQH', asin: 'B0BN9Z9NQH', label: 'Boho Floral A', mainImage: 'https://m.media-amazon.com/images/I/41DimSDdoSL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41DimSDdoSL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0BN9Z9NQH?tag=snapspacemkt-20' },
       { id: 'B0FWBPJJVK', asin: 'B0FWBPJJVK', label: 'Bird Floral', mainImage: 'https://m.media-amazon.com/images/I/41BQ8LduCvL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41BQ8LduCvL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FWBPJJVK?tag=snapspacemkt-20' },
       { id: 'B0G698FJS9', asin: 'B0G698FJS9', label: 'Floral Green', mainImage: 'https://m.media-amazon.com/images/I/51nalepGwgL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51nalepGwgL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0G698FJS9?tag=snapspacemkt-20' },
@@ -18993,8 +18993,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'Amélie Home', Material: 'Chenille', Size: '50×60 inch', Color: 'Beige', Weave: 'Waffle', Care: 'Hand Wash or Gentle Cycle' },
     variants: [
-      { id: 'B0D1K5JMKV', asin: 'B0D1K5JMKV', label: 'Beige', mainImage: 'https://m.media-amazon.com/images/I/41ug0P3QMRL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41ug0P3QMRL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0D1K5JMKV?tag=snapspacemkt-20' },
-      { id: 'B0D1K72HNC', asin: 'B0D1K72HNC', label: 'Ivory', mainImage: 'https://m.media-amazon.com/images/I/41GhiCLCwRL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41GhiCLCwRL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0D1K72HNC?tag=snapspacemkt-20' },
+      { id: 'B0D1K5JMKV', asin: 'B0D1K5JMKV', label: 'Beige', mainImage: 'https://m.media-amazon.com/images/I/41ug0P3QMRL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41ug0P3QMRL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0D1K5JMKV?tag=snapspacemkt-20' },
+      { id: 'B0D1K72HNC', asin: 'B0D1K72HNC', label: 'Ivory', mainImage: 'https://m.media-amazon.com/images/I/41GhiCLCwRL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41GhiCLCwRL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0D1K72HNC?tag=snapspacemkt-20' },
       { id: 'B0D1K2QH4N', asin: 'B0D1K2QH4N', label: 'Grey', mainImage: 'https://m.media-amazon.com/images/I/41v53Z1qVkL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41v53Z1qVkL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0D1K2QH4N?tag=snapspacemkt-20' },
       { id: 'B0D1K7BDPN', asin: 'B0D1K7BDPN', label: 'Ginger', mainImage: 'https://m.media-amazon.com/images/I/41-eXAwQO-L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41-eXAwQO-L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0D1K7BDPN?tag=snapspacemkt-20' },
       { id: 'B0D1K71BSB', asin: 'B0D1K71BSB', label: 'Holly Green', mainImage: 'https://m.media-amazon.com/images/I/41U4BU92goL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41U4BU92goL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0D1K71BSB?tag=snapspacemkt-20' },
@@ -19038,8 +19038,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'DII', Material: 'Cotton', Size: '50×60 inch', Color: 'Stone', Pattern: 'Braided Stripe', Care: 'Machine Wash' },
     variants: [
-      { id: 'B075F9ZTTL', asin: 'B075F9ZTTL', label: 'Stone', mainImage: 'https://m.media-amazon.com/images/I/51UJDYOZkjL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51UJDYOZkjL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B075F9ZTTL?tag=snapspacemkt-20' },
-      { id: 'B09QLH4BYK', asin: 'B09QLH4BYK', label: 'Vintage Linen', mainImage: 'https://m.media-amazon.com/images/I/41vlJeYwYpL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41vlJeYwYpL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B09QLH4BYK?tag=snapspacemkt-20' },
+      { id: 'B075F9ZTTL', asin: 'B075F9ZTTL', label: 'Stone', mainImage: 'https://m.media-amazon.com/images/I/51UJDYOZkjL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51UJDYOZkjL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B075F9ZTTL?tag=snapspacemkt-20' },
+      { id: 'B09QLH4BYK', asin: 'B09QLH4BYK', label: 'Vintage Linen', mainImage: 'https://m.media-amazon.com/images/I/41vlJeYwYpL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41vlJeYwYpL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B09QLH4BYK?tag=snapspacemkt-20' },
       { id: 'B0B8F2B9KF', asin: 'B0B8F2B9KF', label: 'Gray', mainImage: 'https://m.media-amazon.com/images/I/41dz-Gj53EL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41dz-Gj53EL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0B8F2B9KF?tag=snapspacemkt-20' },
       { id: 'B075F9HK75', asin: 'B075F9HK75', label: 'Navy', mainImage: 'https://m.media-amazon.com/images/I/51FyoZlkwAL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51FyoZlkwAL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B075F9HK75?tag=snapspacemkt-20' },
       { id: 'B08NQ542BL', asin: 'B08NQ542BL', label: 'Antique Green', mainImage: 'https://m.media-amazon.com/images/I/51WQrJmLBBS._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51WQrJmLBBS._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B08NQ542BL?tag=snapspacemkt-20' },
@@ -19083,8 +19083,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'Exclusivo Mezcla', Material: 'Fleece (Polyester)', Size: '50×70 inch', Color: 'Celadon', Pattern: 'Wave Texture', Care: 'Machine Wash' },
     variants: [
-      { id: 'B086GFSHG4', asin: 'B086GFSHG4', label: 'Celadon', mainImage: 'https://m.media-amazon.com/images/I/41i9e+EVY4L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41i9e+EVY4L._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B086GFSHG4?tag=snapspacemkt-20' },
-      { id: 'B09VGNGWSX', asin: 'B09VGNGWSX', label: 'Ivory', mainImage: 'https://m.media-amazon.com/images/I/31Gml4bmMpL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/31Gml4bmMpL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B09VGNGWSX?tag=snapspacemkt-20' },
+      { id: 'B086GFSHG4', asin: 'B086GFSHG4', label: 'Celadon', mainImage: 'https://m.media-amazon.com/images/I/41i9e+EVY4L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41i9e+EVY4L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B086GFSHG4?tag=snapspacemkt-20' },
+      { id: 'B09VGNGWSX', asin: 'B09VGNGWSX', label: 'Ivory', mainImage: 'https://m.media-amazon.com/images/I/31Gml4bmMpL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/31Gml4bmMpL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B09VGNGWSX?tag=snapspacemkt-20' },
       { id: 'B086GSGT15', asin: 'B086GSGT15', label: 'Light Grey', mainImage: 'https://m.media-amazon.com/images/I/413WYGc9sXL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/413WYGc9sXL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B086GSGT15?tag=snapspacemkt-20' },
       { id: 'B086GCJT19', asin: 'B086GCJT19', label: 'Dark Grey', mainImage: 'https://m.media-amazon.com/images/I/51CfRurxgYL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51CfRurxgYL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B086GCJT19?tag=snapspacemkt-20' },
       { id: 'B086G865G8', asin: 'B086G865G8', label: 'Forest Green', mainImage: 'https://m.media-amazon.com/images/I/41Dkiz-FWyL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41Dkiz-FWyL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B086G865G8?tag=snapspacemkt-20' },
@@ -19135,8 +19135,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: "D'vine Dev", Material: 'Stoneware', Size: '4 inch', Color: 'Smoked White', Care: 'Hand Wash' },
     variants: [
-      { id: 'B0FJQXBZBY', asin: 'B0FJQXBZBY', label: 'Graphite Blue', mainImage: 'https://m.media-amazon.com/images/I/51YqKOLT+zL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51YqKOLT+zL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0FJQXBZBY?tag=snapspacemkt-20' },
-      { id: 'B0DP8Z6VPX', asin: 'B0DP8Z6VPX', label: 'Midnight Blue', mainImage: 'https://m.media-amazon.com/images/I/51sFN1kKxAL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51sFN1kKxAL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0DP8Z6VPX?tag=snapspacemkt-20' },
+      { id: 'B0FJQXBZBY', asin: 'B0FJQXBZBY', label: 'Graphite Blue', mainImage: 'https://m.media-amazon.com/images/I/51YqKOLT+zL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51YqKOLT+zL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FJQXBZBY?tag=snapspacemkt-20' },
+      { id: 'B0DP8Z6VPX', asin: 'B0DP8Z6VPX', label: 'Midnight Blue', mainImage: 'https://m.media-amazon.com/images/I/51sFN1kKxAL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51sFN1kKxAL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DP8Z6VPX?tag=snapspacemkt-20' },
       { id: 'B0FJQW2Q8B', asin: 'B0FJQW2Q8B', label: 'Ocean Teal', mainImage: 'https://m.media-amazon.com/images/I/51WbsJ6j7uL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51WbsJ6j7uL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FJQW2Q8B?tag=snapspacemkt-20' },
       { id: 'B0FJQZK2ZD', asin: 'B0FJQZK2ZD', label: 'Olive', mainImage: 'https://m.media-amazon.com/images/I/51kokdAdA6L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51kokdAdA6L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FJQZK2ZD?tag=snapspacemkt-20' },
       { id: 'B08LNZKYB9', asin: 'B08LNZKYB9', label: 'Smoked White', mainImage: 'https://m.media-amazon.com/images/I/51lRWa5W5aL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51lRWa5W5aL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B08LNZKYB9?tag=snapspacemkt-20' },
@@ -19178,8 +19178,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'La Jolie Muse', Material: 'Ceramic', Sizes: '6.7 inch + 5.5 inch', Color: 'Ivory', Care: 'Wipe Clean' },
     variants: [
-      { id: 'B08VF28TP2', asin: 'B08VF28TP2', label: 'Glacier Gray', mainImage: 'https://m.media-amazon.com/images/I/51N0ToFBPLL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51N0ToFBPLL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B08VF28TP2?tag=snapspacemkt-20' },
-      { id: 'B08KLRFPMR', asin: 'B08KLRFPMR', label: 'Ivory', mainImage: 'https://m.media-amazon.com/images/I/41zO-7FH1yL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41zO-7FH1yL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B08KLRFPMR?tag=snapspacemkt-20' },
+      { id: 'B08VF28TP2', asin: 'B08VF28TP2', label: 'Glacier Gray', mainImage: 'https://m.media-amazon.com/images/I/51N0ToFBPLL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51N0ToFBPLL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B08VF28TP2?tag=snapspacemkt-20' },
+      { id: 'B08KLRFPMR', asin: 'B08KLRFPMR', label: 'Ivory', mainImage: 'https://m.media-amazon.com/images/I/41zO-7FH1yL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41zO-7FH1yL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B08KLRFPMR?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '2-5', prime: true, returnDays: 30 },
   },
@@ -19217,8 +19217,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'Selamica', Material: 'Ceramic', Size: '4.6 inch', Set: '4 pieces + saucers', Care: 'Wipe Clean' },
     variants: [
-      { id: 'B0CJ7TVH3N', asin: 'B0CJ7TVH3N', label: 'Assorted Colors', mainImage: 'https://m.media-amazon.com/images/I/41fPf3Bv7EL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41fPf3Bv7EL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0CJ7TVH3N?tag=snapspacemkt-20' },
-      { id: 'B0CJ7VZBJB', asin: 'B0CJ7VZBJB', label: 'Vintage Blue', mainImage: 'https://m.media-amazon.com/images/I/41IMlkyhfAL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41IMlkyhfAL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0CJ7VZBJB?tag=snapspacemkt-20' },
+      { id: 'B0CJ7TVH3N', asin: 'B0CJ7TVH3N', label: 'Assorted Colors', mainImage: 'https://m.media-amazon.com/images/I/41fPf3Bv7EL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41fPf3Bv7EL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CJ7TVH3N?tag=snapspacemkt-20' },
+      { id: 'B0CJ7VZBJB', asin: 'B0CJ7VZBJB', label: 'Vintage Blue', mainImage: 'https://m.media-amazon.com/images/I/41IMlkyhfAL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41IMlkyhfAL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CJ7VZBJB?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '2-5', prime: true, returnDays: 30 },
   },
@@ -19256,8 +19256,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'HERDUK', Material: 'Ceramic', Size: '6 inch', Drainage: 'Yes + saucer', Care: 'Wipe Clean' },
     variants: [
-      { id: 'B09KZ63K55', asin: 'B09KZ63K55', label: 'Aqua Blue & Terracotta Red', mainImage: 'https://m.media-amazon.com/images/I/41V8GxR11cL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41V8GxR11cL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B09KZ63K55?tag=snapspacemkt-20' },
-      { id: 'B0BHF9DW14', asin: 'B0BHF9DW14', label: 'Green & Beige', mainImage: 'https://m.media-amazon.com/images/I/41XDwLSAHBL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41XDwLSAHBL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0BHF9DW14?tag=snapspacemkt-20' },
+      { id: 'B09KZ63K55', asin: 'B09KZ63K55', label: 'Aqua Blue & Terracotta Red', mainImage: 'https://m.media-amazon.com/images/I/41V8GxR11cL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41V8GxR11cL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B09KZ63K55?tag=snapspacemkt-20' },
+      { id: 'B0BHF9DW14', asin: 'B0BHF9DW14', label: 'Green & Beige', mainImage: 'https://m.media-amazon.com/images/I/41XDwLSAHBL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41XDwLSAHBL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0BHF9DW14?tag=snapspacemkt-20' },
       { id: 'B09KZ5FSKL', asin: 'B09KZ5FSKL', label: 'Matte Black', mainImage: 'https://m.media-amazon.com/images/I/51TkZZ-EJNL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51TkZZ-EJNL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B09KZ5FSKL?tag=snapspacemkt-20' },
       { id: 'B09KZ8V5KN', asin: 'B09KZ8V5KN', label: 'Matte Black & Brown', mainImage: 'https://m.media-amazon.com/images/I/31c52v9MWnL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/31c52v9MWnL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B09KZ8V5KN?tag=snapspacemkt-20' },
       { id: 'B09KZDFDXR', asin: 'B09KZDFDXR', label: 'Matte White', mainImage: 'https://m.media-amazon.com/images/I/21yokG9aJpL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/21yokG9aJpL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B09KZDFDXR?tag=snapspacemkt-20' },
@@ -19300,8 +19300,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: "D'vine Dev", Material: 'Stoneware', Sizes: '4.5 inch + 5.8 inch', Color: 'Ivory', Care: 'Hand Wash' },
     variants: [
-      { id: 'B087636M6F', asin: 'B087636M6F', label: 'Dark Blue Green', mainImage: 'https://m.media-amazon.com/images/I/41q2qqTj3BS._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41q2qqTj3BS._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B087636M6F?tag=snapspacemkt-20' },
-      { id: 'B08HRLY3RH', asin: 'B08HRLY3RH', label: 'Gray', mainImage: 'https://m.media-amazon.com/images/I/41xg5MRrLIS._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41xg5MRrLIS._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B08HRLY3RH?tag=snapspacemkt-20' },
+      { id: 'B087636M6F', asin: 'B087636M6F', label: 'Dark Blue Green', mainImage: 'https://m.media-amazon.com/images/I/41q2qqTj3BS._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41q2qqTj3BS._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B087636M6F?tag=snapspacemkt-20' },
+      { id: 'B08HRLY3RH', asin: 'B08HRLY3RH', label: 'Gray', mainImage: 'https://m.media-amazon.com/images/I/41xg5MRrLIS._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41xg5MRrLIS._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B08HRLY3RH?tag=snapspacemkt-20' },
       { id: 'B0875KS59W', asin: 'B0875KS59W', label: 'Ivory', mainImage: 'https://m.media-amazon.com/images/I/41hQ-wbiLkL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41hQ-wbiLkL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0875KS59W?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '2-5', prime: true, returnDays: 30 },
@@ -19340,8 +19340,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: "D'vine Dev", Material: 'Ceramic', Size: '10 inch', Drainage: 'Yes + saucer', Care: 'Wipe Clean' },
     variants: [
-      { id: 'B07W2XJGH5', asin: 'B07W2XJGH5', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/31q5vyNQ-lL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/31q5vyNQ-lL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B07W2XJGH5?tag=snapspacemkt-20' },
-      { id: 'B0832Q1JVP', asin: 'B0832Q1JVP', label: 'Black / Speckled Tan', mainImage: 'https://m.media-amazon.com/images/I/31XB+rTXOHL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/31XB+rTXOHL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0832Q1JVP?tag=snapspacemkt-20' },
+      { id: 'B07W2XJGH5', asin: 'B07W2XJGH5', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/31q5vyNQ-lL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/31q5vyNQ-lL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B07W2XJGH5?tag=snapspacemkt-20' },
+      { id: 'B0832Q1JVP', asin: 'B0832Q1JVP', label: 'Black / Speckled Tan', mainImage: 'https://m.media-amazon.com/images/I/31XB+rTXOHL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/31XB+rTXOHL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0832Q1JVP?tag=snapspacemkt-20' },
       { id: 'B07VWWX35L', asin: 'B07VWWX35L', label: 'Gray', mainImage: 'https://m.media-amazon.com/images/I/31CboIVT7gL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/31CboIVT7gL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B07VWWX35L?tag=snapspacemkt-20' },
       { id: 'B0DWZ8FWQJ', asin: 'B0DWZ8FWQJ', label: 'Oatmeal', mainImage: 'https://m.media-amazon.com/images/I/31dEXfACffL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/31dEXfACffL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DWZ8FWQJ?tag=snapspacemkt-20' },
       { id: 'B0DWZKNY5C', asin: 'B0DWZKNY5C', label: 'Olive', mainImage: 'https://m.media-amazon.com/images/I/31ZQgbbHP7L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/31ZQgbbHP7L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DWZKNY5C?tag=snapspacemkt-20' },
@@ -19384,8 +19384,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'G EPGardening', Material: 'Ceramic', Size: '8 inch', Drainage: 'Yes + saucer', Care: 'Wipe Clean' },
     variants: [
-      { id: 'B0DB89B9VT', asin: 'B0DB89B9VT', label: 'Round Dot White', mainImage: 'https://m.media-amazon.com/images/I/41HEn421PHL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41HEn421PHL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0DB89B9VT?tag=snapspacemkt-20' },
-      { id: 'B0DB871VCK', asin: 'B0DB871VCK', label: 'Sunflower White', mainImage: 'https://m.media-amazon.com/images/I/41tX90EWF4L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41tX90EWF4L._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0DB871VCK?tag=snapspacemkt-20' },
+      { id: 'B0DB89B9VT', asin: 'B0DB89B9VT', label: 'Round Dot White', mainImage: 'https://m.media-amazon.com/images/I/41HEn421PHL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41HEn421PHL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DB89B9VT?tag=snapspacemkt-20' },
+      { id: 'B0DB871VCK', asin: 'B0DB871VCK', label: 'Sunflower White', mainImage: 'https://m.media-amazon.com/images/I/41tX90EWF4L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41tX90EWF4L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DB871VCK?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '2-5', prime: true, returnDays: 30 },
   },
@@ -19423,8 +19423,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'Willowy', Material: 'Ceramic', Size: '12 inch', Drainage: 'Hole + plug', Care: 'Wipe Clean' },
     variants: [
-      { id: 'B0BRTF43N8', asin: 'B0BRTF43N8', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/11M+nKtncRL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/11M+nKtncRL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0BRTF43N8?tag=snapspacemkt-20' },
-      { id: 'B0BRRM9BSB', asin: 'B0BRRM9BSB', label: 'White', mainImage: 'https://m.media-amazon.com/images/I/012uZ-fpYYL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/012uZ-fpYYL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0BRRM9BSB?tag=snapspacemkt-20' },
+      { id: 'B0BRTF43N8', asin: 'B0BRTF43N8', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/11M+nKtncRL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/11M+nKtncRL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0BRTF43N8?tag=snapspacemkt-20' },
+      { id: 'B0BRRM9BSB', asin: 'B0BRRM9BSB', label: 'White', mainImage: 'https://m.media-amazon.com/images/I/012uZ-fpYYL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/012uZ-fpYYL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0BRRM9BSB?tag=snapspacemkt-20' },
       { id: 'B07SVTN4JM', asin: 'B07SVTN4JM', label: 'White + Gold Diamonds', mainImage: 'https://m.media-amazon.com/images/I/61FRsc-egWL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61FRsc-egWL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B07SVTN4JM?tag=snapspacemkt-20' },
       { id: 'B08PP2G7XY', asin: 'B08PP2G7XY', label: 'White + Gold Stripes', mainImage: 'https://m.media-amazon.com/images/I/41aNDDmT9EL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41aNDDmT9EL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B08PP2G7XY?tag=snapspacemkt-20' },
     ],
@@ -19464,7 +19464,7 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: "D'vine Dev", Material: 'Terracotta Clay', Size: '12 inch', Color: 'Terracotta', Drainage: 'Yes + saucer', Care: 'Wipe Clean' },
     variants: [
-      { id: 'B0BD4Z21GC', asin: 'B0BD4Z21GC', label: 'Terracotta', mainImage: 'https://m.media-amazon.com/images/I/71fa2CelMkL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71fa2CelMkL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0BD4Z21GC?tag=snapspacemkt-20' },
+      { id: 'B0BD4Z21GC', asin: 'B0BD4Z21GC', label: 'Terracotta', mainImage: 'https://m.media-amazon.com/images/I/71fa2CelMkL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71fa2CelMkL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0BD4Z21GC?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '2-5', prime: true, returnDays: 30 },
   },
@@ -19502,8 +19502,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: "D'vine Dev", Material: 'Ceramic + Metal Stand', Size: '12 inch', Style: 'Mid-Century', Care: 'Wipe Clean' },
     variants: [
-      { id: 'B07MLKDJS4', asin: 'B07MLKDJS4', label: 'Bronze / Grey', mainImage: 'https://m.media-amazon.com/images/I/41ViyAQy-hL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41ViyAQy-hL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B07MLKDJS4?tag=snapspacemkt-20' },
-      { id: 'B07QLNKP47', asin: 'B07QLNKP47', label: 'White / Grey', mainImage: 'https://m.media-amazon.com/images/I/51XiEcRjRDL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51XiEcRjRDL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B07QLNKP47?tag=snapspacemkt-20' },
+      { id: 'B07MLKDJS4', asin: 'B07MLKDJS4', label: 'Bronze / Grey', mainImage: 'https://m.media-amazon.com/images/I/41ViyAQy-hL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41ViyAQy-hL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B07MLKDJS4?tag=snapspacemkt-20' },
+      { id: 'B07QLNKP47', asin: 'B07QLNKP47', label: 'White / Grey', mainImage: 'https://m.media-amazon.com/images/I/51XiEcRjRDL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51XiEcRjRDL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B07QLNKP47?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '2-5', prime: true, returnDays: 30 },
   },
@@ -19541,8 +19541,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'FaithLand', Material: 'Resin/Plastic', Sizes: '9 + 10 + 12 inch', Feature: 'Self-Watering', Care: 'Wipe Clean' },
     variants: [
-      { id: 'B0D7H8TBS6', asin: 'B0D7H8TBS6', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/419Eg2thYXL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/419Eg2thYXL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0D7H8TBS6?tag=snapspacemkt-20' },
-      { id: 'B0D7H7FHL7', asin: 'B0D7H7FHL7', label: 'Black With Brown', mainImage: 'https://m.media-amazon.com/images/I/51cTZzdZ8tL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51cTZzdZ8tL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0D7H7FHL7?tag=snapspacemkt-20' },
+      { id: 'B0D7H8TBS6', asin: 'B0D7H8TBS6', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/419Eg2thYXL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/419Eg2thYXL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0D7H8TBS6?tag=snapspacemkt-20' },
+      { id: 'B0D7H7FHL7', asin: 'B0D7H7FHL7', label: 'Black With Brown', mainImage: 'https://m.media-amazon.com/images/I/51cTZzdZ8tL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51cTZzdZ8tL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0D7H7FHL7?tag=snapspacemkt-20' },
       { id: 'B0D7H34JHQ', asin: 'B0D7H34JHQ', label: 'Green With Brown', mainImage: 'https://m.media-amazon.com/images/I/51ZUNF9nQhL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51ZUNF9nQhL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0D7H34JHQ?tag=snapspacemkt-20' },
       { id: 'B0D7HNYLD4', asin: 'B0D7HNYLD4', label: 'White', mainImage: 'https://m.media-amazon.com/images/I/41nbBfN+GOL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41nbBfN+GOL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0D7HNYLD4?tag=snapspacemkt-20' },
       { id: 'B0D7H9GZD3', asin: 'B0D7H9GZD3', label: 'White With Brown', mainImage: 'https://m.media-amazon.com/images/I/41p7uG48BGL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41p7uG48BGL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0D7H9GZD3?tag=snapspacemkt-20' },
@@ -19583,8 +19583,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'Shineloha', Material: 'Metal + Ceramic', Pot: '5.5 inch', Set: '2 complete kits', Care: 'Wipe Clean' },
     variants: [
-      { id: 'B089FC14SP', asin: 'B089FC14SP', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/51I4dRs1i+L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51I4dRs1i+L._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B089FC14SP?tag=snapspacemkt-20' },
-      { id: 'B0CJPJ1XMK', asin: 'B0CJPJ1XMK', label: 'Black & Gold', mainImage: 'https://m.media-amazon.com/images/I/41vj7LkEzOL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41vj7LkEzOL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0CJPJ1XMK?tag=snapspacemkt-20' },
+      { id: 'B089FC14SP', asin: 'B089FC14SP', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/51I4dRs1i+L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51I4dRs1i+L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B089FC14SP?tag=snapspacemkt-20' },
+      { id: 'B0CJPJ1XMK', asin: 'B0CJPJ1XMK', label: 'Black & Gold', mainImage: 'https://m.media-amazon.com/images/I/41vj7LkEzOL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41vj7LkEzOL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CJPJ1XMK?tag=snapspacemkt-20' },
       { id: 'B0CJPJ9M2T', asin: 'B0CJPJ9M2T', label: 'Gold & White', mainImage: 'https://m.media-amazon.com/images/I/41EykDnTjkL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41EykDnTjkL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CJPJ9M2T?tag=snapspacemkt-20' },
       { id: 'B0CRSWN3XR', asin: 'B0CRSWN3XR', label: 'Gold X 2', mainImage: 'https://m.media-amazon.com/images/I/41gm8EF5RqL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41gm8EF5RqL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CRSWN3XR?tag=snapspacemkt-20' },
     ],
@@ -19624,7 +19624,7 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'Mkono', Material: 'Cotton Rope + Wood Beads', Length: '49 inches', Tiers: '2', Care: 'Spot Clean' },
     variants: [
-      { id: 'B07HRMQP9S', asin: 'B07HRMQP9S', label: 'Natural', mainImage: 'https://m.media-amazon.com/images/I/51N0oxFJLHS._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51N0oxFJLHS._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B07HRMQP9S?tag=snapspacemkt-20' },
+      { id: 'B07HRMQP9S', asin: 'B07HRMQP9S', label: 'Natural', mainImage: 'https://m.media-amazon.com/images/I/51N0oxFJLHS._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51N0oxFJLHS._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B07HRMQP9S?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '2-5', prime: true, returnDays: 30 },
   },
@@ -19662,8 +19662,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'LiyuanQ', Material: 'Plastic', Size: '10 inch', Set: '2 pots + hangers', Feature: 'Self-Watering', Care: 'Wipe Clean' },
     variants: [
-      { id: 'B0CQMC1MTY', asin: 'B0CQMC1MTY', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/41xrKi3L0oL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41xrKi3L0oL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0CQMC1MTY?tag=snapspacemkt-20' },
-      { id: 'B0CQMCSLWL', asin: 'B0CQMCSLWL', label: 'Green', mainImage: 'https://m.media-amazon.com/images/I/41ekysQuO6L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41ekysQuO6L._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0CQMCSLWL?tag=snapspacemkt-20' },
+      { id: 'B0CQMC1MTY', asin: 'B0CQMC1MTY', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/41xrKi3L0oL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41xrKi3L0oL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CQMC1MTY?tag=snapspacemkt-20' },
+      { id: 'B0CQMCSLWL', asin: 'B0CQMCSLWL', label: 'Green', mainImage: 'https://m.media-amazon.com/images/I/41ekysQuO6L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41ekysQuO6L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CQMCSLWL?tag=snapspacemkt-20' },
       { id: 'B0CQMSY1ND', asin: 'B0CQMSY1ND', label: 'White', mainImage: 'https://m.media-amazon.com/images/I/41wWNYxEQBL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41wWNYxEQBL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CQMSY1ND?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '2-5', prime: true, returnDays: 30 },
@@ -19702,8 +19702,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'Mkono', Material: 'Cotton Rope + Wood Beads', Length: '35 inches', Pot: 'Not included (fits 4–6")', Care: 'Spot Clean' },
     variants: [
-      { id: 'B085Y49VVS', asin: 'B085Y49VVS', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/41NkXgMKYML._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41NkXgMKYML._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B085Y49VVS?tag=snapspacemkt-20' },
-      { id: 'B07KPZLSRM', asin: 'B07KPZLSRM', label: 'Brown', mainImage: 'https://m.media-amazon.com/images/I/31WNvtYvUGL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/31WNvtYvUGL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B07KPZLSRM?tag=snapspacemkt-20' },
+      { id: 'B085Y49VVS', asin: 'B085Y49VVS', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/41NkXgMKYML._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41NkXgMKYML._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B085Y49VVS?tag=snapspacemkt-20' },
+      { id: 'B07KPZLSRM', asin: 'B07KPZLSRM', label: 'Brown', mainImage: 'https://m.media-amazon.com/images/I/31WNvtYvUGL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/31WNvtYvUGL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B07KPZLSRM?tag=snapspacemkt-20' },
       { id: 'B085Y4B5GG', asin: 'B085Y4B5GG', label: 'Gray', mainImage: 'https://m.media-amazon.com/images/I/41rzb+Mo5LL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41rzb+Mo5LL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B085Y4B5GG?tag=snapspacemkt-20' },
       { id: 'B07L4J1P9P', asin: 'B07L4J1P9P', label: 'Ivory', mainImage: 'https://m.media-amazon.com/images/I/31YehKAo7sL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/31YehKAo7sL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B07L4J1P9P?tag=snapspacemkt-20' },
     ],
@@ -19743,8 +19743,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'Mkono', Material: 'Cotton Rope + Wood Beads', Lengths: '23" + 29" + 35"', Set: '3 hangers', Care: 'Spot Clean' },
     variants: [
-      { id: 'B0CKZ2PG4H', asin: 'B0CKZ2PG4H', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/41ljXiWDPmL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41ljXiWDPmL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0CKZ2PG4H?tag=snapspacemkt-20' },
-      { id: 'B088822MP6', asin: 'B088822MP6', label: 'Brown', mainImage: 'https://m.media-amazon.com/images/I/51+G4BUmEQL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51+G4BUmEQL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B088822MP6?tag=snapspacemkt-20' },
+      { id: 'B0CKZ2PG4H', asin: 'B0CKZ2PG4H', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/41ljXiWDPmL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41ljXiWDPmL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CKZ2PG4H?tag=snapspacemkt-20' },
+      { id: 'B088822MP6', asin: 'B088822MP6', label: 'Brown', mainImage: 'https://m.media-amazon.com/images/I/51+G4BUmEQL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51+G4BUmEQL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B088822MP6?tag=snapspacemkt-20' },
       { id: 'B093VH975Q', asin: 'B093VH975Q', label: 'Gray', mainImage: 'https://m.media-amazon.com/images/I/417ItqOqbkS._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/417ItqOqbkS._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B093VH975Q?tag=snapspacemkt-20' },
       { id: 'B07ZYKQ2M5', asin: 'B07ZYKQ2M5', label: 'Ivory', mainImage: 'https://m.media-amazon.com/images/I/41iJTtekR3L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41iJTtekR3L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B07ZYKQ2M5?tag=snapspacemkt-20' },
     ],
@@ -19787,8 +19787,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'QLOFEI', Material: 'Ceramic', Set: '2 vases', Color: 'White', Care: 'Wipe Clean' },
     variants: [
-      { id: 'B0B1JDF6RM', asin: 'B0B1JDF6RM', label: 'White', mainImage: 'https://m.media-amazon.com/images/I/31vjvG5NTkL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/31vjvG5NTkL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0B1JDF6RM?tag=snapspacemkt-20' },
-      { id: 'B0B1JFK3J6', asin: 'B0B1JFK3J6', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/41e-XqmunRL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41e-XqmunRL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0B1JFK3J6?tag=snapspacemkt-20' },
+      { id: 'B0B1JDF6RM', asin: 'B0B1JDF6RM', label: 'White', mainImage: 'https://m.media-amazon.com/images/I/31vjvG5NTkL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/31vjvG5NTkL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0B1JDF6RM?tag=snapspacemkt-20' },
+      { id: 'B0B1JFK3J6', asin: 'B0B1JFK3J6', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/41e-XqmunRL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41e-XqmunRL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0B1JFK3J6?tag=snapspacemkt-20' },
       { id: 'B0B1JCYC3V', asin: 'B0B1JCYC3V', label: 'White Style B', mainImage: 'https://m.media-amazon.com/images/I/51+NH9FjPAL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51+NH9FjPAL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0B1JCYC3V?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '2-5', prime: true, returnDays: 30 },
@@ -19827,7 +19827,7 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'QLOFEI', Material: 'Ceramic', Set: '2 vases', Style: 'Round Matte', Care: 'Wipe Clean' },
     variants: [
-      { id: 'B09TTB4RCZ', asin: 'B09TTB4RCZ', label: 'White Round', mainImage: 'https://m.media-amazon.com/images/I/61KVbKSnozL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61KVbKSnozL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B09TTB4RCZ?tag=snapspacemkt-20' },
+      { id: 'B09TTB4RCZ', asin: 'B09TTB4RCZ', label: 'White Round', mainImage: 'https://m.media-amazon.com/images/I/61KVbKSnozL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61KVbKSnozL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B09TTB4RCZ?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '2-5', prime: true, returnDays: 30 },
   },
@@ -19865,8 +19865,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'Kimdio', Material: 'Ceramic', Set: '2 vases', Style: 'Abstract Irregular', Care: 'Wipe Clean' },
     variants: [
-      { id: 'B083NSV2LX', asin: 'B083NSV2LX', label: 'White', mainImage: 'https://m.media-amazon.com/images/I/41Du7gCrUKL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41Du7gCrUKL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B083NSV2LX?tag=snapspacemkt-20' },
-      { id: 'B09G5TZ851', asin: 'B09G5TZ851', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/41gV5MZN2vL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41gV5MZN2vL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B09G5TZ851?tag=snapspacemkt-20' },
+      { id: 'B083NSV2LX', asin: 'B083NSV2LX', label: 'White', mainImage: 'https://m.media-amazon.com/images/I/41Du7gCrUKL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41Du7gCrUKL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B083NSV2LX?tag=snapspacemkt-20' },
+      { id: 'B09G5TZ851', asin: 'B09G5TZ851', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/41gV5MZN2vL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41gV5MZN2vL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B09G5TZ851?tag=snapspacemkt-20' },
       { id: 'B0C8NHVKX6', asin: 'B0C8NHVKX6', label: 'White Set of 2', mainImage: 'https://m.media-amazon.com/images/I/41kA28xV+bL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41kA28xV+bL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0C8NHVKX6?tag=snapspacemkt-20' },
       { id: 'B0C8NJ3LTF', asin: 'B0C8NJ3LTF', label: 'Black & White Set', mainImage: 'https://m.media-amazon.com/images/I/41mfyfO6A6L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41mfyfO6A6L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0C8NJ3LTF?tag=snapspacemkt-20' },
     ],
@@ -19906,8 +19906,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'CwlwGO', Material: 'Ceramic', Set: '3 vases', Style: 'Pottery Farmhouse', Care: 'Wipe Clean' },
     variants: [
-      { id: 'B09X15H7BS', asin: 'B09X15H7BS', label: 'Blue', mainImage: 'https://m.media-amazon.com/images/I/419XyeWwtnL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/419XyeWwtnL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B09X15H7BS?tag=snapspacemkt-20' },
-      { id: 'B09Q2CR55L', asin: 'B09Q2CR55L', label: 'Morandi Colored', mainImage: 'https://m.media-amazon.com/images/I/31Ojx-HKThL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/31Ojx-HKThL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B09Q2CR55L?tag=snapspacemkt-20' },
+      { id: 'B09X15H7BS', asin: 'B09X15H7BS', label: 'Blue', mainImage: 'https://m.media-amazon.com/images/I/419XyeWwtnL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/419XyeWwtnL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B09X15H7BS?tag=snapspacemkt-20' },
+      { id: 'B09Q2CR55L', asin: 'B09Q2CR55L', label: 'Morandi Colored', mainImage: 'https://m.media-amazon.com/images/I/31Ojx-HKThL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/31Ojx-HKThL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B09Q2CR55L?tag=snapspacemkt-20' },
       { id: 'B09Q2DBXDN', asin: 'B09Q2DBXDN', label: 'Yellow', mainImage: 'https://m.media-amazon.com/images/I/31e0jyEgkXL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/31e0jyEgkXL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B09Q2DBXDN?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '2-5', prime: true, returnDays: 30 },
@@ -19946,8 +19946,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'Lvases', Material: 'Ceramic', Size: '6.3"W × 8.4"H (large)', Set: '2 vases', Care: 'Wipe Clean' },
     variants: [
-      { id: 'B0C7WFZZ7D', asin: 'B0C7WFZZ7D', label: 'Extra Large Cream White', mainImage: 'https://m.media-amazon.com/images/I/5130inu-TaL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/5130inu-TaL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0C7WFZZ7D?tag=snapspacemkt-20' },
-      { id: 'B0C7WFP8WN', asin: 'B0C7WFP8WN', label: 'Extra Large Matte Black', mainImage: 'https://m.media-amazon.com/images/I/51UNwc4oUNL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51UNwc4oUNL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0C7WFP8WN?tag=snapspacemkt-20' },
+      { id: 'B0C7WFZZ7D', asin: 'B0C7WFZZ7D', label: 'Extra Large Cream White', mainImage: 'https://m.media-amazon.com/images/I/5130inu-TaL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/5130inu-TaL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0C7WFZZ7D?tag=snapspacemkt-20' },
+      { id: 'B0C7WFP8WN', asin: 'B0C7WFP8WN', label: 'Extra Large Matte Black', mainImage: 'https://m.media-amazon.com/images/I/51UNwc4oUNL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51UNwc4oUNL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0C7WFP8WN?tag=snapspacemkt-20' },
       { id: 'B0FNLJN52L', asin: 'B0FNLJN52L', label: 'Extra Large Navy Blue', mainImage: 'https://m.media-amazon.com/images/I/41zrvt6mRSL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41zrvt6mRSL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FNLJN52L?tag=snapspacemkt-20' },
       { id: 'B0C7WH88W7', asin: 'B0C7WH88W7', label: 'Large Cream White', mainImage: 'https://m.media-amazon.com/images/I/51OGpRy8YdL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51OGpRy8YdL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0C7WH88W7?tag=snapspacemkt-20' },
       { id: 'B0C7WDGJ5B', asin: 'B0C7WDGJ5B', label: 'Large Matte Black', mainImage: 'https://m.media-amazon.com/images/I/51lE2I4wBfL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51lE2I4wBfL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0C7WDGJ5B?tag=snapspacemkt-20' },
@@ -19989,8 +19989,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'CwlwGO', Material: 'Ceramic', Set: '3 vases', Colors: '11 options', Care: 'Wipe Clean' },
     variants: [
-      { id: 'B0GG98DF32', asin: 'B0GG98DF32', label: 'Blue Flower', mainImage: 'https://m.media-amazon.com/images/I/51vFbN056+L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51vFbN056+L._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0GG98DF32?tag=snapspacemkt-20' },
-      { id: 'B0GC3CJHF7', asin: 'B0GC3CJHF7', label: 'Blue', mainImage: 'https://m.media-amazon.com/images/I/51sTv8NKQmL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51sTv8NKQmL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0GC3CJHF7?tag=snapspacemkt-20' },
+      { id: 'B0GG98DF32', asin: 'B0GG98DF32', label: 'Blue Flower', mainImage: 'https://m.media-amazon.com/images/I/51vFbN056+L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51vFbN056+L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0GG98DF32?tag=snapspacemkt-20' },
+      { id: 'B0GC3CJHF7', asin: 'B0GC3CJHF7', label: 'Blue', mainImage: 'https://m.media-amazon.com/images/I/51sTv8NKQmL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51sTv8NKQmL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0GC3CJHF7?tag=snapspacemkt-20' },
       { id: 'B0GG9L78P7', asin: 'B0GG9L78P7', label: 'Green Flower', mainImage: 'https://m.media-amazon.com/images/I/515z0l03PsL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/515z0l03PsL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0GG9L78P7?tag=snapspacemkt-20' },
       { id: 'B0GC58FKK8', asin: 'B0GC58FKK8', label: 'Green', mainImage: 'https://m.media-amazon.com/images/I/51RI2e3iu5L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51RI2e3iu5L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0GC58FKK8?tag=snapspacemkt-20' },
       { id: 'B096H728NZ', asin: 'B096H728NZ', label: 'Ivory', mainImage: 'https://m.media-amazon.com/images/I/41uHQsEdILL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41uHQsEdILL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B096H728NZ?tag=snapspacemkt-20' },
@@ -20035,8 +20035,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: "Carrot's Den", Material: 'Ceramic', Set: '2 vases', Form: 'Hollow Donut Ring', Care: 'Wipe Clean' },
     variants: [
-      { id: 'B0BNMBJ2XC', asin: 'B0BNMBJ2XC', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/41T6w9Xa8fL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41T6w9Xa8fL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0BNMBJ2XC?tag=snapspacemkt-20' },
-      { id: 'B0BDR1X6PT', asin: 'B0BDR1X6PT', label: 'Warm White', mainImage: 'https://m.media-amazon.com/images/I/41ihO22jKPL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41ihO22jKPL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0BDR1X6PT?tag=snapspacemkt-20' },
+      { id: 'B0BNMBJ2XC', asin: 'B0BNMBJ2XC', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/41T6w9Xa8fL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41T6w9Xa8fL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0BNMBJ2XC?tag=snapspacemkt-20' },
+      { id: 'B0BDR1X6PT', asin: 'B0BDR1X6PT', label: 'Warm White', mainImage: 'https://m.media-amazon.com/images/I/41ihO22jKPL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41ihO22jKPL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0BDR1X6PT?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '2-5', prime: true, returnDays: 30 },
   },
@@ -20074,7 +20074,7 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'Home Habitat', Material: 'Ceramic', Set: '2 vases', Style: 'Ribbed Scandi', Color: 'Cream', Care: 'Wipe Clean' },
     variants: [
-      { id: 'B0BLTGHG8Y', asin: 'B0BLTGHG8Y', label: 'Cream', mainImage: 'https://m.media-amazon.com/images/I/81b+WTkmukL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81b+WTkmukL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0BLTGHG8Y?tag=snapspacemkt-20' },
+      { id: 'B0BLTGHG8Y', asin: 'B0BLTGHG8Y', label: 'Cream', mainImage: 'https://m.media-amazon.com/images/I/81b+WTkmukL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81b+WTkmukL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0BLTGHG8Y?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '2-5', prime: true, returnDays: 30 },
   },
@@ -20112,8 +20112,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'COTYNI', Material: 'Ceramic', Set: '2 vases', Style: 'Round Donut', Care: 'Wipe Clean' },
     variants: [
-      { id: 'B0BRP9BS6R', asin: 'B0BRP9BS6R', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/31RQ2i+Vf2L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/31RQ2i+Vf2L._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0BRP9BS6R?tag=snapspacemkt-20' },
-      { id: 'B0CHNFJPYG', asin: 'B0CHNFJPYG', label: 'New Donut', mainImage: 'https://m.media-amazon.com/images/I/411sqGB6TnL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/411sqGB6TnL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0CHNFJPYG?tag=snapspacemkt-20' },
+      { id: 'B0BRP9BS6R', asin: 'B0BRP9BS6R', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/31RQ2i+Vf2L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/31RQ2i+Vf2L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0BRP9BS6R?tag=snapspacemkt-20' },
+      { id: 'B0CHNFJPYG', asin: 'B0CHNFJPYG', label: 'New Donut', mainImage: 'https://m.media-amazon.com/images/I/411sqGB6TnL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/411sqGB6TnL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CHNFJPYG?tag=snapspacemkt-20' },
       { id: 'B0CCNSSS1W', asin: 'B0CCNSSS1W', label: 'New White', mainImage: 'https://m.media-amazon.com/images/I/51rwPLMfCCL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51rwPLMfCCL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CCNSSS1W?tag=snapspacemkt-20' },
       { id: 'B0BB2LB224', asin: 'B0BB2LB224', label: 'White', mainImage: 'https://m.media-amazon.com/images/I/41CkqkYSUqL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41CkqkYSUqL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0BB2LB224?tag=snapspacemkt-20' },
     ],
@@ -20153,8 +20153,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'Zormon', Material: 'Ceramic', Set: '2 vases', Style: 'Round Boho', Care: 'Wipe Clean' },
     variants: [
-      { id: 'B0CGRJ2XLL', asin: 'B0CGRJ2XLL', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/41cA+RL3NAL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41cA+RL3NAL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0CGRJ2XLL?tag=snapspacemkt-20' },
-      { id: 'B0F7J5DRVH', asin: 'B0F7J5DRVH', label: 'Relief Cream', mainImage: 'https://m.media-amazon.com/images/I/51tJox0COGL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51tJox0COGL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0F7J5DRVH?tag=snapspacemkt-20' },
+      { id: 'B0CGRJ2XLL', asin: 'B0CGRJ2XLL', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/41cA+RL3NAL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41cA+RL3NAL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CGRJ2XLL?tag=snapspacemkt-20' },
+      { id: 'B0F7J5DRVH', asin: 'B0F7J5DRVH', label: 'Relief Cream', mainImage: 'https://m.media-amazon.com/images/I/51tJox0COGL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51tJox0COGL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0F7J5DRVH?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '2-5', prime: true, returnDays: 30 },
   },
@@ -20192,8 +20192,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'LUKA', Material: 'Ceramic', Set: '3 vases', Heights: '5 + 7.5 + 10 inch', Care: 'Wipe Clean' },
     variants: [
-      { id: 'B0FVF3PFNW', asin: 'B0FVF3PFNW', label: 'Antique White', mainImage: 'https://m.media-amazon.com/images/I/41+teFJopQL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41+teFJopQL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0FVF3PFNW?tag=snapspacemkt-20' },
-      { id: 'B0F28J93NW', asin: 'B0F28J93NW', label: 'Imitation Wood Color', mainImage: 'https://m.media-amazon.com/images/I/51Qz+OYUonL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51Qz+OYUonL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0F28J93NW?tag=snapspacemkt-20' },
+      { id: 'B0FVF3PFNW', asin: 'B0FVF3PFNW', label: 'Antique White', mainImage: 'https://m.media-amazon.com/images/I/41+teFJopQL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41+teFJopQL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FVF3PFNW?tag=snapspacemkt-20' },
+      { id: 'B0F28J93NW', asin: 'B0F28J93NW', label: 'Imitation Wood Color', mainImage: 'https://m.media-amazon.com/images/I/51Qz+OYUonL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51Qz+OYUonL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0F28J93NW?tag=snapspacemkt-20' },
       { id: 'B0BYVGCYNL', asin: 'B0BYVGCYNL', label: 'Terracotta', mainImage: 'https://m.media-amazon.com/images/I/51rCVVRYO9L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51rCVVRYO9L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0BYVGCYNL?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '2-5', prime: true, returnDays: 30 },
@@ -20232,8 +20232,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'SIDUCAL', Material: 'Terracotta Clay', Set: '3 vases', Style: 'Whitewashed Farmhouse', Care: 'Wipe Clean' },
     variants: [
-      { id: 'B0CN8NMVW3', asin: 'B0CN8NMVW3', label: 'Rustic White', mainImage: 'https://m.media-amazon.com/images/I/41PRbQCnMBL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41PRbQCnMBL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0CN8NMVW3?tag=snapspacemkt-20' },
-      { id: 'B0CK9K8CDH', asin: 'B0CK9K8CDH', label: 'Brick Red', mainImage: 'https://m.media-amazon.com/images/I/41pVfRGhNXL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41pVfRGhNXL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0CK9K8CDH?tag=snapspacemkt-20' },
+      { id: 'B0CN8NMVW3', asin: 'B0CN8NMVW3', label: 'Rustic White', mainImage: 'https://m.media-amazon.com/images/I/41PRbQCnMBL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41PRbQCnMBL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CN8NMVW3?tag=snapspacemkt-20' },
+      { id: 'B0CK9K8CDH', asin: 'B0CK9K8CDH', label: 'Brick Red', mainImage: 'https://m.media-amazon.com/images/I/41pVfRGhNXL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41pVfRGhNXL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CK9K8CDH?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '2-5', prime: true, returnDays: 30 },
   },
@@ -20271,8 +20271,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'JUZAI', Material: 'Ceramic', Height: '11 inch', Style: 'Classic Tall', Care: 'Wipe Clean' },
     variants: [
-      { id: 'B0B9XCTY3K', asin: 'B0B9XCTY3K', label: 'Matt Black', mainImage: 'https://m.media-amazon.com/images/I/31+GmBFUNLL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/31+GmBFUNLL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0B9XCTY3K?tag=snapspacemkt-20' },
-      { id: 'B0B9X9PKCR', asin: 'B0B9X9PKCR', label: 'Matt White', mainImage: 'https://m.media-amazon.com/images/I/21-r5OwwefL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/21-r5OwwefL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0B9X9PKCR?tag=snapspacemkt-20' },
+      { id: 'B0B9XCTY3K', asin: 'B0B9XCTY3K', label: 'Matt Black', mainImage: 'https://m.media-amazon.com/images/I/31+GmBFUNLL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/31+GmBFUNLL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0B9XCTY3K?tag=snapspacemkt-20' },
+      { id: 'B0B9X9PKCR', asin: 'B0B9X9PKCR', label: 'Matt White', mainImage: 'https://m.media-amazon.com/images/I/21-r5OwwefL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/21-r5OwwefL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0B9X9PKCR?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '2-5', prime: true, returnDays: 30 },
   },
@@ -20310,8 +20310,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'Kimdio', Material: 'Ceramic', Style: 'Abstract Irregular', Care: 'Wipe Clean' },
     variants: [
-      { id: 'B083NSV2LX', asin: 'B083NSV2LX', label: 'White', mainImage: 'https://m.media-amazon.com/images/I/41Du7gCrUKL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41Du7gCrUKL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B083NSV2LX?tag=snapspacemkt-20' },
-      { id: 'B09G5TZ851', asin: 'B09G5TZ851', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/41gV5MZN2vL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41gV5MZN2vL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B09G5TZ851?tag=snapspacemkt-20' },
+      { id: 'B083NSV2LX', asin: 'B083NSV2LX', label: 'White', mainImage: 'https://m.media-amazon.com/images/I/41Du7gCrUKL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41Du7gCrUKL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B083NSV2LX?tag=snapspacemkt-20' },
+      { id: 'B09G5TZ851', asin: 'B09G5TZ851', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/41gV5MZN2vL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41gV5MZN2vL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B09G5TZ851?tag=snapspacemkt-20' },
       { id: 'B0C8NHVKX6', asin: 'B0C8NHVKX6', label: 'White Set of 2', mainImage: 'https://m.media-amazon.com/images/I/41kA28xV+bL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41kA28xV+bL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0C8NHVKX6?tag=snapspacemkt-20' },
       { id: 'B0C8NJ3LTF', asin: 'B0C8NJ3LTF', label: 'Black & White Set', mainImage: 'https://m.media-amazon.com/images/I/41mfyfO6A6L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41mfyfO6A6L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0C8NJ3LTF?tag=snapspacemkt-20' },
     ],
@@ -20351,8 +20351,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'XMGZQ', Material: 'Ceramic', Set: '2 vases', Style: 'Hollow Donut', Care: 'Wipe Clean' },
     variants: [
-      { id: 'B0BGBQN76T', asin: 'B0BGBQN76T', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/41VAE2b+dtL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41VAE2b+dtL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0BGBQN76T?tag=snapspacemkt-20' },
-      { id: 'B0BGBQDHXG', asin: 'B0BGBQDHXG', label: 'Blue', mainImage: 'https://m.media-amazon.com/images/I/41kABxMxV1L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41kABxMxV1L._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0BGBQDHXG?tag=snapspacemkt-20' },
+      { id: 'B0BGBQN76T', asin: 'B0BGBQN76T', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/41VAE2b+dtL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41VAE2b+dtL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0BGBQN76T?tag=snapspacemkt-20' },
+      { id: 'B0BGBQDHXG', asin: 'B0BGBQDHXG', label: 'Blue', mainImage: 'https://m.media-amazon.com/images/I/41kABxMxV1L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41kABxMxV1L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0BGBQDHXG?tag=snapspacemkt-20' },
       { id: 'B0BGBTHW5S', asin: 'B0BGBTHW5S', label: 'Orange', mainImage: 'https://m.media-amazon.com/images/I/41W2ohHk2OL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41W2ohHk2OL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0BGBTHW5S?tag=snapspacemkt-20' },
       { id: 'B0BGBRGMWV', asin: 'B0BGBRGMWV', label: 'White', mainImage: 'https://m.media-amazon.com/images/I/51sSXcdQJjL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51sSXcdQJjL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0BGBRGMWV?tag=snapspacemkt-20' },
     ],
@@ -20390,8 +20390,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'QLOFEI', Material: 'Glass', Set: '20 bud vases', Style: 'Vintage Amber', Care: 'Hand Wash' },
     variants: [
-      { id: 'B0BWXSC71Q', asin: 'B0BWXSC71Q', label: '20 Colors', mainImage: 'https://m.media-amazon.com/images/I/5157L9ro7ML._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/5157L9ro7ML._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0BWXSC71Q?tag=snapspacemkt-20' },
-      { id: 'B0BWXQD4JX', asin: 'B0BWXQD4JX', label: '20 Transparent Colors', mainImage: 'https://m.media-amazon.com/images/I/41Q4t110OBL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41Q4t110OBL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0BWXQD4JX?tag=snapspacemkt-20' },
+      { id: 'B0BWXSC71Q', asin: 'B0BWXSC71Q', label: '20 Colors', mainImage: 'https://m.media-amazon.com/images/I/5157L9ro7ML._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/5157L9ro7ML._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0BWXSC71Q?tag=snapspacemkt-20' },
+      { id: 'B0BWXQD4JX', asin: 'B0BWXQD4JX', label: '20 Transparent Colors', mainImage: 'https://m.media-amazon.com/images/I/41Q4t110OBL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41Q4t110OBL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0BWXQD4JX?tag=snapspacemkt-20' },
       { id: 'B0CD3LV1CR', asin: 'B0CD3LV1CR', label: 'Amber', mainImage: 'https://m.media-amazon.com/images/I/4176wk1xLAL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/4176wk1xLAL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CD3LV1CR?tag=snapspacemkt-20' },
       { id: 'B0CMHQZ8JC', asin: 'B0CMHQZ8JC', label: 'Amber Gold', mainImage: 'https://m.media-amazon.com/images/I/41xaaHgSh8L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41xaaHgSh8L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CMHQZ8JC?tag=snapspacemkt-20' },
       { id: 'B0CF57NRB3', asin: 'B0CF57NRB3', label: 'Black Grey', mainImage: 'https://m.media-amazon.com/images/I/41ZM4p5b2OL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41ZM4p5b2OL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CF57NRB3?tag=snapspacemkt-20' },
@@ -20438,8 +20438,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'Vogue Furniture Direct', Material: 'Metal', Height: '24"', Style: 'Backless Stackable', Capacity: '250 lbs', Set: '2 stools' },
     variants: [
-      { id: 'B01M2X53FT', asin: 'B01M2X53FT', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/41IbAXCcJOL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41IbAXCcJOL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B01M2X53FT?tag=snapspacemkt-20' },
-      { id: 'B079P8JZ82', asin: 'B079P8JZ82', label: 'Blue', mainImage: 'https://m.media-amazon.com/images/I/41tXkLZ+2zL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41tXkLZ+2zL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B079P8JZ82?tag=snapspacemkt-20' },
+      { id: 'B01M2X53FT', asin: 'B01M2X53FT', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/41IbAXCcJOL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41IbAXCcJOL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B01M2X53FT?tag=snapspacemkt-20' },
+      { id: 'B079P8JZ82', asin: 'B079P8JZ82', label: 'Blue', mainImage: 'https://m.media-amazon.com/images/I/41tXkLZ+2zL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41tXkLZ+2zL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B079P8JZ82?tag=snapspacemkt-20' },
       { id: 'B0BPH9XPKL', asin: 'B0BPH9XPKL', label: 'Dark Green', mainImage: 'https://m.media-amazon.com/images/I/41CbYhjw98L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41CbYhjw98L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0BPH9XPKL?tag=snapspacemkt-20' },
       { id: 'B09WHT4N3P', asin: 'B09WHT4N3P', label: 'Deep Blue', mainImage: 'https://m.media-amazon.com/images/I/41y5LXmk72L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41y5LXmk72L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B09WHT4N3P?tag=snapspacemkt-20' },
       { id: 'B0CJ8PFN2B', asin: 'B0CJ8PFN2B', label: 'Distressed Deep Blue', mainImage: 'https://m.media-amazon.com/images/I/41IgFG8iLcL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41IgFG8iLcL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CJ8PFN2B?tag=snapspacemkt-20' },
@@ -20489,8 +20489,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'Raynesys', Material: 'Bonded Leather, Steel', Height: '24"', Style: 'Saddle Seat Backless', Capacity: '300 lbs', Set: '2 stools' },
     variants: [
-      { id: 'B0CRL3LKL7', asin: 'B0CRL3LKL7', label: 'All Black', mainImage: 'https://m.media-amazon.com/images/I/41F-AX8kRBL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41F-AX8kRBL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0CRL3LKL7?tag=snapspacemkt-20' },
-      { id: 'B0CRL46ZCM', asin: 'B0CRL46ZCM', label: 'Brown / Black', mainImage: 'https://m.media-amazon.com/images/I/411FkWfPWrL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/411FkWfPWrL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0CRL46ZCM?tag=snapspacemkt-20' },
+      { id: 'B0CRL3LKL7', asin: 'B0CRL3LKL7', label: 'All Black', mainImage: 'https://m.media-amazon.com/images/I/41F-AX8kRBL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41F-AX8kRBL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CRL3LKL7?tag=snapspacemkt-20' },
+      { id: 'B0CRL46ZCM', asin: 'B0CRL46ZCM', label: 'Brown / Black', mainImage: 'https://m.media-amazon.com/images/I/411FkWfPWrL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/411FkWfPWrL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CRL46ZCM?tag=snapspacemkt-20' },
       { id: 'B0CRL2Q2YV', asin: 'B0CRL2Q2YV', label: 'Gray / Black', mainImage: 'https://m.media-amazon.com/images/I/41hs3Km-kdL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41hs3Km-kdL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CRL2Q2YV?tag=snapspacemkt-20' },
       { id: 'B0CRL3K8GL', asin: 'B0CRL3K8GL', label: 'Gray / White', mainImage: 'https://m.media-amazon.com/images/I/41cayTUYh9L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41cayTUYh9L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CRL3K8GL?tag=snapspacemkt-20' },
     ],
@@ -20531,8 +20531,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'FIRAVOE', Material: 'Faux Leather, Metal', Height: '26"', Style: 'Low Back with Footrest', Capacity: '330 lbs', Set: '2 stools' },
     variants: [
-      { id: 'B0DPH3Q156', asin: 'B0DPH3Q156', label: 'Avocado Green', mainImage: 'https://m.media-amazon.com/images/I/11JsS7OWsgL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/11JsS7OWsgL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0DPH3Q156?tag=snapspacemkt-20' },
-      { id: 'B0DPH6F78J', asin: 'B0DPH6F78J', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/11qZmnkoXML._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/11qZmnkoXML._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0DPH6F78J?tag=snapspacemkt-20' },
+      { id: 'B0DPH3Q156', asin: 'B0DPH3Q156', label: 'Avocado Green', mainImage: 'https://m.media-amazon.com/images/I/11JsS7OWsgL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/11JsS7OWsgL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DPH3Q156?tag=snapspacemkt-20' },
+      { id: 'B0DPH6F78J', asin: 'B0DPH6F78J', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/11qZmnkoXML._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/11qZmnkoXML._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DPH6F78J?tag=snapspacemkt-20' },
       { id: 'B0DPH5GNBQ', asin: 'B0DPH5GNBQ', label: 'Caramel Brown', mainImage: 'https://m.media-amazon.com/images/I/115lK9+X32L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/115lK9+X32L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DPH5GNBQ?tag=snapspacemkt-20' },
       { id: 'B0DPH6K5S7', asin: 'B0DPH6K5S7', label: 'Coffee Brown', mainImage: 'https://m.media-amazon.com/images/I/11+dUx8BE+L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/11+dUx8BE+L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DPH6K5S7?tag=snapspacemkt-20' },
     ],
@@ -20573,8 +20573,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'gopop', Material: 'Faux Leather, Chrome Metal', Height: '25"', Style: 'With Back', Capacity: '330 lbs', Set: '2 stools' },
     variants: [
-      { id: 'B0D18YHSDM', asin: 'B0D18YHSDM', label: 'Black / Black Legs', mainImage: 'https://m.media-amazon.com/images/I/31wlmo6fy6L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/31wlmo6fy6L._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0D18YHSDM?tag=snapspacemkt-20' },
-      { id: 'B0D18MHQ38', asin: 'B0D18MHQ38', label: 'Black / White Legs', mainImage: 'https://m.media-amazon.com/images/I/31RrMxl+3qL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/31RrMxl+3qL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0D18MHQ38?tag=snapspacemkt-20' },
+      { id: 'B0D18YHSDM', asin: 'B0D18YHSDM', label: 'Black / Black Legs', mainImage: 'https://m.media-amazon.com/images/I/31wlmo6fy6L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/31wlmo6fy6L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0D18YHSDM?tag=snapspacemkt-20' },
+      { id: 'B0D18MHQ38', asin: 'B0D18MHQ38', label: 'Black / White Legs', mainImage: 'https://m.media-amazon.com/images/I/31RrMxl+3qL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/31RrMxl+3qL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0D18MHQ38?tag=snapspacemkt-20' },
       { id: 'B0D18Q56TC', asin: 'B0D18Q56TC', label: 'Gold / Black', mainImage: 'https://m.media-amazon.com/images/I/313Rg9qikPL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/313Rg9qikPL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0D18Q56TC?tag=snapspacemkt-20' },
       { id: 'B0D18X6TSD', asin: 'B0D18X6TSD', label: 'Gold / Blue Gray', mainImage: 'https://m.media-amazon.com/images/I/31qung+rcQL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/31qung+rcQL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0D18X6TSD?tag=snapspacemkt-20' },
       { id: 'B0D18821HB', asin: 'B0D18821HB', label: 'Gold / Light Grey', mainImage: 'https://m.media-amazon.com/images/I/31oPwPIkIJL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/31oPwPIkIJL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0D18821HB?tag=snapspacemkt-20' },
@@ -20622,8 +20622,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'GrandNoor', Material: 'Rattan, Chrome Metal, Fabric', Height: '24"', Style: 'Cesca / Boho', Capacity: '280 lbs', Set: '2 stools' },
     variants: [
-      { id: 'B0BP13ZYDT', asin: 'B0BP13ZYDT', label: 'Brown', mainImage: 'https://m.media-amazon.com/images/I/71tz8KO7snL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71tz8KO7snL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0BP13ZYDT?tag=snapspacemkt-20' },
-      { id: 'B0FBRPR3BL', asin: 'B0FBRPR3BL', label: 'Green', mainImage: 'https://m.media-amazon.com/images/I/71tz8KO7snL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71tz8KO7snL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0FBRPR3BL?tag=snapspacemkt-20' },
+      { id: 'B0BP13ZYDT', asin: 'B0BP13ZYDT', label: 'Brown', mainImage: 'https://m.media-amazon.com/images/I/71tz8KO7snL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71tz8KO7snL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0BP13ZYDT?tag=snapspacemkt-20' },
+      { id: 'B0FBRPR3BL', asin: 'B0FBRPR3BL', label: 'Green', mainImage: 'https://m.media-amazon.com/images/I/71tz8KO7snL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71tz8KO7snL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FBRPR3BL?tag=snapspacemkt-20' },
       { id: 'B0CS345MYJ', asin: 'B0CS345MYJ', label: 'White', mainImage: 'https://m.media-amazon.com/images/I/71tz8KO7snL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71tz8KO7snL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CS345MYJ?tag=snapspacemkt-20' },
       { id: 'B0FKH7HBTR', asin: 'B0FKH7HBTR', label: 'Brown Leather', mainImage: 'https://m.media-amazon.com/images/I/71tz8KO7snL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71tz8KO7snL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FKH7HBTR?tag=snapspacemkt-20' },
     ],
@@ -20664,8 +20664,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'Rejeke', Material: 'Faux Leather, Chrome Steel', Height: '25"', Style: 'With Back', Capacity: '330 lbs', Set: '2 stools' },
     variants: [
-      { id: 'B0DFW9KTV9', asin: 'B0DFW9KTV9', label: 'Black & White', mainImage: 'https://m.media-amazon.com/images/I/81RJB4bbldL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81RJB4bbldL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0DFW9KTV9?tag=snapspacemkt-20' },
-      { id: 'B0DFWCYRH3', asin: 'B0DFWCYRH3', label: 'Gold & Black', mainImage: 'https://m.media-amazon.com/images/I/81RJB4bbldL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81RJB4bbldL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0DFWCYRH3?tag=snapspacemkt-20' },
+      { id: 'B0DFW9KTV9', asin: 'B0DFW9KTV9', label: 'Black & White', mainImage: 'https://m.media-amazon.com/images/I/81RJB4bbldL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81RJB4bbldL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DFW9KTV9?tag=snapspacemkt-20' },
+      { id: 'B0DFWCYRH3', asin: 'B0DFWCYRH3', label: 'Gold & Black', mainImage: 'https://m.media-amazon.com/images/I/81RJB4bbldL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81RJB4bbldL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DFWCYRH3?tag=snapspacemkt-20' },
       { id: 'B0DFW8V1DC', asin: 'B0DFW8V1DC', label: 'Gold & Light Grey', mainImage: 'https://m.media-amazon.com/images/I/81RJB4bbldL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81RJB4bbldL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DFW8V1DC?tag=snapspacemkt-20' },
       { id: 'B0DFWBW8ZF', asin: 'B0DFWBW8ZF', label: 'Gold & White', mainImage: 'https://m.media-amazon.com/images/I/81RJB4bbldL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81RJB4bbldL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DFWBW8ZF?tag=snapspacemkt-20' },
       { id: 'B0DFWBCF33', asin: 'B0DFWBCF33', label: 'Silver & Black', mainImage: 'https://m.media-amazon.com/images/I/81RJB4bbldL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81RJB4bbldL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DFWBCF33?tag=snapspacemkt-20' },
@@ -20710,8 +20710,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'Zesthouse', Material: 'Rattan, Boucle Fabric, Chrome Metal', Height: '26"', Style: 'Mid-Century', Capacity: '280 lbs', Set: '2 stools' },
     variants: [
-      { id: 'B0FGCTB9W7', asin: 'B0FGCTB9W7', label: 'Beige Grayish Linen', mainImage: 'https://m.media-amazon.com/images/I/71Hz5hNx7xL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71Hz5hNx7xL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0FGCTB9W7?tag=snapspacemkt-20' },
-      { id: 'B0FGCR1ZNJ', asin: 'B0FGCR1ZNJ', label: 'Beige Yellowish Linen', mainImage: 'https://m.media-amazon.com/images/I/71Hz5hNx7xL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71Hz5hNx7xL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0FGCR1ZNJ?tag=snapspacemkt-20' },
+      { id: 'B0FGCTB9W7', asin: 'B0FGCTB9W7', label: 'Beige Grayish Linen', mainImage: 'https://m.media-amazon.com/images/I/71Hz5hNx7xL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71Hz5hNx7xL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FGCTB9W7?tag=snapspacemkt-20' },
+      { id: 'B0FGCR1ZNJ', asin: 'B0FGCR1ZNJ', label: 'Beige Yellowish Linen', mainImage: 'https://m.media-amazon.com/images/I/71Hz5hNx7xL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71Hz5hNx7xL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FGCR1ZNJ?tag=snapspacemkt-20' },
       { id: 'B0CNH146P4', asin: 'B0CNH146P4', label: 'Black Boucle', mainImage: 'https://m.media-amazon.com/images/I/71Hz5hNx7xL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71Hz5hNx7xL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CNH146P4?tag=snapspacemkt-20' },
       { id: 'B0CGJX4NFK', asin: 'B0CGJX4NFK', label: 'Black Velvet', mainImage: 'https://m.media-amazon.com/images/I/71Hz5hNx7xL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71Hz5hNx7xL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CGJX4NFK?tag=snapspacemkt-20' },
       { id: 'B0DBKW9VQL', asin: 'B0DBKW9VQL', label: 'Brown Faux Leather', mainImage: 'https://m.media-amazon.com/images/I/71Hz5hNx7xL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71Hz5hNx7xL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DBKW9VQL?tag=snapspacemkt-20' },
@@ -20757,8 +20757,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'Rejeke', Material: 'Faux Leather, Steel', Height: '27"', Style: 'With Back', Capacity: '500 lbs', Set: '2 stools' },
     variants: [
-      { id: 'B0DMZ75GWV', asin: 'B0DMZ75GWV', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/71gPmUd9NEL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71gPmUd9NEL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0DMZ75GWV?tag=snapspacemkt-20' },
-      { id: 'B0DMZMFTRS', asin: 'B0DMZMFTRS', label: 'Black / Silver Leg', mainImage: 'https://m.media-amazon.com/images/I/71gPmUd9NEL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71gPmUd9NEL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0DMZMFTRS?tag=snapspacemkt-20' },
+      { id: 'B0DMZ75GWV', asin: 'B0DMZ75GWV', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/71gPmUd9NEL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71gPmUd9NEL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DMZ75GWV?tag=snapspacemkt-20' },
+      { id: 'B0DMZMFTRS', asin: 'B0DMZMFTRS', label: 'Black / Silver Leg', mainImage: 'https://m.media-amazon.com/images/I/71gPmUd9NEL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71gPmUd9NEL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DMZMFTRS?tag=snapspacemkt-20' },
       { id: 'B0DMZN3TL1', asin: 'B0DMZN3TL1', label: 'Brown', mainImage: 'https://m.media-amazon.com/images/I/71gPmUd9NEL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71gPmUd9NEL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DMZN3TL1?tag=snapspacemkt-20' },
       { id: 'B0DMZ7891M', asin: 'B0DMZ7891M', label: 'Grey-Brown', mainImage: 'https://m.media-amazon.com/images/I/71gPmUd9NEL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71gPmUd9NEL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DMZ7891M?tag=snapspacemkt-20' },
       { id: 'B0DMZKX2MD', asin: 'B0DMZKX2MD', label: 'Light Grey', mainImage: 'https://m.media-amazon.com/images/I/71gPmUd9NEL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71gPmUd9NEL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DMZKX2MD?tag=snapspacemkt-20' },
@@ -20801,8 +20801,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'STOOLINK', Material: 'Faux Leather, Steel', Height: '26"', Style: 'With Back', Capacity: '330 lbs', Set: '2 stools' },
     variants: [
-      { id: 'B0FK52PTNQ', asin: 'B0FK52PTNQ', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/81ckdLc9zUL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81ckdLc9zUL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0FK52PTNQ?tag=snapspacemkt-20' },
-      { id: 'B0FK4XFVM5', asin: 'B0FK4XFVM5', label: 'Brown', mainImage: 'https://m.media-amazon.com/images/I/81ckdLc9zUL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81ckdLc9zUL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0FK4XFVM5?tag=snapspacemkt-20' },
+      { id: 'B0FK52PTNQ', asin: 'B0FK52PTNQ', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/81ckdLc9zUL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81ckdLc9zUL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FK52PTNQ?tag=snapspacemkt-20' },
+      { id: 'B0FK4XFVM5', asin: 'B0FK4XFVM5', label: 'Brown', mainImage: 'https://m.media-amazon.com/images/I/81ckdLc9zUL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81ckdLc9zUL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FK4XFVM5?tag=snapspacemkt-20' },
       { id: 'B0FK4YGMGX', asin: 'B0FK4YGMGX', label: 'Whiskey Brown', mainImage: 'https://m.media-amazon.com/images/I/81ckdLc9zUL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81ckdLc9zUL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FK4YGMGX?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '3-5', prime: true, returnDays: 30 },
@@ -20842,8 +20842,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'Aklaus', Material: 'Metal', Height: '26"', Style: 'Industrial Farmhouse', Capacity: '300 lbs each', Set: '4 stools' },
     variants: [
-      { id: 'B0869LHJCQ', asin: 'B0869LHJCQ', label: 'Cream', mainImage: 'https://m.media-amazon.com/images/I/516IhFOQQNL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/516IhFOQQNL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0869LHJCQ?tag=snapspacemkt-20' },
-      { id: 'B0GQSSXCCG', asin: 'B0GQSSXCCG', label: 'Matte Black', mainImage: 'https://m.media-amazon.com/images/I/51VLIMXl1YL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51VLIMXl1YL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0GQSSXCCG?tag=snapspacemkt-20' },
+      { id: 'B0869LHJCQ', asin: 'B0869LHJCQ', label: 'Cream', mainImage: 'https://m.media-amazon.com/images/I/516IhFOQQNL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/516IhFOQQNL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0869LHJCQ?tag=snapspacemkt-20' },
+      { id: 'B0GQSSXCCG', asin: 'B0GQSSXCCG', label: 'Matte Black', mainImage: 'https://m.media-amazon.com/images/I/51VLIMXl1YL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51VLIMXl1YL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0GQSSXCCG?tag=snapspacemkt-20' },
       { id: 'B0869LNKR7', asin: 'B0869LNKR7', label: 'Rusty', mainImage: 'https://m.media-amazon.com/images/I/51NFwm9UvRL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51NFwm9UvRL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0869LNKR7?tag=snapspacemkt-20' },
       { id: 'B08BNQG7N5', asin: 'B08BNQG7N5', label: 'Silver', mainImage: 'https://m.media-amazon.com/images/I/51CqiXiHg5L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51CqiXiHg5L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B08BNQG7N5?tag=snapspacemkt-20' },
     ],
@@ -20884,8 +20884,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'DUOMAY', Material: 'Linen, Wood, Metal', Height: '26"', Style: 'Swivel', Capacity: '300 lbs', Set: '2 stools' },
     variants: [
-      { id: 'B0D6WBDYKB', asin: 'B0D6WBDYKB', label: 'Grey', mainImage: 'https://m.media-amazon.com/images/I/41zS-iCIiiL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41zS-iCIiiL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0D6WBDYKB?tag=snapspacemkt-20' },
-      { id: 'B0D6WB5R9S', asin: 'B0D6WB5R9S', label: 'White', mainImage: 'https://m.media-amazon.com/images/I/41KqZxq84VL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41KqZxq84VL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0D6WB5R9S?tag=snapspacemkt-20' },
+      { id: 'B0D6WBDYKB', asin: 'B0D6WBDYKB', label: 'Grey', mainImage: 'https://m.media-amazon.com/images/I/41zS-iCIiiL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41zS-iCIiiL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0D6WBDYKB?tag=snapspacemkt-20' },
+      { id: 'B0D6WB5R9S', asin: 'B0D6WB5R9S', label: 'White', mainImage: 'https://m.media-amazon.com/images/I/41KqZxq84VL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41KqZxq84VL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0D6WB5R9S?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '3-5', prime: true, returnDays: 30 },
   },
@@ -20924,8 +20924,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'VATROS', Material: 'Faux Leather, Metal', Height: '26"', Style: 'Backless with Footrest', Capacity: '330 lbs', Set: '2 stools' },
     variants: [
-      { id: 'B0G5XLJ9RG', asin: 'B0G5XLJ9RG', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/71xV2z9UmSL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71xV2z9UmSL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0G5XLJ9RG?tag=snapspacemkt-20' },
-      { id: 'B0G5XST7WS', asin: 'B0G5XST7WS', label: 'Cream White', mainImage: 'https://m.media-amazon.com/images/I/71xV2z9UmSL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71xV2z9UmSL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0G5XST7WS?tag=snapspacemkt-20' },
+      { id: 'B0G5XLJ9RG', asin: 'B0G5XLJ9RG', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/71xV2z9UmSL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71xV2z9UmSL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0G5XLJ9RG?tag=snapspacemkt-20' },
+      { id: 'B0G5XST7WS', asin: 'B0G5XST7WS', label: 'Cream White', mainImage: 'https://m.media-amazon.com/images/I/71xV2z9UmSL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71xV2z9UmSL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0G5XST7WS?tag=snapspacemkt-20' },
       { id: 'B0G5XT4VWK', asin: 'B0G5XT4VWK', label: 'Green', mainImage: 'https://m.media-amazon.com/images/I/71xV2z9UmSL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71xV2z9UmSL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0G5XT4VWK?tag=snapspacemkt-20' },
       { id: 'B0G5Y5VY9N', asin: 'B0G5Y5VY9N', label: 'Walnut', mainImage: 'https://m.media-amazon.com/images/I/71xV2z9UmSL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/71xV2z9UmSL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0G5Y5VY9N?tag=snapspacemkt-20' },
     ],
@@ -20966,8 +20966,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'KRAMZMING', Material: 'Velvet, Metal', Height: '26"', Style: 'Swivel with Back', Capacity: '300 lbs', Set: '2 stools' },
     variants: [
-      { id: 'B0GMBGNLMV', asin: 'B0GMBGNLMV', label: 'Blue', mainImage: 'https://m.media-amazon.com/images/I/41oi0yeu5rL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41oi0yeu5rL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0GMBGNLMV?tag=snapspacemkt-20' },
-      { id: 'B0FYNCRDGB', asin: 'B0FYNCRDGB', label: 'Grey', mainImage: 'https://m.media-amazon.com/images/I/41bn29yG+cL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41bn29yG+cL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0FYNCRDGB?tag=snapspacemkt-20' },
+      { id: 'B0GMBGNLMV', asin: 'B0GMBGNLMV', label: 'Blue', mainImage: 'https://m.media-amazon.com/images/I/41oi0yeu5rL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41oi0yeu5rL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0GMBGNLMV?tag=snapspacemkt-20' },
+      { id: 'B0FYNCRDGB', asin: 'B0FYNCRDGB', label: 'Grey', mainImage: 'https://m.media-amazon.com/images/I/41bn29yG+cL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41bn29yG+cL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FYNCRDGB?tag=snapspacemkt-20' },
       { id: 'B0FF46CQMP', asin: 'B0FF46CQMP', label: 'White', mainImage: 'https://m.media-amazon.com/images/I/31km-nU+IHL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/31km-nU+IHL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FF46CQMP?tag=snapspacemkt-20' },
       { id: 'B0FF41N4JL', asin: 'B0FF41N4JL', label: 'Yellow', mainImage: 'https://m.media-amazon.com/images/I/41d-sxH2QbL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41d-sxH2QbL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FF41N4JL?tag=snapspacemkt-20' },
     ],
@@ -21008,8 +21008,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'Rowill', Material: 'Faux Leather, Metal', Height: '23.23"–32.68" (adjustable)', Style: 'Swivel Adjustable', Capacity: '300 lbs', Set: '2 stools' },
     variants: [
-      { id: 'B0DV4Q6RND', asin: 'B0DV4Q6RND', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/81IfZ1g3-3L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81IfZ1g3-3L._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0DV4Q6RND?tag=snapspacemkt-20' },
-      { id: 'B0DV4QCYFN', asin: 'B0DV4QCYFN', label: 'Grey', mainImage: 'https://m.media-amazon.com/images/I/81IfZ1g3-3L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81IfZ1g3-3L._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0DV4QCYFN?tag=snapspacemkt-20' },
+      { id: 'B0DV4Q6RND', asin: 'B0DV4Q6RND', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/81IfZ1g3-3L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81IfZ1g3-3L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DV4Q6RND?tag=snapspacemkt-20' },
+      { id: 'B0DV4QCYFN', asin: 'B0DV4QCYFN', label: 'Grey', mainImage: 'https://m.media-amazon.com/images/I/81IfZ1g3-3L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81IfZ1g3-3L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DV4QCYFN?tag=snapspacemkt-20' },
       { id: 'B0DV4QD6GL', asin: 'B0DV4QD6GL', label: 'Khaki', mainImage: 'https://m.media-amazon.com/images/I/81IfZ1g3-3L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81IfZ1g3-3L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DV4QD6GL?tag=snapspacemkt-20' },
       { id: 'B0DV4QPQFH', asin: 'B0DV4QPQFH', label: 'Olive Green', mainImage: 'https://m.media-amazon.com/images/I/81IfZ1g3-3L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81IfZ1g3-3L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DV4QPQFH?tag=snapspacemkt-20' },
       { id: 'B0DV4R9V24', asin: 'B0DV4R9V24', label: 'White', mainImage: 'https://m.media-amazon.com/images/I/81IfZ1g3-3L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/81IfZ1g3-3L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DV4R9V24?tag=snapspacemkt-20' },
@@ -21051,8 +21051,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'Cozyman', Material: 'PU Leather, Walnut Wood', Height: '26"', Style: 'Swivel Mid-Century', Capacity: '300 lbs', Set: '2 stools' },
     variants: [
-      { id: 'B0FCCSL2WW', asin: 'B0FCCSL2WW', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/41xhlCGi8XL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41xhlCGi8XL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0FCCSL2WW?tag=snapspacemkt-20' },
-      { id: 'B0FCCSHR8N', asin: 'B0FCCSHR8N', label: 'Grey', mainImage: 'https://m.media-amazon.com/images/I/41w-ymi-O9L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41w-ymi-O9L._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0FCCSHR8N?tag=snapspacemkt-20' },
+      { id: 'B0FCCSL2WW', asin: 'B0FCCSL2WW', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/41xhlCGi8XL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41xhlCGi8XL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FCCSL2WW?tag=snapspacemkt-20' },
+      { id: 'B0FCCSHR8N', asin: 'B0FCCSHR8N', label: 'Grey', mainImage: 'https://m.media-amazon.com/images/I/41w-ymi-O9L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41w-ymi-O9L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FCCSHR8N?tag=snapspacemkt-20' },
       { id: 'B0FCCS32J3', asin: 'B0FCCS32J3', label: 'White', mainImage: 'https://m.media-amazon.com/images/I/31Tfzc8Gc5L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/31Tfzc8Gc5L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FCCS32J3?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '3-5', prime: true, returnDays: 30 },
@@ -21092,8 +21092,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'Sophia & William', Material: 'PU Leather, Metal', Height: '24"', Style: 'With Back', Capacity: '300 lbs', Set: '2 stools' },
     variants: [
-      { id: 'B099NFGDW5', asin: 'B099NFGDW5', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/316pR4aYYbL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/316pR4aYYbL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B099NFGDW5?tag=snapspacemkt-20' },
-      { id: 'B0D3DXVW4Q', asin: 'B0D3DXVW4Q', label: 'Creamy White', mainImage: 'https://m.media-amazon.com/images/I/31LxjZFgoeL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/31LxjZFgoeL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0D3DXVW4Q?tag=snapspacemkt-20' },
+      { id: 'B099NFGDW5', asin: 'B099NFGDW5', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/316pR4aYYbL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/316pR4aYYbL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B099NFGDW5?tag=snapspacemkt-20' },
+      { id: 'B0D3DXVW4Q', asin: 'B0D3DXVW4Q', label: 'Creamy White', mainImage: 'https://m.media-amazon.com/images/I/31LxjZFgoeL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/31LxjZFgoeL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0D3DXVW4Q?tag=snapspacemkt-20' },
       { id: 'B0CWP87873', asin: 'B0CWP87873', label: 'Grey', mainImage: 'https://m.media-amazon.com/images/I/31rIqHPXrIL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/31rIqHPXrIL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CWP87873?tag=snapspacemkt-20' },
       { id: 'B0CRDNBVHD', asin: 'B0CRDNBVHD', label: 'Light Grey', mainImage: 'https://m.media-amazon.com/images/I/31IF39mntTL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/31IF39mntTL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CRDNBVHD?tag=snapspacemkt-20' },
     ],
@@ -21176,8 +21176,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'YOUNUOKE', Material: 'PU Leather, Metal', Style: 'Mid-Century Modern', Set: 'Set of 2', 'Back Type': 'Armless' },
     variants: [
-      { id: 'B0FJFMQR5N', asin: 'B0FJFMQR5N', label: 'All Blue', mainImage: 'https://m.media-amazon.com/images/I/51hEeGcM3GL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51hEeGcM3GL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0FJFMQR5N?tag=snapspacemkt-20' },
-      { id: 'B0FJFN8LVJ', asin: 'B0FJFN8LVJ', label: 'All Cream', mainImage: 'https://m.media-amazon.com/images/I/51vU3t5uKEL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51vU3t5uKEL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0FJFN8LVJ?tag=snapspacemkt-20' },
+      { id: 'B0FJFMQR5N', asin: 'B0FJFMQR5N', label: 'All Blue', mainImage: 'https://m.media-amazon.com/images/I/51hEeGcM3GL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51hEeGcM3GL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FJFMQR5N?tag=snapspacemkt-20' },
+      { id: 'B0FJFN8LVJ', asin: 'B0FJFN8LVJ', label: 'All Cream', mainImage: 'https://m.media-amazon.com/images/I/51vU3t5uKEL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51vU3t5uKEL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FJFN8LVJ?tag=snapspacemkt-20' },
       { id: 'B0FJFL1G7K', asin: 'B0FJFL1G7K', label: 'All Khaki', mainImage: 'https://m.media-amazon.com/images/I/51gj4zVsXRL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51gj4zVsXRL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FJFL1G7K?tag=snapspacemkt-20' },
       { id: 'B0FJFN9NR9', asin: 'B0FJFN9NR9', label: 'All Navy Blue', mainImage: 'https://m.media-amazon.com/images/I/51v8y1MeieL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51v8y1MeieL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FJFN9NR9?tag=snapspacemkt-20' },
       { id: 'B0FK4RJHMB', asin: 'B0FK4RJHMB', label: 'Beige', mainImage: 'https://m.media-amazon.com/images/I/51s2-pe+iSL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51s2-pe+iSL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FK4RJHMB?tag=snapspacemkt-20' },
@@ -21227,8 +21227,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'REONEY', Material: 'PU Leather, Bentwood, Metal', Style: 'Mid-Century Modern', Set: 'Set of 2', 'Leg Type': 'Metal with Adjustable Feet' },
     variants: [
-      { id: 'B0F3CT6DDY', asin: 'B0F3CT6DDY', label: 'Black Shell Strips', mainImage: 'https://m.media-amazon.com/images/I/41gCgs9TNrL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41gCgs9TNrL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0F3CT6DDY?tag=snapspacemkt-20' },
-      { id: 'B0DY1GP7PB', asin: 'B0DY1GP7PB', label: 'Camel Shell Strips', mainImage: 'https://m.media-amazon.com/images/I/41rhWcDnusL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41rhWcDnusL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0DY1GP7PB?tag=snapspacemkt-20' },
+      { id: 'B0F3CT6DDY', asin: 'B0F3CT6DDY', label: 'Black Shell Strips', mainImage: 'https://m.media-amazon.com/images/I/41gCgs9TNrL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41gCgs9TNrL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0F3CT6DDY?tag=snapspacemkt-20' },
+      { id: 'B0DY1GP7PB', asin: 'B0DY1GP7PB', label: 'Camel Shell Strips', mainImage: 'https://m.media-amazon.com/images/I/41rhWcDnusL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41rhWcDnusL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DY1GP7PB?tag=snapspacemkt-20' },
       { id: 'B0D7LBG549', asin: 'B0D7LBG549', label: 'Dark Black Vertical Stripes', mainImage: 'https://m.media-amazon.com/images/I/41dB1ukmRSL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41dB1ukmRSL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0D7LBG549?tag=snapspacemkt-20' },
       { id: 'B0D9BTJQG3', asin: 'B0D9BTJQG3', label: 'Dark Brown Shell Strips', mainImage: 'https://m.media-amazon.com/images/I/41yY7mXZwWL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41yY7mXZwWL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0D9BTJQG3?tag=snapspacemkt-20' },
       { id: 'B0DSFC7KD6', asin: 'B0DSFC7KD6', label: 'Dark Brown Vertical Stripes', mainImage: 'https://m.media-amazon.com/images/I/31i8sZPTjUL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/31i8sZPTjUL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DSFC7KD6?tag=snapspacemkt-20' },
@@ -21273,8 +21273,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'mikibama', Material: 'Linen Fabric, Solid Wood', Style: 'Transitional', Set: 'Set of 2' },
     variants: [
-      { id: 'B0BRY3CDWS', asin: 'B0BRY3CDWS', label: 'Beige', mainImage: 'https://m.media-amazon.com/images/I/41AjMxEgS9L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41AjMxEgS9L._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0BRY3CDWS?tag=snapspacemkt-20' },
-      { id: 'B0BBW9X8XG', asin: 'B0BBW9X8XG', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/41Q-gyo9XNL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41Q-gyo9XNL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0BBW9X8XG?tag=snapspacemkt-20' },
+      { id: 'B0BRY3CDWS', asin: 'B0BRY3CDWS', label: 'Beige', mainImage: 'https://m.media-amazon.com/images/I/41AjMxEgS9L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41AjMxEgS9L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0BRY3CDWS?tag=snapspacemkt-20' },
+      { id: 'B0BBW9X8XG', asin: 'B0BBW9X8XG', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/41Q-gyo9XNL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41Q-gyo9XNL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0BBW9X8XG?tag=snapspacemkt-20' },
       { id: 'B0BBWC1C15', asin: 'B0BBWC1C15', label: 'Blue', mainImage: 'https://m.media-amazon.com/images/I/41bZJzOxLfL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41bZJzOxLfL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0BBWC1C15?tag=snapspacemkt-20' },
       { id: 'B0BBWN6YRP', asin: 'B0BBWN6YRP', label: 'Brown', mainImage: 'https://m.media-amazon.com/images/I/41cu-NTrEyL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41cu-NTrEyL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0BBWN6YRP?tag=snapspacemkt-20' },
       { id: 'B0BBW9B916', asin: 'B0BBW9B916', label: 'Grey', mainImage: 'https://m.media-amazon.com/images/I/41sjpgcLa4L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41sjpgcLa4L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0BBW9B916?tag=snapspacemkt-20' },
@@ -21315,8 +21315,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'Baysitone', Material: 'PU Leather, Metal', Style: 'Contemporary/Modern', Set: 'Set of 2', 'Leg Type': 'C-Shaped Metal' },
     variants: [
-      { id: 'B0C1SZYCZC', asin: 'B0C1SZYCZC', label: 'Grey / Silver Legs', mainImage: 'https://m.media-amazon.com/images/I/314mmyjBvkL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/314mmyjBvkL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0C1SZYCZC?tag=snapspacemkt-20' },
-      { id: 'B0CSN43LWW', asin: 'B0CSN43LWW', label: 'Black / Gold Legs', mainImage: 'https://m.media-amazon.com/images/I/31x1QztMZaL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/31x1QztMZaL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0CSN43LWW?tag=snapspacemkt-20' },
+      { id: 'B0C1SZYCZC', asin: 'B0C1SZYCZC', label: 'Grey / Silver Legs', mainImage: 'https://m.media-amazon.com/images/I/314mmyjBvkL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/314mmyjBvkL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0C1SZYCZC?tag=snapspacemkt-20' },
+      { id: 'B0CSN43LWW', asin: 'B0CSN43LWW', label: 'Black / Gold Legs', mainImage: 'https://m.media-amazon.com/images/I/31x1QztMZaL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/31x1QztMZaL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CSN43LWW?tag=snapspacemkt-20' },
       { id: 'B0CSN3D1MZ', asin: 'B0CSN3D1MZ', label: 'White / Gold Legs', mainImage: 'https://m.media-amazon.com/images/I/31lua24WPcL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/31lua24WPcL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CSN3D1MZ?tag=snapspacemkt-20' },
       { id: 'B0C1SZ38T1', asin: 'B0C1SZ38T1', label: 'White', mainImage: 'https://m.media-amazon.com/images/I/21x5Yx8mNqL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/21x5Yx8mNqL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0C1SZ38T1?tag=snapspacemkt-20' },
     ],
@@ -21356,8 +21356,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'VASAGLE', Material: 'Synthetic Leather, Metal', Style: 'Mid-Century Modern', 'Seat Height': '19"', Set: 'Set of 2', Award: 'Bronze A\' Design 2024' },
     variants: [
-      { id: 'B0CHMDNNKK', asin: 'B0CHMDNNKK', label: 'Caramel Brown', mainImage: 'https://m.media-amazon.com/images/I/61BJWzeO14L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61BJWzeO14L._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0CHMDNNKK?tag=snapspacemkt-20' },
-      { id: 'B0CHMF5F5M', asin: 'B0CHMF5F5M', label: 'Ink Black', mainImage: 'https://m.media-amazon.com/images/I/61ZUdxa8ZaL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61ZUdxa8ZaL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0CHMF5F5M?tag=snapspacemkt-20' },
+      { id: 'B0CHMDNNKK', asin: 'B0CHMDNNKK', label: 'Caramel Brown', mainImage: 'https://m.media-amazon.com/images/I/61BJWzeO14L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61BJWzeO14L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CHMDNNKK?tag=snapspacemkt-20' },
+      { id: 'B0CHMF5F5M', asin: 'B0CHMF5F5M', label: 'Ink Black', mainImage: 'https://m.media-amazon.com/images/I/61ZUdxa8ZaL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61ZUdxa8ZaL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CHMF5F5M?tag=snapspacemkt-20' },
     ],
     shipping: { freeShipping: true, estimatedDays: '3-5', prime: true, returnDays: 30 },
   },
@@ -21394,8 +21394,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'Newnno', Material: 'Velvet/Fabric, Metal', Style: 'Mid-Century Modern', Set: 'Set of 2', 'Leg Finish': 'Gold Metal' },
     variants: [
-      { id: 'B0GGQ51PJM', asin: 'B0GGQ51PJM', label: 'Black Fabric', mainImage: 'https://m.media-amazon.com/images/I/41Fedj+-YqL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41Fedj+-YqL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0GGQ51PJM?tag=snapspacemkt-20' },
-      { id: 'B0CN6R4P6N', asin: 'B0CN6R4P6N', label: 'Black Velvet', mainImage: 'https://m.media-amazon.com/images/I/41Hvk6hCBeL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41Hvk6hCBeL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0CN6R4P6N?tag=snapspacemkt-20' },
+      { id: 'B0GGQ51PJM', asin: 'B0GGQ51PJM', label: 'Black Fabric', mainImage: 'https://m.media-amazon.com/images/I/41Fedj+-YqL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41Fedj+-YqL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0GGQ51PJM?tag=snapspacemkt-20' },
+      { id: 'B0CN6R4P6N', asin: 'B0CN6R4P6N', label: 'Black Velvet', mainImage: 'https://m.media-amazon.com/images/I/41Hvk6hCBeL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41Hvk6hCBeL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CN6R4P6N?tag=snapspacemkt-20' },
       { id: 'B0DC691YK6', asin: 'B0DC691YK6', label: 'Blue Velvet', mainImage: 'https://m.media-amazon.com/images/I/41MpXnrDehL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41MpXnrDehL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DC691YK6?tag=snapspacemkt-20' },
       { id: 'B0GGQGPS66', asin: 'B0GGQGPS66', label: 'Grey Fabric', mainImage: 'https://m.media-amazon.com/images/I/51H9x8QUzRL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51H9x8QUzRL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0GGQGPS66?tag=snapspacemkt-20' },
       { id: 'B0CN6RG9WZ', asin: 'B0CN6RG9WZ', label: 'Grey Velvet', mainImage: 'https://m.media-amazon.com/images/I/41aHjMgyqRL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41aHjMgyqRL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CN6RG9WZ?tag=snapspacemkt-20' },
@@ -21441,8 +21441,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'RDUEEI', Material: 'PU Leather, Metal', Style: 'Contemporary', Set: 'Set of 4', 'Leg Type': 'Chrome/Gold Metal' },
     variants: [
-      { id: 'B0DP2BK863', asin: 'B0DP2BK863', label: 'Black / Black Legs', mainImage: 'https://m.media-amazon.com/images/I/31NB3DOXnOL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/31NB3DOXnOL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0DP2BK863?tag=snapspacemkt-20' },
-      { id: 'B0DBLCFLD7', asin: 'B0DBLCFLD7', label: 'Black / Gold Legs', mainImage: 'https://m.media-amazon.com/images/I/31W6lSuFBfL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/31W6lSuFBfL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0DBLCFLD7?tag=snapspacemkt-20' },
+      { id: 'B0DP2BK863', asin: 'B0DP2BK863', label: 'Black / Black Legs', mainImage: 'https://m.media-amazon.com/images/I/31NB3DOXnOL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/31NB3DOXnOL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DP2BK863?tag=snapspacemkt-20' },
+      { id: 'B0DBLCFLD7', asin: 'B0DBLCFLD7', label: 'Black / Gold Legs', mainImage: 'https://m.media-amazon.com/images/I/31W6lSuFBfL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/31W6lSuFBfL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DBLCFLD7?tag=snapspacemkt-20' },
       { id: 'B0CWNNC5NT', asin: 'B0CWNNC5NT', label: 'Brown', mainImage: 'https://m.media-amazon.com/images/I/31-mlpt+2AL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/31-mlpt+2AL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CWNNC5NT?tag=snapspacemkt-20' },
       { id: 'B0GBWCZDKS', asin: 'B0GBWCZDKS', label: 'Light Gray', mainImage: 'https://m.media-amazon.com/images/I/31oPgA3FdwL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/31oPgA3FdwL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0GBWCZDKS?tag=snapspacemkt-20' },
       { id: 'B0CWNSK9XT', asin: 'B0CWNSK9XT', label: 'White / Chrome Legs', mainImage: 'https://m.media-amazon.com/images/I/21ZYAnZxe3L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/21ZYAnZxe3L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CWNSK9XT?tag=snapspacemkt-20' },
@@ -21483,8 +21483,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'Homedot', Material: 'Velvet, Metal', Style: 'Contemporary', Set: 'Set of 4', 'Back Type': 'Curved' },
     variants: [
-      { id: 'B0FV8GS2SQ', asin: 'B0FV8GS2SQ', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/41DBXxcDzKL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41DBXxcDzKL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0FV8GS2SQ?tag=snapspacemkt-20' },
-      { id: 'B0BV679372', asin: 'B0BV679372', label: 'Dark Green', mainImage: 'https://m.media-amazon.com/images/I/414Iy1UCDpL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/414Iy1UCDpL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0BV679372?tag=snapspacemkt-20' },
+      { id: 'B0FV8GS2SQ', asin: 'B0FV8GS2SQ', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/41DBXxcDzKL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41DBXxcDzKL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FV8GS2SQ?tag=snapspacemkt-20' },
+      { id: 'B0BV679372', asin: 'B0BV679372', label: 'Dark Green', mainImage: 'https://m.media-amazon.com/images/I/414Iy1UCDpL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/414Iy1UCDpL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0BV679372?tag=snapspacemkt-20' },
       { id: 'B0BS15M85P', asin: 'B0BS15M85P', label: 'Grey', mainImage: 'https://m.media-amazon.com/images/I/41a-wdLQkGL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41a-wdLQkGL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0BS15M85P?tag=snapspacemkt-20' },
       { id: 'B0BV63WP6V', asin: 'B0BV63WP6V', label: 'Navy Blue', mainImage: 'https://m.media-amazon.com/images/I/412O+vm25zL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/412O+vm25zL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0BV63WP6V?tag=snapspacemkt-20' },
       { id: 'B0BV67T6L5', asin: 'B0BV67T6L5', label: 'Yellow', mainImage: 'https://m.media-amazon.com/images/I/41jePg6OyHL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41jePg6OyHL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0BV67T6L5?tag=snapspacemkt-20' },
@@ -21558,8 +21558,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'DUOMAY', Material: 'Linen Fabric, Solid Wood', Style: 'Transitional', Set: 'Set of 2', 'Back Type': 'Wingback' },
     variants: [
-      { id: 'B09PMKXTND', asin: 'B09PMKXTND', label: 'Beige', mainImage: 'https://m.media-amazon.com/images/I/41pxRNeI+CL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41pxRNeI+CL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B09PMKXTND?tag=snapspacemkt-20' },
-      { id: 'B0B51XRCJC', asin: 'B0B51XRCJC', label: 'Brown', mainImage: 'https://m.media-amazon.com/images/I/51hpgxuc+oL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51hpgxuc+oL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0B51XRCJC?tag=snapspacemkt-20' },
+      { id: 'B09PMKXTND', asin: 'B09PMKXTND', label: 'Beige', mainImage: 'https://m.media-amazon.com/images/I/41pxRNeI+CL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41pxRNeI+CL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B09PMKXTND?tag=snapspacemkt-20' },
+      { id: 'B0B51XRCJC', asin: 'B0B51XRCJC', label: 'Brown', mainImage: 'https://m.media-amazon.com/images/I/51hpgxuc+oL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51hpgxuc+oL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0B51XRCJC?tag=snapspacemkt-20' },
       { id: 'B0C1Z16V43', asin: 'B0C1Z16V43', label: 'Linen Grey', mainImage: 'https://m.media-amazon.com/images/I/41ZTZ98Jk1L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41ZTZ98Jk1L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0C1Z16V43?tag=snapspacemkt-20' },
       { id: 'B0B51WS6HF', asin: 'B0B51WS6HF', label: 'White', mainImage: 'https://m.media-amazon.com/images/I/4169D7lH6NL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/4169D7lH6NL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0B51WS6HF?tag=snapspacemkt-20' },
     ],
@@ -21598,8 +21598,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'Aowos', Material: 'Faux PU Leather, Metal', Style: 'Contemporary/Industrial', Set: 'Set of 2', 'Seat Height': '18"' },
     variants: [
-      { id: 'B0CLVBBBMJ', asin: 'B0CLVBBBMJ', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/41fu+1Zgd7L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41fu+1Zgd7L._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0CLVBBBMJ?tag=snapspacemkt-20' },
-      { id: 'B0DNMV3GX1', asin: 'B0DNMV3GX1', label: 'Green', mainImage: 'https://m.media-amazon.com/images/I/615YH2zUQ-L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/615YH2zUQ-L._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0DNMV3GX1?tag=snapspacemkt-20' },
+      { id: 'B0CLVBBBMJ', asin: 'B0CLVBBBMJ', label: 'Black', mainImage: 'https://m.media-amazon.com/images/I/41fu+1Zgd7L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41fu+1Zgd7L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CLVBBBMJ?tag=snapspacemkt-20' },
+      { id: 'B0DNMV3GX1', asin: 'B0DNMV3GX1', label: 'Green', mainImage: 'https://m.media-amazon.com/images/I/615YH2zUQ-L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/615YH2zUQ-L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DNMV3GX1?tag=snapspacemkt-20' },
       { id: 'B0CRT5TCFV', asin: 'B0CRT5TCFV', label: 'Grey', mainImage: 'https://m.media-amazon.com/images/I/41gp4-t8oaL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41gp4-t8oaL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CRT5TCFV?tag=snapspacemkt-20' },
       { id: 'B0FVM29VD7', asin: 'B0FVM29VD7', label: 'White', mainImage: 'https://m.media-amazon.com/images/I/41uF7ihx5yL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41uF7ihx5yL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FVM29VD7?tag=snapspacemkt-20' },
       { id: 'B0CHPMMWZW', asin: 'B0CHPMMWZW', label: 'Brown', mainImage: 'https://m.media-amazon.com/images/I/51-4PGpOXRL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/51-4PGpOXRL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CHPMMWZW?tag=snapspacemkt-20' },
@@ -21639,8 +21639,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'GrandNoor', Material: '100% Natural Rattan, Solid Wood, Metal', Style: 'Mid-Century Modern', Set: 'Set of 2', 'Leg Type': 'Chrome Metal' },
     variants: [
-      { id: 'B0CQR5XW2D', asin: 'B0CQR5XW2D', label: 'Black Chrome', mainImage: 'https://m.media-amazon.com/images/I/61wqdR+GDCL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61wqdR+GDCL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0CQR5XW2D?tag=snapspacemkt-20' },
-      { id: 'B0DC44ZG1K', asin: 'B0DC44ZG1K', label: 'Brown', mainImage: 'https://m.media-amazon.com/images/I/61Gg-O4XA2L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61Gg-O4XA2L._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0DC44ZG1K?tag=snapspacemkt-20' },
+      { id: 'B0CQR5XW2D', asin: 'B0CQR5XW2D', label: 'Black Chrome', mainImage: 'https://m.media-amazon.com/images/I/61wqdR+GDCL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61wqdR+GDCL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CQR5XW2D?tag=snapspacemkt-20' },
+      { id: 'B0DC44ZG1K', asin: 'B0DC44ZG1K', label: 'Brown', mainImage: 'https://m.media-amazon.com/images/I/61Gg-O4XA2L._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/61Gg-O4XA2L._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DC44ZG1K?tag=snapspacemkt-20' },
       { id: 'B0GQB8KKRB', asin: 'B0GQB8KKRB', label: 'Brown Leather', mainImage: 'https://m.media-amazon.com/images/I/413uy4G3eDL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/413uy4G3eDL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0GQB8KKRB?tag=snapspacemkt-20' },
       { id: 'B0DQTT5699', asin: 'B0DQTT5699', label: 'Green', mainImage: 'https://m.media-amazon.com/images/I/41f368h6PTL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41f368h6PTL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DQTT5699?tag=snapspacemkt-20' },
     ],
@@ -21679,8 +21679,8 @@ export const PRODUCT_CATALOG = [
     ],
     details: { Brand: 'JETEAGO', Material: 'Velvet/Leather, Solid Wood', Style: 'Contemporary/Glam', Set: 'Set of 2', Trim: 'Nailhead' },
     variants: [
-      { id: 'B0FDWP9MXV', asin: 'B0FDWP9MXV', label: 'Gold / Beige', mainImage: 'https://m.media-amazon.com/images/I/41Bq4rkEIsL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41Bq4rkEIsL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0FDWP9MXV?tag=snapspacemkt-20' },
-      { id: 'B0FDWKL61F', asin: 'B0FDWKL61F', label: 'Gold / Black', mainImage: 'https://m.media-amazon.com/images/I/41g8BWp7TpL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41g8BWp7TpL._AC_SL300_.jpg' affiliateUrl: 'https://www.amazon.com/dp/B0FDWKL61F?tag=snapspacemkt-20' },
+      { id: 'B0FDWP9MXV', asin: 'B0FDWP9MXV', label: 'Gold / Beige', mainImage: 'https://m.media-amazon.com/images/I/41Bq4rkEIsL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41Bq4rkEIsL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FDWP9MXV?tag=snapspacemkt-20' },
+      { id: 'B0FDWKL61F', asin: 'B0FDWKL61F', label: 'Gold / Black', mainImage: 'https://m.media-amazon.com/images/I/41g8BWp7TpL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41g8BWp7TpL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FDWKL61F?tag=snapspacemkt-20' },
       { id: 'B0DNZDC9GK', asin: 'B0DNZDC9GK', label: 'Gold / Deep Blue', mainImage: 'https://m.media-amazon.com/images/I/41a3FiAZ0hL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41a3FiAZ0hL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DNZDC9GK?tag=snapspacemkt-20' },
       { id: 'B0FDWPGCDC', asin: 'B0FDWPGCDC', label: 'Gold / Green', mainImage: 'https://m.media-amazon.com/images/I/41Ess1KyKkL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41Ess1KyKkL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FDWPGCDC?tag=snapspacemkt-20' },
       { id: 'B0FDWLBLHR', asin: 'B0FDWLBLHR', label: 'Gold / Grey', mainImage: 'https://m.media-amazon.com/images/I/41iPkhBR1SL._AC_SL1500_.jpg', swatchImage: 'https://m.media-amazon.com/images/I/41iPkhBR1SL._AC_SL300_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FDWLBLHR?tag=snapspacemkt-20' },
