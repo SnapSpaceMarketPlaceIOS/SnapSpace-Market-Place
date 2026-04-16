@@ -21,6 +21,7 @@ import {
   Modal,
   Image,
   Share,
+  Alert,
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Path, Line, Polyline, Circle } from 'react-native-svg';
@@ -29,7 +30,7 @@ import CardImage from '../components/CardImage';
 import AutoImage from '../components/AutoImage';
 import LensLoader from '../components/LensLoader';
 import { useAuth } from '../context/AuthContext';
-import { getUserDesigns } from '../services/supabase';
+import { getUserDesigns, deleteUserDesign } from '../services/supabase';
 import { colors } from '../constants/colors';
 import { colors as C } from '../constants/theme';
 
@@ -111,14 +112,41 @@ function ProductCard({ product, onPress }) {
 
 // ── Detail Modal (same layout as AI result page) ───────────────────────────────
 
-function SpaceDetailModal({ design, visible, onClose, navigation }) {
+function SpaceDetailModal({ design, visible, onClose, onDelete, navigation }) {
   const insets = useSafeAreaInsets();
   const products = design?.products || [];
+  const [deleting, setDeleting] = useState(false);
 
   const handleShare = async () => {
     try {
       await Share.share({ message: `Check out my AI room wish on HomeGenie: "${design?.prompt}"` });
     } catch (e) {}
+  };
+
+  const handleDelete = () => {
+    if (!design?.id) return;
+    Alert.alert(
+      'Delete this post?',
+      'This will permanently remove it from the Explore feed and your My Wishes. This cannot be undone.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              setDeleting(true);
+              await onDelete?.(design.id);
+              onClose?.();
+            } catch (e) {
+              Alert.alert('Could not delete', e?.message || 'Please try again.');
+            } finally {
+              setDeleting(false);
+            }
+          },
+        },
+      ],
+    );
   };
 
   if (!design) return null;
@@ -186,6 +214,23 @@ function SpaceDetailModal({ design, visible, onClose, navigation }) {
 
             </View>
           )}
+
+          {/* Danger zone — Delete Post */}
+          <View style={s.deleteSection}>
+            <TouchableOpacity
+              style={[s.deleteBtn, deleting && { opacity: 0.5 }]}
+              onPress={handleDelete}
+              activeOpacity={0.75}
+              disabled={deleting}
+            >
+              <Text style={s.deleteBtnText}>
+                {deleting ? 'Deleting…' : 'Delete Post'}
+              </Text>
+            </TouchableOpacity>
+            <Text style={s.deleteHint}>
+              This permanently removes the post from Explore and your My Wishes.
+            </Text>
+          </View>
         </ScrollView>
       </SafeAreaView>
     </Modal>
@@ -275,6 +320,10 @@ export default function MySpacesScreen({ navigation }) {
         design={selected}
         visible={!!selected}
         onClose={() => setSelected(null)}
+        onDelete={async (designId) => {
+          await deleteUserDesign(designId, user.id);
+          setDesigns((prev) => prev.filter((d) => d.id !== designId));
+        }}
         navigation={navigation}
       />
     </SafeAreaView>
@@ -501,5 +550,38 @@ const s = StyleSheet.create({
     backgroundColor: colors.bluePrimary,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+
+  // ── Danger zone ──
+  deleteSection: {
+    marginTop: 32,
+    marginHorizontal: 20,
+    paddingTop: 20,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(0,0,0,0.06)',
+  },
+  deleteBtn: {
+    height: 48,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#EF4444',
+    backgroundColor: '#FFFFFF',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  deleteBtnText: {
+    fontSize: 15,
+    fontWeight: '600',
+    fontFamily: 'Geist_600SemiBold',
+    color: '#EF4444',
+    letterSpacing: 0.2,
+  },
+  deleteHint: {
+    fontSize: 12,
+    fontFamily: 'Geist_400Regular',
+    color: '#9CA3AF',
+    textAlign: 'center',
+    marginTop: 10,
+    lineHeight: 16,
   },
 });

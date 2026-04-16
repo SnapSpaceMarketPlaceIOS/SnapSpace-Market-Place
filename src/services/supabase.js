@@ -363,6 +363,23 @@ export async function updateDesignProducts(designId, products) {
 }
 
 /**
+ * Permanently delete one of the current user's own designs from the
+ * `user_designs` table. Scoped by `user_id` in addition to RLS so a
+ * forged request can never delete someone else's post.
+ *
+ * Used by the "Delete Post" action on the My Wishes → post detail modal.
+ */
+export async function deleteUserDesign(designId, userId) {
+  if (!designId || !userId) throw new Error('designId and userId required');
+  const { error } = await supabase
+    .from('user_designs')
+    .delete()
+    .eq('id', designId)
+    .eq('user_id', userId);
+  if (error) throw error;
+}
+
+/**
  * Delete duplicate designs that share the same prompt+image within a short window.
  * Keeps the most recent entry for each unique prompt per user.
  */
