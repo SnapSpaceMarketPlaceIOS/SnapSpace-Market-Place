@@ -1801,7 +1801,7 @@ export default function HomeScreen({ navigation, route }) {
               <View>
                 <TouchableOpacity
                   style={styles.inputIconBtn}
-                  onPress={() => navigation?.navigate('Snap')}
+                  onPress={() => navigation?.navigate('Wish')}
                   activeOpacity={1}
                   onPressIn={() => springIn(cameraScale)}
                   onPressOut={() => springOut(cameraScale)}

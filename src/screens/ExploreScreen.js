@@ -411,7 +411,7 @@ function PriceRangeSlider({ minVal, maxVal, onChangeMin, onChangeMax }) {
           <Animated.View style={{
             position: 'absolute',
             height: TRACK_H,
-            backgroundColor: '#0B6DC3',
+            backgroundColor: TC.primary,
             borderRadius: TRACK_H / 2,
             left: minAnim,
             width: activeWidth,
@@ -449,7 +449,7 @@ const sliderS = StyleSheet.create({
     width: 28, height: 28, borderRadius: 14,
     backgroundColor: '#FFFFFF',
     borderWidth: 2,
-    borderColor: '#0B6DC3',
+    borderColor: TC.primary,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.12,
@@ -1656,7 +1656,7 @@ export default function ExploreScreen({ navigation, route }) {
                     <Switch
                       value={filterInStockOnly}
                       onValueChange={setFilterInStockOnly}
-                      trackColor={{ false: '#E5E7EB', true: '#0B6DC3' }}
+                      trackColor={{ false: '#E5E7EB', true: TC.primary }}
                       thumbColor="#FFFFFF"
                     />
                   </View>
@@ -1784,7 +1784,7 @@ const styles = StyleSheet.create({
     paddingLeft: space.md,
     paddingRight: space.xs,
     gap: space.sm,
-    backgroundColor: '#F8F8F8',
+    backgroundColor: TC.inputBg,
   },
   searchInput: {
     flex: 1,
@@ -1890,7 +1890,7 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: radius.full,
-    backgroundColor: '#0B6DC3',
+    backgroundColor: TC.primary,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -1932,7 +1932,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     marginHorizontal: space.lg,
     marginBottom: space.xs,
-    backgroundColor: '#F8F8F8',
+    backgroundColor: TC.inputBg,
     borderRadius: radius.full,
     padding: 3,
   },
@@ -2722,8 +2722,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#FAFAFA',
   },
   filterChipActive: {
-    borderColor: '#0B6DC3',
-    backgroundColor: '#0B6DC3',
+    borderColor: TC.primary,
+    backgroundColor: TC.primary,
   },
   filterChipText: {
     ...typeScale.caption,

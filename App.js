@@ -49,6 +49,7 @@ import TermsOfUseScreen from './src/screens/TermsOfUseScreen';
 import PrivacyPolicyScreen from './src/screens/PrivacyPolicyScreen';
 import VerifyEmailSentScreen from './src/screens/VerifyEmailSentScreen';
 import SupplierApplicationScreen from './src/screens/SupplierApplicationScreen';
+import SupplierApplicationStatusScreen from './src/screens/SupplierApplicationStatusScreen';
 import AdminApplicationsScreen from './src/screens/AdminApplicationsScreen';
 import AdminApplicationDetailScreen from './src/screens/AdminApplicationDetailScreen';
 import SupplierOnboardingScreen from './src/screens/SupplierOnboardingScreen';
@@ -232,13 +233,12 @@ function TabNavigator() {
         tabBarInactiveTintColor: C.textPrimary,
         tabBarShowLabel: true,
         tabBarLabelStyle: {
-          fontSize: 10,
-          fontWeight: '500',
+          ...typeScale.tabLabel,
           fontFamily: 'Geist_500Medium',
           marginTop: 2,
         },
         tabBarItemStyle: {
-          paddingTop: 4,
+          paddingTop: space.xs,
           paddingBottom: 0,
           justifyContent: 'center',
           alignItems: 'center',
@@ -338,6 +338,7 @@ function RootNavigator() {
       <Stack.Screen name="TermsOfUse" component={TermsOfUseScreen} />
       <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicyScreen} />
       <Stack.Screen name="SupplierApplication" component={SupplierApplicationScreen} />
+      <Stack.Screen name="SupplierApplicationStatus" component={SupplierApplicationStatusScreen} />
       <Stack.Screen name="AdminApplications" component={AdminApplicationsScreen} />
       <Stack.Screen name="AdminApplicationDetail" component={AdminApplicationDetailScreen} />
       <Stack.Screen name="SupplierOnboarding" component={SupplierOnboardingScreen} />
@@ -422,7 +423,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: -2,
     right: -4,
-    backgroundColor: '#0B6DC3',
+    backgroundColor: C.primary,
     width: space.base,
     height: space.base,
     borderRadius: space.sm,
@@ -432,9 +433,8 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255,255,255,0.3)',
   },
   badgeText: {
+    ...typeScale.badge,
     color: C.white,
-    fontSize: 9,
-    fontWeight: fontWeight.bold,
     fontFamily: 'Geist_700Bold',
   },
   loadingScreen: {
@@ -444,10 +444,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   loadingWordmark: {
-    fontSize: 32,
-    fontWeight: '800',
+    ...typeScale.wordmark,
     color: C.textPrimary,
-    letterSpacing: -0.6,
-    fontFamily: 'Geist_700Bold',
   },
 });

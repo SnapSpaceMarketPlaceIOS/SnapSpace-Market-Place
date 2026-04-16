@@ -75,6 +75,9 @@ export const uiColors = {
   amazonText:     '#111827', // Amazon button text (dark on orange)
   destructive:    '#EF4444', // Delete / remove actions
   white:          '#FFFFFF',
+  black:          '#000000',
+  accentBg:       '#EEF4FD', // Feature highlight backgrounds (PDP)
+  inputBg:        '#F8F8F8', // Search inputs, text fields
 };
 
 // ── Typography Scale (modular, ratio 1.25) ────────────────────────────────────
@@ -159,6 +162,7 @@ export const radius = {
   lg: 16,     // images inside cards, secondary containers
   xl: 20,     // outer cards, main containers, bottom sheets
   button: 24, // all pill-shaped buttons (primary + secondary)
+  pill: 28,   // large pill CTAs (paywall, referral)
   full: 9999, // avatars, circular FABs only
 };
 
@@ -422,6 +426,33 @@ export const layout = {
 // These 10 named styles are the ONLY text styles allowed across the entire app.
 // Every text element maps to exactly one of these. No exceptions.
 export const typeScale = {
+  // ── Extended display sizes (hero/paywall/loading) ──
+  jumbo: {
+    fontSize: 48, fontWeight: '800', lineHeight: 52,
+    letterSpacing: -1,
+    fontFamily: 'Geist_700Bold',
+  },
+  hero: {
+    fontSize: 38, fontWeight: '800', lineHeight: 44,
+    letterSpacing: -0.5,
+    fontFamily: 'Geist_700Bold',
+  },
+  wordmark: {
+    fontSize: 32, fontWeight: '800', lineHeight: 38,
+    letterSpacing: -0.6,
+    fontFamily: 'Geist_700Bold',
+  },
+  displayLg: {
+    fontSize: 28, fontWeight: '700', lineHeight: 34,
+    letterSpacing: -0.5,
+    fontFamily: 'Geist_700Bold',
+  },
+  displaySm: {
+    fontSize: 22, fontWeight: '700', lineHeight: 28,
+    letterSpacing: -0.3,
+    fontFamily: 'Geist_700Bold',
+  },
+  // ── Core 10 named styles ──
   display: {
     fontSize: 24, fontWeight: '700', lineHeight: 30,
     fontFamily: 'Geist_700Bold',
@@ -463,6 +494,15 @@ export const typeScale = {
   button: {
     fontSize: 14, fontWeight: '600', lineHeight: 18,
     fontFamily: 'Geist_600SemiBold',
+  },
+  // ── Small utility sizes ──
+  tabLabel: {
+    fontSize: 10, fontWeight: '500', lineHeight: 14,
+    fontFamily: 'Geist_500Medium',
+  },
+  badge: {
+    fontSize: 9, fontWeight: '700', lineHeight: 12,
+    fontFamily: 'Geist_700Bold',
   },
 };
 

@@ -65,7 +65,7 @@ const IMAGE_W     = SW - (PAD_H * 2);             // image width with side paddi
 const IMAGE_H     = Math.round(IMAGE_W * 1.1);    // taller than square for breathing room
 const IMAGE_R     = 10;
 const CARD_LIFT   = 0;                             // no overlap — bar sits between hero and card
-const FEAT_BG     = '#EEF4FD';                     // feature icon circle bg
+const FEAT_BG     = uiColors.accentBg;              // feature icon circle bg
 const DIVIDER_COLOR = 'rgba(0,0,0,0.06)';
 
 // ── Reusable separator ───────────────────────────────────────────────────────
@@ -762,7 +762,7 @@ const pr = StyleSheet.create({
     marginTop: space.xl,
   },
   price: {
-    fontSize: 28,
+    fontSize: typeScale.displayLg.fontSize,
     fontWeight: '700',
     fontFamily: fonts.bodyBold,
     color: uiColors.primary,

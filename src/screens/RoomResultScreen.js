@@ -95,7 +95,7 @@ function PlusSmallIcon() {
 function StarIconSmall({ filled = true, size = 10 }) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24"
-      fill={filled ? '#67ACE9' : '#E5E7EB'} stroke={filled ? '#67ACE9' : '#D1D5DB'} strokeWidth={1}>
+      fill={filled ? colors.blueLight : '#E5E7EB'} stroke={filled ? colors.blueLight : '#D1D5DB'} strokeWidth={1}>
       <Path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
     </Svg>
   );
@@ -729,7 +729,7 @@ const s = StyleSheet.create({
   actionsRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: space.sm,
     marginHorizontal: space.lg,
     paddingTop: space.base,
     paddingBottom: space.md,
@@ -754,7 +754,7 @@ const s = StyleSheet.create({
   actionBtns: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: space.sm,
   },
   iconCircleBtn: {
     width: 36,
@@ -791,7 +791,7 @@ const s = StyleSheet.create({
     fontSize: 13,
     fontWeight: '400',
     fontFamily: 'Geist_400Regular',
-    color: '#67ACE9',
+    color: colors.blueLight,
     lineHeight: 18,
     marginHorizontal: space.lg,
     marginBottom: 6,
@@ -818,7 +818,7 @@ const s = StyleSheet.create({
   hList: {
     gap: 10,
     paddingRight: space.lg,
-    paddingBottom: 4,
+    paddingBottom: space.xs,
   },
 
   // ── Tags ──
@@ -829,7 +829,7 @@ const s = StyleSheet.create({
   tagsWrap: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 8,
+    gap: space.sm,
   },
   tag: {
     backgroundColor: C.surface2,
@@ -855,7 +855,7 @@ const s = StyleSheet.create({
   hCardImg: {
     width: '100%',
     height: 150,
-    backgroundColor: '#F3F4F6',
+    backgroundColor: C.surface2,
   },
   similarBadge: {
     position: 'absolute',
@@ -911,7 +911,7 @@ const s = StyleSheet.create({
     maxHeight: '70%',
   },
   debugTitle: {
-    color: '#67ACE9',
+    color: colors.blueLight,
     fontSize: 10,
     fontWeight: '700',
     letterSpacing: 1,
@@ -1003,7 +1003,7 @@ const s = StyleSheet.create({
     justifyContent: 'center',
   },
   hCardAddBtnDone: {
-    backgroundColor: '#67ACE9',
+    backgroundColor: colors.blueLight,
   },
 
   // ── Bottom bar ──
@@ -1035,7 +1035,7 @@ const s = StyleSheet.create({
     ...shadow.medium,
   },
   addAllPillDone: {
-    backgroundColor: '#67ACE9',
+    backgroundColor: colors.blueLight,
   },
   pillLeft: {
     flexDirection: 'row',

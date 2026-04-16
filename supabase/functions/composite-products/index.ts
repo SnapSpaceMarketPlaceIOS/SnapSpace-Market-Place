@@ -66,13 +66,28 @@ Deno.serve(async (req: Request) => {
   const serviceKey  = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
   const supabase    = createClient(supabaseUrl, serviceKey);
 
-  let body: { product_urls?: string[]; user_id?: string };
+  // ── AUTH: Verify JWT ────────────────────────────────────────────────────
+  // Previously accepted anon key only, allowing anyone to fill Storage with
+  // junk panels. Now requires a valid Supabase user JWT.
+  const authHeader = req.headers.get("Authorization");
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return errResp("Missing authorization", 401);
+  }
+  const { data: { user: authUser }, error: authErr } =
+    await supabase.auth.getUser(authHeader.replace("Bearer ", ""));
+  if (authErr || !authUser) {
+    return errResp("Invalid or expired token", 401);
+  }
+
+  let body: { product_urls?: string[] };
   try { body = await req.json(); }
   catch { return errResp("Invalid JSON body", 400); }
 
-  const { product_urls, user_id } = body;
+  const { product_urls } = body;
   if (!product_urls?.length) return errResp("product_urls required", 400);
-  if (!user_id)              return errResp("user_id required", 400);
+
+  // Use the JWT-verified user id (no body-spoofing possible now)
+  const user_id = authUser.id;
 
   // Accept up to 6 URLs as a backup pool — we need exactly 4 panel cells filled.
   // If any URL is broken (wrong content-type, network error, bad JPEG) we skip it

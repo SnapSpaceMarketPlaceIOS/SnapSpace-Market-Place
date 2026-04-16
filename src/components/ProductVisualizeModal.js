@@ -34,7 +34,7 @@ import Svg, { Path, Line } from 'react-native-svg';
 import AutoImage from './AutoImage';
 import { useLiked } from '../context/LikedContext';
 import { useShared } from '../context/SharedContext';
-import { space, fontWeight, layout } from '../constants/tokens';
+import { space, fontWeight, layout, typeScale, radius, shadow, fontSize } from '../constants/tokens';
 import { colors } from '../constants/colors';
 import { colors as C } from '../constants/theme';
 
@@ -580,23 +580,19 @@ const s = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    paddingTop: 16,
+    paddingTop: space.base,
     paddingHorizontal: H_PAD,
   },
 
   // ── Room image + close button container
   imageContainer: {
     position: 'relative',
-    marginBottom: 16,
+    marginBottom: space.base,
   },
   imageWrap: {
-    borderRadius: 12,
+    borderRadius: radius.md,
     overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.10,
-    shadowRadius: 12,
-    elevation: 4,
+    ...shadow.md,
   },
   // ── Close button — white X overlaying image top-right, no background
   closeBtn: {
@@ -621,10 +617,10 @@ const s = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 14,
-    gap: 8,
+    gap: space.sm,
   },
   shopLabel: {
-    fontSize: 15,
+    fontSize: typeScale.headline.fontSize,
     fontWeight: fontWeight.bold,
     fontFamily: 'Geist_700Bold',
     color: TEXT_1,
@@ -633,7 +629,7 @@ const s = StyleSheet.create({
     flex: 1,
   },
   returnLink: {
-    fontSize: 13,
+    fontSize: fontSize.sm,
     fontWeight: fontWeight.regular,
     fontFamily: 'Geist_400Regular',
     color: BLUE,
@@ -643,43 +639,37 @@ const s = StyleSheet.create({
   divider: {
     height: 1,
     backgroundColor: BORDER,
-    marginBottom: 16,
+    marginBottom: space.base,
   },
 
   // ── Product title
   productTitle: {
-    fontSize: 22,
-    fontWeight: fontWeight.bold,
+    ...typeScale.displaySm,
     fontFamily: 'Geist_700Bold',
     color: TEXT_1,
-    lineHeight: 28,
-    letterSpacing: -0.3,
-    marginBottom: 12,
+    marginBottom: space.md,
   },
 
   // ── Description
   description: {
-    fontSize: 14,
-    fontWeight: fontWeight.regular,
+    ...typeScale.body,
     fontFamily: 'Geist_400Regular',
     color: TEXT_2,
-    lineHeight: 21,
-    marginBottom: 4,
+    marginBottom: space.xs,
   },
   readMore: {
-    fontSize: 14,
-    fontWeight: fontWeight.semibold,
+    ...typeScale.button,
     fontFamily: 'Geist_600SemiBold',
     color: BLUE,
-    marginBottom: 16,
+    marginBottom: space.base,
   },
 
   // ── Rating row
   ratingRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 16,
-    gap: 4,
+    marginBottom: space.base,
+    gap: space.xs,
   },
   stars: {
     flexDirection: 'row',
@@ -687,15 +677,13 @@ const s = StyleSheet.create({
     marginRight: 6,
   },
   ratingScore: {
-    fontSize: 14,
-    fontWeight: fontWeight.semibold,
+    ...typeScale.button,
     fontFamily: 'Geist_600SemiBold',
     color: TEXT_1,
     marginRight: 2,
   },
   reviewCount: {
-    fontSize: 14,
-    fontWeight: fontWeight.regular,
+    ...typeScale.body,
     fontFamily: 'Geist_400Regular',
     color: TEXT_2,
   },
@@ -705,14 +693,12 @@ const s = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 20,
+    marginBottom: space.lg,
   },
   price: {
-    fontSize: 22,
-    fontWeight: fontWeight.bold,
+    ...typeScale.displaySm,
     fontFamily: 'Geist_700Bold',
     color: BLUE,
-    letterSpacing: -0.3,
   },
   iconRow: {
     flexDirection: 'row',
@@ -745,8 +731,8 @@ const s = StyleSheet.create({
     marginRight: 10,
   },
   sectionLabel: {
+    ...typeScale.caption,
     flex: 1,
-    fontSize: 12,
     fontWeight: fontWeight.bold,
     fontFamily: 'Geist_700Bold',
     color: TEXT_1,
@@ -760,7 +746,7 @@ const s = StyleSheet.create({
 
   // ── Detail grid (key–value pairs inside sections)
   detailGrid: {
-    gap: 8,
+    gap: space.sm,
   },
   detailItem: {
     flexDirection: 'row',
@@ -768,14 +754,14 @@ const s = StyleSheet.create({
   },
   detailLabel: {
     width: 90,
-    fontSize: 13,
+    fontSize: fontSize.sm,
     fontWeight: fontWeight.medium,
     fontFamily: 'Geist_500Medium',
     color: TEXT_2,
   },
   detailValue: {
     flex: 1,
-    fontSize: 13,
+    fontSize: fontSize.sm,
     fontWeight: fontWeight.regular,
     fontFamily: 'Geist_400Regular',
     color: TEXT_1,
@@ -784,10 +770,10 @@ const s = StyleSheet.create({
   // ── Feature bullet list (inside Key Features section)
   featureList: {
     gap: 6,
-    marginTop: 4,
+    marginTop: space.xs,
   },
   featureBullet: {
-    fontSize: 13,
+    fontSize: fontSize.sm,
     fontWeight: fontWeight.regular,
     fontFamily: 'Geist_400Regular',
     color: TEXT_2,
@@ -801,7 +787,7 @@ const s = StyleSheet.create({
     left: 0,
     right: 0,
     paddingHorizontal: H_PAD,
-    paddingTop: 12,
+    paddingTop: space.md,
     backgroundColor: WHITE,
     borderTopWidth: 1,
     borderTopColor: 'rgba(0,0,0,0.06)',
@@ -815,7 +801,7 @@ const s = StyleSheet.create({
     borderWidth: 2,
   },
   cartBtnLabel: {
-    fontSize: 15,
+    fontSize: typeScale.headline.fontSize,
     fontWeight: fontWeight.bold,
     fontFamily: 'Geist_700Bold',
     letterSpacing: -0.2,

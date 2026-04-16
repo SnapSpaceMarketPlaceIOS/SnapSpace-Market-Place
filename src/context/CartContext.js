@@ -7,6 +7,7 @@ const STORAGE_KEY = '@snapspace_cart';
 
 function parsePrice(priceStr) {
   if (typeof priceStr === 'number') return priceStr;
+  if (priceStr == null) return 0;
   const cleaned = priceStr.replace(/[^0-9.]/g, '');
   return parseFloat(cleaned) || 0;
 }

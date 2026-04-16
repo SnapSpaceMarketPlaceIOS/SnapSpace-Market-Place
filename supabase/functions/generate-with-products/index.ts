@@ -110,6 +110,20 @@ Deno.serve(async (req: Request) => {
 
   const supabase = createClient(supabaseUrl, serviceKey);
 
+  // ── AUTH: Extract user_id from verified JWT, NOT from request body ────────
+  // Previously the function trusted user_id from the body, allowing an
+  // attacker to spoof another user's identity and burn their quota.
+  const authHeader = req.headers.get("Authorization");
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return errorResponse("Missing authorization header", 401);
+  }
+  const { data: { user: authUser }, error: authErr } =
+    await supabase.auth.getUser(authHeader.replace("Bearer ", ""));
+  if (authErr || !authUser) {
+    return errorResponse("Invalid or expired token", 401);
+  }
+  const verifiedUserId = authUser.id;
+
   let body: any;
   try {
     body = await req.json();
@@ -117,11 +131,16 @@ Deno.serve(async (req: Request) => {
     return errorResponse("Invalid JSON body", 400);
   }
 
-  const { room_photo_url, prompt, user_id, tier = "free", products: clientProducts } = body;
+  // Destructure WITHOUT user_id — we use the JWT-verified id below.
+  const { room_photo_url, prompt, tier = "free", products: clientProducts } = body;
 
-  if (!room_photo_url || !prompt || !user_id) {
-    return errorResponse("room_photo_url, prompt, and user_id are required", 400);
+  if (!room_photo_url || !prompt) {
+    return errorResponse("room_photo_url and prompt are required", 400);
   }
+
+  // Shadow the body variable name so downstream log lines / RPC calls / insert
+  // statements don't have to change.
+  const user_id = verifiedUserId;
 
   const startTime = Date.now();
 

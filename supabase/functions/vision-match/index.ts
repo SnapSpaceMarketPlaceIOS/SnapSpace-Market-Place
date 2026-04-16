@@ -9,8 +9,12 @@
  *   ANTHROPIC_API_KEY — Anthropic API key
  *
  * Request:  POST { imageUrl: string, prompt: string }
- * Response: { analysis: string | null, source: "claude" | "unavailable" | "error" }
+ * Response: { analysis: string | null, source: "claude" | "unavailable" | "error" | "unauthorized" | "rate_limited" }
+ *
+ * Auth: Supabase JWT required in Authorization: Bearer header.
  */
+
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const CORS = {
   "Access-Control-Allow-Origin":  "*",
@@ -34,6 +38,56 @@ const SYSTEM_PROMPT =
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: CORS });
+  }
+
+  // ── AUTH: Verify JWT ─────────────────────────────────────────────────────
+  // Previously this endpoint was completely unauthenticated, allowing anyone
+  // to spam Anthropic vision calls (~$0.003 each) on our account.
+  const authHeader = req.headers.get("Authorization");
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return new Response(
+      JSON.stringify({ analysis: null, source: "unauthorized" }),
+      { status: 401, headers: { ...CORS, "Content-Type": "application/json" } },
+    );
+  }
+
+  const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+  const serviceKey  = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+  const supabase    = createClient(supabaseUrl, serviceKey);
+
+  const { data: { user: authUser }, error: authErr } =
+    await supabase.auth.getUser(authHeader.replace("Bearer ", ""));
+  if (authErr || !authUser) {
+    return new Response(
+      JSON.stringify({ analysis: null, source: "unauthorized" }),
+      { status: 401, headers: { ...CORS, "Content-Type": "application/json" } },
+    );
+  }
+
+  // Rate limit — Haiku is cheap (~$0.003/call) so we allow more headroom than
+  // the image-generation endpoints. 1.5s cooldown + 60/hour cap per user.
+  try {
+    const { data: limitData } = await supabase
+      .rpc("check_ai_rate_limit", {
+        p_user_id: authUser.id,
+        p_cooldown_ms: 1500,
+        p_hourly_cap: 60,
+      });
+    const limit = limitData?.[0];
+    if (limit && !limit.allowed) {
+      return new Response(
+        JSON.stringify({
+          analysis: null,
+          source: "rate_limited",
+          reason: limit.reason,
+          retry_after_ms: limit.retry_after_ms,
+        }),
+        { status: 429, headers: { ...CORS, "Content-Type": "application/json" } },
+      );
+    }
+  } catch (e) {
+    // Don't fail closed on infra error — fall through.
+    console.warn("[vision-match] Rate limit check threw:", (e as Error).message);
   }
 
   const apiKey = Deno.env.get("ANTHROPIC_API_KEY");

@@ -61,10 +61,6 @@ const PROVIDERS: Record<
   },
 };
 
-// Simple in-memory rate limiter (per-instance — resets on cold start)
-const lastRequestByUser: Record<string, number> = {};
-const RATE_LIMIT_MS = 2000; // 2 seconds between requests
-
 Deno.serve(async (req: Request) => {
   // CORS preflight
   if (req.method === "OPTIONS") {
@@ -91,24 +87,49 @@ Deno.serve(async (req: Request) => {
       return jsonResponse({ error: "Invalid or expired token" }, 401);
     }
 
-    // ── 2. Rate limit ───────────────────────────────────────────────────
-    const now = Date.now();
-    const lastReq = lastRequestByUser[user.id] || 0;
-    if (now - lastReq < RATE_LIMIT_MS) {
-      return jsonResponse(
-        {
-          error: "rate_limited",
-          message: "Please wait a moment between requests.",
-          retry_after_ms: RATE_LIMIT_MS - (now - lastReq),
-        },
-        429
-      );
-    }
-    lastRequestByUser[user.id] = now;
-
-    // ── 3. Parse request ────────────────────────────────────────────────
+    // ── 2. Parse request (needed before rate limit so we can skip polls) ──
     const body = await req.json();
     const { provider, method, url, headers: extraHeaders, body: reqBody } = body;
+
+    // ── 3. Durable rate limit + quota check ──────────────────────────────
+    // Only debit rate-limit budget for actual generation POSTs — polling GETs
+    // (status checks) would otherwise eat the cooldown allowance during normal
+    // use. A single generation fires one POST + ~20 polls; we only want the
+    // POST to count.
+    const isPollingRead =
+      (method ?? "POST") === "GET" ||
+      /\/get_result\?/.test(url ?? "") ||
+      /\/predictions\/[A-Za-z0-9_-]+$/.test(url ?? "");
+
+    if (!isPollingRead) {
+      const { data: limitData, error: limitError } = await supabase
+        .rpc("check_ai_rate_limit", { p_user_id: user.id });
+
+      if (limitError) {
+        console.error("[ai-proxy] Rate limit check failed:", limitError.message);
+        // Don't fail closed on an infra error — fall through. The cooldown
+        // table upsert is best-effort. If the RPC is truly down, the monthly
+        // quota check downstream in generate-with-products still applies.
+      } else {
+        const limit = limitData?.[0];
+        if (limit && !limit.allowed) {
+          const status = limit.reason === "quota_exceeded" ? 402 : 429;
+          return jsonResponse(
+            {
+              error: limit.reason,
+              message:
+                limit.reason === "cooldown"       ? "Please wait a moment between requests." :
+                limit.reason === "hourly_cap"     ? "Hourly request cap reached. Try again later." :
+                limit.reason === "quota_exceeded" ? "You've used all your generations this month." :
+                "Rate limited.",
+              retry_after_ms: limit.retry_after_ms,
+              quota_remaining: limit.quota_remaining,
+            },
+            status
+          );
+        }
+      }
+    }
 
     if (!provider || !PROVIDERS[provider]) {
       return jsonResponse(

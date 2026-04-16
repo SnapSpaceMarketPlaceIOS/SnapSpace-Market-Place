@@ -19,7 +19,7 @@ import {
   Animated,
   Pressable,
 } from 'react-native';
-import * as FileSystem from 'expo-file-system';
+import * as FileSystem from 'expo-file-system/legacy';
 import CardImage from '../components/CardImage';
 import AutoImage from '../components/AutoImage';
 import LensLoader from '../components/LensLoader';

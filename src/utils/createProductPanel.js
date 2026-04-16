@@ -23,6 +23,8 @@
  * @returns {Promise<string|null>} Public URL of the composite panel, or null on failure
  */
 
+import { supabase } from '../services/supabase';
+
 const SUPABASE_URL  = process.env.EXPO_PUBLIC_SUPABASE_URL || '';
 const ANON_KEY      = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || '';
 const FUNCTION_URL  = `${SUPABASE_URL}/functions/v1/composite-products`;
@@ -94,16 +96,26 @@ export async function createProductPanel(products, userId) {
   console.log(`[Panel] Requesting 2×2 panel | ${productUrls.length} products | user=${userId}`);
   productUrls.forEach((url, i) => console.log(`[Panel] Product ${i + 1}: ${url.substring(0, 80)}`));
 
-  // ── Call edge function directly with anon key (bypasses user JWT issues) ──
-  // supabase.functions.invoke sends the user's session JWT which can be stale
-  // or invalid after storage adapter changes. The composite function only needs
-  // the anon key — it uses the service role key internally for storage uploads.
+  // ── Resolve a fresh user JWT ─────────────────────────────────────────────
+  // Composite-products now requires a verified user JWT (previously accepted
+  // anon key only). We read the current session once and reuse its access
+  // token across retries. If no session is available, fall back to the anon
+  // key — the edge function will return 401 and the client falls back to
+  // individual product images, which is the same outcome as a panel failure.
+  let userJwt = ANON_KEY;
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session?.access_token) userJwt = session.access_token;
+  } catch (e) {
+    console.warn('[Panel] Could not read session token, using anon key:', e?.message || e);
+  }
+
   for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
     try {
       const res = await fetch(FUNCTION_URL, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${ANON_KEY}`,
+          'Authorization': `Bearer ${userJwt}`,
           'apikey':         ANON_KEY,
           'Content-Type':   'application/json',
         },

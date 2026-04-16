@@ -23,7 +23,7 @@ import Svg, { Line, Circle, Polyline, Path, Rect, Defs, LinearGradient as SvgLin
 import { LinearGradient } from 'expo-linear-gradient';
 import { colors } from '../constants/colors';
 import { colors as C } from '../constants/theme';
-import { space, radius, fontWeight, layout, uiColors } from '../constants/tokens';
+import { space, radius, fontWeight, fontSize, typeScale, layout, uiColors } from '../constants/tokens';
 import { useSubscription, PAID_TIERS, WISH_PACKAGES } from '../context/SubscriptionContext';
 import { useAuth } from '../context/AuthContext';
 import { getReferralCode } from '../services/subscriptionService';
@@ -46,14 +46,14 @@ const HERO_FADE_MS  = 1200;
 
 function CloseIcon() {
   return (
-    <Svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" strokeWidth={2.4} strokeLinecap="round">
+    <Svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke={C.white} strokeWidth={2.4} strokeLinecap="round">
       <Line x1={18} y1={6} x2={6} y2={18} />
       <Line x1={6} y1={6} x2={18} y2={18} />
     </Svg>
   );
 }
 
-function CheckIcon({ size = 14, color = '#FFFFFF' }) {
+function CheckIcon({ size = 14, color = C.white }) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={3} strokeLinecap="round" strokeLinejoin="round">
       <Polyline points="20 6 9 17 4 12" />
@@ -61,7 +61,7 @@ function CheckIcon({ size = 14, color = '#FFFFFF' }) {
   );
 }
 
-function ShareIcon({ color = '#67ACE9', size = 20 }) {
+function ShareIcon({ color = colors.blueLight, size = 20 }) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={1.4} strokeLinecap="round" strokeLinejoin="round">
       <Circle cx={12} cy={12} r={10} />
@@ -481,7 +481,7 @@ export default function PaywallScreen({ navigation }) {
                 {features.map((feature, i) => (
                   <View key={i} style={styles.featureRow}>
                     <View style={styles.featureCheckCircle}>
-                      <CheckIcon size={11} color="#67ACE9" />
+                      <CheckIcon size={11} color={colors.blueLight} />
                     </View>
                     <Text style={styles.featureText}>{feature}</Text>
                   </View>
@@ -567,7 +567,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    paddingBottom: 16,
+    paddingBottom: space.base,
     flexGrow: 1,
   },
 
@@ -583,17 +583,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   wordmark: {
-    fontSize: 38,
-    fontWeight: fontWeight.xbold,
+    ...typeScale.hero,
     fontFamily: 'Geist_700Bold',
-    color: '#FFFFFF',
-    letterSpacing: -0.5,
+    color: C.white,
   },
   closeBtnCorner: {
     position: 'absolute',
     top: 52,
     left: space.lg,
-    padding: 8,
+    padding: space.sm,
     zIndex: 10,
   },
   subtitle: {
@@ -610,10 +608,10 @@ const styles = StyleSheet.create({
   progressCard: {
     marginHorizontal: layout.screenPaddingH,
     marginBottom: space.lg,
-    paddingHorizontal: 16,
+    paddingHorizontal: space.base,
     paddingVertical: 14,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
+    backgroundColor: C.white,
+    borderRadius: radius.md,
     borderWidth: 1,
     borderColor: '#D1D5DB',
   },
@@ -621,30 +619,30 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: space.sm,
   },
   progressLabel: {
-    fontSize: 13,
+    fontSize: fontSize.sm,
     fontWeight: fontWeight.regular,
     fontFamily: 'Geist_400Regular',
-    color: '#6B7280',
+    color: C.textSecondary,
   },
   progressCount: {
     fontSize: 14,
     fontWeight: fontWeight.bold,
     fontFamily: 'Geist_700Bold',
-    color: '#111827',
+    color: C.textPrimary,
   },
   progressTrack: {
     height: 4,
     borderRadius: 2,
-    backgroundColor: '#E5E7EB',
+    backgroundColor: C.border,
   },
   progressFill: {
     height: 4,
     borderRadius: 2,
-    backgroundColor: '#67ACE9',
-    shadowColor: '#67ACE9',
+    backgroundColor: colors.blueLight,
+    shadowColor: colors.blueLight,
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.6,
     shadowRadius: 6,
@@ -658,8 +656,8 @@ const styles = StyleSheet.create({
   },
   toggleContainer: {
     flexDirection: 'row',
-    borderRadius: 28,
-    backgroundColor: '#FFFFFF',
+    borderRadius: radius.pill,
+    backgroundColor: C.white,
     padding: 3,
   },
   toggleTab: {
@@ -670,16 +668,16 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   toggleTabActive: {
-    backgroundColor: '#67ACE9',
+    backgroundColor: colors.blueLight,
   },
   toggleText: {
-    fontSize: 13,
+    fontSize: fontSize.sm,
     fontWeight: fontWeight.semibold,
     fontFamily: 'Geist_600SemiBold',
-    color: '#67ACE9',
+    color: colors.blueLight,
   },
   toggleTextActive: {
-    color: '#FFFFFF',
+    color: C.white,
     fontWeight: fontWeight.semibold,
     fontFamily: 'Geist_600SemiBold',
   },
@@ -695,14 +693,14 @@ const styles = StyleSheet.create({
   gridCard: {
     width: CARD_W,
     backgroundColor: 'rgba(255,255,255,0.08)',
-    borderRadius: 16,
+    borderRadius: radius.lg,
     paddingVertical: 18,
     paddingHorizontal: 14,
     borderWidth: 1.5,
     borderColor: 'rgba(255,255,255,0.25)',
   },
   gridCardSelected: {
-    borderColor: '#67ACE9',
+    borderColor: colors.blueLight,
     borderWidth: 2,
     backgroundColor: 'rgba(103,172,233,0.12)',
   },
@@ -715,7 +713,7 @@ const styles = StyleSheet.create({
     width: 26,
     height: 26,
     borderRadius: 13,
-    backgroundColor: '#67ACE9',
+    backgroundColor: colors.blueLight,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 2,
@@ -725,7 +723,7 @@ const styles = StyleSheet.create({
 
   // ── Card inner content
   cardBrandLabel: {
-    fontSize: 11,
+    fontSize: fontSize.xs,
     fontWeight: fontWeight.semibold,
     fontFamily: 'Geist_600SemiBold',
     color: 'rgba(255,255,255,0.6)',
@@ -742,14 +740,14 @@ const styles = StyleSheet.create({
     fontSize: 48,
     fontWeight: fontWeight.bold,
     fontFamily: 'Geist_700Bold',
-    color: '#FFFFFF',
+    color: C.white,
     lineHeight: 52,
     letterSpacing: -1,
   },
   cardWishesRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
+    gap: space.xs,
   },
   cardWishesLabel: {
     fontSize: 14,
@@ -767,14 +765,14 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: fontWeight.semibold,
     fontFamily: 'Geist_600SemiBold',
-    color: '#FFFFFF',
+    color: C.white,
   },
 
   // ── Feature checklist (subscribe tab)
   featuresSection: {
     paddingHorizontal: layout.screenPaddingH,
     marginBottom: space.lg,
-    gap: 12,
+    gap: space.md,
   },
   featureRow: {
     flexDirection: 'row',
@@ -785,7 +783,7 @@ const styles = StyleSheet.create({
     width: 22,
     height: 22,
     borderRadius: 11,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: C.white,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -801,11 +799,11 @@ const styles = StyleSheet.create({
   legalSection: {
     marginTop: space.lg,
     marginHorizontal: layout.screenPaddingH,
-    paddingHorizontal: 4,
+    paddingHorizontal: space.xs,
     gap: 10,
   },
   finePrint: {
-    fontSize: 11,
+    fontSize: fontSize.xs,
     fontWeight: fontWeight.regular,
     fontFamily: 'Geist_400Regular',
     color: 'rgba(255,255,255,0.4)',
@@ -837,8 +835,8 @@ const styles = StyleSheet.create({
     paddingBottom: space.xs,
   },
   cta: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 28,
+    backgroundColor: C.white,
+    borderRadius: radius.pill,
     height: 54,
     alignItems: 'center',
     justifyContent: 'center',
@@ -854,7 +852,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: fontWeight.bold,
     fontFamily: 'Geist_700Bold',
-    color: '#67ACE9',
+    color: colors.blueLight,
     letterSpacing: -0.2,
   },
   ctaDivider: {
@@ -867,7 +865,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: fontWeight.bold,
     fontFamily: 'Geist_700Bold',
-    color: '#67ACE9',
+    color: colors.blueLight,
   },
 
   // ── Referral share button
@@ -876,24 +874,23 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     height: 50,
-    borderRadius: 28,
-    backgroundColor: '#67ACE9',
+    borderRadius: radius.pill,
+    backgroundColor: colors.blueLight,
     marginTop: space.sm,
-    paddingLeft: 24,
+    paddingLeft: space.xl,
     paddingRight: 6,
   },
   referralBtnText: {
-    fontSize: 14,
-    fontWeight: fontWeight.semibold,
+    ...typeScale.button,
     fontFamily: 'Geist_600SemiBold',
-    color: '#FFFFFF',
+    color: C.white,
     flex: 1,
   },
   referralIconCircle: {
     width: 38,
     height: 38,
     borderRadius: 19,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: C.white,
     alignItems: 'center',
     justifyContent: 'center',
   },
