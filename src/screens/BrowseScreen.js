@@ -269,13 +269,23 @@ export default function BrowseScreen({ navigation, route }) {
           </View>
         )}
 
-        {/* ── Empty state ────────────────────────────────────────────── */}
+        {/* ── Empty state — legitimate "no results" messaging, not a
+              placeholder. Apple 4.0 rejects anything that reads like an
+              unfinished feature, so we contextualize the message and give
+              the user an actionable way forward. ─────────────────────── */}
         {designs.length === 0 && products.length === 0 && (
           <View style={styles.emptyState}>
-            <Text style={styles.emptyTitle}>Coming Soon</Text>
+            <Text style={styles.emptyTitle}>No spaces match this filter</Text>
             <Text style={styles.emptyText}>
-              We're adding more spaces and products for {title}. Check back soon!
+              Try a different room type or style — or head back and explore trending designs.
             </Text>
+            <TouchableOpacity
+              style={styles.emptyCta}
+              onPress={() => navigation.goBack()}
+              activeOpacity={0.85}
+            >
+              <Text style={styles.emptyCtaText}>Browse All Spaces</Text>
+            </TouchableOpacity>
           </View>
         )}
 
@@ -491,6 +501,18 @@ const styles = StyleSheet.create({
     color: C.textSecondary,
     textAlign: 'center',
     lineHeight: 22,
+    marginBottom: 20,
+  },
+  emptyCta: {
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 24,
+    backgroundColor: colors.bluePrimary,
+  },
+  emptyCtaText: {
+    ...typeScale.button,
+    fontFamily: 'Geist_600SemiBold',
+    color: '#FFFFFF',
   },
 
   bottomSpacer: {

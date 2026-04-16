@@ -71,24 +71,57 @@ export async function proxyFetch(provider, url, options = {}) {
 }
 
 /**
+ * Read an EXPO_PUBLIC_ env var using a COMPUTED key.
+ *
+ * Metro (Expo's bundler) statically replaces literal `process.env.EXPO_PUBLIC_FOO`
+ * access with the string value of that env var at build time. That means any
+ * AI keys referenced directly in source would end up INLINED into the shipped
+ * production bundle if they happened to be set during `eas build`.
+ *
+ * Using a computed key (`process.env[prefix + name]`) is opaque to the bundler,
+ * so no values are ever inlined. At runtime in dev, JavaScript still resolves
+ * the lookup against the injected `process.env` object normally.
+ *
+ * Also hard-guarded by `__DEV__` so this function is a no-op in production.
+ */
+function readDevKey(name) {
+  if (!__DEV__) return '';
+  const prefix = 'EXPO_PUBLIC_';
+  try {
+    return (typeof process !== 'undefined' && process.env
+      ? process.env[prefix + name]
+      : '') || '';
+  } catch {
+    return '';
+  }
+}
+
+/**
  * Direct fetch for __DEV__ mode — uses EXPO_PUBLIC_ keys from .env.
  * This path is ONLY used during development on the simulator.
- * In production EAS builds, these env vars are NOT configured, so
- * proxyFetch() routes through the edge function instead.
+ * In production EAS builds, `__DEV__` is false, the hard guard below throws,
+ * and the computed-key pattern in readDevKey() prevents Metro from inlining
+ * any key values into the shipped bundle.
  */
 function directFetch(provider, url, options = {}) {
+  // Hard guard — should be dead code in production builds (Metro DCE strips
+  // it because the only caller is gated by `if (__DEV__)`).
+  if (!__DEV__) {
+    throw new Error('directFetch is a development-only helper');
+  }
+
   const headers = { 'Content-Type': 'application/json', ...(options.headers || {}) };
 
   // Inject the correct auth header based on provider
   switch (provider) {
     case 'replicate':
-      headers['Authorization'] = `Bearer ${process.env.EXPO_PUBLIC_REPLICATE_API_TOKEN}`;
+      headers['Authorization'] = `Bearer ${readDevKey('REPLICATE_API_TOKEN')}`;
       break;
     case 'bfl':
-      headers['X-Key'] = process.env.EXPO_PUBLIC_BFL_API_KEY;
+      headers['X-Key'] = readDevKey('BFL_API_KEY');
       break;
     case 'anthropic':
-      headers['x-api-key'] = process.env.EXPO_PUBLIC_ANTHROPIC_API_KEY;
+      headers['x-api-key'] = readDevKey('ANTHROPIC_API_KEY');
       headers['anthropic-version'] = '2023-06-01';
       break;
   }

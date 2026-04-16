@@ -31,6 +31,7 @@ import { useCart } from '../context/CartContext';
 import { useLiked } from '../context/LikedContext';
 import { useAuth } from '../context/AuthContext';
 import { getProductsForDesign, getRecommendedProducts } from '../services/affiliateProducts';
+import ModerationMenu from '../components/ModerationMenu';
 
 const { width } = Dimensions.get('window');
 const IMG_RADIUS = Math.round((width - space.lg * 2) * 0.025);
@@ -375,6 +376,19 @@ export default function ShopTheLookScreen({ route, navigation }) {
                 <Text style={s.followBtnText}>Follow</Text>
               </TouchableOpacity>
             )}
+            {/* Report/Block affordance — UGC compliance (Apple Guideline 1.2).
+                Renders null on own posts (ModerationMenu has an internal guard). */}
+            {!isOwnPost && (
+              <ModerationMenu
+                targetUserId={design.user_id}
+                targetUserName={`@${displayUser}`}
+                targetDesignId={design.id ? String(design.id) : null}
+                currentUserId={user?.id}
+                iconColor="#9CA3AF"
+                iconSize={20}
+                style={s.moderationBtn}
+              />
+            )}
           </View>
         </TouchableOpacity>
 
@@ -605,6 +619,12 @@ const s = StyleSheet.create({
     ...typeScale.button,
     fontFamily: 'Geist_600SemiBold',
     color: '#fff',
+  },
+  moderationBtn: {
+    width: 36,
+    height: 36,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 
   // ── Title + Description ──

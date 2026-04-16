@@ -16,6 +16,7 @@ import CardImage from '../components/CardImage';
 import Skeleton from '../components/Skeleton';
 import LensLoader from '../components/LensLoader';
 import PressableCard from '../components/PressableCard';
+import ModerationMenu from '../components/ModerationMenu';
 import { useAuth } from '../context/AuthContext';
 // Like functionality is on ShopTheLookScreen (when user taps into a post)
 import {
@@ -160,9 +161,20 @@ export default function UserProfileScreen({ navigation, route }) {
             <TouchableOpacity style={styles.navBtn} onPress={() => navigation?.goBack()} activeOpacity={0.7}>
               <BackIcon />
             </TouchableOpacity>
-            <TouchableOpacity style={styles.navBtn} activeOpacity={0.7}>
-              <DotsIcon />
-            </TouchableOpacity>
+            {/* Report/Block affordance — Apple Guideline 1.2 UGC compliance.
+                ModerationMenu returns null for own profile (internal guard). */}
+            {profile?.id && !isOwnProfile ? (
+              <ModerationMenu
+                targetUserId={profile.id}
+                targetUserName={profile.full_name || `@${rawUsername}`}
+                currentUserId={currentUser?.id}
+                iconColor="#FFFFFF"
+                iconSize={22}
+                style={styles.navBtn}
+              />
+            ) : (
+              <View style={styles.navBtn} />
+            )}
           </SafeAreaView>
         </View>
 
