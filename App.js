@@ -228,6 +228,11 @@ function TabNavigator() {
       screenOptions={{
         headerShown: false,
         lazy: true,
+        // Keep visited tab screens warm in memory but pause their render loop
+        // while blurred. Eliminates the gray-flash / image re-decode that happens
+        // when navigating back to a previously-visited tab. First visit still
+        // goes through lazy mount.
+        freezeOnBlur: true,
         tabBarStyle: styles.tabBar,
         tabBarActiveTintColor: C.primary,
         tabBarInactiveTintColor: C.textPrimary,

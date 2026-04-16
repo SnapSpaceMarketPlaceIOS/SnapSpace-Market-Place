@@ -1861,7 +1861,7 @@ const styles = StyleSheet.create({
   tabBorder: {
     height: 1,
     backgroundColor: 'rgba(0,0,0,0.06)',
-    marginBottom: space.md,
+    marginBottom: space.xs,
     marginTop: space.xs,
   },
 
@@ -2823,7 +2823,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: space.lg,
-    paddingTop: 10,
+    paddingTop: 4,
     paddingBottom: 8,
   },
   sortTouchable: {
