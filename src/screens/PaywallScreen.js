@@ -578,8 +578,10 @@ const styles = StyleSheet.create({
   // ── Header
   header: {
     alignItems: 'center',
+    // Slight nudge down from the top of the sheet so the wordmark has
+    // breathing room below the status bar + close (X) button.
     paddingHorizontal: layout.screenPaddingH,
-    paddingTop: space['2xl'],
+    paddingTop: 56,
     paddingBottom: space.sm,
   },
   wordmarkRow: {
@@ -593,7 +595,9 @@ const styles = StyleSheet.create({
   },
   closeBtnCorner: {
     position: 'absolute',
-    top: 52,
+    // Standard iOS sheet pattern — X sits in the top-left corner,
+    // clearly above the heading (not tangled with the subheading).
+    top: 16,
     left: space.lg,
     padding: space.sm,
     zIndex: 10,
