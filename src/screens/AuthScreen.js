@@ -328,7 +328,7 @@ export default function AuthScreen({ navigation }) {
   const loadingTimerRef = useRef(null);
   const safeSetLoading = (val) => {
     if (val) {
-      loadingTimerRef.current = setTimeout(() => setLoading(false), 60000);
+      loadingTimerRef.current = setTimeout(() => setLoading(false), 20000);
     } else {
       clearTimeout(loadingTimerRef.current);
     }

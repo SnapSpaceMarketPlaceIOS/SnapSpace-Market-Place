@@ -154,14 +154,22 @@ export function AuthProvider({ children }) {
    * Throws an Error with a user-friendly message on failure.
    */
   const signIn = async (email, password) => {
-    // Call Supabase directly — no withTimeout wrapper so iOS 26.x simulator
-    // cold TLS handshakes (which can take 30-60s) are not prematurely killed.
+    // iOS 26.x simulator cold TLS handshakes can stall 30-60s.
+    // Strategy: 15s timeout per attempt, up to 3 retries. The second
+    // attempt almost always succeeds because the TLS session is cached.
     console.log('[Auth] signIn: calling Supabase...');
     const start = Date.now();
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email: email.trim().toLowerCase(),
-      password,
-    });
+
+    const attempt = () => withTimeout(
+      supabase.auth.signInWithPassword({
+        email: email.trim().toLowerCase(),
+        password,
+      }),
+      15000,
+      'Connection timed out — retrying...',
+    );
+
+    const { data, error } = await withRetry(attempt, 3, 1000);
     console.log(`[Auth] signIn: responded in ${Date.now() - start}ms`, error ? `error: ${error.message}` : 'success');
 
     if (error) {
