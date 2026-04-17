@@ -1,5 +1,6 @@
 import React, { useRef, useCallback, useEffect } from 'react';
 import { View, Text, StyleSheet, Animated, Pressable } from 'react-native';
+import * as ScreenOrientation from 'expo-screen-orientation';
 import { useFonts } from 'expo-font';
 import {
   Geist_400Regular,
@@ -363,6 +364,16 @@ export default function App() {
     Geist_600SemiBold,
     Geist_700Bold,
   });
+
+  // app.json sets orientation to "default" (allows rotation natively) so the
+  // camera screen can unlock to landscape. Every other screen in the app
+  // assumes portrait layout, so we lock globally here at startup. SnapScreen
+  // unlocks on focus and re-locks on blur — see its useFocusEffect.
+  useEffect(() => {
+    ScreenOrientation
+      .lockAsync(ScreenOrientation.OrientationLock.PORTRAIT_UP)
+      .catch(() => { /* non-fatal: some sim runtimes reject lockAsync */ });
+  }, []);
 
   if (!fontsLoaded) {
     return (

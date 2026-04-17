@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import {
   View,
   Text,
@@ -9,6 +9,8 @@ import {
 } from 'react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import * as ImagePicker from 'expo-image-picker';
+import * as ScreenOrientation from 'expo-screen-orientation';
+import { useFocusEffect } from '@react-navigation/native';
 import Svg, { Path, Line, Polyline, Rect, Circle } from 'react-native-svg';
 import { palette } from '../constants/tokens';
 import { useAuth } from '../context/AuthContext';
@@ -49,6 +51,22 @@ export default function SnapScreen({ navigation, route }) {
   const cameraRef = useRef(null);
   const mediaPermGranted = useRef(false);
 
+  // Allow landscape rotation while the camera is on screen so users can
+  // hold their phone sideways for wide room shots. The rest of the app is
+  // portrait-locked in App.js, so on blur we snap back to PORTRAIT_UP.
+  useFocusEffect(
+    useCallback(() => {
+      ScreenOrientation
+        .unlockAsync()
+        .catch(() => { /* non-fatal — some simulator runtimes reject this */ });
+      return () => {
+        ScreenOrientation
+          .lockAsync(ScreenOrientation.OrientationLock.PORTRAIT_UP)
+          .catch(() => {});
+      };
+    }, [])
+  );
+
   // Optional: product passed from ProductDetailScreen for single-product visualize flow.
   // When present, the captured photo + product are forwarded to HomeScreen which runs
   // the single-product generation pipeline instead of the full room redesign.
@@ -73,16 +91,30 @@ export default function SnapScreen({ navigation, route }) {
     if (!cameraRef.current || tapInFlight.current) return;
     tapInFlight.current = true;
     try {
-      // base64 omitted — upload helper reads file on-demand, keeps capture snappy
-      const photo = await cameraRef.current.takePictureAsync({ quality: 0.8 });
+      // base64 omitted — upload helper reads file on-demand, keeps capture snappy.
+      // exif:true so we can inspect EXIF Orientation and rotate (width,height)
+      // to match the visual orientation of the captured image. Without this,
+      // landscape photos can report portrait dimensions on iOS, which makes
+      // pickAspectRatio snap to 9:16 and flux-2-max renders a tall image.
+      const photo = await cameraRef.current.takePictureAsync({ quality: 0.8, exif: true });
       if (!photo?.uri) {
         Alert.alert('Capture Failed', 'We couldn\'t capture that photo. Please try again.');
         return;
       }
-      // Explicitly pass dimensions so the AI generation pipeline can derive
-      // the correct aspect ratio for both portrait and landscape photos.
+
+      // EXIF Orientation codes (per TIFF 6.0 spec):
+      //   1 = normal, 3 = 180°, 6 = 90° CW (camera rotated right),
+      //   8 = 90° CCW (camera rotated left). 5/7 are mirrored-rotations
+      //   which no stock iOS camera ever produces. Codes 5-8 mean the
+      //   captured pixel matrix has width ↔ height swapped relative to the
+      //   visual image the user took.
+      const orientation = photo.exif?.Orientation ?? 1;
+      const dimsSwapped = orientation >= 5 && orientation <= 8;
+      const finalWidth  = dimsSwapped ? photo.height : photo.width;
+      const finalHeight = dimsSwapped ? photo.width  : photo.height;
+
       navigation.navigate('Home', {
-        capturedPhoto: { uri: photo.uri, base64: null, width: photo.width, height: photo.height },
+        capturedPhoto: { uri: photo.uri, base64: null, width: finalWidth, height: finalHeight },
         singleProduct,  // null for normal flow, product object for single-product visualize
       });
     } catch (err) {

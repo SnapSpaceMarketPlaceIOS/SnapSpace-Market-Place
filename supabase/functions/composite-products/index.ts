@@ -107,7 +107,13 @@ Deno.serve(async (req: Request) => {
 
   // ── Download, decode, resize, and composite each product ──────────────────
   // `composited` tracks filled cells (we stop after 4 — the panel is full).
+  // `compositedIndices` records which INPUT URL index ended up in each cell,
+  // so the client can show the exact same 4 products in "Shop Your Room"
+  // that flux-2-max rendered into the room image. Without this array the
+  // client has to guess, and falls back to the first 4 matched products —
+  // which produces the 3-of-4 mismatch when a URL was skipped mid-pool.
   let composited = 0;
+  const compositedIndices: number[] = [];
 
   for (let urlIdx = 0; urlIdx < candidateUrls.length && composited < 4; urlIdx++) {
     const url = candidateUrls[urlIdx];
@@ -150,6 +156,7 @@ Deno.serve(async (req: Request) => {
       }
 
       composited++;
+      compositedIndices.push(urlIdx);
       console.log(`[composite] Cell ${composited}/4 filled from URL ${urlIdx + 1} at grid pos (${POSITIONS[composited - 1].x}, ${POSITIONS[composited - 1].y})`);
     } catch (e: any) {
       console.warn(`[composite] URL ${urlIdx + 1} error: ${e?.message ?? String(e)} — skipping`);
@@ -181,9 +188,13 @@ Deno.serve(async (req: Request) => {
   const { data: urlData } = supabase.storage.from("room-uploads").getPublicUrl(path);
   if (!urlData?.publicUrl) return errResp("Upload succeeded but no public URL", 500);
 
-  console.log(`[composite] Done | url=${urlData.publicUrl.substring(0, 80)}`);
+  console.log(`[composite] Done | url=${urlData.publicUrl.substring(0, 80)} | indices=[${compositedIndices.join(",")}]`);
   return new Response(
-    JSON.stringify({ url: urlData.publicUrl, composited_count: composited }),
+    JSON.stringify({
+      url:                 urlData.publicUrl,
+      composited_count:    composited,
+      composited_indices:  compositedIndices,
+    }),
     { headers: { ...CORS, "Content-Type": "application/json" } },
   );
 });

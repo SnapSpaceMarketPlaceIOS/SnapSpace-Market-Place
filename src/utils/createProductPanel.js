@@ -20,7 +20,10 @@
  *
  * @param {object[]} products  Array of products (each with an imageUrl string)
  * @param {string}   userId    Auth user ID (used for the Storage path)
- * @returns {Promise<string|null>} Public URL of the composite panel, or null on failure
+ * @returns {Promise<{url: string, compositedIndices: number[] | null} | null>}
+ *          Panel URL + indices of which input products ended up in the
+ *          panel (so the caller can show the exact 4 in Shop Your Room).
+ *          Returns null on failure.
  */
 
 import { supabase } from '../services/supabase';
@@ -160,8 +163,21 @@ export async function createProductPanel(products, userId) {
       // guarantees a JPEG regardless of the underlying storage format.
       const renderUrl = toRenderUrl(data.url);
 
-      console.log(`[Panel] Panel ready (attempt ${attempt}) | composited=${data.composited_count ?? '?'} | url=${renderUrl.substring(0, 80)}`);
-      return renderUrl;
+      // compositedIndices tells the caller which of the INPUT productUrls
+      // actually ended up as cells in the panel. The caller uses this to
+      // show exactly the same 4 products in "Shop Your Room" — no drift
+      // when a URL fails mid-pool and a backup slot fills the cell.
+      const compositedIndices = Array.isArray(data.composited_indices)
+        ? data.composited_indices
+        : null;
+
+      console.log(
+        `[Panel] Panel ready (attempt ${attempt}) | ` +
+        `composited=${data.composited_count ?? '?'} | ` +
+        `indices=[${compositedIndices?.join(',') ?? '?'}] | ` +
+        `url=${renderUrl.substring(0, 80)}`
+      );
+      return { url: renderUrl, compositedIndices };
 
     } catch (err) {
       // Network failure, timeout, or Deno crash — retry once

@@ -1295,10 +1295,18 @@ export default function HomeScreen({ navigation, route }) {
       setGenStatus('');
 
       // ── Pre-match products (full-room only — single-product already has one) ──
+      // We match 6 (not 4) to give the panel compositor a 2-product backup
+      // pool. If any of the top-4 URLs fail the content-type / decode check
+      // inside composite-products, the edge fn falls through to product 5 or
+      // 6 and fills the cell from the pool. Without the backup pool we'd
+      // ship a 3-cell panel + a gray 4th cell, which the user would see as
+      // a weird flat region in the generated room image. The edge function
+      // returns composited_indices so the client can filter finalProducts
+      // down to exactly the 4 that actually made it into the panel.
       let matchedProducts = [];
       if (!isSingleProductMode) {
         setGenStatus('Finding products for your space…');
-        matchedProducts = getProductsForPrompt(designPrompt, 4);
+        matchedProducts = getProductsForPrompt(designPrompt, 6);
         log('pre-matched', matchedProducts.length, 'products:', matchedProducts.map(p => p.category).join(','));
       }
 
@@ -1492,22 +1500,25 @@ export default function HomeScreen({ navigation, route }) {
             log('replicate flux-2-max | visual product refs');
 
             // ── Try panel approach: 2 images instead of 4 → ~50% less GPU compute ──
-            // Creates a 512×512 2×2 product grid via edge function, then sends
-            // [room, panel] to flux-2-max instead of [room, p1, p2, p3].
+            // Creates a 768×768 2×2 product grid via edge function, then sends
+            // [room, panel] to flux-2-max instead of [room, p1, p2, p3, p4].
             // Target cost: ~$0.13/gen vs $0.31 with individual images.
             //
             // Uses reachableProducts (pre-flighted) so a single stale Amazon
-            // URL can't take down the whole generation.
+            // URL can't take down the whole generation. We also read back
+            // compositedIndices to know EXACTLY which of those products made
+            // it into the panel — "Shop Your Room" must show the same 4.
             let usedPanel = false;
+            let panelCompositedIndices = null;
             if (reachableProducts.length >= 2) {
               try {
                 setGenStatus('Preparing product panel…');
-                const panelUrl = await createProductPanel(reachableProducts, user.id);
-                if (panelUrl) {
+                const panelResponse = await createProductPanel(reachableProducts, user.id);
+                if (panelResponse?.url) {
                   // Panel URL pre-flight: Supabase Storage is usually instant
                   // but CDN propagation can briefly lag. Verify before sending
                   // to flux-2-max so a 404 on the panel doesn't trigger E006.
-                  const panelOk = await preflightUrl(panelUrl);
+                  const panelOk = await preflightUrl(panelResponse.url);
                   if (!panelOk) {
                     warn('panel URL not yet reachable — skipping panel path');
                   } else {
@@ -1517,15 +1528,16 @@ export default function HomeScreen({ navigation, route }) {
                       roomPhotoUrl,
                       designPrompt,
                       reachableProducts,
-                      panelUrl,
+                      panelResponse.url,
                       aspectRatio,
                     );
                     resultUrl = panelResult.url;
                     genMeta.predictionId = panelResult.predictionId;
                     genMeta.seed = panelResult.seed;
                     genMeta.pipeline = 'panel';
+                    panelCompositedIndices = panelResponse.compositedIndices;
                     usedPanel = true;
-                    log('panel gen complete | prediction=' + panelResult.predictionId + ' seed=' + panelResult.seed);
+                    log('panel gen complete | prediction=' + panelResult.predictionId + ' seed=' + panelResult.seed + ' | composited=[' + (panelCompositedIndices?.join(',') ?? '?') + ']');
                   }
                 }
               } catch (panelErr) {
@@ -1536,37 +1548,65 @@ export default function HomeScreen({ navigation, route }) {
             }
 
             // ── Fallback: individual product images (original 4-image approach) ──
+            let individualUsedProducts = null;
             if (!usedPanel && reachableProducts.length >= 1) {
               log('using individual product refs (room + ' + Math.min(reachableProducts.length, 4) + ' product images)');
               setGenStatus('Analyzing your room…');
               resultUrl = await generateWithProductRefs(roomPhotoUrl, designPrompt, reachableProducts, aspectRatio);
               genMeta.pipeline = 'individual';
+              // Individual path: replicate.js slices to exactly the first 4
+              // reachable products and uses each as a distinct image input.
+              // No panel compositing → no index drift → the 4 sent ARE the 4
+              // used, so just mirror the slice here for Shop Your Room.
+              individualUsedProducts = reachableProducts.slice(0, 4);
             } else if (!usedPanel) {
               // No reachable product images — force the replicate path to fail
               // so we drop to BFL (which doesn't need product URLs).
               throw new Error('no reachable product images for replicate path');
             }
 
-            finalProducts = matchedProducts;
+            // ── Reconcile finalProducts with what was ACTUALLY rendered ────────
+            // Previously this was unconditionally `matchedProducts` — which
+            // could include products whose images failed the composite pool,
+            // producing the 3-of-4 mismatch ("Shop Your Room shows a product
+            // that isn't in the generated image"). Now we map back to the
+            // exact subset that went to flux-2-max.
+            if (usedPanel && Array.isArray(panelCompositedIndices) && panelCompositedIndices.length > 0) {
+              finalProducts = panelCompositedIndices
+                .map(i => reachableProducts[i])
+                .filter(Boolean);
+            } else if (individualUsedProducts) {
+              finalProducts = individualUsedProducts;
+            } else {
+              // Shouldn't hit here (would've thrown above), but defensive fallback
+              finalProducts = reachableProducts.slice(0, 4);
+            }
             replicateSucceeded = true;
-            log('replicate complete | url=' + resultUrl.substring(0, 80));
+            log('replicate complete | url=' + resultUrl.substring(0, 80) + ' | finalProducts=' + finalProducts.length);
           } catch (repErr) {
             warn('replicate failed (' + repErr.message + ') — falling back to BFL');
           }
 
           // ── Fallback: BFL kontext (room photo, product names in prompt) ──
           // No visual product references — products matched by text only.
-          // Cost: ~$0.04/generation
+          // Cost: ~$0.04/generation. Uses reachableProducts (not matched)
+          // and slices to 4 so Shop Your Room never shows a product whose
+          // image would 404 on tap. BFL doesn't guarantee visual accuracy
+          // (text-only refs), but at least the 4 products shown all load.
           if (!replicateSucceeded) {
-            log('BFL kontext fallback | cost=~$0.04 | aspect=' + aspectRatio);
+            const bflProducts = (reachableProducts.length > 0
+              ? reachableProducts
+              : matchedProducts
+            ).slice(0, 4);
+            log('BFL kontext fallback | cost=~$0.04 | aspect=' + aspectRatio + ' | products=' + bflProducts.length);
             resultUrl = await generateWithBFL(
               designPrompt,
-              matchedProducts,
+              bflProducts,
               (msg) => setGenStatus(msg),
               roomPhotoUrl,
               aspectRatio,
             );
-            finalProducts = matchedProducts;
+            finalProducts = bflProducts;
             genMeta.pipeline = 'bfl';
             log('BFL complete');
           }
