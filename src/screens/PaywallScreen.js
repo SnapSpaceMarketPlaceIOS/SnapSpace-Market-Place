@@ -609,10 +609,11 @@ const styles = StyleSheet.create({
   // ── Header
   header: {
     alignItems: 'center',
-    // Nudge down below the fixed close (X) button (which sits in the
-    // top-left corner at safe-area-top + 8pt, 40pt tall).
+    // Push the wordmark well below the close (X) button (which sits
+    // at safe-area-top + 32pt, 40pt tall → bottom edge at ~72pt).
+    // 80pt paddingTop gives the HomeGenie wordmark real breathing room.
     paddingHorizontal: layout.screenPaddingH,
-    paddingTop: space.xl,
+    paddingTop: 80,
     paddingBottom: space.sm,
   },
   wordmarkRow: {
@@ -625,17 +626,15 @@ const styles = StyleSheet.create({
     color: C.white,
   },
   closeBtnCorner: {
-    // Fixed to the SafeAreaView so it sits just below the iPhone
-    // Dynamic Island / status bar on 14 Pro & 16 Pro. Previous
-    // position (top: 16 inside ScrollView) was landing in the
-    // status bar region and was not tappable.
+    // Fixed inside SafeAreaView so it clears the Dynamic Island and
+    // any iOS system chrome (e.g. the "◀ Safari" back-link pill that
+    // appears when the app is launched from another app). Plain white
+    // X on the hero background — no pill/circle backing.
     position: 'absolute',
-    top: space.sm,              // 8pt below safe-area top = ~65pt from screen top (well clear of Dynamic Island)
-    left: space.md,             // 12pt in from the left edge
+    top: space['2xl'],          // 32pt below safe-area top = well clear of status-bar UI
+    left: space.lg,             // 20pt in from the left edge
     width: 40,
     height: 40,
-    borderRadius: 20,
-    backgroundColor: 'rgba(0,0,0,0.35)',
     alignItems: 'center',
     justifyContent: 'center',
     zIndex: 20,
