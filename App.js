@@ -1,7 +1,20 @@
 import React, { useRef, useCallback, useEffect } from 'react';
-import { View, Text, StyleSheet, Animated, Pressable } from 'react-native';
+import { View, Text, StyleSheet, Animated, Pressable, LogBox } from 'react-native';
 import { lockPortrait } from './src/utils/orientation';
 import { useFonts } from 'expo-font';
+
+// Silence known-harmless dev-mode warnings that LogBox promotes to red
+// error boxes. The orientation entry hides the 'Cannot find native
+// module ExpoScreenOrientation' trace that fires on the current
+// dev-client build — our try/catch in src/utils/orientation.js already
+// handles this gracefully, but LogBox's global error hook picks it up
+// anyway and blocks the UI with a red modal every launch. Once the dev
+// client is rebuilt with the expo-screen-orientation pod linked, the
+// warning stops firing and this entry is a no-op.
+LogBox.ignoreLogs([
+  "Cannot find native module 'ExpoScreenOrientation'",
+  '[Orientation] expo-screen-orientation native module not linked',
+]);
 import {
   Geist_400Regular,
   Geist_500Medium,
