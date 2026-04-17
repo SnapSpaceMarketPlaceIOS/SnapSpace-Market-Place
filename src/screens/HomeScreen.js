@@ -1082,14 +1082,14 @@ export default function HomeScreen({ navigation, route }) {
     setPhotoSource('library');
   }, [generating]);
 
-  // Timed loading bar — 3-phase crawl matching real Replicate generation time
+  // Timed loading bar — fixed 30-second runway regardless of real
+  // generation time. Crawls 0→95% linearly and snaps to 100% when
+  // generation actually completes (which may be before or after 30s).
   const startLoadingBar = useCallback(() => {
     loadingProgress.setValue(0);
-    // Linear 0→95% over 75 seconds at constant speed.
-    // Snaps to 100% when generation completes.
     loadingAnim.current = Animated.timing(loadingProgress, {
       toValue: 0.95,
-      duration: 75000,
+      duration: 30000,
       easing: Easing.linear,
       useNativeDriver: false,
     });
@@ -1666,6 +1666,11 @@ export default function HomeScreen({ navigation, route }) {
       setPhoto(null);
       setPhotoSource(null);
       setPrompt('');
+      // Collapse the input bar back to single-line pill shape. Without this
+      // explicit reset, onContentSizeChange sometimes doesn't fire when the
+      // prompt is cleared programmatically, so the bar stays stuck in its
+      // expanded multi-line rounded-square state.
+      setInputExpanded(false);
 
       // ── Auto-save: persist every generation to Supabase immediately ──
       if (user?.id) {
@@ -1753,8 +1758,12 @@ export default function HomeScreen({ navigation, route }) {
       >
         {/* ── Hero section — fills visible screen ─────────────────────── */}
         <View style={styles.overlay}>
-          {/* Top bar: centered logo — icon hidden during generation */}
-          <View style={styles.topBar}>
+          {/* Top bar: centered logo — icon hidden during generation.
+              During generation we lift the heading + tagline higher on the
+              screen so the GenieLoader's orbiting particles (80px radius
+              around the lamp at ~34% from top) don't visually overlap the
+              "HomeGenie" wordmark or tagline. */}
+          <View style={[styles.topBar, generating && styles.topBarGenerating]}>
             <View style={styles.logoRow}>
               <Text style={styles.logo}>HomeGenie</Text>
               {!generating && (
@@ -2449,6 +2458,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: space.lg,
     zIndex: 10,
+  },
+  // Raised position applied during generation so the GenieLoader's
+  // orbiting particles (heroCentered is at ~34% from top, particle
+  // orbit radius ≈ 80px) don't collide with the heading or tagline.
+  topBarGenerating: {
+    top: '14%',
   },
   wishTagline: {
     fontSize: 21,
