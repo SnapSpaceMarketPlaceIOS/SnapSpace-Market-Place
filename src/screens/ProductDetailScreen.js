@@ -20,7 +20,7 @@
  *   CTABar        — always-visible: FTC note + affiliate link + "Add to Cart"
  */
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import {
   View,
   Text,
@@ -201,7 +201,52 @@ const pb = StyleSheet.create({
 
 function ProductHero({ images, imageUrl, onBack, topInset, heroResizeMode }) {
   const [activeIdx, setActiveIdx] = useState(0);
-  const heroImages = (images && images.length > 0) ? images : (imageUrl ? [imageUrl] : [null]);
+
+  // Deduplicate by Amazon asset ID — without this, the same product shot
+  // shows up twice in the carousel because `imageUrl` points to it at a
+  // smaller size (e.g. ._AC_UL640_.jpg) and `images[0]` points to the
+  // larger render (._AC_SL1500_.jpg). Strip the size/quality suffix so
+  // both variants collapse to one entry.
+  const heroImages = useMemo(() => {
+    const all = [];
+    if (imageUrl) all.push(imageUrl);
+    if (Array.isArray(images)) all.push(...images);
+    if (all.length === 0) return [null];
+
+    const keyOf = (url) => {
+      if (typeof url !== 'string') return url;
+      // Amazon asset IDs look like "81-a1cUJElL" — isolate them by stripping
+      // any "._AC_<variant>_.jpg" / "._SL<n>_.jpg" style suffix.
+      const match = url.match(/\/([^/]+?)(?:\._[^.]+?)?\.(?:jpg|jpeg|png|webp|gif)(?:\?.*)?$/i);
+      if (match) {
+        const name = match[1];
+        // Strip the trailing size modifier like "_AC_UL640" / "_AC_SL1500"
+        return name.replace(/\._[A-Z]{2,}_[A-Z]{2,}\d+_?$/i, '')
+                   .replace(/\._[A-Z]{2,}\d+_?$/i, '');
+      }
+      return url;
+    };
+
+    const seen = new Set();
+    const out = [];
+    for (const u of all) {
+      const key = keyOf(u);
+      if (seen.has(key)) continue;
+      seen.add(key);
+      // Prefer the highest-resolution variant: swap *_UL640_ / *_SX300_ etc
+      // to *_SL1500_ when we can, so the hero carousel always renders the
+      // sharpest available version of each unique asset.
+      const upgraded = typeof u === 'string'
+        ? u
+            .replace(/_AC_UL\d+_/g, '_AC_SL1500_')
+            .replace(/_AC_SX\d+_/g, '_AC_SL1500_')
+            .replace(/_SX\d+_/g,    '_AC_SL1500_')
+        : u;
+      out.push(upgraded);
+    }
+    return out;
+  }, [imageUrl, images]);
+
   const flatListRef = useRef(null);
   const resMode = heroResizeMode || 'cover';
 
@@ -555,14 +600,14 @@ function VariantSelector({ variants, selectedId, onSelect }) {
                   <CardImage
                     uri={v.swatchImage}
                     style={va.swatchImg}
-                    resizeMode="cover"
+                    resizeMode="contain"
                     placeholderColor={uiColors.surface}
                   />
                 ) : v.mainImage ? (
                   <CardImage
                     uri={v.mainImage}
                     style={va.swatchImg}
-                    resizeMode="cover"
+                    resizeMode="contain"
                     placeholderColor={uiColors.surface}
                   />
                 ) : v.color ? (
@@ -570,7 +615,7 @@ function VariantSelector({ variants, selectedId, onSelect }) {
                 ) : null}
               </View>
               <View style={va.labelRow}>
-                <Text style={[va.tileLabel, active && va.tileLabelOn]} numberOfLines={2}>
+                <Text style={[va.tileLabel, active && va.tileLabelOn]} numberOfLines={1} ellipsizeMode="tail">
                   {v.label}
                 </Text>
               </View>
@@ -615,9 +660,14 @@ const va = StyleSheet.create({
     borderColor: uiColors.primary,
   },
   imgArea: {
+    // Square so product swatches (Amazon serves 300×300) aren't aggressively
+    // cropped when rendered inside the variant tile. Paired with
+    // resizeMode="contain" the product sits within its own bounds —
+    // clearer at a glance and no "exaggerated zoom" on legs/edges.
     width: '100%',
-    height: 88,
+    aspectRatio: 1,
     backgroundColor: uiColors.bg,
+    padding: 4,
   },
   swatchImg: {
     width: '100%',
@@ -626,11 +676,15 @@ const va = StyleSheet.create({
   colorBlock: {
     width: '100%',
     height: '100%',
+    borderRadius: 4,
   },
   labelRow: {
-    paddingVertical: space.sm,
-    paddingHorizontal: 6,
-    minHeight: 36,
+    // Fixed height + single-line label with ellipsis so every variant
+    // tile has the same overall dimensions regardless of label length
+    // (e.g. "Brown/Walnut" vs "Transparent/Walnut" both collapse to
+    // one line, and all tiles line up in a tidy row).
+    height: 36,
+    paddingHorizontal: 8,
     justifyContent: 'center',
     backgroundColor: uiColors.surface,
   },
