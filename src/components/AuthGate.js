@@ -331,9 +331,22 @@ export default function AuthGate({ title, subtitle, navigation, onSuccess }) {
     return Object.keys(e).length === 0;
   };
 
+  // Safety net — force-clear the spinner after 25s so it can never get stuck
+  // if a Supabase call hangs. AuthContext itself has a 15s timeout + 3 retries
+  // so worst case is ~45s, but the user should see an error by then.
+  const loadingTimerRef = useRef(null);
+  const safeSetLoading = (val) => {
+    if (val) {
+      loadingTimerRef.current = setTimeout(() => setLoading(false), 25000);
+    } else {
+      clearTimeout(loadingTimerRef.current);
+    }
+    setLoading(val);
+  };
+
   const handleAuth = async () => {
     if (!validate()) return;
-    setLoading(true);
+    safeSetLoading(true);
     try {
       if (isSignUp) {
         const result = await signUp(name, email, password);
@@ -344,12 +357,19 @@ export default function AuthGate({ title, subtitle, navigation, onSuccess }) {
         }
       } else {
         await signIn(email, password);
+        // signIn eagerly sets the user state in AuthContext, so the parent
+        // screen (Snap/Cart/Profile) re-renders and swaps AuthGate for the
+        // actual content. onSuccess is a no-op hook for callers that want
+        // to react to success (e.g. kick off a pending action).
         onSuccess?.();
       }
     } catch (err) {
-      Alert.alert('Error', err.message);
+      Alert.alert(
+        isSignUp ? 'Sign Up Failed' : 'Sign In Failed',
+        err.message || 'Something went wrong. Please try again.'
+      );
     } finally {
-      setLoading(false);
+      safeSetLoading(false);
     }
   };
 

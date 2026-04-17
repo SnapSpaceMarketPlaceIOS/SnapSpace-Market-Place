@@ -410,8 +410,33 @@ export default function AuthScreen({ navigation }) {
     setConfirmPassword('');
   };
 
+  // Dismiss AuthScreen and return to the main tab navigator. Used by the
+  // close (X) button. If there's no previous stack entry (e.g. we landed
+  // here via navigation.reset), fall back to resetting to Main so the user
+  // is never stranded on the auth wall.
+  const handleClose = () => {
+    if (navigation.canGoBack?.()) {
+      navigation.goBack();
+    } else {
+      navigation.reset({ index: 0, routes: [{ name: 'Main' }] });
+    }
+  };
+
   return (
     <View style={styles.root}>
+      {/* ── Close (X) — dismiss auth wall and return to browsing ─── */}
+      <TouchableOpacity
+        style={styles.closeBtn}
+        onPress={handleClose}
+        hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+        activeOpacity={0.7}
+      >
+        <Svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke="#111" strokeWidth={2.2} strokeLinecap="round">
+          <Line x1={18} y1={6} x2={6} y2={18} />
+          <Line x1={6} y1={6} x2={18} y2={18} />
+        </Svg>
+      </TouchableOpacity>
+
       <KeyboardAvoidingView
         style={styles.flex}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
@@ -578,6 +603,20 @@ const styles = StyleSheet.create({
   scroll: {
     flexGrow: 1,
     paddingBottom: 32,
+  },
+
+  // ── Close (X) button — top-left so it doesn't overlap right-side inputs ──
+  closeBtn: {
+    position: 'absolute',
+    top: 56,
+    left: 20,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: 'rgba(0,0,0,0.04)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 10,
   },
 
   // ── Header: title + subtitle ──

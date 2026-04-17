@@ -1706,17 +1706,17 @@ export default function HomeScreen({ navigation, route }) {
     }
   };
 
-  // First-visit auth redirect
-  useEffect(() => {
-    if (user) return;
-    (async () => {
-      const visited = await AsyncStorage.getItem(FIRST_VISIT_KEY);
-      if (!visited) {
-        await AsyncStorage.setItem(FIRST_VISIT_KEY, 'true');
-        navigation.navigate('Auth');
-      }
-    })();
-  }, [user]);
+  // First-visit auth redirect — REMOVED. This was creating a "dual sign-in
+  // wall" experience: on first launch it would auto-push the full-screen
+  // AuthScreen modal (which hides the tab bar), while the Snap/Cart/Profile
+  // tabs separately show an inline AuthGate (which keeps the tab bar
+  // visible). Two visually-identical walls with different dismiss behavior
+  // was confusing users on TestFlight and blocking browsing.
+  //
+  // New behavior: unauthenticated users land on Home and can freely browse
+  // Home + Explore. They only see the AuthGate when they explicitly tap a
+  // tab that requires sign-in (Snap/Cart/Profile), and that gate keeps the
+  // tab bar visible so they can navigate away.
 
   // Generation quota now managed by SubscriptionContext
 
