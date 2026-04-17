@@ -497,7 +497,7 @@ export default function ProfileScreen({ navigation }) {
 
         {/* ── Banner ── */}
         <View style={styles.banner}>
-          <CardImage uri={profile.bannerUri} style={styles.bannerImage} resizeMode="cover" placeholderColor="#67ACE9" />
+          <CardImage uri={profile.bannerUri} style={styles.bannerImage} resizeMode="cover" />
           <SafeAreaView style={styles.navRow}>
             <View style={{ width: space['2xl'] + space.xs }} />
             <TouchableOpacity
@@ -1054,14 +1054,11 @@ const styles = StyleSheet.create({
     backgroundColor: C.white,
   },
 
-  // Banner — default blue (#67ACE9) when the user hasn't uploaded a custom
-  // banner image. Replaces the gray CardImage placeholder so fresh accounts
-  // land on a branded blue header instead of a neutral gray one.
+  // Banner
   banner: {
     height: BANNER_HEIGHT,
     position: 'relative',
     overflow: 'hidden',
-    backgroundColor: '#67ACE9',
   },
   bannerGradient: {
     ...StyleSheet.absoluteFillObject,
