@@ -217,3 +217,24 @@ export async function getReferralCode(userId) {
   if (error) throw new Error(error.message);
   return data;
 }
+
+/**
+ * Grant the current user a one-time 2-wish "share bonus" the first time
+ * they share the paywall. Idempotent — subsequent calls return the
+ * existing balance without double-crediting.
+ *
+ * @param {string} userId
+ * @returns {Promise<{ newBalance: number, alreadyClaimed: boolean }>}
+ */
+export async function grantShareBonus(userId) {
+  const { supabase } = await import('./supabase');
+  const { data, error } = await supabase
+    .rpc('grant_share_bonus', { p_user_id: userId });
+
+  if (error) throw new Error(error.message);
+  const row = data?.[0] || {};
+  return {
+    newBalance:     row.new_balance ?? 0,
+    alreadyClaimed: row.already_claimed ?? false,
+  };
+}

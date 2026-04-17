@@ -141,6 +141,18 @@ export function AuthProvider({ children }) {
       options: { data: { full_name: fullName.trim() } },
     });
     if (error) throw new Error(error.message);
+
+    // Explicitly zero the quota for this user so a fresh account always
+    // starts at 0/5 wishes, even if a stale row exists from a prior
+    // sandbox/test session reusing the same email. Non-fatal on failure.
+    if (data?.user?.id) {
+      try {
+        await supabase.rpc('initialize_user_quota', { p_user_id: data.user.id });
+      } catch (e) {
+        console.warn('[Auth] initialize_user_quota failed:', e?.message);
+      }
+    }
+
     // If Supabase requires email confirmation, session will be null here.
     // The user must verify their email before they can sign in.
     return { needsEmailVerification: !data.session };

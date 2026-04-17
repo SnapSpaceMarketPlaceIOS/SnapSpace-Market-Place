@@ -3,7 +3,6 @@ import {
   initConnection,
   endConnection,
   getSubscriptions,
-  requestSubscription,
   purchaseErrorListener,
   purchaseUpdatedListener,
   finishTransaction,
@@ -97,24 +96,29 @@ export function SubscriptionProvider({ children }) {
         await initConnection();
         if (!mounted) return;
 
-        // Load product metadata from StoreKit / App Store
+        // Load subscription product metadata from StoreKit / App Store
         let subs = [];
         try {
-          subs = await getSubscriptions({ skus: ALL_PRODUCT_IDS });
-        } catch {
-          // Fallback to new API if getSubscriptions is not available
-          try { subs = await fetchProducts({ skus: ALL_PRODUCT_IDS, type: 'subs' }); } catch {}
+          subs = await fetchProducts({ skus: ALL_PRODUCT_IDS, type: 'subs' });
+        } catch (e) {
+          // Fallback to legacy API for older expo-iap versions
+          try { subs = await getSubscriptions({ skus: ALL_PRODUCT_IDS }); } catch {}
+          console.warn('[Subscription] fetchProducts(subs) failed, used fallback:', e?.message);
         }
         if (!mounted) return;
-        setProducts(subs);
+        setProducts(subs || []);
+        console.log('[Subscription] subscription products loaded:', (subs || []).length, 'of', ALL_PRODUCT_IDS.length);
 
-        // Load token (consumable) product metadata
+        // Load wish (consumable) product metadata
+        let tokenProds = [];
         try {
-          const tokenProds = await fetchProducts({ skus: ALL_TOKEN_PRODUCT_IDS, type: 'in-app' });
-          if (mounted) setTokenProducts(tokenProds);
+          tokenProds = await fetchProducts({ skus: ALL_TOKEN_PRODUCT_IDS, type: 'in-app' });
         } catch (e) {
-          console.warn('[Subscription] Token product fetch failed:', e.message);
+          console.warn('[Subscription] fetchProducts(in-app) failed:', e?.message);
         }
+        if (!mounted) return;
+        setTokenProducts(tokenProds || []);
+        console.log('[Subscription] wish products loaded:', (tokenProds || []).length, 'of', ALL_TOKEN_PRODUCT_IDS.length);
 
         if (mounted) setIapReady(true);
       } catch (e) {
@@ -261,11 +265,11 @@ export function SubscriptionProvider({ children }) {
     }
   }, [user?.id]);
 
-  // ── Purchase tokens (consumable IAP) ───────────────────────────────────
+  // ── Purchase wishes (consumable IAP) ───────────────────────────────────
   const purchaseTokens = useCallback(async (productId) => {
     if (__DEV__ && !iapReady) {
       // Dev fallback when StoreKit not configured
-      console.log('[Subscription] DEV MODE — mock token purchase:', productId);
+      console.log('[Subscription] DEV MODE — mock wish purchase:', productId);
       const pkg = TOKEN_PACKAGES.find(p => p.id === productId);
       if (pkg) {
         setTokenBalance(prev => prev + pkg.tokens);
@@ -275,12 +279,34 @@ export function SubscriptionProvider({ children }) {
 
     if (!iapReady) throw new Error('In-app purchases are not available right now.');
 
+    // Defensive fetch: if the product wasn't loaded at init (App Store
+    // config propagation delay, network hiccup, etc.), StoreKit throws
+    // "SKU not found". Retry the fetch just-in-time before the purchase.
+    const haveProduct = tokenProducts.some(p => (p.id || p.productId) === productId);
+    if (!haveProduct) {
+      try {
+        const refetched = await fetchProducts({ skus: ALL_TOKEN_PRODUCT_IDS, type: 'in-app' });
+        if (refetched?.length) setTokenProducts(refetched);
+        const found = refetched?.some(p => (p.id || p.productId) === productId);
+        if (!found) {
+          throw new Error(
+            `This item isn't available right now. Please try again in a moment. (SKU: ${productId})`
+          );
+        }
+      } catch (e) {
+        if (e?.message?.startsWith("This item isn't")) throw e;
+        throw new Error(
+          `Could not load products from the App Store. Please check your connection and try again.`
+        );
+      }
+    }
+
     await requestPurchase({
       request: { apple: { sku: productId } },
       type: 'in-app',
     });
     return { success: true };
-  }, [iapReady]);
+  }, [iapReady, tokenProducts]);
 
   // ── Purchase subscription ───────────────────────────────────────────────
   const purchaseSubscription = useCallback(async (productId) => {
@@ -305,11 +331,36 @@ export function SubscriptionProvider({ children }) {
 
     if (!iapReady) throw new Error('In-app purchases are not available right now.');
 
-    // requestSubscription triggers the StoreKit payment sheet.
+    // Defensive fetch: same rationale as purchaseTokens — if the sub
+    // product wasn't loaded at init, retry before the purchase call.
+    const haveProduct = products.some(p => (p.id || p.productId) === productId);
+    if (!haveProduct) {
+      try {
+        const refetched = await fetchProducts({ skus: ALL_PRODUCT_IDS, type: 'subs' });
+        if (refetched?.length) setProducts(refetched);
+        const found = refetched?.some(p => (p.id || p.productId) === productId);
+        if (!found) {
+          throw new Error(
+            `This subscription isn't available right now. Please try again in a moment. (SKU: ${productId})`
+          );
+        }
+      } catch (e) {
+        if (e?.message?.startsWith("This subscription isn't")) throw e;
+        throw new Error(
+          `Could not load subscriptions from the App Store. Please check your connection and try again.`
+        );
+      }
+    }
+
+    // Unified purchase call — expo-iap v3.x removed standalone
+    // requestSubscription in favor of requestPurchase with type:'subs'.
     // The actual result comes through purchaseUpdatedListener above.
-    await requestSubscription({ sku: productId });
+    await requestPurchase({
+      request: { apple: { sku: productId } },
+      type: 'subs',
+    });
     return { success: true };
-  }, [iapReady]);
+  }, [iapReady, products]);
 
   // ── Restore purchases ───────────────────────────────────────────────────
   const restorePurchases = useCallback(async () => {

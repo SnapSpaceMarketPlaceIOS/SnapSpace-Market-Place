@@ -182,23 +182,26 @@ Deno.serve(async (req: Request) => {
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
 
     // ── WISH PURCHASE FLOW ───────────────────────────────────────
+    // Note: DB tables/RPCs are named token_* (from migration 012). The
+    // client-facing field name is still `tokens_added` to match what
+    // subscriptionService.validateReceipt() already reads (`type === 'tokens'`).
     if (isWish) {
       const wishCount = WISH_PRODUCT_MAP[productId];
 
       // Idempotency: check if this transactionId was already processed
       const { data: existingTx } = await supabase
-        .from('wish_transactions')
+        .from('token_transactions')
         .select('id')
         .eq('reference_id', transactionId)
         .limit(1);
 
       if (existingTx && existingTx.length > 0) {
         // Already processed — return current balance without double-crediting
-        const { data: balData } = await supabase.rpc('get_wish_balance', { p_user_id: userId });
+        const { data: balData } = await supabase.rpc('get_token_balance', { p_user_id: userId });
         const bal = balData?.[0]?.balance ?? 0;
         return new Response(JSON.stringify({
-          success: true, type: 'wishes',
-          wishes_added: wishCount, new_balance: bal,
+          success: true, type: 'tokens',
+          tokens_added: wishCount, new_balance: bal,
           transaction_id: transactionId, environment,
         }), {
           status: 200,
@@ -206,8 +209,8 @@ Deno.serve(async (req: Request) => {
         });
       }
 
-      // Credit wishes
-      const { data: addData, error: addError } = await supabase.rpc('add_wishes', {
+      // Credit wishes (tokens)
+      const { data: addData, error: addError } = await supabase.rpc('add_tokens', {
         p_user_id:      userId,
         p_amount:       wishCount,
         p_type:         'purchase',
@@ -216,7 +219,7 @@ Deno.serve(async (req: Request) => {
       });
 
       if (addError) {
-        console.error('[validate-apple-receipt] add_wishes error:', addError);
+        console.error('[validate-apple-receipt] add_tokens error:', addError);
         return new Response(JSON.stringify({ error: addError.message }), {
           status: 500,
           headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' },
@@ -226,8 +229,8 @@ Deno.serve(async (req: Request) => {
       const newBalance = addData?.[0]?.new_balance ?? wishCount;
 
       return new Response(JSON.stringify({
-        success: true, type: 'wishes',
-        wishes_added: wishCount, new_balance: newBalance,
+        success: true, type: 'tokens',
+        tokens_added: wishCount, new_balance: newBalance,
         transaction_id: transactionId, environment,
       }), {
         status: 200,

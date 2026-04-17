@@ -1814,6 +1814,34 @@ export default function HomeScreen({ navigation, route }) {
                 ))}
               </ScrollView>
             )}
+            {/* Photo preview — shows attached photo with correct landscape /
+                portrait aspect so the user can confirm what they're sending
+                to the AI before typing their wish. */}
+            {photo?.uri && !generating && (() => {
+              const isLandscape = photo.width > 0 && photo.height > 0
+                ? photo.width > photo.height
+                : false;
+              return (
+                <View style={styles.photoPreviewWrap}>
+                  <Image
+                    source={{ uri: photo.uri }}
+                    style={[
+                      styles.photoPreview,
+                      isLandscape ? styles.photoLandscape : styles.photoPortrait,
+                    ]}
+                    resizeMode="cover"
+                  />
+                  <TouchableOpacity
+                    style={styles.photoRemoveBtn}
+                    onPress={() => { setPhoto(null); setPhotoSource(null); }}
+                    hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                  >
+                    <CloseIcon size={14} color="#fff" />
+                  </TouchableOpacity>
+                </View>
+              );
+            })()}
+
             <OnboardingGlow visible={isStepActive('chat_bar')} borderRadius={inputExpanded ? 20 : 40} style={isStepActive('chat_bar') ? { padding: 4 } : undefined}>
             <Animated.View style={[styles.inputBar, { borderRadius: inputExpanded ? 16 : 36, transform: [{ scale: inputScale }] }]}>
               {/* Camera icon — badge only when photo came from camera */}

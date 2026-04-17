@@ -26,7 +26,7 @@ import { colors as C } from '../constants/theme';
 import { space, radius, fontWeight, fontSize, typeScale, layout, uiColors } from '../constants/tokens';
 import { useSubscription, PAID_TIERS, WISH_PACKAGES } from '../context/SubscriptionContext';
 import { useAuth } from '../context/AuthContext';
-import { getReferralCode } from '../services/subscriptionService';
+import { getReferralCode, grantShareBonus } from '../services/subscriptionService';
 
 const { width: SCREEN_W, height: SCREEN_H } = Dimensions.get('window');
 
@@ -220,7 +220,7 @@ export default function PaywallScreen({ navigation }) {
   const { user } = useAuth();
   const {
     subscription, purchaseSubscription, restorePurchases,
-    tokenBalance, purchaseTokens,
+    tokenBalance, purchaseTokens, refreshTokenBalance,
   } = useSubscription();
 
   const [activeTab, setActiveTab] = useState('wishes');
@@ -324,15 +324,45 @@ export default function PaywallScreen({ navigation }) {
   // ── Referral share ─────────────────────────────────────────────────────
 
   const handleShareReferral = async () => {
+    if (!user?.id) {
+      Alert.alert('Sign In Required', 'Please sign in to share and earn free wishes.');
+      return;
+    }
     try {
-      const code = await getReferralCode(user?.id);
+      const code = await getReferralCode(user.id);
       const appStoreId = process.env.EXPO_PUBLIC_APP_STORE_ID;
       const downloadLine = /^\d+$/.test(appStoreId || '')
         ? `\nDownload: https://apps.apple.com/app/id${appStoreId}`
         : '';
-      await Share.share({
+      const shareResult = await Share.share({
         message: `Join me on HomeGenie! Use my referral code ${code} when you sign up and we both get 2 free design credits.${downloadLine}`,
       });
+
+      // Only credit the share bonus if the user actually completed the share
+      // (Share.share returns { action: 'sharedAction' } on iOS when shared,
+      // 'dismissedAction' if the sheet was closed without sharing).
+      if (shareResult?.action === Share.sharedAction) {
+        try {
+          const { newBalance, alreadyClaimed } = await grantShareBonus(user.id);
+          // Pull the latest balance into the subscription context so the
+          // paywall + rest of the app reflect the new count.
+          await refreshTokenBalance?.();
+          if (alreadyClaimed) {
+            Alert.alert(
+              'Thanks for sharing!',
+              `Your message has been shared. Your wish balance: ${newBalance}.`
+            );
+          } else {
+            Alert.alert(
+              '2 Free Wishes Added!',
+              `Thanks for sharing HomeGenie. Your new balance: ${newBalance} wishes.`
+            );
+          }
+        } catch (bonusErr) {
+          // Share succeeded even if the bonus credit failed — don't block.
+          console.warn('[Paywall] grantShareBonus failed:', bonusErr?.message);
+        }
+      }
     } catch (e) {
       if (e.message !== 'User did not share') {
         console.warn('[Paywall] share failed:', e.message);
