@@ -1712,37 +1712,14 @@ export default function HomeScreen({ navigation, route }) {
       // expanded multi-line rounded-square state.
       setInputExpanded(false);
 
-      // ── Auto-save: persist every generation to Supabase immediately ──
-      if (user?.id) {
-        const styleTags = finalMatchedProducts.flatMap(p => p.styles || p.styleTags || []).filter(Boolean);
-        const uniqueTags = [...new Set(styleTags)];
-        const productSummary = finalMatchedProducts.map(p => ({
-          id: p.id, name: p.name, brand: p.brand,
-          price: p.priceValue ?? p.price, imageUrl: p.imageUrl,
-          rating: p.rating, reviewCount: p.reviewCount,
-          affiliateUrl: p.affiliateUrl, source: p.source,
-          // Persist vision-verification state so saved designs retain the
-          // "Similar style" badge when re-opened from Profile → My Designs.
-          confidence: p.confidence || 'unverified',
-        }));
-        saveUserDesign(user.id, {
-          imageUrl: resultUrl,
-          prompt: designPrompt,
-          styleTags: uniqueTags,
-          products: productSummary,
-          visibility: 'private',
-        })
-          .then(result => {
-            if (result?.designId) setAutoSavedDesignId(result.designId);
-            // Swap resultUri to the permanent Supabase Storage URL so the Replicate
-            // CDN URL (which expires in ~24h) is never held in state after this point.
-            if (result?.permanentUrl) {
-              setResultData(prev => prev ? { ...prev, resultUri: result.permanentUrl } : prev);
-            }
-            console.log('[AutoSave] Design persisted:', result?.designId);
-          })
-          .catch(err => console.warn('[AutoSave] Failed:', err.message));
-      }
+      // Auto-save is now handled EXCLUSIVELY in RoomResultScreen's mount
+      // useEffect. Previously HomeScreen ALSO auto-saved here right after
+      // navigation, which caused every full-room generation to be persisted
+      // twice — once from this fire-and-forget call, and once from the
+      // RoomResultScreen useEffect that has no idea this save happened.
+      // Result: the user's My Snaps showed two identical posts for every
+      // generation. RoomResultScreen's auto-save has proper ref-based
+      // dedup guards and is the correct single source of truth.
     } catch (err) {
       stopLoadingBar(false);
       setGenerating(false);

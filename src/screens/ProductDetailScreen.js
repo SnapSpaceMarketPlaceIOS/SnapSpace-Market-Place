@@ -204,9 +204,13 @@ function ProductHero({ images, imageUrl, onBack, topInset, heroResizeMode }) {
 
   // Deduplicate by Amazon asset ID — without this, the same product shot
   // shows up twice in the carousel because `imageUrl` points to it at a
-  // smaller size (e.g. ._AC_UL640_.jpg) and `images[0]` points to the
-  // larger render (._AC_SL1500_.jpg). Strip the size/quality suffix so
-  // both variants collapse to one entry.
+  // smaller size (e.g. 81-a1cUJElL._AC_UL640_.jpg) and `images[0]` points
+  // to the larger render (81-a1cUJElL._AC_SL1500_.jpg). Same picture, two
+  // URLs — the carousel was treating them as distinct slides.
+  //
+  // Previous regex approach was correct in theory but fragile. This
+  // implementation splits the filename on "." and takes the first token,
+  // which for Amazon URLs IS the asset ID, every time.
   const heroImages = useMemo(() => {
     const all = [];
     if (imageUrl) all.push(imageUrl);
@@ -214,17 +218,17 @@ function ProductHero({ images, imageUrl, onBack, topInset, heroResizeMode }) {
     if (all.length === 0) return [null];
 
     const keyOf = (url) => {
-      if (typeof url !== 'string') return url;
-      // Amazon asset IDs look like "81-a1cUJElL" — isolate them by stripping
-      // any "._AC_<variant>_.jpg" / "._SL<n>_.jpg" style suffix.
-      const match = url.match(/\/([^/]+?)(?:\._[^.]+?)?\.(?:jpg|jpeg|png|webp|gif)(?:\?.*)?$/i);
-      if (match) {
-        const name = match[1];
-        // Strip the trailing size modifier like "_AC_UL640" / "_AC_SL1500"
-        return name.replace(/\._[A-Z]{2,}_[A-Z]{2,}\d+_?$/i, '')
-                   .replace(/\._[A-Z]{2,}\d+_?$/i, '');
-      }
-      return url;
+      if (typeof url !== 'string' || !url) return url;
+      // Strip query string, then grab the path's last segment (filename).
+      const noQuery = url.split('?')[0];
+      const slashIdx = noQuery.lastIndexOf('/');
+      const filename = slashIdx >= 0 ? noQuery.slice(slashIdx + 1) : noQuery;
+      // For "81-a1cUJElL._AC_UL640_.jpg" → first token is "81-a1cUJElL"
+      // For "81-a1cUJElL.jpg"            → first token is "81-a1cUJElL"
+      // For non-Amazon URLs with a single dot (photo.png) the key is the
+      // bare filename before the extension — still correct.
+      const firstDot = filename.indexOf('.');
+      return firstDot >= 0 ? filename.slice(0, firstDot) : filename;
     };
 
     const seen = new Set();
@@ -233,9 +237,8 @@ function ProductHero({ images, imageUrl, onBack, topInset, heroResizeMode }) {
       const key = keyOf(u);
       if (seen.has(key)) continue;
       seen.add(key);
-      // Prefer the highest-resolution variant: swap *_UL640_ / *_SX300_ etc
-      // to *_SL1500_ when we can, so the hero carousel always renders the
-      // sharpest available version of each unique asset.
+      // Opportunistic upgrade: when we have a lower-res Amazon size suffix
+      // swap to the 1500px variant so the hero always renders sharp.
       const upgraded = typeof u === 'string'
         ? u
             .replace(/_AC_UL\d+_/g, '_AC_SL1500_')
