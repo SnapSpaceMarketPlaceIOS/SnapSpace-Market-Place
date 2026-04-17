@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import * as ImagePicker from 'expo-image-picker';
-import * as ScreenOrientation from 'expo-screen-orientation';
+import { lockPortrait, unlockAll } from '../utils/orientation';
 import { useFocusEffect } from '@react-navigation/native';
 import Svg, { Path, Line, Polyline, Rect, Circle } from 'react-native-svg';
 import { palette } from '../constants/tokens';
@@ -54,15 +54,14 @@ export default function SnapScreen({ navigation, route }) {
   // Allow landscape rotation while the camera is on screen so users can
   // hold their phone sideways for wide room shots. The rest of the app is
   // portrait-locked in App.js, so on blur we snap back to PORTRAIT_UP.
+  // Both helpers are no-ops if the native module isn't linked into this
+  // build (stale dev client) — the app still works, landscape just won't
+  // rotate until the dev client is rebuilt.
   useFocusEffect(
     useCallback(() => {
-      ScreenOrientation
-        .unlockAsync()
-        .catch(() => { /* non-fatal — some simulator runtimes reject this */ });
+      unlockAll();
       return () => {
-        ScreenOrientation
-          .lockAsync(ScreenOrientation.OrientationLock.PORTRAIT_UP)
-          .catch(() => {});
+        lockPortrait();
       };
     }, [])
   );
