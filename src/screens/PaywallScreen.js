@@ -418,6 +418,17 @@ export default function PaywallScreen({ navigation }) {
       />
 
       <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
+        {/* Close (X) button — OUTSIDE the ScrollView so it stays fixed at
+            the top of the safe area and doesn't scroll away. Positioned
+            below the status bar / Dynamic Island on iPhone 14/16 Pro. */}
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          style={styles.closeBtnCorner}
+          hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+        >
+          <CloseIcon />
+        </TouchableOpacity>
+
         {/* ── Scrollable content ────────────────────────────────────── */}
         <ScrollView
           style={styles.scroll}
@@ -428,16 +439,6 @@ export default function PaywallScreen({ navigation }) {
           alwaysBounceVertical={false}
           overScrollMode="never"
         >
-          {/* ── Header ─────────────────────────────────────────────── */}
-          {/* Close button — top right corner */}
-          <TouchableOpacity
-            onPress={() => navigation.goBack()}
-            style={styles.closeBtnCorner}
-            hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-          >
-            <CloseIcon />
-          </TouchableOpacity>
-
           <View style={styles.header}>
             <View style={styles.wordmarkRow}>
               <Text style={styles.wordmark}>HomeGenie</Text>
@@ -608,10 +609,10 @@ const styles = StyleSheet.create({
   // ── Header
   header: {
     alignItems: 'center',
-    // Slight nudge down from the top of the sheet so the wordmark has
-    // breathing room below the status bar + close (X) button.
+    // Nudge down below the fixed close (X) button (which sits in the
+    // top-left corner at safe-area-top + 8pt, 40pt tall).
     paddingHorizontal: layout.screenPaddingH,
-    paddingTop: 56,
+    paddingTop: space.xl,
     paddingBottom: space.sm,
   },
   wordmarkRow: {
@@ -624,13 +625,20 @@ const styles = StyleSheet.create({
     color: C.white,
   },
   closeBtnCorner: {
+    // Fixed to the SafeAreaView so it sits just below the iPhone
+    // Dynamic Island / status bar on 14 Pro & 16 Pro. Previous
+    // position (top: 16 inside ScrollView) was landing in the
+    // status bar region and was not tappable.
     position: 'absolute',
-    // Standard iOS sheet pattern — X sits in the top-left corner,
-    // clearly above the heading (not tangled with the subheading).
-    top: 16,
-    left: space.lg,
-    padding: space.sm,
-    zIndex: 10,
+    top: space.sm,              // 8pt below safe-area top = ~65pt from screen top (well clear of Dynamic Island)
+    left: space.md,             // 12pt in from the left edge
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(0,0,0,0.35)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 20,
   },
   subtitle: {
     fontSize: 16,
