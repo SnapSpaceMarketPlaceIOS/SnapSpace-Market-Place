@@ -338,28 +338,48 @@ export async function saveUserDesign(userId, { imageUrl, prompt, styleTags, prod
   return Promise.race([insertPromise, timeoutPromise]);
 }
 
+// Wrap any promise with a timeout. Used to prevent spinners from hanging
+// forever when Supabase / Cloudflare routing stalls on the UPDATE path —
+// we got TestFlight reports of "Post to Profile" stuck on "Posting..."
+// because these small RPC-style writes had no timeout at all.
+function withTimeout(promise, ms, label) {
+  return Promise.race([
+    promise,
+    new Promise((_, reject) =>
+      setTimeout(() => reject(new Error(`${label} timed out after ${ms / 1000}s — please try again.`)), ms)
+    ),
+  ]);
+}
+
 /**
  * Update an existing design's visibility (e.g. private → public for "Post").
+ * 15-second timeout so the Post spinner can never hang on a stalled network.
  */
 export async function updateDesignVisibility(designId, visibility) {
-  const { error } = await supabase
-    .from('user_designs')
-    .update({ visibility })
-    .eq('id', designId);
-  if (error) throw error;
+  const run = (async () => {
+    const { error } = await supabase
+      .from('user_designs')
+      .update({ visibility })
+      .eq('id', designId);
+    if (error) throw error;
+  })();
+  return withTimeout(run, 15000, 'Visibility update');
 }
 
 /**
  * Update the products snapshot on an existing design.
  * Used to ensure products are always persisted even if auto-save
- * fired before product matching completed.
+ * fired before product matching completed. Same 15s timeout guard.
  */
 export async function updateDesignProducts(designId, products) {
-  const { error } = await supabase
-    .from('user_designs')
-    .update({ products })
-    .eq('id', designId);
-  if (error) throw error;
+  const run = (async () => {
+    const { error } = await supabase
+      .from('user_designs')
+      .update({ products })
+      .eq('id', designId);
+    if (error) throw error;
+  })();
+  return withTimeout(run, 15000, 'Products update');
 }
 
 /**

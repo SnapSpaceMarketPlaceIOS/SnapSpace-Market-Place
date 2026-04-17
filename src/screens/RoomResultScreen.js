@@ -411,10 +411,17 @@ export default function RoomResultScreen({ route, navigation }) {
     autoSaveAttempted.current = true;
 
     try {
-      // If auto-save is still in flight from a prior mount, wait for it to
-      // finish before deciding whether to update or create.
+      // If auto-save is still in flight, wait up to 8 seconds for it to
+      // finish so we can reuse its designId for an UPDATE. If it takes
+      // longer we stop waiting and fall through to the ELSE branch which
+      // creates a fresh record — better to occasionally write two rows
+      // than to leave the user staring at a "Posting…" spinner forever
+      // because the background save happened to stall.
       if (autoSavePromiseRef.current) {
-        await autoSavePromiseRef.current.catch(() => {});
+        await Promise.race([
+          autoSavePromiseRef.current.catch(() => {}),
+          new Promise((resolve) => setTimeout(resolve, 8000)),
+        ]);
       }
 
       // Build a fresh product snapshot from the current (correct) products

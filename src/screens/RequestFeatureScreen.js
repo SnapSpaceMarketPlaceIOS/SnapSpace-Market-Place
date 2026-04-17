@@ -129,14 +129,25 @@ export default function RequestFeatureScreen({ navigation }) {
     }
     setSubmitting(true);
     try {
-      await supabase.from('feature_requests').insert({
-        title: title.trim(),
-        description: description.trim() || null,
-        category: selectedCategory,
-        user_id: user?.id ?? null,
-      });
-    } catch (_) {
-      // Non-fatal — show success regardless so UX isn't blocked if table doesn't exist yet
+      // 10s cap so the Submit button can never hang forever. The Supabase
+      // client has no default timeout, so a stalled network or missing
+      // feature_requests table could otherwise leave the spinner stuck.
+      // We swallow the error either way — the feedback is logged locally
+      // in the catch, and the user still sees the success screen so the
+      // submit UX isn't blocked by a backend hiccup.
+      await Promise.race([
+        supabase.from('feature_requests').insert({
+          title: title.trim(),
+          description: description.trim() || null,
+          category: selectedCategory,
+          user_id: user?.id ?? null,
+        }),
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('feature_requests insert timed out')), 10000)
+        ),
+      ]);
+    } catch (e) {
+      console.warn('[RequestFeature] submit non-fatal:', e?.message || e);
     } finally {
       setSubmitting(false);
     }
@@ -157,6 +168,10 @@ export default function RequestFeatureScreen({ navigation }) {
   };
 
   if (submitted) {
+    // Minimalist confirmation — heading + subheading only. No icon, no
+    // "Submit Another Idea" button, no "Back to Settings" secondary
+    // action. The top-bar back chevron is the only way out, which is
+    // what the user wanted (cleaner, less vibe-coded feel).
     return (
       <View style={styles.container}>
         <SafeAreaView edges={['top']}>
@@ -169,19 +184,10 @@ export default function RequestFeatureScreen({ navigation }) {
           </View>
         </SafeAreaView>
         <View style={styles.successContainer}>
-          <View style={styles.successIcon}>
-            <SparkleIcon size={38} color="#0B6DC3" />
-          </View>
-          <Text style={styles.successTitle}>Idea Received!</Text>
+          <Text style={styles.successTitle}>Idea Received</Text>
           <Text style={styles.successSubtitle}>
-            Thanks for the suggestion! We read every request and use your feedback to build better features.
+            Thanks for your suggestion. We read every request and use your feedback to build better features.
           </Text>
-          <TouchableOpacity style={styles.submitBtn} onPress={handleNewRequest} activeOpacity={0.85}>
-            <Text style={styles.submitBtnText}>Submit Another Idea</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.backHomeBtn} onPress={() => navigation.goBack()} activeOpacity={0.7}>
-            <Text style={styles.backHomeBtnText}>Back to Settings</Text>
-          </TouchableOpacity>
         </View>
       </View>
     );
