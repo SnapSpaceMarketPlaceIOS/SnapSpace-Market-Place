@@ -191,7 +191,9 @@ export function OnboardingGlow({ visible, children, style, borderRadius = 36, bo
 
   if (!visible) return children;
 
-  return (
+  // Split native-driver (scale) and JS-driver (borderColor, shadowOpacity)
+  // onto separate Animated.View nodes to avoid the mixed-driver crash.
+  const innerView = (
     <Animated.View style={[
       {
         borderWidth: 1.5,
@@ -201,11 +203,18 @@ export function OnboardingGlow({ visible, children, style, borderRadius = 36, bo
         shadowOffset: { width: 0, height: 0 },
         shadowOpacity,
         shadowRadius: 10,
-        transform: bold ? [{ scale: scaleAnim }] : [],
       },
       style,
     ]}>
       {children}
+    </Animated.View>
+  );
+
+  if (!bold) return innerView;
+
+  return (
+    <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
+      {innerView}
     </Animated.View>
   );
 }

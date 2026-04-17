@@ -226,7 +226,6 @@ function InfoIcon() {
 const ACCOUNT_ITEMS = [
   { label: 'Subscription',           icon: <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="#444" strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round"><Path d="M2 4l3 12h14l3-12-6 7-4-9-4 9-6-7z" /><Path d="M5 16h14v2H5z" /></Svg>, screen: 'Paywall' },
   { label: 'My Wishes',              icon: <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="#444" strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round"><Path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z" /><Line x1={4} y1={22} x2={4} y2={15} /></Svg>,  screen: 'MySpaces' },
-  { label: 'Order History',          icon: <OrderIcon />, screen: 'OrderHistory' },
   { label: 'Payment Methods',        icon: <CardIcon />,  screen: 'PaymentMethods' },
   { label: 'Work With Us',             icon: <StarIcon />,  url: 'https://www.homegenieios.com/work-with-us' },
 ];
@@ -592,23 +591,27 @@ export default function ProfileScreen({ navigation }) {
         </View>
         <View style={styles.tabBorder} />
 
-        {/* ── Wishes / Products pill bar (Liked tab only) ── */}
+        {/* ── Wishes / Products pill bar (Liked tab only) — matches ExploreScreen exactly ── */}
         {activeTab === 1 && (
-          <View style={styles.likedPillRow}>
-            <View style={styles.likedPillTrack}>
-              {['Wishes', 'Products'].map((label, i) => (
-                <TouchableOpacity
-                  key={label}
-                  onPress={() => setLikedFilter(i)}
-                  activeOpacity={0.75}
-                  style={[styles.likedPill, likedFilter === i && styles.likedPillActive]}
-                >
-                  <Text style={[styles.likedPillTxt, likedFilter === i && styles.likedPillTxtActive]}>
-                    {label}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
+          <View style={styles.modeToggleRow}>
+            <TouchableOpacity
+              style={[styles.modeToggleBtn, likedFilter === 0 && styles.modeToggleBtnActive]}
+              onPress={() => setLikedFilter(0)}
+              activeOpacity={0.8}
+            >
+              <Text style={[styles.modeToggleLabel, likedFilter === 0 && styles.modeToggleLabelActive]}>
+                Wishes
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.modeToggleBtn, likedFilter === 1 && styles.modeToggleBtnActive]}
+              onPress={() => setLikedFilter(1)}
+              activeOpacity={0.8}
+            >
+              <Text style={[styles.modeToggleLabel, likedFilter === 1 && styles.modeToggleLabelActive]}>
+                Products
+              </Text>
+            </TouchableOpacity>
           </View>
         )}
 
@@ -1282,42 +1285,38 @@ const styles = StyleSheet.create({
     marginBottom: 0,
   },
 
-  // Liked tab pill bar
-  likedPillRow: {
-    paddingHorizontal: space.lg + 40,
-    paddingVertical: space.sm,
-  },
-  likedPillTrack: {
+  // Liked tab pill bar — exact copy of ExploreScreen modeToggle styles
+  modeToggleRow: {
     flexDirection: 'row',
-    borderRadius: 28,
-    backgroundColor: '#F8F8F8',
+    marginHorizontal: space.lg,
+    marginTop: space.md,
+    marginBottom: space.sm,
+    backgroundColor: C.surface,
+    borderRadius: radius.full,
     padding: 3,
-    borderWidth: 1,
-    borderColor: '#F3F3F3',
   },
-  likedPill: {
+  modeToggleBtn: {
     flex: 1,
-    height: 30,
-    borderRadius: 20,
+    height: 33,
+    borderRadius: radius.full,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  likedPillActive: {
-    backgroundColor: '#FFFFFF',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.08,
-    shadowRadius: 3,
-    elevation: 2,
+  modeToggleBtnActive: {
+    backgroundColor: C.bg,
+    ...shadow.sm,
   },
-  likedPillTxt: {
+  modeToggleLabel: {
+    fontSize: 12,
+    fontWeight: '300',
+    fontFamily: 'Geist_400Regular',
+    color: 'rgba(0,0,0,0.45)',
+  },
+  modeToggleLabelActive: {
     fontSize: 13,
-    fontWeight: '600',
-    fontFamily: 'Geist_600SemiBold',
-    color: '#AAAAAA',
-  },
-  likedPillTxtActive: {
-    color: '#67ACE9',
+    fontWeight: '500',
+    fontFamily: 'Geist_500Medium',
+    color: C.primary,
   },
   productCardInfo: {
     paddingHorizontal: space.sm,

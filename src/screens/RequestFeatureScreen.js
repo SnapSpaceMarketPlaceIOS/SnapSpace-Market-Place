@@ -272,46 +272,6 @@ export default function RequestFeatureScreen({ navigation }) {
           <Text style={styles.submitBtnText}>{submitting ? 'Submitting…' : 'Submit Idea'}</Text>
         </TouchableOpacity>
 
-        {/* Popular requests */}
-        <Text style={[styles.sectionLabel, { marginTop: 36 }]}>POPULAR REQUESTS</Text>
-        <Text style={styles.popularSubtitle}>Vote for the features you want most.</Text>
-        <View style={styles.card}>
-          {POPULAR_REQUESTS.map((req, i) => {
-            const cfg = STATUS_CONFIG[req.status];
-            const voted = !!votedIds[req.title];
-            return (
-              <View key={req.title} style={[styles.popularItem, i < POPULAR_REQUESTS.length - 1 && styles.popularItemBorder]}>
-                <View style={styles.popularLeft}>
-                  <View style={styles.popularTitleRow}>
-                    <Text style={styles.popularTitle}>{req.title}</Text>
-                  </View>
-                  <Text style={styles.popularDescription}>{req.description}</Text>
-                  <View style={styles.popularMeta}>
-                    <View style={[styles.statusBadge, { backgroundColor: cfg.bg }]}>
-                      <Text style={[styles.statusText, { color: cfg.text }]}>{cfg.label}</Text>
-                    </View>
-                    <View style={styles.tagPill}>
-                      <Text style={styles.tagText}>{req.tag}</Text>
-                    </View>
-                  </View>
-                </View>
-                <TouchableOpacity
-                  style={[styles.voteBtn, voted && styles.voteBtnVoted]}
-                  onPress={() => handleVote(req.title)}
-                  activeOpacity={0.75}
-                >
-                  <Text style={[styles.voteArrow, voted && styles.voteArrowVoted]}>▲</Text>
-                  <Text style={[styles.voteCount, voted && styles.voteCountVoted]}>
-                    {popularVotes[req.title] >= 1000
-                      ? `${(popularVotes[req.title] / 1000).toFixed(1)}k`
-                      : popularVotes[req.title]}
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            );
-          })}
-        </View>
-
         <View style={{ height: 48 }} />
       </ScrollView>
     </KeyboardAvoidingView>

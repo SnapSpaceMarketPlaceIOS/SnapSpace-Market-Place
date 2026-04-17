@@ -48,20 +48,22 @@ export function OnboardingProvider({ children }) {
   const [active, setActive] = useState(false);       // is onboarding running?
   const [currentStep, setCurrentStep] = useState(null); // current step key
   const [completed, setCompleted] = useState(true);   // assume completed until checked
+  const [loaded, setLoaded] = useState(false);        // true once AsyncStorage resolves
 
-  // Check if onboarding has been completed
+  // Check if onboarding has been completed — set loaded AFTER so callers know the value is real
   useEffect(() => {
     AsyncStorage.getItem(STORAGE_KEY).then((value) => {
       setCompleted(value === 'true');
-    }).catch(() => setCompleted(true));
+      setLoaded(true);
+    }).catch(() => { setCompleted(true); setLoaded(true); });
   }, []);
 
-  // Start the onboarding flow
+  // Start the onboarding flow — only runs if AsyncStorage has loaded AND not completed
   const startOnboarding = useCallback(() => {
-    if (completed) return;
+    if (!loaded || completed) return;
     setActive(true);
     setCurrentStep('chat_bar');
-  }, [completed]);
+  }, [loaded, completed]);
 
   // Mark onboarding as needed (called after first sign-up + sign-in)
   const enableOnboarding = useCallback(async () => {
@@ -106,6 +108,7 @@ export function OnboardingProvider({ children }) {
       active,
       currentStep,
       completed,
+      loaded,
       startOnboarding,
       enableOnboarding,
       nextStep,

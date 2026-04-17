@@ -870,7 +870,8 @@ export default function HomeScreen({ navigation, route }) {
   } = useSubscription();
   const { addToCart, items: cartItems } = useCart();
   const { liked } = useLiked();
-  const { isStepActive, nextStep, prevStep, finishOnboarding, startOnboarding, active: onboardingActive } = useOnboarding();
+  const { isStepActive, nextStep, prevStep, finishOnboarding, startOnboarding, active: onboardingActive, loaded: onboardingLoaded } = useOnboarding();
+  const onboardingAttempted = useRef(false); // prevent re-trigger on profile refreshes
   const [prompt, setPrompt] = useState('');
   const [inputExpanded, setInputExpanded] = useState(false);
   const [greeting, setGreeting] = useState(getGreeting());
@@ -919,14 +920,14 @@ export default function HomeScreen({ navigation, route }) {
       .catch(() => {});
   }, []);
 
-  // Auto-start onboarding on first visit after sign-up
+  // Auto-start onboarding — only once per session, only after AsyncStorage has loaded
   useEffect(() => {
-    if (user && !onboardingActive) {
-      // Small delay so the home screen finishes rendering first
+    if (user && onboardingLoaded && !onboardingActive && !onboardingAttempted.current) {
+      onboardingAttempted.current = true;
       const t = setTimeout(() => startOnboarding(), 800);
       return () => clearTimeout(t);
     }
-  }, [user]);
+  }, [user, onboardingLoaded]);
 
   const springIn  = (anim) => Animated.spring(anim, { toValue: 0.82, useNativeDriver: true, tension: 300, friction: 10 }).start();
   const springOut = (anim) => Animated.spring(anim, { toValue: 1,    useNativeDriver: true, tension: 200, friction: 7  }).start();
@@ -1791,16 +1792,16 @@ export default function HomeScreen({ navigation, route }) {
                 contentContainerStyle={styles.promptChipsContent}
               >
                 {[
-                  'All-white minimalist living room, linen sofa, oak coffee table, floor lamp',
-                  'Dark luxe bedroom, charcoal walls, velvet platform bed, brass nightstands',
-                  'Japandi dining room, walnut table, rattan chairs, warm pendant lighting',
-                  'Scandinavian reading nook, cream boucle chair, wood shelving, arc lamp',
-                  'Mid-century home office, walnut desk, leather chair, warm ambient lighting',
-                  'Coastal bedroom, white linen bedding, rattan headboard, sea-grass rug',
-                  'Industrial kitchen, matte black fixtures, marble countertops, open shelving',
-                  'Biophilic living room, terracotta tones, clay sofa, hanging plants, jute rug',
-                  'Glam dining room, jewel-toned velvet chairs, gold chandelier, mirrored sideboard',
-                  'Boho bedroom, rust walls, layered textile bedding, macramé wall art',
+                  'Minimalist living room, white linen sofa, oak coffee table, arc floor lamp, jute rug',
+                  'Dark luxe bedroom, velvet platform bed, brass nightstands, charcoal walls, statement pendant',
+                  'Japandi dining room, walnut table, rattan chairs, ceramic vase, warm pendant lighting',
+                  'Scandinavian home office, white oak desk, bouclé chair, open shelving, linen curtain',
+                  'Mid-century living room, walnut credenza, camel leather sofa, sunburst mirror, tripod lamp',
+                  'Coastal bedroom, white linen bedding, rattan headboard, driftwood nightstand, sea-grass rug',
+                  'Industrial kitchen, matte black fixtures, marble countertops, open metal shelving, Edison pendants',
+                  'Biophilic living room, terracotta sofa, live-edge coffee table, hanging plants, jute rug',
+                  'Glam dining room, jewel velvet chairs, gold chandelier, marble table, mirrored sideboard',
+                  'Bohemian bedroom, rust walls, layered textile bedding, macramé wall art, rattan pendant',
                 ].map((chip) => (
                   <TouchableOpacity
                     key={chip}
@@ -1855,7 +1856,7 @@ export default function HomeScreen({ navigation, route }) {
               </View>
               <TextInput
                 style={styles.inputText}
-                placeholder={photo ? "Photo attached — describe your style..." : "Describe your style..."}
+                placeholder={photo ? "Photo attached — what's your wish..." : "What's your wish..."}
                 placeholderTextColor="rgba(255,255,255,0.45)"
                 value={prompt}
                 onChangeText={setPrompt}
@@ -2054,12 +2055,14 @@ export default function HomeScreen({ navigation, route }) {
                 {/* Price row */}
                 <View style={styles.dealPriceRow}>
                   <Text style={styles.dealPrice}>
-                    {typeof dealProduct.price === 'number'
-                      ? `$${dealProduct.price.toLocaleString()}`
-                      : dealProduct.price}
+                    {dealProduct.salePrice && dealProduct.salePrice < dealProduct.price
+                      ? (dealProduct.salePriceDisplay || `$${dealProduct.salePrice.toLocaleString()}`)
+                      : (dealProduct.priceDisplay || `$${dealProduct.price.toLocaleString()}`)}
                   </Text>
-                  {dealProduct.priceDisplay && dealProduct.priceDisplay !== dealProduct.price && (
-                    <Text style={styles.dealPriceOrig}>{dealProduct.priceDisplay}</Text>
+                  {dealProduct.salePrice && dealProduct.salePrice < dealProduct.price && (
+                    <Text style={styles.dealPriceOrig}>
+                      {dealProduct.priceDisplay || `$${dealProduct.price.toLocaleString()}`}
+                    </Text>
                   )}
                 </View>
 
@@ -2411,7 +2414,7 @@ const styles = StyleSheet.create({
   // ── Top bar ──────────────────────────────────────────────────────────────────
   topBar: {
     position: 'absolute',
-    top: 80,
+    top: '36%',
     left: 0,
     right: 0,
     flexDirection: 'column',
@@ -2420,7 +2423,7 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
   wishTagline: {
-    fontSize: fontSize.md,
+    fontSize: 21,
     fontWeight: fontWeight.semibold,
     fontFamily: 'Geist_600SemiBold',
     color: 'rgba(255,255,255,0.90)',
@@ -2429,7 +2432,7 @@ const styles = StyleSheet.create({
   },
   logoRow: { flexDirection: 'row', alignItems: 'center' },
   logo: {
-    fontSize: fontSize['3xl'],
+    fontSize: 46,
     fontWeight: fontWeight.bold,
     fontFamily: 'Geist_700Bold',
     color: '#FFFFFF',
