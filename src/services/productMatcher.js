@@ -22,10 +22,19 @@ const MIN_HARD_FILTER_CANDIDATES = 2;
 // a room typically has 1 sofa, 1 coffee table, 1 rug, etc.
 const MAX_PER_CATEGORY = 1;
 
-// Always pick the highest-scored product per category — no randomness.
-// Previously set to 3 which caused the wrong sofa to appear when a lower-scored
-// candidate randomly beat the correct one.
-const RANDOM_POOL_SIZE = 1;
+// Pool size for the weighted-random pick inside each category. We sample
+// from the top N candidates but weight by their match score, so when
+// there's a clear winner it still dominates (~60-70% of the time) while
+// lower-scored but still-relevant alternates occasionally come through.
+// This replaces the prior RANDOM_POOL_SIZE=1 (always top) which made
+// every generation of the same prompt produce an identical product set.
+//
+// Why 3 is safe (vs the earlier rollback to 1): the old bug was uniform
+// random over the top 3, so an 80-point sofa could lose to a 45-point
+// sofa 33% of the time. With the new weighted pick, an 80/45/30 score
+// distribution gives the top sofa ~52% odds — variety is real but
+// quality-biased.
+const RANDOM_POOL_SIZE = 3;
 
 // Categories that are ONLY appropriate for specific room types.
 // If a product's category is in this map, it can only appear for those rooms.
@@ -656,14 +665,29 @@ function diversify(sorted, limit, roomType = 'living-room') {
   const result = [];
   const usedIds = new Set();
 
-  // Helper: pick best available product for a category
+  // Helper: weighted-random pick from the top-scored candidates for a
+  // category. Probability of each pool entry = score / sum(scores), so
+  // the top-matched product wins most of the time and weak matches very
+  // rarely sneak in. When there's a single candidate we always return it.
   function pickFromCategory(cat) {
     const candidates = sorted.filter(
       (p) => p.category === cat && !usedIds.has(p.id) && (categoryCounts[cat] || 0) < MAX_PER_CATEGORY
     );
     if (candidates.length === 0) return null;
+
     const pool = candidates.slice(0, RANDOM_POOL_SIZE);
-    return pool[Math.floor(Math.random() * pool.length)];
+    if (pool.length === 1) return pool[0];
+
+    // Use a floored score (min 1) so candidates with score 0 still have
+    // a non-zero weight, and a tiny score doesn't become infinite odds.
+    const weights = pool.map((p) => Math.max(1, p._score || 0));
+    const total = weights.reduce((a, b) => a + b, 0);
+    let r = Math.random() * total;
+    for (let i = 0; i < pool.length; i++) {
+      r -= weights[i];
+      if (r <= 0) return pool[i];
+    }
+    return pool[0]; // numerical safety fallback
   }
 
   // Pass 1: Fill essential categories for this room type

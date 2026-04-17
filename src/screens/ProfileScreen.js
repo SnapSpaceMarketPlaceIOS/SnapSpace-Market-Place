@@ -489,7 +489,7 @@ export default function ProfileScreen({ navigation }) {
     }
   };
 
-  const tabs = ['My Snaps', 'Liked'];
+  const tabs = ['My Wishes', 'Liked'];
 
   return (
     <TabScreenFade style={styles.container}>
