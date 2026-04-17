@@ -26,7 +26,6 @@ These are complete — you don't need to touch them.
 | Photo library permission copy | `app.json` (via expo-image-picker plugin) | ✅ |
 | Privacy Manifest (PrivacyInfo.xcprivacy) | `app.json` | ✅ API reason codes declared |
 | ITSAppUsesNonExemptEncryption | `app.json` | ✅ `false` — skips export compliance questionnaire |
-| Stripe Merchant ID | `app.json` | ✅ `merchant.com.anthonyrivera.snapspace` |
 | Apple receipt validation edge function | `supabase/functions/validate-apple-receipt/` | ✅ Deployed (needs env var — see below) |
 | In-App Purchase product IDs in code | `SubscriptionContext.js` | ✅ All referenced — need matching records in App Store Connect |
 | Terms of Use + Privacy Policy in-app | `src/screens/TermsOfUseScreen.js`, `PrivacyPolicyScreen.js` | ✅ Include promotional credits + affiliate attribution disclosure |

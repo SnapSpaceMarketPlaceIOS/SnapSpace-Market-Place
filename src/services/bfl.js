@@ -256,7 +256,9 @@ export async function generateWithBFL(
       const imageBase64 = await fetchAsBase64(roomPhotoUrl);
       const prompt      = buildKontextPrompt(userPrompt, products);
 
-      console.log(`[BFL] Using kontext (image-to-image) | aspect=${bflAspect} | prompt="${prompt.substring(0, 120)}…"`);
+      if (__DEV__) {
+        console.log(`[BFL] Using kontext (image-to-image) | aspect=${bflAspect} | prompt="${prompt.substring(0, 120)}…"`);
+      }
 
       return await submitAndPoll(
         apiKey,
@@ -281,7 +283,9 @@ export async function generateWithBFL(
 
   // ── Path 2: flux-pro-1.1-ultra — text-to-image fallback ─────────────────
   const prompt = buildTextPrompt(userPrompt, products);
-  console.log(`[BFL] Using text-to-image | aspect=${bflAspect} | prompt="${prompt.substring(0, 120)}…"`);
+  if (__DEV__) {
+    console.log(`[BFL] Using text-to-image | aspect=${bflAspect} | prompt="${prompt.substring(0, 120)}…"`);
+  }
 
   return await submitAndPoll(
     apiKey,

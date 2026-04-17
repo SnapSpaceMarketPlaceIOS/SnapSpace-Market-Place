@@ -52,14 +52,23 @@ export const ALL_TOKEN_PRODUCT_IDS = Object.values(TOKEN_PRODUCT_IDS);
  * @returns {Promise<{ tier, quotaLimit, generationsRemaining, subscriptionStatus, subscriptionExpiresAt }>}
  */
 export async function validateReceipt(jwsRepresentation, userId) {
+  // Get the signed-in user's Supabase JWT — edge function derives
+  // user_id from this to prevent cross-account purchase spoofing.
+  const { supabase } = await import('./supabase');
+  const { data: sessionData } = await supabase.auth.getSession();
+  const accessToken = sessionData?.session?.access_token;
+  if (!accessToken) {
+    throw new Error('Not signed in — cannot validate receipt.');
+  }
+
   const res = await fetch(
     `${SUPABASE_URL}/functions/v1/validate-apple-receipt`,
     {
       method: 'POST',
       headers: {
         'Content-Type':  'application/json',
-        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-        'x-user-id':     userId,
+        'apikey':        SUPABASE_ANON_KEY,
+        'Authorization': `Bearer ${accessToken}`,
       },
       body: JSON.stringify({ jwsRepresentation }),
     }

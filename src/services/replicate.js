@@ -211,9 +211,11 @@ export async function generateWithProductRefs(roomPhotoUrl, userPrompt, products
   const inputImages = [roomPhotoUrl, ...productImages];
   const generationPrompt = buildFlux2MaxPrompt(userPrompt || 'Modern minimalist interior design.', products || []);
 
-  console.log('[flux-2-max] Prompt:', generationPrompt.substring(0, 200) + '...');
-  console.log('[flux-2-max] input_images:', inputImages.length, '(1 room +', productImages.length, 'products)');
-  console.log('[flux-2-max] aspect_ratio:', aspectRatio || 'match_input_image');
+  if (__DEV__) {
+    console.log('[flux-2-max] Prompt:', generationPrompt.substring(0, 200) + '...');
+    console.log('[flux-2-max] input_images:', inputImages.length, '(1 room +', productImages.length, 'products)');
+    console.log('[flux-2-max] aspect_ratio:', aspectRatio || 'match_input_image');
+  }
 
   const result = await submitFluxWithRetry({
     prompt:           generationPrompt,
@@ -283,10 +285,12 @@ export async function generateSingleProductInRoom(roomPhotoUrl, product, aspectR
     `Place this EXACT product reference (image 2) into the room: ${descriptor}. Match color, material, silhouette, and proportions precisely. Position it naturally where this type of furniture belongs in the room. Do not substitute with similar-looking alternatives.`,
   ].join(' ');
 
-  console.log('[flux-2-max] single-product prompt:', prompt.substring(0, 200) + '...');
-  console.log('[flux-2-max] input_images: 2 (1 room + 1 product)');
-  console.log('[flux-2-max] product image:', productImageUrl.substring(0, 80));
-  console.log('[flux-2-max] aspect_ratio:', aspectRatio || 'match_input_image');
+  if (__DEV__) {
+    console.log('[flux-2-max] single-product prompt:', prompt.substring(0, 200) + '...');
+    console.log('[flux-2-max] input_images: 2 (1 room + 1 product)');
+    console.log('[flux-2-max] product image:', productImageUrl.substring(0, 80));
+    console.log('[flux-2-max] aspect_ratio:', aspectRatio || 'match_input_image');
+  }
 
   const result = await submitFluxWithRetry({
     prompt,
@@ -379,10 +383,12 @@ export async function generateWithProductPanel(roomPhotoUrl, userPrompt, product
   const inputImages      = [roomPhotoUrl, panelUrl];
   const generationPrompt = buildPanelPrompt(userPrompt || 'Modern minimalist interior design.', products || []);
 
-  console.log('[flux-2-max panel] Prompt:', generationPrompt.substring(0, 200) + '...');
-  console.log('[flux-2-max panel] input_images: 2 (room + 2×2 product panel)');
-  console.log('[flux-2-max panel] aspect_ratio:', aspectRatio || 'match_input_image');
-  console.log('[flux-2-max panel] Panel URL:', panelUrl.substring(0, 80));
+  if (__DEV__) {
+    console.log('[flux-2-max panel] Prompt:', generationPrompt.substring(0, 200) + '...');
+    console.log('[flux-2-max panel] input_images: 2 (room + 2×2 product panel)');
+    console.log('[flux-2-max panel] aspect_ratio:', aspectRatio || 'match_input_image');
+    console.log('[flux-2-max panel] Panel URL:', panelUrl.substring(0, 80));
+  }
 
   return await submitFluxWithRetry({
     prompt:           generationPrompt,

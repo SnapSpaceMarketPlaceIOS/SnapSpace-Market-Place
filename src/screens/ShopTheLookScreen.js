@@ -216,18 +216,29 @@ function ProductCard({ product, inCart, onAddToCart, onPress }) {
 // ── Main Screen ────────────────────────────────────────────────────────────────
 
 export default function ShopTheLookScreen({ route, navigation }) {
-  const { design } = route.params;
+  const design = route?.params?.design;
+
   const { addToCart, items } = useCart();
   const { liked, toggleLiked, isLiked } = useLiked();
   const { user } = useAuth();
   const [addedKeys, setAddedKeys] = useState({});
-  const [products, setProducts] = useState(design.products || []);
+  const [products, setProducts] = useState(design?.products || []);
   const [recommended, setRecommended] = useState([]);
   const [saving, setSaving] = useState(false);
   const [shareActive, setShareActive] = useState(false);
   const [downloadActive, setDownloadActive] = useState(false);
 
-  const isOwnPost = user && (
+  // Defensive: bail safely if screen was navigated to without a design param.
+  // Registers after state hooks so React's hook-call order stays stable, and
+  // any deeper useEffects below remain reachable on first render. We don't
+  // early-return here — we let the component render one empty tick and the
+  // effect pops the user back. `isOwnPost` and handlers below use optional
+  // chaining on `design` so the empty-tick render is crash-safe.
+  useEffect(() => {
+    if (!design) navigation.goBack();
+  }, [design, navigation]);
+
+  const isOwnPost = user && design && (
     design.user_id === user.id ||
     (user.username && design.user === user.username) ||
     (user.name && design.user === user.name) ||
@@ -265,6 +276,7 @@ export default function ShopTheLookScreen({ route, navigation }) {
 
   // Load products + recommendations in one pass (avoids waterfall)
   useEffect(() => {
+    if (!design) return;
     let prods = design.products && design.products.length > 0
       ? design.products
       : getProductsForDesign(design, 6);
@@ -275,6 +287,9 @@ export default function ShopTheLookScreen({ route, navigation }) {
     const recs = getRecommendedProducts(design, shopRoomIds, liked, 6);
     setRecommended(recs);
   }, [design, liked]);
+
+  // Past all hooks — safe to short-circuit render if design is missing
+  if (!design) return null;
 
   const isInCart = (product) => {
     const key = `${product.name}__${product.brand}`;

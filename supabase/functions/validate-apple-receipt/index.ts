@@ -14,16 +14,18 @@
  *   4. Calls activate_subscription() Supabase RPC
  *   5. Returns updated subscription state to client
  *
- * Auth: uses anon key + x-user-id header (same pattern as
- * composite-products). Do NOT use Authorization Bearer user JWT
- * — it fails with 401 on iOS simulator due to SecureStore issues.
+ * Auth: verifies Supabase JWT via Authorization Bearer header.
+ * user_id is derived from the verified JWT — NEVER trusted from
+ * the request body or a client-supplied header. This prevents
+ * authenticated user A from crediting a purchase to user B.
  */
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const SUPABASE_URL        = Deno.env.get('SUPABASE_URL')!;
+const SUPABASE_ANON_KEY    = Deno.env.get('SUPABASE_ANON_KEY')!;
 const SUPABASE_SERVICE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-const BUNDLE_ID           = 'com.anthonyrivera.homegenie';
+const BUNDLE_ID           = 'com.anthonyrivera.snapspace';
 
 // Apple root CA — used to verify the x5c chain in the JWS header.
 // We fetch it once at cold start. In local StoreKit testing, Apple
@@ -100,14 +102,25 @@ Deno.serve(async (req: Request) => {
   }
 
   try {
-    // ── Auth: get user ID from header ──────────────────────────────
-    const userId = req.headers.get('x-user-id');
-    if (!userId) {
-      return new Response(JSON.stringify({ error: 'x-user-id header required' }), {
+    // ── Auth: verify JWT, derive user_id from the verified token ───
+    const authHeader = req.headers.get('Authorization') || '';
+    const jwt = authHeader.replace(/^Bearer\s+/i, '').trim();
+    if (!jwt) {
+      return new Response(JSON.stringify({ error: 'Authorization Bearer token required' }), {
         status: 401,
         headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' },
       });
     }
+
+    const authClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const { data: userData, error: userError } = await authClient.auth.getUser(jwt);
+    if (userError || !userData?.user?.id) {
+      return new Response(JSON.stringify({ error: 'Invalid or expired token' }), {
+        status: 401,
+        headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' },
+      });
+    }
+    const userId = userData.user.id;
 
     // ── Parse body ─────────────────────────────────────────────────
     const body = await req.json();

@@ -14,7 +14,7 @@ npx expo start --web    # Web preview
 - **Navigation:** React Navigation (bottom tabs + native stack)
 - **Backend:** Supabase (auth, PostgreSQL, storage)
 - **AI:** Replicate API (`adirik/interior-design` model)
-- **Payments:** Stripe (test mode)
+- **Payments:** Apple IAP only (StoreKit 2 via `expo-iap`) — subscriptions + consumable wishes. No Stripe, no other processors.
 - **Affiliates:** Amazon PA-API, Wayfair (CJ), Houzz (ShareASale)
 
 ---
@@ -39,8 +39,7 @@ npx expo start --web    # Web preview
 ```
 
 **Expo plugins:** `expo-font`, `expo-camera` (no mic), `expo-image-picker`, `expo-secure-store`,
-`expo-apple-authentication`, `expo-notifications` (icon: `#0B6DC3`), `@stripe/stripe-react-native`
-**Merchant ID:** `merchant.com.anthonyrivera.snapspace`
+`expo-apple-authentication`, `expo-notifications` (icon: `#0B6DC3`), `expo-iap`
 
 ---
 
@@ -52,7 +51,6 @@ Stored in `.env` (never commit):
 EXPO_PUBLIC_SUPABASE_URL=
 EXPO_PUBLIC_SUPABASE_ANON_KEY=
 EXPO_PUBLIC_REPLICATE_API_TOKEN=
-EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY=
 
 # Amazon Associates (PA-API — LOCKED until 10 qualifying sales)
 EXPO_PUBLIC_AMAZON_PARTNER_TAG=snapspace20-20
@@ -78,7 +76,6 @@ EXPO_PUBLIC_HOUZZ_MERCHANT_ID=
   "@react-navigation/bottom-tabs": "^7.15.5",
   "@react-navigation/native": "^7.1.33",
   "@react-navigation/native-stack": "^7.14.4",
-  "@stripe/stripe-react-native": "0.58.0",
   "@supabase/supabase-js": "^2.98.0",
   "expo": "~55.0.4",
   "expo-apple-authentication": "~55.0.8",
@@ -152,15 +149,16 @@ supabase/
 
 ### Provider Tree (outermost first)
 ```
-StripeProvider
-  SafeAreaProvider
-    AuthProvider
+SafeAreaProvider
+  AuthProvider
+    SubscriptionProvider
       CartProvider
         OrderHistoryProvider
           LikedProvider
             SharedProvider
-              NavigationContainer
-                RootNavigator
+              OnboardingProvider
+                NavigationContainer
+                  RootNavigator
 ```
 
 ### Tab Navigator (bottom tabs)

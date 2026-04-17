@@ -13,7 +13,13 @@ npx supabase login
 npx supabase link --project-ref YOUR_PROJECT_REF
 
 # Deploy all edge functions
-npx supabase functions deploy create-payment-intent
+npx supabase functions deploy ai-proxy
+npx supabase functions deploy validate-apple-receipt
+npx supabase functions deploy generate-with-products
+npx supabase functions deploy composite-products
+npx supabase functions deploy vision-match
+npx supabase functions deploy amazon-search
+npx supabase functions deploy ingest-affiliate-purchases
 npx supabase functions deploy send-email
 ```
 
@@ -22,14 +28,12 @@ npx supabase functions deploy send-email
 Set these via the Supabase dashboard (Project → Edge Functions → Secrets) or CLI:
 
 ```bash
-npx supabase secrets set STRIPE_SECRET_KEY=sk_test_...
 npx supabase secrets set RESEND_API_KEY=re_...
 npx supabase secrets set EMAIL_FROM=noreply@snapspace.app
 ```
 
 | Secret | Required By | Notes |
 |--------|-------------|-------|
-| `STRIPE_SECRET_KEY` | `create-payment-intent` | Use `sk_test_...` in development, `sk_live_...` in production |
 | `RESEND_API_KEY` | `send-email` | Get from [resend.com](https://resend.com) |
 | `EMAIL_FROM` | `send-email` | Must be a verified domain in Resend |
 
