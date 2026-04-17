@@ -401,10 +401,19 @@ export default function RoomResultScreen({ route, navigation }) {
   const handlePostToProfile = async () => {
     if (!resultUri || !user || posting) return;
     setPosting(true);
+
+    // Duplicate-post guard: claim the auto-save slot IMMEDIATELY so the
+    // background auto-save useEffect can't fire a second INSERT after we
+    // commit below. Previously the auto-save was gated on products.length,
+    // so if the user tapped Post before products finished matching, the
+    // manual save ran first (Design #1), then auto-save ran once products
+    // loaded (Design #2) — resulting in the duplicate post the user saw.
+    autoSaveAttempted.current = true;
+
     try {
-      // If auto-save is still in flight, wait for it to finish before deciding
-      // whether to update or create — this prevents duplicate designs
-      if (autoSaveAttempted.current && autoSavePromiseRef.current) {
+      // If auto-save is still in flight from a prior mount, wait for it to
+      // finish before deciding whether to update or create.
+      if (autoSavePromiseRef.current) {
         await autoSavePromiseRef.current.catch(() => {});
       }
 
