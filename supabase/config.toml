@@ -50,5 +50,14 @@ secret = ""
 [edge_runtime]
 policy = "oneshot"
 
+# Disable gateway-level JWT pre-verification for composite-products.
+# Supabase recently rotated the auth service to sign JWTs with ES256, but
+# the Functions gateway's cached verification still expects HS256, causing
+# UNAUTHORIZED_UNSUPPORTED_TOKEN_ALGORITHM 401s on every panel build.
+# The function's own code calls supabase.auth.getUser(jwt) which hits the
+# auth service API directly and verifies ES256 correctly.
+[functions.composite-products]
+verify_jwt = false
+
 [analytics]
 enabled = false

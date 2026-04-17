@@ -1863,35 +1863,12 @@ export default function HomeScreen({ navigation, route }) {
                 ))}
               </ScrollView>
             )}
-            {/* Photo preview — shows attached photo with correct landscape /
-                portrait aspect so the user can confirm what they're sending
-                to the AI before typing their wish. */}
-            {photo?.uri && !generating && (() => {
-              const isLandscape = photo.width > 0 && photo.height > 0
-                ? photo.width > photo.height
-                : false;
-              return (
-                <View style={styles.photoPreviewWrap}>
-                  <Image
-                    source={{ uri: photo.uri }}
-                    style={[
-                      styles.photoPreview,
-                      isLandscape ? styles.photoLandscape : styles.photoPortrait,
-                    ]}
-                    resizeMode="cover"
-                  />
-                  <TouchableOpacity
-                    style={styles.photoRemoveBtn}
-                    onPress={() => { setPhoto(null); setPhotoSource(null); }}
-                    hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-                  >
-                    <CloseIcon size={14} color="#fff" />
-                  </TouchableOpacity>
-                </View>
-              );
-            })()}
+            {/* Photo preview removed — the camera/gallery icons on the input
+                bar already show a blue checkmark badge when a photo is
+                attached. A full-size thumbnail above the input bar is
+                redundant and pushes the hero content down. */}
 
-            <OnboardingGlow visible={isStepActive('chat_bar')} borderRadius={inputExpanded ? 20 : 40} style={isStepActive('chat_bar') ? { padding: 4 } : undefined}>
+            <OnboardingGlow visible={isStepActive('chat_bar') && !generating} borderRadius={inputExpanded ? 20 : 40} style={(isStepActive('chat_bar') && !generating) ? { padding: 4 } : undefined}>
             <Animated.View style={[styles.inputBar, { borderRadius: inputExpanded ? 16 : 36, transform: [{ scale: inputScale }] }]}>
               {/* Camera icon — badge only when photo came from camera */}
               <View>
@@ -1976,8 +1953,12 @@ export default function HomeScreen({ navigation, route }) {
               </TouchableOpacity>
             </Animated.View>
             </OnboardingGlow>
-            {/* Onboarding Step 1 tooltip */}
-            {isStepActive('chat_bar') && (
+            {/* Onboarding Step 1 tooltip — hidden during generation so the
+                "Describe Your Dream Room" card doesn't sit on top of the
+                GenieLoader / status text. When generation completes and
+                the user is back on Home, it reappears if they haven't
+                finished the onboarding flow. */}
+            {isStepActive('chat_bar') && !generating && (
               <OnboardingOverlay
                 visible
                 step={ONBOARDING_STEPS.CHAT_BAR}
