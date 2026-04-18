@@ -262,6 +262,33 @@ export default function ProductVisualizeModal({
     }
   }, [visible, resultUri]);
 
+  // Animate OUT when parent sets `visible={false}` (e.g. Add to Cart fires
+  // setVisualizeResult(null) on HomeScreen). Without this effect, the modal's
+  // internal modalVisible stayed true after the parent dismissed — the sheet
+  // kept rendering with stale props (product became undefined), and any
+  // subsequent tap on cached buttons would crash with `undefined.name` in
+  // CartContext.addToCart. The effect mirrors handleClose's animation so the
+  // dismissal looks the same whether the user tapped X or the parent closed.
+  useEffect(() => {
+    if (!visible && modalVisible) {
+      Animated.parallel([
+        Animated.timing(slideY, {
+          toValue: -SH,
+          duration: 280,
+          easing: Easing.in(Easing.cubic),
+          useNativeDriver: true,
+        }),
+        Animated.timing(overlayOpacity, {
+          toValue: 0,
+          duration: 250,
+          useNativeDriver: true,
+        }),
+      ]).start(() => {
+        if (mountedRef.current) setModalVisible(false);
+      });
+    }
+  }, [visible, modalVisible]);
+
   // Animate OUT + dismiss
   const handleClose = () => {
     Animated.parallel([
@@ -280,7 +307,7 @@ export default function ProductVisualizeModal({
       if (mountedRef.current) {
         setModalVisible(false);
       }
-      onClose();
+      onClose?.();
     });
   };
 
@@ -553,7 +580,13 @@ export default function ProductVisualizeModal({
         <View style={[s.stickyBar, { paddingBottom: Math.max(insets.bottom, 16) }]}>
           <AnimatedCartButton
             priceDisplay={priceDisplay}
-            onPress={() => onAddToCart?.(product)}
+            onPress={() => {
+              // Guard against stale props: when parent fires
+              // setVisualizeResult(null) after Add to Cart, `product` can be
+              // undefined on the next tap. Without this check, addToCart
+              // dereferences undefined.name and crashes the app.
+              if (product) onAddToCart?.(product);
+            }}
           />
         </View>
       </Animated.View>

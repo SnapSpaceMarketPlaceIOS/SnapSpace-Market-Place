@@ -336,7 +336,17 @@ function RootNavigator() {
   }
 
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false, animationDuration: 300 }}>
+    <Stack.Navigator
+      screenOptions={{
+        headerShown: false,
+        animationDuration: 300,
+        // Paint the card bg white during stack transitions. Without this,
+        // iOS briefly shows black between screens on back-navigation (the
+        // native stack container defaults to no bg), which was visible as
+        // a ~100ms black flash when popping from ProductDetail → Home.
+        contentStyle: { backgroundColor: '#FFFFFF' },
+      }}
+    >
       <Stack.Screen name="Main" component={TabNavigator} />
       <Stack.Screen name="Auth" component={AuthScreen} options={{ animation: 'fade' }} />
       <Stack.Screen name="VerifyEmailSent" component={VerifyEmailSentScreen} options={{ animation: 'fade' }} />

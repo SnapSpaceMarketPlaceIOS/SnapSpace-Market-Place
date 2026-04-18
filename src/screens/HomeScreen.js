@@ -2674,7 +2674,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     overflow: 'hidden',
-    backgroundColor: '#000000',
+    // White (not black) so back-navigation doesn't flash a black frame while
+    // the hero ImageBackground re-renders. The hero image still covers the
+    // top section; anything below the hero is already white in the layout.
+    backgroundColor: '#FFFFFF',
   },
   bgImage: {
     position: 'absolute',

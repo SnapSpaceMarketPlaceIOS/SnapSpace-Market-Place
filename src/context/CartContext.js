@@ -7,9 +7,14 @@ const CartContext = createContext();
 const STORAGE_KEY = '@snapspace_cart';
 
 function parsePrice(priceStr) {
-  if (typeof priceStr === 'number') return priceStr;
+  if (typeof priceStr === 'number' && isFinite(priceStr)) return priceStr;
   if (priceStr == null) return 0;
-  const cleaned = priceStr.replace(/[^0-9.]/g, '');
+  // Coerce anything else (object, boolean, etc.) to string before .replace
+  // so a malformed catalog entry can never crash the cart. Prior to this
+  // guard, a product with price:{amount:X} would throw "replace is not a
+  // function" from inside addToCart on tap.
+  const str = typeof priceStr === 'string' ? priceStr : String(priceStr);
+  const cleaned = str.replace(/[^0-9.]/g, '');
   return parseFloat(cleaned) || 0;
 }
 
@@ -68,6 +73,12 @@ export function CartProvider({ children }) {
   }, [items, hydrated]);
 
   const addToCart = (product) => {
+    // Guard against stale/missing product. Callers (e.g. ProductVisualizeModal)
+    // may fire onAddToCart after the parent has cleared its visualizeResult
+    // state, which can leave `product` undefined on the next tap. Silently
+    // no-op rather than crash — the modal already guards its press handler,
+    // so reaching here with no product means a programmer error downstream.
+    if (!product || !product.name) return;
     setItems((prev) => {
       const key = `${product.name}__${product.brand}`;
       const existing = prev.find((item) => item.key === key);

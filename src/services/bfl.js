@@ -274,14 +274,25 @@ export async function generateWithBFL(
         onStatus,
       );
     } catch (kontextErr) {
-      // If kontext fails (e.g. model unavailable), log and fall through to text-only
+      // Do NOT silently fall through to text-to-image. When a room photo is
+      // provided the user EXPECTS their photo to condition the generation.
+      // Text-to-image ignores the photo and produces a generic room that only
+      // references product descriptors — user gets billed (~$0.04–0.16) for a
+      // result that doesn't use their input. Prior to this guard, landscape
+      // photos consistently hit this path because Replicate failed + kontext
+      // base64-fetch timed out on the /render/image/ endpoint. See Build 17
+      // bug report. Throwing here lets the caller show a real error instead
+      // of misleading the user into thinking the AI "read" their photo.
       console.warn(
-        `[BFL] flux-kontext-pro failed (${kontextErr.message}) — falling back to text-to-image`
+        `[BFL] flux-kontext-pro failed (${kontextErr.message}) — aborting, room photo would be ignored by text-to-image`
+      );
+      throw new Error(
+        'We couldn\'t process your room photo. Please try again or try a different photo.'
       );
     }
   }
 
-  // ── Path 2: flux-pro-1.1-ultra — text-to-image fallback ─────────────────
+  // ── Path 2: flux-pro-1.1-ultra — text-to-image (only when no room photo) ─
   const prompt = buildTextPrompt(userPrompt, products);
   if (__DEV__) {
     console.log(`[BFL] Using text-to-image | aspect=${bflAspect} | prompt="${prompt.substring(0, 120)}…"`);

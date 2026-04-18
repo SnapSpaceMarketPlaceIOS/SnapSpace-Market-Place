@@ -184,27 +184,30 @@ export async function uploadAvatar(userId, uri) {
 }
 
 /**
- * Upload a room photo for AI generation. Returns a public URL that ALWAYS
- * serves as JPEG regardless of the source bytes.
+ * Upload a room photo for AI generation. Returns a raw /object/public/ URL.
  *
- * ROOT CAUSE of flux-2-max E006 "invalid input" errors (fixed here):
- * On iOS 26.x simulator, expo-image-picker/expo-camera return files whose
- * raw bytes are AVIF even when the URI ends in .jpg/.jpeg. We upload those
- * bytes verbatim, so Supabase Storage ends up holding an AVIF file under a
- * .jpeg path. Cloudflare (in front of Supabase) then serves it with
- * content-type: image/avif, and flux-2-max rejects anything that isn't
- * jpeg/png/gif/webp, throwing E006 before generation even starts.
+ * Why NOT /render/image/: Supabase's render/image/ transform endpoint cold-
+ * starts its image-processing pipeline lazily, taking 5–10+ seconds on a
+ * fresh cache. Replicate/BFL have a hard 10s input-fetch timeout, so every
+ * "first generation" on a freshly-uploaded room URL would fail with E006.
+ * This was the root cause of the Build 17 "AI ignored my photo" bug:
+ * flux-2-max's fetch timed out, BFL kontext's base64 fetch also timed out,
+ * and the whole pipeline silently pivoted to text-to-image (which ignores
+ * the photo entirely). See bfl.js — we now throw instead of pivoting.
  *
- * Fix: return the Supabase /render/image/ transform endpoint instead of
- * the raw /object/public/ endpoint. The render layer decodes whatever is
- * stored (including AVIF) and re-emits a proper JPEG with the requested
- * width/quality. flux-2-max sees a clean JPEG every time.
+ * AVIF protection: normalizeOrientation() runs every captured/picked photo
+ * through expo-image-manipulator with SaveFormat.JPEG before we ever call
+ * uploadRoomPhoto, so the bytes we upload are always real JPEG pixels, not
+ * AVIF. The render/image/ endpoint's AVIF-decoding safety net isn't needed
+ * because the client-side re-encode already handles it. In the rare case
+ * manipulateAsync fails, flux-2-max's own retry (on E006 with new seed)
+ * is a better fallback than failing every generation at the 10s fetch.
  */
 export async function uploadRoomPhoto(userId, uri, base64Data = null) {
   const ts = Date.now();
   const storagePath = `${userId}/${ts}.jpeg`;
   await uploadImage('room-uploads', storagePath, uri, base64Data);
-  return `${SUPABASE_URL}/storage/v1/render/image/public/room-uploads/${storagePath}?width=1024&quality=90`;
+  return `${SUPABASE_URL}/storage/v1/object/public/room-uploads/${storagePath}`;
 }
 
 // ─── User Designs Helpers ────────────────────────────────────────────────────
