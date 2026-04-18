@@ -464,11 +464,24 @@ export default function PaywallScreen({ navigation }) {
           <Text style={styles.subtitle}>Generate stunning room designs and shop curated furniture.</Text>
 
           {/* ── Free Wishes Usage bar ──────────────────────────────── */}
+          {/*
+              The count was previously rendered as "{remaining} of {totalFree}"
+              — e.g. "5 of 5" for a fresh account. That reads as EITHER "5
+              remaining of 5 total" OR "5 used of 5 total" depending on the
+              reader's mental model. TestFlight feedback (Apr 17 2026)
+              confirmed users were misreading a fresh account as "all 5
+              wishes already used" because the bar was visually full and the
+              label was ambiguous. Switched to the unambiguous
+              "{remaining} remaining" so fresh accounts display "5 remaining"
+              (clearly: you have 5 left), depleted accounts show "0 remaining"
+              (clearly: you have none left). The progress bar still fills
+              from 0% up to 100% representing remaining share — unchanged.
+          */}
           {isFree && (
           <View style={styles.progressCard}>
             <View style={styles.progressLabelRow}>
               <Text style={styles.progressLabel}>Free Wishes</Text>
-              <Text style={styles.progressCount}>{remaining} of {totalFree}</Text>
+              <Text style={styles.progressCount}>{remaining} remaining</Text>
             </View>
             <View style={styles.progressTrack}>
               <Animated.View style={[styles.progressFill, {

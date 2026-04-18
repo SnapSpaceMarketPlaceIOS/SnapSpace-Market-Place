@@ -42,6 +42,7 @@ import { SELLERS } from '../data/sellers';
 import { searchProducts, getSourceColor, getProductsForPrompt, getNormalizedProductsByIds } from '../services/affiliateProducts';
 import { buildFinalPrompt, generateWithProductRefs, generateWithProductPanel, generateSingleProductInRoom, pickAspectRatio } from '../services/replicate';
 import { createProductPanel } from '../utils/createProductPanel';
+import { withTimeout } from '../utils/withTimeout';
 import { verifyGeneratedProducts } from '../services/visionMatcher';
 import { PRODUCT_CATALOG } from '../data/productCatalog';
 import { saveUserDesign, updateDesignVisibility, uploadRoomPhoto } from '../services/supabase';
@@ -1545,17 +1546,26 @@ export default function HomeScreen({ navigation, route }) {
           const durationMs = Date.now() - startedAt;
           log('done | single-product | ' + durationMs + 'ms');
 
-          // Auto-save to user_designs so the Like button can reference a real designId
+          // Auto-save to user_designs so the Like button can reference a real designId.
+          // Wrapped in withTimeout(10s) so a hung Supabase write can never
+          // block the user from seeing their result. If the save times out,
+          // we proceed without savedDesignId — the user still sees the
+          // generated image, they just can't Like it until it's saved
+          // via a retry path. Better than an infinite loading spinner.
           let savedDesignId = null;
           if (user?.id) {
             try {
-              const saved = await saveUserDesign(user.id, {
-                imageUrl: resultUrl,
-                prompt: `Product visualize: ${singleProduct.name || 'product'}`,
-                styleTags: singleProduct.styles || [],
-                products: [{ id: singleProduct.id, name: singleProduct.name, brand: singleProduct.brand, price: singleProduct.price, imageUrl: singleProduct.imageUrl, affiliateUrl: singleProduct.affiliateUrl, source: singleProduct.source }],
-                visibility: 'private',
-              });
+              const saved = await withTimeout(
+                saveUserDesign(user.id, {
+                  imageUrl: resultUrl,
+                  prompt: `Product visualize: ${singleProduct.name || 'product'}`,
+                  styleTags: singleProduct.styles || [],
+                  products: [{ id: singleProduct.id, name: singleProduct.name, brand: singleProduct.brand, price: singleProduct.price, imageUrl: singleProduct.imageUrl, affiliateUrl: singleProduct.affiliateUrl, source: singleProduct.source }],
+                  visibility: 'private',
+                }),
+                10_000,
+                'auto-save single-product design',
+              );
               savedDesignId = saved?.id || null;
               log('auto-saved single-product design:', savedDesignId);
             } catch (saveErr) {
@@ -1608,12 +1618,20 @@ export default function HomeScreen({ navigation, route }) {
                   // client silently fell back to the 5-image individual-refs
                   // path at ~2× the cost (confirmed in the Apr 2026 cost audit).
                   //
-                  // Now that `toRenderUrl` uses `format=origin` the endpoint
-                  // no longer transforms (it just serves stored bytes), so
-                  // the cold-start slowness is gone. We also trust our own
-                  // edge function's output: if createProductPanel returned a
-                  // URL, the underlying bytes exist. Skipping preflight means
-                  // the panel path "just works" whenever the edge fn succeeds.
+                  // UPDATE 2026-04-17: createProductPanel now returns the
+                  // raw /storage/v1/object/public/ URL (NOT /render/image/).
+                  // The /render/image/ path — even with format=origin —
+                  // still goes through Supabase's image-processing pipeline
+                  // and takes 5-10+ seconds on a cold cache, which caused
+                  // Replicate to time out with "Read timed out (read
+                  // timeout=10)" every panel generation. Panels don't need
+                  // AVIF protection because we encode them as pure JPEG
+                  // server-side in the composite-products edge fn.
+                  //
+                  // We trust the edge function's output: if createProductPanel
+                  // returned a URL, the underlying bytes exist on the raw
+                  // object endpoint. Skipping preflight means the panel path
+                  // "just works" whenever the edge fn succeeds.
                   //
                   // If flux-2-max still can't fetch the URL for some reason,
                   // submitFluxWithRetry() already retries once on E006 with
@@ -1838,11 +1856,26 @@ export default function HomeScreen({ navigation, route }) {
       // style" badge on them. The product IDs displayed ALWAYS match what we
       // pre-committed, so users can't be shown a product that wasn't in the
       // reference set. Cost: ~$0.001/call (Haiku). Falls back to unverified.
+      //
+      // CRITICAL: this call is wrapped in a 20-second timeout via withTimeout.
+      // Before this guard was added, the call had no timeout whatsoever — if
+      // the Anthropic API was slow or degraded, the entire generation UI hung
+      // forever on "Adding the finishing touches…" even though the Replicate
+      // image had already been generated successfully (see Apr 17 2026
+      // TestFlight report: user got charged $0.25 for a generation they
+      // never actually saw because this step blocked indefinitely). 20s is
+      // 10x the typical Haiku latency (~1-3s) — if we miss it, something is
+      // wrong upstream and falling back to unverified is the right call.
       let finalMatchedProducts = finalProducts;
       let verifyMeta = { verifiedCount: 0, roomType: null, visionItems: [] };
+      let verifyTimedOut = false;
       try {
         setGenStatus('Verifying your products…');
-        const verifyResult = await verifyGeneratedProducts(resultUrl, finalProducts);
+        const verifyResult = await withTimeout(
+          verifyGeneratedProducts(resultUrl, finalProducts),
+          20_000,
+          'product verification',
+        );
         if (verifyResult?.products?.length > 0) {
           finalMatchedProducts = verifyResult.products;
           verifyMeta.verifiedCount = finalMatchedProducts.filter(p => p.confidence === 'verified').length;
@@ -1851,8 +1884,20 @@ export default function HomeScreen({ navigation, route }) {
           log('verify: ' + verifyMeta.verifiedCount + '/' + finalMatchedProducts.length + ' verified');
         }
       } catch (visionErr) {
-        warn('verify failed, showing pre-matched set unverified: ' + visionErr.message);
+        const msg = visionErr?.message || String(visionErr);
+        verifyTimedOut = /timed out/i.test(msg);
+        warn('verify failed (' + (verifyTimedOut ? 'timeout' : 'error') + '), showing pre-matched set unverified: ' + msg);
         finalMatchedProducts = finalProducts.map(p => ({ ...p, confidence: 'unverified' }));
+
+        // Structured telemetry: distinguish timeout from other verify errors
+        // so we can detect Anthropic-API degradation in production logs.
+        console.log(
+          '[genmeta]',
+          'event=' + (verifyTimedOut ? 'verify_timeout' : 'verify_failed'),
+          'pipeline=' + genMeta.pipeline,
+          'generationId=' + generationId,
+          'err=' + String(msg).substring(0, 120),
+        );
       }
 
       const durationMs = Date.now() - startedAt;

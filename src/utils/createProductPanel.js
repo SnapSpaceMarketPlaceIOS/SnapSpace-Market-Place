@@ -36,20 +36,44 @@ const SEND_LIMIT    = 6;   // send up to 6 URLs so edge fn has backup slots if a
 const MAX_RETRIES   = 2;   // retry once on failure (cold starts, transient errors)
 
 /**
- * Rewrite a Supabase /storage/v1/object/public/... URL to the equivalent
- * /storage/v1/render/image/public/... URL with explicit `format=origin` so
- * Cloudflare serves the original JPEG bytes we uploaded without re-negotiating
- * to AVIF based on the client's Accept header (iOS 26 Safari / some iOS
- * simulator builds request AVIF, which flux-2-max rejects with E006).
+ * ⚠️ Historical note — no longer applied to panel URLs (2026-04-17).
  *
- * CRITICAL: `format=origin` is what keeps this cheap. Without it, Supabase
- * applies an on-the-fly transform which can take 3-5 seconds on first request
- * and causes the client-side preflight to time out. `format=origin` just
- * serves the stored bytes with a sanity-checked content-type header.
+ * This helper rewrites a Supabase /storage/v1/object/public/... URL to the
+ * equivalent /storage/v1/render/image/public/...?format=origin URL. The
+ * original motivation: when an iOS 26 Safari client requests a stored JPEG,
+ * Cloudflare can re-serve it as AVIF based on the `Accept` header. flux-2-max
+ * rejects AVIF with E006 "invalid input". Forcing the URL through the
+ * /render/image/ endpoint with `format=origin` makes Supabase serve the
+ * original stored bytes with a correct `Content-Type: image/jpeg` header.
+ *
+ * Why we stopped using it for PANELS:
+ *   The /render/image/ endpoint is Supabase's image-processing pipeline.
+ *   Even with `format=origin`, there's per-request overhead: the Supabase
+ *   image server loads the object, inspects it, re-validates the content-
+ *   type, and serves. On a freshly-uploaded file with a cold cache, this
+ *   can take 5-10+ seconds — longer than Replicate's 10-second download
+ *   timeout when fetching input images. Result: panel URLs were timing
+ *   out inside flux-2-max with "Read timed out. (read timeout=10)" and
+ *   the client fell back to the expensive individual-products path
+ *   ($0.25/gen instead of the targeted $0.13). See Apr 17 2026 bug report.
+ *
+ *   Panels don't actually need this transform: we encode them as pure
+ *   JPEG in the composite-products edge function (jpeg-js, content-type
+ *   set explicitly on upload), so Cloudflare never has a reason to
+ *   negotiate AVIF for panel files. The /object/public/ direct-serve
+ *   path is both correct and fast.
+ *
+ * Why we KEEP the function:
+ *   It may still be needed for USER ROOM PHOTOS, which are uploaded by
+ *   mobile clients as JPEG but can be re-negotiated to AVIF at the CDN
+ *   layer. If you need to rewrite a room-upload URL for that reason,
+ *   call toRenderUrl() explicitly at the caller site. (Today, HomeScreen
+ *   passes the raw room-upload URL directly to ai-proxy; if that ever
+ *   starts hitting E006, revisit this.)
  *
  * Non-Supabase URLs are returned unchanged.
  */
-function toRenderUrl(url) {
+function toRenderUrl(url) { // eslint-disable-line no-unused-vars
   if (typeof url !== 'string') return url;
   const marker = '/storage/v1/object/public/';
   const idx = url.indexOf(marker);
@@ -58,9 +82,6 @@ function toRenderUrl(url) {
   const tail = url.slice(idx + marker.length); // "<bucket>/<path>?maybe=query"
   const [tailPath, tailQuery] = tail.split('?');
   const sep = tailQuery ? '&' : '';
-  // format=origin forces JPEG (what we stored), skipping the expensive
-  // on-the-fly transform. width/quality params are ignored when
-  // format=origin. Kept in the URL for telemetry / future tweaking.
   return `${head}/storage/v1/render/image/public/${tailPath}?format=origin${sep}${tailQuery || ''}`;
 }
 
@@ -161,12 +182,22 @@ export async function createProductPanel(products, userId) {
         return null;
       }
 
-      // Force the panel URL through Supabase's /render/image/ transform endpoint
-      // so flux-2-max always receives clean JPEG bytes. Cloudflare occasionally
-      // serves stored JPEGs as AVIF based on client Accept headers, which
-      // flux-2-max rejects with E006 "invalid input". The render endpoint
-      // guarantees a JPEG regardless of the underlying storage format.
-      const renderUrl = toRenderUrl(data.url);
+      // Return the RAW /storage/v1/object/public/ URL that the edge function
+      // generated via getPublicUrl(). Previously we wrapped this with
+      // toRenderUrl() (/render/image/?format=origin) to avoid Cloudflare AVIF
+      // negotiation — but that put the fetch through Supabase's image-
+      // processing pipeline, which on cold cache takes 5-10+ seconds and
+      // caused Replicate's flux-2-max to hit its 10-second input-download
+      // timeout. Every panel generation was silently failing and falling
+      // back to the expensive individual-products path ($0.25 vs the
+      // targeted $0.13). See toRenderUrl() comment above for full history.
+      //
+      // Panels are safe to serve via the raw object endpoint because we
+      // encode them server-side as pure JPEG in composite-products/index.ts
+      // and set `contentType: "image/jpeg"` explicitly on upload. Cloudflare
+      // has no basis to negotiate AVIF for files we've already committed as
+      // JPEG, regardless of the fetcher's Accept header.
+      const panelUrl = data.url;
 
       // compositedIndices tells the caller which of the INPUT productUrls
       // actually ended up as cells in the panel. The caller uses this to
@@ -180,9 +211,10 @@ export async function createProductPanel(products, userId) {
         `[Panel] Panel ready (attempt ${attempt}) | ` +
         `composited=${data.composited_count ?? '?'} | ` +
         `indices=[${compositedIndices?.join(',') ?? '?'}] | ` +
-        `url=${renderUrl.substring(0, 80)}`
+        `url=${panelUrl.substring(0, 80)} | ` +
+        `endpoint=object-public (not render/image — fixes Replicate 10s timeout)`
       );
-      return { url: renderUrl, compositedIndices };
+      return { url: panelUrl, compositedIndices };
 
     } catch (err) {
       // Network failure, timeout, or Deno crash — retry once
