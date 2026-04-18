@@ -142,93 +142,23 @@ export function buildFinalPrompt(userPrompt, productHints, colorPalette) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// flux-2-max: Multi-image product-reference room generation (fallback path)
+// REMOVED (Build 22): `buildFlux2MaxPrompt` + `generateWithProductRefs`
 // ─────────────────────────────────────────────────────────────────────────────
-
-/**
- * Build the flux-2-max prompt for product-reference room editing.
- *
- * Tells the model to treat image 1 as the room to preserve and images 2+ as
- * product references to swap in. Product categories are mapped to image indices.
- *
- * Used by the local fallback path (generateWithProductRefs) when the product
- * panel edge function is unavailable.
- *
- * @param {string}   userPrompt - The user's raw design prompt (or enriched prompt from buildFinalPrompt)
- * @param {object[]} products   - Array of products with a category field
- * @returns {string} Structured prompt for flux-2-max
- */
-export function buildFlux2MaxPrompt(userPrompt, products) {
-  const placements = [];
-  (products || []).slice(0, 4).forEach((p, i) => {
-    const desc = describeProductForPrompt(p) || (p.category || 'furniture').replace(/-/g, ' ');
-    placements.push(`${desc} → image ${i + 2}`);
-  });
-
-  const placementStr = placements.length > 0
-    ? `Place these EXACT product references into the room, matching color, material, silhouette, and proportions precisely: [${placements.join('; ')}]. Do not substitute with similar-looking alternatives.`
-    : "Replace furniture with pieces that match the room's style.";
-
-  const styleIntent = userPrompt
-    ? `While maintaining this overall style intent: ${userPrompt}.`
-    : '';
-
-  return [
-    QUALITY_PREFIX,
-    'This is a precise scene edit, not a new generation.',
-    'Preserve image 1 exactly: same walls, floor, ceiling, windows, lighting, camera angle, perspective, and spatial layout. Do not alter any architecture.',
-    placementStr,
-    styleIntent,
-  ].filter(Boolean).join(' ');
-}
-
-/**
- * Generate a product-aware room redesign using a single flux-2-max call with
- * individual product reference images. This is the FALLBACK path used only
- * when the 2×2 panel edge function is unavailable — the panel path is cheaper
- * (2 inputs instead of 5) and should be preferred.
- *
- * @param {string}   roomPhotoUrl - Public URL of the user's room photo
- * @param {string}   userPrompt   - Enriched design prompt (from buildFinalPrompt)
- * @param {object[]} products     - Matched products (each with an imageUrl field)
- * @param {string}   [aspectRatio] - Explicit aspect ratio (e.g. '4:3', '3:4', '16:9'). Falls back to 'match_input_image'.
- * @returns {Promise<string>}     - URL of the generated room image
- */
-export async function generateWithProductRefs(roomPhotoUrl, userPrompt, products, aspectRatio) {
-  // Auth handled by apiProxy (server-side in production, EXPO_PUBLIC_ in dev)
-  if (!roomPhotoUrl) throw new Error('generateWithProductRefs requires a public room photo URL.');
-
-  // Use full-resolution product images so flux sees maximum detail.
-  // Per-input MP is still bounded by Replicate's internal preprocessing —
-  // flux-2-max downsamples inputs to match output resolution (0.5 MP) before
-  // attention, so sending 1500px sources costs the same as sending 300px
-  // sources, but we get sharper detail in the attention map.
-  const productImages = (products || [])
-    .filter(p => p.imageUrl)
-    .slice(0, 4)
-    .map(p => p.imageUrl);
-
-  const inputImages = [roomPhotoUrl, ...productImages];
-  const generationPrompt = buildFlux2MaxPrompt(userPrompt || 'Modern minimalist interior design.', products || []);
-
-  if (__DEV__) {
-    console.log('[flux-2-max] Prompt:', generationPrompt.substring(0, 200) + '...');
-    console.log('[flux-2-max] input_images:', inputImages.length, '(1 room +', productImages.length, 'products)');
-    console.log('[flux-2-max] aspect_ratio:', aspectRatio || 'match_input_image');
-  }
-
-  const result = await submitFluxWithRetry({
-    prompt:           generationPrompt,
-    input_images:     inputImages,
-    aspect_ratio:     aspectRatio || 'match_input_image',
-    resolution:       '0.5 MP',   // fixed — cost constraint
-    output_format:    'webp',
-    output_quality:   100,        // max WebP quality — no billing impact
-    safety_tolerance: 5,
-  });
-
-  return result.url;
-}
+//
+// These implemented a legacy fallback that sent flux-2-max 3–5 input images
+// (room + N individual product images). That path violated the cost contract:
+// a single generation through it billed ~$0.19–0.40 vs the $0.13–0.16 target.
+// The panel-based path (`generateWithProductPanel`, 2 inputs: room + 2×2 grid
+// produced by the composite-products edge function) carries the same product
+// information in a fixed-cost shape. When panel creation fails, the caller
+// now drops directly to BFL text-to-image (~$0.04) via generateWithBFL with
+// roomPhotoUrl=null — NOT back into flux-2-max with extra inputs.
+//
+// Deleting these functions enforces the ≤ 2-input contract at the module
+// boundary: the only way a future caller can send more than 2 inputs to
+// flux-2-max is to introduce a new function, which a code reviewer will
+// catch. This was the 2026-04-18 consolidation after TestFlight landscape
+// captures silently billed $0.31 via this path.
 
 // ─────────────────────────────────────────────────────────────────────────────
 // flux-2-max: Single-product placement (2 images: room + 1 product)

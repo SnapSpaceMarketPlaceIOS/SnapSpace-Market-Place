@@ -253,7 +253,7 @@ export async function uploadRoomPhoto(userId, uri, base64Data = null) {
   } catch { /* ignore — handled below */ }
   if (!jwt) {
     console.warn('[uploadRoomPhoto] no session JWT, using raw URL (may be rotated incorrectly)');
-    return rawUrl;
+    return { url: rawUrl, width: null, height: null };
   }
 
   try {
@@ -276,10 +276,18 @@ export async function uploadRoomPhoto(userId, uri, base64Data = null) {
         console.log(
           `[uploadRoomPhoto] normalized | orient=${data.orientation} rotated=${data.rotated} dims=${data.dims}`,
         );
-        return data.url;
+        // Return server-truth dims alongside the URL so the caller can compute
+        // aspect_ratio from the ACTUAL encoded bytes flux-2-max will see,
+        // eliminating the client/server mismatch where the client's pre-rotation
+        // dims disagreed with the post-rotation bytes (Build 20 failure mode).
+        return {
+          url: data.url,
+          width: typeof data.width === 'number' ? data.width : null,
+          height: typeof data.height === 'number' ? data.height : null,
+        };
       }
       console.warn('[uploadRoomPhoto] normalize returned 200 but no URL — using raw URL');
-      return rawUrl;
+      return { url: rawUrl, width: null, height: null };
     }
 
     // Non-2xx. 4xx = the photo itself is the problem (too large / undecodable);
@@ -303,11 +311,11 @@ export async function uploadRoomPhoto(userId, uri, base64Data = null) {
     }
 
     console.warn(`[uploadRoomPhoto] normalize 5xx (${res.status}): ${reason} — using raw URL`);
-    return rawUrl;
+    return { url: rawUrl, width: null, height: null };
   } catch (err) {
     if (err?.userFacing) throw err; // let caller show the message
     console.warn('[uploadRoomPhoto] normalize threw:', err?.message || err, '— using raw URL');
-    return rawUrl;
+    return { url: rawUrl, width: null, height: null };
   }
 }
 

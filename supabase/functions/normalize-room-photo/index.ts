@@ -336,6 +336,14 @@ Deno.serve(async (req: Request) => {
         url: publicUrl,
         orientation,
         rotated,
+        // Numeric post-rotation dimensions. Caller uses these to compute the
+        // aspect_ratio it sends to flux-2-max — this is "server truth" (the
+        // actual encoded pixel dimensions of the file flux will fetch), which
+        // prevents client/server aspect-ratio mismatch that was the Build 20
+        // "landscape served as 9:16" failure mode.
+        width: w2,
+        height: h2,
+        // Legacy string form kept for backward compatibility.
         dims: `${w2}x${h2}`,
       }),
       { status: 200, headers: { ...CORS, "Content-Type": "application/json" } },

@@ -40,7 +40,7 @@ import { useCart } from '../context/CartContext';
 import { DESIGNS } from '../data/designs';
 import { SELLERS } from '../data/sellers';
 import { searchProducts, getSourceColor, getProductsForPrompt, getNormalizedProductsByIds } from '../services/affiliateProducts';
-import { buildFinalPrompt, generateWithProductRefs, generateWithProductPanel, generateSingleProductInRoom, pickAspectRatio } from '../services/replicate';
+import { buildFinalPrompt, generateWithProductPanel, generateSingleProductInRoom, pickAspectRatio } from '../services/replicate';
 import { createProductPanel } from '../utils/createProductPanel';
 import { withTimeout } from '../utils/withTimeout';
 import { verifyGeneratedProducts } from '../services/visionMatcher';
@@ -1097,28 +1097,47 @@ export default function HomeScreen({ navigation, route }) {
     // module on iPhone 14 Pro iOS 26 strips EXIF while leaving raw pixel
     // matrix sideways, which shipped a sideways-bytes JPEG to Replicate and
     // caused the "AI ignored my photo" bug across Builds 17–19. We now
-    // upload the ORIGINAL asset URI (EXIF intact) and let Supabase's
-    // /render/image/ endpoint handle rotation server-side. See
-    // uploadRoomPhoto in src/services/supabase.js for the full rationale.
+    // upload the ORIGINAL asset URI (EXIF intact) and let the
+    // normalize-room-photo edge function bake rotation server-side.
     //
-    // Dims for pickAspectRatio: Image.getSize on iOS UIImage honors EXIF
-    // and returns visual (post-rotation) dims, so asset.width/height (which
-    // already reflect this) are correct.
+    // Dims for pickAspectRatio: prefer Image.getSize() over
+    // asset.width/height. On iOS, Image.getSize uses UIImage which honors
+    // EXIF and returns VISUAL (post-rotation) dims. expo-image-picker's
+    // `asset.width/height` is documented as EXIF-corrected, but on some iOS
+    // 26 HEIC/ph:// sources it returns the raw pixel matrix — which would
+    // send flux-2-max the wrong aspect_ratio for landscape shots picked
+    // from the library. The Image.getSize roundtrip is cheap (~100ms) and
+    // matches what SnapScreen's library-pick path does, keeping the two
+    // entry points behaviourally identical.
     const orientation = asset.exif?.Orientation ?? 1;
+
+    let finalWidth  = asset.width ?? null;
+    let finalHeight = asset.height ?? null;
+    try {
+      const dims = await new Promise((resolve, reject) => {
+        Image.getSize(asset.uri, (w, h) => resolve({ w, h }), reject);
+      });
+      if (dims.w > 0 && dims.h > 0) {
+        finalWidth  = dims.w;
+        finalHeight = dims.h;
+      }
+    } catch (e) {
+      console.warn('[Home library pick] Image.getSize failed, using asset dims:', e?.message || e);
+    }
 
     console.log(
       '[Home library pick] asset meta',
       'exifOrientation=' + orientation,
-      'w=' + asset.width,
-      'h=' + asset.height,
+      'assetWH=' + asset.width + 'x' + asset.height,
+      'finalWH=' + finalWidth + 'x' + finalHeight,
       'uri=' + String(asset.uri).substring(0, 80)
     );
 
     setPhoto({
       uri: asset.uri,
       base64: null,
-      width: asset.width ?? null,
-      height: asset.height ?? null,
+      width: finalWidth,
+      height: finalHeight,
     });
     setPhotoSource('library');
   }, [generating]);
@@ -1403,8 +1422,13 @@ export default function HomeScreen({ navigation, route }) {
         }
       }
 
-      const aspectRatio = pickAspectRatio(photoW, photoH);
-      log('photo', photoW + 'x' + photoH, '→ aspect_ratio =', aspectRatio);
+      // Initial aspect_ratio guess from CLIENT-side dims. This may be
+      // overridden below with SERVER-truth dims (post-rotation) after
+      // uploadRoomPhoto returns — see `if (roomPhotoServerWidth && ...)`
+      // block. We compute it here too so it's available if the server
+      // path short-circuits (no session / fallback to raw URL / etc).
+      let aspectRatio = pickAspectRatio(photoW, photoH);
+      log('photo (client dims)', photoW + 'x' + photoH, '→ aspect_ratio =', aspectRatio);
 
       // ── Quota waterfall: free → tokens → subscription → paywall ─────────
       let generationSource = null;
@@ -1450,8 +1474,20 @@ export default function HomeScreen({ navigation, route }) {
         // ── Step 1: Upload room photo to Supabase Storage ─────────────────
         setGenStatus('Preparing your room…');
         let roomPhotoUrl = null;
+        let roomPhotoServerWidth = null;
+        let roomPhotoServerHeight = null;
         try {
-          roomPhotoUrl = await uploadRoomPhoto(user.id, savedPhoto.uri, savedPhoto.base64);
+          const uploaded = await uploadRoomPhoto(user.id, savedPhoto.uri, savedPhoto.base64);
+          // uploadRoomPhoto now returns { url, width, height }. Width/height
+          // come from the normalize-room-photo edge function's post-rotation
+          // pixel dims — i.e. the actual encoded bytes flux-2-max will fetch.
+          // These OVERRIDE the client-side pre-rotation dims for aspect_ratio
+          // selection, so portrait/landscape output always matches what the
+          // server rotated to rather than what the client originally captured.
+          roomPhotoUrl         = uploaded?.url || null;
+          roomPhotoServerWidth  = uploaded?.width ?? null;
+          roomPhotoServerHeight = uploaded?.height ?? null;
+          if (!roomPhotoUrl) throw new Error('uploadRoomPhoto returned no url');
         } catch (uploadErr) {
           stopLoadingBar(false);
           setGenerating(false);
@@ -1486,6 +1522,27 @@ export default function HomeScreen({ navigation, route }) {
         // latency for flux-2-max to trip on. The normalize step itself is
         // inside uploadRoomPhoto and runs on our time budget, which is
         // exactly where the wait should be.
+
+        // Server-truth aspect_ratio override (Build 22). If the edge function
+        // returned numeric post-rotation dims, recompute aspect_ratio from
+        // those — this is the ACTUAL shape of the bytes flux-2-max will
+        // fetch. Prevents the Build 20 failure mode where the client reported
+        // portrait dims (pre-rotation) but the server rotated the bytes to
+        // landscape, so flux got a mismatched aspect_ratio and output was
+        // letterboxed / garbled.
+        if (roomPhotoServerWidth && roomPhotoServerHeight) {
+          const serverAspect = pickAspectRatio(roomPhotoServerWidth, roomPhotoServerHeight);
+          if (serverAspect !== aspectRatio) {
+            log(
+              'aspect_ratio override | client=' + aspectRatio +
+              ' → server=' + serverAspect +
+              ' (server dims: ' + roomPhotoServerWidth + 'x' + roomPhotoServerHeight + ')'
+            );
+            aspectRatio = serverAspect;
+          } else {
+            log('aspect_ratio confirmed by server | ' + aspectRatio);
+          }
+        }
 
         // ── Step 2: Generation ──────────────────────────────────────────────
 
@@ -1700,65 +1757,38 @@ export default function HomeScreen({ navigation, route }) {
                   usedPanel = true;
                   log('panel gen complete | prediction=' + panelResult.predictionId + ' seed=' + panelResult.seed + ' | composited=[' + (panelCompositedIndices?.join(',') ?? '?') + ']');
                 } else {
-                  warn('createProductPanel returned no URL — falling back to individual refs');
+                  warn('createProductPanel returned no URL');
                 }
               } catch (panelErr) {
-                warn('panel approach threw (' + panelErr.message + ') — falling back to individual refs');
+                warn('panel approach threw (' + panelErr.message + ')');
               }
             } else {
               warn('panel skipped — only ' + reachableProducts.length + ' reachable products (need 2+)');
             }
 
-            // ── Fallback: individual product images ──────────────────────
-            // Cost-capped fallback. The previous fallback sent the room
-            // + 4 product images (5 inputs total), which runs at roughly
-            // 2× the GPU time of the panel path (room + 2×2 panel = 2
-            // inputs). That's what drove the $34 Replicate bill in the
-            // April test window — every silent panel-preflight failure
-            // doubled the per-gen cost.
-            //
-            // We now cap the fallback at 2 product references (3 total
-            // inputs). This brings the cost floor on fallback within ~20%
-            // of the panel path while still giving flux-2-max enough
-            // visual anchor references to match cataloged silhouettes.
-            // If you ever want to raise this, change FALLBACK_PRODUCT_CAP
-            // and accept the higher per-gen cost. Do not exceed 4.
-            const FALLBACK_PRODUCT_CAP = 2;
-
-            let individualUsedProducts = null;
-            if (!usedPanel && reachableProducts.length >= 1) {
-              const cappedProducts = reachableProducts.slice(0, FALLBACK_PRODUCT_CAP);
-              log('using individual product refs (cost-capped) | ' +
-                'room + ' + cappedProducts.length + ' product images | ' +
-                'cap=' + FALLBACK_PRODUCT_CAP + ' of ' + reachableProducts.length + ' reachable');
-              setGenStatus('Analyzing your room…');
-              resultUrl = await generateWithProductRefs(roomPhotoUrl, designPrompt, cappedProducts, aspectRatio);
-              genMeta.pipeline = 'individual-capped';
-              // Individual path: replicate.js slices to exactly the first N
-              // products and uses each as a distinct image input. No panel
-              // compositing → no index drift → the products we sent ARE the
-              // products used, so just mirror the slice here for Shop Your Room.
-              individualUsedProducts = cappedProducts;
-            } else if (!usedPanel) {
-              // No reachable product images — force the replicate path to fail
-              // so we drop to BFL (which doesn't need product URLs).
-              throw new Error('no reachable product images for replicate path');
+            // Build 22: no individual-capped fallback. The only legal flux-2-max
+            // paths send EXACTLY 2 inputs. If the 2×2 panel didn't come back,
+            // we bail out of the flux path here — the outer catch will drop us
+            // to the BFL text-to-image fallback (Ring 3). Previously this path
+            // submitted flux-2-max with 3 inputs (room + 2 products) which
+            // billed ~$0.19–0.23 per gen and was the root of the 2026-04-18
+            // landscape $0.31 overcharge. By hard-failing here, we make the
+            // ≤$0.16 cost ceiling a structural property of the code, not a
+            // runtime check.
+            if (!usedPanel) {
+              throw new Error('2×2 panel unavailable — dropping to BFL text-to-image fallback');
             }
 
-            // ── Reconcile finalProducts with what was ACTUALLY rendered ────────
-            // Previously this was unconditionally `matchedProducts` — which
-            // could include products whose images failed the composite pool,
-            // producing the 3-of-4 mismatch ("Shop Your Room shows a product
-            // that isn't in the generated image"). Now we map back to the
-            // exact subset that went to flux-2-max.
-            if (usedPanel && Array.isArray(panelCompositedIndices) && panelCompositedIndices.length > 0) {
+            // Panel succeeded — reconcile finalProducts with what was ACTUALLY
+            // rendered. panelCompositedIndices tells us which of the input
+            // reachableProducts made it into the 2×2 grid; Shop Your Room
+            // shows exactly those 4, so users never see a product that isn't
+            // in their generated image.
+            if (Array.isArray(panelCompositedIndices) && panelCompositedIndices.length > 0) {
               finalProducts = panelCompositedIndices
                 .map(i => reachableProducts[i])
                 .filter(Boolean);
-            } else if (individualUsedProducts) {
-              finalProducts = individualUsedProducts;
             } else {
-              // Shouldn't hit here (would've thrown above), but defensive fallback
               finalProducts = reachableProducts.slice(0, 4);
             }
             replicateSucceeded = true;
@@ -1780,42 +1810,59 @@ export default function HomeScreen({ navigation, route }) {
             );
             log('replicate complete | url=' + resultUrl.substring(0, 80) + ' | finalProducts=' + finalProducts.length);
           } catch (repErr) {
-            warn('replicate failed (' + repErr.message + ') — falling back to BFL');
+            warn('replicate failed (' + repErr.message + ') — dropping to BFL text-to-image');
           }
 
-          // ── Fallback: BFL kontext (room photo, product names in prompt) ──
-          // No visual product references — products matched by text only.
-          // Cost: ~$0.04/generation. Uses reachableProducts (not matched)
-          // and slices to 4 so Shop Your Room never shows a product whose
-          // image would 404 on tap. BFL doesn't guarantee visual accuracy
-          // (text-only refs), but at least the 4 products shown all load.
+          // ── Ring 3 fallback: BFL text-to-image (prompt only, no image inputs) ──
+          //
+          // Build 22: this is the ONLY fallback path. We no longer submit
+          // flux-2-max with extra inputs (that violated the ≤ 2-input cost
+          // contract) and we no longer use BFL kontext (image-to-image with
+          // the room photo) — kontext costs more AND can fail silently with
+          // sideways bytes the same way flux-2-max did.
+          //
+          // flux-pro-1.1-ultra text-to-image:
+          //   - No image inputs at all → no EXIF / rotation / format issues
+          //   - Cost: ~$0.04/gen
+          //   - Produces a "general" room in the prompted style + products by
+          //     description (not visual reference) — the user's actual room
+          //     is NOT preserved. We tell the user this up front via the
+          //     alert below so they're not surprised.
+          //
+          // Why an alert before the fallback: otherwise the user sees a room
+          // that isn't theirs and thinks the AI is broken. With the heads-up
+          // they understand that the product matching didn't work this time,
+          // the image they're seeing is a generic design, and they can retry
+          // with a different photo.
           if (!replicateSucceeded) {
             const bflProducts = (reachableProducts.length > 0
               ? reachableProducts
               : matchedProducts
             ).slice(0, 4);
-            log('BFL kontext fallback | cost=~$0.04 | aspect=' + aspectRatio + ' | products=' + bflProducts.length);
+
+            // Non-blocking heads-up. Alert.alert is synchronous-to-show but
+            // the user interaction is async — we kick off the BFL call in
+            // parallel so they don't wait for their OK tap to generate.
+            Alert.alert(
+              "We couldn't use your room photo",
+              "Generating a general design from your prompt instead. Try another photo for a personalized result.",
+            );
+
+            log('BFL text-to-image fallback | cost=~$0.04 | aspect=' + aspectRatio + ' | products=' + bflProducts.length);
             resultUrl = await generateWithBFL(
               designPrompt,
               bflProducts,
               (msg) => setGenStatus(msg),
-              roomPhotoUrl,
+              null,           // ← no room photo → forces text-to-image path
               aspectRatio,
             );
             finalProducts = bflProducts;
-            genMeta.pipeline = 'bfl';
-            log('BFL complete');
-            // Structured telemetry for BFL-fallback success. Previously
-            // missing — without this, the BFL pipeline's hit rate was
-            // invisible in logs and we couldn't detect when Replicate was
-            // failing at a higher-than-expected rate. Cost context: BFL
-            // is ~$0.04 vs Replicate's ~$0.13, so a sudden spike in
-            // event=success+pipeline=bfl counts is a flag that our primary
-            // pipeline is degraded.
+            genMeta.pipeline = 'bfl-text';
+            log('BFL text-to-image complete');
             console.log(
               '[genmeta]',
               'event=success',
-              'pipeline=bfl',
+              'pipeline=bfl-text',
               'generationId=' + generationId,
               'productsIn=' + reachableProducts.length,
               'productsUsed=' + bflProducts.length,
