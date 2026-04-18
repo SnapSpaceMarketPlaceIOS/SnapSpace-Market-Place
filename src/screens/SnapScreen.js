@@ -10,6 +10,7 @@ import {
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import * as ImagePicker from 'expo-image-picker';
 import { lockPortrait, unlockAll } from '../utils/orientation';
+import { normalizeOrientation } from '../utils/normalizeOrientation';
 import { useFocusEffect } from '@react-navigation/native';
 import Svg, { Path, Line, Polyline, Rect, Circle } from 'react-native-svg';
 import { palette } from '../constants/tokens';
@@ -107,13 +108,19 @@ export default function SnapScreen({ navigation, route }) {
       //   which no stock iOS camera ever produces. Codes 5-8 mean the
       //   captured pixel matrix has width ↔ height swapped relative to the
       //   visual image the user took.
+      //
+      // We bake the rotation into the pixels so downstream consumers
+      // (Supabase /render/image/, flux-2-max, stripped-EXIF browsers) see
+      // the correct orientation. Swapping only width/height numbers isn't
+      // enough — most tools ignore EXIF metadata entirely.
       const orientation = photo.exif?.Orientation ?? 1;
       const dimsSwapped = orientation >= 5 && orientation <= 8;
       const finalWidth  = dimsSwapped ? photo.height : photo.width;
       const finalHeight = dimsSwapped ? photo.width  : photo.height;
+      const normalizedUri = await normalizeOrientation(photo.uri, orientation);
 
       navigation.navigate('Home', {
-        capturedPhoto: { uri: photo.uri, base64: null, width: finalWidth, height: finalHeight },
+        capturedPhoto: { uri: normalizedUri, base64: null, width: finalWidth, height: finalHeight },
         singleProduct,  // null for normal flow, product object for single-product visualize
       });
     } catch (err) {
@@ -144,9 +151,12 @@ export default function SnapScreen({ navigation, route }) {
         }
         mediaPermGranted.current = true;
       }
+      // exif:true so library photos (which often have EXIF Orientation set
+      // the same way camera captures do) also get rotated correctly.
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ['images'],
         quality: 0.8,
+        exif: true,
       });
       if (result.canceled || !result.assets?.length) return;
       const asset = result.assets[0];
@@ -154,8 +164,14 @@ export default function SnapScreen({ navigation, route }) {
         Alert.alert('Could Not Load Photo', 'Please try picking a different photo.');
         return;
       }
+      const orientation = asset.exif?.Orientation ?? 1;
+      const dimsSwapped = orientation >= 5 && orientation <= 8;
+      const finalWidth  = dimsSwapped ? asset.height : asset.width;
+      const finalHeight = dimsSwapped ? asset.width  : asset.height;
+      const normalizedUri = await normalizeOrientation(asset.uri, orientation);
+
       navigation.navigate('Home', {
-        capturedPhoto: { uri: asset.uri, base64: null, width: asset.width, height: asset.height },
+        capturedPhoto: { uri: normalizedUri, base64: null, width: finalWidth, height: finalHeight },
         singleProduct,  // null for normal flow, product object for single-product visualize
       });
     } catch (err) {
