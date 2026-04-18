@@ -55,7 +55,23 @@ export default function ConsentModal() {
 
     const timestamp = new Date().toISOString();
     await AsyncStorage.setItem(`${CONSENT_KEY_PREFIX}${user.id}`, timestamp);
-    console.log(`[consent] User ${user.id} (${user.email}) accepted policies at ${timestamp}`);
+
+    // DEV-only log: the full email + user.id is PII and we don't want it in
+    // production device console output. EAS release builds do NOT strip
+    // plain console.log — this line would land in iOS unified logging and
+    // could be lifted out via a sysdiagnose or attached-debugger capture.
+    // In production, log a sanitized marker only (no email, truncated id)
+    // so we can still tell "consent was recorded" from the log stream
+    // without leaking identifying information.
+    if (__DEV__) {
+      console.log(
+        `[consent] User ${user.id} (${user.email}) accepted policies at ${timestamp}`
+      );
+    } else {
+      console.log(
+        `[consent] accepted | uid=${String(user.id).substring(0, 8)}… | ts=${timestamp}`
+      );
+    }
 
     Animated.timing(fadeAnim, {
       toValue: 0,

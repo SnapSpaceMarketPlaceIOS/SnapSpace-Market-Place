@@ -3,18 +3,77 @@ import * as AppleAuthentication from 'expo-apple-authentication';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { supabase, fetchProfile } from '../services/supabase';
 import { registerForPushNotifications } from '../services/notifications';
+// Module-level caches live outside React state and are NOT wiped by
+// AsyncStorage.multiRemove. We must call these explicit clearers on every
+// auth transition so user B doesn't inherit user A's in-memory style or
+// preference signals. See fullAccountReset() below.
+import { clearStyleProfile } from '../services/styleDnaService';
+import { clearUserPreferences } from '../utils/userPreferences';
 
 // AsyncStorage keys that are NOT yet scoped to a specific user.
 // Cleared on sign-out so the next account on this device can't inherit
-// the previous user's cart / liked items / order history / share flags.
-// (Onboarding flag is per-user and handled separately in OnboardingContext.)
+// the previous user's data. (Onboarding flag is per-user and handled
+// separately in OnboardingContext.)
+//
+// To keep the guarantee real, ANY AsyncStorage key elsewhere in the app
+// that holds user-scoped data MUST appear in this list OR be namespaced
+// per user-id (like the onboarding flag). Audited 2026-04-17:
+//   - @snapspace_cart                       (CartContext)
+//   - @snapspace_liked                      (LikedContext designs)
+//   - @snapspace_liked_products             (LikedContext products)
+//   - @snapspace_shared                     (SharedContext)
+//   - @snapspace_order_history              (OrderHistoryContext)
+//   - homegenie_style_dna                   (styleDnaService)
+//   - @snapspace_user_preferences           (userPreferences)
+//   - @snapspace_supplier_submitted         (SupplierApplicationScreen)
+//   - snapspace_recently_viewed             (HomeScreen — reader-only today,
+//                                             but if any build ever writes to
+//                                             it, would bleed across accounts)
+// Device-scoped (intentionally NOT cleared on signOut):
+//   - @snapspace_language                   (language pref — device preference)
+//   - @homegenie_notif_prefs, @homegenie_notif_push
+//   - homegenie_affiliate_id                (attribution, device-wide by design)
+//   - homegenie_tracking_initialized, homegenie_first_open_seen
 const DEVICE_WIDE_STORAGE_KEYS = [
   '@snapspace_cart',
   '@snapspace_liked',
   '@snapspace_liked_products',
   '@snapspace_shared',
   '@snapspace_order_history',
+  'homegenie_style_dna',
+  '@snapspace_user_preferences',
+  '@snapspace_supplier_submitted',
+  'snapspace_recently_viewed',
 ];
+
+/**
+ * Clear EVERY user-scoped state on device: AsyncStorage keys + module-level
+ * in-memory caches (style DNA, user preferences). Safe to call even if
+ * nothing is currently stored.
+ *
+ * Why we can't just do AsyncStorage.multiRemove():
+ *   styleDnaService and userPreferences both keep a module-scoped `_cache`
+ *   variable that survives a signOut because it lives in the JS runtime,
+ *   not in AsyncStorage. clearStyleProfile() / clearUserPreferences() null
+ *   those out. Without this step, user B signs in, immediately reads the
+ *   cached variable, and gets user A's taste profile.
+ */
+async function fullAccountReset() {
+  // Step 1 — purge AsyncStorage. Best-effort; never throw.
+  try {
+    await AsyncStorage.multiRemove(DEVICE_WIDE_STORAGE_KEYS);
+  } catch (e) {
+    console.warn('[Auth] fullAccountReset multiRemove failed (non-fatal):', e?.message);
+  }
+  // Step 2 — null the JS-module caches. These are awaited in parallel
+  // because they write separately to AsyncStorage (the multiRemove above
+  // already cleared those files, but these calls also reset the in-memory
+  // variables, which is the critical bit).
+  await Promise.allSettled([
+    clearStyleProfile(),
+    clearUserPreferences(),
+  ]);
+}
 
 const AuthContext = createContext();
 
@@ -160,9 +219,11 @@ export function AuthProvider({ children }) {
     try {
       await supabase.auth.signOut();
       setUser(null);
-      // Also purge device-wide caches for the same reason — the new account
-      // (once verified) must start with a clean slate.
-      await AsyncStorage.multiRemove(DEVICE_WIDE_STORAGE_KEYS).catch(() => {});
+      // Also purge device-wide caches AND module-level in-memory caches for
+      // the same reason — the new account (once verified) must start with a
+      // clean slate. fullAccountReset wipes both AsyncStorage keys and the
+      // style/preferences in-memory vars that survive a multiRemove alone.
+      await fullAccountReset();
     } catch (e) {
       console.warn('[Auth] pre-signup signOut failed (non-fatal):', e?.message);
     }
@@ -257,12 +318,11 @@ export function AuthProvider({ children }) {
     await supabase.auth.signOut();
     setUser(null);
 
-    // Best-effort purge of device-wide caches. Non-fatal on failure.
-    try {
-      await AsyncStorage.multiRemove(DEVICE_WIDE_STORAGE_KEYS);
-    } catch (e) {
-      console.warn('[Auth] post-signOut storage clear failed (non-fatal):', e?.message);
-    }
+    // Best-effort purge of device-wide caches AND module-level in-memory
+    // caches. See fullAccountReset — multiRemove alone leaves the style DNA
+    // and userPreferences JS module vars populated, which would bleed into
+    // the next account to sign in on this device.
+    await fullAccountReset();
   };
 
   /**
@@ -296,12 +356,10 @@ export function AuthProvider({ children }) {
     await supabase.auth.signOut();
     setUser(null);
 
-    // Wipe device-wide caches so deletion is truly complete.
-    try {
-      await AsyncStorage.multiRemove(DEVICE_WIDE_STORAGE_KEYS);
-    } catch (e) {
-      console.warn('[Auth] post-delete storage clear failed (non-fatal):', e?.message);
-    }
+    // Wipe device-wide caches AND in-memory module caches so deletion is
+    // truly complete. See fullAccountReset for why multiRemove alone isn't
+    // sufficient (it leaves style/preference module vars populated).
+    await fullAccountReset();
   };
 
   /**

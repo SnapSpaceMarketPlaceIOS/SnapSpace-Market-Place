@@ -89,6 +89,66 @@ Deno.serve(async (req: Request) => {
   // Use the JWT-verified user id (no body-spoofing possible now)
   const user_id = authUser.id;
 
+  // ── RATE LIMIT: cap panel builds per user per hour ──────────────────────
+  //
+  // Before this fix, an authenticated user could loop composite-products and
+  // fill room-uploads Storage with junk panels — the auth check stops
+  // anonymous abuse, but an authed user had no per-user limit beyond what
+  // ai-proxy enforces downstream. Since composite-products is sometimes
+  // called WITHOUT a follow-up ai-proxy call (e.g. client aborts between
+  // the two), ai-proxy's hourly cap doesn't cover this path.
+  //
+  // We deliberately do NOT call the shared `check_ai_rate_limit` RPC here.
+  // That RPC updates `last_request = now()` on success, which would
+  // interfere with ai-proxy's 2000ms cooldown — composite-products is
+  // normally called 2-5 seconds before ai-proxy, and if the panel build
+  // is fast (<2s), ai-proxy would then get cooldown-blocked by our own
+  // write.  Breaking generation is worse than letting an abuser through.
+  //
+  // Instead we measure the actual abuse signal directly: how many panel
+  // files this user has uploaded in the last hour. The sortBy=created_at
+  // + limit ordering guarantees we only scan the most recent HOURLY_CAP+1
+  // entries (cheap regardless of total folder size). Failures here are
+  // non-fatal — we log and let the request through rather than blocking
+  // legitimate generations if Storage.list has a momentary hiccup.
+  try {
+    const HOURLY_CAP = 60;
+    const { data: recentFiles, error: listErr } = await supabase.storage
+      .from("room-uploads")
+      .list(`product-panels/${user_id}`, {
+        limit: HOURLY_CAP + 1,
+        sortBy: { column: "created_at", order: "desc" },
+      });
+
+    if (listErr) {
+      console.warn(`[composite] Rate limit list failed (fail-open): ${listErr.message}`);
+    } else if (recentFiles && recentFiles.length >= HOURLY_CAP) {
+      const cutoff = Date.now() - 3_600_000;
+      const recentCount = recentFiles.filter((f) => {
+        const ts = f.created_at ? Date.parse(f.created_at) : 0;
+        return Number.isFinite(ts) && ts >= cutoff;
+      }).length;
+      if (recentCount >= HOURLY_CAP) {
+        console.warn(
+          `[composite] Rate limited: user=${user_id} | ${recentCount} panels in last hour`,
+        );
+        return errResp(
+          `Hourly panel cap reached (${HOURLY_CAP}/hr). Please wait before building more.`,
+          429,
+        );
+      }
+    }
+  } catch (rateLimitErr) {
+    // Fail-open: a Storage API blip should not block generation. ai-proxy's
+    // own hourly cap (30/hr by default) still applies to downstream flux
+    // calls, which is the costlier resource anyway.
+    console.warn(
+      `[composite] Rate limit check threw (fail-open): ${
+        (rateLimitErr as Error)?.message ?? String(rateLimitErr)
+      }`,
+    );
+  }
+
   // Accept up to 6 URLs as a backup pool — we need exactly 4 panel cells filled.
   // If any URL is broken (wrong content-type, network error, bad JPEG) we skip it
   // and pull from the remaining pool, guaranteeing all 4 cells are filled as long
@@ -96,7 +156,7 @@ Deno.serve(async (req: Request) => {
   const candidateUrls = product_urls.slice(0, 6);
   console.log(`[composite v8] ${candidateUrls.length} candidate URLs | user=${user_id} | cell=${CELL}×${CELL} panel=${PANEL}×${PANEL}`);
 
-  // ── Allocate 512×512 RGBA panel buffer — light gray background ─────────────
+  // ── Allocate 768×768 RGBA panel buffer — light gray background ─────────────
   const panelRGBA = new Uint8Array(PANEL * PANEL * 4);
   for (let i = 0; i < panelRGBA.length; i += 4) {
     panelRGBA[i]     = 240;  // R

@@ -1421,6 +1421,17 @@ export default function HomeScreen({ navigation, route }) {
         } catch (uploadErr) {
           stopLoadingBar(false);
           setGenerating(false);
+          // Structured telemetry for log aggregation. Upload failures rarely
+          // correlate with a downstream cost (Replicate never billed) but we
+          // still want to track how often they happen to catch Supabase
+          // Storage flakiness or network reliability issues.
+          console.log(
+            '[genmeta]',
+            'event=upload_failed',
+            'pipeline=none',
+            'generationId=' + generationId,
+            'err=' + String(uploadErr?.message || uploadErr).substring(0, 120)
+          );
           Alert.alert(
             'Upload Failed',
             'Could not upload your room photo. Please check your connection and try again.'
@@ -1453,19 +1464,75 @@ export default function HomeScreen({ navigation, route }) {
             genMeta.pipeline = 'single-product';
             log('single-product gen complete | url=' + resultUrl?.substring(0, 80));
 
-            // ── Cost tracking (same as full-room) ─────────────────────────
-            if (generationSource === 'token') {
-              await deductToken();
-              refreshTokenBalance();
-            } else {
-              await recordGeneration();
-              refreshQuota();
+            // Structured telemetry for successful single-product generation.
+            // Previously missing — BFL-fallback and single-product pipeline
+            // ratios were invisible in production logs because only the
+            // Replicate-success path emitted [genmeta]. Now every terminal
+            // state (success, failure, upload-failure, deduct-failure)
+            // emits exactly one structured line so dashboards can compute
+            // accurate pipeline breakdowns.
+            console.log(
+              '[genmeta]',
+              'event=success',
+              'pipeline=single-product',
+              'generationId=' + generationId,
+              'productId=' + (singleProduct?.id || '(none)'),
+              'source=' + generationSource
+            );
+
+            // ── Cost tracking (isolated from generation try/catch) ────────
+            // CRITICAL: if deductToken / recordGeneration throws (e.g. network
+            // blip while hitting Supabase RPC), the generation has ALREADY
+            // succeeded — we have `resultUrl` in hand. Prior to this fix, the
+            // outer catch would swallow the success, show "Generation Failed",
+            // and the user would lose both the $0.13 generation AND have no
+            // wish decrement. Now: log the failure as a warning so telemetry
+            // can track it, but continue showing the result. The user gets
+            // their image; we eat the cost of the missed decrement rather
+            // than double-punishing the user for our network hiccup.
+            try {
+              if (generationSource === 'token') {
+                await deductToken();
+                refreshTokenBalance();
+              } else {
+                await recordGeneration();
+                refreshQuota();
+              }
+            } catch (deductErr) {
+              console.warn(
+                '[Gen] deduct/record failed on single-product path — result shown anyway.',
+                'source=' + generationSource,
+                'err=' + (deductErr?.message || deductErr),
+                'generationId=' + generationId,
+                'resultUrl=' + (resultUrl ? resultUrl.substring(0, 80) : '(none)')
+              );
+              // Emit structured telemetry so dashboards can count these and
+              // investigate if the rate spikes. Log level 'warn' not 'error'
+              // because the user experience is not broken.
+              console.log(
+                '[genmeta]',
+                'event=deduct_failed',
+                'pipeline=' + genMeta.pipeline,
+                'source=' + generationSource,
+                'generationId=' + generationId
+              );
             }
 
           } catch (genErr) {
             stopLoadingBar(false);
             setGenerating(false);
             setSingleProduct(null);
+            // Structured telemetry — single-product generation failed.
+            // pipeline may or may not have been set (depends on whether
+            // we got past the preflightUrl check). Use 'single-product'
+            // as a best-effort attribution since that's the mode we were in.
+            console.log(
+              '[genmeta]',
+              'event=gen_failed',
+              'pipeline=single-product',
+              'generationId=' + generationId,
+              'err=' + String(genErr?.message || genErr).substring(0, 120)
+            );
             Alert.alert(
               'Generation Failed',
               'We couldn\'t place this product in your room. Please try again in a moment.'
@@ -1633,14 +1700,18 @@ export default function HomeScreen({ navigation, route }) {
             // Structured telemetry: exactly which pipeline ran. Grep prod
             // logs for `[genmeta]` to see panel vs individual-capped ratios
             // and catch any regression in the 2×2 panel path cost/routing.
+            // Added event=success so all terminal states use a consistent
+            // event= key that log aggregators can group on.
             console.log(
               '[genmeta]',
+              'event=success',
               'pipeline=' + genMeta.pipeline,
               'generationId=' + generationId,
               'productsIn=' + reachableProducts.length,
               'productsUsed=' + finalProducts.length,
               'predictionId=' + (genMeta.predictionId || '(none)'),
-              'seed=' + (genMeta.seed ?? '(none)')
+              'seed=' + (genMeta.seed ?? '(none)'),
+              'source=' + generationSource
             );
             log('replicate complete | url=' + resultUrl.substring(0, 80) + ' | finalProducts=' + finalProducts.length);
           } catch (repErr) {
@@ -1669,20 +1740,75 @@ export default function HomeScreen({ navigation, route }) {
             finalProducts = bflProducts;
             genMeta.pipeline = 'bfl';
             log('BFL complete');
+            // Structured telemetry for BFL-fallback success. Previously
+            // missing — without this, the BFL pipeline's hit rate was
+            // invisible in logs and we couldn't detect when Replicate was
+            // failing at a higher-than-expected rate. Cost context: BFL
+            // is ~$0.04 vs Replicate's ~$0.13, so a sudden spike in
+            // event=success+pipeline=bfl counts is a flag that our primary
+            // pipeline is degraded.
+            console.log(
+              '[genmeta]',
+              'event=success',
+              'pipeline=bfl',
+              'generationId=' + generationId,
+              'productsIn=' + reachableProducts.length,
+              'productsUsed=' + bflProducts.length,
+              'source=' + generationSource
+            );
           }
 
-          // Record generation based on payment source
-          if (generationSource === 'token') {
-            await deductToken();
-            refreshTokenBalance();
-          } else {
-            await recordGeneration();
-            refreshQuota();
+          // ── Cost tracking (isolated from generation try/catch) ──────────
+          // Same isolation as single-product path above. By this point we
+          // have a valid resultUrl from either Replicate or BFL. If the
+          // deduct/record call to Supabase fails (transient network, RPC
+          // error, stale session), we MUST still show the user their
+          // generated image. Swallow the error, log it loudly for later
+          // reconciliation, and continue. The alternative (dropping through
+          // to the outer catch) would hide a successful $0.13 generation
+          // from the user while also not decrementing their wish — the
+          // worst possible UX + revenue outcome.
+          try {
+            if (generationSource === 'token') {
+              await deductToken();
+              refreshTokenBalance();
+            } else {
+              await recordGeneration();
+              refreshQuota();
+            }
+          } catch (deductErr) {
+            console.warn(
+              '[Gen] deduct/record failed on full-room path — result shown anyway.',
+              'source=' + generationSource,
+              'err=' + (deductErr?.message || deductErr),
+              'generationId=' + generationId,
+              'pipeline=' + genMeta.pipeline,
+              'resultUrl=' + (resultUrl ? resultUrl.substring(0, 80) : '(none)')
+            );
+            console.log(
+              '[genmeta]',
+              'event=deduct_failed',
+              'pipeline=' + genMeta.pipeline,
+              'source=' + generationSource,
+              'generationId=' + generationId
+            );
           }
 
         } catch (genErr) {
           stopLoadingBar(false);
           setGenerating(false);
+          // Structured telemetry — full-room generation failed on BOTH
+          // Replicate and BFL (or at an earlier step like product match).
+          // genMeta.pipeline may be 'panel' / 'individual-capped' / 'bfl'
+          // depending on how far we got before the throw, or null if we
+          // failed before any pipeline was attempted.
+          console.log(
+            '[genmeta]',
+            'event=gen_failed',
+            'pipeline=' + (genMeta.pipeline || 'pre-pipeline'),
+            'generationId=' + generationId,
+            'err=' + String(genErr?.message || genErr).substring(0, 120)
+          );
           Alert.alert(
             'Generation Failed',
             'We couldn\'t generate your wish right now. Please try again in a moment.'
@@ -1784,6 +1910,19 @@ export default function HomeScreen({ navigation, route }) {
       stopLoadingBar(false);
       setGenerating(false);
       setGenStatus('');
+      // Structured telemetry — outermost error boundary. This catches things
+      // like vision verification throws, setResultData failures, or anything
+      // between pipeline success and navigation.navigate. genMeta is NOT in
+      // scope here (declared inside the outer try), so we reference only
+      // generationId. This is the "last resort" bucket — any spike here
+      // points to a bug in the post-generation flow (verify, save, navigate).
+      console.log(
+        '[genmeta]',
+        'event=outer_error',
+        'pipeline=unknown',
+        'generationId=' + generationId,
+        'err=' + String(err?.message || err).substring(0, 120)
+      );
       Alert.alert('Generation Failed', err.message || 'Something went wrong. Please try again.');
     } finally {
       // Always release the double-tap lock, no matter how we exit the try —

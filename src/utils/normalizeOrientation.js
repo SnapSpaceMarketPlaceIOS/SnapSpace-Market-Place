@@ -1,5 +1,6 @@
 /**
- * normalizeOrientation — bake any EXIF rotation into raw pixels.
+ * normalizeOrientation — bake any EXIF rotation into raw pixels AND report
+ * the true post-rotation dimensions.
  *
  * Why: iOS stores landscape photos as portrait-shaped pixel matrices with an
  * EXIF Orientation tag (e.g. code 6 = "rotate 90° CW when displaying"). Most
@@ -20,10 +21,17 @@
  *     encoder writes a fresh JPEG with NO orientation metadata. The output
  *     is always raw pixels matching the visual orientation the user captured.
  *   - Does NOT depend on `exifOrientation` being populated or correct.
- *   - Dumps a structured debug line so we can verify end-to-end from device
- *     logs which branch fired for any given capture.
+ *   - Returns the post-rotation dimensions from manipulateAsync's result.
+ *     These are the TRUE dimensions of the final JPEG bytes, not the raw
+ *     capture's possibly-swapped w/h. This is critical for pickAspectRatio
+ *     downstream — without it, a landscape photo whose EXIF Orientation
+ *     field is undefined would be sent to flux-2-max with a portrait
+ *     aspect ratio bucket, and the rendered result would be rotated 90°.
  *
- * Falls back to the original URI on failure so users never lose a photo.
+ * Return contract:
+ *   Always returns { uri, width, height }. On manipulation failure,
+ *   returns the original uri with width/height = null so the caller can
+ *   fall back to Image.getSize or skip aspect-ratio optimization.
  */
 
 import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
@@ -34,7 +42,7 @@ export async function normalizeOrientation(uri, exifOrientation = null) {
 
   if (!uri) {
     console.warn(tag, 'no uri provided', inputInfo);
-    return uri;
+    return { uri, width: null, height: null };
   }
 
   try {
@@ -58,14 +66,25 @@ export async function normalizeOrientation(uri, exifOrientation = null) {
       'dims=' + result.width + 'x' + result.height
     );
 
-    return result.uri;
+    // result.width/height are the TRUE post-rotation pixel dimensions.
+    // For a landscape photo captured in portrait-shaped matrix + EXIF=6,
+    // the input "width" might be 3024 and "height" 4032 (portrait-shape
+    // pixel matrix), but the result after decode+rotate+encode will be
+    // width=4032, height=3024 (actual landscape pixels). We return these
+    // values so downstream code uses the real geometry, not the EXIF-
+    // dependent computed swap from the raw capture.
+    return {
+      uri: result.uri,
+      width: result.width ?? null,
+      height: result.height ?? null,
+    };
   } catch (err) {
     // If the manipulate fails (expo-image-manipulator native module missing
     // from the current dev-client, corrupt input, disk full, etc.) fall back
     // to the original URI rather than blocking the user. Worse to lose the
-    // photo than show it sideways.
+    // photo than show it sideways. Caller will fall back to Image.getSize.
     console.warn(tag, 'manipulateAsync failed — returning original URI:',
       err?.message || err, inputInfo);
-    return uri;
+    return { uri, width: null, height: null };
   }
 }

@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   Alert,
   Linking,
+  Image, // for Image.getSize fallback when manipulateAsync doesn't return dims
 } from 'react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import * as ImagePicker from 'expo-image-picker';
@@ -39,6 +40,49 @@ function GalleryIcon({ size = 22, color = 'rgba(255,255,255,0.9)' }) {
       <Polyline points="21 15 16 10 5 21" />
     </Svg>
   );
+}
+
+// ─── Dimension resolver ───────────────────────────────────────────────────────
+//
+// Why this exists:
+// `normalizeOrientation` returns the true post-rotation pixel dimensions by
+// reading what `manipulateAsync` actually encoded. In the 99% case that's all
+// we need. But if manipulateAsync itself failed (native module missing from a
+// stale dev client, disk full, corrupt input), we get back `width: null,
+// height: null` and need a fallback so `pickAspectRatio` downstream doesn't
+// choke on NaN.
+//
+// `Image.getSize(uri)` is a synchronous RN built-in that reads pixel dims
+// from the file/URL header without decoding the whole bitmap. It's slightly
+// slower than using the manipulateAsync return value directly, but it never
+// lies about orientation (reads the actual encoded bytes, not EXIF).
+//
+// The old SnapScreen code did the opposite: trusted `photo.exif?.Orientation`
+// to compute a swap of `photo.width`/`photo.height`. On iOS 26 iPhone 14 Pro
+// that field is often undefined for landscape captures, producing wrong dims
+// → wrong aspect ratio bucket → flux-2-max rendering portrait for landscape
+// sources. This resolver removes that EXIF dependency entirely.
+function resolveDimensions(uri, manipulatedWidth, manipulatedHeight) {
+  if (manipulatedWidth && manipulatedHeight) {
+    return Promise.resolve({ width: manipulatedWidth, height: manipulatedHeight });
+  }
+  return new Promise(resolve => {
+    Image.getSize(
+      uri,
+      (width, height) => {
+        console.log('[Snap] resolveDimensions via Image.getSize', { width, height });
+        resolve({ width, height });
+      },
+      err => {
+        // Worst case: we can't read dims at all. Return nulls so the upstream
+        // code falls back to its own Image.getSize block (HomeScreen has one)
+        // or to aspect-ratio defaults. Never crash.
+        console.warn('[Snap] resolveDimensions Image.getSize failed:',
+          err?.message || err);
+        resolve({ width: null, height: null });
+      }
+    );
+  });
 }
 
 // ─── SnapScreen ───────────────────────────────────────────────────────────────
@@ -130,17 +174,40 @@ export default function SnapScreen({ navigation, route }) {
       );
 
       const orientation = photo.exif?.Orientation ?? 1;
-      const dimsSwapped = orientation >= 5 && orientation <= 8;
-      const finalWidth  = dimsSwapped ? photo.height : photo.width;
-      const finalHeight = dimsSwapped ? photo.width  : photo.height;
 
-      // Always re-encode. The new normalizeOrientation no longer depends on
-      // EXIF — it just forces a decode→encode round trip which bakes any
-      // rotation metadata into pixels. Safe to call even when orientation=1.
-      const normalizedUri = await normalizeOrientation(photo.uri, orientation);
+      // Re-encode to bake EXIF rotation into pixels AND read back the TRUE
+      // post-rotation dimensions. This replaces the old EXIF-swap heuristic
+      // (`dimsSwapped = orientation >= 5 && orientation <= 8`) which produced
+      // wrong dims on iOS 26 iPhone 14 Pro where `photo.exif.Orientation` is
+      // often undefined for landscape captures. `normalizeOrientation` now
+      // returns `{ uri, width, height }` reflecting actual encoded bytes.
+      const normalized = await normalizeOrientation(photo.uri, orientation);
+
+      // Prefer the dims from the re-encoded file. If manipulateAsync failed,
+      // fall back to Image.getSize on the (original) URI. Only in a total
+      // failure case do we send dims as null and let HomeScreen's own
+      // Image.getSize safety net at line 1355 resolve them.
+      const { width: finalWidth, height: finalHeight } = await resolveDimensions(
+        normalized.uri,
+        normalized.width,
+        normalized.height
+      );
+
+      console.log(
+        '[Snap capture] dims resolved',
+        'exifOrientation=' + orientation,
+        'rawCaptureWH=' + photo.width + 'x' + photo.height,
+        'finalWH=' + finalWidth + 'x' + finalHeight,
+        'swapDetected=' + (photo.width !== finalWidth || photo.height !== finalHeight)
+      );
 
       navigation.navigate('Home', {
-        capturedPhoto: { uri: normalizedUri, base64: null, width: finalWidth, height: finalHeight },
+        capturedPhoto: {
+          uri: normalized.uri,
+          base64: null,
+          width: finalWidth,
+          height: finalHeight,
+        },
         singleProduct,  // null for normal flow, product object for single-product visualize
       });
     } catch (err) {
@@ -197,13 +264,33 @@ export default function SnapScreen({ navigation, route }) {
       );
 
       const orientation = asset.exif?.Orientation ?? 1;
-      const dimsSwapped = orientation >= 5 && orientation <= 8;
-      const finalWidth  = dimsSwapped ? asset.height : asset.width;
-      const finalHeight = dimsSwapped ? asset.width  : asset.height;
-      const normalizedUri = await normalizeOrientation(asset.uri, orientation);
+
+      // Same fix as handleCapture: trust re-encoded bytes, not EXIF swap math.
+      // iOS Photos library exports may or may not include Orientation in asset
+      // metadata — same undefined-on-iOS-26 risk as expo-camera captures.
+      const normalized = await normalizeOrientation(asset.uri, orientation);
+
+      const { width: finalWidth, height: finalHeight } = await resolveDimensions(
+        normalized.uri,
+        normalized.width,
+        normalized.height
+      );
+
+      console.log(
+        '[Snap library pick] dims resolved',
+        'exifOrientation=' + orientation,
+        'rawAssetWH=' + asset.width + 'x' + asset.height,
+        'finalWH=' + finalWidth + 'x' + finalHeight,
+        'swapDetected=' + (asset.width !== finalWidth || asset.height !== finalHeight)
+      );
 
       navigation.navigate('Home', {
-        capturedPhoto: { uri: normalizedUri, base64: null, width: finalWidth, height: finalHeight },
+        capturedPhoto: {
+          uri: normalized.uri,
+          base64: null,
+          width: finalWidth,
+          height: finalHeight,
+        },
         singleProduct,  // null for normal flow, product object for single-product visualize
       });
     } catch (err) {
@@ -217,14 +304,52 @@ export default function SnapScreen({ navigation, route }) {
   if (!permission) return <View style={s.container} />;
 
   if (!permission.granted) {
+    // Onboarding escape hatch:
+    // Before this fix, a user who denied camera permission while the
+    // tutorial was on step 2 (camera) became trapped — the onboarding
+    // overlay only renders inside the `permission.granted` branch below,
+    // so Skip wasn't reachable. Going back to Home didn't help either,
+    // because `currentStep` was already advanced past 'chat_bar', so the
+    // step-1 overlay wouldn't re-render on Home. The only way out was to
+    // force-quit and re-open the app.
+    //
+    // Fix: if the tutorial's camera step is active when we render the
+    // permission CTA, also render a "Skip tutorial" button so the user
+    // can exit the flow without granting camera access.
+    //
+    // Also added an Open Settings affordance for users who've previously
+    // denied permission (`canAskAgain === false`) — `requestPermission`
+    // silently no-ops in that case, so the only way to grant is through
+    // iOS Settings. Without this, the Enable Camera button looks broken.
+    const cameraStepActive = isStepActive('camera');
+    const canReprompt = permission.canAskAgain !== false;
+
     return (
       <View style={[s.container, { justifyContent: 'center', alignItems: 'center', gap: 16 }]}>
         <Text style={{ color: '#fff', fontSize: 16, textAlign: 'center', paddingHorizontal: 32, fontFamily: 'Geist_400Regular' }}>
           Camera access is needed to photograph your room for AI design.
         </Text>
-        <TouchableOpacity style={s.permBtn} onPress={requestPermission}>
-          <Text style={{ color: '#fff', fontWeight: '700', fontFamily: 'Geist_700Bold' }}>Enable Camera</Text>
+        <TouchableOpacity
+          style={s.permBtn}
+          onPress={canReprompt ? requestPermission : () => Linking.openSettings?.()}
+        >
+          <Text style={{ color: '#fff', fontWeight: '700', fontFamily: 'Geist_700Bold' }}>
+            {canReprompt ? 'Enable Camera' : 'Open Settings'}
+          </Text>
         </TouchableOpacity>
+
+        {cameraStepActive && (
+          <TouchableOpacity
+            onPress={finishOnboarding}
+            style={{ marginTop: 8, paddingVertical: 10, paddingHorizontal: 16 }}
+            accessibilityLabel="Skip tutorial"
+            accessibilityRole="button"
+          >
+            <Text style={{ color: 'rgba(255,255,255,0.7)', fontSize: 14, fontFamily: 'Geist_400Regular', textDecorationLine: 'underline' }}>
+              Skip tutorial
+            </Text>
+          </TouchableOpacity>
+        )}
       </View>
     );
   }
