@@ -23,6 +23,7 @@ import * as FileSystem from 'expo-file-system/legacy';
 import CardImage from '../components/CardImage';
 import AutoImage from '../components/AutoImage';
 import LensLoader from '../components/LensLoader';
+import AffiliateDisclosure from '../components/AffiliateDisclosure';
 import Svg, { Path, Circle, Polyline, Line, G, Ellipse } from 'react-native-svg';
 import { colors } from '../constants/colors';
 import { colors as C } from '../constants/theme';
@@ -487,6 +488,11 @@ export default function ShopTheLookScreen({ route, navigation }) {
             </View>
           </View>
         )}
+
+        {/* FTC + Apple 2.3.1 affiliate disclosure. ShopTheLook is a browsing
+            surface for catalog products with affiliate links to Amazon /
+            Wayfair / Houzz — disclosure must appear where the links live. */}
+        <AffiliateDisclosure style={{ marginTop: 8 }} />
 
         <View style={{ height: 120 }} />
       </ScrollView>

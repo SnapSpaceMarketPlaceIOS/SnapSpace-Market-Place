@@ -16,6 +16,7 @@ import {
 import CardImage from '../components/CardImage';
 import LensLoader from '../components/LensLoader';
 import AutoImage from '../components/AutoImage';
+import AffiliateDisclosure from '../components/AffiliateDisclosure';
 import Svg, { Path, Circle, Polyline, Line, G, Ellipse } from 'react-native-svg';
 import { colors } from '../constants/colors';
 import { colors as C } from '../constants/theme';
@@ -638,6 +639,10 @@ export default function RoomResultScreen({ route, navigation }) {
             </View>
           </>
         )}
+
+        {/* FTC + Apple 2.3.1 required affiliate disclosure — must appear
+            on every screen that surfaces affiliate product links. */}
+        <AffiliateDisclosure style={{ marginTop: 8 }} />
 
         <View style={{ height: 120 }} />
       </ScrollView>
