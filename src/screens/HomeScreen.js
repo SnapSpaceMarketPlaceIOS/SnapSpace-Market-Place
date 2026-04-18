@@ -1455,21 +1455,27 @@ export default function HomeScreen({ navigation, route }) {
         } catch (uploadErr) {
           stopLoadingBar(false);
           setGenerating(false);
-          // Structured telemetry for log aggregation. Upload failures rarely
-          // correlate with a downstream cost (Replicate never billed) but we
-          // still want to track how often they happen to catch Supabase
-          // Storage flakiness or network reliability issues.
           console.log(
             '[genmeta]',
             'event=upload_failed',
             'pipeline=none',
             'generationId=' + generationId,
+            'code=' + (uploadErr?.code || 'unknown'),
             'err=' + String(uploadErr?.message || uploadErr).substring(0, 120)
           );
-          Alert.alert(
-            'Upload Failed',
-            'Could not upload your room photo. Please check your connection and try again.'
-          );
+          // userFacing errors come from the normalize-room-photo edge function
+          // (e.g. "photo is too large (18.2 MB)..." / "could not decode photo...").
+          // Those are the user's problem — show the server's message so they
+          // know to pick a different photo. Generic upload/network errors get
+          // the generic message.
+          if (uploadErr?.userFacing) {
+            Alert.alert("We couldn't use that photo", uploadErr.message);
+          } else {
+            Alert.alert(
+              'Upload Failed',
+              'Could not upload your room photo. Please check your connection and try again.',
+            );
+          }
           return;
         }
 

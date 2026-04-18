@@ -48,6 +48,20 @@ const CORS = {
 // Keeping well under that caps upload size + edge-function memory usage.
 const MAX_EDGE = 1600;
 
+// Pre-decode sanity cap on the uploaded JPEG. iPhone 14 Pro "ProRAW"-style
+// full-res captures can be 10+ MB. Decoding those to RGBA inside a Deno edge
+// function produces 48 MP × 4 bytes ≈ 200 MB — over the typical edge memory
+// limit. Rather than OOM silently (which is what produced the Build 21
+// landscape failures where the client fell back to the raw URL and paid
+// $0.31 for a sideways gen), we reject up-front with a clear error the
+// client can surface to the user.
+const MAX_INPUT_BYTES = 15 * 1024 * 1024; // 15 MB
+
+// Pre-decode sanity cap on raw pixel dimensions. 4032 × 3024 (12 MP) decodes
+// to ~48 MB RGBA — well inside Deno edge memory. 8064 × 6048 (48 MP) would
+// hit ~195 MB which is not. Reject above this so OOM never becomes silent.
+const MAX_INPUT_PIXELS = 20_000_000; // 20 megapixels
+
 // ─── Minimal EXIF Orientation parser ─────────────────────────────────────────
 // Walks the JPEG marker stream looking for the APP1 "Exif\0\0" segment and
 // reads the Orientation tag (0x0112) from IFD0. Returns 1 (no rotation) if
@@ -244,9 +258,49 @@ Deno.serve(async (req: Request) => {
     if (!res.ok) return errResp(`Failed to fetch source: HTTP ${res.status}`, 502);
     const raw = new Uint8Array(await res.arrayBuffer());
 
+    // Pre-decode size guard. Rather than OOMing the edge worker on huge
+    // iPhone captures (which manifested as the client silently falling back
+    // to the raw URL → sideways generation billed at $0.31), reject with a
+    // 413 so the client can show "photo too large, please try a smaller one".
+    if (raw.length > MAX_INPUT_BYTES) {
+      const mb = (raw.length / (1024 * 1024)).toFixed(1);
+      console.warn(`[normalize] reject oversize | user=${user_id} | ${mb} MB > ${MAX_INPUT_BYTES / (1024 * 1024)} MB`);
+      return errResp(
+        `Photo is too large (${mb} MB). Please pick a smaller photo or retake it.`,
+        413,
+      );
+    }
+
     const orientation = readExifOrientation(raw);
-    const decoded = jpeg.decode(raw, { useTArray: true });
+
+    // Decode is the memory-heaviest step — any exception here means we can't
+    // proceed. We throw (caller catches + surfaces) rather than return a
+    // doctored result.
+    let decoded;
+    try {
+      decoded = jpeg.decode(raw, { useTArray: true });
+    } catch (decodeErr) {
+      const msg = (decodeErr as Error)?.message || String(decodeErr);
+      console.warn(`[normalize] decode failed | user=${user_id} | ${msg}`);
+      return errResp(
+        `Could not decode photo (${msg.substring(0, 120)}). Try a different photo.`,
+        422,
+      );
+    }
+
     const { data: rgba0, width: w0, height: h0 } = decoded;
+
+    // Post-decode pixel-count guard. The byte-size check above catches most
+    // oversized uploads, but a heavily compressed JPEG can pass the byte
+    // check yet decode to hundreds of megabytes of RGBA. Reject those too.
+    if (w0 * h0 > MAX_INPUT_PIXELS) {
+      const mp = ((w0 * h0) / 1_000_000).toFixed(1);
+      console.warn(`[normalize] reject hi-res | user=${user_id} | ${mp} MP > ${MAX_INPUT_PIXELS / 1_000_000} MP | dims=${w0}x${h0}`);
+      return errResp(
+        `Photo resolution is too high (${mp} MP). Please pick a smaller photo.`,
+        413,
+      );
+    }
 
     const { data: rgba1, width: w1, height: h1, rotated } =
       applyOrientation(rgba0, w0, h0, orientation);

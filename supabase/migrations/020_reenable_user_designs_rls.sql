@@ -1,0 +1,24 @@
+-- Re-enable Row-Level Security on public.user_designs.
+--
+-- Migration 008 enabled RLS originally, but Supabase's Security Advisor
+-- reported on 2026-04-18 that RLS is currently DISABLED on this table —
+-- meaning the SELECT/INSERT/UPDATE/DELETE policies defined in 008 are
+-- present but NOT ENFORCED. Any client with the public anon key (which
+-- ships in every app bundle) can read, insert, update, or delete any row
+-- in this table, bypassing the per-user policies entirely.
+--
+-- Impact before this fix:
+--   - A malicious user could enumerate every other user's generated design
+--     prompts + image URLs by querying user_designs with the anon key.
+--   - A malicious user could delete or modify other users' designs.
+--
+-- Impact after this fix:
+--   - The existing policies from migration 008 ("Public designs are viewable
+--     by everyone", "Users can view/create/update/delete own designs") become
+--     active. Public designs (visibility = 'public') remain readable by
+--     anyone; private designs (visibility = 'private') are only readable by
+--     their owner. Inserts/updates/deletes are restricted to the owner.
+--
+-- Idempotent: `ENABLE ROW LEVEL SECURITY` is a no-op if already enabled.
+
+ALTER TABLE public.user_designs ENABLE ROW LEVEL SECURITY;

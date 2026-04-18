@@ -269,28 +269,44 @@ export async function uploadRoomPhoto(userId, uri, base64Data = null) {
       // rotate + re-encode + upload. Typical warm path is 1–3s.
       signal: AbortSignal.timeout(30_000),
     });
-    if (!res.ok) {
-      const text = await res.text().catch(() => '');
-      console.warn(
-        `[uploadRoomPhoto] normalize failed HTTP ${res.status}: ${text.substring(0, 200)} — using raw URL`,
-      );
+
+    if (res.ok) {
+      const data = await res.json().catch(() => null);
+      if (data?.url) {
+        console.log(
+          `[uploadRoomPhoto] normalized | orient=${data.orientation} rotated=${data.rotated} dims=${data.dims}`,
+        );
+        return data.url;
+      }
+      console.warn('[uploadRoomPhoto] normalize returned 200 but no URL — using raw URL');
       return rawUrl;
     }
-    const data = await res.json();
-    if (!data?.url) {
-      console.warn('[uploadRoomPhoto] normalize returned no URL — using raw URL');
-      return rawUrl;
+
+    // Non-2xx. 4xx = the photo itself is the problem (too large / undecodable);
+    // the user needs to pick a different one. We surface those as UploadPhotoError
+    // so the UI can show a specific message instead of silently billing the user
+    // for a broken generation (the raw-URL fallback shipped sideways bytes to
+    // Replicate and charged $0.31 for a useless result). 5xx = our server
+    // problem; the raw-URL fallback is still a better UX than an error alert.
+    let body = '';
+    try { body = await res.text(); } catch { /* ignore */ }
+    let parsed = null;
+    try { parsed = JSON.parse(body); } catch { /* keep body as text */ }
+    const reason = parsed?.error || body || `HTTP ${res.status}`;
+
+    if (res.status >= 400 && res.status < 500) {
+      console.warn(`[uploadRoomPhoto] normalize rejected (${res.status}): ${reason}`);
+      const err = new Error(reason);
+      err.userFacing = true;
+      err.code = `NORMALIZE_${res.status}`;
+      throw err;
     }
-    console.log(
-      `[uploadRoomPhoto] normalized | orient=${data.orientation} rotated=${data.rotated} dims=${data.dims}`,
-    );
-    return data.url;
+
+    console.warn(`[uploadRoomPhoto] normalize 5xx (${res.status}): ${reason} — using raw URL`);
+    return rawUrl;
   } catch (err) {
-    console.warn(
-      '[uploadRoomPhoto] normalize threw:',
-      err?.message || err,
-      '— using raw URL',
-    );
+    if (err?.userFacing) throw err; // let caller show the message
+    console.warn('[uploadRoomPhoto] normalize threw:', err?.message || err, '— using raw URL');
     return rawUrl;
   }
 }

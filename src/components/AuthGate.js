@@ -290,6 +290,24 @@ const mS = StyleSheet.create({
 
 // ── AuthGate ──────────────────────────────────────────────────────────────────
 
+// Module-level state so the sign-in/sign-up mode is shared across every tab's
+// AuthGate mount. Previously each tab (Snap, Cart, Profile, Explore) rendered
+// its own AuthGate with its own `isSignUp = useState(true)`, so tapping
+// between tabs showed different walls (some in sign-up mode, some in sign-in)
+// depending on which tab the user had last interacted with. The user reported
+// this as "multiple different sign-in walls" on 2026-04-18.
+//
+// Defaulting to SIGN-IN (not sign-up) because the majority of users opening
+// the app already have an account — returning users shouldn't see a
+// "create account" form as the default view. New users can still tap the
+// "Sign Up" link at the bottom to switch.
+let _sharedIsSignUp = false;
+const _authModeSubscribers = new Set();
+function setSharedAuthMode(next) {
+  _sharedIsSignUp = next;
+  for (const fn of _authModeSubscribers) fn(next);
+}
+
 export default function AuthGate({ title, subtitle, navigation, onSuccess }) {
   const { signUp, signIn, signInWithApple } = useAuth();
 
@@ -299,7 +317,15 @@ export default function AuthGate({ title, subtitle, navigation, onSuccess }) {
   const pressIn  = (anim) => Animated.spring(anim, { toValue: 0.94, useNativeDriver: true, speed: 60, bounciness: 0 }).start();
   const pressOut = (anim) => Animated.spring(anim, { toValue: 1,    useNativeDriver: true, speed: 18, bounciness: 14 }).start();
 
-  const [isSignUp, setIsSignUp] = useState(true);
+  // Subscribe to the shared isSignUp state. Every AuthGate instance on screen
+  // reflects the same mode, so the user never sees two different walls as
+  // they switch tabs.
+  const [isSignUp, setIsSignUpLocal] = useState(_sharedIsSignUp);
+  useEffect(() => {
+    _authModeSubscribers.add(setIsSignUpLocal);
+    return () => { _authModeSubscribers.delete(setIsSignUpLocal); };
+  }, []);
+  const setIsSignUp = setSharedAuthMode;
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -390,7 +416,8 @@ export default function AuthGate({ title, subtitle, navigation, onSuccess }) {
   };
 
   const switchMode = () => {
-    setIsSignUp((v) => !v);
+    // Toggle based on the CURRENT shared mode (isSignUp reflects it reactively).
+    setIsSignUp(!isSignUp);
     setErrors({});
     setPassword('');
     setConfirmPassword('');

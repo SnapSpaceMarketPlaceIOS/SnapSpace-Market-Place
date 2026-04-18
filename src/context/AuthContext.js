@@ -172,9 +172,37 @@ export function AuthProvider({ children }) {
             const profile = await fetchProfile(session.user.id);
             const builtUser = buildUser(session, profile);
             setUser(builtUser);
-            // Register push token on first sign-in or app resume
+            // Register push token on first sign-in — DEFERRED by 3 seconds.
+            //
+            // Why deferred: SIGNED_IN fires immediately after signUp/signIn,
+            // and the entire downstream Context tree (Subscription, Cart,
+            // Liked, Shared, OrderHistory) simultaneously re-mounts because
+            // `user.id` changed. Firing the native push-token TurboModule
+            // call in the same tick as that mount storm has correlated with
+            // Fabric use-after-free crashes on iPhone 14 Pro / iOS 26
+            // (2026-04-18 TestFlight crash report: frame 0 = `objc_retain`
+            // inside `-[RCTViewComponentView unmountChildComponentView:]`).
+            //
+            // A 3s delay lets the UI settle before we hand the native module
+            // any work, which removes the pressure on Fabric's mount queue
+            // during the most volatile moment of the app lifecycle. The
+            // user never waits on push registration anyway — it's fire-and-
+            // forget — so deferring has zero UX cost.
+            //
+            // The setTimeout callback also gets its OWN try/catch. The outer
+            // `.catch(() => {})` only catches Promise rejections; a
+            // synchronous Obj-C exception thrown inside the native module
+            // would bypass it. Wrapping the call in a JS try ensures any
+            // synchronous throw lands somewhere safe.
             if (event === 'SIGNED_IN') {
-              registerForPushNotifications(session.user.id).catch(() => {});
+              setTimeout(() => {
+                if (!mounted) return;
+                try {
+                  registerForPushNotifications(session.user.id).catch(() => {});
+                } catch (e) {
+                  console.warn('[Auth] push registration threw synchronously (non-fatal):', e?.message || e);
+                }
+              }, 3000);
             }
           } catch {
             setUser(buildUser(session, null));

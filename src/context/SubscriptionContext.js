@@ -71,7 +71,7 @@ const DEFAULT_SUBSCRIPTION = FORCE_PAID_TIER
 const SubscriptionContext = createContext(null);
 
 export function SubscriptionProvider({ children }) {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
 
   const [subscription, setSubscription] = useState(DEFAULT_SUBSCRIPTION);
   const [iapReady, setIapReady] = useState(false);
@@ -86,6 +86,30 @@ export function SubscriptionProvider({ children }) {
 
   const purchaseUpdateSub = useRef(null);
   const purchaseErrorSub  = useRef(null);
+
+  // Reset per-user state when the signed-in user changes.
+  //
+  // Without this, after user A signs out and user B signs in on the same
+  // device, user B would briefly see user A's `subscription` (tier, quota,
+  // generations used) and `tokenBalance` until the background refresh RPCs
+  // complete. That was a root cause of the "Anthony's inbox shows up when
+  // I log in as info@" bug reported 2026-04-18.
+  //
+  // Same pattern CartContext/LikedContext/SharedContext/OrderHistoryContext
+  // already use. Ref starts undefined so a cold-boot (undefined → first id)
+  // doesn't wipe state before the backend fetches happen.
+  const lastUserIdRef = useRef(undefined);
+  useEffect(() => {
+    if (authLoading) return;
+    const currentId = user?.id || null;
+    const previousId = lastUserIdRef.current;
+    if (previousId === currentId) return;
+    lastUserIdRef.current = currentId;
+    if (previousId === undefined) return;
+    // Actual user change (sign-out or account switch) — reset to defaults.
+    setSubscription(DEFAULT_SUBSCRIPTION);
+    setTokenBalance(0);
+  }, [user?.id, authLoading]);
 
   // ── Initialize IAP connection ────────────────────────────────────────────
   useEffect(() => {
