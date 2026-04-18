@@ -246,16 +246,11 @@ export function AuthProvider({ children }) {
                   console.warn('[Auth] push registration threw synchronously (non-fatal):', e?.message || e);
                 }
               }, 3000);
-              // Warm up the normalize-room-photo + composite-products edge
-              // functions so the user's first photo upload doesn't hit a
-              // 5–15s cold-start (which causes uploadRoomPhoto to silently
-              // fall back to the raw URL, shipping sideways bytes to
-              // flux-2-max — confirmed as the root cause of the Build 24
-              // "still sideways" bug). Deferred 1s so we don't compete with
-              // the native signIn network traffic.
-              setTimeout(() => {
-                if (mounted) warmupEdgeFunctions();
-              }, 1000);
+              // Build 26: edge-fn warmup removed. It crashed RN's native
+              // bridge on first-launch-post-update (see warmupEdgeFunctions
+              // in services/supabase.js for the full explanation). Cold-
+              // start mitigation will be reworked as a pure-JS retry at
+              // the real call site in a future build.
             }
           } catch {
             setUser(buildUser(session, null));

@@ -148,21 +148,19 @@ export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
  * at flux-2-max" bug on the first generation post-deploy.
  */
 export function warmupEdgeFunctions() {
-  const urls = [
-    `${SUPABASE_URL}/functions/v1/normalize-room-photo`,
-    `${SUPABASE_URL}/functions/v1/composite-products`,
-  ];
-  for (const url of urls) {
-    fetch(url, {
-      method: 'OPTIONS',
-      // Short timeout — if warm-up fails we don't care, the real call will
-      // retry. We're just nudging Deno to stay hot.
-      signal: AbortSignal.timeout(5_000),
-    }).then(
-      () => console.log('[warmup] ok ' + url.split('/').pop()),
-      (err) => console.log('[warmup] skipped ' + url.split('/').pop() + ' ' + (err?.message || '').substring(0, 40)),
-    );
-  }
+  // DISABLED in Build 26 after Build 25 crashed with EXC_BAD_ACCESS on the
+  // first launch and Snap tab focus. The OPTIONS + AbortSignal.timeout call
+  // pattern triggered an NSException that RN's bridge could not marshal
+  // back to JS cleanly (see convertNSExceptionToJSError stack frame in the
+  // crash report). The cold-start problem this was meant to paper over
+  // will be addressed in a future build via a pure-JS retry strategy
+  // inside uploadRoomPhoto — NOT by reintroducing native-adjacent calls.
+  //
+  // Kept as an exported no-op so existing imports in AuthContext /
+  // SnapScreen don't break if they miss a removal. The callers should
+  // also be removed, but leaving the symbol safe means a stray call
+  // can never crash again.
+  return;
 }
 
 /**

@@ -105,13 +105,11 @@ export default function SnapScreen({ navigation, route }) {
   useFocusEffect(
     useCallback(() => {
       unlockAll();
-      // Warm up the normalize-room-photo + composite-products edge functions
-      // as soon as the user lands on the camera tab. Between framing the
-      // shot and tapping the shutter, the Deno runtime will be hot — so the
-      // real upload hits a warm runtime (~500ms round-trip) instead of a
-      // cold start (5–15s, which triggered the silent raw-URL fallback
-      // that shipped sideways bytes to flux-2-max in Build 24).
-      warmupEdgeFunctions();
+      // Build 26: removed warmupEdgeFunctions() call here. Calling it from
+      // inside useFocusEffect's callback — which executes synchronously
+      // from a native UIViewController transition — collided with
+      // expo-camera's native view initialization and produced an
+      // EXC_BAD_ACCESS crash in Build 25 when the Snap tab was opened.
       return () => {
         lockPortrait();
       };
