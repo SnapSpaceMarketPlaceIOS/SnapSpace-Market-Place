@@ -42,6 +42,7 @@ import { SELLERS } from '../data/sellers';
 import { searchProducts, getSourceColor, getProductsForPrompt, getNormalizedProductsByIds } from '../services/affiliateProducts';
 import { buildFinalPrompt, generateWithProductRefs, generateWithProductPanel, generateSingleProductInRoom, pickAspectRatio } from '../services/replicate';
 import { createProductPanel } from '../utils/createProductPanel';
+import { normalizeOrientation } from '../utils/normalizeOrientation';
 import { withTimeout } from '../utils/withTimeout';
 import { verifyGeneratedProducts } from '../services/visionMatcher';
 import { PRODUCT_CATALOG } from '../data/productCatalog';
@@ -1082,11 +1083,43 @@ export default function HomeScreen({ navigation, route }) {
       mediaTypes: ['images'],
       // allowsEditing removed — the native crop UI is the 1-2s bottleneck on iOS simulator
       quality: 0.6,
-      exif: false,
+      // exif: true so we can read Orientation and log it for diagnostics.
+      // Was `false` previously, which combined with the missing normalize
+      // call below to silently ship sideways pixels to Replicate — the
+      // TestFlight bug that Build 19 was meant to fix was ONLY fixed on
+      // the SnapScreen path. This handler was a parallel entry point that
+      // bypassed normalizeOrientation entirely.
+      exif: true,
     });
     if (result.canceled || !result.assets?.length) return;
     const asset = result.assets[0];
-    setPhoto({ uri: asset.uri, base64: null, width: asset.width, height: asset.height });
+
+    // Bake EXIF rotation into raw pixels + read true post-rotation dims.
+    // Mirror the SnapScreen library-pick path exactly: normalizeOrientation
+    // uses manipulateAsync with a real resize action to force the native
+    // decode+rotate+encode pipeline (actions:[] doesn't do this reliably on
+    // iPhone 14 Pro / iOS 26). Without this, any photo the user picks from
+    // the Home tab library button gets uploaded with sideways bytes and
+    // flux-2-max ignores the room (same bug as Build 18).
+    const orientation = asset.exif?.Orientation ?? 1;
+    const normalized = await normalizeOrientation(asset.uri, orientation);
+    const finalWidth  = normalized.width  ?? asset.width  ?? null;
+    const finalHeight = normalized.height ?? asset.height ?? null;
+
+    console.log(
+      '[Home library pick] dims resolved',
+      'exifOrientation=' + orientation,
+      'finalWidth=' + finalWidth,
+      'finalHeight=' + finalHeight,
+      'uri=' + String(normalized.uri).substring(0, 80)
+    );
+
+    setPhoto({
+      uri: normalized.uri,
+      base64: null,
+      width: finalWidth,
+      height: finalHeight,
+    });
     setPhotoSource('library');
   }, [generating]);
 
