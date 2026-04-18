@@ -309,7 +309,7 @@ function setSharedAuthMode(next) {
 }
 
 export default function AuthGate({ title, subtitle, navigation, onSuccess }) {
-  const { signUp, signIn, signInWithApple } = useAuth();
+  const { signUp, signIn, signInWithApple, resetPassword } = useAuth();
 
   // ── Button bounce animations ───────────────────────────────────────────────
   const btnScale   = useRef(new Animated.Value(1)).current;
@@ -394,6 +394,27 @@ export default function AuthGate({ title, subtitle, navigation, onSuccess }) {
         isSignUp ? 'Sign Up Failed' : 'Sign In Failed',
         err.message || 'Something went wrong. Please try again.'
       );
+    } finally {
+      safeSetLoading(false);
+    }
+  };
+
+  const handleForgotPassword = async () => {
+    // Mirrors AuthScreen.handleForgotPassword so the UX is identical whether
+    // the user hit this from the full-screen auth or an inline tab gate.
+    if (!email.trim() || !/\S+@\S+\.\S+/.test(email)) {
+      Alert.alert('Enter your email', 'Type your email address above and tap "Forgot password?" again.');
+      return;
+    }
+    safeSetLoading(true);
+    try {
+      await resetPassword(email);
+      Alert.alert(
+        'Check your inbox',
+        `A password reset link has been sent to ${email}.`,
+      );
+    } catch (err) {
+      Alert.alert('Error', err.message || 'Could not send reset email. Please try again.');
     } finally {
       safeSetLoading(false);
     }
@@ -494,6 +515,19 @@ export default function AuthGate({ title, subtitle, navigation, onSuccess }) {
             </>
           )}
 
+          {/* Forgot Password — visible in SIGN-IN mode only, same placement
+              as AuthScreen (above the CTA, right-aligned) so the UX is
+              identical across the full-screen auth and the inline tab gates. */}
+          {!isSignUp && (
+            <TouchableOpacity
+              style={s.forgotBtn}
+              activeOpacity={0.7}
+              onPress={handleForgotPassword}
+            >
+              <Text style={s.forgotText}>Forgot password?</Text>
+            </TouchableOpacity>
+          )}
+
           {/* ── CTA Button ── */}
           <Animated.View style={{ transform: [{ scale: btnScale }] }}>
             <TouchableOpacity
@@ -584,6 +618,9 @@ const s = StyleSheet.create({
   },
 
   err: { fontSize: 12, color: '#E74C3C', marginTop: -8, marginBottom: 10, marginLeft: 4, fontFamily: 'Geist_400Regular' },
+
+  forgotBtn: { alignSelf: 'flex-end', marginBottom: 16, marginTop: -4 },
+  forgotText: { fontSize: 13, color: BLUE, fontWeight: '600', fontFamily: 'Geist_600SemiBold' },
 
   primaryBtn: {
     height: 54,

@@ -326,7 +326,22 @@ export default function RoomResultScreen({ route, navigation }) {
           autoSavedDesignIdRef.current = result.designId;
           setAutoSavedDesignId(result.designId);
         }
-        if (result?.permanentUrl) setResultUri(result.permanentUrl);
+        // Intentionally do NOT overwrite resultUri with result.permanentUrl.
+        //
+        // persistDesignImage() fetches the Replicate CDN URL, re-encodes the
+        // bytes (fetch → arrayBuffer → base64 → Uint8Array → upload), and
+        // stores the result in room-uploads. That round-trip was corrupting
+        // the displayed image — users were seeing a different, weirdly-
+        // generic room from what Replicate actually generated. Confirmed on
+        // Build 24 via side-by-side comparison of Replicate dashboard output
+        // vs. the app's Room Result screen.
+        //
+        // The permanentUrl is STILL saved on the user_designs DB row (via
+        // saveUserDesign's internal persist step) — so when the user opens
+        // this design later from MySpaces, the image is served from our
+        // own bucket and survives Replicate's CDN expiration. But for the
+        // *current* display, the Replicate CDN URL passed via route params
+        // is the canonical pixel truth.
       })
       .catch(err => console.warn('[AutoSave] Failed:', err.message));
   }, [resultUri, user?.id, products, prompt]);

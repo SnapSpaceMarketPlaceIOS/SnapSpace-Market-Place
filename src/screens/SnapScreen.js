@@ -16,6 +16,7 @@ import Svg, { Path, Line, Polyline, Rect, Circle } from 'react-native-svg';
 import { palette } from '../constants/tokens';
 import { useAuth } from '../context/AuthContext';
 import AuthGate from '../components/AuthGate';
+import { warmupEdgeFunctions } from '../services/supabase';
 import TabScreenFade from '../components/TabScreenFade';
 import { useOnboarding, ONBOARDING_STEPS } from '../context/OnboardingContext';
 import OnboardingOverlay from '../components/OnboardingOverlay';
@@ -104,6 +105,13 @@ export default function SnapScreen({ navigation, route }) {
   useFocusEffect(
     useCallback(() => {
       unlockAll();
+      // Warm up the normalize-room-photo + composite-products edge functions
+      // as soon as the user lands on the camera tab. Between framing the
+      // shot and tapping the shutter, the Deno runtime will be hot — so the
+      // real upload hits a warm runtime (~500ms round-trip) instead of a
+      // cold start (5–15s, which triggered the silent raw-URL fallback
+      // that shipped sideways bytes to flux-2-max in Build 24).
+      warmupEdgeFunctions();
       return () => {
         lockPortrait();
       };

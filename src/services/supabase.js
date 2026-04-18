@@ -132,6 +132,40 @@ export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
 });
 
 /**
+ * Fire-and-forget warm-up ping to the normalize-room-photo and composite-
+ * products edge functions. Called from AuthContext when a user signs in
+ * and from SnapScreen when the user opens the camera tab. The goal is to
+ * spin up the Deno runtime on Supabase so the first REAL photo upload
+ * doesn't hit a ~5–15s cold-start that causes uploadRoomPhoto to throw,
+ * silently fall back to the raw URL, and ship sideways bytes to flux-2-max.
+ *
+ * We send an OPTIONS preflight — the edge function's handler responds to
+ * OPTIONS with 200 and no body (no auth required). Cheap, non-disruptive,
+ * and warms the runtime the same way a real POST would.
+ *
+ * Build 25 (2026-04-18): added after the normalize fn silent-fallback was
+ * confirmed as the root cause of the "landscape photo displayed sideways
+ * at flux-2-max" bug on the first generation post-deploy.
+ */
+export function warmupEdgeFunctions() {
+  const urls = [
+    `${SUPABASE_URL}/functions/v1/normalize-room-photo`,
+    `${SUPABASE_URL}/functions/v1/composite-products`,
+  ];
+  for (const url of urls) {
+    fetch(url, {
+      method: 'OPTIONS',
+      // Short timeout — if warm-up fails we don't care, the real call will
+      // retry. We're just nudging Deno to stay hot.
+      signal: AbortSignal.timeout(5_000),
+    }).then(
+      () => console.log('[warmup] ok ' + url.split('/').pop()),
+      (err) => console.log('[warmup] skipped ' + url.split('/').pop() + ' ' + (err?.message || '').substring(0, 40)),
+    );
+  }
+}
+
+/**
  * Wipes the locally-stored Supabase auth token from AsyncStorage.
  * Call this before signInWithPassword when the client may have a
  * stale/corrupted session (e.g. after a crash with bad env vars).

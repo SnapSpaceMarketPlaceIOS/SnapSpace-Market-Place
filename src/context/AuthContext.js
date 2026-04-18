@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import * as AppleAuthentication from 'expo-apple-authentication';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { supabase, fetchProfile } from '../services/supabase';
+import { supabase, fetchProfile, warmupEdgeFunctions } from '../services/supabase';
 import { registerForPushNotifications } from '../services/notifications';
 // Module-level caches live outside React state and are NOT wiped by
 // AsyncStorage.multiRemove. We must call these explicit clearers on every
@@ -136,36 +136,52 @@ export function AuthProvider({ children }) {
     let mounted = true;
 
     const bootstrap = async () => {
-      // Safety net: if getSession() hangs (e.g. no network, bad env vars),
-      // bail out after 8s so the app is never stuck on the loading screen.
+      // Safety net: if getSession() hangs (no network, bad env vars), bail
+      // out after 15s so the app is never stuck on the loading screen.
       //
-      // Why 8s (was 2s): iOS 26 cold AsyncStorage reads routinely take 2–5s
-      // on the first launch. The old 2s budget was shorter than the typical
-      // read, so bootstrap fell through to the "guest" branch while the
-      // cached session was still loading, forcing the user through the sign-
-      // in wall on every refresh/reopen even though they had a valid session
-      // on disk. 8s comfortably covers the iOS 26 worst-case AsyncStorage
-      // cold read without making the truly-offline guest path wait forever.
+      // Why 15s (was 8s, before that 2s): iOS post-update cold launches
+      // combine a cold AsyncStorage read (2–5s on iOS 26) with Supabase's
+      // autoRefreshToken network round-trip (cold DNS + TLS routinely 3–8s
+      // after app update). The 8s budget was still too short on some
+      // devices, leaving the user with an auth wall until force-quit.
+      //
+      // CRITICAL Build 25 change: after the timer fires we NO LONGER refuse
+      // late-arriving sessions. Previously the `!settled` guard in the
+      // finally block locked out any session that arrived after the timer —
+      // so if getSession() eventually resolved at 9s, the user stayed
+      // signed-out until they force-quit. Now: the timer only flips
+      // loading=false (so the UI renders SOMETHING instead of the spinner),
+      // but the session, if it eventually arrives, will still populate
+      // setUser — UNLESS the user has taken a superseding action
+      // (signIn/signUp/signOut) in the meantime, in which case
+      // bootstrapSupersededRef correctly blocks the late result.
+      //
+      // Net behavior: signed-in users on slow networks now see the auth
+      // wall briefly (~15s max) and then it auto-dismisses as the session
+      // lands, instead of being trapped until force-quit.
       let settled = false;
       const timer = setTimeout(() => {
         if (!settled && mounted) {
-          console.log('[Auth] bootstrap timeout — proceeding as guest');
+          console.log('[Auth] bootstrap timeout (15s) — rendering as guest, late session still allowed');
           settled = true;
           loadingRef.current = false;
           setLoading(false);
         }
-      }, 8000);
+      }, 15000);
 
       try {
         const { data: { session } } = await supabase.auth.getSession();
-        // Critical: by the time getSession() resolves, the user may have
-        // already moved on — either the 8s timer fired (settled=true) OR
-        // a user-initiated signIn/signUp/signInWithApple started and set
-        // bootstrapSupersededRef. In either case we must NOT overwrite the
-        // current user state with this stale result, because the cached
-        // session belongs to a PREVIOUS account. Root cause of the Apr 2026
+        // The only reason we must skip this is if the user has taken over
+        // with a signIn/signUp/signOut action — that flips
+        // bootstrapSupersededRef and the late cached session must not
+        // clobber the explicit user choice. Root cause of the Apr 2026
         // "signed in as B, app shows A" revert bug.
-        if (session && mounted && !settled && !bootstrapSupersededRef.current) {
+        //
+        // We INTENTIONALLY do NOT gate on `!settled` anymore. If the
+        // timer fired first, that just means we rendered the UI; it does
+        // not mean the user's session is invalid. When it arrives late,
+        // let it land so the auth wall clears.
+        if (session && mounted && !bootstrapSupersededRef.current) {
           try {
             const profile = await fetchProfile(session.user.id);
             if (mounted && !bootstrapSupersededRef.current) {
@@ -230,6 +246,16 @@ export function AuthProvider({ children }) {
                   console.warn('[Auth] push registration threw synchronously (non-fatal):', e?.message || e);
                 }
               }, 3000);
+              // Warm up the normalize-room-photo + composite-products edge
+              // functions so the user's first photo upload doesn't hit a
+              // 5–15s cold-start (which causes uploadRoomPhoto to silently
+              // fall back to the raw URL, shipping sideways bytes to
+              // flux-2-max — confirmed as the root cause of the Build 24
+              // "still sideways" bug). Deferred 1s so we don't compete with
+              // the native signIn network traffic.
+              setTimeout(() => {
+                if (mounted) warmupEdgeFunctions();
+              }, 1000);
             }
           } catch {
             setUser(buildUser(session, null));
