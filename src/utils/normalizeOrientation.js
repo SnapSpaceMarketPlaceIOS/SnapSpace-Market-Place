@@ -46,24 +46,56 @@ export async function normalizeOrientation(uri, exifOrientation = null) {
   }
 
   try {
-    // Pass an empty actions array. expo-image-manipulator still decodes the
-    // input (honoring EXIF orientation) and re-encodes as a fresh JPEG. The
-    // output file has NO EXIF orientation tag and raw pixels in visual order.
-    // This is the critical behavior: even with `actions: []`, manipulateAsync
-    // always does a full decode→encode round trip on iOS (verified via v55).
+    // Force a real decode+encode by passing an explicit resize action.
+    //
+    // WHY WE CAN'T USE `actions: []`:
+    //   Previous versions of this file used `actions: []` and claimed
+    //   manipulateAsync would "always do a full decode→encode round trip"
+    //   that bakes EXIF rotation into pixels. On physical iPhone 14 Pro /
+    //   iOS 26 this is NOT true — the stored output file still contained
+    //   sideways pixel matrices with an EXIF Orientation tag that flux-2-max
+    //   ignored, causing the Build 17/18 "AI didn't read my photo" bug.
+    //   Confirmed in TestFlight (Build 18 Apr 17): Replicate received room
+    //   URLs whose bytes displayed sideways in the Replicate preview, and
+    //   the model fell back to text+panel for a generic kitchen output.
+    //
+    // WHY `resize: { width: 1600 }` FIXES IT:
+    //   An explicit resize forces the native module through its decode+
+    //   rotate+scale+encode pipeline on every code path — no short-circuit.
+    //   The output is a fresh JPEG with raw pixels in visual order and no
+    //   EXIF orientation tag. flux-2-max sees the same bytes a human sees.
+    //
+    // WHY 1600px:
+    //   flux-2-max downsamples every input to its 0.5 MP internal resolution
+    //   (~707×707 for a square). Sending the full-res 4032×3024 iPhone photo
+    //   (~5–8 MB base64-encoded) wastes bandwidth on the upload leg AND on
+    //   the Replicate input-fetch leg with zero quality gain at the model's
+    //   end. 1600×1200 (landscape) or 1600×2133 (portrait) is ~200–500 KB
+    //   and preserves more than enough detail for the 0.5 MP downsample.
+    //
+    // Note: resize with only `width` preserves aspect ratio natively — the
+    // height is computed from the source's aspect (EXIF-corrected) so the
+    // result reflects the actual visual content regardless of orientation.
     const result = await manipulateAsync(
       uri,
-      [], // no transforms needed — decode/encode alone bakes rotation
+      [{ resize: { width: 1600 } }],
       { format: SaveFormat.JPEG, compress: 0.9 }
     );
 
+    // Structured log — grep `[normalizeOrientation] baked` in prod logs to
+    // verify the fix is still working. If result.width/height ever come back
+    // null or swap-matching the input dims, the decode+rotate+encode pipeline
+    // isn't running and we're shipping sideways bytes to Replicate again.
     console.log(
       tag,
-      'normalized',
+      'baked',
       'exifOrientation=' + exifOrientation,
       'in=' + inputInfo.uri,
       'out=' + String(result.uri).substring(0, 80),
-      'dims=' + result.width + 'x' + result.height
+      'dims=' + result.width + 'x' + result.height,
+      'ratio=' + (result.width && result.height
+        ? (result.width / result.height).toFixed(3)
+        : '(unknown)'),
     );
 
     // result.width/height are the TRUE post-rotation pixel dimensions.
