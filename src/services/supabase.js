@@ -209,41 +209,90 @@ export async function uploadAvatar(userId, uri) {
 }
 
 /**
- * Upload a room photo for AI generation. Returns a /render/image/ URL that
- * Supabase serves with EXIF Orientation correctly applied server-side.
+ * Upload a room photo for AI generation. Returns a permanently-correct,
+ * EXIF-rotated JPEG URL by way of the `normalize-room-photo` edge function.
  *
- * Why /render/image/ instead of /object/public/:
- *   Every attempt to bake EXIF rotation client-side with expo-image-manipulator
- *   on physical iPhone 14 Pro / iOS 26 has failed (Builds 17 → 19). The native
- *   module does not honor EXIF on decode even when given an explicit resize
- *   action, so uploaded bytes stayed in the pre-rotation matrix order and
- *   flux-2-max saw sideways kitchens. Offloading rotation to the server
- *   (Supabase's /render/image/ runs ImageMagick which respects EXIF) removes
- *   the client-side dependency entirely.
+ * Pipeline (post Build 20, 2026-04-18):
+ *   1. Upload the ORIGINAL device bytes (EXIF Orientation tag intact) to
+ *      /object/public/ under the raw upload path.
+ *   2. Call the normalize-room-photo edge function with that URL. The
+ *      function reads EXIF, rotates the RGBA buffer in pure JS, resizes
+ *      to 1600px longest edge, re-encodes as JPEG (no EXIF tag on output),
+ *      and uploads the normalized version back to /object/public/.
+ *   3. Return the normalized URL for flux-2-max to fetch.
  *
- * Why the Build 18 "render/image/ timed out flux-2-max" concern is now moot:
- *   The caller (HomeScreen.runGeneration) pre-warms this URL with a partial-
- *   range GET immediately after upload — by the time flux-2-max fetches it,
- *   the Supabase transform has already run and the response is cached on the
- *   Cloudflare edge. Cold-cache latency (5–10s) is spent on our side, not
- *   inside Replicate's 10s input-fetch budget.
+ * Why this shape (and what we tried and abandoned):
+ *   - Build 18 tried client-side rotation via expo-image-manipulator with
+ *     empty actions: did not bake rotation on iPhone 14 Pro / iOS 26.
+ *   - Build 19 added a resize action to force decode+encode: still did not
+ *     bake rotation (native module ignores EXIF on decode) + doubled cost.
+ *   - Build 20 switched to Supabase /render/image/ assuming it auto-orients:
+ *     confirmed on 2026-04-18 that it does so inconsistently — some captures
+ *     come through rotated, others arrive sideways at Replicate.
+ *   - The edge function is deterministic: we parse EXIF ourselves and rotate
+ *     the pixel buffer byte-for-byte. No device variability, no Supabase
+ *     transform ambiguity, no trusting flux-2-max to honor EXIF (it doesn't).
  *
- * Why width=1024 & quality=85:
- *   flux-2-max downsamples every input to ~0.5 MP. 1024px longest edge
- *   (~0.5–1 MP) is the sweet spot — smaller = lower input cost on Replicate,
- *   larger = wasted bytes on upload and Replicate's fetch leg. 85 quality
- *   is visually indistinguishable from 95 at this resolution and halves the
- *   JPEG file size.
- *
- * Caller requirement: the bytes at `uri` must be the ORIGINAL device capture
- * with EXIF intact — do NOT pre-process through expo-image-manipulator (it
- * strips EXIF, which would leave the server nothing to rotate by).
+ * Fallback: if the edge function call fails (network, cold-start timeout,
+ * 5xx), we fall back to the raw /object/public/ URL rather than blocking the
+ * user. In that degraded mode the photo may be served sideways — but they'll
+ * still see SOMETHING. Logged as a warning so we can catch reliability dips.
  */
 export async function uploadRoomPhoto(userId, uri, base64Data = null) {
   const ts = Date.now();
   const storagePath = `${userId}/${ts}.jpeg`;
   await uploadImage('room-uploads', storagePath, uri, base64Data);
-  return `${SUPABASE_URL}/storage/v1/render/image/public/room-uploads/${storagePath}?width=1024&quality=85`;
+  const rawUrl = `${SUPABASE_URL}/storage/v1/object/public/room-uploads/${storagePath}`;
+
+  // Resolve a user JWT for the edge-function call. Any failure here drops
+  // to the raw URL — we still prefer a sideways image over no image.
+  let jwt = null;
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    jwt = session?.access_token || null;
+  } catch { /* ignore — handled below */ }
+  if (!jwt) {
+    console.warn('[uploadRoomPhoto] no session JWT, using raw URL (may be rotated incorrectly)');
+    return rawUrl;
+  }
+
+  try {
+    const res = await fetch(`${SUPABASE_URL}/functions/v1/normalize-room-photo`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${jwt}`,
+        'apikey':         SUPABASE_ANON_KEY,
+        'Content-Type':   'application/json',
+      },
+      body: JSON.stringify({ raw_url: rawUrl }),
+      // 30s cap covers cold-start of the Deno runtime + download + decode +
+      // rotate + re-encode + upload. Typical warm path is 1–3s.
+      signal: AbortSignal.timeout(30_000),
+    });
+    if (!res.ok) {
+      const text = await res.text().catch(() => '');
+      console.warn(
+        `[uploadRoomPhoto] normalize failed HTTP ${res.status}: ${text.substring(0, 200)} — using raw URL`,
+      );
+      return rawUrl;
+    }
+    const data = await res.json();
+    if (!data?.url) {
+      console.warn('[uploadRoomPhoto] normalize returned no URL — using raw URL');
+      return rawUrl;
+    }
+    console.log(
+      `[uploadRoomPhoto] normalized | orient=${data.orientation} rotated=${data.rotated} dims=${data.dims}`,
+    );
+    return data.url;
+  } catch (err) {
+    console.warn(
+      '[uploadRoomPhoto] normalize threw:',
+      err?.message || err,
+      '— using raw URL',
+    );
+    return rawUrl;
+  }
 }
 
 // ─── User Designs Helpers ────────────────────────────────────────────────────

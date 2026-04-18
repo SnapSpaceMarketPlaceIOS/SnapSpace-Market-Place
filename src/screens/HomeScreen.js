@@ -1473,41 +1473,13 @@ export default function HomeScreen({ navigation, route }) {
           return;
         }
 
-        // ── Pre-warm /render/image/ transform ────────────────────────────
-        // uploadRoomPhoto returns a Supabase /render/image/ URL whose
-        // ImageMagick pipeline handles EXIF rotation server-side (the only
-        // reliable way to bake rotation on iPhone 14 Pro iOS 26 — every
-        // client-side attempt via expo-image-manipulator has shipped sideways
-        // bytes). That transform is lazy: the FIRST request to the URL
-        // triggers a cold-start that can take 5–10+ seconds. flux-2-max has
-        // a hard 10s timeout on input-fetch — if it lands the first request,
-        // it throws E006 and drops to BFL, which then silently fell back to
-        // text-to-image in earlier builds.
-        //
-        // Pre-warming by issuing a Range request from the client forces the
-        // transform to run NOW, on our time budget, and caches the response
-        // on the Cloudflare edge. When flux-2-max fetches the same URL a few
-        // seconds later, it hits a warm cache and returns in <1s.
-        //
-        // preflightUrl uses Range: bytes=0-0 so we download almost nothing —
-        // the server still has to process the full image to honor the Range
-        // on a transformed resource, which is exactly the side-effect we want.
-        try {
-          setGenStatus('Preparing your room…');
-          const warmStart = Date.now();
-          const warmOk = await preflightUrl(roomPhotoUrl);
-          const warmMs = Date.now() - warmStart;
-          if (!warmOk) {
-            warn('room pre-warm returned not-reachable after ' + warmMs + 'ms — flux may hit cold cache');
-          } else {
-            log('room pre-warm ok | ' + warmMs + 'ms');
-          }
-        } catch (warmErr) {
-          // Swallow — pre-warm is best-effort. Worst case flux hits cold
-          // cache and might throw E006, which its retry-with-fresh-seed
-          // path inside submitFluxWithRetry handles.
-          warn('room pre-warm threw (non-fatal):', warmErr?.message || warmErr);
-        }
+        // Note (Build 21): pre-warm removed. uploadRoomPhoto now returns a
+        // raw /object/public/ URL to a normalized JPEG produced by the
+        // `normalize-room-photo` edge function — no lazy Supabase transform
+        // sits between Replicate and the bytes, so there's no cold-cache
+        // latency for flux-2-max to trip on. The normalize step itself is
+        // inside uploadRoomPhoto and runs on our time budget, which is
+        // exactly where the wait should be.
 
         // ── Step 2: Generation ──────────────────────────────────────────────
 
