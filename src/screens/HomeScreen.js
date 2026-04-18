@@ -42,7 +42,6 @@ import { SELLERS } from '../data/sellers';
 import { searchProducts, getSourceColor, getProductsForPrompt, getNormalizedProductsByIds } from '../services/affiliateProducts';
 import { buildFinalPrompt, generateWithProductRefs, generateWithProductPanel, generateSingleProductInRoom, pickAspectRatio } from '../services/replicate';
 import { createProductPanel } from '../utils/createProductPanel';
-import { normalizeOrientation } from '../utils/normalizeOrientation';
 import { withTimeout } from '../utils/withTimeout';
 import { verifyGeneratedProducts } from '../services/visionMatcher';
 import { PRODUCT_CATALOG } from '../data/productCatalog';
@@ -1094,31 +1093,32 @@ export default function HomeScreen({ navigation, route }) {
     if (result.canceled || !result.assets?.length) return;
     const asset = result.assets[0];
 
-    // Bake EXIF rotation into raw pixels + read true post-rotation dims.
-    // Mirror the SnapScreen library-pick path exactly: normalizeOrientation
-    // uses manipulateAsync with a real resize action to force the native
-    // decode+rotate+encode pipeline (actions:[] doesn't do this reliably on
-    // iPhone 14 Pro / iOS 26). Without this, any photo the user picks from
-    // the Home tab library button gets uploaded with sideways bytes and
-    // flux-2-max ignores the room (same bug as Build 18).
+    // Do NOT re-encode via expo-image-manipulator before upload. The native
+    // module on iPhone 14 Pro iOS 26 strips EXIF while leaving raw pixel
+    // matrix sideways, which shipped a sideways-bytes JPEG to Replicate and
+    // caused the "AI ignored my photo" bug across Builds 17–19. We now
+    // upload the ORIGINAL asset URI (EXIF intact) and let Supabase's
+    // /render/image/ endpoint handle rotation server-side. See
+    // uploadRoomPhoto in src/services/supabase.js for the full rationale.
+    //
+    // Dims for pickAspectRatio: Image.getSize on iOS UIImage honors EXIF
+    // and returns visual (post-rotation) dims, so asset.width/height (which
+    // already reflect this) are correct.
     const orientation = asset.exif?.Orientation ?? 1;
-    const normalized = await normalizeOrientation(asset.uri, orientation);
-    const finalWidth  = normalized.width  ?? asset.width  ?? null;
-    const finalHeight = normalized.height ?? asset.height ?? null;
 
     console.log(
-      '[Home library pick] dims resolved',
+      '[Home library pick] asset meta',
       'exifOrientation=' + orientation,
-      'finalWidth=' + finalWidth,
-      'finalHeight=' + finalHeight,
-      'uri=' + String(normalized.uri).substring(0, 80)
+      'w=' + asset.width,
+      'h=' + asset.height,
+      'uri=' + String(asset.uri).substring(0, 80)
     );
 
     setPhoto({
-      uri: normalized.uri,
+      uri: asset.uri,
       base64: null,
-      width: finalWidth,
-      height: finalHeight,
+      width: asset.width ?? null,
+      height: asset.height ?? null,
     });
     setPhotoSource('library');
   }, [generating]);
@@ -1471,6 +1471,42 @@ export default function HomeScreen({ navigation, route }) {
             'Could not upload your room photo. Please check your connection and try again.'
           );
           return;
+        }
+
+        // ── Pre-warm /render/image/ transform ────────────────────────────
+        // uploadRoomPhoto returns a Supabase /render/image/ URL whose
+        // ImageMagick pipeline handles EXIF rotation server-side (the only
+        // reliable way to bake rotation on iPhone 14 Pro iOS 26 — every
+        // client-side attempt via expo-image-manipulator has shipped sideways
+        // bytes). That transform is lazy: the FIRST request to the URL
+        // triggers a cold-start that can take 5–10+ seconds. flux-2-max has
+        // a hard 10s timeout on input-fetch — if it lands the first request,
+        // it throws E006 and drops to BFL, which then silently fell back to
+        // text-to-image in earlier builds.
+        //
+        // Pre-warming by issuing a Range request from the client forces the
+        // transform to run NOW, on our time budget, and caches the response
+        // on the Cloudflare edge. When flux-2-max fetches the same URL a few
+        // seconds later, it hits a warm cache and returns in <1s.
+        //
+        // preflightUrl uses Range: bytes=0-0 so we download almost nothing —
+        // the server still has to process the full image to honor the Range
+        // on a transformed resource, which is exactly the side-effect we want.
+        try {
+          setGenStatus('Preparing your room…');
+          const warmStart = Date.now();
+          const warmOk = await preflightUrl(roomPhotoUrl);
+          const warmMs = Date.now() - warmStart;
+          if (!warmOk) {
+            warn('room pre-warm returned not-reachable after ' + warmMs + 'ms — flux may hit cold cache');
+          } else {
+            log('room pre-warm ok | ' + warmMs + 'ms');
+          }
+        } catch (warmErr) {
+          // Swallow — pre-warm is best-effort. Worst case flux hits cold
+          // cache and might throw E006, which its retry-with-fresh-seed
+          // path inside submitFluxWithRetry handles.
+          warn('room pre-warm threw (non-fatal):', warmErr?.message || warmErr);
         }
 
         // ── Step 2: Generation ──────────────────────────────────────────────

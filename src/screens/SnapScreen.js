@@ -11,7 +11,6 @@ import {
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import * as ImagePicker from 'expo-image-picker';
 import { lockPortrait, unlockAll } from '../utils/orientation';
-import { normalizeOrientation } from '../utils/normalizeOrientation';
 import { useFocusEffect } from '@react-navigation/native';
 import Svg, { Path, Line, Polyline, Rect, Circle } from 'react-native-svg';
 import { palette } from '../constants/tokens';
@@ -175,22 +174,22 @@ export default function SnapScreen({ navigation, route }) {
 
       const orientation = photo.exif?.Orientation ?? 1;
 
-      // Re-encode to bake EXIF rotation into pixels AND read back the TRUE
-      // post-rotation dimensions. This replaces the old EXIF-swap heuristic
-      // (`dimsSwapped = orientation >= 5 && orientation <= 8`) which produced
-      // wrong dims on iOS 26 iPhone 14 Pro where `photo.exif.Orientation` is
-      // often undefined for landscape captures. `normalizeOrientation` now
-      // returns `{ uri, width, height }` reflecting actual encoded bytes.
-      const normalized = await normalizeOrientation(photo.uri, orientation);
-
-      // Prefer the dims from the re-encoded file. If manipulateAsync failed,
-      // fall back to Image.getSize on the (original) URI. Only in a total
-      // failure case do we send dims as null and let HomeScreen's own
-      // Image.getSize safety net at line 1355 resolve them.
+      // IMPORTANT: do NOT re-encode with expo-image-manipulator before
+      // navigating. Physical iPhone 14 Pro / iOS 26 does not reliably honor
+      // EXIF on manipulateAsync decode, so the "normalized" JPEG ships
+      // sideways pixels with EXIF stripped — the server then has nothing
+      // to rotate by, and flux-2-max sees sideways bytes. We now upload
+      // the ORIGINAL device file (EXIF intact) and let Supabase's
+      // /render/image/ endpoint handle rotation server-side, which is
+      // deterministic. See src/services/supabase.js:uploadRoomPhoto.
+      //
+      // For display dims (used by pickAspectRatio), we use Image.getSize
+      // directly on the original URI. On iOS UIImage honors EXIF at
+      // decode time, so getSize returns the visual (post-rotation) dims.
       const { width: finalWidth, height: finalHeight } = await resolveDimensions(
-        normalized.uri,
-        normalized.width,
-        normalized.height
+        photo.uri,
+        null,
+        null,
       );
 
       console.log(
@@ -203,7 +202,7 @@ export default function SnapScreen({ navigation, route }) {
 
       navigation.navigate('Home', {
         capturedPhoto: {
-          uri: normalized.uri,
+          uri: photo.uri,
           base64: null,
           width: finalWidth,
           height: finalHeight,
@@ -265,15 +264,13 @@ export default function SnapScreen({ navigation, route }) {
 
       const orientation = asset.exif?.Orientation ?? 1;
 
-      // Same fix as handleCapture: trust re-encoded bytes, not EXIF swap math.
-      // iOS Photos library exports may or may not include Orientation in asset
-      // metadata — same undefined-on-iOS-26 risk as expo-camera captures.
-      const normalized = await normalizeOrientation(asset.uri, orientation);
-
+      // Do NOT re-encode via expo-image-manipulator. Upload original bytes
+      // with EXIF intact and let Supabase /render/image/ rotate server-side.
+      // See handleCapture above for the full rationale.
       const { width: finalWidth, height: finalHeight } = await resolveDimensions(
-        normalized.uri,
-        normalized.width,
-        normalized.height
+        asset.uri,
+        null,
+        null,
       );
 
       console.log(
@@ -286,7 +283,7 @@ export default function SnapScreen({ navigation, route }) {
 
       navigation.navigate('Home', {
         capturedPhoto: {
-          uri: normalized.uri,
+          uri: asset.uri,
           base64: null,
           width: finalWidth,
           height: finalHeight,
