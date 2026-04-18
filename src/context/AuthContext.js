@@ -110,6 +110,13 @@ export function AuthProvider({ children }) {
   // Ref so auth state callbacks always see the current loading value
   // without stale closure issues.
   const loadingRef = useRef(true);
+  // Shared "bootstrap is still authoritative" flag, readable by both the
+  // bootstrap's late getSession() resolve AND the user-initiated signIn /
+  // signUp / signInWithApple paths. When any user-initiated auth action
+  // kicks off, it flips this to true so a late-arriving bootstrap result
+  // can no longer overwrite the current user. Prevents the "signed in as
+  // B but app reverts to A" race documented in the Apr 2026 bug report.
+  const bootstrapSupersededRef = useRef(false);
 
   // Build a merged user object from Supabase session + profiles row
   const buildUser = (session, profile) => ({
@@ -130,24 +137,44 @@ export function AuthProvider({ children }) {
 
     const bootstrap = async () => {
       // Safety net: if getSession() hangs (e.g. no network, bad env vars),
-      // bail out after 2s so the app is never stuck on the loading screen.
+      // bail out after 8s so the app is never stuck on the loading screen.
+      //
+      // Why 8s (was 2s): iOS 26 cold AsyncStorage reads routinely take 2–5s
+      // on the first launch. The old 2s budget was shorter than the typical
+      // read, so bootstrap fell through to the "guest" branch while the
+      // cached session was still loading, forcing the user through the sign-
+      // in wall on every refresh/reopen even though they had a valid session
+      // on disk. 8s comfortably covers the iOS 26 worst-case AsyncStorage
+      // cold read without making the truly-offline guest path wait forever.
       let settled = false;
       const timer = setTimeout(() => {
         if (!settled && mounted) {
           console.log('[Auth] bootstrap timeout — proceeding as guest');
           settled = true;
+          loadingRef.current = false;
           setLoading(false);
         }
-      }, 2000);
+      }, 8000);
 
       try {
         const { data: { session } } = await supabase.auth.getSession();
-        if (session && mounted) {
+        // Critical: by the time getSession() resolves, the user may have
+        // already moved on — either the 8s timer fired (settled=true) OR
+        // a user-initiated signIn/signUp/signInWithApple started and set
+        // bootstrapSupersededRef. In either case we must NOT overwrite the
+        // current user state with this stale result, because the cached
+        // session belongs to a PREVIOUS account. Root cause of the Apr 2026
+        // "signed in as B, app shows A" revert bug.
+        if (session && mounted && !settled && !bootstrapSupersededRef.current) {
           try {
             const profile = await fetchProfile(session.user.id);
-            setUser(buildUser(session, profile));
+            if (mounted && !bootstrapSupersededRef.current) {
+              setUser(buildUser(session, profile));
+            }
           } catch {
-            setUser(buildUser(session, null));
+            if (mounted && !bootstrapSupersededRef.current) {
+              setUser(buildUser(session, null));
+            }
           }
         }
       } catch {
@@ -236,6 +263,13 @@ export function AuthProvider({ children }) {
       throw new Error('App is not configured. Please contact support.');
     }
 
+    // Any user-initiated auth action supersedes any in-flight bootstrap
+    // getSession(). Without this, a late-resolving bootstrap holding the
+    // PREVIOUS account's cached session would clobber the new account
+    // the user is creating here, producing the "signed up as B, app
+    // shows A" revert bug.
+    bootstrapSupersededRef.current = true;
+
     // CRITICAL: Force-clear any existing session before creating a new account.
     // Supabase's signUp() with email confirmation enabled does NOT create a new
     // session — it sends a verification email and leaves the previous session
@@ -287,6 +321,13 @@ export function AuthProvider({ children }) {
    * Throws an Error with a user-friendly message on failure.
    */
   const signIn = async (email, password) => {
+    // Supersede any in-flight bootstrap getSession(): on a cold launch the
+    // bootstrap may still be waiting on AsyncStorage and about to resolve
+    // with the PREVIOUS account's cached session. If that late result wins
+    // the race, it clobbers the user we sign in here. Flipping the flag
+    // first makes the late bootstrap a no-op.
+    bootstrapSupersededRef.current = true;
+
     // iOS 26.x simulator cold TLS handshakes can stall 30-60s.
     // Strategy: 15s timeout per attempt, up to 3 retries. The second
     // attempt almost always succeeds because the TLS session is cached.
@@ -343,6 +384,10 @@ export function AuthProvider({ children }) {
    * so the UI flips immediately without waiting for an app restart.
    */
   const signOut = async () => {
+    // Supersede any in-flight bootstrap getSession() so a stale cached
+    // session can never resurrect the just-signed-out user.
+    bootstrapSupersededRef.current = true;
+
     // Always clear local UI state + device-wide caches, even if the server
     // signOut rejects (network blip, expired JWT, etc). Otherwise a network
     // failure mid-signOut would leave the user stuck in an "authenticated"
@@ -414,6 +459,9 @@ export function AuthProvider({ children }) {
    * Passes the Apple identity token to Supabase for verification.
    */
   const signInWithApple = async () => {
+    // Supersede any in-flight bootstrap getSession() (see signIn for rationale).
+    bootstrapSupersededRef.current = true;
+
     const credential = await AppleAuthentication.signInAsync({
       requestedScopes: [
         AppleAuthentication.AppleAuthenticationScope.FULL_NAME,

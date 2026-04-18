@@ -253,6 +253,7 @@ export async function uploadRoomPhoto(userId, uri, base64Data = null) {
   } catch { /* ignore — handled below */ }
   if (!jwt) {
     console.warn('[uploadRoomPhoto] no session JWT, using raw URL (may be rotated incorrectly)');
+    console.log('[normalize] path=raw-fallback reason=no-jwt user=' + userId);
     return { url: rawUrl, width: null, height: null };
   }
 
@@ -276,6 +277,7 @@ export async function uploadRoomPhoto(userId, uri, base64Data = null) {
         console.log(
           `[uploadRoomPhoto] normalized | orient=${data.orientation} rotated=${data.rotated} dims=${data.dims}`,
         );
+        console.log('[normalize] path=edge-fn user=' + userId + ' dims=' + data.dims);
         // Return server-truth dims alongside the URL so the caller can compute
         // aspect_ratio from the ACTUAL encoded bytes flux-2-max will see,
         // eliminating the client/server mismatch where the client's pre-rotation
@@ -287,6 +289,7 @@ export async function uploadRoomPhoto(userId, uri, base64Data = null) {
         };
       }
       console.warn('[uploadRoomPhoto] normalize returned 200 but no URL — using raw URL');
+      console.log('[normalize] path=raw-fallback reason=empty-response user=' + userId);
       return { url: rawUrl, width: null, height: null };
     }
 
@@ -311,10 +314,12 @@ export async function uploadRoomPhoto(userId, uri, base64Data = null) {
     }
 
     console.warn(`[uploadRoomPhoto] normalize 5xx (${res.status}): ${reason} — using raw URL`);
+    console.log('[normalize] path=raw-fallback reason=5xx status=' + res.status + ' user=' + userId);
     return { url: rawUrl, width: null, height: null };
   } catch (err) {
     if (err?.userFacing) throw err; // let caller show the message
     console.warn('[uploadRoomPhoto] normalize threw:', err?.message || err, '— using raw URL');
+    console.log('[normalize] path=raw-fallback reason=threw err=' + String(err?.message || err).substring(0, 80) + ' user=' + userId);
     return { url: rawUrl, width: null, height: null };
   }
 }

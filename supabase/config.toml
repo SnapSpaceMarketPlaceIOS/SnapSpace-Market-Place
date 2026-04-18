@@ -59,5 +59,15 @@ policy = "oneshot"
 [functions.composite-products]
 verify_jwt = false
 
+# Same ES256/HS256 gateway mismatch applies to normalize-room-photo.
+# Without this, Build 22's server-side EXIF rotation silently 401s at the
+# gateway on every upload and the client falls back to the raw URL — which
+# is what produced the Apr 18 2026 dashboard showing "No recent invocations"
+# on the normalize function after it was deployed. The function's handler
+# validates the user JWT itself via supabase.auth.getUser(token), so turning
+# off gateway verify_jwt does not weaken auth.
+[functions.normalize-room-photo]
+verify_jwt = false
+
 [analytics]
 enabled = false

@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef } from 'react';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
 import {
   View,
   Text,
@@ -334,6 +334,18 @@ export default function ProfileScreen({ navigation }) {
   const [saving, setSaving] = useState(false);
   const [profile, setProfile] = useState(() => getInitialProfile(user));
   const [editDraft, setEditDraft] = useState(() => getInitialProfile(user));
+
+  // Re-sync local profile state whenever the signed-in user switches.
+  // ProfileScreen lives inside a tab navigator and does NOT unmount on
+  // signOut → signIn, so the useState initializer above only fires once —
+  // name/username/bio/avatar would otherwise stay frozen on the previous
+  // account until the user force-quits the app. Re-keying on user?.id
+  // re-runs getInitialProfile with the new session's values.
+  useEffect(() => {
+    const next = getInitialProfile(user);
+    setProfile(next);
+    setEditDraft(next);
+  }, [user?.id]);
   const [myDesigns, setMyDesigns] = useState([]);
   const [designsLoading, setDesignsLoading] = useState(true);
   const [socialStats, setSocialStats] = useState({ followers: 0, following: 0, designs: 0 });
