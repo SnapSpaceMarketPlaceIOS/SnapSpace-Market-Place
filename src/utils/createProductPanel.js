@@ -37,12 +37,15 @@ const MAX_RETRIES   = 2;   // retry once on failure (cold starts, transient erro
 
 /**
  * Rewrite a Supabase /storage/v1/object/public/... URL to the equivalent
- * /storage/v1/render/image/public/... URL, which forces the server to
- * decode and re-emit the image as JPEG (or a requested format) regardless
- * of how the bytes are stored. This is the fix for the iOS 26 AVIF bug:
- * Cloudflare serves stored bytes as AVIF to clients sending Accept headers
- * that permit it, and flux-2-max rejects AVIF with E006. The render endpoint
- * bypasses that entirely.
+ * /storage/v1/render/image/public/... URL with explicit `format=origin` so
+ * Cloudflare serves the original JPEG bytes we uploaded without re-negotiating
+ * to AVIF based on the client's Accept header (iOS 26 Safari / some iOS
+ * simulator builds request AVIF, which flux-2-max rejects with E006).
+ *
+ * CRITICAL: `format=origin` is what keeps this cheap. Without it, Supabase
+ * applies an on-the-fly transform which can take 3-5 seconds on first request
+ * and causes the client-side preflight to time out. `format=origin` just
+ * serves the stored bytes with a sanity-checked content-type header.
  *
  * Non-Supabase URLs are returned unchanged.
  */
@@ -53,10 +56,12 @@ function toRenderUrl(url) {
   if (idx === -1) return url; // not a Supabase object URL
   const head = url.slice(0, idx);
   const tail = url.slice(idx + marker.length); // "<bucket>/<path>?maybe=query"
-  // Strip any existing query so we can append our own deterministically
   const [tailPath, tailQuery] = tail.split('?');
   const sep = tailQuery ? '&' : '';
-  return `${head}/storage/v1/render/image/public/${tailPath}?width=1024&quality=90${sep}${tailQuery || ''}`;
+  // format=origin forces JPEG (what we stored), skipping the expensive
+  // on-the-fly transform. width/quality params are ignored when
+  // format=origin. Kept in the URL for telemetry / future tweaking.
+  return `${head}/storage/v1/render/image/public/${tailPath}?format=origin${sep}${tailQuery || ''}`;
 }
 
 export async function createProductPanel(products, userId) {

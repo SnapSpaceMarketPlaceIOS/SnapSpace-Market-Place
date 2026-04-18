@@ -407,9 +407,18 @@ export function SubscriptionProvider({ children }) {
     });
   }, []);
 
-  // ── Refresh on user login ───────────────────────────────────────────────
+  // ── Refresh on user login / reset on sign-out ───────────────────────────
+  // When user becomes null (sign-out) or changes identity (account switch),
+  // immediately reset local state so the previous user's quota/balance can
+  // never flash on screen for the next user before the DB round-trip
+  // completes. This is the fix for the "5 of 5 wishes" showing on a freshly
+  // signed-in account because the previous account's state was still in memory.
   useEffect(() => {
     if (user?.id) {
+      // New user signed in — reset to defaults first, then fetch fresh data
+      setSubscription(DEFAULT_SUBSCRIPTION);
+      setTokenBalance(0);
+
       if (__DEV__) {
         // DEV: reset to fresh 5 wishes on app launch, skip DB fetch entirely.
         // recordGeneration() will increment locally from 0.
@@ -418,6 +427,10 @@ export function SubscriptionProvider({ children }) {
         refreshQuota();
       }
       refreshTokenBalance();
+    } else {
+      // Signed out — wipe in-memory quota and token state immediately.
+      setSubscription(DEFAULT_SUBSCRIPTION);
+      setTokenBalance(0);
     }
   }, [user?.id, refreshQuota, refreshTokenBalance]);
 

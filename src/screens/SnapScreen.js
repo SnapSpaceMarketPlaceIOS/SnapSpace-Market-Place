@@ -113,10 +113,30 @@ export default function SnapScreen({ navigation, route }) {
       // (Supabase /render/image/, flux-2-max, stripped-EXIF browsers) see
       // the correct orientation. Swapping only width/height numbers isn't
       // enough — most tools ignore EXIF metadata entirely.
+      // DIAGNOSTIC: dump what expo-camera actually returned. On iOS 26 /
+      // iPhone 14 Pro we've observed `photo.exif` being undefined or missing
+      // the Orientation field for landscape captures — which was letting the
+      // old (EXIF-dependent) path silently skip rotation and upload sideways
+      // pixels. These logs surface in `npx react-native log-ios` and EAS
+      // Submit/TestFlight device logs so we can confirm which branch fires.
+      console.log(
+        '[Snap capture] photo meta',
+        'uri=' + String(photo.uri).substring(0, 80),
+        'w=' + photo.width,
+        'h=' + photo.height,
+        'hasExif=' + !!photo.exif,
+        'exifOrientation=' + (photo.exif?.Orientation ?? '(unset)'),
+        'exifKeys=' + (photo.exif ? Object.keys(photo.exif).slice(0, 10).join(',') : '(none)')
+      );
+
       const orientation = photo.exif?.Orientation ?? 1;
       const dimsSwapped = orientation >= 5 && orientation <= 8;
       const finalWidth  = dimsSwapped ? photo.height : photo.width;
       const finalHeight = dimsSwapped ? photo.width  : photo.height;
+
+      // Always re-encode. The new normalizeOrientation no longer depends on
+      // EXIF — it just forces a decode→encode round trip which bakes any
+      // rotation metadata into pixels. Safe to call even when orientation=1.
       const normalizedUri = await normalizeOrientation(photo.uri, orientation);
 
       navigation.navigate('Home', {
@@ -164,6 +184,18 @@ export default function SnapScreen({ navigation, route }) {
         Alert.alert('Could Not Load Photo', 'Please try picking a different photo.');
         return;
       }
+      // Same diagnostic for library photos — some iOS Photos.app exports
+      // have EXIF orientation stripped; some don't. Re-encode unconditionally.
+      console.log(
+        '[Snap library pick] asset meta',
+        'uri=' + String(asset.uri).substring(0, 80),
+        'w=' + asset.width,
+        'h=' + asset.height,
+        'hasExif=' + !!asset.exif,
+        'exifOrientation=' + (asset.exif?.Orientation ?? '(unset)'),
+        'exifKeys=' + (asset.exif ? Object.keys(asset.exif).slice(0, 10).join(',') : '(none)')
+      );
+
       const orientation = asset.exif?.Orientation ?? 1;
       const dimsSwapped = orientation >= 5 && orientation <= 8;
       const finalWidth  = dimsSwapped ? asset.height : asset.width;

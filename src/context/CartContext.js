@@ -1,6 +1,7 @@
-import React, { createContext, useContext, useState, useMemo, useEffect } from 'react';
+import React, { createContext, useContext, useState, useMemo, useEffect, useRef } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { PRODUCT_CATALOG } from '../data/productCatalog';
+import { useAuth } from './AuthContext';
 
 const CartContext = createContext();
 const STORAGE_KEY = '@snapspace_cart';
@@ -13,8 +14,24 @@ function parsePrice(priceStr) {
 }
 
 export function CartProvider({ children }) {
+  const { user, loading: authLoading } = useAuth();
   const [items, setItems] = useState([]);
   const [hydrated, setHydrated] = useState(false);
+
+  // Detect sign-out / account switch and wipe the in-memory cart immediately.
+  // Ref starts as `undefined` so we can distinguish "first real observation
+  // after auth bootstrap" (do nothing — let hydrated data stay) from a
+  // genuine sign-out or user switch (wipe items).
+  const lastUserIdRef = useRef(undefined);
+  useEffect(() => {
+    if (authLoading) return;        // auth still bootstrapping — ignore
+    const currentId = user?.id || null;
+    const previousId = lastUserIdRef.current;
+    if (previousId === currentId) return;
+    lastUserIdRef.current = currentId;
+    if (previousId === undefined) return;  // first real read — don't wipe
+    setItems([]);                   // sign-out or account switch — start fresh
+  }, [user?.id, authLoading]);
 
   // Load persisted cart on mount — enrich missing imageUrl/affiliateUrl from catalog
   useEffect(() => {

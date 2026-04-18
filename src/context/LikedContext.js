@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useAuth } from './AuthContext';
 import { toggleLike as toggleLikeRPC, getUserLikedIds } from '../services/supabase';
@@ -8,11 +8,25 @@ const STORAGE_KEY = '@snapspace_liked';
 const STORAGE_KEY_PRODUCTS = '@snapspace_liked_products';
 
 export function LikedProvider({ children }) {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const [liked, setLiked] = useState({});
   const [hydrated, setHydrated] = useState(false);
   const [likedProducts, setLikedProducts] = useState({});
   const [productsHydrated, setProductsHydrated] = useState(false);
+
+  // Reset likedProducts on sign-out / account switch. (`liked` on designs
+  // is already re-hydrated from Supabase when user.id changes below.)
+  // Ignore the bootstrap transition so a cold-boot doesn't wipe persisted data.
+  const lastUserIdRef = useRef(undefined);
+  useEffect(() => {
+    if (authLoading) return;
+    const currentId = user?.id || null;
+    const previousId = lastUserIdRef.current;
+    if (previousId === currentId) return;
+    lastUserIdRef.current = currentId;
+    if (previousId === undefined) return;
+    setLikedProducts({});
+  }, [user?.id, authLoading]);
 
   // Hydrate liked products from AsyncStorage (no Supabase — product IDs are not UUIDs)
   useEffect(() => {

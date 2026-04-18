@@ -1,7 +1,20 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import * as AppleAuthentication from 'expo-apple-authentication';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { supabase, fetchProfile } from '../services/supabase';
 import { registerForPushNotifications } from '../services/notifications';
+
+// AsyncStorage keys that are NOT yet scoped to a specific user.
+// Cleared on sign-out so the next account on this device can't inherit
+// the previous user's cart / liked items / order history / share flags.
+// (Onboarding flag is per-user and handled separately in OnboardingContext.)
+const DEVICE_WIDE_STORAGE_KEYS = [
+  '@snapspace_cart',
+  '@snapspace_liked',
+  '@snapspace_liked_products',
+  '@snapspace_shared',
+  '@snapspace_order_history',
+];
 
 const AuthContext = createContext();
 
@@ -135,6 +148,25 @@ export function AuthProvider({ children }) {
     if (!process.env.EXPO_PUBLIC_SUPABASE_URL) {
       throw new Error('App is not configured. Please contact support.');
     }
+
+    // CRITICAL: Force-clear any existing session before creating a new account.
+    // Supabase's signUp() with email confirmation enabled does NOT create a new
+    // session — it sends a verification email and leaves the previous session
+    // active. Without this, a user who "signs up" while already logged in as
+    // user A ends up silently still signed in as user A, and the app happily
+    // shows A's profile/wishes/data as if it belonged to the new account.
+    // See AuthContext bug report (Apr 2026): fresh info@homegenieios.com signup
+    // rendered antrivera3193's profile because the old session was never cleared.
+    try {
+      await supabase.auth.signOut();
+      setUser(null);
+      // Also purge device-wide caches for the same reason — the new account
+      // (once verified) must start with a clean slate.
+      await AsyncStorage.multiRemove(DEVICE_WIDE_STORAGE_KEYS).catch(() => {});
+    } catch (e) {
+      console.warn('[Auth] pre-signup signOut failed (non-fatal):', e?.message);
+    }
+
     const { data, error } = await supabase.auth.signUp({
       email: email.trim().toLowerCase(),
       password,
@@ -214,10 +246,23 @@ export function AuthProvider({ children }) {
 
   /**
    * Sign out the current user.
+   *
+   * Clears all device-wide AsyncStorage caches so a second account
+   * signing in on the same device doesn't inherit the previous user's
+   * cart, liked items, shared flags, or order history. Individual
+   * contexts also reset their in-memory state when `user?.id` changes
+   * so the UI flips immediately without waiting for an app restart.
    */
   const signOut = async () => {
     await supabase.auth.signOut();
     setUser(null);
+
+    // Best-effort purge of device-wide caches. Non-fatal on failure.
+    try {
+      await AsyncStorage.multiRemove(DEVICE_WIDE_STORAGE_KEYS);
+    } catch (e) {
+      console.warn('[Auth] post-signOut storage clear failed (non-fatal):', e?.message);
+    }
   };
 
   /**
@@ -250,6 +295,13 @@ export function AuthProvider({ children }) {
     // Sign out and clear local state
     await supabase.auth.signOut();
     setUser(null);
+
+    // Wipe device-wide caches so deletion is truly complete.
+    try {
+      await AsyncStorage.multiRemove(DEVICE_WIDE_STORAGE_KEYS);
+    } catch (e) {
+      console.warn('[Auth] post-delete storage clear failed (non-fatal):', e?.message);
+    }
   };
 
   /**

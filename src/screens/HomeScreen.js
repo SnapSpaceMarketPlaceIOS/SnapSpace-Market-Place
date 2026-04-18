@@ -882,6 +882,13 @@ export default function HomeScreen({ navigation, route }) {
   const [photoSource, setPhotoSource] = useState(null); // 'camera' | 'library'
   const [generating, setGenerating] = useState(false);
   const [genStatus, setGenStatus] = useState('');
+  // Synchronous in-flight guard to prevent double-tap races. React state
+  // updates are batched/async, so two taps within the same frame can both
+  // observe `generating === false` and fire concurrent generations —
+  // which would let a user sneak past the per-user quota (seen in the DB
+  // as `anthonyxinbox` at 6/5 during TestFlight). A ref flips atomically
+  // and blocks every subsequent tap until the current run finishes.
+  const generatingRef = useRef(false);
   const [loadingMsgIndex, setLoadingMsgIndex] = useState(0);
   const [loadingMessages, setLoadingMessages] = useState([]);
   const loadingMsgOpacity = useRef(new Animated.Value(1)).current;
@@ -1260,14 +1267,26 @@ export default function HomeScreen({ navigation, route }) {
   };
 
   const runGeneration = async () => {
+    // ── Atomic double-tap guard ────────────────────────────────────────────
+    // Must come BEFORE any early-return validation so rapid-fire taps can't
+    // each fail validation independently, bypass this check, and race to the
+    // network. The ref flip is synchronous and sticks until the finally block
+    // at the end of this function resets it.
+    if (generatingRef.current) {
+      return;
+    }
+    generatingRef.current = true;
+
     const isSingleProductMode = !!singleProduct;
 
     if (!photo) {
+      generatingRef.current = false;
       Alert.alert('Add a Room Photo', 'Tap the camera icon to snap your room, or pick from your library.');
       return;
     }
     // Prompt is only required for the full-room flow — single-product skips it
     if (!isSingleProductMode && !prompt.trim()) {
+      generatingRef.current = false;
       Alert.alert('Describe Your Style', 'Add a style description so the AI knows what to create.');
       return;
     }
@@ -1515,50 +1534,79 @@ export default function HomeScreen({ navigation, route }) {
                 setGenStatus('Preparing product panel…');
                 const panelResponse = await createProductPanel(reachableProducts, user.id);
                 if (panelResponse?.url) {
-                  // Panel URL pre-flight: Supabase Storage is usually instant
-                  // but CDN propagation can briefly lag. Verify before sending
-                  // to flux-2-max so a 404 on the panel doesn't trigger E006.
-                  const panelOk = await preflightUrl(panelResponse.url);
-                  if (!panelOk) {
-                    warn('panel URL not yet reachable — skipping panel path');
-                  } else {
-                    log('panel ready — using 2-image input (room + 2×2 panel)');
-                    setGenStatus('Analyzing your room…');
-                    const panelResult = await generateWithProductPanel(
-                      roomPhotoUrl,
-                      designPrompt,
-                      reachableProducts,
-                      panelResponse.url,
-                      aspectRatio,
-                    );
-                    resultUrl = panelResult.url;
-                    genMeta.predictionId = panelResult.predictionId;
-                    genMeta.seed = panelResult.seed;
-                    genMeta.pipeline = 'panel';
-                    panelCompositedIndices = panelResponse.compositedIndices;
-                    usedPanel = true;
-                    log('panel gen complete | prediction=' + panelResult.predictionId + ' seed=' + panelResult.seed + ' | composited=[' + (panelCompositedIndices?.join(',') ?? '?') + ']');
-                  }
+                  // NOTE: we USED to preflight the panel URL here with a 2.5s
+                  // timeout. Supabase's render/image/ endpoint cold-first-
+                  // request lazily transforms the image, which sometimes takes
+                  // > 2.5s, making the preflight fail — at which point the
+                  // client silently fell back to the 5-image individual-refs
+                  // path at ~2× the cost (confirmed in the Apr 2026 cost audit).
+                  //
+                  // Now that `toRenderUrl` uses `format=origin` the endpoint
+                  // no longer transforms (it just serves stored bytes), so
+                  // the cold-start slowness is gone. We also trust our own
+                  // edge function's output: if createProductPanel returned a
+                  // URL, the underlying bytes exist. Skipping preflight means
+                  // the panel path "just works" whenever the edge fn succeeds.
+                  //
+                  // If flux-2-max still can't fetch the URL for some reason,
+                  // submitFluxWithRetry() already retries once on E006 with
+                  // a fresh seed, which covers transient CDN hiccups.
+                  log('panel ready — using 2-image input (room + 2×2 panel) | url=' + String(panelResponse.url).substring(0, 80));
+                  setGenStatus('Analyzing your room…');
+                  const panelResult = await generateWithProductPanel(
+                    roomPhotoUrl,
+                    designPrompt,
+                    reachableProducts,
+                    panelResponse.url,
+                    aspectRatio,
+                  );
+                  resultUrl = panelResult.url;
+                  genMeta.predictionId = panelResult.predictionId;
+                  genMeta.seed = panelResult.seed;
+                  genMeta.pipeline = 'panel';
+                  panelCompositedIndices = panelResponse.compositedIndices;
+                  usedPanel = true;
+                  log('panel gen complete | prediction=' + panelResult.predictionId + ' seed=' + panelResult.seed + ' | composited=[' + (panelCompositedIndices?.join(',') ?? '?') + ']');
+                } else {
+                  warn('createProductPanel returned no URL — falling back to individual refs');
                 }
               } catch (panelErr) {
-                warn('panel approach failed (' + panelErr.message + ') — falling back to individual refs');
+                warn('panel approach threw (' + panelErr.message + ') — falling back to individual refs');
               }
             } else {
               warn('panel skipped — only ' + reachableProducts.length + ' reachable products (need 2+)');
             }
 
-            // ── Fallback: individual product images (original 4-image approach) ──
+            // ── Fallback: individual product images ──────────────────────
+            // Cost-capped fallback. The previous fallback sent the room
+            // + 4 product images (5 inputs total), which runs at roughly
+            // 2× the GPU time of the panel path (room + 2×2 panel = 2
+            // inputs). That's what drove the $34 Replicate bill in the
+            // April test window — every silent panel-preflight failure
+            // doubled the per-gen cost.
+            //
+            // We now cap the fallback at 2 product references (3 total
+            // inputs). This brings the cost floor on fallback within ~20%
+            // of the panel path while still giving flux-2-max enough
+            // visual anchor references to match cataloged silhouettes.
+            // If you ever want to raise this, change FALLBACK_PRODUCT_CAP
+            // and accept the higher per-gen cost. Do not exceed 4.
+            const FALLBACK_PRODUCT_CAP = 2;
+
             let individualUsedProducts = null;
             if (!usedPanel && reachableProducts.length >= 1) {
-              log('using individual product refs (room + ' + Math.min(reachableProducts.length, 4) + ' product images)');
+              const cappedProducts = reachableProducts.slice(0, FALLBACK_PRODUCT_CAP);
+              log('using individual product refs (cost-capped) | ' +
+                'room + ' + cappedProducts.length + ' product images | ' +
+                'cap=' + FALLBACK_PRODUCT_CAP + ' of ' + reachableProducts.length + ' reachable');
               setGenStatus('Analyzing your room…');
-              resultUrl = await generateWithProductRefs(roomPhotoUrl, designPrompt, reachableProducts, aspectRatio);
-              genMeta.pipeline = 'individual';
-              // Individual path: replicate.js slices to exactly the first 4
-              // reachable products and uses each as a distinct image input.
-              // No panel compositing → no index drift → the 4 sent ARE the 4
-              // used, so just mirror the slice here for Shop Your Room.
-              individualUsedProducts = reachableProducts.slice(0, 4);
+              resultUrl = await generateWithProductRefs(roomPhotoUrl, designPrompt, cappedProducts, aspectRatio);
+              genMeta.pipeline = 'individual-capped';
+              // Individual path: replicate.js slices to exactly the first N
+              // products and uses each as a distinct image input. No panel
+              // compositing → no index drift → the products we sent ARE the
+              // products used, so just mirror the slice here for Shop Your Room.
+              individualUsedProducts = cappedProducts;
             } else if (!usedPanel) {
               // No reachable product images — force the replicate path to fail
               // so we drop to BFL (which doesn't need product URLs).
@@ -1582,6 +1630,18 @@ export default function HomeScreen({ navigation, route }) {
               finalProducts = reachableProducts.slice(0, 4);
             }
             replicateSucceeded = true;
+            // Structured telemetry: exactly which pipeline ran. Grep prod
+            // logs for `[genmeta]` to see panel vs individual-capped ratios
+            // and catch any regression in the 2×2 panel path cost/routing.
+            console.log(
+              '[genmeta]',
+              'pipeline=' + genMeta.pipeline,
+              'generationId=' + generationId,
+              'productsIn=' + reachableProducts.length,
+              'productsUsed=' + finalProducts.length,
+              'predictionId=' + (genMeta.predictionId || '(none)'),
+              'seed=' + (genMeta.seed ?? '(none)')
+            );
             log('replicate complete | url=' + resultUrl.substring(0, 80) + ' | finalProducts=' + finalProducts.length);
           } catch (repErr) {
             warn('replicate failed (' + repErr.message + ') — falling back to BFL');
@@ -1725,6 +1785,12 @@ export default function HomeScreen({ navigation, route }) {
       setGenerating(false);
       setGenStatus('');
       Alert.alert('Generation Failed', err.message || 'Something went wrong. Please try again.');
+    } finally {
+      // Always release the double-tap lock, no matter how we exit the try —
+      // normal completion, thrown error, paywall navigation return, upload
+      // failure return, single-product catch return, etc. Without this,
+      // one failed generation would leave the Generate button dead.
+      generatingRef.current = false;
     }
   };
 

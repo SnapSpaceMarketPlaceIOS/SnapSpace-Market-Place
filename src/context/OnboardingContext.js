@@ -1,19 +1,28 @@
 /**
  * OnboardingContext — One-time guided tutorial for new users.
  *
- * 4-step walkthrough that plays ONCE after first account creation:
+ * 3-step walkthrough that plays ONCE per user account:
  *   Step 1: HomeScreen AI chat bar (blue glow + tooltip)
  *   Step 2: SnapScreen camera (blue glow + tooltip)
- *   Step 3: ExploreScreen first product (blue glow + tooltip)
- *   Step 4: ProductDetailScreen genie lamp button (blue glow + tooltip)
+ *   Step 3: ProductDetailScreen genie lamp button (blue glow + tooltip)
  *
- * Uses AsyncStorage to persist completion flag.
+ * Uses AsyncStorage to persist completion flag, NAMESPACED BY USER ID so
+ * multiple accounts on the same device each get their own tutorial once.
+ * A missing key = has never completed onboarding → show tutorial.
  */
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useAuth } from './AuthContext';
 
 const OnboardingContext = createContext(null);
-const STORAGE_KEY = '@homegenie_onboarding_complete';
+const STORAGE_KEY_BASE = '@homegenie_onboarding_complete';
+
+// Build the per-user storage key. Returns null if there's no signed-in user.
+const getStorageKey = (userId) => (userId ? `${STORAGE_KEY_BASE}_${userId}` : null);
+
+// Legacy device-wide key — migrated/cleaned up at mount so it doesn't
+// pollute new accounts.
+const LEGACY_STORAGE_KEY = '@homegenie_onboarding_complete';
 
 // Step definitions with tooltip content
 export const ONBOARDING_STEPS = {
@@ -45,18 +54,61 @@ const STEP_ORDER = ['chat_bar', 'camera', 'genie_lamp'];
 const TOTAL_STEPS = STEP_ORDER.length;
 
 export function OnboardingProvider({ children }) {
-  const [active, setActive] = useState(false);       // is onboarding running?
-  const [currentStep, setCurrentStep] = useState(null); // current step key
-  const [completed, setCompleted] = useState(true);   // assume completed until checked
-  const [loaded, setLoaded] = useState(false);        // true once AsyncStorage resolves
+  const { user } = useAuth();
+  const userId = user?.id || null;
 
-  // Check if onboarding has been completed — set loaded AFTER so callers know the value is real
+  const [active, setActive] = useState(false);          // is onboarding running?
+  const [currentStep, setCurrentStep] = useState(null); // current step key
+  const [completed, setCompleted] = useState(true);     // assume completed until checked
+  const [loaded, setLoaded] = useState(false);          // true once AsyncStorage resolves
+
+  // Re-read the per-user onboarding flag whenever the signed-in user changes.
+  // - No user signed in  → reset state, do not trigger onboarding
+  // - Key missing for this user → treat as "needs onboarding" (first-time user)
+  // - Key === 'true'     → already completed
+  // - Key === 'false'    → explicitly enabled but not yet finished
   useEffect(() => {
-    AsyncStorage.getItem(STORAGE_KEY).then((value) => {
-      setCompleted(value === 'true');
+    let cancelled = false;
+
+    // Always kill any in-progress tour when user changes (sign-out or switch)
+    setActive(false);
+    setCurrentStep(null);
+
+    if (!userId) {
+      // No user → don't try to load anything. Treat as completed so no
+      // overlay can render before login.
+      setCompleted(true);
       setLoaded(true);
-    }).catch(() => { setCompleted(true); setLoaded(true); });
-  }, []);
+      return;
+    }
+
+    setLoaded(false);
+    const key = getStorageKey(userId);
+
+    (async () => {
+      try {
+        // One-time cleanup: if the legacy device-wide key still exists,
+        // remove it so it can't bleed into new accounts on this device.
+        const legacy = await AsyncStorage.getItem(LEGACY_STORAGE_KEY);
+        if (legacy !== null) {
+          await AsyncStorage.removeItem(LEGACY_STORAGE_KEY).catch(() => {});
+        }
+
+        const value = await AsyncStorage.getItem(key);
+        if (cancelled) return;
+        // Only 'true' counts as completed. Missing key or any other value
+        // means this user still needs to see the tutorial.
+        setCompleted(value === 'true');
+        setLoaded(true);
+      } catch {
+        if (cancelled) return;
+        setCompleted(true);
+        setLoaded(true);
+      }
+    })();
+
+    return () => { cancelled = true; };
+  }, [userId]);
 
   // Start the onboarding flow — only runs if AsyncStorage has loaded AND not completed
   const startOnboarding = useCallback(() => {
@@ -65,11 +117,17 @@ export function OnboardingProvider({ children }) {
     setCurrentStep('chat_bar');
   }, [loaded, completed]);
 
-  // Mark onboarding as needed (called after first sign-up + sign-in)
+  // Explicitly mark the current user as needing onboarding.
+  // Called from AuthScreen after a fresh signup. Safe no-op if no user yet
+  // (signup-with-email-verification has no active session until verified;
+  //  the useEffect above will auto-show onboarding on first sign-in because
+  //  the key won't exist yet).
   const enableOnboarding = useCallback(async () => {
-    await AsyncStorage.setItem(STORAGE_KEY, 'false').catch(() => {});
+    const key = getStorageKey(userId);
+    if (!key) return;
+    await AsyncStorage.setItem(key, 'false').catch(() => {});
     setCompleted(false);
-  }, []);
+  }, [userId]);
 
   // Advance to next step
   const nextStep = useCallback(() => {
@@ -90,13 +148,16 @@ export function OnboardingProvider({ children }) {
     }
   }, [currentStep]);
 
-  // Skip/finish onboarding
+  // Skip/finish onboarding — writes 'true' to THIS user's key only
   const finishOnboarding = useCallback(async () => {
     setActive(false);
     setCurrentStep(null);
     setCompleted(true);
-    await AsyncStorage.setItem(STORAGE_KEY, 'true').catch(() => {});
-  }, []);
+    const key = getStorageKey(userId);
+    if (key) {
+      await AsyncStorage.setItem(key, 'true').catch(() => {});
+    }
+  }, [userId]);
 
   // Check if a specific step is active
   const isStepActive = useCallback((stepKey) => {
