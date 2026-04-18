@@ -46,7 +46,6 @@ import CartScreen from './src/screens/CartScreen';
 import ProfileScreen from './src/screens/ProfileScreen';
 import RoomResultScreen from './src/screens/RoomResultScreen';
 import ProductDetailScreen from './src/screens/ProductDetailScreen';
-import AuthScreen from './src/screens/AuthScreen';
 import UserProfileScreen from './src/screens/UserProfileScreen';
 import LikedScreen from './src/screens/LikedScreen';
 import SharedScreen from './src/screens/SharedScreen';
@@ -348,7 +347,12 @@ function RootNavigator() {
       }}
     >
       <Stack.Screen name="Main" component={TabNavigator} />
-      <Stack.Screen name="Auth" component={AuthScreen} options={{ animation: 'fade' }} />
+      {/*
+        Stack.Screen "Auth" removed 2026-04-18. No caller in the app navigated
+        to it — AuthGate is rendered inline on Snap/Cart/Profile when !user.
+        Keeping two sign-in walls (AuthScreen modal + inline AuthGate) with
+        different dismissal behaviors confused users on TestFlight.
+      */}
       <Stack.Screen name="VerifyEmailSent" component={VerifyEmailSentScreen} options={{ animation: 'fade' }} />
       <Stack.Screen name="RoomResult" component={RoomResultScreen} options={{ animation: 'slide_from_bottom' }} />
       <Stack.Screen name="ProductDetail" component={ProductDetailScreen} />

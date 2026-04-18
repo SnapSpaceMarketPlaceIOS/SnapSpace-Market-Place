@@ -87,7 +87,7 @@ function resolveDimensions(uri, manipulatedWidth, manipulatedHeight) {
 // ─── SnapScreen ───────────────────────────────────────────────────────────────
 
 export default function SnapScreen({ navigation, route }) {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const { isStepActive, nextStep, prevStep, finishOnboarding } = useOnboarding();
   const [permission, requestPermission] = useCameraPermissions();
   const [facing, setFacing] = useState('back');
@@ -116,6 +116,10 @@ export default function SnapScreen({ navigation, route }) {
   const singleProduct = route?.params?.product ?? null;
 
   // ── Auth gate ──
+  // While AuthContext is bootstrapping (supabase.auth.getSession() in-flight),
+  // user is null but loading is true. Show nothing instead of the sign-in wall
+  // — otherwise a signed-in user sees the AuthGate flash on cold app launch.
+  if (authLoading) return <View style={s.container} />;
   if (!user) {
     return (
       <AuthGate

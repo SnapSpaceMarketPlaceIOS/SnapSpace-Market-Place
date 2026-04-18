@@ -286,6 +286,17 @@ export default function PaywallScreen({ navigation }) {
   // ── Purchase handlers ──────────────────────────────────────────────────
 
   const handlePurchase = async () => {
+    // Guard against session expiry mid-flow. If the refresh token died while
+    // the user was on this screen, StoreKit will charge the card but the
+    // Supabase RPC write (record purchase + grant entitlement) will silently
+    // fail — user ends up charged with nothing to show for it.
+    if (!user?.id) {
+      Alert.alert(
+        'Sign In Required',
+        'Your session expired. Please sign in again to complete this purchase.',
+      );
+      return;
+    }
     setPurchasing(true);
     try {
       if (activeTab === 'wishes') {

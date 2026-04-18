@@ -312,7 +312,7 @@ const getInitialProfile = (user) => ({
 export default function ProfileScreen({ navigation }) {
   const { liked, toggleLiked, likedProducts } = useLiked();
   const { shared, addShared } = useShared();
-  const { user, signOut, deleteAccount, refreshUser } = useAuth();
+  const { user, loading: authLoading, signOut, deleteAccount, refreshUser } = useAuth();
   const [activeTab, setActiveTab] = useState(0);
   const [likedFilter, setLikedFilter] = useState(0); // 0 = Wishes, 1 = Products
   const [gridCols, setGridCols] = useState(2);
@@ -431,6 +431,10 @@ export default function ProfileScreen({ navigation }) {
   }, [profile]);
 
   // Guest gate — must come AFTER all hooks
+  // Suppress the AuthGate flash during AuthContext bootstrap so a signed-in
+  // user doesn't see the sign-in wall briefly on cold launch while
+  // supabase.auth.getSession() is still in-flight.
+  if (authLoading) return <View style={{ flex: 1, backgroundColor: '#FFFFFF' }} />;
   if (!user) {
     return (
       <AuthGate

@@ -642,7 +642,7 @@ const ROOM_LABEL_MAP = {
 // ── Main Component ─────────────────────────────────────────────────────────────
 
 export default function ExploreScreen({ navigation, route }) {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const { liked, toggleLiked } = useLiked();
   // onboarding hooks kept for potential future use
   const _onboarding = useOnboarding();
@@ -993,6 +993,9 @@ export default function ExploreScreen({ navigation, route }) {
   );
 
   // ── Auth wall — show full Auth screen inline if not signed in ──────────────
+  // Suppress flash during AuthContext bootstrap so signed-in users don't see
+  // the sign-in screen briefly on cold launch.
+  if (authLoading) return <View style={{ flex: 1, backgroundColor: '#FFFFFF' }} />;
   if (!user) {
     const AuthScreen = require('./AuthScreen').default;
     return <AuthScreen navigation={navigation} />;

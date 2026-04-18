@@ -315,14 +315,23 @@ export function AuthProvider({ children }) {
    * so the UI flips immediately without waiting for an app restart.
    */
   const signOut = async () => {
-    await supabase.auth.signOut();
-    setUser(null);
-
-    // Best-effort purge of device-wide caches AND module-level in-memory
-    // caches. See fullAccountReset — multiRemove alone leaves the style DNA
-    // and userPreferences JS module vars populated, which would bleed into
-    // the next account to sign in on this device.
-    await fullAccountReset();
+    // Always clear local UI state + device-wide caches, even if the server
+    // signOut rejects (network blip, expired JWT, etc). Otherwise a network
+    // failure mid-signOut would leave the user stuck in an "authenticated"
+    // UI state with their data still visible locally — a worse UX than
+    // showing the sign-in wall while the server call silently retries.
+    try {
+      await supabase.auth.signOut();
+    } catch (e) {
+      console.warn('[Auth] supabase.signOut failed (clearing local anyway):', e?.message);
+    } finally {
+      setUser(null);
+      // Best-effort purge of device-wide caches AND module-level in-memory
+      // caches. See fullAccountReset — multiRemove alone leaves the style DNA
+      // and userPreferences JS module vars populated, which would bleed into
+      // the next account to sign in on this device.
+      await fullAccountReset();
+    }
   };
 
   /**

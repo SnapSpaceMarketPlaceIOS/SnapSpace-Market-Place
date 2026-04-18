@@ -328,7 +328,7 @@ function AnimatedQtyText({ value, style }) {
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export default function CartScreen({ navigation }) {
-  const { user }                              = useAuth();
+  const { user, loading: authLoading }        = useAuth();
   const { items, removeFromCart, updateQuantity, subtotal, clearCart } = useCart();
   const { addOrder }                          = useOrderHistory();
   const [checkingOut, setCheckingOut]         = useState(false);
@@ -406,6 +406,10 @@ export default function CartScreen({ navigation }) {
   }, [checkingOut, total, items, subtotal, shipping]);
 
   // ── Guest gate ───────────────────────────────────────────────────────────────
+  // Suppress the AuthGate flash during AuthContext bootstrap — otherwise a
+  // signed-in user lands on Cart on cold launch and sees the sign-in wall
+  // briefly while supabase.auth.getSession() resolves.
+  if (authLoading) return <View style={{ flex: 1, backgroundColor: '#FFFFFF' }} />;
   if (!user) {
     return (
       <AuthGate

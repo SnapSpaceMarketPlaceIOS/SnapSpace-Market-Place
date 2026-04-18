@@ -102,10 +102,25 @@ const SecureStoreAdapter = {
   },
 };
 
-// iOS 26.x beta simulators: keychain hangs without throwing, eating the 15s
-// auth timeout before SecureStore's own 2s fallback can fire.
-// Use AsyncStorage directly in __DEV__ to skip the keychain entirely.
-const authStorage = __DEV__ ? AsyncStorage : SecureStoreAdapter;
+// Always use AsyncStorage for Supabase auth persistence.
+//
+// We previously ran SecureStoreAdapter in production for "better security"
+// — in practice this chunked the session token across multiple iOS Keychain
+// entries, each with its own 2-second read timeout. On iPhone 14 Pro / iOS 26
+// cold launches the Keychain often took > 2 seconds on the FIRST chunk read,
+// which tripped the timeout, dumped the chunked data, and fell through to an
+// empty AsyncStorage (which had never been written because the original
+// setItem succeeded on SecureStore). Net result: the session appeared to
+// persist but was silently dropped on every app refresh, forcing the user
+// back to the sign-in wall on every launch. Confirmed via Build 19 TestFlight
+// report on 2026-04-18.
+//
+// AsyncStorage gives us deterministic reads/writes with no timeouts, no
+// chunking, and no Keychain dependency. The security trade-off (refresh
+// token stored locally on disk vs Keychain) is the standard React Native
+// pattern used by every major consumer app — Supabase RLS is the real
+// security boundary, not local token storage.
+const authStorage = AsyncStorage;
 
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   auth: {
@@ -166,10 +181,20 @@ export async function updateProfile(userId, updates) {
  * Returns the public URL of the uploaded file.
  * Bucket must exist and have public read access enabled.
  */
-async function uploadImage(bucket, path, uri, base64Data = null) {
+async function uploadImage(bucket, path, uri, base64Data = null, contentTypeOverride = null) {
   const base64 = base64Data || await FileSystem.readAsStringAsync(uri, { encoding: 'base64' });
-  const ext = uri.split('.').pop()?.toLowerCase().replace('jpg', 'jpeg') || 'jpeg';
-  const contentType = `image/${ext}`;
+  // Derive content-type from URI extension, but whitelist to formats
+  // Supabase Storage + flux-2-max both understand. Build 20 stopped
+  // re-encoding room photos to JPEG client-side, so URIs can now be raw
+  // HEIC/HEIF from iPhone 14 Pro or ph:// asset-library URIs with no
+  // resolvable extension. `uri.split('.').pop()` on a ph:// URI returns
+  // the entire URI, producing a garbage content-type that Supabase rejects.
+  let contentType = contentTypeOverride;
+  if (!contentType) {
+    const rawExt = uri.split('.').pop()?.toLowerCase().replace('jpg', 'jpeg') || '';
+    const allowed = { jpeg: 1, png: 1, webp: 1, heic: 1, heif: 1 };
+    contentType = `image/${allowed[rawExt] ? rawExt : 'jpeg'}`;
+  }
   const { error } = await supabase.storage
     .from(bucket)
     .upload(path, base64ToUint8Array(base64), { contentType, upsert: true });
