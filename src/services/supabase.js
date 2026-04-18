@@ -265,19 +265,81 @@ export async function uploadAvatar(userId, uri) {
  *     the pixel buffer byte-for-byte. No device variability, no Supabase
  *     transform ambiguity, no trusting flux-2-max to honor EXIF (it doesn't).
  *
- * Fallback: if the edge function call fails (network, cold-start timeout,
- * 5xx), we fall back to the raw /object/public/ URL rather than blocking the
- * user. In that degraded mode the photo may be served sideways — but they'll
- * still see SOMETHING. Logged as a warning so we can catch reliability dips.
+ * Retry + error-surfacing (Build 27):
+ *   - Each attempt gets a 60s timeout (was 30s) to cover Deno cold-starts
+ *     that routinely take 15–20s on Supabase edge.
+ *   - Up to TWO attempts total, 1.5s backoff between. The first attempt
+ *     warms the worker even if it times out; the second attempt usually
+ *     hits a warm runtime and succeeds in ~1–2s.
+ *   - If BOTH attempts exhaust without success, we throw a user-facing
+ *     error instead of silently falling back to the raw URL. Silent
+ *     fallback shipped sideways bytes to flux-2-max and produced
+ *     mysteriously-wrong-orientation outputs that looked like "the AI
+ *     is broken." A visible retry prompt is better UX than a confusing
+ *     output.
+ *
+ * 4xx errors still bypass retry — those are photo-level problems (too
+ * large, undecodable) that won't clear with a retry. The user needs to
+ * pick a different photo; we surface that immediately.
  */
+
+// Single normalize attempt. Returns one of:
+//   { success: true,  data }            — normalized URL ready
+//   { retryable: true, reason }         — transient failure, retry may help
+//   throws userFacing Error             — photo is bad, do not retry
+async function _attemptNormalize(rawUrl, jwt, userId) {
+  const res = await fetch(`${SUPABASE_URL}/functions/v1/normalize-room-photo`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${jwt}`,
+      'apikey':         SUPABASE_ANON_KEY,
+      'Content-Type':   'application/json',
+    },
+    body: JSON.stringify({ raw_url: rawUrl }),
+    // 60s cap (was 30s in Build 26). Cold-starts on Supabase edge Deno
+    // routinely take 15–20s; the old 30s budget was too tight and fired
+    // the catch branch on first-call, producing the silent sideways
+    // fallback bug confirmed in Build 26 testing.
+    signal: AbortSignal.timeout(60_000),
+  });
+
+  if (res.ok) {
+    const data = await res.json().catch(() => null);
+    if (data?.url) {
+      return { success: true, data };
+    }
+    return { retryable: true, reason: 'empty-response' };
+  }
+
+  let body = '';
+  try { body = await res.text(); } catch { /* ignore */ }
+  let parsed = null;
+  try { parsed = JSON.parse(body); } catch { /* keep body as text */ }
+  const reason = parsed?.error || body || `HTTP ${res.status}`;
+
+  // 4xx = photo-level issue. Retrying won't help — surface immediately.
+  if (res.status >= 400 && res.status < 500) {
+    const err = new Error(reason);
+    err.userFacing = true;
+    err.code = `NORMALIZE_${res.status}`;
+    throw err;
+  }
+
+  // 5xx — server problem, retry may help (same worker on cold retry
+  // is now warm from the first attempt, often succeeds).
+  return { retryable: true, reason: `5xx-${res.status}` };
+}
+
 export async function uploadRoomPhoto(userId, uri, base64Data = null) {
   const ts = Date.now();
   const storagePath = `${userId}/${ts}.jpeg`;
   await uploadImage('room-uploads', storagePath, uri, base64Data);
   const rawUrl = `${SUPABASE_URL}/storage/v1/object/public/room-uploads/${storagePath}`;
 
-  // Resolve a user JWT for the edge-function call. Any failure here drops
-  // to the raw URL — we still prefer a sideways image over no image.
+  // Resolve a user JWT for the edge-function call. No JWT means the user
+  // isn't signed in — there's no path forward that produces a correct
+  // image, so raw URL fallback here is fine. This branch should never
+  // fire in practice because generation is gated behind auth upstream.
   let jwt = null;
   try {
     const { data: { session } } = await supabase.auth.getSession();
@@ -289,71 +351,59 @@ export async function uploadRoomPhoto(userId, uri, base64Data = null) {
     return { url: rawUrl, width: null, height: null };
   }
 
-  try {
-    const res = await fetch(`${SUPABASE_URL}/functions/v1/normalize-room-photo`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${jwt}`,
-        'apikey':         SUPABASE_ANON_KEY,
-        'Content-Type':   'application/json',
-      },
-      body: JSON.stringify({ raw_url: rawUrl }),
-      // 30s cap covers cold-start of the Deno runtime + download + decode +
-      // rotate + re-encode + upload. Typical warm path is 1–3s.
-      signal: AbortSignal.timeout(30_000),
-    });
+  // Two-attempt retry loop. First attempt warms the cold worker (often
+  // timing out); second attempt hits a warm runtime and almost always
+  // succeeds. 1.5s backoff gives Deno a moment to finish spinning up.
+  const MAX_ATTEMPTS = 2;
+  const BACKOFF_MS = 1500;
+  let lastReason = null;
 
-    if (res.ok) {
-      const data = await res.json().catch(() => null);
-      if (data?.url) {
+  for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+    try {
+      const outcome = await _attemptNormalize(rawUrl, jwt, userId);
+      if (outcome.success) {
+        const { data } = outcome;
         console.log(
-          `[uploadRoomPhoto] normalized | orient=${data.orientation} rotated=${data.rotated} dims=${data.dims}`,
+          `[uploadRoomPhoto] normalized | attempt=${attempt} orient=${data.orientation} rotated=${data.rotated} dims=${data.dims}`,
         );
-        console.log('[normalize] path=edge-fn user=' + userId + ' dims=' + data.dims);
-        // Return server-truth dims alongside the URL so the caller can compute
-        // aspect_ratio from the ACTUAL encoded bytes flux-2-max will see,
-        // eliminating the client/server mismatch where the client's pre-rotation
-        // dims disagreed with the post-rotation bytes (Build 20 failure mode).
+        console.log('[normalize] path=edge-fn attempt=' + attempt + ' user=' + userId + ' dims=' + data.dims);
         return {
           url: data.url,
           width: typeof data.width === 'number' ? data.width : null,
           height: typeof data.height === 'number' ? data.height : null,
         };
       }
-      console.warn('[uploadRoomPhoto] normalize returned 200 but no URL — using raw URL');
-      console.log('[normalize] path=raw-fallback reason=empty-response user=' + userId);
-      return { url: rawUrl, width: null, height: null };
+      // Retryable outcome. Record and try again if we have budget.
+      lastReason = outcome.reason;
+      console.warn(`[uploadRoomPhoto] attempt ${attempt}/${MAX_ATTEMPTS} retryable | reason=${lastReason}`);
+    } catch (err) {
+      // 4xx throws propagate immediately — photo-level issue, retry won't help.
+      if (err?.userFacing) throw err;
+      // Network throw / timeout — retryable if we have budget.
+      lastReason = String(err?.message || err).substring(0, 60);
+      console.warn(`[uploadRoomPhoto] attempt ${attempt}/${MAX_ATTEMPTS} threw | ${lastReason}`);
     }
 
-    // Non-2xx. 4xx = the photo itself is the problem (too large / undecodable);
-    // the user needs to pick a different one. We surface those as UploadPhotoError
-    // so the UI can show a specific message instead of silently billing the user
-    // for a broken generation (the raw-URL fallback shipped sideways bytes to
-    // Replicate and charged $0.31 for a useless result). 5xx = our server
-    // problem; the raw-URL fallback is still a better UX than an error alert.
-    let body = '';
-    try { body = await res.text(); } catch { /* ignore */ }
-    let parsed = null;
-    try { parsed = JSON.parse(body); } catch { /* keep body as text */ }
-    const reason = parsed?.error || body || `HTTP ${res.status}`;
-
-    if (res.status >= 400 && res.status < 500) {
-      console.warn(`[uploadRoomPhoto] normalize rejected (${res.status}): ${reason}`);
-      const err = new Error(reason);
-      err.userFacing = true;
-      err.code = `NORMALIZE_${res.status}`;
-      throw err;
+    if (attempt < MAX_ATTEMPTS) {
+      await new Promise(r => setTimeout(r, BACKOFF_MS));
     }
-
-    console.warn(`[uploadRoomPhoto] normalize 5xx (${res.status}): ${reason} — using raw URL`);
-    console.log('[normalize] path=raw-fallback reason=5xx status=' + res.status + ' user=' + userId);
-    return { url: rawUrl, width: null, height: null };
-  } catch (err) {
-    if (err?.userFacing) throw err; // let caller show the message
-    console.warn('[uploadRoomPhoto] normalize threw:', err?.message || err, '— using raw URL');
-    console.log('[normalize] path=raw-fallback reason=threw err=' + String(err?.message || err).substring(0, 80) + ' user=' + userId);
-    return { url: rawUrl, width: null, height: null };
   }
+
+  // Both attempts exhausted without success. Build 27 behavior: surface
+  // a user-facing error instead of silent sideways-fallback. Prior
+  // behavior (Build 26 and earlier) returned the raw URL and shipped
+  // unrotated bytes to flux-2-max, producing landscape-input →
+  // portrait-output "the AI is broken" confusion on every cold-start
+  // window. The retry means we only reach this branch after ~62s of
+  // genuine trying; at that point the user's time is better spent
+  // retrying with a visible prompt than silently getting a wrong
+  // output.
+  console.warn('[uploadRoomPhoto] normalize exhausted ' + MAX_ATTEMPTS + ' attempts | lastReason=' + lastReason);
+  console.log('[normalize] path=error attempts=' + MAX_ATTEMPTS + ' lastReason=' + lastReason + ' user=' + userId);
+  const err = new Error("We couldn't prepare your photo. Please tap Retry.");
+  err.userFacing = true;
+  err.code = 'NORMALIZE_RETRY_EXHAUSTED';
+  throw err;
 }
 
 // ─── User Designs Helpers ────────────────────────────────────────────────────
