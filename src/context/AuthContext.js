@@ -349,9 +349,10 @@ export function AuthProvider({ children }) {
     // first makes the late bootstrap a no-op.
     bootstrapSupersededRef.current = true;
 
-    // iOS 26.x simulator cold TLS handshakes can stall 30-60s.
-    // Strategy: 15s timeout per attempt, up to 3 retries. The second
-    // attempt almost always succeeds because the TLS session is cached.
+    // Build 28: reduce retry aggression. Previously 3 × 15s = up to 47s
+    // of silent spinner; users gave up and force-quit before auth completed.
+    // Now 2 × 10s = 21s max. The second attempt almost always succeeds
+    // because the first warmed TLS; three attempts was excess.
     console.log('[Auth] signIn: calling Supabase...');
     const start = Date.now();
 
@@ -360,11 +361,11 @@ export function AuthProvider({ children }) {
         email: email.trim().toLowerCase(),
         password,
       }),
-      15000,
+      10000,
       'Connection timed out — retrying...',
     );
 
-    const { data, error } = await withRetry(attempt, 3, 1000);
+    const { data, error } = await withRetry(attempt, 2, 1000);
     console.log(`[Auth] signIn: responded in ${Date.now() - start}ms`, error ? `error: ${error.message}` : 'success');
 
     if (error) {

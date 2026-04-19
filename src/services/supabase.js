@@ -389,21 +389,19 @@ export async function uploadRoomPhoto(userId, uri, base64Data = null) {
     }
   }
 
-  // Both attempts exhausted without success. Build 27 behavior: surface
-  // a user-facing error instead of silent sideways-fallback. Prior
-  // behavior (Build 26 and earlier) returned the raw URL and shipped
-  // unrotated bytes to flux-2-max, producing landscape-input →
-  // portrait-output "the AI is broken" confusion on every cold-start
-  // window. The retry means we only reach this branch after ~62s of
-  // genuine trying; at that point the user's time is better spent
-  // retrying with a visible prompt than silently getting a wrong
-  // output.
-  console.warn('[uploadRoomPhoto] normalize exhausted ' + MAX_ATTEMPTS + ' attempts | lastReason=' + lastReason);
-  console.log('[normalize] path=error attempts=' + MAX_ATTEMPTS + ' lastReason=' + lastReason + ' user=' + userId);
-  const err = new Error("We couldn't prepare your photo. Please tap Retry.");
-  err.userFacing = true;
-  err.code = 'NORMALIZE_RETRY_EXHAUSTED';
-  throw err;
+  // Both attempts exhausted. Build 28 reverts to Build 26 behavior:
+  // fall back to the raw /object/public/ URL rather than blocking the
+  // user entirely. Build 27 tried to hard-fail on exhaustion to avoid
+  // shipping sideways bytes to flux-2-max, but in TestFlight (Build 29)
+  // that produced a broken "We couldn't prepare your photo" on EVERY
+  // cold-start generation — which is strictly worse UX than occasional
+  // landscape-sideways output. Landscape-sideways is recoverable (user
+  // retakes); hard-fail blocks everything.
+  //
+  // Telemetry remains loud so we can track normalize reliability.
+  console.warn('[uploadRoomPhoto] normalize exhausted ' + MAX_ATTEMPTS + ' attempts — falling back to raw URL | lastReason=' + lastReason);
+  console.log('[normalize] path=raw-fallback attempts=' + MAX_ATTEMPTS + ' lastReason=' + lastReason + ' user=' + userId);
+  return { url: rawUrl, width: null, height: null };
 }
 
 // ─── User Designs Helpers ────────────────────────────────────────────────────
