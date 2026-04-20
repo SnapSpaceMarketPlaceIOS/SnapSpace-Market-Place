@@ -18,8 +18,6 @@ import theme from '../constants/theme';
 import { typeScale } from '../constants/tokens';
 import { useCart } from '../context/CartContext';
 import { useOrderHistory } from '../context/OrderHistoryContext';
-import { useAuth } from '../context/AuthContext';
-import AuthGate from '../components/AuthGate';
 import { supabase } from '../services/supabase';
 import { trackAffiliateClickAndTagUrl } from '../services/purchaseTracking';
 import { PRODUCT_CATALOG } from '../data/productCatalog';
@@ -329,7 +327,6 @@ function AnimatedQtyText({ value, style }) {
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export default function CartScreen({ navigation }) {
-  const { user, loading: authLoading }        = useAuth();
   const { items, removeFromCart, updateQuantity, subtotal, clearCart } = useCart();
   const { addOrder }                          = useOrderHistory();
   const [checkingOut, setCheckingOut]         = useState(false);
@@ -405,21 +402,6 @@ export default function CartScreen({ navigation }) {
     );
     releaseGuard();
   }, [checkingOut, total, items, subtotal, shipping]);
-
-  // ── Guest gate ───────────────────────────────────────────────────────────────
-  // Suppress the AuthGate flash during AuthContext bootstrap — otherwise a
-  // signed-in user lands on Cart on cold launch and sees the sign-in wall
-  // briefly while supabase.auth.getSession() resolves.
-  if (authLoading) return <View style={{ flex: 1, backgroundColor: '#FFFFFF' }} />;
-  if (!user) {
-    return (
-      <AuthGate
-        title="Sign in to view your cart"
-        subtitle="Create a free account to generate AI room designs, save favorites, and shop curated furniture."
-        navigation={navigation}
-      />
-    );
-  }
 
   // ── Empty state ───────────────────────────────────────────────────────────────
   if (items.length === 0) {

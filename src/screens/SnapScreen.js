@@ -14,8 +14,6 @@ import { lockPortrait, unlockAll } from '../utils/orientation';
 import { useFocusEffect } from '@react-navigation/native';
 import Svg, { Path, Line, Polyline, Rect, Circle } from 'react-native-svg';
 import { palette } from '../constants/tokens';
-import { useAuth } from '../context/AuthContext';
-import AuthGate from '../components/AuthGate';
 import { warmupEdgeFunctions } from '../services/supabase';
 import TabScreenFade from '../components/TabScreenFade';
 import { useOnboarding, ONBOARDING_STEPS } from '../context/OnboardingContext';
@@ -88,7 +86,6 @@ function resolveDimensions(uri, manipulatedWidth, manipulatedHeight) {
 // ─── SnapScreen ───────────────────────────────────────────────────────────────
 
 export default function SnapScreen({ navigation, route }) {
-  const { user, loading: authLoading } = useAuth();
   const { isStepActive, nextStep, prevStep, finishOnboarding } = useOnboarding();
   const [permission, requestPermission] = useCameraPermissions();
   const [facing, setFacing] = useState('back');
@@ -121,23 +118,9 @@ export default function SnapScreen({ navigation, route }) {
   // the single-product generation pipeline instead of the full room redesign.
   const singleProduct = route?.params?.product ?? null;
 
-  // ── Auth gate ──
-  // While AuthContext is bootstrapping (supabase.auth.getSession() in-flight),
-  // user is null but loading is true. Show nothing instead of the sign-in wall
-  // — otherwise a signed-in user sees the AuthGate flash on cold app launch.
-  if (authLoading) return <View style={s.container} />;
-  if (!user) {
-    return (
-      <AuthGate
-        title="Design with AI"
-        subtitle="Take a photo of your room and generate AI-powered wishes with shoppable products."
-        navigation={navigation}
-      />
-    );
-  }
-
   // Simple in-flight guard so rapid double-taps on the shutter / library
-  // button don't queue two navigations.
+  // button don't queue two navigations. Moved before permission checks so
+  // hooks are called unconditionally (hard-wall auth removed in Build 34).
   const tapInFlight = useRef(false);
 
   const handleCapture = async () => {

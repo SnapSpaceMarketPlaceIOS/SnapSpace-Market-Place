@@ -52,31 +52,34 @@ let _manipulatorMissing = false;
 function getManipulator() {
   if (_ImageManipulator) return _ImageManipulator;
   if (_manipulatorMissing) return null;
-  // Two-stage check so the redbox doesn't surface "Cannot find native module
-  // 'ExpoImageManipulator'" on dev clients built before the dependency was added.
-  // We first probe the native registry quietly via expo-modules-core; if the
-  // native side isn't registered we mark missing WITHOUT triggering a require()
-  // that throws to LogBox.
+
+  // Strategy: first try the expo-modules-core probe (quiet on dev clients that
+  // were built before the dependency was added), then fall directly through to
+  // require() regardless of probe outcome. On production / TestFlight builds the
+  // native module IS registered; the old "probe-returns-null → mark missing"
+  // logic was too conservative and was incorrectly skipping HEIC→JPEG conversion
+  // on physical devices (Build 33 regression). We still catch probe errors
+  // but no longer abort on a null probe result.
+  let probeOk = false;
   try {
     // eslint-disable-next-line global-require
     const ExpoModulesCore = require('expo-modules-core');
-    const probe = typeof ExpoModulesCore?.requireOptionalNativeModule === 'function'
-      ? ExpoModulesCore.requireOptionalNativeModule('ExpoImageManipulator')
-      : null;
-    if (!probe) {
-      _manipulatorMissing = true;
-      console.warn(
-        '[imageOptimizer] ExpoImageManipulator native module not registered — ' +
-        'uploads will skip resizing (rebuild the dev client to enable).'
-      );
-      return null;
+    if (typeof ExpoModulesCore?.requireOptionalNativeModule === 'function') {
+      const probe = ExpoModulesCore.requireOptionalNativeModule('ExpoImageManipulator');
+      probeOk = !!probe;
     }
   } catch (probeErr) {
-    // expo-modules-core itself missing or older API — fall through to require()
+    // expo-modules-core missing or older API — fall through to require()
   }
+
   try {
     // eslint-disable-next-line global-require
     _ImageManipulator = require('expo-image-manipulator');
+    if (!probeOk) {
+      // Probe didn't confirm — log a dev warning but don't block, since
+      // production/EAS builds always have the module even if the probe fails.
+      console.warn('[imageOptimizer] ExpoImageManipulator probe negative but require succeeded — continuing');
+    }
     return _ImageManipulator;
   } catch (e) {
     _manipulatorMissing = true;
@@ -134,17 +137,27 @@ export async function optimizeForGeneration(uri, maxMegapixels = 1) {
   }
 
   // ── Step 1: resolve original dimensions ──────────────────────────────────
+  // For HEIC/HEIF files, Image.getSize may fail or hang on some iOS versions.
+  // Skip it for those formats and jump straight to ImageManipulator which
+  // uses UIImage (supports HEIC natively) and provides dimensions in the result.
+  const uriLower = uri.toLowerCase();
+  const isHEIC = uriLower.endsWith('.heic') || uriLower.endsWith('.heif') ||
+                 uriLower.includes('.heic?') || uriLower.includes('.heif?');
   let origWidth = 0;
   let origHeight = 0;
-  try {
-    const dims = await resolveDimensions(uri);
-    origWidth = dims.width;
-    origHeight = dims.height;
-  } catch (e) {
-    // Image.getSize can fail on some content:// URIs or transient FS issues.
-    // We continue: ImageManipulator can still decode the file and we'll just
-    // skip the size-aware short-circuit below.
-    console.warn('[imageOptimizer] Image.getSize failed:', e?.message || e);
+  if (!isHEIC) {
+    try {
+      const dims = await resolveDimensions(uri);
+      origWidth = dims.width;
+      origHeight = dims.height;
+    } catch (e) {
+      // Image.getSize can fail on some content:// URIs or transient FS issues.
+      // We continue: ImageManipulator can still decode the file and we'll just
+      // skip the size-aware short-circuit below.
+      console.warn('[imageOptimizer] Image.getSize failed:', e?.message || e);
+    }
+  } else {
+    console.log('[imageOptimizer] HEIC detected — skipping Image.getSize, going straight to manipulateAsync');
   }
 
   const origMP = (origWidth * origHeight) / 1_000_000;

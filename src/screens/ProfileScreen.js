@@ -24,7 +24,6 @@ import { fontSize, fontWeight, letterSpacing, space, radius, shadow, typeScale }
 import { useLiked } from '../context/LikedContext';
 import { useShared } from '../context/SharedContext';
 import { useAuth } from '../context/AuthContext';
-import AuthGate from '../components/AuthGate';
 import { useFocusEffect } from '@react-navigation/native';
 import { updateProfile, uploadAvatar, getUserDesigns, getMyStats, deleteExpiredDesigns, getUserLikedDesigns } from '../services/supabase';
 import { parseDesignPrompt } from '../utils/promptParser';
@@ -312,7 +311,7 @@ const getInitialProfile = (user) => ({
 export default function ProfileScreen({ navigation }) {
   const { liked, toggleLiked, likedProducts } = useLiked();
   const { shared, addShared } = useShared();
-  const { user, loading: authLoading, signOut, deleteAccount, refreshUser } = useAuth();
+  const { user, signOut, deleteAccount, refreshUser } = useAuth();
   const [activeTab, setActiveTab] = useState(0);
   const [likedFilter, setLikedFilter] = useState(0); // 0 = Wishes, 1 = Products
   const [gridCols, setGridCols] = useState(2);
@@ -441,21 +440,6 @@ export default function ProfileScreen({ navigation }) {
     setEditDraft(profile);
     setShowEditProfile(true);
   }, [profile]);
-
-  // Guest gate — must come AFTER all hooks
-  // Suppress the AuthGate flash during AuthContext bootstrap so a signed-in
-  // user doesn't see the sign-in wall briefly on cold launch while
-  // supabase.auth.getSession() is still in-flight.
-  if (authLoading) return <View style={{ flex: 1, backgroundColor: '#FFFFFF' }} />;
-  if (!user) {
-    return (
-      <AuthGate
-        title="Your profile awaits"
-        subtitle="Sign in to access your profile, saved wishes, and order history."
-        navigation={navigation}
-      />
-    );
-  }
 
   const saveEditProfile = async () => {
     if (!user?.id || saving) return;

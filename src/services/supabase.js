@@ -343,18 +343,39 @@ export async function uploadRoomPhoto(userId, uri, base64Data = null) {
   // original bytes — upload is never blocked by the optimizer.
   let uploadUri = uri;
   let uploadBase64 = base64Data;
+  let optimizationSucceeded = false;
   try {
     const optimized = await optimizeForGeneration(uri, 1);
     if (optimized?.optimized && optimized.uri) {
       uploadUri = optimized.uri;
       uploadBase64 = null; // force re-read from optimized URI
+      optimizationSucceeded = true;
     }
   } catch (e) {
     console.warn('[uploadRoomPhoto] optimizer threw, using original:', e?.message || e);
   }
 
+  // ── HEIC safety net ────────────────────────────────────────────────────
+  // normalize-room-photo uses jpeg-js which can ONLY decode JPEG. If the
+  // optimizer failed AND the original URI is HEIC/HEIF, the edge function
+  // will fail with a 422. When we detect this condition, switch the
+  // rawUrl we pass to normalize to a Supabase /render/image/ URL that
+  // forces JPEG delivery — imgproxy (which powers render/image) supports
+  // HEIC and applies auto-orientation, so normalize receives clean JPEG
+  // bytes regardless of the source codec.
+  const originalUriLower = (uri || '').toLowerCase();
+  const originalIsHEIC = originalUriLower.endsWith('.heic') || originalUriLower.endsWith('.heif');
+
   await uploadImage('room-uploads', storagePath, uploadUri, uploadBase64);
-  const rawUrl = `${SUPABASE_URL}/storage/v1/object/public/room-uploads/${storagePath}`;
+  const rawStoragePath = `${SUPABASE_URL}/storage/v1/object/public/room-uploads/${storagePath}`;
+
+  // If optimization didn't produce a JPEG and the input was HEIC, serve
+  // it through the image transform endpoint so normalize gets JPEG bytes.
+  let rawUrl = rawStoragePath;
+  if (!optimizationSucceeded && originalIsHEIC) {
+    rawUrl = `${SUPABASE_URL}/storage/v1/render/image/public/room-uploads/${storagePath}?format=jpeg&quality=90`;
+    console.log('[uploadRoomPhoto] HEIC safety net — using render/image/ URL for normalize');
+  }
 
   // Resolve a user JWT for the edge-function call. No JWT means the user
   // isn't signed in — there's no path forward that produces a correct

@@ -368,11 +368,14 @@ export default function AuthScreen({ navigation }) {
         if (result.needsEmailVerification) {
           navigation.replace('VerifyEmailSent', { email });
         } else {
-          navigation.reset({ index: 0, routes: [{ name: 'Main' }] });
+          // Hard-wall auth: RootNavigator re-renders when user state changes.
+          // navigation.reset is a no-op here but kept for safety in case
+          // AuthScreen is ever used in a full-stack context.
+          try { navigation.reset({ index: 0, routes: [{ name: 'Main' }] }); } catch (_e) { /* handled by RootNavigator re-render */ }
         }
       } else {
         await signIn(email, password);
-        navigation.reset({ index: 0, routes: [{ name: 'Main' }] });
+        try { navigation.reset({ index: 0, routes: [{ name: 'Main' }] }); } catch (_e) { /* handled by RootNavigator re-render */ }
       }
     } catch (err) {
       Alert.alert(
@@ -565,7 +568,7 @@ export default function AuthScreen({ navigation }) {
                   safeSetLoading(true);
                   try {
                     await signInWithApple();
-                    navigation.reset({ index: 0, routes: [{ name: 'Main' }] });
+                    try { navigation.reset({ index: 0, routes: [{ name: 'Main' }] }); } catch (_e) { /* handled by RootNavigator re-render */ }
                   } catch (err) {
                     if (err.code !== 'ERR_REQUEST_CANCELED') {
                       Alert.alert('Apple Sign-In Failed', err.message);

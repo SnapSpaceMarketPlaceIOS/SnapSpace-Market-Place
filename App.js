@@ -60,6 +60,7 @@ import NotificationsScreen from './src/screens/NotificationsScreen';
 import LanguageScreen from './src/screens/LanguageScreen';
 import TermsOfUseScreen from './src/screens/TermsOfUseScreen';
 import PrivacyPolicyScreen from './src/screens/PrivacyPolicyScreen';
+import AuthScreen from './src/screens/AuthScreen';
 import VerifyEmailSentScreen from './src/screens/VerifyEmailSentScreen';
 import SupplierApplicationScreen from './src/screens/SupplierApplicationScreen';
 import SupplierApplicationStatusScreen from './src/screens/SupplierApplicationStatusScreen';
@@ -323,7 +324,7 @@ function TabNavigator() {
 
 // ─── Root Navigator ──────────────────────────────────────────────
 function RootNavigator() {
-  const { loading } = useAuth();
+  const { loading, user } = useAuth();
 
   if (loading) {
     return (
@@ -331,6 +332,25 @@ function RootNavigator() {
         <Text style={styles.loadingWordmark}>HomeGenie</Text>
         <GenieLoader size={80} animating style={{ marginTop: 48 }} />
       </View>
+    );
+  }
+
+  // ── Option A hard wall ────────────────────────────────────────
+  // Unauthenticated users see ONLY the sign-in screen — no tabs,
+  // no content. When AuthContext sets user (sign-in / Apple auth
+  // completes), this navigator re-renders and switches to the full
+  // app stack automatically. No inline AuthGate needed on individual
+  // screens (those were removed in Build 34).
+  if (!user) {
+    return (
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="Auth" component={AuthScreen} />
+        <Stack.Screen
+          name="VerifyEmailSent"
+          component={VerifyEmailSentScreen}
+          options={{ animation: 'fade' }}
+        />
+      </Stack.Navigator>
     );
   }
 
@@ -347,12 +367,6 @@ function RootNavigator() {
       }}
     >
       <Stack.Screen name="Main" component={TabNavigator} />
-      {/*
-        Stack.Screen "Auth" removed 2026-04-18. No caller in the app navigated
-        to it — AuthGate is rendered inline on Snap/Cart/Profile when !user.
-        Keeping two sign-in walls (AuthScreen modal + inline AuthGate) with
-        different dismissal behaviors confused users on TestFlight.
-      */}
       <Stack.Screen name="VerifyEmailSent" component={VerifyEmailSentScreen} options={{ animation: 'fade' }} />
       <Stack.Screen name="RoomResult" component={RoomResultScreen} options={{ animation: 'slide_from_bottom' }} />
       <Stack.Screen name="ProductDetail" component={ProductDetailScreen} />
