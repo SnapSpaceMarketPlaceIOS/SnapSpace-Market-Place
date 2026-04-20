@@ -40,7 +40,7 @@ import { useCart } from '../context/CartContext';
 import { DESIGNS } from '../data/designs';
 import { SELLERS } from '../data/sellers';
 import { searchProducts, getSourceColor, getProductsForPrompt, getNormalizedProductsByIds } from '../services/affiliateProducts';
-import { buildFinalPrompt, generateWithProductPanel, generateSingleProductInRoom, pickAspectRatio } from '../services/replicate';
+import { buildFinalPrompt, generateWithProductPanel, generateSingleProductInRoom, pickAspectRatio } from '../services/aiProvider';
 import { createProductPanel } from '../utils/createProductPanel';
 import { withTimeout } from '../utils/withTimeout';
 import { verifyGeneratedProducts } from '../services/visionMatcher';
@@ -74,29 +74,49 @@ const FLUX_SUPPORTED_MIMES = new Set([
 ]);
 
 async function preflightUrl(url) {
+  // We try HEAD first (cheapest), then fall back to GET (no Range — some CDNs
+  // including parts of Amazon's image CDN reject Range with 416/400 even when
+  // the same URL serves perfectly to <Image>). On any error we DIAGNOSE then
+  // FAIL OPEN — assume the URL is reachable and let the AI decide. Dropping
+  // products silently is worse than letting the AI try and gracefully fall back,
+  // because a dropped product means the AI generates the room from text alone
+  // and the rendered furniture doesn't match what the user is buying.
   try {
     const ctrl = new AbortController();
     const timer = setTimeout(() => ctrl.abort(), PREFLIGHT_TIMEOUT_MS);
-    // HEAD is ideal but some CDNs don't implement it; fall back to GET with
-    // a Range header so we don't download the whole file.
-    const res = await fetch(url, {
-      method: 'GET',
-      headers: { 'Range': 'bytes=0-0' },
-      signal: ctrl.signal,
-    });
+    let res;
+    try {
+      res = await fetch(url, { method: 'HEAD', signal: ctrl.signal });
+    } catch (headErr) {
+      // Some CDNs don't allow HEAD — fall through to GET below
+      res = null;
+    }
+    if (!res || (res.status >= 400 && res.status < 500)) {
+      // HEAD returned a 4xx (often because of Range/HEAD policy). Retry as GET
+      // without a Range header. We'll abort the body read by aborting the
+      // controller right after we have headers.
+      res = await fetch(url, { method: 'GET', signal: ctrl.signal });
+    }
     clearTimeout(timer);
-    const reachable = res.status === 200 || res.status === 206;
-    if (!reachable) return false;
+    const reachable = res.status >= 200 && res.status < 400;
+    if (!reachable) {
+      console.warn(`[preflight] ${url.substring(0, 80)} → HTTP ${res.status} (treating as reachable, fail-open)`);
+      return true; // FAIL OPEN: let the AI try, it'll fallback if the URL is truly bad
+    }
     // Verify the CDN is actually serving a flux-compatible format.
     // Strip any "; charset=..." suffix before comparing.
     const ct = (res.headers.get('content-type') || '').split(';')[0].trim().toLowerCase();
     if (ct && !FLUX_SUPPORTED_MIMES.has(ct)) {
-      console.warn(`[preflight] ${url.substring(0, 80)} served as ${ct} — flux-2-max can't decode this`);
-      return false;
+      // Common case: Amazon serves jpegs but content-type may be missing or odd.
+      // Don't drop just because we don't recognize the type — log and trust.
+      console.warn(`[preflight] ${url.substring(0, 80)} served as ${ct} (treating as reachable, fail-open)`);
+      return true;
     }
     return true;
-  } catch {
-    return false;
+  } catch (e) {
+    // Network/timeout/abort. We don't know if the URL is bad — assume good.
+    console.warn(`[preflight] ${url.substring(0, 80)} check failed: ${e?.message || e} (treating as reachable, fail-open)`);
+    return true;
   }
 }
 
@@ -1697,7 +1717,7 @@ export default function HomeScreen({ navigation, route }) {
           // Cost: ~$0.10–0.20/generation
           let replicateSucceeded = false;
           try {
-            log('replicate flux-2-max | visual product refs');
+            log('AI gen | visual product refs (provider routed via aiProvider)');
 
             // ── Try panel approach: 2 images instead of 4 → ~50% less GPU compute ──
             // Creates a 768×768 2×2 product grid via edge function, then sends
@@ -1808,7 +1828,7 @@ export default function HomeScreen({ navigation, route }) {
               'seed=' + (genMeta.seed ?? '(none)'),
               'source=' + generationSource
             );
-            log('replicate complete | url=' + resultUrl.substring(0, 80) + ' | finalProducts=' + finalProducts.length);
+            log('AI gen complete | url=' + resultUrl.substring(0, 80) + ' | finalProducts=' + finalProducts.length);
           } catch (repErr) {
             warn('replicate failed (' + repErr.message + ') — dropping to BFL text-to-image');
           }

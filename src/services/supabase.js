@@ -2,6 +2,7 @@ import { createClient } from '@supabase/supabase-js';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as SecureStore from 'expo-secure-store';
 import * as FileSystem from 'expo-file-system/legacy';
+import { optimizeForGeneration } from '../utils/imageOptimizer';
 
 // Add your Supabase Project URL and Anon Key to the .env file.
 // Find them in: Supabase Dashboard → Project Settings → API
@@ -333,7 +334,26 @@ async function _attemptNormalize(rawUrl, jwt, userId) {
 export async function uploadRoomPhoto(userId, uri, base64Data = null) {
   const ts = Date.now();
   const storagePath = `${userId}/${ts}.jpeg`;
-  await uploadImage('room-uploads', storagePath, uri, base64Data);
+
+  // ── Pre-upload optimization (FAL migration — Phase 1) ──────────────────
+  // Resize source to ≤ 1 MP before upload so FAL's per-megapixel billing
+  // stays in the cheap tier (~$0.06/gen instead of ~$0.45+ on raw 12-25 MP
+  // iPhone photos). Optimizer also re-encodes to JPEG, fixing the iOS-26
+  // AVIF E006 rejection at the source. On any failure we fall back to the
+  // original bytes — upload is never blocked by the optimizer.
+  let uploadUri = uri;
+  let uploadBase64 = base64Data;
+  try {
+    const optimized = await optimizeForGeneration(uri, 1);
+    if (optimized?.optimized && optimized.uri) {
+      uploadUri = optimized.uri;
+      uploadBase64 = null; // force re-read from optimized URI
+    }
+  } catch (e) {
+    console.warn('[uploadRoomPhoto] optimizer threw, using original:', e?.message || e);
+  }
+
+  await uploadImage('room-uploads', storagePath, uploadUri, uploadBase64);
   const rawUrl = `${SUPABASE_URL}/storage/v1/object/public/room-uploads/${storagePath}`;
 
   // Resolve a user JWT for the edge-function call. No JWT means the user

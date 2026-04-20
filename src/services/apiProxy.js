@@ -124,6 +124,9 @@ function directFetch(provider, url, options = {}) {
       headers['x-api-key'] = readDevKey('ANTHROPIC_API_KEY');
       headers['anthropic-version'] = '2023-06-01';
       break;
+    case 'fal':
+      headers['Authorization'] = `Key ${readDevKey('FAL_API_KEY')}`;
+      break;
   }
 
   const fetchOptions = {

@@ -59,6 +59,10 @@ const PROVIDERS: Record<
       "anthropic-version": "2023-06-01",
     }),
   },
+  fal: {
+    envKey: "FAL_API_KEY",
+    authHeader: (key) => ({ Authorization: `Key ${key}` }),
+  },
 };
 
 Deno.serve(async (req: Request) => {
