@@ -40,7 +40,7 @@ import { useCart } from '../context/CartContext';
 import { DESIGNS } from '../data/designs';
 import { SELLERS } from '../data/sellers';
 import { searchProducts, getSourceColor, getProductsForPrompt, getNormalizedProductsByIds } from '../services/affiliateProducts';
-import { buildFinalPrompt, generateWithProductPanel, generateSingleProductInRoom, pickAspectRatio } from '../services/aiProvider';
+import { buildFinalPrompt, generateWithProductPanel, generateWithProductRefs, generateSingleProductInRoom, pickAspectRatio } from '../services/aiProvider';
 import { createProductPanel } from '../utils/createProductPanel';
 import { withTimeout } from '../utils/withTimeout';
 import { verifyGeneratedProducts } from '../services/visionMatcher';
@@ -1786,17 +1786,59 @@ export default function HomeScreen({ navigation, route }) {
               warn('panel skipped — only ' + reachableProducts.length + ' reachable products (need 2+)');
             }
 
-            // Build 22: no individual-capped fallback. The only legal flux-2-max
-            // paths send EXACTLY 2 inputs. If the 2×2 panel didn't come back,
-            // we bail out of the flux path here — the outer catch will drop us
-            // to the BFL text-to-image fallback (Ring 3). Previously this path
-            // submitted flux-2-max with 3 inputs (room + 2 products) which
-            // billed ~$0.19–0.23 per gen and was the root of the 2026-04-18
-            // landscape $0.31 overcharge. By hard-failing here, we make the
-            // ≤$0.16 cost ceiling a structural property of the code, not a
-            // runtime check.
+            // Build 36: Ring 2 — individual-product-refs safety net.
+            //
+            // If the 2×2 panel path didn't produce an image (createProductPanel
+            // returned null OR generateWithProductPanel threw), fall back to
+            // generateWithProductRefs which sends [room, p1, p2, p3, p4] to FAL
+            // directly. This is the path that worked reliably pre-Build-22 and
+            // gives us a second chance at a room-preserving generation BEFORE
+            // dropping all the way to BFL text-to-image (which doesn't preserve
+            // the user's actual room).
+            //
+            // Build 22 removed this fallback to enforce a ≤$0.16 cost ceiling.
+            // That ceiling matters less than users being able to generate at
+            // all — we restore Ring 2 as a CAUGHT fallback (its own try/catch)
+            // so a panel failure doesn't immediately erase the user's room.
+            //
+            // Cost: ~$0.10–0.20/gen (still well under the $0.45+ raw cost we
+            // were seeing pre-optimizer). BFL stays as Ring 3 if BOTH panel
+            // and refs paths fail.
             if (!usedPanel) {
-              throw new Error('2×2 panel unavailable — dropping to BFL text-to-image fallback');
+              try {
+                setGenStatus('Refining your design…');
+                log('Ring 2: panel failed → trying generateWithProductRefs (room + ' + Math.min(reachableProducts.length, 4) + ' product images)');
+                const refsResultUrl = await generateWithProductRefs(
+                  roomPhotoUrl,
+                  designPrompt,
+                  reachableProducts.slice(0, 4),
+                  aspectRatio,
+                );
+                resultUrl = refsResultUrl;
+                genMeta.pipeline = 'individual-refs';
+                finalProducts = reachableProducts.slice(0, 4);
+                replicateSucceeded = true;
+                log('Ring 2 succeeded | url=' + String(resultUrl).substring(0, 80));
+                console.log(
+                  '[genmeta]',
+                  'event=success',
+                  'pipeline=individual-refs',
+                  'generationId=' + generationId,
+                  'productsIn=' + reachableProducts.length,
+                  'productsUsed=' + finalProducts.length,
+                  'source=' + generationSource
+                );
+              } catch (refsErr) {
+                warn('Ring 2 (productRefs) failed (' + (refsErr?.message || refsErr) + ') — dropping to BFL text-to-image');
+                console.log(
+                  '[genmeta]',
+                  'event=ring2_failed',
+                  'pipeline=individual-refs',
+                  'generationId=' + generationId,
+                  'err=' + String(refsErr?.message || refsErr).substring(0, 120)
+                );
+                throw new Error('All FAL paths failed — dropping to BFL text-to-image fallback');
+              }
             }
 
             // Panel succeeded — reconcile finalProducts with what was ACTUALLY
@@ -1804,33 +1846,58 @@ export default function HomeScreen({ navigation, route }) {
             // reachableProducts made it into the 2×2 grid; Shop Your Room
             // shows exactly those 4, so users never see a product that isn't
             // in their generated image.
-            if (Array.isArray(panelCompositedIndices) && panelCompositedIndices.length > 0) {
-              finalProducts = panelCompositedIndices
-                .map(i => reachableProducts[i])
-                .filter(Boolean);
-            } else {
-              finalProducts = reachableProducts.slice(0, 4);
+            //
+            // Build 36: gate this entire block behind `usedPanel` so that when
+            // Ring 2 (individual-refs) succeeds via the new fallback above,
+            // we don't double-emit [genmeta] event=success or overwrite the
+            // already-correct finalProducts/replicateSucceeded values.
+            if (usedPanel) {
+              if (Array.isArray(panelCompositedIndices) && panelCompositedIndices.length > 0) {
+                finalProducts = panelCompositedIndices
+                  .map(i => reachableProducts[i])
+                  .filter(Boolean);
+              } else {
+                finalProducts = reachableProducts.slice(0, 4);
+              }
+              replicateSucceeded = true;
+              // Structured telemetry: exactly which pipeline ran. Grep prod
+              // logs for `[genmeta]` to see panel vs individual-capped ratios
+              // and catch any regression in the 2×2 panel path cost/routing.
+              // Added event=success so all terminal states use a consistent
+              // event= key that log aggregators can group on.
+              console.log(
+                '[genmeta]',
+                'event=success',
+                'pipeline=' + genMeta.pipeline,
+                'generationId=' + generationId,
+                'productsIn=' + reachableProducts.length,
+                'productsUsed=' + finalProducts.length,
+                'predictionId=' + (genMeta.predictionId || '(none)'),
+                'seed=' + (genMeta.seed ?? '(none)'),
+                'source=' + generationSource
+              );
+              log('AI gen complete | url=' + resultUrl.substring(0, 80) + ' | finalProducts=' + finalProducts.length);
             }
-            replicateSucceeded = true;
-            // Structured telemetry: exactly which pipeline ran. Grep prod
-            // logs for `[genmeta]` to see panel vs individual-capped ratios
-            // and catch any regression in the 2×2 panel path cost/routing.
-            // Added event=success so all terminal states use a consistent
-            // event= key that log aggregators can group on.
+          } catch (repErr) {
+            // Surface as much detail as possible — this catch is the funnel
+            // for "user sees BFL fallback" and we historically lost the actual
+            // FAL error here. Build 36: also emit a [genmeta] line so
+            // production logs let us slice failure rates by pipeline.
+            const errMsg = String(repErr?.message || repErr);
+            warn(
+              'replicate failed | name=' + (repErr?.name || 'Error') +
+              ' | msg=' + errMsg.substring(0, 200) +
+              ' | pipeline=' + (genMeta.pipeline || 'pre-pipeline') +
+              ' — dropping to BFL text-to-image'
+            );
             console.log(
               '[genmeta]',
-              'event=success',
-              'pipeline=' + genMeta.pipeline,
+              'event=fal_pipeline_failed',
+              'pipeline=' + (genMeta.pipeline || 'pre-pipeline'),
               'generationId=' + generationId,
-              'productsIn=' + reachableProducts.length,
-              'productsUsed=' + finalProducts.length,
-              'predictionId=' + (genMeta.predictionId || '(none)'),
-              'seed=' + (genMeta.seed ?? '(none)'),
-              'source=' + generationSource
+              'errName=' + (repErr?.name || 'Error'),
+              'err=' + errMsg.substring(0, 200)
             );
-            log('AI gen complete | url=' + resultUrl.substring(0, 80) + ' | finalProducts=' + finalProducts.length);
-          } catch (repErr) {
-            warn('replicate failed (' + repErr.message + ') — dropping to BFL text-to-image');
           }
 
           // ── Ring 3 fallback: BFL text-to-image (prompt only, no image inputs) ──
