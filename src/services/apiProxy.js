@@ -56,9 +56,22 @@ export async function proxyFetch(provider, url, options = {}) {
     }),
   });
 
-  // Check for rate limiting
+  // Build 38: 429-aware retry. The ai-proxy enforces a 2-second per-user
+  // cooldown (014_rate_limits.sql); our fallback rings (panel → refs → BFL)
+  // can fire back-to-back faster than that and previously caused cascading
+  // failures with two error popups. When the proxy returns 429 with a
+  // `retry_after_ms` hint, we wait that long (+200ms safety) and retry once.
+  // This converts a hard failure into a transparent backoff for the caller.
+  // Quota-exceeded (402) is intentionally NOT retried — that's a real billing
+  // limit, not a transient cooldown.
   if (response.status === 429) {
-    const data = await response.json();
+    const data = await response.json().catch(() => ({}));
+    const retryAfterMs = Math.min(Number(data?.retry_after_ms) || 2200, 5000);
+    if (retryAfterMs > 0 && !options.__noRetry) {
+      console.log('[apiProxy] 429 cooldown — sleeping ' + retryAfterMs + 'ms before retry');
+      await new Promise(r => setTimeout(r, retryAfterMs + 200));
+      return proxyFetch(provider, url, { ...options, __noRetry: true });
+    }
     throw new Error(data.message || 'Please wait a moment between requests.');
   }
 

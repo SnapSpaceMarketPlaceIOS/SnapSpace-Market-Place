@@ -46,7 +46,13 @@ const MAX_POLLS = 80; // 3s × 80 = 4 min ceiling — matches replicate.js
 // retry behavior is consistent across providers.
 const RETRYABLE_ERROR_REGEX =
   /E006|invalid input|content moderated|safety|moderation|nsfw_concepts|content_policy/i;
-const RETRY_BACKOFF_MS = 1500;
+// Build 38: bumped from 1500ms to 2200ms. The Supabase ai-proxy enforces a
+// 2000ms per-user cooldown via check_ai_rate_limit (014_rate_limits.sql).
+// A 1500ms backoff meant the retry POST always 429'd before reaching FAL,
+// turning every "transient/moderation" failure into a hard failure even
+// though FAL was perfectly capable of succeeding on a fresh seed. 2200ms
+// gives a 200ms safety margin over the cooldown wall.
+const RETRY_BACKOFF_MS = 2200;
 
 // Re-used quality prefix kept identical to replicate.js for prompt-fidelity
 // parity. Flux models weight early tokens highest — leading with editorial
@@ -186,16 +192,67 @@ async function submitFalWithRetry(baseInput) {
  * @returns {Promise<string>}  The generated image URL
  */
 async function pollUntilDone(statusUrl, responseUrl) {
+  // Build 44: allow up to this many *consecutive* transient poll failures
+  // (network blip, proxy 5xx, malformed JSON, supabase.auth.getSession
+  // refresh glitch, etc.) before surfacing an error. One bad poll response
+  // previously killed the entire generation — the #1 suspect for the Build
+  // 42/43 TestFlight report where FAL's dashboard showed a valid submit
+  // followed by client-side Ring-1 throw. A successful poll resets the
+  // streak back to 0.
+  const MAX_CONSECUTIVE_POLL_FAILURES = 3;
+  let consecutiveFailures = 0;
+
   for (let i = 0; i < MAX_POLLS; i++) {
     await new Promise(r => setTimeout(r, POLL_INTERVAL_MS));
 
-    const statusRes = await proxyFetch('fal', statusUrl, { method: 'GET' });
-    const status = await statusRes.json();
+    let status = null;
+    try {
+      const statusRes = await proxyFetch('fal', statusUrl, { method: 'GET' });
+      status = await statusRes.json();
+      // Successful parse — reset transient-failure streak.
+      consecutiveFailures = 0;
+    } catch (pollErr) {
+      consecutiveFailures += 1;
+      console.warn(
+        '[flux-2-pro/edit] poll ' + (i + 1) + ' failed (' +
+        consecutiveFailures + '/' + MAX_CONSECUTIVE_POLL_FAILURES + ' consecutive): ' +
+        String(pollErr?.message || pollErr).substring(0, 120)
+      );
+      if (consecutiveFailures >= MAX_CONSECUTIVE_POLL_FAILURES) {
+        throw new Error(
+          'FAL polling failed ' + MAX_CONSECUTIVE_POLL_FAILURES +
+          ' times in a row: ' + String(pollErr?.message || pollErr).substring(0, 120)
+        );
+      }
+      // Skip terminal-state checks this iteration — try again on next tick.
+      continue;
+    }
 
-    if (status.status === 'COMPLETED') {
-      // Fetch the actual result payload
-      const resultRes = await proxyFetch('fal', responseUrl, { method: 'GET' });
-      const result = await resultRes.json();
+    if (status?.status === 'COMPLETED') {
+      // Fetch the actual result payload. This fetch gets ONE retry on
+      // transient failure for symmetry with the polling loop — the result
+      // payload is often the same "reachable in 2nd attempt" cold-cache
+      // shape as status responses.
+      let result = null;
+      let lastResultErr = null;
+      for (let r = 0; r < 2; r++) {
+        try {
+          const resultRes = await proxyFetch('fal', responseUrl, { method: 'GET' });
+          result = await resultRes.json();
+          break;
+        } catch (resErr) {
+          lastResultErr = resErr;
+          console.warn('[flux-2-pro/edit] result fetch attempt ' + (r + 1) +
+            ' failed: ' + String(resErr?.message || resErr).substring(0, 120));
+          await new Promise(res => setTimeout(res, 1500));
+        }
+      }
+      if (!result) {
+        throw new Error(
+          'flux-2-pro/edit result fetch failed after retry: ' +
+          String(lastResultErr?.message || lastResultErr).substring(0, 120)
+        );
+      }
 
       // Result shape: { images: [{ url, width, height, content_type }], seed, ... }
       const firstImage = result?.images?.[0];
@@ -208,13 +265,33 @@ async function pollUntilDone(statusUrl, responseUrl) {
       return firstImage.url;
     }
 
-    if (status.status === 'FAILED') {
+    if (status?.status === 'FAILED') {
       const errMsg = status.error || status.detail || 'AI generation failed';
       // Surface a friendly error for known image-format issues
       if (/UnidentifiedImageError|cannot identify image|invalid.*image/i.test(errMsg)) {
         throw new Error('The image format is not supported. Please try a different photo from your library.');
       }
       throw new Error(errMsg);
+    }
+
+    // Unknown/missing status.status (e.g. proxy returned an auth error object
+    // like {error: "Session expired"}). Don't silently loop forever — treat
+    // like a transient poll failure so the streak counter catches repeated
+    // garbage responses.
+    if (!status?.status) {
+      consecutiveFailures += 1;
+      console.warn(
+        '[flux-2-pro/edit] poll ' + (i + 1) + ' returned no .status (' +
+        consecutiveFailures + '/' + MAX_CONSECUTIVE_POLL_FAILURES + ' consecutive): ' +
+        JSON.stringify(status || {}).substring(0, 120)
+      );
+      if (consecutiveFailures >= MAX_CONSECUTIVE_POLL_FAILURES) {
+        throw new Error(
+          'FAL polling returned malformed status ' + MAX_CONSECUTIVE_POLL_FAILURES +
+          ' times in a row: ' + JSON.stringify(status || {}).substring(0, 120)
+        );
+      }
+      continue;
     }
 
     // IN_QUEUE / IN_PROGRESS — keep polling

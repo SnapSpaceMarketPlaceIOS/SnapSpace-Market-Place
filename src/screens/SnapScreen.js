@@ -7,6 +7,7 @@ import {
   Alert,
   Linking,
   Image, // for Image.getSize fallback when manipulateAsync doesn't return dims
+  Dimensions, // Build 58: device orientation at capture time
 } from 'react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import * as ImagePicker from 'expo-image-picker';
@@ -193,12 +194,32 @@ export default function SnapScreen({ navigation, route }) {
         'swapDetected=' + (photo.width !== finalWidth || photo.height !== finalHeight)
       );
 
+      // Build 58: capture device orientation at the moment of shutter press.
+      // iOS 26 / iPhone 14 Pro Max writes IDENTICAL EXIF metadata for landscape
+      // and portrait captures (Build 57 telemetry confirmed this), so file-side
+      // EXIF can't discriminate. Dimensions.get('window') reflects the actual
+      // physical phone orientation right now and IS the correct discriminator.
+      // 'portrait' = phone held upright (height > width)
+      // 'landscape' = phone held sideways (width > height)
+      // This signal flows through to HomeScreen.runGeneration where it gates
+      // the dim-swap and rotation logic in supabase.js + imageOptimizer.js.
+      const winDims = Dimensions.get('window');
+      const captureOrientation = winDims.width > winDims.height ? 'landscape' : 'portrait';
+      console.log('[Snap capture] device orientation at shutter | window=' +
+        winDims.width + 'x' + winDims.height + ' → captureOrientation=' + captureOrientation);
+
       navigation.navigate('Home', {
         capturedPhoto: {
           uri: photo.uri,
           base64: null,
           width: finalWidth,
           height: finalHeight,
+          // Build 44: propagate EXIF so runGeneration's orientation swap can
+          // correct dims if Image.getSize returned raw pre-rotation pixels.
+          exif: photo.exif || null,
+          // Build 58: trump card. When set to 'portrait', downstream code
+          // skips the EXIF-based dim swap and rotation entirely.
+          captureOrientation,
         },
         singleProduct,  // null for normal flow, product object for single-product visualize
       });
@@ -274,12 +295,32 @@ export default function SnapScreen({ navigation, route }) {
         'swapDetected=' + (asset.width !== finalWidth || asset.height !== finalHeight)
       );
 
+      // Build 58: For library picks we don't have capture-time orientation
+      // info, but we CAN use the asset's actual aspect ratio as a heuristic.
+      // If asset.width > asset.height → user picked a landscape-display photo.
+      // If asset.width < asset.height → user picked a portrait-display photo.
+      // Note that on iOS this matches user-visible orientation since iOS
+      // Photos.app stores photos in display orientation (post-EXIF-rotation
+      // for the album view).
+      let pickedOrientation = null;
+      if (typeof asset.width === 'number' && typeof asset.height === 'number') {
+        pickedOrientation = asset.width > asset.height ? 'landscape' : 'portrait';
+      }
+      console.log('[Snap library pick] asset aspect | ' + asset.width + 'x' + asset.height +
+        ' → captureOrientation=' + (pickedOrientation || 'unknown'));
+
       navigation.navigate('Home', {
         capturedPhoto: {
           uri: asset.uri,
           base64: null,
           width: finalWidth,
           height: finalHeight,
+          // Build 44: propagate EXIF so runGeneration's orientation swap can
+          // correct dims if Image.getSize returned raw pre-rotation pixels.
+          exif: asset.exif || null,
+          // Build 58: derived from asset dims for library picks (no shutter-
+          // time gyro signal available).
+          captureOrientation: pickedOrientation,
         },
         singleProduct,  // null for normal flow, product object for single-product visualize
       });

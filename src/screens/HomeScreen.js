@@ -43,9 +43,11 @@ import { searchProducts, getSourceColor, getProductsForPrompt, getNormalizedProd
 import { buildFinalPrompt, generateWithProductPanel, generateWithProductRefs, generateSingleProductInRoom, pickAspectRatio } from '../services/aiProvider';
 import { createProductPanel } from '../utils/createProductPanel';
 import { withTimeout } from '../utils/withTimeout';
+import { readFileExifOrientation, readFileExif, getLastFileExifError } from '../utils/imageOptimizer';
 import { verifyGeneratedProducts } from '../services/visionMatcher';
 import { PRODUCT_CATALOG } from '../data/productCatalog';
-import { saveUserDesign, updateDesignVisibility, uploadRoomPhoto } from '../services/supabase';
+import { saveUserDesign, updateDesignVisibility, uploadRoomPhoto, recordGenerationError } from '../services/supabase';
+import Constants from 'expo-constants';
 import { useSubscription } from '../context/SubscriptionContext';
 import { generateWithBFL } from '../services/bfl';
 import TabScreenFade from '../components/TabScreenFade';
@@ -1153,11 +1155,24 @@ export default function HomeScreen({ navigation, route }) {
       'uri=' + String(asset.uri).substring(0, 80)
     );
 
+    // Build 58: derive orientation from picked asset's aspect ratio.
+    // For library picks we have no shutter-time gyro signal — but iOS
+    // Photos.app stores photos in display orientation, so asset.width vs
+    // asset.height reliably indicates how the user views the photo.
+    let pickedOrientation = null;
+    if (typeof asset.width === 'number' && typeof asset.height === 'number') {
+      pickedOrientation = asset.width > asset.height ? 'landscape' : 'portrait';
+    }
     setPhoto({
       uri: asset.uri,
       base64: null,
       width: finalWidth,
       height: finalHeight,
+      // Build 44: propagate EXIF so runGeneration's orientation swap can
+      // correct dims if Image.getSize returned raw pre-rotation pixels.
+      exif: asset.exif || null,
+      // Build 58: trump card for the EXIF-based dim swap + rotation logic.
+      captureOrientation: pickedOrientation,
     });
     setPhotoSource('library');
   }, [generating]);
@@ -1374,6 +1389,201 @@ export default function HomeScreen({ navigation, route }) {
     const startedAt = Date.now();
     log('start | mode=' + (isSingleProductMode ? 'single-product' : 'full-room') + ' | prompt="' + designPrompt.substring(0, 80) + '"');
 
+    // ── Build 53: real EXIF from file bytes (trumps picker metadata) ─────────
+    // Build 51 telemetry proved that expo-image-picker's asset.exif.Orientation
+    // is unreliable on iOS 26 / iPhone 14 Pro: it returns 6 for ALL captures
+    // regardless of how the phone was held. The real source of truth is the
+    // EXIF marker embedded in the raw JPEG file bytes, which iOS writes
+    // correctly at capture time. readFileExifOrientation (imageOptimizer.js)
+    // reads the first 64 KB of the file and extracts Orientation via piexifjs.
+    //
+    // Downstream, this value is used for:
+    //   1. The HomeScreen EXIF-aware dim swap (determines aspect ratio)
+    //   2. uploadRoomPhoto → optimizeForGeneration rotation-bake decision
+    //
+    // Falls back to savedPhoto.exif?.Orientation (picker) if file read fails,
+    // which preserves Build 49 behavior for any code path that doesn't get the
+    // file-read to complete. So strictly safer than current code.
+    let fileExifOrientation = null;
+    let fileExifError = null;
+    let fileExifFull = null;
+    try {
+      // Build 56: read the FULL EXIF dict (not just Orientation). Build 55
+      // proved iPhone 14 Pro / iOS 26 writes Orientation=6 for BOTH landscape
+      // and portrait captures, so Orientation alone can't discriminate. The
+      // richer fields (PixelXDimension, PixelYDimension, ImageWidth,
+      // ImageLength, MakerNote presence) may reveal the true orientation.
+      fileExifFull = await readFileExif(savedPhoto?.uri);
+      fileExifOrientation = fileExifFull?.orientation ?? null;
+      if (fileExifFull == null) {
+        fileExifError = getLastFileExifError();
+      }
+      log('full file EXIF | orient=' + fileExifOrientation +
+          ' pixelXY=' + (fileExifFull?.pixelXDimension ?? '?') + 'x' + (fileExifFull?.pixelYDimension ?? '?') +
+          ' rawWH=' + (fileExifFull?.imageWidth ?? '?') + 'x' + (fileExifFull?.imageLength ?? '?') +
+          ' model=' + (fileExifFull?.model ?? '?') +
+          (fileExifError ? ' | error=' + fileExifError : ''));
+    } catch (e) {
+      fileExifError = String(e?.message || e).substring(0, 150);
+      warn('file EXIF read threw:', fileExifError);
+    }
+    // Effective orientation: prefer file EXIF, fall back to picker, default to 1.
+    let effectiveOrientation = fileExifOrientation ?? savedPhoto?.exif?.Orientation ?? 1;
+
+    // Build 58: capture orientation TRUMPS EXIF. Build 57 telemetry conclusively
+    // proved that on iOS 26 / iPhone 14 Pro Max, every photo Apple writes has
+    // IDENTICAL EXIF metadata regardless of how the user held the phone — so
+    // EXIF cannot distinguish landscape from portrait captures. The only
+    // reliable signal is the device's window orientation at the moment of
+    // capture (Dimensions.get('window') in SnapScreen.handleCapture for camera,
+    // or the picked asset's aspect ratio for library picks).
+    //
+    // When captureOrientation is 'portrait', we OVERRIDE the EXIF-driven
+    // rotation chain by setting effectiveOrientation = 1 (no rotation needed).
+    // This makes:
+    //   - The HomeScreen dim-swap below skip (because needsSwap requires
+    //     effectiveOrientation in {5,6,7,8})
+    //   - The optimizer's rotation-bake skip (EXIF_ROTATION_MAP[1] = undefined)
+    // Result: portrait pixels preserved, portrait aspect_ratio sent to FAL,
+    // portrait output produced. Exactly what the user expects.
+    //
+    // For 'landscape' captures we keep the existing EXIF-driven rotation
+    // (Build 49 → 55 logic worked correctly for landscape — the bug only
+    // manifested for portrait).
+    const captureOrientation = savedPhoto?.captureOrientation || null;
+    if (captureOrientation === 'portrait' && effectiveOrientation !== 1) {
+      log('captureOrientation=portrait overrides EXIF=' + effectiveOrientation +
+          ' → forcing effectiveOrientation=1 (no swap, no rotation, portrait preserved)');
+      effectiveOrientation = 1;
+    } else {
+      log('captureOrientation=' + captureOrientation +
+          ' | effectiveOrientation=' + effectiveOrientation + ' (EXIF-driven path)');
+    }
+
+    // ── Build 46: unconditional start-of-generation telemetry ────────────────
+    // Every generation writes ONE row to public.generation_errors at start with
+    // the exact state we care about for the ongoing orientation investigation:
+    //   - client_version: confirms which Build is actually running on device
+    //   - exif_orientation_raw: the Orientation tag expo-image-picker gave us
+    //   - exif_keys: which EXIF fields were returned at all (null => picker
+    //     stripped EXIF from its metadata response)
+    //   - picker_dims: width/height the picker reported (pre-optimizer)
+    //   - photo_source: 'camera' | 'library' | null
+    //
+    // Fire-and-forget; never blocks generation. This lets us query after any
+    // test and see EXACTLY what the app saw — replacing assumptions about
+    // Build 42/44/45 behavior with ground-truth data. After this ships, one
+    // test photo tells us whether the rotation-bake failed because the
+    // picker returns no Orientation, because rotation direction is inverted,
+    // or because we're not even running the new build.
+    (async () => {
+      // Reuse the recordGenerationError helper — the ring value distinguishes
+      // this from actual errors ("start-telemetry" vs "panel"/"individual-refs"/etc.)
+      // so we can filter it out when looking at real failures.
+      if (user?.id) {
+        try {
+          const exifObj = savedPhoto?.exif;
+
+          // Build 50: capture Image.getSize(uri) as the discriminator between
+          // landscape and portrait captures on iOS 26. Build 47/49 telemetry
+          // showed BOTH orientations produce identical picker metadata
+          // (exif=6, picker_dims=980×1920, source=camera). The actual pixel
+          // content differs but the metadata doesn't — so we need a second
+          // signal. On iOS, Image.getSize uses UIImage which auto-applies
+          // EXIF during decode, so its returned dims should reflect the
+          // DISPLAY orientation (post-rotation). If Image.getSize dims
+          // differ from picker's asset.width/height → the raw buffer needs
+          // EXIF rotation to display correctly (landscape case). If they
+          // match → the raw buffer is already in display orientation
+          // (portrait case, where EXIF=6 is effectively a lie).
+          let uriActualW = null;
+          let uriActualH = null;
+          let uriSizeError = null;
+          try {
+            const dims = await new Promise((resolve, reject) => {
+              Image.getSize(
+                savedPhoto?.uri,
+                (w, h) => resolve({ w, h }),
+                (err) => reject(err),
+              );
+            });
+            uriActualW = dims.w;
+            uriActualH = dims.h;
+          } catch (sizeErr) {
+            uriSizeError = String(sizeErr?.message || sizeErr).substring(0, 100);
+          }
+
+          recordGenerationError({
+            userId: user.id,
+            generationId,
+            ring: 'start-telemetry',
+            errorName: 'StartTelemetry',
+            errorMessage: 'B56 diagnostic ping',
+            pipeline: 'pre-pipeline',
+            clientVersion: String(Constants.expoConfig?.ios?.buildNumber || 'unknown'),
+            metadata: {
+              // Build 53: BOTH sources of EXIF so we can see the delta.
+              // Picker is known-unreliable on iOS 26; file is ground truth.
+              exif_orientation_picker: exifObj?.Orientation ?? null,
+              exif_orientation_file: fileExifOrientation,
+              exif_effective: effectiveOrientation,
+              exif_source: fileExifOrientation != null ? 'file' : 'picker-fallback',
+              exif_file_error: fileExifError,
+              // Build 56: FULL EXIF dump. On iOS 26 Orientation alone doesn't
+              // discriminate landscape from portrait (Build 55 proved this).
+              // Checking if richer fields — especially PixelXDimension /
+              // PixelYDimension which EXIF spec defines as display-oriented
+              // dims — carry the real signal.
+              exif_pixel_x_dim: fileExifFull?.pixelXDimension ?? null,
+              exif_pixel_y_dim: fileExifFull?.pixelYDimension ?? null,
+              exif_image_width: fileExifFull?.imageWidth ?? null,
+              exif_image_length: fileExifFull?.imageLength ?? null,
+              exif_make: fileExifFull?.make ?? null,
+              exif_model: fileExifFull?.model ?? null,
+              exif_software: fileExifFull?.software ?? null,
+              exif_has_makernote: fileExifFull?.hasMakerNote ?? null,
+              exif_total_keys: fileExifFull?.totalKeys ?? null,
+              // Derived: is PixelXDimension > PixelYDimension? This is the
+              // EXIF-spec-canonical way to detect landscape vs portrait.
+              exif_pixel_dims_landscape:
+                fileExifFull?.pixelXDimension != null && fileExifFull?.pixelYDimension != null
+                  ? fileExifFull.pixelXDimension > fileExifFull.pixelYDimension
+                  : null,
+              // Build 58: device orientation at capture time. THE discriminator.
+              // captureOrientation = 'landscape' | 'portrait' | null (unknown).
+              // 'portrait' triggers the no-swap, no-rotation override above.
+              capture_orientation: captureOrientation,
+              capture_orientation_overrode_exif: captureOrientation === 'portrait' &&
+                (fileExifOrientation === 6 || fileExifOrientation === 8 ||
+                 (savedPhoto?.exif?.Orientation === 6 || savedPhoto?.exif?.Orientation === 8)),
+              // Legacy name kept for dashboard compatibility with Build 47+ rows.
+              exif_orientation_raw: exifObj?.Orientation ?? null,
+              exif_is_object: typeof exifObj === 'object' && exifObj !== null,
+              exif_keys: exifObj && typeof exifObj === 'object'
+                ? Object.keys(exifObj).slice(0, 15)
+                : [],
+              picker_w: savedPhoto?.width ?? null,
+              picker_h: savedPhoto?.height ?? null,
+              picker_landscape: (savedPhoto?.width ?? 0) > (savedPhoto?.height ?? 0),
+              uri_actual_w: uriActualW,
+              uri_actual_h: uriActualH,
+              uri_actual_landscape: uriActualW && uriActualH ? uriActualW > uriActualH : null,
+              uri_matches_picker: uriActualW === (savedPhoto?.width ?? null) &&
+                                   uriActualH === (savedPhoto?.height ?? null),
+              uri_size_error: uriSizeError,
+              uri_prefix: String(savedPhoto?.uri || '').substring(0, 60),
+              uri_scheme: String(savedPhoto?.uri || '').split(':')[0] || 'unknown',
+              photo_source: photoSource || 'unknown',
+              single_product_mode: isSingleProductMode,
+            },
+          });
+        } catch (e) {
+          // Never block generation on telemetry
+          console.warn('[start-telemetry] write failed:', e?.message || e);
+        }
+      }
+    })();
+
     // Initialize rotating loading messages
     const msgs = isSingleProductMode
       ? ['Placing product in your space…', 'Matching lighting and perspective…', 'Almost there…']
@@ -1442,6 +1652,48 @@ export default function HomeScreen({ navigation, route }) {
         }
       }
 
+      // Build 44: EXIF-aware orientation swap (defense in depth).
+      //
+      // Upstream paths (SnapScreen capture/pick, HomeScreen library pick) use
+      // Image.getSize to resolve display-oriented dims before handing photo
+      // to runGeneration — which SHOULD give us EXIF-corrected values via
+      // iOS UIImage's auto-orientation. But we've seen cases on iOS 26 /
+      // iPhone 14 Pro where Image.getSize returns the raw pixel matrix for
+      // certain HEIC / ph:// URI shapes, defeating the upstream resolution.
+      //
+      // If the photo arrived with an EXIF Orientation tag of 5/6/7/8 (any
+      // of the 90° or 270° rotations) AND the current photoW/photoH are
+      // portrait-shaped (photoH > photoW), we treat them as raw/pre-rotation
+      // and swap. Orientations 5-8 mean the stored pixel matrix is rotated
+      // relative to the visual image — swap gives us the true display dims.
+      //
+      // This is a zero-cost correction when dims are already right (if
+      // photoW > photoH for a landscape capture, we don't swap). It ONLY
+      // fires when upstream Image.getSize missed the rotation.
+      // Build 53: use effective (file-truth) EXIF rather than picker EXIF.
+      // On iOS 26, picker reports Orientation=6 for ALL captures (landscape
+      // AND portrait); only the real file EXIF correctly distinguishes them.
+      // Portrait captures (EXIF=1 in the real file) should NOT swap dims —
+      // that was forcing every portrait photo into a landscape aspect ratio
+      // before Build 53. Landscape captures (EXIF=6 in real file) still swap
+      // from raw portrait buffer dims to display landscape dims as before.
+      const needsSwap = (effectiveOrientation === 5 || effectiveOrientation === 6 ||
+                         effectiveOrientation === 7 || effectiveOrientation === 8);
+      if (needsSwap && photoW > 0 && photoH > 0 && photoH > photoW) {
+        const swappedW = photoH;
+        const swappedH = photoW;
+        log('EXIF orientation ' + effectiveOrientation + ' (source=' +
+            (fileExifOrientation != null ? 'file' : 'picker-fallback') +
+            ') with raw-portrait dims ' + photoW + 'x' + photoH +
+            ' — swapping to display dims ' + swappedW + 'x' + swappedH);
+        photoW = swappedW;
+        photoH = swappedH;
+      } else {
+        log('EXIF orientation ' + effectiveOrientation + ' (source=' +
+            (fileExifOrientation != null ? 'file' : 'picker-fallback') +
+            ') — no dim swap (dims preserved at ' + photoW + 'x' + photoH + ')');
+      }
+
       // Initial aspect_ratio guess from CLIENT-side dims. This may be
       // overridden below with SERVER-truth dims (post-rotation) after
       // uploadRoomPhoto returns — see `if (roomPhotoServerWidth && ...)`
@@ -1497,13 +1749,33 @@ export default function HomeScreen({ navigation, route }) {
         let roomPhotoServerWidth = null;
         let roomPhotoServerHeight = null;
         try {
-          const uploaded = await uploadRoomPhoto(user.id, savedPhoto.uri, savedPhoto.base64);
-          // uploadRoomPhoto now returns { url, width, height }. Width/height
-          // come from the normalize-room-photo edge function's post-rotation
-          // pixel dims — i.e. the actual encoded bytes flux-2-max will fetch.
-          // These OVERRIDE the client-side pre-rotation dims for aspect_ratio
-          // selection, so portrait/landscape output always matches what the
-          // server rotated to rather than what the client originally captured.
+          // Build 45: pass EXIF Orientation through to uploadRoomPhoto so the
+          // optimizer can bake rotation into the pixels BEFORE upload. This is
+          // the upstream fix for "sideways bytes land in Supabase" that
+          // defeated all Build 40-44 orientation corrections. See supabase.js
+          // uploadRoomPhoto / imageOptimizer.js rotateAction logic.
+          // Build 53: pass EFFECTIVE EXIF (file-truth), not picker EXIF.
+          // This drives the optimizer's rotation-bake in imageOptimizer.js.
+          // For portrait captures the real file EXIF is 1 → no rotation →
+          // portrait pixels preserved → FAL receives portrait-shaped input.
+          // For landscape captures the real file EXIF is 6 → 270° rotation
+          // applied (per EXIF_ROTATION_MAP) → raw rotated buffer becomes
+          // display-correct landscape before upload. Source of truth matters.
+          const exifOrientForRotation = effectiveOrientation;
+          log('uploadRoomPhoto called with effective EXIF=' + exifOrientForRotation +
+              ' (source=' + (fileExifOrientation != null ? 'file' : 'picker-fallback') + ')' +
+              ' | will bake rotation=' + (exifOrientForRotation > 1 && exifOrientForRotation < 9));
+          const uploaded = await uploadRoomPhoto(
+            user.id,
+            savedPhoto.uri,
+            savedPhoto.base64,
+            exifOrientForRotation,
+          );
+          // uploadRoomPhoto returns { url, width, height }. Width/height come
+          // from normalize-room-photo's post-rotation dims (if it succeeded),
+          // or null on fallback (so HomeScreen's EXIF-aware client dims win).
+          // Both paths now serve correctly-oriented pixels thanks to the
+          // Build 45 optimizer rotation-bake.
           roomPhotoUrl         = uploaded?.url || null;
           roomPhotoServerWidth  = uploaded?.width ?? null;
           roomPhotoServerHeight = uploaded?.height ?? null;
@@ -1563,6 +1835,68 @@ export default function HomeScreen({ navigation, route }) {
             log('aspect_ratio confirmed by server | ' + aspectRatio);
           }
         }
+
+        // Build 46: unconditional post-upload orientation telemetry.
+        // Build 45 shipped a narrower version of this that ONLY wrote when
+        // client and upload orientation disagreed — but that only catches
+        // landscape-vs-portrait flips. It misses 180°-upside-down and 90°
+        // sideways-within-landscape cases (both cases the investigation
+        // revealed on 2026-04-20). Now we ALWAYS write a row so we can see
+        // the actual delivered dims + the optimizer path taken, in every
+        // single generation. Combined with the start-telemetry ping above,
+        // we get the full client-side picture: what the picker reported,
+        // what the optimizer received, what we uploaded, and what FAL sees.
+        // Fire-and-forget; never blocks generation.
+        (async () => {
+          try {
+            const dims = await new Promise((resolve, reject) => {
+              Image.getSize(roomPhotoUrl, (w, h) => resolve({ w, h }), reject);
+            });
+            const clientLandscape = photoW > photoH;
+            const uploadLandscape = dims.w > dims.h;
+            const match = clientLandscape === uploadLandscape;
+            log('orientation check | clientWH=' + photoW + 'x' + photoH +
+                ' uploadWH=' + dims.w + 'x' + dims.h +
+                ' match=' + match);
+            recordGenerationError({
+              userId: user.id,
+              generationId,
+              ring: 'orientation-check',
+              errorName: match ? 'OrientationOK' : 'OrientationMismatch',
+              errorMessage:
+                'client=' + (clientLandscape ? 'landscape' : 'portrait') +
+                ' upload=' + (uploadLandscape ? 'landscape' : 'portrait') +
+                ' exif=' + (savedPhoto?.exif?.Orientation ?? 1),
+              pipeline: 'pre-pipeline',
+              clientVersion: String(Constants.expoConfig?.ios?.buildNumber || ''),
+              metadata: {
+                client_wh: photoW + 'x' + photoH,
+                upload_wh: dims.w + 'x' + dims.h,
+                match,
+                exif_orientation: savedPhoto?.exif?.Orientation ?? null,
+                room_url: roomPhotoUrl,
+                server_wh_from_normalize: roomPhotoServerWidth && roomPhotoServerHeight
+                  ? (roomPhotoServerWidth + 'x' + roomPhotoServerHeight)
+                  : 'null',
+              },
+            });
+          } catch (sizeErr) {
+            // Record the getSize failure itself — that's also a valuable signal.
+            recordGenerationError({
+              userId: user.id,
+              generationId,
+              ring: 'orientation-check',
+              errorName: 'GetSizeFailed',
+              errorMessage: String(sizeErr?.message || sizeErr).substring(0, 200),
+              pipeline: 'pre-pipeline',
+              clientVersion: String(Constants.expoConfig?.ios?.buildNumber || ''),
+              metadata: {
+                client_wh: photoW + 'x' + photoH,
+                room_url: roomPhotoUrl,
+              },
+            });
+          }
+        })();
 
         // ── Step 2: Generation ──────────────────────────────────────────────
 
@@ -1780,7 +2114,37 @@ export default function HomeScreen({ navigation, route }) {
                   warn('createProductPanel returned no URL');
                 }
               } catch (panelErr) {
-                warn('panel approach threw (' + panelErr.message + ')');
+                // Build 38: surface the actual panel error in structured
+                // telemetry so we can finally see WHY iPhone camera photos
+                // fail Ring 1. Previously this was a warn-only log that never
+                // made it into [genmeta] aggregation, leaving us blind to the
+                // root cause.
+                const pErrMsg = String(panelErr?.message || panelErr);
+                warn('panel approach threw | name=' + (panelErr?.name || 'Error') + ' | msg=' + pErrMsg.substring(0, 200));
+                console.log(
+                  '[genmeta]',
+                  'event=ring1_panel_failed',
+                  'pipeline=panel',
+                  'generationId=' + generationId,
+                  'errName=' + (panelErr?.name || 'Error'),
+                  'err=' + pErrMsg.substring(0, 200)
+                );
+                // Build 44: durable server-side telemetry (see supabase.js
+                // recordGenerationError comment). Fire-and-forget.
+                recordGenerationError({
+                  userId: user.id,
+                  generationId,
+                  ring: 'panel',
+                  errorName: panelErr?.name || 'Error',
+                  errorMessage: pErrMsg,
+                  pipeline: 'panel',
+                  clientVersion: String(Constants.expoConfig?.ios?.buildNumber || ''),
+                  metadata: {
+                    aspect_ratio: aspectRatio,
+                    reachable_products: reachableProducts.length,
+                    has_room_photo_url: !!roomPhotoUrl,
+                  },
+                });
               }
             } else {
               warn('panel skipped — only ' + reachableProducts.length + ' reachable products (need 2+)');
@@ -1806,7 +2170,16 @@ export default function HomeScreen({ navigation, route }) {
             // and refs paths fail.
             if (!usedPanel) {
               try {
+                // Build 38: clear the 2-second ai-proxy cooldown window
+                // before attempting Ring 2. The Supabase check_ai_rate_limit
+                // RPC enforces a min 2000ms gap between any AI POST per user
+                // (014_rate_limits.sql). If Ring 1 just submitted ~1s ago,
+                // Ring 2 would 429 with reason='cooldown' and we'd lose the
+                // last shot at preserving the user's actual room before
+                // dropping to BFL text-to-image. Sleep 2200ms (200ms safety
+                // margin over the 2000ms cooldown).
                 setGenStatus('Refining your design…');
+                await new Promise(r => setTimeout(r, 2200));
                 log('Ring 2: panel failed → trying generateWithProductRefs (room + ' + Math.min(reachableProducts.length, 4) + ' product images)');
                 const refsResultUrl = await generateWithProductRefs(
                   roomPhotoUrl,
@@ -1829,14 +2202,30 @@ export default function HomeScreen({ navigation, route }) {
                   'source=' + generationSource
                 );
               } catch (refsErr) {
-                warn('Ring 2 (productRefs) failed (' + (refsErr?.message || refsErr) + ') — dropping to BFL text-to-image');
+                const rErrMsg = String(refsErr?.message || refsErr);
+                warn('Ring 2 (productRefs) failed (' + rErrMsg + ') — dropping to BFL text-to-image');
                 console.log(
                   '[genmeta]',
                   'event=ring2_failed',
                   'pipeline=individual-refs',
                   'generationId=' + generationId,
-                  'err=' + String(refsErr?.message || refsErr).substring(0, 120)
+                  'err=' + rErrMsg.substring(0, 120)
                 );
+                // Build 44: durable telemetry for Ring 2 failure.
+                recordGenerationError({
+                  userId: user.id,
+                  generationId,
+                  ring: 'individual-refs',
+                  errorName: refsErr?.name || 'Error',
+                  errorMessage: rErrMsg,
+                  pipeline: 'individual-refs',
+                  clientVersion: String(Constants.expoConfig?.ios?.buildNumber || ''),
+                  metadata: {
+                    aspect_ratio: aspectRatio,
+                    reachable_products: reachableProducts.length,
+                    has_room_photo_url: !!roomPhotoUrl,
+                  },
+                });
                 throw new Error('All FAL paths failed — dropping to BFL text-to-image fallback');
               }
             }
@@ -1898,6 +2287,24 @@ export default function HomeScreen({ navigation, route }) {
               'errName=' + (repErr?.name || 'Error'),
               'err=' + errMsg.substring(0, 200)
             );
+            // Build 44: durable telemetry for the outer-try catch — this is
+            // the funnel that captures "something in the FAL/Replicate path
+            // threw but we couldn't attribute to Ring 1 or Ring 2 specifically"
+            // (e.g. product matching threw, pre-pipeline bailout, etc.)
+            recordGenerationError({
+              userId: user.id,
+              generationId,
+              ring: 'outer',
+              errorName: repErr?.name || 'Error',
+              errorMessage: errMsg,
+              pipeline: genMeta.pipeline || 'pre-pipeline',
+              clientVersion: String(Constants.expoConfig?.ios?.buildNumber || ''),
+              metadata: {
+                aspect_ratio: aspectRatio,
+                reachable_products: reachableProducts.length,
+                has_room_photo_url: !!roomPhotoUrl,
+              },
+            });
           }
 
           // ── Ring 3 fallback: BFL text-to-image (prompt only, no image inputs) ──
@@ -1934,6 +2341,12 @@ export default function HomeScreen({ navigation, route }) {
               "We couldn't use your room photo",
               "Generating a general design from your prompt instead. Try another photo for a personalized result.",
             );
+
+            // Build 38: clear the 2-second ai-proxy cooldown window before
+            // attempting Ring 3 BFL. Ring 2's failed POST just consumed the
+            // cooldown; without this delay BFL would also 429 and the user
+            // would see TWO error popups in ~3 seconds (the Build 37 regression).
+            await new Promise(r => setTimeout(r, 2200));
 
             log('BFL text-to-image fallback | cost=~$0.04 | aspect=' + aspectRatio + ' | products=' + bflProducts.length);
             resultUrl = await generateWithBFL(

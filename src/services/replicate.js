@@ -289,6 +289,46 @@ export function buildPanelPrompt(userPrompt, products) {
 }
 
 /**
+ * Build 45: Restored (was removed in Build 22, but fal.js's
+ * generateWithProductRefs still imports it — causing a latent
+ * ReferenceError if Ring 2 ever fires as a fallback. Ring 1 technically
+ * always "completes" on FAL so Ring 2 rarely ran in practice, but we want
+ * defense in depth: if flux-2-pro/edit ever fails mid-generation, Ring 2
+ * individual-refs needs to produce valid output, not crash.
+ *
+ * Unlike buildPanelPrompt, this function describes products WITHOUT
+ * referencing a 2×2 grid. Each product is addressed by its image index
+ * (image 2, image 3, ...) since we send room + 4 separate product refs.
+ *
+ * @param {string}   userPrompt - User's raw design prompt
+ * @param {object[]} products   - Products with category/tags/materials/name
+ * @returns {string} Structured prompt for flux-2-pro/edit individual-refs input
+ */
+export function buildFlux2MaxPrompt(userPrompt, products) {
+  const entries = (products || []).slice(0, 4).map((p, i) => {
+    const desc = describeProductForPrompt(p) || (p.category || 'furniture').replace(/-/g, ' ');
+    // Image 1 is the room, so products start at image 2.
+    return `image ${i + 2} is a ${desc}`;
+  });
+
+  const refLine = entries.length > 0
+    ? `Place these products into the room shown in image 1: ${entries.join(', ')}. Match each product's color, material, silhouette, and proportions precisely — do not substitute with similar-looking alternatives. Position each piece naturally where this type of furniture belongs in the room.`
+    : 'Replace furniture with pieces that complement the room style.';
+
+  const styleIntent = userPrompt
+    ? `While maintaining this overall style intent: ${userPrompt}.`
+    : '';
+
+  return [
+    QUALITY_PREFIX,
+    'This is a precise scene edit, not a new generation.',
+    'Preserve image 1 exactly: same walls, floor, ceiling, windows, lighting, camera angle, perspective, and spatial layout. Do not alter any architecture.',
+    refLine,
+    styleIntent,
+  ].filter(Boolean).join(' ');
+}
+
+/**
  * Generate a product-aware room redesign using a 2-image input.
  *
  * Sends [roomPhotoUrl, panelUrl] — 2 images instead of 5 — to reduce GPU

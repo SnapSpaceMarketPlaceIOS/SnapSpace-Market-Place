@@ -331,7 +331,7 @@ async function _attemptNormalize(rawUrl, jwt, userId) {
   return { retryable: true, reason: `5xx-${res.status}` };
 }
 
-export async function uploadRoomPhoto(userId, uri, base64Data = null) {
+export async function uploadRoomPhoto(userId, uri, base64Data = null, exifOrientation = 1) {
   const ts = Date.now();
   const storagePath = `${userId}/${ts}.jpeg`;
 
@@ -344,12 +344,41 @@ export async function uploadRoomPhoto(userId, uri, base64Data = null) {
   let uploadUri = uri;
   let uploadBase64 = base64Data;
   let optimizationSucceeded = false;
+  // Build 44 correction: Build 40 attempted to return the optimizer's
+  // post-manipulator dims on the fallback path so HomeScreen's aspect-ratio
+  // override could use them. That was wrong — expo-image-manipulator on
+  // iOS 26 does NOT bake EXIF rotation (confirmed in Build 18/19 triage),
+  // so for a LANDSCAPE photo `manipulateAsync` returns raw PORTRAIT pixel
+  // dims. When HomeScreen then ran pickAspectRatio on those dims, it
+  // OVERRODE the correct (display-oriented, Image.getSize-resolved) client
+  // dims with wrong portrait dims → FAL got aspect_ratio 9:16 for a
+  // landscape photo → output rendered portrait-sideways. Confirmed from
+  // Build 42/43 FAL dashboard evidence (image_size 768×1344 submitted for
+  // a landscape photo). Build 44: return null dims on fallback so the
+  // override block doesn't fire — client's Image.getSize dims (which DO
+  // honor EXIF on iOS) are the authoritative source.
+  // Build 45: Pass EXIF Orientation into the optimizer so it can bake rotation
+  // into the output pixels via an explicit ImageManipulator rotate action.
+  // Without this, optimizeForGeneration strips EXIF but DOESN'T rotate pixels
+  // on iPhone 14 Pro / iOS 26 — leaving Supabase storage with a sideways
+  // pixel matrix tagged Orientation=1. Every downstream consumer (imgproxy
+  // via /render/image/, the normalize-room-photo edge fn, flux-2-pro/edit)
+  // then sees "no rotation needed" and serves/processes sideways bytes,
+  // which is why the Build 42-44 landscape fixes felt partial. Evidence:
+  // the user's 1776710784437.jpeg landed in storage as 714×1400 portrait
+  // with EXIF=1 despite being a visually-landscape room photo.
   try {
-    const optimized = await optimizeForGeneration(uri, 1);
+    const optimized = await optimizeForGeneration(uri, 1, exifOrientation);
     if (optimized?.optimized && optimized.uri) {
       uploadUri = optimized.uri;
       uploadBase64 = null; // force re-read from optimized URI
       optimizationSucceeded = true;
+      if (optimized.rotated) {
+        console.log(
+          '[uploadRoomPhoto] baked EXIF rotation into pixels | exif=' +
+          exifOrientation + ' | post-rotate dims=' + optimized.width + 'x' + optimized.height
+        );
+      }
     }
   } catch (e) {
     console.warn('[uploadRoomPhoto] optimizer threw, using original:', e?.message || e);
@@ -386,10 +415,19 @@ export async function uploadRoomPhoto(userId, uri, base64Data = null) {
     const { data: { session } } = await supabase.auth.getSession();
     jwt = session?.access_token || null;
   } catch { /* ignore — handled below */ }
+  // Build 40: `/render/image/public/` URL for fallback paths — imgproxy
+  // auto-applies EXIF orientation server-side, so flux/FAL always fetch
+  // upright bytes regardless of whether the normalize edge function runs.
+  // This is the safety net that prevents the "landscape-sideways" output
+  // bug the Build 39 user reported. Quality is slightly lower than the
+  // hand-rotated JPEG normalize produces, but strictly better than sideways.
+  const orientedFallbackUrl =
+    `${SUPABASE_URL}/storage/v1/render/image/public/room-uploads/${storagePath}?width=1600&quality=90`;
+
   if (!jwt) {
-    console.warn('[uploadRoomPhoto] no session JWT, using raw URL (may be rotated incorrectly)');
-    console.log('[normalize] path=raw-fallback reason=no-jwt user=' + userId);
-    return { url: rawUrl, width: null, height: null };
+    console.warn('[uploadRoomPhoto] no session JWT, using render/image URL (EXIF applied)');
+    console.log('[normalize] path=render-fallback reason=no-jwt user=' + userId);
+    return { url: orientedFallbackUrl, width: null, height: null };
   }
 
   // Two-attempt retry loop. First attempt warms the cold worker (often
@@ -430,19 +468,85 @@ export async function uploadRoomPhoto(userId, uri, base64Data = null) {
     }
   }
 
-  // Both attempts exhausted. Build 28 reverts to Build 26 behavior:
-  // fall back to the raw /object/public/ URL rather than blocking the
-  // user entirely. Build 27 tried to hard-fail on exhaustion to avoid
-  // shipping sideways bytes to flux-2-max, but in TestFlight (Build 29)
-  // that produced a broken "We couldn't prepare your photo" on EVERY
-  // cold-start generation — which is strictly worse UX than occasional
-  // landscape-sideways output. Landscape-sideways is recoverable (user
-  // retakes); hard-fail blocks everything.
+  // Both attempts exhausted. Build 40 introduced the `/render/image/public/`
+  // fallback URL (imgproxy auto-orients via EXIF) instead of the raw
+  // `/object/public/` URL used by Build 28. That part of the Build 40 fix
+  // still stands — it addresses the sideways-pixel bug correctly.
+  //
+  // Build 44 REMOVES the optimizer-dim return that Build 40 added. Those
+  // dims came from expo-image-manipulator, which does NOT bake EXIF rotation
+  // on iOS 26. For a landscape photo the manipulator returns raw portrait-
+  // ordered pixel dims. HomeScreen's aspect-ratio override block then
+  // clobbered the correct (Image.getSize-resolved, EXIF-aware) client dims
+  // with those wrong optimizer dims, causing FAL to receive image_size
+  // 768×1344 (portrait) for landscape input → portrait-sideways output.
+  // Returning null dims keeps the override block from firing; HomeScreen's
+  // Image.getSize-derived aspect ratio is authoritative.
   //
   // Telemetry remains loud so we can track normalize reliability.
-  console.warn('[uploadRoomPhoto] normalize exhausted ' + MAX_ATTEMPTS + ' attempts — falling back to raw URL | lastReason=' + lastReason);
-  console.log('[normalize] path=raw-fallback attempts=' + MAX_ATTEMPTS + ' lastReason=' + lastReason + ' user=' + userId);
-  return { url: rawUrl, width: null, height: null };
+  console.warn('[uploadRoomPhoto] normalize exhausted ' + MAX_ATTEMPTS + ' attempts — falling back to render/image URL | lastReason=' + lastReason);
+  console.log('[normalize] path=render-fallback attempts=' + MAX_ATTEMPTS + ' lastReason=' + lastReason + ' user=' + userId);
+  return { url: orientedFallbackUrl, width: null, height: null };
+}
+
+// ─── Generation Error Telemetry (Build 44) ──────────────────────────────────
+//
+// Writes an error row to public.generation_errors via RLS-scoped insert so
+// we have a durable, queryable record of client-side pipeline failures.
+// TestFlight devices don't expose console to us, so "generation failed"
+// reports were un-diagnosable before this — we could only guess which of
+// Ring 1 / Ring 2 / normalize / proxy / polling went wrong. Now every catch
+// block writes a row, and we can query by user_id during support.
+//
+// Intentionally FIRE-AND-FORGET. The generation path must never throw because
+// telemetry failed; if we can't insert the row (offline, RLS glitch, table
+// missing in some environment), we log a warning and move on. The user
+// still gets their generation result — or their graceful fallback.
+//
+// Payload size notes:
+//   - error_message is truncated to 500 chars client-side
+//   - metadata is JSONB but we keep it small (<1 KB) by only including
+//     bounded-size fields: aspect_ratio, product counts, flags, URLs
+//
+// Ring taxonomy (keep in sync with HomeScreen.js catch blocks):
+//   panel           — Ring 1 (generateWithProductPanel via FAL)
+//   individual-refs — Ring 2 (generateWithProductRefs via FAL)
+//   bfl             — Ring 3 (generateWithBFL text-to-image)
+//   normalize       — normalize-room-photo edge fn exhausted retries
+//   single-product  — single-product visualize path
+//   pre-pipeline    — failure before any ring ran (upload, product match)
+//   outer           — caught in the outer try's catch (unknown ring)
+export async function recordGenerationError({
+  userId,
+  generationId = null,
+  ring,
+  errorName = null,
+  errorMessage = null,
+  pipeline = null,
+  clientVersion = null,
+  metadata = {},
+}) {
+  if (!userId || !ring) return;
+  try {
+    const payload = {
+      user_id: userId,
+      generation_id: generationId,
+      ring,
+      error_name: errorName ? String(errorName).substring(0, 80) : null,
+      error_message: errorMessage ? String(errorMessage).substring(0, 500) : null,
+      pipeline,
+      client_version: clientVersion,
+      metadata: metadata || {},
+    };
+    const { error } = await supabase
+      .from('generation_errors')
+      .insert(payload);
+    if (error) {
+      console.warn('[recordGenerationError] insert failed (non-fatal):', error.message);
+    }
+  } catch (e) {
+    console.warn('[recordGenerationError] threw (non-fatal):', e?.message || e);
+  }
 }
 
 // ─── User Designs Helpers ────────────────────────────────────────────────────

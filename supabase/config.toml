@@ -69,5 +69,20 @@ verify_jwt = false
 [functions.normalize-room-photo]
 verify_jwt = false
 
+# Build 40 root cause: same ES256/HS256 mismatch was silently 401-ing every
+# ai-proxy call after the 2026-04 auth-service rotation. Symptom: every
+# generation attempt failed ~168ms after submission. With three rings firing
+# (panel → individual refs → BFL) and a panel composite call in between,
+# the user saw "Generation Failed" alerts ~3-5s after pressing Generate.
+# Probe that found it:
+#   curl POST /functions/v1/ai-proxy with a fresh signup JWT
+#     → {"code":"UNAUTHORIZED_UNSUPPORTED_TOKEN_ALGORITHM",
+#        "message":"Unsupported JWT algorithm ES256"}, HTTP 401
+# The function code itself was fine — supabase.auth.getUser(jwt) inside the
+# handler hits the auth service API directly and verifies ES256 correctly.
+# Turning off gateway verify_jwt does not weaken auth.
+[functions.ai-proxy]
+verify_jwt = false
+
 [analytics]
 enabled = false
