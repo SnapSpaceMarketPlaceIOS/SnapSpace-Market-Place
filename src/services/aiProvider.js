@@ -1,49 +1,49 @@
 /**
- * aiProvider.js — Feature-flag router for AI generation providers.
+ * aiProvider.js — Single-provider AI generation router (FAL only).
  *
- * Controls which backend handles image generation calls without requiring
- * a code deploy. Flip EXPO_PUBLIC_AI_PROVIDER in .env (or EAS secrets) to
- * switch between providers instantly on app restart.
+ * ── Build 63 (Gate A): retired the replicate/fal feature flag ──────────────
+ * Previously this module routed between `replicateService` and `falService`
+ * based on `EXPO_PUBLIC_AI_PROVIDER`. With FAL validated in production and
+ * cost-proven (~$0.06/gen vs Replicate's ~$0.13/gen), the flag became a
+ * liability — any accidental flip in .env or EAS secrets silently doubled
+ * generation cost. The flag is now a no-op; FAL is the only code path.
  *
- * Supported values:
- *   replicate  (default) — Replicate flux-2-max,  ~$0.13/gen
- *   fal                  — FAL flux-2-pro/edit,    ~$0.06/gen
+ * replicate.js remains in the repo as orphaned code for reference, but is
+ * no longer imported by any live module. It can be deleted in a future
+ * cleanup pass once the team has confidence in Build 63+.
  *
- * Usage (callers import from here, never from replicate.js or fal.js directly):
+ * ── Public surface ─────────────────────────────────────────────────────────
+ *   generateWithProductPanel(roomURL, prompt, products, panelURL, aspect)
+ *   generateWithProductRefs(roomURL, prompt, products, aspect)
+ *   generateSingleProductInRoom(roomURL, product, aspect)
+ *   pickAspectRatio(w, h)
+ *   buildFinalPrompt(userPrompt, productHints, colorPalette)
  *
- *   import {
- *     generateWithProductPanel,
- *     generateWithProductRefs,
- *     generateSingleProductInRoom,
- *     pickAspectRatio,
- *     buildFinalPrompt,
- *   } from '../services/aiProvider';
- *
- * Provider selection is resolved once at module load time — changing the env
- * var takes effect on the next app restart (expected behavior for a feature flag).
- *
- * Model-agnostic utilities (pickAspectRatio, buildFinalPrompt) always come from
- * replicate.js since they are provider-independent and kept as the source of truth.
+ * Callers should always import from here, never directly from fal.js or
+ * promptBuilders.js. This keeps the provider swap surface to a single
+ * file if we ever need to bring in a third backend.
  */
 
-import * as replicateService from './replicate';
 import * as falService from './fal';
+import { pickAspectRatio as pickAspectRatioImpl, buildFinalPrompt as buildFinalPromptImpl } from './promptBuilders';
 
-// ── Provider selection ────────────────────────────────────────────────────────
-// Metro statically replaces literal `process.env.EXPO_PUBLIC_*` at bundle time,
-// but only literal references — a computed key would be stripped in prod.
-// Reading the flag inline here is intentional and safe: it's a feature flag
-// (non-secret), so inlining it in the bundle is fine.
-const ACTIVE_PROVIDER = process.env.EXPO_PUBLIC_AI_PROVIDER || 'replicate';
-const isFal = ACTIVE_PROVIDER === 'fal';
+// ── Legacy feature-flag compatibility ────────────────────────────────────────
+// If an older .env still sets EXPO_PUBLIC_AI_PROVIDER=replicate (or anything
+// other than 'fal'), warn once on module load so it shows up in TestFlight
+// logs. We still route to FAL — the flag is intentionally ignored.
+const LEGACY_FLAG = process.env.EXPO_PUBLIC_AI_PROVIDER;
+if (LEGACY_FLAG && LEGACY_FLAG !== 'fal') {
+  console.warn(
+    '[aiProvider] EXPO_PUBLIC_AI_PROVIDER=' + LEGACY_FLAG +
+    ' is ignored — FAL is the only supported provider as of Build 63.'
+  );
+}
+console.log('[aiProvider] Active provider: fal (locked)');
 
-console.log(`[aiProvider] Active provider: ${ACTIVE_PROVIDER}`);
-
-// ── Generation functions — routed by flag ────────────────────────────────────
+// ── Generation functions — always FAL ────────────────────────────────────────
 
 /**
- * Full-room redesign with 2×2 product panel.
- * Primary generation path.
+ * Full-room redesign with 2×2 product panel. Primary generation path.
  *
  * @param {string} roomPhotoUrl  Supabase storage URL of the uploaded room photo
  * @param {string} userPrompt    Raw style prompt from the user
@@ -53,55 +53,34 @@ console.log(`[aiProvider] Active provider: ${ACTIVE_PROVIDER}`);
  * @returns {Promise<{ url: string, predictionId: string, seed: number }>}
  */
 export function generateWithProductPanel(roomPhotoUrl, userPrompt, products, panelUrl, aspectRatio) {
-  console.log(`[aiProvider] Routing to ${ACTIVE_PROVIDER} for generateWithProductPanel`);
-  return isFal
-    ? falService.generateWithProductPanel(roomPhotoUrl, userPrompt, products, panelUrl, aspectRatio)
-    : replicateService.generateWithProductPanel(roomPhotoUrl, userPrompt, products, panelUrl, aspectRatio);
+  return falService.generateWithProductPanel(roomPhotoUrl, userPrompt, products, panelUrl, aspectRatio);
 }
 
 /**
  * Full-room redesign using individual product images (fallback when panel fails).
- *
- * @param {string} roomPhotoUrl  Supabase storage URL of the uploaded room photo
- * @param {string} userPrompt    Raw style prompt from the user
- * @param {Array}  products      Matched affiliate products (up to 4)
- * @param {string} aspectRatio   e.g. '16:9', '3:2', '1:1'
- * @returns {Promise<string>}    URL of the generated image
  */
 export function generateWithProductRefs(roomPhotoUrl, userPrompt, products, aspectRatio) {
-  console.log(`[aiProvider] Routing to ${ACTIVE_PROVIDER} for generateWithProductRefs`);
-  return isFal
-    ? falService.generateWithProductRefs(roomPhotoUrl, userPrompt, products, aspectRatio)
-    : replicateService.generateWithProductRefs(roomPhotoUrl, userPrompt, products, aspectRatio);
+  return falService.generateWithProductRefs(roomPhotoUrl, userPrompt, products, aspectRatio);
 }
 
 /**
  * Visualize a single product in the user's room ("Visualize in your space").
- *
- * @param {string} roomPhotoUrl  Supabase storage URL of the uploaded room photo
- * @param {object} product       Affiliate product object (needs imageUrl)
- * @param {string} aspectRatio   e.g. '16:9', '3:2', '1:1'
- * @returns {Promise<string>}    URL of the generated image
  */
 export function generateSingleProductInRoom(roomPhotoUrl, product, aspectRatio) {
-  console.log(`[aiProvider] Routing to ${ACTIVE_PROVIDER} for generateSingleProductInRoom`);
-  return isFal
-    ? falService.generateSingleProductInRoom(roomPhotoUrl, product, aspectRatio)
-    : replicateService.generateSingleProductInRoom(roomPhotoUrl, product, aspectRatio);
+  return falService.generateSingleProductInRoom(roomPhotoUrl, product, aspectRatio);
 }
 
-// ── Model-agnostic utilities — always from replicate.js (source of truth) ────
-// These are prompt/aspect-ratio helpers that are provider-independent.
-// fal.js re-exports them from replicate.js anyway, so we go straight to the source.
+// ── Model-agnostic utilities — source of truth in promptBuilders.js ──────────
+// Re-exported here so callers don't need to know which module owns them.
 
 /**
  * Snap a raw aspect ratio (width/height) to the nearest supported bucket.
  * Buckets: '21:9' | '16:9' | '3:2' | '4:3' | '1:1' | '3:4' | '2:3' | '9:16' | '9:21'
  */
-export const pickAspectRatio = replicateService.pickAspectRatio;
+export const pickAspectRatio = pickAspectRatioImpl;
 
 /**
  * Build the final generation prompt, capped at 200 words.
- * Combines user intent with product hint text.
+ * Combines user intent with product hint text and optional color palette.
  */
-export const buildFinalPrompt = replicateService.buildFinalPrompt;
+export const buildFinalPrompt = buildFinalPromptImpl;

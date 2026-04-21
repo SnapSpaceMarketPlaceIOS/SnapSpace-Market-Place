@@ -40,6 +40,7 @@ import { useCart } from '../context/CartContext';
 import { DESIGNS } from '../data/designs';
 import { SELLERS } from '../data/sellers';
 import { searchProducts, getSourceColor, getProductsForPrompt, getNormalizedProductsByIds } from '../services/affiliateProducts';
+import { parseDesignPrompt } from '../utils/promptParser';
 import { buildFinalPrompt, generateWithProductPanel, generateWithProductRefs, generateSingleProductInRoom, pickAspectRatio } from '../services/aiProvider';
 import { createProductPanel } from '../utils/createProductPanel';
 import { withTimeout } from '../utils/withTimeout';
@@ -700,6 +701,77 @@ function buildEnrichedPrompt(userPrompt, products) {
   // Use the centralized prompt builder from replicate.js
   // This adds architecture preservation + quality suffix automatically
   return buildFinalPrompt(userPrompt, productHints);
+}
+
+// ─── Build 62: Prompt enrichment helpers ──────────────────────────────────────
+//
+// These add two pieces of structural information to the user's design prompt
+// before it reaches FAL/BFL:
+//
+//   1. Color palette  — derived from parseDesignPrompt's per-category color
+//      attribution. "brown leather couch with white rug" → palette has both.
+//   2. Cohesive material — if half or more of the matched products share a
+//      material (e.g. wood appears in 4 of 6 picks), tell the AI to honor
+//      that cohesion in the output.
+//
+// Both are appended to the raw userPrompt as additional sentences. They flow
+// into buildPanelPrompt's "While maintaining this overall style intent: X"
+// wrapper. They do NOT replace the user's text; the user-visible prompt on
+// the result screen still shows their original input.
+
+/**
+ * Convert parseDesignPrompt's colorByCategory map into a human-readable
+ * palette string the AI can act on.
+ *
+ * Example: { sofa: 'brown', rug: 'white' } → "brown sofa, white rug"
+ *
+ * Returns null when no per-category colors were detected (the matcher's
+ * own color scoring still applies; we just don't add a redundant prompt
+ * sentence for it).
+ */
+function buildColorPaletteHint(parsed) {
+  if (!parsed?.colorByCategory) return null;
+  const entries = Object.entries(parsed.colorByCategory);
+  if (entries.length === 0) return null;
+
+  const phrases = entries.map(([cat, color]) => {
+    const label = FURNITURE_LABELS[cat] || cat.replace(/-/g, ' ');
+    return `${color} ${label}`;
+  });
+  return phrases.join(', ');
+}
+
+/**
+ * Find a material that appears in at least half of the matched products.
+ * Used to tell the AI "wood throughout" when the catalog match converged on
+ * a material the user didn't explicitly call out — improves visual cohesion.
+ *
+ * Returns null when no material clears the threshold (mixed-material rooms
+ * shouldn't be over-constrained by a hint).
+ */
+function getDominantMaterial(products) {
+  if (!Array.isArray(products) || products.length < 2) return null;
+
+  const counts = {};
+  for (const p of products) {
+    const mats = Array.isArray(p?.materials) ? p.materials : [];
+    for (const m of mats) {
+      const ml = String(m || '').toLowerCase().trim();
+      if (!ml) continue;
+      counts[ml] = (counts[ml] || 0) + 1;
+    }
+  }
+
+  const threshold = Math.ceil(products.length / 2);
+  let best = null;
+  let bestCount = 0;
+  for (const [mat, count] of Object.entries(counts)) {
+    if (count >= threshold && count > bestCount) {
+      best = mat;
+      bestCount = count;
+    }
+  }
+  return best;
 }
 
 function ChevronRight({ color = '#fff' }) {
@@ -1635,6 +1707,30 @@ export default function HomeScreen({ navigation, route }) {
         }
       }
 
+      // ── Build 62: prompt enrichment for the AI call only ────────────────────
+      // designPrompt remains the raw user text (shown on RoomResult screen
+      // and stored in telemetry). enrichedDesignPrompt is what flows to
+      // FAL/BFL — adds two structural sentences:
+      //   1. Color palette inferred from per-category color attribution
+      //   2. Cohesive material if the matcher converged on one
+      // Both fall back to the raw prompt when no enrichment applies, so the
+      // path is always safe.
+      let enrichedDesignPrompt = designPrompt;
+      if (!isSingleProductMode && designPrompt) {
+        const parsedForPrompt = parseDesignPrompt(designPrompt);
+        const colorHint = buildColorPaletteHint(parsedForPrompt);
+        const dominantMat = getDominantMaterial(reachableProducts.length > 0 ? reachableProducts : matchedProducts);
+
+        const enrichmentParts = [designPrompt];
+        if (colorHint) enrichmentParts.push(`Color palette: ${colorHint}.`);
+        if (dominantMat) enrichmentParts.push(`Cohesive ${dominantMat} tones throughout.`);
+        enrichedDesignPrompt = enrichmentParts.join(' ');
+
+        if (enrichedDesignPrompt !== designPrompt) {
+          log('prompt enriched | palette=' + (colorHint || '-') + ' | material=' + (dominantMat || '-'));
+        }
+      }
+
       // ── Derive aspect ratio from the room photo orientation ──────────────
       // flux-2-max's 'match_input_image' is ambiguous with multi-image input,
       // so we snap the room photo's native aspect to the closest supported
@@ -2109,7 +2205,7 @@ export default function HomeScreen({ navigation, route }) {
                   setGenStatus('Analyzing your room…');
                   const panelResult = await generateWithProductPanel(
                     roomPhotoUrl,
-                    designPrompt,
+                    enrichedDesignPrompt,
                     reachableProducts,
                     panelResponse.url,
                     aspectRatio,
@@ -2194,7 +2290,7 @@ export default function HomeScreen({ navigation, route }) {
                 log('Ring 2: panel failed → trying generateWithProductRefs (room + ' + Math.min(reachableProducts.length, 4) + ' product images)');
                 const refsResultUrl = await generateWithProductRefs(
                   roomPhotoUrl,
-                  designPrompt,
+                  enrichedDesignPrompt,
                   reachableProducts.slice(0, 4),
                   aspectRatio,
                 );
@@ -2361,7 +2457,7 @@ export default function HomeScreen({ navigation, route }) {
 
             log('BFL text-to-image fallback | cost=~$0.04 | aspect=' + aspectRatio + ' | products=' + bflProducts.length);
             resultUrl = await generateWithBFL(
-              designPrompt,
+              enrichedDesignPrompt,
               bflProducts,
               (msg) => setGenStatus(msg),
               null,           // ← no room photo → forces text-to-image path

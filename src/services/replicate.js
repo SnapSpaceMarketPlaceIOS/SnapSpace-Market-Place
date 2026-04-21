@@ -82,8 +82,35 @@ async function submitFluxWithRetry(baseInput) {
 // cues biases the whole generation toward magazine-quality output. We keep
 // this list short and specific — "8k" and other common LLM noise tokens
 // actually degrade flux output, so they are intentionally excluded.
-const QUALITY_PREFIX =
-  'Editorial architectural photography, ultra-sharp focus, crisp detail, natural light, magazine-quality interior, Architectural Digest style.';
+//
+// Build 62: the lighting token rotates per-generation across an editorial
+// pool to give the same prompt visibly different output moods (was the #1
+// "feels like the same room" complaint). Light is a low-risk variation
+// because it doesn't change product/architecture semantics — flux can
+// "warm afternoon" or "soft morning" the SAME room arrangement and the
+// user perceives a different result. We swap ONLY the light token; every
+// other word in the prefix stays identical so editorial quality is unchanged.
+const ATMOSPHERIC_LIGHT = [
+  'natural light',                     // original baseline — kept in pool
+  'warm afternoon light',
+  'soft morning light',
+  'golden hour glow',
+  'north-facing diffused daylight',
+  'cinematic editorial light',
+];
+
+/**
+ * Returns the editorial quality prefix with a randomly-rotated lighting
+ * descriptor. Called ONCE per generation (NOT per retry — retries reuse the
+ * same light to keep the prompt-hash stable).
+ *
+ * Exported for fal.js — both providers must use the same function so the
+ * lighting pool stays consistent across the FAL/Replicate split.
+ */
+export function getQualityPrefix() {
+  const light = ATMOSPHERIC_LIGHT[Math.floor(Math.random() * ATMOSPHERIC_LIGHT.length)];
+  return `Editorial architectural photography, ultra-sharp focus, crisp detail, ${light}, magazine-quality interior, Architectural Digest style.`;
+}
 
 // Cap total prompt words. Raised to 200: flux-2-max retains useful signal up to
 // ~200 words; beyond that the tokenizer starts dropping late tokens. The smart
@@ -209,7 +236,7 @@ export async function generateSingleProductInRoom(roomPhotoUrl, product, aspectR
   }
 
   const prompt = [
-    QUALITY_PREFIX,
+    getQualityPrefix(),
     'This is a precise scene edit, not a new generation.',
     'Preserve image 1 exactly: same walls, floor, ceiling, windows, lighting, camera angle, perspective, and spatial layout. Do not alter any architecture.',
     `Place this EXACT product reference (image 2) into the room: ${descriptor}. Match color, material, silhouette, and proportions precisely. Position it naturally where this type of furniture belongs in the room. Do not substitute with similar-looking alternatives.`,
@@ -280,7 +307,7 @@ export function buildPanelPrompt(userPrompt, products) {
     : '';
 
   return [
-    QUALITY_PREFIX,
+    getQualityPrefix(),
     'This is a precise scene edit, not a new generation.',
     'Preserve image 1 exactly: same walls, floor, ceiling, windows, lighting, camera angle, perspective, and spatial layout. Do not alter any architecture.',
     refLine,
@@ -320,7 +347,7 @@ export function buildFlux2MaxPrompt(userPrompt, products) {
     : '';
 
   return [
-    QUALITY_PREFIX,
+    getQualityPrefix(),
     'This is a precise scene edit, not a new generation.',
     'Preserve image 1 exactly: same walls, floor, ceiling, windows, lighting, camera angle, perspective, and spatial layout. Do not alter any architecture.',
     refLine,

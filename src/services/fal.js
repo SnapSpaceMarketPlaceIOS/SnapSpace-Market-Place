@@ -35,7 +35,11 @@
 
 import { describeProductForPrompt } from '../utils/productDescriptor';
 import { proxyFetch } from './apiProxy';
-import { buildPanelPrompt, buildFlux2MaxPrompt } from './replicate';
+// Build 63 (Gate A): prompt builders live in a provider-neutral module so
+// fal.js has zero runtime dependency on replicate.js. replicate.js is now
+// orphaned (no import graph edge into it) and can be deleted in a future
+// cleanup. Keeping it around for the moment in case a rollback is needed.
+import { buildPanelPrompt, buildFlux2MaxPrompt, getQualityPrefix } from './promptBuilders';
 
 const FAL_QUEUE_URL = 'https://queue.fal.run/fal-ai/flux-2-pro/edit';
 const POLL_INTERVAL_MS = 3000;
@@ -54,11 +58,11 @@ const RETRYABLE_ERROR_REGEX =
 // gives a 200ms safety margin over the cooldown wall.
 const RETRY_BACKOFF_MS = 2200;
 
-// Re-used quality prefix kept identical to replicate.js for prompt-fidelity
-// parity. Flux models weight early tokens highest — leading with editorial
-// cues biases toward Architectural Digest-style output.
-const QUALITY_PREFIX =
-  'Editorial architectural photography, ultra-sharp focus, crisp detail, natural light, magazine-quality interior, Architectural Digest style.';
+// Build 62: QUALITY_PREFIX moved to replicate.js as getQualityPrefix() — both
+// providers now share a single rotating-light quality prefix so the lighting
+// pool stays consistent across the FAL/Replicate split. Removing the local
+// duplicate prevents future drift (the source of bugs where one provider
+// shipped a token tweak the other didn't).
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Aspect ratio → image_size dimension mapping
@@ -417,7 +421,7 @@ export async function generateSingleProductInRoom(roomPhotoUrl, product, aspectR
   }
 
   const prompt = [
-    QUALITY_PREFIX,
+    getQualityPrefix(),
     'This is a precise scene edit, not a new generation.',
     'Preserve image 1 exactly: same walls, floor, ceiling, windows, lighting, camera angle, perspective, and spatial layout. Do not alter any architecture.',
     `Place this EXACT product reference (image 2) into the room: ${descriptor}. Match color, material, silhouette, and proportions precisely. Position it naturally where this type of furniture belongs in the room. Do not substitute with similar-looking alternatives.`,
@@ -444,9 +448,8 @@ export async function generateSingleProductInRoom(roomPhotoUrl, product, aspectR
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Re-exports for convenience: feature flag router (Phase 4) can import the
-// shared aspect-ratio helper from either provider — it lives in replicate.js.
-// We re-export here so call sites can `import { pickAspectRatio } from '../services/fal'`
-// without needing to know which file owns it.
+// Re-exports for convenience: provider-neutral helpers live in
+// ./promptBuilders. Re-exporting here lets callers keep the one-stop-shop
+// import pattern (`import { pickAspectRatio } from '../services/fal'`).
 // ─────────────────────────────────────────────────────────────────────────────
-export { pickAspectRatio, buildFinalPrompt } from './replicate';
+export { pickAspectRatio, buildFinalPrompt } from './promptBuilders';
