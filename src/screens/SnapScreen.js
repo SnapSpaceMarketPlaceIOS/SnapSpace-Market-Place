@@ -607,30 +607,36 @@ export default function SnapScreen({ navigation, route }) {
           <View style={[s.corner, { bottom: 0, right: 0, borderBottomWidth: 2, borderRightWidth: 2 }]} />
         </View>
 
-        {/* Shutter + gallery pick + .5 native-camera shortcut */}
+        {/* Shutter + gallery pick + .5 native-camera shortcut
+            Build 69 Commit F: left cluster (gallery + .5) grouped as a
+            single space-between item so its total width can be mirrored
+            by the right-side invisible spacer — that balance keeps the
+            shutter perfectly centered on the screen regardless of how
+            many chips sit on the left. Gallery + .5 shrunk 50→44 per
+            user request for "a little bit smaller and closer together."
+            Left cluster width: 44 + 10 + 44 = 98px → right spacer = 98px. */}
         <View style={s.bottomBar}>
-          <TouchableOpacity style={s.galleryBtn} onPress={handlePickFromLibrary} activeOpacity={0.7}>
-            <GalleryIcon />
-          </TouchableOpacity>
+          <View style={s.leftCluster}>
+            <TouchableOpacity style={s.galleryBtn} onPress={handlePickFromLibrary} activeOpacity={0.7}>
+              <GalleryIcon />
+            </TouchableOpacity>
 
-          {/* Build 69 Commit E: ".5" between gallery and shutter so the
-              ultra-wide shortcut sits with the other camera action buttons
-              at thumb-reachable height. */}
-          <TouchableOpacity
-            style={s.wideBtn}
-            onPress={handleNativeCameraCapture}
-            accessibilityLabel="Open native camera for 0.5x wide angle"
-            accessibilityRole="button"
-            activeOpacity={0.7}
-          >
-            <Text style={s.wideBtnLabel}>.5</Text>
-          </TouchableOpacity>
+            <TouchableOpacity
+              style={s.wideBtn}
+              onPress={handleNativeCameraCapture}
+              accessibilityLabel="Open native camera for 0.5x wide angle"
+              accessibilityRole="button"
+              activeOpacity={0.7}
+            >
+              <Text style={s.wideBtnLabel}>.5</Text>
+            </TouchableOpacity>
+          </View>
 
           <TouchableOpacity style={s.shutter} onPress={handleCapture} activeOpacity={0.8}>
             <View style={s.shutterInner} />
           </TouchableOpacity>
 
-          <View style={{ width: 50 }} />
+          <View style={s.rightSpacer} />
         </View>
       </View>
 
@@ -686,20 +692,34 @@ const s = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.4)',
     alignItems: 'center', justifyContent: 'center',
   },
-  // Build 69 Commit E: ".5" lens shortcut lives in the bottom bar between
-  // gallery and shutter, so its styling mirrors galleryBtn (same 50x50
-  // rounded square, same translucent fill + border) for visual cohesion.
+  // Build 69 Commit F: ".5" matches galleryBtn exactly for the bottom row.
+  // Shrunk 50 → 44 per user request ("a little bit smaller, closer together")
+  // so the pair (gallery + .5) reads as one tight cluster instead of two
+  // separate chips.
   wideBtn: {
-    width: 50, height: 50, borderRadius: 12,
+    width: 44, height: 44, borderRadius: 12,
     backgroundColor: 'rgba(255,255,255,0.12)',
     borderWidth: 1, borderColor: 'rgba(255,255,255,0.25)',
     alignItems: 'center', justifyContent: 'center',
   },
   wideBtnLabel: {
     color: '#fff',
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '600',
     letterSpacing: 0.2,
+  },
+  // Build 69 Commit F: left cluster + matching right spacer. With
+  // bottomBar's justifyContent: 'space-between' acting on 3 items
+  // (cluster | shutter | spacer), equal left+right widths force the
+  // shutter to screen center. Cluster width: 44 + 10 gap + 44 = 98px.
+  leftCluster: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  rightSpacer: {
+    width: 98, // matches leftCluster: 44 + 10 + 44
+    height: 44,
   },
   permBtn: {
     backgroundColor: palette.primaryBlue,
@@ -725,7 +745,7 @@ const s = StyleSheet.create({
   },
   shutterInner: { width: 56, height: 56, borderRadius: 28, backgroundColor: '#fff' },
   galleryBtn: {
-    width: 50, height: 50, borderRadius: 12,
+    width: 44, height: 44, borderRadius: 12,
     backgroundColor: 'rgba(255,255,255,0.12)',
     borderWidth: 1, borderColor: 'rgba(255,255,255,0.25)',
     alignItems: 'center', justifyContent: 'center',
