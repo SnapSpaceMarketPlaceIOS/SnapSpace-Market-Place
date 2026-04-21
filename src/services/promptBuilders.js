@@ -146,8 +146,15 @@ export function buildPanelPrompt(userPrompt, products) {
   // User text is included as SUPPLEMENTARY style intent, NOT as the primary
   // content definition. Wrapping it in "While maintaining this intent:"
   // tells flux to treat it as a hint rather than the canonical spec.
-  const styleIntent = userPrompt
-    ? `While maintaining this overall style intent: ${userPrompt}.`
+  //
+  // Build 69: normalize trailing punctuation. HomeScreen's enrichment path
+  // appends sentences ending in `.` to a user prompt that may or may not
+  // already end with `.`, producing strings like "...throughout." — then this
+  // wrapper added another `.` giving "..throughout.." in live FAL logs.
+  // Strip trailing periods/whitespace before we add our own terminator.
+  const cleanedPrompt = (userPrompt || '').replace(/[.\s]+$/, '');
+  const styleIntent = cleanedPrompt
+    ? `While maintaining this overall style intent: ${cleanedPrompt}.`
     : '';
 
   return [

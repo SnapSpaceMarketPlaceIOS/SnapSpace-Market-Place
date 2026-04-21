@@ -1534,13 +1534,33 @@ export default function HomeScreen({ navigation, route }) {
     // Result: portrait pixels preserved, portrait aspect_ratio sent to FAL,
     // portrait output produced. Exactly what the user expects.
     //
-    // For 'landscape' captures we keep the existing EXIF-driven rotation
-    // (Build 49 → 55 logic worked correctly for landscape — the bug only
-    // manifested for portrait).
+    // Build 69: symmetric landscape override for EXIF=3.
+    // Build 68 field report: landscape room photos were landing UPSIDE-DOWN
+    // in Supabase. Analysis of the live FAL dashboard showed the render/image
+    // fallback URL serving bytes rotated 180° from correct. Root cause: on
+    // iOS 26 / iPhone 14 Pro, landscape captures where the phone is held
+    // with the dynamic-island on the RIGHT report EXIF Orientation=3 (needs
+    // 180° rotate to display) but the raw pixel matrix is ALREADY upright.
+    // The optimizer's EXIF_ROTATION_MAP[3]=180 then flips an already-correct
+    // image to upside-down. flux-2-pro/edit can't parse the upside-down
+    // scene so it regenerates a novel room from the prompt alone — exactly
+    // the behavior the user reported.
+    //
+    // Fix: when the accelerometer confirms the device was held landscape
+    // AND EXIF claims 180° rotation is needed, trust the accelerometer and
+    // skip the rotation bake. Same pattern as the Build 55 portrait override.
+    //
+    // EXIF=6 and EXIF=8 landscape captures (phone rotated 90° CW/CCW) are
+    // NOT overridden — those paths worked correctly in Build 67/68 testing
+    // and their rotation bake is needed to orient the sideways buffer.
     const captureOrientation = savedPhoto?.captureOrientation || null;
     if (captureOrientation === 'portrait' && effectiveOrientation !== 1) {
       log('captureOrientation=portrait overrides EXIF=' + effectiveOrientation +
           ' → forcing effectiveOrientation=1 (no swap, no rotation, portrait preserved)');
+      effectiveOrientation = 1;
+    } else if (captureOrientation === 'landscape' && effectiveOrientation === 3) {
+      log('captureOrientation=landscape overrides EXIF=3 ' +
+          '→ forcing effectiveOrientation=1 (accelerometer says upright landscape, skip 180° flip)');
       effectiveOrientation = 1;
     } else {
       log('captureOrientation=' + captureOrientation +
@@ -1643,6 +1663,12 @@ export default function HomeScreen({ navigation, route }) {
               capture_orientation_overrode_exif: captureOrientation === 'portrait' &&
                 (fileExifOrientation === 6 || fileExifOrientation === 8 ||
                  (savedPhoto?.exif?.Orientation === 6 || savedPhoto?.exif?.Orientation === 8)),
+              // Build 69: landscape-override flag. Lets us verify in telemetry
+              // whether the new EXIF=3 override actually fired for a given
+              // upside-down-landscape test capture.
+              landscape_override_fired: captureOrientation === 'landscape' &&
+                (fileExifOrientation === 3 || savedPhoto?.exif?.Orientation === 3),
+              effective_orientation_post_override: effectiveOrientation,
               // Build 60: accelerometer diagnostic. Lets us verify which path
               // (accelerometer = physical truth, or dimensions-fallback = screen)
               // made the orientation decision. If the user reports a portrait/
@@ -1736,7 +1762,12 @@ export default function HomeScreen({ navigation, route }) {
         const colorHint = buildColorPaletteHint(parsedForPrompt);
         const dominantMat = getDominantMaterial(reachableProducts.length > 0 ? reachableProducts : matchedProducts);
 
-        const enrichmentParts = [designPrompt];
+        // Build 69: ensure user prompt has a sentence terminator before
+        // we append enrichment sentences. Without this the joined output
+        // ran together: "brown leather sofa Color palette: ..." — no
+        // punctuation boundary for flux's tokenizer to latch onto.
+        const seededPrompt = designPrompt.replace(/[.\s]+$/, '') + '.';
+        const enrichmentParts = [seededPrompt];
         if (colorHint) enrichmentParts.push(`Color palette: ${colorHint}.`);
         if (dominantMat) enrichmentParts.push(`Cohesive ${dominantMat} tones throughout.`);
         enrichedDesignPrompt = enrichmentParts.join(' ');

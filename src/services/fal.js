@@ -342,7 +342,11 @@ export async function generateWithProductPanel(roomPhotoUrl, userPrompt, product
     image_urls:       imageUrls,
     image_size:       imageSize,
     output_format:    'jpeg',     // FAL flux-2-pro/edit only accepts jpeg|png (no webp)
-    safety_tolerance: 5,          // FAL accepts the same scale (1-6)
+    // Build 69: dropped from 5 → 1. FAL's scale is 1-6 where higher is more
+    // permissive. flux-edit empirically drifts further from the reference
+    // image at higher tolerances — 1 keeps edits conservative so the output
+    // actually contains the matched products rather than style-similar substitutes.
+    safety_tolerance: 1,
   });
 }
 
@@ -384,7 +388,7 @@ export async function generateWithProductRefs(roomPhotoUrl, userPrompt, products
     image_urls:       imageUrls,
     image_size:       imageSize,
     output_format:    'jpeg',     // FAL flux-2-pro/edit only accepts jpeg|png (no webp)
-    safety_tolerance: 5,
+    safety_tolerance: 1,          // Build 69: see generateWithProductPanel for rationale
   });
 
   return result.url;
@@ -441,7 +445,7 @@ export async function generateSingleProductInRoom(roomPhotoUrl, product, aspectR
     image_urls:       [roomPhotoUrl, productImageUrl],
     image_size:       imageSize,
     output_format:    'jpeg',     // FAL flux-2-pro/edit only accepts jpeg|png (no webp)
-    safety_tolerance: 5,
+    safety_tolerance: 1,          // Build 69: see generateWithProductPanel for rationale
   });
 
   return result.url;
