@@ -2731,6 +2731,12 @@ export default function HomeScreen({ navigation, route }) {
       navigation.navigate('RoomResult', {
         prompt: designPrompt,
         resultUri: resultUrl,
+        // Build 69 Commit D: pass the original photo URI so RoomResultScreen
+        // can play a reveal animation (before → after sweep). The screen
+        // gracefully falls back to showing only `resultUri` if beforeUri is
+        // absent (e.g. when the user opens an old design from their profile
+        // history, where the original photo isn't available).
+        beforeUri: savedPhoto?.uri || null,
         products: finalMatchedProducts,
         // Dev-only debug metadata — RoomResultScreen renders an overlay when __DEV__
         debug: {

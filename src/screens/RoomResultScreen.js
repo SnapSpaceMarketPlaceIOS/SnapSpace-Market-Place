@@ -10,6 +10,7 @@ import {
   Alert,
   Image,
   Animated,
+  Easing,
   Pressable,
   Modal,
 } from 'react-native';
@@ -179,6 +180,193 @@ function MiniLensLoader({ color = colors.bluePrimary, size = 24 }) {
   );
 }
 
+// Build 69 Commit D: RevealImage — "page-lift" animation revealing the
+// AI-generated room from beneath the user's original photo.
+//
+// Works like a scanner sweep: the original photo slides upward off the
+// top of the card while a glowing brand-blue line tracks the bottom
+// edge, appearing to peel the photo away to expose the generated room
+// underneath.
+//
+// Contract:
+//   before   (string | null)  — URI of the user's original capture
+//   after    (string)         — URI of the generated AI image
+//   borderRadius (number)     — mirrors AutoImage prop
+//
+// Behavior:
+//   • Sizes the card from the AFTER image's natural aspect (same logic
+//     as AutoImage) so the final layout matches today's design exactly.
+//   • If `before` is falsy (opening an old design from profile history
+//     where the capture isn't available), renders AFTER directly with
+//     no animation — zero-cost fallback.
+//   • One-shot: plays once per component instance. Subsequent re-renders
+//     within the same mount don't replay. Fresh navigation to a new
+//     result remounts and plays again.
+//   • `useNativeDriver: true` on all animated transforms → runs on the
+//     UI thread, 60fps guaranteed on device. Opacity interpolation also
+//     native-driver compatible.
+const SCREEN_W = Dimensions.get('window').width;
+const SCREEN_H = Dimensions.get('window').height;
+
+function RevealImage({ before, after, borderRadius = 9 }) {
+  const availableWidth = SCREEN_W - space.lg * 2;
+  const heightCap = SCREEN_H * 0.75;
+  const [dimensions, setDimensions] = useState(null);
+  const progress = useRef(new Animated.Value(0)).current;
+  const hasPlayed = useRef(false);
+
+  // Resolve natural dims from the AFTER image (same heuristic as AutoImage)
+  useEffect(() => {
+    if (!after) return;
+    Image.getSize(
+      after,
+      (w, h) => {
+        if (w > 0 && h > 0) {
+          const naturalRatio = w / h;
+          let finalW = availableWidth;
+          let finalH = availableWidth / naturalRatio;
+          if (finalH > heightCap) {
+            finalH = heightCap;
+            finalW = heightCap * naturalRatio;
+            if (finalW > availableWidth) finalW = availableWidth;
+          }
+          setDimensions({ width: finalW, height: finalH });
+        }
+      },
+      () => setDimensions({ width: availableWidth, height: availableWidth * 0.75 }),
+    );
+  }, [after, availableWidth, heightCap]);
+
+  // Kick off the reveal once dims are known AND we have a before image.
+  useEffect(() => {
+    if (!dimensions || !before || hasPlayed.current) return;
+    hasPlayed.current = true;
+    Animated.sequence([
+      Animated.delay(200),  // brief hold so user registers "before"
+      Animated.timing(progress, {
+        toValue: 1,
+        duration: 1000,
+        easing: Easing.inOut(Easing.cubic),
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, [dimensions, before, progress]);
+
+  const containerStyle = {
+    width: availableWidth,
+    height: dimensions ? dimensions.height : availableWidth * 0.75,
+    borderRadius,
+    overflow: 'hidden',
+    backgroundColor: '#E5E7EB',
+  };
+
+  // Fallback: no before image → render AFTER directly, no animation
+  if (!before) {
+    return (
+      <View style={containerStyle}>
+        {after && (
+          <Image source={{ uri: after }} style={StyleSheet.absoluteFill} resizeMode="cover" />
+        )}
+      </View>
+    );
+  }
+
+  // If dims not yet known, show a solid placeholder (matches AutoImage idle state)
+  if (!dimensions) {
+    return <View style={containerStyle} />;
+  }
+
+  const containerHeight = dimensions.height;
+
+  // BEFORE slides from translateY: 0 → -containerHeight (upward, off-screen)
+  const beforeTranslateY = progress.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0, -containerHeight],
+  });
+  // Line tracks the BOTTOM EDGE of BEFORE as it slides up.
+  // At progress=0, line sits at y=containerHeight (bottom of card, clipped by overflow).
+  // At progress=1, line sits at y=0 (top of card, clipped by overflow).
+  const lineTranslateY = progress.interpolate({
+    inputRange: [0, 1],
+    outputRange: [containerHeight, 0],
+  });
+  // Line opacity: fade in 0→10%, hold 10→90%, fade out 90→100%.
+  const lineOpacity = progress.interpolate({
+    inputRange: [0, 0.1, 0.9, 1],
+    outputRange: [0, 1, 1, 0],
+  });
+
+  return (
+    <View style={containerStyle}>
+      {/* AFTER — static bottom layer */}
+      <Image source={{ uri: after }} style={StyleSheet.absoluteFill} resizeMode="cover" />
+
+      {/* BEFORE — animated top layer, slides up off-screen */}
+      <Animated.View
+        style={[
+          StyleSheet.absoluteFill,
+          { transform: [{ translateY: beforeTranslateY }] },
+        ]}
+      >
+        <Image source={{ uri: before }} style={StyleSheet.absoluteFill} resizeMode="cover" />
+      </Animated.View>
+
+      {/* Glow line — tracks the reveal edge */}
+      <Animated.View
+        pointerEvents="none"
+        style={[
+          revealStyles.glowTrack,
+          {
+            opacity: lineOpacity,
+            transform: [{ translateY: lineTranslateY }],
+          },
+        ]}
+      >
+        {/* Outer soft halo */}
+        <View style={revealStyles.glowHalo} />
+        {/* Inner bright band */}
+        <View style={revealStyles.glowBand} />
+        {/* Sharp core line */}
+        <View style={revealStyles.glowLine} />
+      </Animated.View>
+    </View>
+  );
+}
+
+const revealStyles = StyleSheet.create({
+  glowTrack: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 1, // zero-content anchor; children position relative to this
+  },
+  glowHalo: {
+    position: 'absolute',
+    top: -14,
+    left: 0,
+    right: 0,
+    height: 28,
+    backgroundColor: 'rgba(103, 172, 233, 0.22)',
+  },
+  glowBand: {
+    position: 'absolute',
+    top: -5,
+    left: 0,
+    right: 0,
+    height: 10,
+    backgroundColor: 'rgba(103, 172, 233, 0.55)',
+  },
+  glowLine: {
+    position: 'absolute',
+    top: -1,
+    left: 0,
+    right: 0,
+    height: 2,
+    backgroundColor: '#67ACE9',
+  },
+});
+
 // Spring-bounce animated icon button — same feel as bottom tab bar
 function AnimatedIconBtn({ onPress, style, children, disabled }) {
   const scale = useRef(new Animated.Value(1)).current;
@@ -273,6 +461,11 @@ export default function RoomResultScreen({ route, navigation }) {
 
   const prompt = route?.params?.prompt || 'Modern minimalist redesign';
   const [resultUri, setResultUri] = useState(route?.params?.resultUri || null);
+  // Build 69 Commit D: original-photo URI for the reveal animation.
+  // Falsy on old-design views (from profile history) → RevealImage skips
+  // the animation and renders resultUri directly. No state needed; this
+  // never changes across the component's lifetime.
+  const beforeUri = route?.params?.beforeUri || null;
 
   // Dev-only debug metadata from HomeScreen.runGeneration()
   const debug = route?.params?.debug || null;
@@ -522,9 +715,15 @@ export default function RoomResultScreen({ route, navigation }) {
         </View>
 
         {/* ── Image ────────────────────────────────────────────────── */}
+        {/* Build 69 Commit D: RevealImage wraps the "before → after" reveal
+            animation. If beforeUri is present, the user's original photo
+            slides up with a glowing brand-blue line tracking the reveal
+            edge, exposing the AI-generated room beneath. If beforeUri is
+            absent (old design viewed from profile history), RevealImage
+            renders resultUri directly with no animation. */}
         <View style={s.imageWrap}>
           {resultUri
-            ? <AutoImage uri={resultUri} borderRadius={IMG_RADIUS} />
+            ? <RevealImage before={beforeUri} after={resultUri} borderRadius={IMG_RADIUS} />
             : <View style={s.imagePlaceholder}><LensLoader size={40} /></View>}
         </View>
 
