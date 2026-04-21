@@ -50,3 +50,8 @@ supabase/.temp/
 
 # Apple credentials — never commit
 keys/
+
+# Local EAS build artifacts (huge binaries, never commit)
+*.ipa
+build-*.ipa
+build-local-*.ipa

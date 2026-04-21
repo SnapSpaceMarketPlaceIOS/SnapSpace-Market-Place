@@ -1556,6 +1556,17 @@ export default function HomeScreen({ navigation, route }) {
               capture_orientation_overrode_exif: captureOrientation === 'portrait' &&
                 (fileExifOrientation === 6 || fileExifOrientation === 8 ||
                  (savedPhoto?.exif?.Orientation === 6 || savedPhoto?.exif?.Orientation === 8)),
+              // Build 60: accelerometer diagnostic. Lets us verify which path
+              // (accelerometer = physical truth, or dimensions-fallback = screen)
+              // made the orientation decision. If the user reports a portrait/
+              // landscape mismatch we can tell whether the accelerometer fired
+              // and what gravity vector it returned.
+              accel_x: savedPhoto?.captureOrientationDebug?.accelX ?? null,
+              accel_y: savedPhoto?.captureOrientationDebug?.accelY ?? null,
+              accel_z: savedPhoto?.captureOrientationDebug?.accelZ ?? null,
+              accel_orientation: savedPhoto?.captureOrientationDebug?.accelOrientation ?? null,
+              dims_orientation: savedPhoto?.captureOrientationDebug?.dimsOrientation ?? null,
+              orientation_decision_source: savedPhoto?.captureOrientationDebug?.decisionSource ?? null,
               // Legacy name kept for dashboard compatibility with Build 47+ rows.
               exif_orientation_raw: exifObj?.Orientation ?? null,
               exif_is_object: typeof exifObj === 'object' && exifObj !== null,

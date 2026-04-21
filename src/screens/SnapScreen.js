@@ -11,6 +11,41 @@ import {
 } from 'react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import * as ImagePicker from 'expo-image-picker';
+// Build 60: Accelerometer for true physical device orientation. Build 59's
+// Dimensions.get('window') reads SCREEN orientation, which on iOS gets
+// stuck in portrait when system orientation lock is on or when expo-screen-
+// orientation's native module silently fails to unlock — so it can't tell
+// landscape captures from portrait captures. The accelerometer's gravity
+// vector is independent of the screen and always reflects how the user is
+// physically holding the phone.
+let _Accelerometer = null;
+try { _Accelerometer = require('expo-sensors').Accelerometer; } catch {}
+
+// Build 60: one-shot accelerometer reading. Subscribes to the sensor with a
+// short update interval, captures the first sample, then immediately
+// unsubscribes. Returns null if the native module is missing or the read
+// times out. The 400ms timeout is comfortable for the iOS sensor (which
+// typically delivers a sample within 50-100ms of subscription).
+async function readAccelerometerOnce() {
+  if (!_Accelerometer) return null;
+  return new Promise((resolve) => {
+    let resolved = false;
+    let subscription = null;
+    const finish = (value) => {
+      if (resolved) return;
+      resolved = true;
+      try { subscription?.remove(); } catch {}
+      resolve(value);
+    };
+    try {
+      _Accelerometer.setUpdateInterval(50);
+      subscription = _Accelerometer.addListener((data) => finish(data));
+      setTimeout(() => finish(null), 400);
+    } catch {
+      finish(null);
+    }
+  });
+}
 import { lockPortrait, unlockAll } from '../utils/orientation';
 import { useFocusEffect } from '@react-navigation/native';
 import Svg, { Path, Line, Polyline, Rect, Circle } from 'react-native-svg';
@@ -194,19 +229,60 @@ export default function SnapScreen({ navigation, route }) {
         'swapDetected=' + (photo.width !== finalWidth || photo.height !== finalHeight)
       );
 
-      // Build 58: capture device orientation at the moment of shutter press.
-      // iOS 26 / iPhone 14 Pro Max writes IDENTICAL EXIF metadata for landscape
-      // and portrait captures (Build 57 telemetry confirmed this), so file-side
-      // EXIF can't discriminate. Dimensions.get('window') reflects the actual
-      // physical phone orientation right now and IS the correct discriminator.
-      // 'portrait' = phone held upright (height > width)
-      // 'landscape' = phone held sideways (width > height)
-      // This signal flows through to HomeScreen.runGeneration where it gates
-      // the dim-swap and rotation logic in supabase.js + imageOptimizer.js.
+      // Build 60: physical device orientation via accelerometer.
+      //
+      // Build 59 telemetry showed Dimensions.get('window') unreliable —
+      // when iOS-level orientation lock is on (or expo-screen-orientation's
+      // native module isn't actually linked), the screen stays portrait even
+      // when the phone is physically landscape. Both tests reported
+      // captureOrientation=portrait but one upload had landscape content
+      // shoved into a portrait buffer (the user was holding the phone
+      // landscape but the screen didn't rotate).
+      //
+      // The accelerometer reads gravity directly, independent of any screen
+      // rotation lock. When the phone is held portrait-upright, gravity
+      // points down the device's Y-axis (|y| > |x|). When held sideways,
+      // gravity points along the X-axis (|x| > |y|). When the phone is
+      // flat (face up/down), Z dominates — in which case we fall back to
+      // Dimensions because there's no clear orientation.
+      //
+      // We try the accelerometer first; if it fails (native module missing,
+      // timeout, etc.), fall back to Dimensions.get('window') (Build 59
+      // behavior). This means Build 60 strictly improves on 59 — never
+      // regresses below it.
       const winDims = Dimensions.get('window');
-      const captureOrientation = winDims.width > winDims.height ? 'landscape' : 'portrait';
-      console.log('[Snap capture] device orientation at shutter | window=' +
-        winDims.width + 'x' + winDims.height + ' → captureOrientation=' + captureOrientation);
+      const dimsOrientation = winDims.width > winDims.height ? 'landscape' : 'portrait';
+
+      let accelOrientation = null;
+      let accelReading = null;
+      try {
+        accelReading = await readAccelerometerOnce();
+        if (accelReading) {
+          const absX = Math.abs(accelReading.x);
+          const absY = Math.abs(accelReading.y);
+          const absZ = Math.abs(accelReading.z);
+          // Z dominant = phone flat (face up/down) → can't tell orientation
+          // from gravity, so leave accelOrientation null and fall back to dims.
+          if (absX > absZ && absX > absY) {
+            accelOrientation = 'landscape';
+          } else if (absY > absZ && absY > absX) {
+            accelOrientation = 'portrait';
+          }
+        }
+      } catch (e) {
+        console.warn('[Snap capture] accelerometer read failed:', e?.message || e);
+      }
+
+      // Priority: accelerometer-derived (physical truth) > Dimensions
+      // (screen, may be locked) > default 'portrait'.
+      const captureOrientation = accelOrientation || dimsOrientation;
+      console.log('[Snap capture] orientation detection',
+        '| accel=' + (accelReading
+          ? `(x=${accelReading.x.toFixed(2)},y=${accelReading.y.toFixed(2)},z=${accelReading.z.toFixed(2)})`
+          : 'unavailable') +
+        ' → ' + (accelOrientation || 'inconclusive') +
+        ' | dims=' + winDims.width + 'x' + winDims.height + ' → ' + dimsOrientation +
+        ' | FINAL captureOrientation=' + captureOrientation);
 
       navigation.navigate('Home', {
         capturedPhoto: {
@@ -217,9 +293,23 @@ export default function SnapScreen({ navigation, route }) {
           // Build 44: propagate EXIF so runGeneration's orientation swap can
           // correct dims if Image.getSize returned raw pre-rotation pixels.
           exif: photo.exif || null,
-          // Build 58: trump card. When set to 'portrait', downstream code
+          // Build 58/60: trump card. When set to 'portrait', downstream code
           // skips the EXIF-based dim swap and rotation entirely.
           captureOrientation,
+          // Build 60: full diagnostic context for the orientation decision.
+          // Lets us verify in telemetry which path made the decision and
+          // catch any edge cases where the accelerometer disagrees with
+          // Dimensions (e.g. user takes photo with phone flat).
+          captureOrientationDebug: {
+            accelX: accelReading?.x ?? null,
+            accelY: accelReading?.y ?? null,
+            accelZ: accelReading?.z ?? null,
+            accelOrientation,
+            dimsW: winDims.width,
+            dimsH: winDims.height,
+            dimsOrientation,
+            decisionSource: accelOrientation ? 'accelerometer' : 'dimensions-fallback',
+          },
         },
         singleProduct,  // null for normal flow, product object for single-product visualize
       });
