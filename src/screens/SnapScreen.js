@@ -582,17 +582,6 @@ export default function SnapScreen({ navigation, route }) {
       <View style={s.overlay} pointerEvents="box-none">
         {/* Top controls */}
         <View style={s.topBar}>
-          {/* Build 69 Commit C: ".5" opens iOS native camera (ultra-wide access).
-              Subtle pill — stays out of the way but available when user wants
-              wider framing. Inside native camera they tap 0.5x themselves. */}
-          <TouchableOpacity
-            style={s.wideBtn}
-            onPress={handleNativeCameraCapture}
-            accessibilityLabel="Open native camera for 0.5x wide angle"
-            accessibilityRole="button"
-          >
-            <Text style={s.wideBtnLabel}>.5</Text>
-          </TouchableOpacity>
           <View style={{ flex: 1 }} />
           <View style={{ flexDirection: 'row', gap: 10 }}>
             <TouchableOpacity style={s.btn} onPress={() => setFlash(!flash)}>
@@ -618,10 +607,23 @@ export default function SnapScreen({ navigation, route }) {
           <View style={[s.corner, { bottom: 0, right: 0, borderBottomWidth: 2, borderRightWidth: 2 }]} />
         </View>
 
-        {/* Shutter + gallery pick */}
+        {/* Shutter + gallery pick + .5 native-camera shortcut */}
         <View style={s.bottomBar}>
           <TouchableOpacity style={s.galleryBtn} onPress={handlePickFromLibrary} activeOpacity={0.7}>
             <GalleryIcon />
+          </TouchableOpacity>
+
+          {/* Build 69 Commit E: ".5" between gallery and shutter so the
+              ultra-wide shortcut sits with the other camera action buttons
+              at thumb-reachable height. */}
+          <TouchableOpacity
+            style={s.wideBtn}
+            onPress={handleNativeCameraCapture}
+            accessibilityLabel="Open native camera for 0.5x wide angle"
+            accessibilityRole="button"
+            activeOpacity={0.7}
+          >
+            <Text style={s.wideBtnLabel}>.5</Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={s.shutter} onPress={handleCapture} activeOpacity={0.8}>
@@ -684,17 +686,18 @@ const s = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.4)',
     alignItems: 'center', justifyContent: 'center',
   },
-  // Build 69 Commit C: subtle pill for the ".5" lens shortcut.
-  // Same dark translucent fill as the icon buttons, slightly wider to fit
-  // text, 44pt height for Apple HIG touch target.
+  // Build 69 Commit E: ".5" lens shortcut lives in the bottom bar between
+  // gallery and shutter, so its styling mirrors galleryBtn (same 50x50
+  // rounded square, same translucent fill + border) for visual cohesion.
   wideBtn: {
-    minWidth: 44, height: 44, paddingHorizontal: 14, borderRadius: 22,
-    backgroundColor: 'rgba(0,0,0,0.4)',
+    width: 50, height: 50, borderRadius: 12,
+    backgroundColor: 'rgba(255,255,255,0.12)',
+    borderWidth: 1, borderColor: 'rgba(255,255,255,0.25)',
     alignItems: 'center', justifyContent: 'center',
   },
   wideBtnLabel: {
     color: '#fff',
-    fontSize: 15,
+    fontSize: 16,
     fontWeight: '600',
     letterSpacing: 0.2,
   },
