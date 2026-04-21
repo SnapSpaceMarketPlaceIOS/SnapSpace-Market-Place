@@ -1459,6 +1459,21 @@ export default function HomeScreen({ navigation, route }) {
     const log = (...args) => console.log(`[gen:${generationId}]`, ...args);
     const warn = (...args) => console.warn(`[gen:${generationId}]`, ...args);
     const startedAt = Date.now();
+    // Build 64 (C2): absolute wall-clock deadline across ALL rings for a
+    // single generation attempt. Each ring already has its own internal
+    // polling cap (~4 min per FAL ring, ~3 min for BFL), but three rings
+    // back-to-back + per-ring cooldown sleeps + retry-on-moderation loops
+    // can stack to ~19 min of wall-clock in the worst case. Users close the
+    // app long before that. 8 min is a pragmatic cap: long enough that a
+    // single-ring slow-but-succeeding generation (the panel cold-start
+    // cases we saw on Build 42) isn't penalized, short enough that a
+    // cascading failure surfaces a real error instead of an indefinite spinner.
+    //
+    // Checked at the entry of Ring 2 and Ring 3 — we intentionally don't
+    // interrupt an in-flight ring (JS can't cancel a Promise mid-poll), so
+    // the true cap is (elapsed at check) + (remaining ring budget). Worst
+    // case therefore bounds at ~12 min instead of the prior ~19.
+    const GENERATION_DEADLINE_MS = 8 * 60 * 1000;
     log('start | mode=' + (isSingleProductMode ? 'single-product' : 'full-room') + ' | prompt="' + designPrompt.substring(0, 80) + '"');
 
     // ── Build 53: real EXIF from file bytes (trumps picker metadata) ─────────
@@ -2157,6 +2172,14 @@ export default function HomeScreen({ navigation, route }) {
           // Products shown in "Shop Your Room" ARE the products in the photo.
           // Cost: ~$0.10–0.20/generation
           let replicateSucceeded = false;
+          // Build 64 (B1 fix): when Ring 2's inner catch records a ring-specific
+          // failure, we DON'T want the outer catch (repErr) to also record a
+          // redundant ring='outer' row for the same failure. Historically every
+          // Ring-2-caused failure produced two rows in generation_errors (one
+          // from the inner catch, one from the outer) which inflated the "outer
+          // funnel" error count and made dashboards misleading. This flag
+          // scopes the de-dupe to a single generation attempt.
+          let ring2RecordedError = false;
           try {
             log('AI gen | visual product refs (provider routed via aiProvider)');
 
@@ -2285,6 +2308,22 @@ export default function HomeScreen({ navigation, route }) {
                 // last shot at preserving the user's actual room before
                 // dropping to BFL text-to-image. Sleep 2200ms (200ms safety
                 // margin over the 2000ms cooldown).
+                //
+                // Build 64 (C2): before consuming Ring 2's budget, check the
+                // global 8-min deadline. If Ring 1 burned most of it (e.g.
+                // max-polls + seed-retry = 8 min), skip Ring 2 entirely and
+                // let Ring 3 (BFL, ~3 min cap) run inside what's left. The
+                // throw is caught by the enclosing catch (repErr) and sets us
+                // up for Ring 3 just like a normal Ring-2 failure would.
+                if (Date.now() - startedAt > GENERATION_DEADLINE_MS) {
+                  console.log(
+                    '[genmeta]',
+                    'event=ring2_skipped_deadline',
+                    'generationId=' + generationId,
+                    'elapsedMs=' + (Date.now() - startedAt)
+                  );
+                  throw new Error('Ring 2 skipped — 8-min generation deadline exceeded.');
+                }
                 setGenStatus('Refining your design…');
                 await new Promise(r => setTimeout(r, 2200));
                 log('Ring 2: panel failed → trying generateWithProductRefs (room + ' + Math.min(reachableProducts.length, 4) + ' product images)');
@@ -2333,6 +2372,12 @@ export default function HomeScreen({ navigation, route }) {
                     has_room_photo_url: !!roomPhotoUrl,
                   },
                 });
+                // Build 64 (B1): mark that Ring 2 has already recorded a durable
+                // error for this attempt. The outer catch (repErr) below will
+                // see this flag and skip its own recordGenerationError so we
+                // don't double-record the same failure as both 'individual-refs'
+                // AND 'outer' in the generation_errors table.
+                ring2RecordedError = true;
                 throw new Error('All FAL paths failed — dropping to BFL text-to-image fallback');
               }
             }
@@ -2398,20 +2443,31 @@ export default function HomeScreen({ navigation, route }) {
             // the funnel that captures "something in the FAL/Replicate path
             // threw but we couldn't attribute to Ring 1 or Ring 2 specifically"
             // (e.g. product matching threw, pre-pipeline bailout, etc.)
-            recordGenerationError({
-              userId: user.id,
-              generationId,
-              ring: 'outer',
-              errorName: repErr?.name || 'Error',
-              errorMessage: errMsg,
-              pipeline: genMeta.pipeline || 'pre-pipeline',
-              clientVersion: String(Constants.expoConfig?.ios?.buildNumber || ''),
-              metadata: {
-                aspect_ratio: aspectRatio,
-                reachable_products: reachableProducts.length,
-                has_room_photo_url: !!roomPhotoUrl,
-              },
-            });
+            //
+            // Build 64 (B1 fix): skip this record if Ring 2 already recorded
+            // one for the same attempt. Ring 2's inner catch writes a row with
+            // ring='individual-refs' and then rethrows into us; without this
+            // guard we'd also write a ring='outer' row for the same failure,
+            // which was doubling the outer-funnel count in dashboards and
+            // masking the true distribution of pre-pipeline vs Ring-2 errors.
+            if (!ring2RecordedError) {
+              recordGenerationError({
+                userId: user.id,
+                generationId,
+                ring: 'outer',
+                errorName: repErr?.name || 'Error',
+                errorMessage: errMsg,
+                pipeline: genMeta.pipeline || 'pre-pipeline',
+                clientVersion: String(Constants.expoConfig?.ios?.buildNumber || ''),
+                metadata: {
+                  aspect_ratio: aspectRatio,
+                  reachable_products: reachableProducts.length,
+                  has_room_photo_url: !!roomPhotoUrl,
+                },
+              });
+            } else {
+              log('outer catch: skipping ring=outer record (Ring 2 already recorded individual-refs)');
+            }
           }
 
           // ── Ring 3 fallback: BFL text-to-image (prompt only, no image inputs) ──
@@ -2436,6 +2492,25 @@ export default function HomeScreen({ navigation, route }) {
           // the image they're seeing is a generic design, and they can retry
           // with a different photo.
           if (!replicateSucceeded) {
+            // Build 64 (C2): enforce the 8-min wall-clock deadline before
+            // burning Ring 3's ~3 min polling budget. If Rings 1+2 already
+            // consumed the whole budget (e.g. panel timed out at 4 min +
+            // individual-refs timed out at 4 min), falling through to BFL
+            // would push total time to ~11 min — past when any real user has
+            // given up. Throwing here lands in catch (genErr) at the outer
+            // scope, which shows the friendly "Generation Failed" Alert and
+            // releases the double-tap lock cleanly. Wish is NOT deducted
+            // because we never reached deductToken/recordGeneration.
+            if (Date.now() - startedAt > GENERATION_DEADLINE_MS) {
+              console.log(
+                '[genmeta]',
+                'event=ring3_skipped_deadline',
+                'generationId=' + generationId,
+                'elapsedMs=' + (Date.now() - startedAt)
+              );
+              throw new Error('Generation took too long. Please try again with a different photo or prompt.');
+            }
+
             const bflProducts = (reachableProducts.length > 0
               ? reachableProducts
               : matchedProducts
