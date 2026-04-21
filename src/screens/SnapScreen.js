@@ -422,6 +422,99 @@ export default function SnapScreen({ navigation, route }) {
     }
   };
 
+  // Build 69 Commit C: ".5" lens shortcut → iOS native camera.
+  //
+  // expo-camera cannot switch to the ultra-wide lens (0.5x) from JS — the
+  // library exposes digital zoom only, which can zoom IN but not widen
+  // beyond the default 1x wide-angle lens. To give users 0.5x access
+  // without introducing a new native module (which the regression rule
+  // explicitly forbids), we open iOS's native Camera UI via
+  // ImagePicker.launchCameraAsync. Inside the native camera the user taps
+  // the "0.5x" chip (iOS UI), frames the shot, and hits the shutter.
+  // Result is handed back to us in the same asset shape library picks
+  // return, so every downstream handler (EXIF read, orientation logic,
+  // upload, generation) just works with no new code paths.
+  //
+  // Added bonus: iOS's native camera writes reliable EXIF Orientation
+  // tags, which bypasses the iOS 26 picker-lies issue that Build 53
+  // worked around with the file-truth piexifjs read.
+  const handleNativeCameraCapture = async () => {
+    if (tapInFlight.current) return;
+    tapInFlight.current = true;
+    try {
+      const { status } = await ImagePicker.requestCameraPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert(
+          'Camera Access Needed',
+          'Allow HomeGenie to access your camera to take a room photo.',
+          [
+            { text: 'Cancel', style: 'cancel' },
+            { text: 'Open Settings', onPress: () => Linking.openSettings?.() },
+          ]
+        );
+        return;
+      }
+      const result = await ImagePicker.launchCameraAsync({
+        mediaTypes: ['images'],
+        quality: 0.8,
+        exif: true,
+      });
+      if (result.canceled || !result.assets?.length) return;
+      const asset = result.assets[0];
+      if (!asset?.uri) {
+        Alert.alert('Capture Failed', 'We couldn\'t capture that photo. Please try again.');
+        return;
+      }
+
+      console.log(
+        '[Snap native-camera] asset meta',
+        'uri=' + String(asset.uri).substring(0, 80),
+        'w=' + asset.width,
+        'h=' + asset.height,
+        'hasExif=' + !!asset.exif,
+        'exifOrientation=' + (asset.exif?.Orientation ?? '(unset)'),
+      );
+
+      const orientation = asset.exif?.Orientation ?? 1;
+      const { width: finalWidth, height: finalHeight } = await resolveDimensions(
+        asset.uri,
+        null,
+        null,
+      );
+
+      console.log(
+        '[Snap native-camera] dims resolved',
+        'exifOrientation=' + orientation,
+        'rawAssetWH=' + asset.width + 'x' + asset.height,
+        'finalWH=' + finalWidth + 'x' + finalHeight,
+      );
+
+      // Native camera returns display-oriented dims, so aspect-ratio
+      // derivation works the same as library picks.
+      let pickedOrientation = null;
+      if (typeof asset.width === 'number' && typeof asset.height === 'number') {
+        pickedOrientation = asset.width > asset.height ? 'landscape' : 'portrait';
+      }
+
+      navigation.navigate('Home', {
+        capturedPhoto: {
+          uri: asset.uri,
+          base64: null,
+          width: finalWidth,
+          height: finalHeight,
+          exif: asset.exif || null,
+          captureOrientation: pickedOrientation,
+        },
+        singleProduct,
+      });
+    } catch (err) {
+      console.warn('[Snap] native-camera capture failed:', err?.message || err);
+      Alert.alert('Capture Failed', 'We couldn\'t take that photo. Please try again.');
+    } finally {
+      setTimeout(() => { tapInFlight.current = false; }, 800);
+    }
+  };
+
   if (!permission) return <View style={s.container} />;
 
   if (!permission.granted) {
@@ -489,6 +582,17 @@ export default function SnapScreen({ navigation, route }) {
       <View style={s.overlay} pointerEvents="box-none">
         {/* Top controls */}
         <View style={s.topBar}>
+          {/* Build 69 Commit C: ".5" opens iOS native camera (ultra-wide access).
+              Subtle pill — stays out of the way but available when user wants
+              wider framing. Inside native camera they tap 0.5x themselves. */}
+          <TouchableOpacity
+            style={s.wideBtn}
+            onPress={handleNativeCameraCapture}
+            accessibilityLabel="Open native camera for 0.5x wide angle"
+            accessibilityRole="button"
+          >
+            <Text style={s.wideBtnLabel}>.5</Text>
+          </TouchableOpacity>
           <View style={{ flex: 1 }} />
           <View style={{ flexDirection: 'row', gap: 10 }}>
             <TouchableOpacity style={s.btn} onPress={() => setFlash(!flash)}>
@@ -579,6 +683,20 @@ const s = StyleSheet.create({
     width: 44, height: 44, borderRadius: 22,
     backgroundColor: 'rgba(0,0,0,0.4)',
     alignItems: 'center', justifyContent: 'center',
+  },
+  // Build 69 Commit C: subtle pill for the ".5" lens shortcut.
+  // Same dark translucent fill as the icon buttons, slightly wider to fit
+  // text, 44pt height for Apple HIG touch target.
+  wideBtn: {
+    minWidth: 44, height: 44, paddingHorizontal: 14, borderRadius: 22,
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    alignItems: 'center', justifyContent: 'center',
+  },
+  wideBtnLabel: {
+    color: '#fff',
+    fontSize: 15,
+    fontWeight: '600',
+    letterSpacing: 0.2,
   },
   permBtn: {
     backgroundColor: palette.primaryBlue,
