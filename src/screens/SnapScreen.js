@@ -441,7 +441,13 @@ export default function SnapScreen({ navigation, route }) {
     // Also added an Open Settings affordance for users who've previously
     // denied permission (`canAskAgain === false`) — `requestPermission`
     // silently no-ops in that case, so the only way to grant is through
-    // iOS Settings. Without this, the Enable Camera button looks broken.
+    // iOS Settings. Without this, the Continue button looks broken.
+    //
+    // Build 69 Commit B: button label changed from "Enable Camera" → "Continue"
+    // to comply with App Review Guideline 5.1.1(iv). Apple rejected Build 31
+    // on 2026-04-21 for using pressure language ("Enable") on a custom
+    // pre-permission CTA. Neutral wording like "Continue" or "Next" is
+    // required — iOS's own permission dialog handles the actual grant.
     const cameraStepActive = isStepActive('camera');
     const canReprompt = permission.canAskAgain !== false;
 
@@ -455,7 +461,7 @@ export default function SnapScreen({ navigation, route }) {
           onPress={canReprompt ? requestPermission : () => Linking.openSettings?.()}
         >
           <Text style={{ color: '#fff', fontWeight: '700', fontFamily: 'Geist_700Bold' }}>
-            {canReprompt ? 'Enable Camera' : 'Open Settings'}
+            {canReprompt ? 'Continue' : 'Open Settings'}
           </Text>
         </TouchableOpacity>
 
