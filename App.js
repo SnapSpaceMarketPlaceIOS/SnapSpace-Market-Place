@@ -237,6 +237,30 @@ function AnimatedTabButton({ children, onPress, style, accessibilityState, ...re
 
 // ─── Tab Navigator ───────────────────────────────────────────────
 function TabNavigator() {
+  // Build 69 Commit G: soft auth wall.
+  // Logged-out users can browse ONLY the Home tab. Tapping Explore,
+  // Wish, Cart, or Profile → intercepted below and redirects to
+  // AuthScreen (mounted in the root stack). Explore was originally
+  // planned as public but was gated too because its design cards
+  // rely on author info which RLS restricts to authenticated users —
+  // showing blank/placeholder author fields could read as broken to
+  // both real users and App Review, so we gate the whole tab instead.
+  // See useRequireAuth for action-level gating used by individual
+  // screens (like/share/add-to-cart, etc.).
+  const { user } = useAuth();
+
+  // Factory for the gated-tab listener. Each gated Tab.Screen wires this
+  // to `listeners={...}` so a single signed-out tap preventDefaults the
+  // tab switch and navigates to Auth instead.
+  const gatedTabListener = ({ navigation: tabNav }) => ({
+    tabPress: (e) => {
+      if (!user) {
+        e.preventDefault();
+        tabNav.getParent()?.navigate('Auth');
+      }
+    },
+  });
+
   return (
     <Tab.Navigator
       screenOptions={{
@@ -275,6 +299,7 @@ function TabNavigator() {
       <Tab.Screen
         name="Explore"
         component={ExploreScreen}
+        listeners={gatedTabListener}
         options={{
           tabBarIcon: ({ color }) => <SearchIcon color={color} size={ICON_SIZE} />,
         }}
@@ -282,6 +307,7 @@ function TabNavigator() {
       <Tab.Screen
         name="Wish"
         component={SnapScreen}
+        listeners={gatedTabListener}
         options={{
           tabBarIcon: ({ color }) => (
             <View style={{ position: 'relative' }}>
@@ -302,6 +328,7 @@ function TabNavigator() {
       <Tab.Screen
         name="Cart"
         component={CartScreen}
+        listeners={gatedTabListener}
         options={{
           tabBarIcon: ({ color }) => (
             <View>
@@ -314,6 +341,7 @@ function TabNavigator() {
       <Tab.Screen
         name="Profile"
         component={ProfileScreen}
+        listeners={gatedTabListener}
         options={{
           tabBarIcon: ({ color }) => <ProfileIcon color={color} size={ICON_SIZE} />,
         }}
@@ -335,24 +363,24 @@ function RootNavigator() {
     );
   }
 
-  // ── Option A hard wall ────────────────────────────────────────
-  // Unauthenticated users see ONLY the sign-in screen — no tabs,
-  // no content. When AuthContext sets user (sign-in / Apple auth
-  // completes), this navigator re-renders and switches to the full
-  // app stack automatically. No inline AuthGate needed on individual
-  // screens (those were removed in Build 34).
-  if (!user) {
-    return (
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="Auth" component={AuthScreen} />
-        <Stack.Screen
-          name="VerifyEmailSent"
-          component={VerifyEmailSentScreen}
-          options={{ animation: 'fade' }}
-        />
-      </Stack.Navigator>
-    );
-  }
+  // Build 69 Commit G: soft auth wall.
+  //
+  // Previously (Build 34): a hard wall kept unauthenticated users on
+  // AuthScreen with no access to any app content. We've flipped to a
+  // freemium-browse model — the Home tab is open to everyone, and
+  // any gated action (tapping Explore/Wish/Cart/Profile tabs, tapping
+  // Add to Cart, Like, Follow, Generate, etc.) routes here to Auth.
+  //
+  // AuthScreen is now part of the main stack, presented as a modal so
+  // users can dismiss it and continue browsing. See useRequireAuth
+  // (src/hooks/useRequireAuth.js) for how actions gate themselves,
+  // and the TabNavigator's `listeners={gatedTabListener}` blocks above
+  // for tab-level gating.
+  //
+  // The loading screen above still runs on first app launch while
+  // AuthContext bootstraps from AsyncStorage — that behavior is
+  // unchanged and necessary to avoid a brief flash of "signed out" UI
+  // for users whose session is already persisted.
 
   return (
     <Stack.Navigator
@@ -367,6 +395,14 @@ function RootNavigator() {
       }}
     >
       <Stack.Screen name="Main" component={TabNavigator} />
+      {/* Build 69 Commit G: Auth screens always mounted so soft-wall
+          gates can navigate here from anywhere. Presented as a modal so
+          users can X-close and resume browsing. */}
+      <Stack.Screen
+        name="Auth"
+        component={AuthScreen}
+        options={{ presentation: 'modal', animation: 'slide_from_bottom' }}
+      />
       <Stack.Screen name="VerifyEmailSent" component={VerifyEmailSentScreen} options={{ animation: 'fade' }} />
       <Stack.Screen name="RoomResult" component={RoomResultScreen} options={{ animation: 'slide_from_bottom' }} />
       <Stack.Screen name="ProductDetail" component={ProductDetailScreen} />

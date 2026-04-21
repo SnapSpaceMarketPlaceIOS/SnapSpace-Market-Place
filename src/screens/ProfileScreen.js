@@ -882,7 +882,15 @@ export default function ProfileScreen({ navigation }) {
                         style: 'default',
                         onPress: () => {
                           setShowSettings(false);
-                          setTimeout(() => signOut(), 300);
+                          setTimeout(() => {
+                            // Build 69 Commit G: jump to Home before signOut
+                            // wipes the session. With the new soft wall,
+                            // Profile is a gated tab — leaving the user here
+                            // after signOut would strand them on a cached,
+                            // stale Profile view. Home is always accessible.
+                            navigation.navigate('Main', { screen: 'Home' });
+                            signOut();
+                          }, 300);
                         },
                       },
                     ]
