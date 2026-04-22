@@ -26,8 +26,8 @@ import { describeProductForPrompt } from '../utils/productDescriptor';
 
 // ── Prompt quality tokens ────────────────────────────────────────────────────
 // flux weights EARLY tokens highest. Leading with editorial/sharpness cues
-// biases the whole generation toward magazine-quality output. We keep this
-// list short and specific — "8k" and other common LLM noise tokens actually
+// biases the whole generation toward magazine-quality output. We keep these
+// lists short and specific — "8k" and other common LLM noise tokens actually
 // degrade flux output, so they are intentionally excluded.
 //
 // Build 62: the lighting token rotates per-generation across an editorial
@@ -37,7 +37,15 @@ import { describeProductForPrompt } from '../utils/productDescriptor';
 // "warm afternoon" or "soft morning" the SAME room arrangement and the
 // user perceives a different result. We swap ONLY the light token; every
 // other word in the prefix stays identical so editorial quality is unchanged.
-const ATMOSPHERIC_LIGHT = [
+//
+// Build 71 (Commit A): the prefix mode now ALSO swaps between EDITORIAL and
+// COZY when the user's prompt reads as warm/lived-in rather than editorial.
+// Previously every generation led with "Architectural Digest style" which
+// fought cozy prompts toward a staged, magazine look. Mood detection uses
+// word-boundary keyword match on the user prompt — COZY keywords swap both
+// the opening tokens AND the lighting pool (no "cinematic editorial light"
+// when the user asked for a warm reading nook).
+const EDITORIAL_LIGHT = [
   'natural light',                     // original baseline — kept in pool
   'warm afternoon light',
   'soft morning light',
@@ -46,15 +54,59 @@ const ATMOSPHERIC_LIGHT = [
   'cinematic editorial light',
 ];
 
+const COZY_LIGHT = [
+  'warm afternoon sidelight',
+  'golden hour glow',
+  'soft morning window light',
+  'warm lamp glow',
+  'hearth-side ambient light',
+];
+
+const COZY_KEYWORDS = [
+  'cozy', 'cosy', 'warm', 'lived-in', 'lived in', 'casual', 'inviting',
+  'homey', 'intimate', 'snug', 'rustic', 'farmhouse', 'cottage', 'hygge',
+  'comfortable',
+];
+const COZY_REGEX = new RegExp(
+  `\\b(${COZY_KEYWORDS.map(k => k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')})\\b`,
+  'i'
+);
+
+function isCozyPrompt(userPrompt) {
+  return typeof userPrompt === 'string' && COZY_REGEX.test(userPrompt);
+}
+
 /**
- * Returns the editorial quality prefix with a randomly-rotated lighting
- * descriptor. Called ONCE per generation (NOT per retry — retries reuse the
- * same light to keep the prompt-hash stable).
+ * Returns the quality prefix with a randomly-rotated lighting descriptor.
+ * Called ONCE per generation (NOT per retry — retries reuse the same
+ * rotation so the prompt-hash stays stable).
+ *
+ * @param {string} [userPrompt] - User's raw/expanded prompt. Used to pick
+ *   EDITORIAL vs COZY mode. Optional for backward compatibility — callers
+ *   that pass nothing get the original EDITORIAL behavior.
  */
-export function getQualityPrefix() {
-  const light = ATMOSPHERIC_LIGHT[Math.floor(Math.random() * ATMOSPHERIC_LIGHT.length)];
+export function getQualityPrefix(userPrompt) {
+  if (isCozyPrompt(userPrompt)) {
+    const light = COZY_LIGHT[Math.floor(Math.random() * COZY_LIGHT.length)];
+    return `Lived-in interior photography, ${light}, soft tactile detail, inviting atmosphere, documentary style.`;
+  }
+  const light = EDITORIAL_LIGHT[Math.floor(Math.random() * EDITORIAL_LIGHT.length)];
   return `Editorial architectural photography, ultra-sharp focus, crisp detail, ${light}, magazine-quality interior, Architectural Digest style.`;
 }
+
+// Build 71 (Commit A): parenthetical weighting directives appended to the
+// end of each edit prompt. flux honors (text:weight) syntax; weights above
+// 1.0 amplify the directive. Three pins:
+//   1.3 architecture  — keep walls/windows/ceiling stable across the edit
+//   1.2 no new decor  — suppress prop drift (extra pillows, side tables)
+//   1.5 exact refs    — force higher fidelity to the product reference
+//                        images. Address for the "catalog shows X, render
+//                        shows Y" mismatch on rugs / accent chairs.
+// These are belt-and-suspenders — the plain-English preservation sentence
+// above each one still runs. If FAL's flux-2-pro ignores the weighting
+// grammar, the effect is neutral (tokens still contribute semantically).
+export const WEIGHTED_DIRECTIVES =
+  '(preserve architecture:1.3) (no new decor objects:1.2) (copy furniture from reference images exactly:1.5)';
 
 // Cap total prompt words. Raised to 200: flux retains useful signal up to
 // ~200 words; beyond that the tokenizer starts dropping late tokens. The
@@ -158,11 +210,12 @@ export function buildPanelPrompt(userPrompt, products) {
     : '';
 
   return [
-    getQualityPrefix(),
+    getQualityPrefix(cleanedPrompt),
     'This is a precise scene edit, not a new generation.',
     'Preserve image 1 exactly: same walls, floor, ceiling, windows, lighting, camera angle, perspective, and spatial layout. Do not alter any architecture.',
     refLine,
     styleIntent,
+    WEIGHTED_DIRECTIVES,
   ].filter(Boolean).join(' ');
 }
 
@@ -194,11 +247,12 @@ export function buildFlux2MaxPrompt(userPrompt, products) {
     : '';
 
   return [
-    getQualityPrefix(),
+    getQualityPrefix(userPrompt),
     'This is a precise scene edit, not a new generation.',
     'Preserve image 1 exactly: same walls, floor, ceiling, windows, lighting, camera angle, perspective, and spatial layout. Do not alter any architecture.',
     refLine,
     styleIntent,
+    WEIGHTED_DIRECTIVES,
   ].filter(Boolean).join(' ');
 }
 
