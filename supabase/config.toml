@@ -84,5 +84,17 @@ verify_jwt = false
 [functions.ai-proxy]
 verify_jwt = false
 
+# Same ES256/HS256 gateway mismatch was silently 401-ing every vision-match
+# call since the 2026-04 auth-service rotation. Symptom discovered Build 69
+# post-ship verification: fresh-signup JWT returned
+# {"code":"UNAUTHORIZED_UNSUPPORTED_TOKEN_ALGORITHM"} from the gateway,
+# meaning the Anthropic vision step has never fired in production — product
+# matching has been silently falling back to local prompt-parsing instead of
+# analyzing the actual generated image. The function's handler validates
+# the user JWT itself via supabase.auth.getUser(token), so turning off
+# gateway verify_jwt does not weaken auth.
+[functions.vision-match]
+verify_jwt = false
+
 [analytics]
 enabled = false
