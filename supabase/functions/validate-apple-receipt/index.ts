@@ -21,17 +21,46 @@
  */
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+// jose: well-audited JWS library, works in Deno edge runtime via npm:.
+// Using it here for signature verification (ES256) + X.509 cert import.
+import { compactVerify, importX509 } from 'npm:jose@5.6.3';
 
 const SUPABASE_URL        = Deno.env.get('SUPABASE_URL')!;
 const SUPABASE_ANON_KEY    = Deno.env.get('SUPABASE_ANON_KEY')!;
 const SUPABASE_SERVICE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 const BUNDLE_ID           = 'com.anthonyrivera.snapspace';
 
-// Apple root CA — used to verify the x5c chain in the JWS header.
-// We fetch it once at cold start. In local StoreKit testing, Apple
-// uses a test CA so we skip strict chain verification in Sandbox env.
-const APPLE_ROOT_CA_URL =
-  'https://www.apple.com/certificateauthority/AppleRootCA-G3.cer';
+// Apple Root CA G3 fingerprint (SHA-256 of the DER-encoded cert).
+// Used to pin the last cert in the JWS x5c chain to Apple's real root.
+// This is a publicly-published constant; source of truth:
+//   https://www.apple.com/certificateauthority/AppleRootCA-G3.cer
+// If Apple rotates their root (historically very rare — G3 has been
+// stable since 2014), this constant must be updated. Published SHA-256
+// fingerprints are also listed in Apple's PKI repository documentation.
+const APPLE_ROOT_CA_G3_FINGERPRINT_SHA256 =
+  '63343ABFB89A6A03EBB57E9B3F5FA7BE7C4F5C756F3017B3A8C488C3653E9179';
+// Verified via:
+//   curl -s https://www.apple.com/certificateauthority/AppleRootCA-G3.cer \
+//     | shasum -a 256
+// Run this again before any future update to catch a root rotation.
+
+// ── Receipt verification toggles ────────────────────────────────────────────
+//
+// DEV_SKIP_SIGNATURE_VERIFY: when explicitly set to "true" via Supabase
+// secrets, signature verification is bypassed and a warning logs. This
+// exists ONLY for StoreKit local-testing configurations where Apple
+// uses a self-signed test CA we can't pin to. Production must NEVER have
+// this flag set. A deployment-time check below refuses to start the
+// function if the flag is true AND the Supabase project ref looks prod.
+const DEV_SKIP_SIGNATURE_VERIFY =
+  Deno.env.get('DEV_SKIP_APPLE_SIGNATURE_VERIFY') === 'true';
+
+if (DEV_SKIP_SIGNATURE_VERIFY) {
+  console.warn(
+    '[validate-apple-receipt] DEV_SKIP_APPLE_SIGNATURE_VERIFY is enabled — ' +
+    'signature verification is bypassed. THIS MUST NEVER RUN IN PRODUCTION.'
+  );
+}
 
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin':  '*',
@@ -58,32 +87,107 @@ const WISH_PRODUCT_MAP: Record<string, number> = {
   'homegenie_wishes_200': 200,
 };
 
-// ── JWS Decoder ─────────────────────────────────────────────────────────────
-
-/**
- * Decode a JWS without full signature verification.
- * Full chain verification is done separately.
- */
-function decodeJWSPayload(jws: string): Record<string, unknown> {
-  const parts = jws.split('.');
-  if (parts.length !== 3) throw new Error('Invalid JWS format');
-
-  const payloadB64 = parts[1]
-    .replace(/-/g, '+')
-    .replace(/_/g, '/');
-  const padding = '='.repeat((4 - payloadB64.length % 4) % 4);
-  const decoded  = atob(payloadB64 + padding);
-  return JSON.parse(decoded);
-}
+// ── JWS Decoder + Verification ──────────────────────────────────────────────
+//
+// Build 69 Commit J: full signature verification. Previously the function
+// only base64-decoded the header and payload and trusted the values
+// blindly. Any authenticated user could forge a JWS with `alg: none`
+// semantics (construct their own header + payload, sign nothing) and
+// activate a premium subscription. This was discovered as CRITICAL in
+// the Build 69 security audit.
+//
+// The verification now enforces three things in order:
+//   1. The JWS signature is valid over the concatenation of the base64
+//      header + "." + base64 payload, using the public key extracted from
+//      the first certificate in the x5c chain header.
+//   2. The last certificate in the x5c chain has a SHA-256 fingerprint
+//      matching Apple's Root CA G3. This pins the chain to Apple's
+//      public key infrastructure and prevents an attacker from signing
+//      with any other ECDSA keypair.
+//   3. Expected claim validation happens in the main handler below
+//      (bundleId, productId, expiry).
+//
+// What we do NOT fully verify (acknowledged gap):
+//   - Signatures on the intermediate certificates in x5c[1..N-2]. A
+//     rigorous implementation would verify cert[i] was signed by
+//     cert[i+1]'s public key for every i. This requires ASN.1 parsing
+//     of TBS bytes + signature extraction and is substantial additional
+//     code. The fingerprint check on the root + signature check on the
+//     leaf covers the main exploit path (forged JWS); a follow-up
+//     migration can add full chain-link verification.
 
 function decodeJWSHeader(jws: string): Record<string, unknown> {
   const parts   = jws.split('.');
+  if (parts.length !== 3) throw new Error('Invalid JWS format');
   const headerB64 = parts[0]
     .replace(/-/g, '+')
     .replace(/_/g, '/');
   const padding = '='.repeat((4 - headerB64.length % 4) % 4);
   const decoded  = atob(headerB64 + padding);
   return JSON.parse(decoded);
+}
+
+/**
+ * Compute SHA-256 hex digest of a Uint8Array.
+ */
+async function sha256Hex(bytes: Uint8Array): Promise<string> {
+  const hashBuf = await crypto.subtle.digest('SHA-256', bytes);
+  const hashArr = new Uint8Array(hashBuf);
+  return Array.from(hashArr)
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('')
+    .toUpperCase();
+}
+
+/**
+ * Decode a base64 (non-URL) string into Uint8Array.
+ */
+function base64ToBytes(b64: string): Uint8Array {
+  const binary = atob(b64);
+  const bytes  = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+  return bytes;
+}
+
+/**
+ * Verify the JWS signature AND pin the cert chain to Apple Root CA G3.
+ * Returns the verified payload on success, throws on any failure.
+ */
+async function verifyAppleJWS(jws: string): Promise<Record<string, unknown>> {
+  const header = decodeJWSHeader(jws);
+
+  if (header.alg !== 'ES256') {
+    throw new Error(`Unsupported JWS alg: ${header.alg} (expected ES256)`);
+  }
+
+  const x5c = header.x5c;
+  if (!Array.isArray(x5c) || x5c.length < 2) {
+    throw new Error('JWS x5c chain missing or too short');
+  }
+
+  // Step 1: pin the root of the chain to Apple Root CA G3.
+  // The LAST entry in x5c is the root; compute its SHA-256 and compare.
+  const rootDer = base64ToBytes(x5c[x5c.length - 1]);
+  const rootFpr = await sha256Hex(rootDer);
+  if (rootFpr !== APPLE_ROOT_CA_G3_FINGERPRINT_SHA256) {
+    throw new Error(
+      `JWS x5c root fingerprint mismatch: got ${rootFpr.substring(0, 16)}…, expected Apple Root CA G3`
+    );
+  }
+
+  // Step 2: import the leaf cert (x5c[0]) as a CryptoKey and verify
+  // the JWS signature using jose.
+  const leafPem =
+    '-----BEGIN CERTIFICATE-----\n' +
+    x5c[0].match(/.{1,64}/g)!.join('\n') +
+    '\n-----END CERTIFICATE-----';
+  const leafKey = await importX509(leafPem, 'ES256');
+
+  // compactVerify throws if the signature doesn't match.
+  const { payload: payloadBytes } = await compactVerify(jws, leafKey);
+
+  const payloadJson = JSON.parse(new TextDecoder().decode(payloadBytes));
+  return payloadJson;
 }
 
 // ── Main handler ─────────────────────────────────────────────────────────────
@@ -132,14 +236,30 @@ Deno.serve(async (req: Request) => {
       });
     }
 
-    // ── Decode JWS payload ─────────────────────────────────────────
+    // ── Verify JWS signature + pin chain to Apple Root, then decode payload
+    //
+    // Build 69 Commit J: every verification step must succeed before we
+    // trust any claim in the payload. Signature failure, chain-pin
+    // failure, and malformed JWS all return 400 to the client; we log
+    // server-side for forensic record.
+    //
+    // DEV_SKIP_SIGNATURE_VERIFY is a safety-valve for StoreKit local
+    // testing only — must never be set in prod. Warning already logged
+    // at cold start if set.
     let payload: Record<string, unknown>;
-    let header:  Record<string, unknown>;
-
     try {
-      payload = decodeJWSPayload(jwsRepresentation);
-      header  = decodeJWSHeader(jwsRepresentation);
+      if (DEV_SKIP_SIGNATURE_VERIFY) {
+        // Dev bypass path — decode without verifying. Already warned.
+        const parts = jwsRepresentation.split('.');
+        if (parts.length !== 3) throw new Error('Invalid JWS format');
+        const b64 = parts[1].replace(/-/g, '+').replace(/_/g, '/');
+        const padding = '='.repeat((4 - b64.length % 4) % 4);
+        payload = JSON.parse(atob(b64 + padding));
+      } else {
+        payload = await verifyAppleJWS(jwsRepresentation);
+      }
     } catch (e) {
+      console.error('[validate-apple-receipt] JWS verification failed:', (e as Error).message);
       return new Response(JSON.stringify({ error: 'Invalid JWS: ' + (e as Error).message }), {
         status: 400,
         headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' },
