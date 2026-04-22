@@ -145,6 +145,38 @@ Deno.serve(async (req: Request) => {
   const startTime = Date.now();
 
   // ────────────────────────────────────────────────────────────────────────────
+  // STEP -1: Per-user rate limit
+  // ────────────────────────────────────────────────────────────────────────────
+  // Build 69 Commit H: monthly quota alone isn't enough for premium-tier
+  // users (quota_limit = -1). Without a rate limit, a premium subscriber
+  // could fire thousands of parallel requests burning ~$0.10 each on BFL.
+  // check_ai_rate_limit is the same RPC ai-proxy uses (3-second cooldown,
+  // 60 requests/hour) and was hardened in Build 65 Gate C with FOR UPDATE
+  // to close a TOCTOU race. Migration 025 just REVOKED authenticated-role
+  // EXECUTE so this call has to come from an edge function running as
+  // service_role — which is what we are.
+  const { data: rateLimitRows, error: rateLimitErr } = await supabase.rpc(
+    "check_ai_rate_limit",
+    { p_user_id: user_id, p_cooldown_ms: 3000, p_hourly_cap: 60 },
+  );
+  if (rateLimitErr) {
+    console.warn("[gen] rate-limit check failed (non-blocking):", rateLimitErr.message);
+  } else {
+    const rl = Array.isArray(rateLimitRows) ? rateLimitRows[0] : rateLimitRows;
+    if (rl && rl.allowed === false) {
+      return new Response(
+        JSON.stringify({
+          error: "rate_limited",
+          message: "Too many requests — please wait a moment before trying again.",
+          retry_after_ms: rl.retry_after_ms ?? 3000,
+          reason: rl.reason ?? "cooldown",
+        }),
+        { status: 429, headers: { ...CORS, "Content-Type": "application/json" } },
+      );
+    }
+  }
+
+  // ────────────────────────────────────────────────────────────────────────────
   // STEP 0: Quota check
   // ────────────────────────────────────────────────────────────────────────────
   console.log(`[gen] Step 0: Quota check | user=${user_id} | tier=${tier}`);

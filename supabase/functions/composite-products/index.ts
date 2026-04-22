@@ -52,6 +52,44 @@ const CORS = {
 const CELL  = 384;
 const PANEL = 768;
 
+// Build 69 Commit H: SSRF allowlist for product image fetches.
+//
+// Previously composite-products called fetch(url) on ANY URL the caller
+// provided. Authenticated attackers could point it at internal metadata
+// endpoints (169.254.169.254), slow-loris endpoints to burn the 15s
+// timeout × 6 slots, or arbitrary large files to drain function bandwidth.
+// The audit flagged this as HIGH — not data-leak bad, but a real DoS
+// and cost-abuse vector.
+//
+// Whitelisted hosts cover the three legitimate sources of product
+// imagery HomeGenie uses today. New sources require a migration here
+// + a security review.
+const ALLOWED_HOSTS = new Set([
+  // Supabase Storage (own uploads, own CDN transforms)
+  "lqjfnpibbjymhzupqtda.supabase.co",
+  // Amazon product image CDNs
+  "m.media-amazon.com",
+  "images-na.ssl-images-amazon.com",
+  "images-amazon.com",
+  // Wayfair CJ affiliate image CDN
+  "secure.img1-fg.wfcdn.com",
+  "secure.img2-fg.wfcdn.com",
+  // Houzz affiliate image CDN
+  "st.hzcdn.com",
+  // Unsplash — used by seed catalog designs
+  "images.unsplash.com",
+]);
+
+function isAllowedImageHost(url: string): boolean {
+  try {
+    const parsed = new URL(url);
+    if (parsed.protocol !== "https:") return false;
+    return ALLOWED_HOSTS.has(parsed.hostname);
+  } catch {
+    return false;
+  }
+}
+
 const POSITIONS = [
   { x: 0,    y: 0    },   // top-left
   { x: CELL, y: 0    },   // top-right
@@ -177,6 +215,14 @@ Deno.serve(async (req: Request) => {
 
   for (let urlIdx = 0; urlIdx < candidateUrls.length && composited < 4; urlIdx++) {
     const url = candidateUrls[urlIdx];
+    // Build 69 Commit H: reject URLs that don't resolve to an allowlisted
+    // image CDN BEFORE calling fetch. This closes the SSRF + DoS vector.
+    // Skipping (not erroring) keeps the panel-building loop resilient —
+    // a single bad URL in the 6-candidate pool just drops that slot.
+    if (!isAllowedImageHost(url)) {
+      console.warn(`[composite] URL ${urlIdx + 1} host not in allowlist — skipping`);
+      continue;
+    }
     try {
       const res = await fetch(url, { signal: AbortSignal.timeout(15_000) });
       if (!res.ok) {

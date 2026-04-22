@@ -120,6 +120,41 @@ Deno.serve(async (req: Request) => {
     );
   }
 
+  // Build 69 Commit H: allowlist imageUrl host BEFORE forwarding to Anthropic.
+  // Anthropic's vision API fetches the URL server-side against our API
+  // key, and every call costs ~$0.003. Without this check an authenticated
+  // attacker can pipe arbitrary URLs (large images, slow hosts, any public
+  // page) through our Anthropic quota to drive up our bill.
+  //
+  // The legitimate callers of vision-match pass either a Supabase Storage
+  // URL (the normalized room photo) or a Replicate / BFL CDN URL (the
+  // generated room). We don't pass raw affiliate product URLs here.
+  const VISION_MATCH_ALLOWED_HOSTS = new Set([
+    "lqjfnpibbjymhzupqtda.supabase.co", // own storage
+    "replicate.delivery",                // Replicate CDN
+    "bfldata.ai",                        // BFL output CDN
+    "fal.media",                         // FAL output CDN
+    "v3.fal.media",                      // FAL CDN variants
+  ]);
+  try {
+    const parsed = new URL(imageUrl);
+    const hostAllowed =
+      parsed.protocol === "https:" &&
+      VISION_MATCH_ALLOWED_HOSTS.has(parsed.hostname);
+    if (!hostAllowed) {
+      console.warn(`[vision-match] imageUrl host ${parsed.hostname} not in allowlist — rejecting`);
+      return new Response(
+        JSON.stringify({ analysis: null, source: "error", reason: "host-not-allowed" }),
+        { headers: { ...CORS, "Content-Type": "application/json" }, status: 400 },
+      );
+    }
+  } catch {
+    return new Response(
+      JSON.stringify({ analysis: null, source: "error", reason: "invalid-url" }),
+      { headers: { ...CORS, "Content-Type": "application/json" }, status: 400 },
+    );
+  }
+
   try {
     const userText = prompt
       ? `The design intent was: "${prompt}". Describe the furniture you actually see in this image.`
