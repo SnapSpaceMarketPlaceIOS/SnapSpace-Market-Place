@@ -176,43 +176,29 @@ REVOKE EXECUTE ON FUNCTION public.activate_subscription(
   UUID, TEXT, TEXT, TEXT, TIMESTAMPTZ, TEXT, TEXT
 ) FROM PUBLIC;
 
--- expire_subscription: server-only admin operation.
--- Grant it if somehow present; otherwise DO block below handles it.
+-- expire_subscription / add_tokens / apply_referral: these helpers may
+-- or may not exist in all environments, and where they do the signatures
+-- may not match a hardcoded REVOKE. A dynamic lookup handles both: it
+-- iterates every overload of the target name under the public schema,
+-- revokes EXECUTE from authenticated + PUBLIC on each by its real
+-- argument list, and is a no-op when no function matches. Silent on
+-- absence, correct on presence, safe to re-run.
 DO $$
+DECLARE
+  fn RECORD;
 BEGIN
-  IF EXISTS (
-    SELECT 1 FROM pg_proc p
+  FOR fn IN
+    SELECT p.oid::regprocedure AS sig
+    FROM pg_proc p
     JOIN pg_namespace n ON n.oid = p.pronamespace
-    WHERE n.nspname = 'public' AND p.proname = 'expire_subscription'
-  ) THEN
-    EXECUTE 'REVOKE EXECUTE ON FUNCTION public.expire_subscription(UUID) FROM authenticated, PUBLIC';
-  END IF;
-END$$;
-
--- add_tokens: internal helper called by grant_share_bonus / apply_referral.
--- Never meant to be client-callable.
-DO $$
-BEGIN
-  IF EXISTS (
-    SELECT 1 FROM pg_proc p
-    JOIN pg_namespace n ON n.oid = p.pronamespace
-    WHERE n.nspname = 'public' AND p.proname = 'add_tokens'
-  ) THEN
-    EXECUTE 'REVOKE EXECUTE ON FUNCTION public.add_tokens(UUID, INTEGER, TEXT, TEXT) FROM authenticated, PUBLIC';
-  END IF;
-END$$;
-
--- apply_referral: called server-side when a referred user signs up.
--- Not a legitimate client endpoint.
-DO $$
-BEGIN
-  IF EXISTS (
-    SELECT 1 FROM pg_proc p
-    JOIN pg_namespace n ON n.oid = p.pronamespace
-    WHERE n.nspname = 'public' AND p.proname = 'apply_referral'
-  ) THEN
-    EXECUTE 'REVOKE EXECUTE ON FUNCTION public.apply_referral(UUID, TEXT) FROM authenticated, PUBLIC';
-  END IF;
+    WHERE n.nspname = 'public'
+      AND p.proname IN ('expire_subscription', 'add_tokens', 'apply_referral')
+  LOOP
+    EXECUTE format(
+      'REVOKE EXECUTE ON FUNCTION %s FROM authenticated, PUBLIC',
+      fn.sig
+    );
+  END LOOP;
 END$$;
 
 -- Re-grant EXECUTE on the guarded RPCs (A group) to authenticated.
