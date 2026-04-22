@@ -39,7 +39,7 @@ import { proxyFetch } from './apiProxy';
 // fal.js has zero runtime dependency on replicate.js. replicate.js is now
 // orphaned (no import graph edge into it) and can be deleted in a future
 // cleanup. Keeping it around for the moment in case a rollback is needed.
-import { buildPanelPrompt, buildFlux2MaxPrompt, getQualityPrefix } from './promptBuilders';
+import { buildPanelPrompt, buildFlux2MaxPrompt, getQualityPrefix, WEIGHTED_DIRECTIVES } from './promptBuilders';
 
 const FAL_QUEUE_URL = 'https://queue.fal.run/fal-ai/flux-2-pro/edit';
 const POLL_INTERVAL_MS = 3000;
@@ -424,11 +424,14 @@ export async function generateSingleProductInRoom(roomPhotoUrl, product, aspectR
     // URL parsing failed — use original URL unchanged
   }
 
+  // Single-product flow has no user style prompt — EDITORIAL (default) fits
+  // product-placement photography. Weighted directives pin fidelity.
   const prompt = [
     getQualityPrefix(),
     'This is a precise scene edit, not a new generation.',
     'Preserve image 1 exactly: same walls, floor, ceiling, windows, lighting, camera angle, perspective, and spatial layout. Do not alter any architecture.',
     `Place this EXACT product reference (image 2) into the room: ${descriptor}. Match color, material, silhouette, and proportions precisely. Position it naturally where this type of furniture belongs in the room. Do not substitute with similar-looking alternatives.`,
+    WEIGHTED_DIRECTIVES,
   ].join(' ');
 
   const imageSize = resolveImageSize(aspectRatio);
