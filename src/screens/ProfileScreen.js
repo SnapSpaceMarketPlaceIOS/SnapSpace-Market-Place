@@ -17,6 +17,7 @@ import {
 } from 'react-native';
 import CardImage from '../components/CardImage';
 import LensLoader from '../components/LensLoader';
+import { safeOpenURL } from '../utils/safeOpenURL';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path, Circle, Line, Polyline, Rect } from 'react-native-svg';
 import { colors as C } from '../constants/theme';
@@ -263,11 +264,13 @@ const ABOUT_ITEMS = [
         );
         return;
       }
+      // Build 69 Commit I: App Store links use itms-apps:// scheme which
+      // safeOpenURL allowlists explicitly. canOpenURL is still used to
+      // probe the review variant first (in-app review deep link works
+      // on some iOS versions, falls through to web App Store otherwise).
       Linking.canOpenURL(APP_STORE_REVIEW_URL)
-        .then((supported) => {
-          Linking.openURL(supported ? APP_STORE_REVIEW_URL : APP_STORE_URL);
-        })
-        .catch(() => APP_STORE_URL && Linking.openURL(APP_STORE_URL));
+        .then((supported) => { safeOpenURL(supported ? APP_STORE_REVIEW_URL : APP_STORE_URL); })
+        .catch(() => { if (APP_STORE_URL) safeOpenURL(APP_STORE_URL); });
     },
   },
   {
@@ -761,7 +764,7 @@ export default function ProfileScreen({ navigation }) {
                   <TouchableOpacity
                     key={item.label}
                     style={[styles.settingsItem, i < ACCOUNT_ITEMS.length - 1 && styles.settingsItemBorder]}
-                    onPress={() => { setShowSettings(false); if (item.url) { Linking.openURL(item.url).catch(() => null); } else if (item.screen) { navigation?.navigate(item.screen); } }}
+                    onPress={() => { setShowSettings(false); if (item.url) { safeOpenURL(item.url); } else if (item.screen) { navigation?.navigate(item.screen); } }}
                     activeOpacity={0.65}
                   >
                     <View style={styles.settingsLeft}>
@@ -849,7 +852,7 @@ export default function ProfileScreen({ navigation }) {
                         setTimeout(() => item.action(), 300);
                       } else if (item.url) {
                         setShowSettings(false);
-                        Linking.openURL(item.url).catch(() => null);
+                        safeOpenURL(item.url);
                       } else if (item.screen) {
                         setShowSettings(false);
                         navigation?.navigate(item.screen);

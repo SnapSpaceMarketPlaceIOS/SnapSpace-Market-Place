@@ -426,7 +426,12 @@ export async function uploadRoomPhoto(userId, uri, base64Data = null, exifOrient
 
   if (!jwt) {
     console.warn('[uploadRoomPhoto] no session JWT, using render/image URL (EXIF applied)');
-    console.log('[normalize] path=render-fallback reason=no-jwt user=' + userId);
+    // Build 69 Commit I: stripped user_id from prod logs. Identifying values
+    // in console.log leak to iOS device logs + crash reports. The audit
+    // flagged this as LOW but fixing it here is one line — and if we add
+    // more telemetry paths later this one-line pattern (__DEV__-gated
+    // identifying data) is the one to follow.
+    if (__DEV__) console.log('[normalize] path=render-fallback reason=no-jwt user=' + userId);
     return { url: orientedFallbackUrl, width: null, height: null };
   }
 

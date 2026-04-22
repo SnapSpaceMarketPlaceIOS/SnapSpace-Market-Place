@@ -11,6 +11,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Polyline } from 'react-native-svg';
 import { colors } from '../constants/colors';
 import { space, radius, fontWeight, fontSize, uiColors, typeScale, shadow } from '../constants/tokens';
+import { safeOpenURL } from '../utils/safeOpenURL';
 
 function BackIcon() {
   return (
@@ -301,7 +302,7 @@ export default function TermsOfUseScreen({ navigation }) {
 
         <TouchableOpacity
           style={styles.webBanner}
-          onPress={() => Linking.openURL('https://www.homegenieios.com/terms')}
+          onPress={() => safeOpenURL('https://www.homegenieios.com/terms')}
           activeOpacity={0.75}
         >
           <Text style={styles.webBannerText}>View latest version at homegenieios.com/terms →</Text>

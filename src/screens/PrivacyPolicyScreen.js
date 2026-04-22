@@ -11,6 +11,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Polyline } from 'react-native-svg';
 import { colors } from '../constants/colors';
 import { space, radius, fontWeight, fontSize, uiColors, typeScale, shadow } from '../constants/tokens';
+import { safeOpenURL } from '../utils/safeOpenURL';
 
 function BackIcon() {
   return (
@@ -354,7 +355,7 @@ export default function PrivacyPolicyScreen({ navigation }) {
 
         <TouchableOpacity
           style={styles.webBanner}
-          onPress={() => Linking.openURL('https://www.homegenieios.com/privacy')}
+          onPress={() => safeOpenURL('https://www.homegenieios.com/privacy')}
           activeOpacity={0.75}
         >
           <Text style={styles.webBannerText}>View latest version at homegenieios.com/privacy →</Text>

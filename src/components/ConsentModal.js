@@ -11,6 +11,7 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useAuth } from '../context/AuthContext';
 import { colors } from '../constants/colors';
+import { safeOpenURL } from '../utils/safeOpenURL';
 
 const CONSENT_KEY_PREFIX = '@homegenie_consent_v1:';
 const SHOW_DELAY = 15000;
@@ -93,14 +94,14 @@ export default function ConsentModal() {
           {/* Policy links */}
           <View style={styles.linkRow}>
             <TouchableOpacity
-              onPress={() => Linking.openURL('https://www.homegenieios.com/terms')}
+              onPress={() => safeOpenURL('https://www.homegenieios.com/terms')}
               activeOpacity={0.7}
               style={styles.linkBtn}
             >
               <Text style={styles.linkText}>Terms of Use</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              onPress={() => Linking.openURL('https://www.homegenieios.com/privacy')}
+              onPress={() => safeOpenURL('https://www.homegenieios.com/privacy')}
               activeOpacity={0.7}
               style={styles.linkBtn}
             >
@@ -121,14 +122,14 @@ export default function ConsentModal() {
               I agree to the{' '}
               <Text
                 style={styles.inlineLink}
-                onPress={() => Linking.openURL('https://www.homegenieios.com/terms')}
+                onPress={() => safeOpenURL('https://www.homegenieios.com/terms')}
               >
                 Terms of Use
               </Text>
               {' '}and{' '}
               <Text
                 style={styles.inlineLink}
-                onPress={() => Linking.openURL('https://www.homegenieios.com/privacy')}
+                onPress={() => safeOpenURL('https://www.homegenieios.com/privacy')}
               >
                 Privacy Policy
               </Text>

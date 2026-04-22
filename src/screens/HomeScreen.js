@@ -48,6 +48,7 @@ import { readFileExifOrientation, readFileExif, getLastFileExifError } from '../
 import { verifyGeneratedProducts } from '../services/visionMatcher';
 import { PRODUCT_CATALOG } from '../data/productCatalog';
 import { saveUserDesign, updateDesignVisibility, uploadRoomPhoto, recordGenerationError } from '../services/supabase';
+import { safeOpenURL } from '../utils/safeOpenURL';
 import Constants from 'expo-constants';
 import { useSubscription } from '../context/SubscriptionContext';
 import { generateWithBFL } from '../services/bfl';
@@ -1365,9 +1366,13 @@ export default function HomeScreen({ navigation, route }) {
       try {
         await Share.share({ url: resultData.resultUri });
       } catch {
-        Linking.openURL(resultData.resultUri).catch(() =>
-          Alert.alert('Could Not Save', 'Please screenshot the image to save it to your camera roll.')
-        );
+        // Build 69 Commit I: safeOpenURL enforces https-only for AI
+        // pipeline output URLs. If the generated URI is ever malformed
+        // or an unexpected scheme, silently fall back to the user alert.
+        const opened = await safeOpenURL(resultData.resultUri);
+        if (!opened) {
+          Alert.alert('Could Not Save', 'Please screenshot the image to save it to your camera roll.');
+        }
       }
     }
   };

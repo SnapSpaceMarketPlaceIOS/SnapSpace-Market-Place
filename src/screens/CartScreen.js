@@ -20,6 +20,7 @@ import { useCart } from '../context/CartContext';
 import { useOrderHistory } from '../context/OrderHistoryContext';
 import { supabase } from '../services/supabase';
 import { trackAffiliateClickAndTagUrl } from '../services/purchaseTracking';
+import { safeOpenURL } from '../utils/safeOpenURL';
 import { PRODUCT_CATALOG } from '../data/productCatalog';
 import TabScreenFade from '../components/TabScreenFade';
 
@@ -372,8 +373,13 @@ export default function CartScreen({ navigation }) {
         try {
           tagged = await trackAffiliateClickAndTagUrl({ userId, url, product });
         } catch { tagged = url; }
-        try { await Linking.openURL(tagged); }
-        catch { await Linking.openURL(url).catch(() => null); }
+        // Build 69 Commit I: affiliate URLs go through safeOpenURL (https-only).
+        // The tracked/tagged URL is always an https affiliate host; if it somehow
+        // fails the scheme check we fall back to the original product URL which
+        // goes through the same check. Both failing = silently no-op (user sees
+        // the "redirecting..." affordance already shown before this handler).
+        const ok = await safeOpenURL(tagged);
+        if (!ok) await safeOpenURL(url);
       };
 
       if (itemsWithAsin.length > 0) {

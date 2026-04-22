@@ -1,8 +1,9 @@
-import { Linking, Alert } from 'react-native';
+import { Alert } from 'react-native';
 import { trackEvent } from './trackingService';
 import { getAffiliateUrl } from './affiliateProducts';
 import { supabase } from './supabase';
 import { trackAffiliateClickAndTagUrl } from './purchaseTracking';
+import { safeOpenURL } from '../utils/safeOpenURL';
 
 /**
  * ProductTapHandler — the function that pays HomeGenie.
@@ -87,13 +88,15 @@ export async function handleShopNow(product) {
   }
 
   // Step 4: Open the affiliate deep link (tagged if possible, original otherwise).
-  // Do NOT gate on Linking.canOpenURL — iOS returns false for deep link schemes
-  // not declared in LSApplicationQueriesSchemes, which would silently drop
-  // valid affiliate URLs that would otherwise open in Safari.
-  try {
-    await Linking.openURL(urlToOpen);
-  } catch (e) {
-    console.warn('[ProductTapHandler] Linking.openURL failed:', e?.message || e);
+  // Build 69 Commit I: routed through safeOpenURL which enforces an https-only
+  // scheme allowlist. Previously we trusted the URL string from the product
+  // row directly, which — combined with anyone who can write rows (suppliers,
+  // admins, or an RLS gap) — was a mailto/tel/sms/third-party-app injection
+  // vector flagged HIGH by the audit. Affiliate URLs are ALL https in the
+  // legitimate case, so this is a drop-in hardening with zero UX impact.
+  const opened = await safeOpenURL(urlToOpen);
+  if (!opened && __DEV__) {
+    console.warn('[ProductTapHandler] safeOpenURL rejected:', String(urlToOpen).substring(0, 80));
   }
 }
 

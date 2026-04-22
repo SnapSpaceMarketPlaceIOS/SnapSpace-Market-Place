@@ -9,6 +9,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path, Polyline } from 'react-native-svg';
 import { colors } from '../constants/colors';
+import { safeOpenURL } from '../utils/safeOpenURL';
 
 // ── Icons ──────────────────────────────────────────────────────────────────────
 
@@ -77,7 +78,7 @@ export default function PaymentMethodsScreen({ navigation }) {
         <TouchableOpacity
           style={styles.settingsBtn}
           activeOpacity={0.8}
-          onPress={() => Linking.openURL('https://apps.apple.com/account/subscriptions')}
+          onPress={() => safeOpenURL('https://apps.apple.com/account/subscriptions')}
         >
           <Text style={styles.settingsBtnText}>Manage Subscriptions</Text>
         </TouchableOpacity>

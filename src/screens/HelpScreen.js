@@ -14,6 +14,7 @@ import Svg, { Path, Circle, Polyline, Line, Rect } from 'react-native-svg';
 import { colors } from '../constants/colors';
 import { space, radius, fontWeight, fontSize, uiColors, typeScale, shadow } from '../constants/tokens';
 import { Button, Badge, SectionHeader } from '../components/ds';
+import { safeOpenURL } from '../utils/safeOpenURL';
 
 const { width } = Dimensions.get('window');
 
@@ -285,7 +286,7 @@ export default function HelpScreen({ navigation }) {
           <Text style={styles.contactSubtitle}>We're here to help. Send us an email and we'll respond within 24–48 hours.</Text>
           <TouchableOpacity
             style={styles.contactBtn}
-            onPress={() => Linking.openURL('mailto:info@homegenieios.com?subject=HomeGenie Support')}
+            onPress={() => safeOpenURL('mailto:info@homegenieios.com?subject=HomeGenie Support', { allowMailto: true })}
             activeOpacity={0.85}
           >
             <Text style={styles.contactBtnText}>Email Support</Text>

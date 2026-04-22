@@ -16,6 +16,7 @@ import Svg, { Path, Polyline, Circle, Line } from 'react-native-svg';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { colors as C } from '../constants/theme';
 import { space, radius, typeScale, fontWeight } from '../constants/tokens';
+import { safeOpenURL } from '../utils/safeOpenURL';
 
 const BLUE       = '#0B6DC3';
 const LIGHT_BLUE = '#67ACE9';
@@ -132,14 +133,18 @@ export default function SupplierApplicationScreen({ navigation }) {
       `Submitted via HomeGenie iOS App`
     );
 
-    Linking.openURL(`mailto:info@homegenieios.com?subject=${subject}&body=${body}`)
-      .then(() => {
+    // Build 69 Commit I: user-initiated support flow → allow mailto.
+    safeOpenURL(`mailto:info@homegenieios.com?subject=${subject}&body=${body}`, {
+      allowMailto: true,
+      onError: () => Alert.alert('Could not open email', 'Please email info@homegenieios.com directly.'),
+    }).then((ok) => {
+      if (ok) {
         AsyncStorage.setItem(SUBMITTED_KEY, 'true');
         setSubmitted(true);
-      })
-      .catch(() => {
+      } else {
         Alert.alert('Could not open email', 'Please email info@homegenieios.com directly.');
-      });
+      }
+    });
   };
 
   // ── Submitted confirmation state ──────────────────────────────────────────
@@ -163,7 +168,7 @@ export default function SupplierApplicationScreen({ navigation }) {
           </Text>
           <View style={s.confirmedNote}>
             <Text style={s.confirmedNoteText}>Questions? Email us at{' '}
-              <Text style={s.confirmedNoteLink} onPress={() => Linking.openURL('mailto:info@homegenieios.com')}>
+              <Text style={s.confirmedNoteLink} onPress={() => safeOpenURL('mailto:info@homegenieios.com', { allowMailto: true })}>
                 info@homegenieios.com
               </Text>
             </Text>
