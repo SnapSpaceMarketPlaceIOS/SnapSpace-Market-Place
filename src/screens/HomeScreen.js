@@ -42,7 +42,6 @@ import { SELLERS } from '../data/sellers';
 import { searchProducts, getSourceColor, getProductsForPrompt, getNormalizedProductsByIds } from '../services/affiliateProducts';
 import { parseDesignPrompt } from '../utils/promptParser';
 import { buildFinalPrompt, generateWithProductPanel, generateWithProductRefs, generateSingleProductInRoom, pickAspectRatio } from '../services/aiProvider';
-import { expandPrompt } from '../services/promptExpander';
 import { createProductPanel } from '../utils/createProductPanel';
 import { withTimeout } from '../utils/withTimeout';
 import { readFileExifOrientation, readFileExif, getLastFileExifError } from '../utils/imageOptimizer';
@@ -1456,7 +1455,7 @@ export default function HomeScreen({ navigation, route }) {
       Alert.alert('Describe Your Style', 'Add a style description so the AI knows what to create.');
       return;
     }
-    const rawPrompt = isSingleProductMode ? '' : prompt.trim();
+    const designPrompt = isSingleProductMode ? '' : prompt.trim();
     const savedPhoto = { ...photo };
     Keyboard.dismiss();
 
@@ -1480,7 +1479,7 @@ export default function HomeScreen({ navigation, route }) {
     // the true cap is (elapsed at check) + (remaining ring budget). Worst
     // case therefore bounds at ~12 min instead of the prior ~19.
     const GENERATION_DEADLINE_MS = 8 * 60 * 1000;
-    log('start | mode=' + (isSingleProductMode ? 'single-product' : 'full-room') + ' | prompt="' + rawPrompt.substring(0, 80) + '"');
+    log('start | mode=' + (isSingleProductMode ? 'single-product' : 'full-room') + ' | prompt="' + designPrompt.substring(0, 80) + '"');
 
     // ── Build 53: real EXIF from file bytes (trumps picker metadata) ─────────
     // Build 51 telemetry proved that expo-image-picker's asset.exif.Orientation
@@ -1714,21 +1713,15 @@ export default function HomeScreen({ navigation, route }) {
       }
     })();
 
-    // Initialize rotating loading messages (uses raw prompt — expansion runs after)
+    // Initialize rotating loading messages
     const msgs = isSingleProductMode
       ? ['Placing product in your space…', 'Matching lighting and perspective…', 'Almost there…']
-      : getLoadingMessages(rawPrompt);
+      : getLoadingMessages(designPrompt);
     setLoadingMessages(msgs);
     setLoadingMsgIndex(0);
     loadingMsgOpacity.setValue(1);
     setGenerating(true);
     startLoadingBar();
-
-    // Build 71 (Commit A): expand the prompt via Haiku under the loading UI
-    // so the user sees immediate feedback. Fails open — returns rawPrompt on
-    // any error (timeout, HTTP error, empty response). Cost ~$0.0005/gen.
-    const designPrompt = isSingleProductMode ? '' : await expandPrompt(rawPrompt);
-
     try {
       setGenStatus('');
 

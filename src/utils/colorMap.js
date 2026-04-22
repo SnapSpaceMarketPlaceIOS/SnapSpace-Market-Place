@@ -76,77 +76,17 @@ export function getColorFamilyWords(family) {
 }
 
 /**
- * Find the first variant whose label belongs to the given color family.
- * Returns the variant object or null. Variant labels are short and clean
- * (e.g. 'Brown/Walnut', 'Sage Green', 'Natural'), so substring match is safe.
- *
- * NEW in Build 71 Fix #2 — prior to this, the 1,463 variants across 399
- * products were invisible to the matcher: a sofa whose default name said
- * "beige" with a "Sage Green" variant never matched the user prompt
- * "green living room" on color.
+ * True if the product's text contains ANY word from the given color family.
+ * Product text = name + description + tags joined.
  */
-export function findMatchingColorVariant(product, family) {
-  if (!product || !Array.isArray(product.variants) || product.variants.length === 0) return null;
+export function productHasColorFamily(product, family) {
   const words = getColorFamilyWords(family);
-  for (const v of product.variants) {
-    const label = (v && v.label ? String(v.label) : '').toLowerCase();
-    if (!label) continue;
-    if (words.some(w => label.includes(w))) return v;
-  }
-  return null;
-}
-
-// ── Per-product color derivation cache (Build 71 Fix #3) ─────────────────
-// Keyed by product.id. Values are arrays of canonical color families.
-// Populated on first lookup; reused for the remaining session. A 399-product
-// catalog fills the cache in ~5ms total and then scoreProduct's color checks
-// become O(1) array lookups instead of text-scan + variant-scan per call.
-const _productColorCache = new Map();
-
-/**
- * Derive all canonical color families present in a product by scanning every
- * text signal it carries: name, description, tags, features, and variant
- * labels. Results memoized by product.id.
- *
- * Returns an array of canonical family names (e.g. ['brown', 'beige']).
- * Empty array if no colors detected.
- *
- * Build 71 Fix #3: surfacing this value means a product's colors become a
- * first-class field. Downstream screens (cards, PDP) can render swatches
- * without re-scanning. And because detectColorFamilies uses word boundaries,
- * we eliminate the old substring false-positives (e.g. "tan" matching
- * "tantrum" or "sand" matching "thousand").
- */
-export function getProductColorFamilies(product) {
-  if (!product) return [];
-  if (product.id && _productColorCache.has(product.id)) {
-    return _productColorCache.get(product.id);
-  }
   const text = [
     product.name || '',
     product.description || '',
     ...(product.tags || []),
-    ...(product.features || []),
-    ...((product.variants || []).map(v => (v && v.label) ? String(v.label) : '')),
-  ].join(' ');
-  const families = detectColorFamilies(text);
-  if (product.id) _productColorCache.set(product.id, families);
-  return families;
-}
-
-/**
- * True if the product belongs to the given canonical color family, considering
- * name, description, tags, features, and variant labels.
- *
- * Build 71 Fix #3: now backed by getProductColorFamilies — same result set,
- * but faster (memoized) and stricter (word-boundary matching via
- * detectColorFamilies). Prior implementation used naive substring matching
- * which occasionally flagged products with unrelated words like "tantrum"
- * or "thousand" as color matches.
- */
-export function productHasColorFamily(product, family) {
-  if (!product || !family) return false;
-  return getProductColorFamilies(product).includes(family);
+  ].join(' ').toLowerCase();
+  return words.some(w => text.includes(w));
 }
 
 // ─── Opposite-color pairs ───────────────────────────────────────────────
@@ -190,10 +130,6 @@ export const COLOR_OPPOSITES = {
  */
 export function getColorOppositionPenalty(userColorFamily, product, penaltyPerHit = 6) {
   if (!userColorFamily) return 0;
-  // Build 71 Fix #2: if the product has a matching variant in the requested
-  // family, no penalty — the user can buy THAT variant. A "white boucle"
-  // sofa with a "cognac leather" variant is valid for a "brown leather" prompt.
-  if (findMatchingColorVariant(product, userColorFamily)) return 0;
   // Get all opposing words for this family (plus opposites of its synonyms)
   const opposites = new Set();
   const directOpposites = COLOR_OPPOSITES[userColorFamily] || [];
