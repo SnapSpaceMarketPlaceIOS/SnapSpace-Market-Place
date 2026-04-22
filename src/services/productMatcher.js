@@ -4,6 +4,8 @@ import {
   productHasColorFamily,
   getColorOppositionPenalty,
   getColorFamilyWords,
+  findMatchingColorVariant,
+  getProductColorFamilies,
 } from '../utils/colorMap';
 import { computePreferenceBonus } from '../utils/userPreferences';
 
@@ -24,17 +26,28 @@ const MAX_PER_CATEGORY = 1;
 
 // Pool size for the weighted-random pick inside each category. We sample
 // from the top N candidates but weight by their match score, so when
-// there's a clear winner it still dominates (~60-70% of the time) while
-// lower-scored but still-relevant alternates occasionally come through.
-// This replaces the prior RANDOM_POOL_SIZE=1 (always top) which made
-// every generation of the same prompt produce an identical product set.
+// there's a clear winner it still dominates while lower-scored but
+// still-relevant alternates occasionally come through.
 //
-// Why 3 is safe (vs the earlier rollback to 1): the old bug was uniform
-// random over the top 3, so an 80-point sofa could lose to a 45-point
-// sofa 33% of the time. With the new weighted pick, an 80/45/30 score
-// distribution gives the top sofa ~52% odds — variety is real but
-// quality-biased.
-const RANDOM_POOL_SIZE = 3;
+// Raised 3 → 7 (Build 71 Fix #1): with RANDOM_POOL_SIZE=3 a single top
+// product (e.g. the MXSANYOO rug) was appearing in >40% of all generations.
+// At pool=7 with weighted draw the top product's expected win rate drops
+// from ~52% to ~28% while quality stays high (weakest of 7 still scored
+// above the style-filter floor). Reach simulation: 332/399 products are
+// now reachable vs 297/399 before.
+const RANDOM_POOL_SIZE = 7;
+
+// Top-N pool for the optional wildcard slot. One non-essential result slot
+// gets swapped for a uniform-random pick from these top-N overall scorers
+// with WILDCARD_PROBABILITY. Uniform (not weighted) so even the #15 scorer
+// has a fair shot — this is intentional discovery, not quality ranking.
+const WILDCARD_POOL_SIZE = 15;
+
+// 1-in-10 chance the last non-essential slot becomes a wildcard. At 10%,
+// a user generating 10 rooms will see ~1 surprise product. Keeping this
+// low preserves quality while breaking category "gravity" (same rug every
+// time). Set to 0 to disable; raise to 0.20 if users ask for more variety.
+const WILDCARD_PROBABILITY = 0.10;
 
 // Categories that are ONLY appropriate for specific room types.
 // If a product's category is in this map, it can only appear for those rooms.
@@ -266,12 +279,62 @@ export function matchProducts(parsedPrompt, limit = 6, catalog = PRODUCT_CATALOG
     }
   }
 
-  if (MATCH_DEBUG && diversified.length > 0) {
-    console.log(`[match] top ${Math.min(diversified.length, 4)} results:`);
-    diversified.slice(0, 4).forEach((p, i) => {
-      const b = p._breakdown || {};
+  // ── Variant swap (Build 71 Fix #2) ───────────────────────────────────────
+  // When the user asked for a specific color on a category AND the chosen
+  // product has a matching variant, swap the display asset + affiliate link
+  // to that variant. Without this, a "sage green" prompt could return a sofa
+  // that has a Sage Green variant but still shows the default Ivory photo in
+  // the Shop Room strip — visually unmatched to the rendered AI room.
+  //
+  // We preserve the underlying product id (so Liked/Cart continue to work)
+  // but update imageUrl, affiliateUrl, asin, and price/priceDisplay to the
+  // matched variant. _matchedVariant is attached for downstream debugging
+  // and future UX (e.g. showing the variant swatch on the card).
+  const finalResults = diversified.map((p) => {
+    // Build 71 Fix #3: attach the derived color families as a first-class
+    // field so downstream UI (cards, PDP, filter chips) can render swatches
+    // and filter without re-scanning variant labels. Memoized under the
+    // hood, so this is effectively free for products seen before.
+    const derivedColors = getProductColorFamilies(p);
+
+    const desired = colorByCategory[p.category];
+    const matched = desired ? findMatchingColorVariant(p, desired) : null;
+
+    if (!matched) {
+      // No variant swap, but still surface colors for consumers.
+      return derivedColors.length > 0 ? { ...p, colors: derivedColors } : p;
+    }
+
+    const next = {
+      ...p,
+      colors: derivedColors,
+      _matchedVariant: matched,
+    };
+    if (matched.mainImage || matched.swatchImage) {
+      next.imageUrl = matched.mainImage || matched.swatchImage;
+    }
+    if (matched.affiliateUrl) next.affiliateUrl = matched.affiliateUrl;
+    if (matched.asin) next.asin = matched.asin;
+    if (typeof matched.price === 'number' && matched.price > 0) {
+      next.price = matched.price;
+      next.priceDisplay = `$${matched.price.toFixed(2)}`;
+    }
+    if (MATCH_DEBUG) {
       console.log(
-        `[match]   ${i + 1}. ${p.category} — ${(p.name || '').substring(0, 50)} | ` +
+        `[match] variant swap: ${p.category} — ${(p.name || '').substring(0, 40)} ` +
+        `→ "${matched.label}" (color=${desired})`
+      );
+    }
+    return next;
+  });
+
+  if (MATCH_DEBUG && finalResults.length > 0) {
+    console.log(`[match] top ${Math.min(finalResults.length, 4)} results:`);
+    finalResults.slice(0, 4).forEach((p, i) => {
+      const b = p._breakdown || {};
+      const variantTag = p._matchedVariant ? ` [variant: ${p._matchedVariant.label}]` : '';
+      console.log(
+        `[match]   ${i + 1}. ${p.category} — ${(p.name || '').substring(0, 50)}${variantTag} | ` +
         `total=${p._score?.toFixed(1)} ` +
         `(color=${(b.color || 0).toFixed(1)} style=${(b.style || 0).toFixed(1)} ` +
         `mat=${(b.material || 0).toFixed(1)} name=${(b.name || 0).toFixed(1)})`
@@ -279,7 +342,7 @@ export function matchProducts(parsedPrompt, limit = 6, catalog = PRODUCT_CATALOG
     });
   }
 
-  return diversified;
+  return finalResults;
 }
 
 /**
@@ -333,9 +396,11 @@ function applyAttributeHardFilter(products, colorByCategory, materialByCategory)
 }
 
 /**
- * True if the product matches the named material. Checks both product.materials
- * array AND free-text name/description/tags (for materials like "marble" that
- * might only appear in the name).
+ * True if the product matches the named material. Checks, in order:
+ *   1. product.materials array (exact canonical match)
+ *   2. free-text name/description/tags (e.g. "marble" in product name)
+ *   3. variant labels (Build 71 Fix #2) — "Walnut"/"Rattan"/"Velvet"
+ *      labels encode material even when the default listing doesn't.
  */
 function productHasMaterial(product, material) {
   const ml = material.toLowerCase();
@@ -345,7 +410,15 @@ function productHasMaterial(product, material) {
   const text = [product.name || '', product.description || '', ...(product.tags || [])]
     .join(' ')
     .toLowerCase();
-  return text.includes(ml);
+  if (text.includes(ml)) return true;
+  // Variant-label check — short clean strings like "Walnut", "Brown/Walnut".
+  if (Array.isArray(product.variants)) {
+    for (const v of product.variants) {
+      const label = (v && v.label ? String(v.label) : '').toLowerCase();
+      if (label.includes(ml)) return true;
+    }
+  }
+  return false;
 }
 
 // Moods that suggest higher-end / premium items — boosts rating weight
@@ -734,6 +807,71 @@ function diversify(sorted, limit, roomType = 'living-room') {
         result.push(product);
         usedIds.add(product.id);
         categoryCounts[product.category] = (categoryCounts[product.category] || 0) + 1;
+      }
+    }
+  }
+
+  // Pass 5 (Wildcard): 10% of the time, swap the last non-essential slot
+  // for a uniform-random pick from the top-WILDCARD_POOL_SIZE scorers.
+  // This breaks the gravitational pull of high-scoring repeat products
+  // (e.g. a single rug winning 40% of all generations) without touching
+  // the essential category slots users expect (sofa, rug, coffee table).
+  //
+  // Build 71 Fix #5: the wildcard pool now excludes categories already
+  // present in OTHER slots, so a wildcard swap can never create a
+  // duplicate-category result. Prior to this the 1-per-category invariant
+  // was violated ~4% of the time (240-run audit 2026-04-22, confirmed
+  // bathroom→2×planter, kitchen→2×pendant-light, nursery→2×throw-pillow).
+  if (result.length >= 2 && Math.random() < WILDCARD_PROBABILITY) {
+    const essentialCatSet = new Set(essentials);
+
+    // Find the last non-essential slot to replace — we protect essentials
+    let replaceIdx = -1;
+    for (let i = result.length - 1; i >= 0; i--) {
+      if (!essentialCatSet.has(result[i].category)) {
+        replaceIdx = i;
+        break;
+      }
+    }
+
+    if (replaceIdx >= 0) {
+      // Categories in every slot EXCEPT the one we're replacing.
+      // The wildcard must avoid these to preserve 1-per-category.
+      const otherSlotCats = new Set();
+      for (let i = 0; i < result.length; i++) {
+        if (i !== replaceIdx) otherSlotCats.add(result[i].category);
+      }
+
+      // Build wildcard pool: top scorers not already in result, not
+      // duplicating an existing category, respecting category-room lock.
+      const wildcardPool = sorted
+        .filter(p => !usedIds.has(p.id))
+        .filter(p => !otherSlotCats.has(p.category))
+        .filter(p => {
+          const lock = CATEGORY_ROOM_LOCK[p.category];
+          return !lock || lock.includes(roomType);
+        })
+        .slice(0, WILDCARD_POOL_SIZE);
+
+      if (wildcardPool.length > 0) {
+        const wildPick = wildcardPool[Math.floor(Math.random() * wildcardPool.length)];
+        if (MATCH_DEBUG) {
+          console.log(
+            `[match] wildcard: swapping slot ${replaceIdx} ` +
+            `(${result[replaceIdx].category} — ${(result[replaceIdx].name || '').substring(0, 30)}) ` +
+            `→ ${wildPick.category} — ${(wildPick.name || '').substring(0, 30)} ` +
+            `(score ${wildPick._score?.toFixed(1)})`
+          );
+        }
+        // Keep usedIds and categoryCounts in sync with the swap so any
+        // future passes (there are none today, but defensive) see
+        // consistent state.
+        usedIds.delete(result[replaceIdx].id);
+        const oldCat = result[replaceIdx].category;
+        if (categoryCounts[oldCat]) categoryCounts[oldCat] -= 1;
+        result[replaceIdx] = wildPick;
+        usedIds.add(wildPick.id);
+        categoryCounts[wildPick.category] = (categoryCounts[wildPick.category] || 0) + 1;
       }
     }
   }

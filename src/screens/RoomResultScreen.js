@@ -471,6 +471,21 @@ export default function RoomResultScreen({ route, navigation }) {
   const debug = route?.params?.debug || null;
   const [showDebug, setShowDebug] = useState(false);
 
+  // Post-to-Profile modal image aspect — fetched from the actual image so the
+  // preview container fits landscape OR portrait output without black letterbox.
+  // Null = not yet measured; default to 16/9 at render time.
+  const [postPreviewAspect, setPostPreviewAspect] = useState(null);
+  useEffect(() => {
+    if (!resultUri) return;
+    let cancelled = false;
+    Image.getSize(
+      resultUri,
+      (w, h) => { if (!cancelled && w && h) setPostPreviewAspect(w / h); },
+      (err) => { if (__DEV__) console.warn('[RoomResult] Image.getSize failed:', err?.message || err); }
+    );
+    return () => { cancelled = true; };
+  }, [resultUri]);
+
   // ── Load products ──
   useEffect(() => {
     const routeProducts = route?.params?.products;
@@ -876,7 +891,11 @@ export default function RoomResultScreen({ route, navigation }) {
             <Text style={s.modalSubtitle}>Share your AI wish with the community</Text>
 
             {resultUri && (
-              <Image source={{ uri: resultUri }} style={s.modalPreview} resizeMode="contain" />
+              <Image
+                source={{ uri: resultUri }}
+                style={[s.modalPreview, { aspectRatio: postPreviewAspect || 16 / 9 }]}
+                resizeMode="cover"
+              />
             )}
 
             <Text style={s.modalLabel}>Visibility</Text>
@@ -1343,9 +1362,11 @@ const s = StyleSheet.create({
   },
   modalPreview: {
     width: '100%',
-    height: 160,
+    // height driven by inline aspectRatio so landscape + portrait outputs
+    // both fit edge-to-edge with no letterbox. Background only shows
+    // during the brief load window before Image.getSize resolves.
     borderRadius: 12,
-    backgroundColor: '#000',
+    backgroundColor: '#F5F5F7',
     marginBottom: 16,
   },
   modalLabel: {
@@ -1358,34 +1379,36 @@ const s = StyleSheet.create({
   },
   toggleRow: {
     flexDirection: 'row',
-    borderRadius: 12,
-    overflow: 'hidden',
+    borderRadius: 999,
     borderWidth: 1,
-    borderColor: colors.bluePrimary,
+    borderColor: 'rgba(103,172,233,0.35)',
+    padding: 4,
     marginBottom: 20,
     alignSelf: 'stretch',
+    backgroundColor: C.white,
   },
   toggleBtn: {
     flex: 1,
     paddingVertical: 10,
     alignItems: 'center',
-    backgroundColor: C.white,
+    borderRadius: 999,
+    backgroundColor: 'transparent',
   },
   toggleBtnActive: {
-    backgroundColor: colors.bluePrimary,
+    backgroundColor: colors.blueLight,
   },
   toggleText: {
     fontSize: 14,
     fontWeight: '600',
     fontFamily: 'Geist_600SemiBold',
-    color: colors.bluePrimary,
+    color: colors.blueLight,
   },
   toggleTextActive: {
     color: '#fff',
   },
   postBtn: {
-    backgroundColor: colors.bluePrimary,
-    borderRadius: 14,
+    backgroundColor: colors.blueLight,
+    borderRadius: 999,
     paddingVertical: 14,
     alignSelf: 'stretch',
     alignItems: 'center',
