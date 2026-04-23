@@ -23365,6 +23365,56 @@ export const PRODUCT_CATALOG = [
     ],
   },
 
+  {
+    id: 'B0G53GZNSR',
+    asin: 'B0G53GZNSR',
+    name: 'Christopher Knight Home Midel 111" Modular L-Shape Cloud Sofa with Chaise Lounge, Boneless Fabric Upholstered, Olive Green',
+    brand: 'Christopher Knight Home',
+    price: 879.99,
+    priceDisplay: '$879.99',
+    compareAtPrice: 879.99,
+    compareAtPriceDisplay: '$879.99',
+    imageUrl: 'https://m.media-amazon.com/images/I/91lp+x+9ljL._AC_SL1500_.jpg',
+    images: [
+      'https://m.media-amazon.com/images/I/91lp+x+9ljL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/41CjdV1-8tL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/31Dynk7EXwL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/41Wr+wbAAIL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/51ODmMtQ+SL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/31FcHbUTirL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/31n-TY9NRaL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/51-pCbgoK4L._AC_SL1500_.jpg',
+    ],
+    category: 'sofa',
+    roomType: ['living-room'],
+    styles: ['modern', 'contemporary', 'minimalist', 'bohemian'],
+    materials: ['linen'],
+    tags: ['cloud-couch', 'l-shaped', 'chaise', 'modular', 'boneless', 'fabric', '111-inch', 'olive-green', 'deep-seat', 'no-assembly', 'vacuum-sealed', 'living-room', 'modern', 'contemporary', 'minimalist', 'christopher-knight', 'gdf-studio'],
+    source: 'amazon',
+    affiliateUrl: 'https://www.amazon.com/dp/B0G53GZNSR?tag=' + TAG,
+    rating: null,
+    reviewCount: null,
+    description: 'Christopher Knight Home Midel 111" boneless L-shape cloud sofa with chaise lounge. Delivered vacuum-sealed — no assembly or tools required. Simply unbox and let it expand to full size within 72 hours. Deep seat and fabric upholstery make it ideal for lounging in modern living rooms and open studios.',
+    features: [
+      'No assembly required — arrives vacuum-sealed, expands to full size within 72 hours',
+      '111" modular L-shape with chaise lounge for flexible, generous seating',
+      'Boneless cloud construction — deep, sink-in comfort without traditional spring/frame feel',
+      'Fabric upholstered in olive green — versatile tone for modern, bohemian, or eclectic rooms',
+      'Flexible configuration fits large living rooms, studios, and open floor plans',
+    ],
+    variants: [
+      {
+        id: '1',
+        label: 'Olive Green',
+        asin: 'B0G53GZNSR',
+        price: 879.99,
+        swatchImage: 'https://m.media-amazon.com/images/I/41CjdV1-8tL._AC_SL1500_.jpg',
+        mainImage: 'https://m.media-amazon.com/images/I/91lp+x+9ljL._AC_SL1500_.jpg',
+        affiliateUrl: 'https://www.amazon.com/dp/B0G53GZNSR?tag=' + TAG,
+      },
+    ],
+  },
+
 ];
 
 // ─── Enrichment status helper ────────────────────────────────────────────────
