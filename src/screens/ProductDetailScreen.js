@@ -320,7 +320,7 @@ const hs = StyleSheet.create({
     borderRadius: IMAGE_R,
     overflow: 'hidden',
     alignSelf: 'center',
-    backgroundColor: '#F4F5F7',
+    backgroundColor: '#FFFFFF',
   },
   img: {
     width: IMAGE_W,
@@ -1500,12 +1500,11 @@ export default function ProductDetailScreen({ route, navigation }) {
     ? deliveryDate(parseInt(product.shipping.estimatedDays))
     : deliveryDate(4);
 
-  // Categories where the full product (including frame/border) should be visible
-  // instead of cropping to fill — e.g. artwork, mirrors, chandeliers
-  const CONTAIN_CATEGORIES = new Set([
-    'wall-art', 'mirror', 'chandelier', 'pendant-light', 'vase', 'planter',
-  ]);
-  const heroResizeMode = CONTAIN_CATEGORIES.has(product?.category) ? 'contain' : 'cover';
+  // All product hero images display in full (resizeMode: 'contain') — Amazon
+  // photos are studio shots on white backgrounds, so contain + white background
+  // looks editorial and never crops the product. Previously we used 'cover'
+  // for furniture which cut off arms/ends of sofas and cropped into the photo.
+  const heroResizeMode = 'contain';
 
   // ── Cart logic ────────────────────────────────────────────────────────────
   const cartKey = `${name}__${brand}`;
@@ -1562,10 +1561,12 @@ export default function ProductDetailScreen({ route, navigation }) {
         )}
         scrollEventThrottle={16}>
 
-        {/* S0: Hero image gallery */}
+        {/* S0: Hero image gallery — pass activeImageUrl (variant-aware hero)
+            NOT static imageUrl, so tapping a variant swatch swaps slide 0
+            immediately instead of the variant's photo ending up at slide 2. */}
         <ProductHero
           images={activeImages}
-          imageUrl={imageUrl}
+          imageUrl={activeImageUrl}
           onBack={() => navigation?.goBack()}
           topInset={insets.top}
           heroResizeMode={heroResizeMode}
