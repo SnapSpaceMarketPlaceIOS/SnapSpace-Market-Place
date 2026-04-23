@@ -21943,6 +21943,74 @@ export const PRODUCT_CATALOG = [
     ],
     shipping: { freeShipping: true, estimatedDays: '5-10', prime: true, returnDays: 30 },
   },
+  // ─── ACCENT CHAIRS & RECLINERS ───────────────────────────────────────────────
+  {
+    id: 'B0BT8C39X7', asin: 'B0BT8C39X7',
+    name: 'ZURI Modern Leather Luxor Reclining Chair with Power Headrests',
+    brand: 'ZURI',
+    price: 664.90, priceDisplay: '$664.90',
+    imageUrl: 'https://m.media-amazon.com/images/I/71YMm8LjArL._AC_SL1500_.jpg',
+    images: [
+      'https://m.media-amazon.com/images/I/415XoXFTkgL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/319Fv20tRmL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/4176Lq5MaoL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/21j4rjb9URL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/31Iuo1oqNgL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/21Su0zX4yhL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/21YDM5pit1L._AC_SL1500_.jpg',
+    ],
+    category: 'accent-chair',
+    roomType: ['living-room', 'office'],
+    styles: ['contemporary', 'minimalist'],
+    materials: ['leather'],
+    tags: ['recliner', 'power-recliner', 'power-headrest', 'adjustable', 'top-grain-leather', 'stainless-steel', 'wall-hugger', 'motorized', 'contemporary', 'minimalist', 'white', 'lounge-chair', 'home-theater', 'modern', 'clean-lines', 'living-room', 'accent-chair', 'electric-recliner'],
+    source: 'amazon',
+    affiliateUrl: 'https://www.amazon.com/dp/B0BT8C39X7?tag=' + TAG,
+    rating: 5.0, reviewCount: 1,
+    description: 'ZURI\'s Luxor pairs top-grain leather with independent motorized controls for both recline angle and headrest — a wall-hugger design that needs just 4" of clearance to fully recline, finished with polished stainless steel feet.',
+    features: [
+      'Top grain leather seating surfaces with split leather back and sides — supple, durable, easy to maintain',
+      'Independent power recliner + power headrest — motorized controls adjust each axis separately',
+      'Wall-hugging design — only 4" clearance from wall needed to reach full recline',
+      'Polished stainless steel feet and accent hardware — modern silhouette with metallic finish',
+      'Full adjustable range: 56"W × 40–61"D × 28.5–37.5"H, seat depth 22", seat height 19"',
+    ],
+    details: {
+      Brand: 'ZURI',
+      Dimensions: '56"W × 40–61"D × 28.5–37.5"H (recline range)',
+      'Seat Depth': '22 inches',
+      'Seat Height': '19 inches',
+      'Wall Clearance': '4 inches',
+      'Seating Capacity': '1',
+      Material: 'Top Grain Leather (seating), Split Leather (back/sides), Stainless Steel Feet',
+      'Item Weight': '192 lbs',
+      'Special Feature': 'Power Recliner, Power Headrest',
+      'Room Type': 'Living Room',
+    },
+    variants: [
+      {
+        id: '1', label: 'White', asin: 'B0BT8C39X7', price: 664.90,
+        swatchImage: 'https://m.media-amazon.com/images/I/41S6csaPPfL._AC_SL300_.jpg',
+        mainImage: 'https://m.media-amazon.com/images/I/71YMm8LjArL._AC_SL1500_.jpg',
+        affiliateUrl: 'https://www.amazon.com/dp/B0BT8C39X7?tag=' + TAG,
+      },
+      {
+        id: '2', label: 'Black', asin: 'B0BT5QQ6W6', price: 664.90,
+        swatchImage: 'https://m.media-amazon.com/images/I/513pfb-6O7L._AC_SL300_.jpg',
+        mainImage: 'https://m.media-amazon.com/images/I/61zNLmdgxpL._AC_SL1500_.jpg',
+        affiliateUrl: 'https://www.amazon.com/dp/B0BT5QQ6W6?tag=' + TAG,
+      },
+      {
+        id: '3', label: 'Slate', asin: 'B0BT56PKGY', price: 664.90,
+        swatchImage: 'https://m.media-amazon.com/images/I/41M+mdRL7-L._AC_SL300_.jpg',
+        mainImage: 'https://m.media-amazon.com/images/I/61uCegZLoKL._AC_SL1500_.jpg',
+        affiliateUrl: 'https://www.amazon.com/dp/B0BT56PKGY?tag=' + TAG,
+      },
+    ],
+    shipping: { freeShipping: true, estimatedDays: '5-7', prime: true, returnDays: 30 },
+  },
+  // ── end accent chairs & recliners ──
+
   // ── end sofas & sectionals ──
 
 ];
