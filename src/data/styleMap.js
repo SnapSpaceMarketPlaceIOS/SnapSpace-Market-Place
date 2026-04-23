@@ -23,11 +23,11 @@ export const ROOM_KEYWORDS = {
 
 // Default furniture categories for each room type
 export const ROOM_FURNITURE = {
-  'living-room': ['sofa', 'accent-chair', 'coffee-table', 'rug', 'floor-lamp', 'side-table', 'bookshelf', 'mirror'],
-  'bedroom':     ['bed', 'nightstand', 'dresser', 'rug', 'table-lamp', 'mirror', 'throw-blanket', 'throw-pillow'],
+  'living-room': ['sofa', 'accent-chair', 'coffee-table', 'rug', 'floor-lamp', 'side-table', 'bookshelf', 'mirror', 'furniture-set'],
+  'bedroom':     ['bed', 'nightstand', 'dresser', 'rug', 'table-lamp', 'mirror', 'throw-blanket', 'throw-pillow', 'furniture-set'],
   'kitchen':     ['bar-stool', 'pendant-light', 'rug', 'vase', 'wall-art'],
-  'dining-room': ['dining-table', 'dining-chair', 'chandelier', 'rug', 'mirror', 'wall-art'],
-  'office':      ['desk', 'desk-chair', 'bookshelf', 'floor-lamp', 'rug', 'planter'],
+  'dining-room': ['dining-table', 'dining-chair', 'chandelier', 'rug', 'mirror', 'wall-art', 'furniture-set'],
+  'office':      ['desk', 'desk-chair', 'bookshelf', 'floor-lamp', 'rug', 'planter', 'furniture-set'],
   'bathroom':    ['mirror', 'vase', 'planter', 'wall-art'],
   'outdoor':     ['planter', 'rug', 'wall-art'],
   'nursery':     ['bookshelf', 'rug', 'floor-lamp', 'throw-pillow'],
