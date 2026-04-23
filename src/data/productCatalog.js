@@ -22011,6 +22011,59 @@ export const PRODUCT_CATALOG = [
   },
   // ── end accent chairs & recliners ──
 
+  {
+    id: 'B0CZTTVB7J', asin: 'B0CZTTVB7J',
+    name: 'SIMPLIHOME Rex Right-Facing Modular Sectional Sofa in Full-Grain Genuine Leather, Sienna, 122" Wide, 4-Seater L-Shaped with Right Chaise',
+    brand: 'SIMPLIHOME',
+    price: 3250.50, priceDisplay: '$3,250.50',
+    imageUrl: 'https://m.media-amazon.com/images/I/61IrRmLbNUL._AC_SL1500_.jpg',
+    images: [
+      'https://m.media-amazon.com/images/I/31ws4Op2nuL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/415cuct5CWL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/31t0aNaZwuL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/41uVdMd4jTL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/51ZSz0N0tuL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/51miF9jjL3L._AC_SL1500_.jpg',
+    ],
+    category: 'sofa',
+    roomType: ['living-room'],
+    styles: ['contemporary', 'minimalist', 'transitional'],
+    materials: ['leather', 'wood'],
+    tags: ['sectional', 'l-shaped', 'modular', 'full-grain-leather', 'aniline-leather', 'brazilian-leather', 'eco-leather', 'right-chaise', 'four-seater', 'sienna', 'boxy', 'cushionless', 'feather-wrapped', 'sinuous-springs', 'corner-blocked', 'solid-wood-feet', 'living-room', 'handcrafted', 'statement-piece', 'premium'],
+    source: 'amazon',
+    affiliateUrl: 'https://www.amazon.com/dp/B0CZTTVB7J?tag=' + TAG,
+    rating: 4.0, reviewCount: 1,
+    description: 'SIMPLIHOME\'s Rex is a 122"-wide L-shaped sectional in full-grain aniline "Kind" leather — a Brazilian hide processed with fewer harsh chemicals. Cushionless seats wrap high-density foam in feather-fiber for medium firmness, with sinuous springs underneath to prevent long-term sagging.',
+    features: [
+      'Full-grain aniline Kind leather — Brazilian hide, eco-friendlier process, natural color variation that ages beautifully',
+      'Cushionless boxy profile — high-density foam cores wrapped in feather-fiber for medium firmness and a clean silhouette',
+      'Corner-blocked solid and engineered wood frame — high-gauge sinuous springs prevent seat sag, webbing supports the back',
+      'Right-facing chaise configuration — 122" wide, seats 4, 1,200 lb weight capacity',
+      'Connector-based modular assembly — no tools needed, illustrated instructions included',
+    ],
+    details: {
+      Brand: 'SIMPLIHOME',
+      Dimensions: '69.5"D × 122"W × 27"H',
+      'Seat Depth': '69.5 inches',
+      'Seat Height': '27 inches',
+      'Seating Capacity': '4',
+      Material: 'Full-Grain Aniline Leather (Kind/Brazilian), Solid & Engineered Wood Frame',
+      'Weight Limit': '1,200 lbs',
+      'Item Weight': '293.2 lbs',
+      'Leg Length': '1.18 inches',
+      Assembly: 'Modular connector system — no tools',
+      Type: 'Right-Facing L-Shaped Sectional',
+    },
+    variants: [
+      {
+        id: '1', label: 'Sienna', asin: 'B0CZTTVB7J', price: 3250.50,
+        swatchImage: 'https://m.media-amazon.com/images/I/41YaBhJG5wL._AC_SL300_.jpg',
+        mainImage: 'https://m.media-amazon.com/images/I/61IrRmLbNUL._AC_SL1500_.jpg',
+        affiliateUrl: 'https://www.amazon.com/dp/B0CZTTVB7J?tag=' + TAG,
+      },
+    ],
+    shipping: { freeShipping: true, estimatedDays: '5-10', prime: true, returnDays: 30 },
+  },
   // ── end sofas & sectionals ──
 
 ];
