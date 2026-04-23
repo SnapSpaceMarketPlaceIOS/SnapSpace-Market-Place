@@ -21696,6 +21696,84 @@ export const PRODUCT_CATALOG = [
   },
   // ── end dining-chair ──
 
+  // ─── SOFAS & SECTIONALS ──────────────────────────────────────────────────────
+  {
+    id: 'B0F9P86J57', asin: 'B0F9P86J57',
+    name: 'MIXPATIO 123" Cloud Modular Sectional Sofa, 3-Seater w/Deep Seat & Removable Arms, Plush Chenille for Living Room',
+    brand: 'MIXPATIO',
+    price: 608.99, priceDisplay: '$608.99',
+    imageUrl: 'https://m.media-amazon.com/images/I/91KRkm+o07L._AC_SL1500_.jpg',
+    images: [
+      'https://m.media-amazon.com/images/I/51WNK5j39nL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/418ixO6x2tL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/31dbiaPtozL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/51U51zCMfCL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/5109vLKSMLL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/51o-FVIssTL._AC_SL1500_.jpg',
+    ],
+    category: 'sofa',
+    roomType: ['living-room'],
+    styles: ['contemporary', 'minimalist'],
+    materials: ['velvet', 'wood'],
+    tags: ['cloud-sofa', 'modular', 'sectional', 'deep-seat', 'plush', 'chenille', 'lumbar-pillow', 'removable-arms', 'neutral-tones', 'muted-palette', 'clean-lines', 'upholstered', 'solid-wood-frame', 'robot-vacuum-friendly', 'easy-clean', 'fade-resistant', 'apartment-friendly', 'living-room', 'lounge', 'soft-seating'],
+    source: 'amazon',
+    affiliateUrl: 'https://www.amazon.com/dp/B0F9P86J57?tag=' + TAG,
+    rating: 4.5, reviewCount: 41,
+    description: 'MIXPATIO\'s 123" cloud sectional wraps three seats in plush chenille with high-resilience foam, solid wood frame, and removable lumbar pillows — 24.4" deep for true sink-in comfort that holds its shape through daily use.',
+    features: [
+      'Plush chenille over high-resilience foam — 24.4" deep double-layer cushions that keep their shape with daily use',
+      'Fade-resistant, scratch-proof upholstery — smooth on skin, easy to wipe clean year-round',
+      'Sleek rectangular silhouette with muted tones — fits living rooms, offices, and lounges without clashing',
+      'Solid wood frame with 4.33" tall legs — scratch-proof silent feet, elevated for robot vacuum clearance',
+      'Tool-free modular assembly — independent sections for flexible placement, removable arms and lumbar pillows included',
+    ],
+    details: {
+      Brand: 'MIXPATIO',
+      Style: 'Modern',
+      Dimensions: '24.4"D × 123.6"W × 34.6"H',
+      'Seating Capacity': '3',
+      Material: 'Chenille Fabric / Corduroy Fabric, Solid Wood Frame',
+      Type: 'Convertible / Modular Sectional',
+      Shape: 'Rectangular',
+      'Room Type': 'Living Room',
+      'Special Feature': 'Removable Arms, Lumbar Pillows Included',
+    },
+    variants: [
+      {
+        id: '1', label: 'Taupe Chenille', asin: 'B0F9P86J57', price: 608.99,
+        swatchImage: 'https://m.media-amazon.com/images/I/618VVUVmtHL._AC_SL300_.jpg',
+        mainImage: 'https://m.media-amazon.com/images/I/91KRkm+o07L._AC_SL1500_.jpg',
+        affiliateUrl: 'https://www.amazon.com/dp/B0F9P86J57?tag=' + TAG,
+      },
+      {
+        id: '2', label: 'Beige Chenille', asin: 'B0F9P7DP73', price: 608.99,
+        swatchImage: 'https://m.media-amazon.com/images/I/41c05-6DBwL._AC_SL300_.jpg',
+        mainImage: 'https://m.media-amazon.com/images/I/91nVCd+2B8L._AC_SL1500_.jpg',
+        affiliateUrl: 'https://www.amazon.com/dp/B0F9P7DP73?tag=' + TAG,
+      },
+      {
+        id: '3', label: 'Beige Corduroy', asin: 'B0F9P99R5R', price: 608.99,
+        swatchImage: 'https://m.media-amazon.com/images/I/51QfnWXRHpL._AC_SL300_.jpg',
+        mainImage: 'https://m.media-amazon.com/images/I/915z3uUhrsL._AC_SL1500_.jpg',
+        affiliateUrl: 'https://www.amazon.com/dp/B0F9P99R5R?tag=' + TAG,
+      },
+      {
+        id: '4', label: 'Cyan Chenille', asin: 'B0F9PBM2DF', price: 608.99,
+        swatchImage: 'https://m.media-amazon.com/images/I/614o-dwTaoL._AC_SL300_.jpg',
+        mainImage: 'https://m.media-amazon.com/images/I/915jSA-oLwL._AC_SL1500_.jpg',
+        affiliateUrl: 'https://www.amazon.com/dp/B0F9PBM2DF?tag=' + TAG,
+      },
+      {
+        id: '5', label: 'Smoky Gray Chenille', asin: 'B0FSKYQV5Y', price: 608.99,
+        swatchImage: 'https://m.media-amazon.com/images/I/61spSyVC4nL._AC_SL300_.jpg',
+        mainImage: 'https://m.media-amazon.com/images/I/91FOB3b+K4L._AC_SL1500_.jpg',
+        affiliateUrl: 'https://www.amazon.com/dp/B0FSKYQV5Y?tag=' + TAG,
+      },
+    ],
+    shipping: { freeShipping: true, estimatedDays: '3-7', prime: true, returnDays: 30 },
+  },
+  // ── end sofas & sectionals ──
+
 ];
 
 // ─── Enrichment status helper ────────────────────────────────────────────────
