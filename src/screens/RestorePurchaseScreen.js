@@ -93,7 +93,7 @@ export default function RestorePurchaseScreen({ navigation }) {
 
   const handleRestore = async () => {
     if (!user) {
-      Alert.alert('Sign In Required', 'Please sign in to restore your purchases.', [{ text: 'OK' }]);
+      navigation.navigate('Auth');
       return;
     }
     setRestoring(true);

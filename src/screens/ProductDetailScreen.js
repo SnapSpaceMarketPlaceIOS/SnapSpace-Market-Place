@@ -1275,15 +1275,6 @@ function CTABar({ inCart, onAddToCart, affiliateUrl, source, cartLabelOpacity, a
   return (
     <View style={[cta.bar, { paddingBottom: pb }]}>
 
-      {/* FTC + Apple 2.3.1 affiliate disclosure — must appear near the
-          affiliate link, not buried in Terms of Use. Shown only when the
-          affiliate link is visible so it's contextual. */}
-      {!!affiliateUrl && (
-        <Text style={cta.ftcDisclosure}>
-          We may earn a commission when you buy through links on this app.
-        </Text>
-      )}
-
       {/* Affiliate link — routes through handleShopNow so the click is
           attributed for promotional wish credits (see PROMOTIONAL_CREDITS_*) */}
       {!!affiliateUrl && (
@@ -1339,15 +1330,6 @@ const cta = StyleSheet.create({
     fontStyle: 'italic',
     textAlign: 'center',
     marginBottom: space.xs,
-  },
-  ftcDisclosure: {
-    fontSize: 10,
-    lineHeight: 13,
-    color: '#9CA3AF',
-    textAlign: 'center',
-    fontFamily: 'Geist_400Regular',
-    marginBottom: 4,
-    paddingHorizontal: 20,
   },
   affiliateRow: {
     alignItems: 'center',

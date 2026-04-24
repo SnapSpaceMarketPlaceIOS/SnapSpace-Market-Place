@@ -291,10 +291,7 @@ export default function PaywallScreen({ navigation }) {
     // Supabase RPC write (record purchase + grant entitlement) will silently
     // fail — user ends up charged with nothing to show for it.
     if (!user?.id) {
-      Alert.alert(
-        'Sign In Required',
-        'Your session expired. Please sign in again to complete this purchase.',
-      );
+      navigation.navigate('Auth');
       return;
     }
     setPurchasing(true);
@@ -336,7 +333,7 @@ export default function PaywallScreen({ navigation }) {
 
   const handleShareReferral = async () => {
     if (!user?.id) {
-      Alert.alert('Sign In Required', 'Please sign in to share and earn free wishes.');
+      navigation.navigate('Auth');
       return;
     }
     try {

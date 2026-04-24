@@ -129,6 +129,27 @@ export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
     persistSession: true,
     autoRefreshToken: true,
     detectSessionInUrl: false,
+    // Disable Supabase's internal auth lock. In the browser this lock
+    // coordinates multiple tabs fighting over the same session; in a
+    // React Native app there is only ever one client and one user, so
+    // the lock is pure overhead.
+    //
+    // The real bug it caused: on cold launch, bootstrap's getSession()
+    // acquires the lock and holds it during a slow network roundtrip.
+    // If the user taps Sign In before bootstrap finishes, the lock
+    // queues the signIn call behind bootstrap. Our JS-level
+    // withTimeout wrapper rejects at 10s but Supabase keeps the queue
+    // alive anyway, so the UI clears but nothing completes — user sees
+    // a frozen spinner and force-quits to escape. After force-quit,
+    // the JS runtime is fresh and the lock is gone, so auth "works
+    // again" on the next launch.
+    //
+    // This pass-through replacement removes the queue entirely, so
+    // bootstrap and user-initiated signIn run concurrently without
+    // blocking each other. Safe because we rely on the existing
+    // `bootstrapSupersededRef` flag in AuthContext to prevent a late
+    // bootstrap result from overwriting the user's explicit action.
+    lock: async (_name, _acquireTimeout, fn) => await fn(),
   },
 });
 

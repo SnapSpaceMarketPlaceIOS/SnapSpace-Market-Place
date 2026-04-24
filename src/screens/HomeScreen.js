@@ -1024,6 +1024,47 @@ export default function HomeScreen({ navigation, route }) {
       .catch(() => {});
   }, []);
 
+  // Bug 4A: keep inputExpanded in sync with the prompt. TextInput's
+  // onContentSizeChange is unreliable when the prompt is cleared through
+  // paths other than successful generation (e.g. after hitting the Auth
+  // wall and returning), so the bar used to stay stuck in its expanded
+  // multi-line shape with an empty value. Forcing collapse whenever the
+  // prompt is empty makes the two states impossible to desync.
+  useEffect(() => {
+    if (!prompt) setInputExpanded(false);
+  }, [prompt]);
+
+  // Bug 4B: restore a pending prompt saved by the Auth-wall gate below.
+  // When a logged-out user taps Generate, we stash the prompt before
+  // navigating to Auth. AuthScreen then does navigation.reset to Main on
+  // success, which unmounts the entire tab tree — including this Home
+  // screen — and loses in-memory state. On remount we rehydrate so the
+  // user lands back on Home with the prompt they originally typed.
+  //
+  // 5-minute TTL so a prompt abandoned last week doesn't resurrect out
+  // of nowhere. Best-effort: any JSON/storage error falls through to a
+  // clean empty state.
+  useEffect(() => {
+    (async () => {
+      try {
+        const raw = await AsyncStorage.getItem('@homegenie_pending_prompt');
+        if (!raw) return;
+        // Always clear the key, even if we decide not to restore — it's
+        // a one-shot handoff, not a persistent preference.
+        await AsyncStorage.removeItem('@homegenie_pending_prompt');
+        const parsed = JSON.parse(raw);
+        const { prompt: saved, savedAt } = parsed || {};
+        if (!saved || !savedAt) return;
+        if (Date.now() - savedAt > 5 * 60 * 1000) return;
+        // Defensive: don't clobber a prompt the user has already started
+        // typing on the fresh mount. Only restore into an empty field.
+        setPrompt((prev) => (prev ? prev : saved));
+      } catch (e) {
+        // Best-effort — never block the home screen on a storage hiccup
+      }
+    })();
+  }, []);
+
   // Auto-start onboarding — only once per session, only after AsyncStorage has loaded
   useEffect(() => {
     if (user && onboardingLoaded && !onboardingActive && !onboardingAttempted.current) {
@@ -2654,14 +2695,27 @@ export default function HomeScreen({ navigation, route }) {
           return;
         }
       } else {
-        // Not signed in — require sign-in, no generation without auth
+        // Not signed in — route to the full Auth wall so the user can sign
+        // in or create an account in-flow instead of being bounced back to
+        // Home by a dead-end native Alert.
+        //
+        // Stash the prompt first so AuthScreen's navigation.reset (which
+        // remounts the whole tab tree) doesn't lose what the user typed.
+        // The matching restore effect above rehydrates it on remount if
+        // the handoff happens within 5 minutes.
         stopLoadingBar(false);
         setGenerating(false);
-        Alert.alert(
-          'Sign In Required',
-          'Please sign in to generate AI designs.',
-          [{ text: 'OK' }]
-        );
+        try {
+          if (prompt && prompt.trim()) {
+            await AsyncStorage.setItem(
+              '@homegenie_pending_prompt',
+              JSON.stringify({ prompt, savedAt: Date.now() }),
+            );
+          }
+        } catch (e) {
+          // Best-effort — never block the Auth navigation on storage
+        }
+        navigation.navigate('Auth');
         return;
       }
 
@@ -2857,14 +2911,22 @@ export default function HomeScreen({ navigation, route }) {
               "HomeGenie" wordmark or tagline. */}
           <View style={[styles.topBar, generating && styles.topBarGenerating]}>
             <View style={styles.logoRow}>
-              <Text style={styles.logo}>HomeGenie</Text>
+              <Text style={styles.logo} allowFontScaling={false}>HomeGenie</Text>
               {!generating && (
                 <View style={styles.logoIcon}>
                   <HeaderLogoIcon size={44} />
                 </View>
               )}
             </View>
-            <Text style={styles.wishTagline}>Your dream room, one wish away</Text>
+            <Text
+              style={styles.wishTagline}
+              allowFontScaling={false}
+              numberOfLines={1}
+              adjustsFontSizeToFit
+              minimumFontScale={0.85}
+            >
+              Your dream room, one wish away
+            </Text>
           </View>
 
           {/* Blur overlay when generating */}
@@ -4495,14 +4557,6 @@ const styles = StyleSheet.create({
   },
 
   // ── Featured Product cards ───────────────────────────────────────────────────
-  affiliateDisclosure: {
-    ...typeScale.caption,
-    fontFamily: 'Geist_400Regular',
-    color: C.textTertiary,
-    paddingHorizontal: space.lg,
-    marginBottom: space.sm,
-    marginTop: -2,
-  },
   productCard: {
     width: 155,
   },

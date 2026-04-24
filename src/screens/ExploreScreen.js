@@ -2456,16 +2456,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
 
-  ftcDisclosure: {
-    fontSize: 11,
-    fontFamily: 'Geist_400Regular',
-    fontStyle: 'italic',
-    color: TC.textTertiary,
-    textAlign: 'center',
-    marginTop: SP[4],
-    marginBottom: SP[2],
-  },
-
   // ── Section 3F: Tags ──────────────────────────────────────────────────────
   tagsWrap: {
     flexDirection: 'row',

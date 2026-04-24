@@ -13,11 +13,11 @@ import {
   Easing,
   Pressable,
   Modal,
+  FlatList,
 } from 'react-native';
 import CardImage from '../components/CardImage';
 import LensLoader from '../components/LensLoader';
 import AutoImage from '../components/AutoImage';
-import AffiliateDisclosure from '../components/AffiliateDisclosure';
 import Svg, { Path, Circle, Polyline, Line, G, Ellipse } from 'react-native-svg';
 import { colors } from '../constants/colors';
 import { colors as C } from '../constants/theme';
@@ -252,9 +252,17 @@ function RevealImage({ before, after, borderRadius = 9 }) {
     ]).start();
   }, [dimensions, before, progress]);
 
+  // Use the COMPUTED width from Image.getSize, not a fixed availableWidth.
+  // Previously width was pinned to availableWidth even when the height cap
+  // kicked in for tall portrait outputs — so a 9:16 AFTER image got shoved
+  // into a full-width container and `resizeMode="cover"` had to aggressively
+  // crop it to hide the distortion, which broke the blue-line reveal for
+  // portrait-aspect generations. Now the container matches the image's true
+  // proportions and centers itself in the parent via alignSelf.
   const containerStyle = {
-    width: availableWidth,
+    width: dimensions ? dimensions.width : availableWidth,
     height: dimensions ? dimensions.height : availableWidth * 0.75,
+    alignSelf: 'center',
     borderRadius,
     overflow: 'hidden',
     backgroundColor: '#E5E7EB',
@@ -364,6 +372,159 @@ const revealStyles = StyleSheet.create({
     right: 0,
     height: 2,
     backgroundColor: '#67ACE9',
+  },
+});
+
+// ── RevealGallery — horizontal swipe between AFTER (page 1) and BEFORE (page 2).
+//
+// Page 1 mounts the existing RevealImage component, which plays the top-down
+// reveal animation once and then settles on AFTER. Page 2 shows the user's
+// original BEFORE photo rendered in the same-sized card but at its own
+// natural aspect via `resizeMode="contain"` so nothing is cropped.
+//
+// Paging uses the same FlatList + snapToInterval pattern already proven in
+// ProductDetailScreen — native-driven, no extra gesture libraries, and
+// consistent with the rest of the app.
+//
+// If `before` is falsy (opening an old design from profile history) we skip
+// the gallery entirely and render the single-image RevealImage fallback,
+// so this is a zero-regression enhancement for existing flows.
+function BeforeCard({ before, borderRadius = 9 }) {
+  const availableWidth = SCREEN_W - space.lg * 2;
+  const heightCap = SCREEN_H * 0.75;
+  const [dimensions, setDimensions] = useState(null);
+
+  // Match RevealImage's AFTER-sized container so the two pages feel like
+  // a matched pair when swiping — same outer box, different contents.
+  // We still measure BEFORE here only as a fallback aspect if AFTER never
+  // resolved (shouldn't happen, but safe).
+  useEffect(() => {
+    if (!before) return;
+    Image.getSize(
+      before,
+      (w, h) => {
+        if (w > 0 && h > 0) {
+          const naturalRatio = w / h;
+          let finalW = availableWidth;
+          let finalH = availableWidth / naturalRatio;
+          if (finalH > heightCap) {
+            finalH = heightCap;
+            finalW = heightCap * naturalRatio;
+            if (finalW > availableWidth) finalW = availableWidth;
+          }
+          setDimensions({ width: finalW, height: finalH });
+        }
+      },
+      () => setDimensions({ width: availableWidth, height: availableWidth * 0.75 }),
+    );
+  }, [before, availableWidth, heightCap]);
+
+  const containerStyle = {
+    width: dimensions ? dimensions.width : availableWidth,
+    height: dimensions ? dimensions.height : availableWidth * 0.75,
+    alignSelf: 'center',
+    borderRadius,
+    overflow: 'hidden',
+    backgroundColor: '#111',
+  };
+
+  if (!dimensions) return <View style={containerStyle} />;
+
+  return (
+    <View style={containerStyle}>
+      {/* contain = show user's full original photo without cropping */}
+      <Image
+        source={{ uri: before }}
+        style={StyleSheet.absoluteFill}
+        resizeMode="contain"
+      />
+    </View>
+  );
+}
+
+function RevealGallery({ before, after, borderRadius = 9 }) {
+  // All hooks at the top — rules-of-hooks compliance. Any early return
+  // must come AFTER every hook call on every render path.
+  const [activeIdx, setActiveIdx] = useState(0);
+  const onViewableItemsChanged = useRef(({ viewableItems }) => {
+    if (viewableItems.length > 0) {
+      setActiveIdx(viewableItems[0].index ?? 0);
+    }
+  }).current;
+  const viewabilityConfig = useRef({ viewAreaCoveragePercentThreshold: 60 }).current;
+
+  // No BEFORE → no point in a gallery. Render the single-image reveal
+  // (which itself short-circuits to a plain Image when before is null).
+  if (!before) {
+    return <RevealImage before={null} after={after} borderRadius={borderRadius} />;
+  }
+
+  const pages = [
+    { key: 'after', type: 'reveal' },
+    { key: 'before', type: 'before' },
+  ];
+
+  return (
+    <View>
+      <FlatList
+        data={pages}
+        keyExtractor={(item) => item.key}
+        horizontal
+        pagingEnabled
+        showsHorizontalScrollIndicator={false}
+        onViewableItemsChanged={onViewableItemsChanged}
+        viewabilityConfig={viewabilityConfig}
+        // Keep both pages mounted. Without these, Android's default
+        // removeClippedSubviews can unmount the off-screen RevealImage and
+        // its internal `hasPlayed` ref would reset — so swiping back to
+        // page 1 would replay the reveal animation, which is wrong.
+        initialNumToRender={2}
+        windowSize={2}
+        removeClippedSubviews={false}
+        renderItem={({ item }) => (
+          <View style={galleryStyles.page}>
+            {item.type === 'reveal'
+              ? <RevealImage before={before} after={after} borderRadius={borderRadius} />
+              : <BeforeCard before={before} borderRadius={borderRadius} />}
+          </View>
+        )}
+      />
+      {/* Dot indicator — tells the user there's a second page to swipe to.
+          Without it, discoverability is near zero. */}
+      <View style={galleryStyles.dots}>
+        {pages.map((_, i) => (
+          <View
+            key={i}
+            style={[galleryStyles.dot, i === activeIdx && galleryStyles.dotActive]}
+          />
+        ))}
+      </View>
+    </View>
+  );
+}
+
+const galleryStyles = StyleSheet.create({
+  page: {
+    width: SCREEN_W,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  dots: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 6,
+    marginTop: space.sm,
+  },
+  dot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: 'rgba(0,0,0,0.18)',
+  },
+  dotActive: {
+    width: 18,
+    backgroundColor: colors.bluePrimary,
   },
 });
 
@@ -563,13 +724,6 @@ export default function RoomResultScreen({ route, navigation }) {
 
   const allInCart = products.length > 0 && products.every(p => isInCart(p));
 
-  const totalPrice = products.reduce((sum, p) => {
-    const num = typeof (p.priceValue ?? p.price) === 'number'
-      ? (p.priceValue ?? p.price)
-      : parseFloat(String(p.price).replace(/[^0-9.]/g, '')) || 0;
-    return sum + num;
-  }, 0);
-
   const styleTags = [...new Set(products.flatMap(p => p.styles || []).filter(Boolean))];
 
   // ── Handlers ──
@@ -730,15 +884,13 @@ export default function RoomResultScreen({ route, navigation }) {
         </View>
 
         {/* ── Image ────────────────────────────────────────────────── */}
-        {/* Build 69 Commit D: RevealImage wraps the "before → after" reveal
-            animation. If beforeUri is present, the user's original photo
-            slides up with a glowing brand-blue line tracking the reveal
-            edge, exposing the AI-generated room beneath. If beforeUri is
-            absent (old design viewed from profile history), RevealImage
-            renders resultUri directly with no animation. */}
+        {/* RevealGallery: two-page swipe between AFTER (with reveal animation)
+            and BEFORE (user's original photo, full-frame). Falls back to
+            single-image RevealImage when beforeUri is absent — e.g. opening
+            an old design from profile history. */}
         <View style={s.imageWrap}>
           {resultUri
-            ? <RevealImage before={beforeUri} after={resultUri} borderRadius={IMG_RADIUS} />
+            ? <RevealGallery before={beforeUri} after={resultUri} borderRadius={IMG_RADIUS} />
             : <View style={s.imagePlaceholder}><LensLoader size={40} /></View>}
         </View>
 
@@ -854,10 +1006,6 @@ export default function RoomResultScreen({ route, navigation }) {
           </>
         )}
 
-        {/* FTC + Apple 2.3.1 required affiliate disclosure — must appear
-            on every screen that surfaces affiliate product links. */}
-        <AffiliateDisclosure style={{ marginTop: 8 }} />
-
         <View style={{ height: 120 }} />
       </ScrollView>
 
@@ -871,9 +1019,6 @@ export default function RoomResultScreen({ route, navigation }) {
           <View style={s.pillLeft}>
             <View style={s.pillMeta}>
               <Text style={s.pillCount}>{products.length} item{products.length !== 1 ? 's' : ''}</Text>
-              <Text style={s.pillPrice}>
-                {totalPrice.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2 })}
-              </Text>
             </View>
           </View>
           <View style={s.pillRight}>
@@ -967,11 +1112,15 @@ const s = StyleSheet.create({
 
   // ── Image ──
   imageWrap: {
-    paddingHorizontal: space.lg,
+    // paddingHorizontal removed: RevealImage / RevealGallery / placeholder
+    // each manage their own widths with alignSelf: 'center'. Keeping the
+    // outer padding would double-margin the single-image cases and break
+    // the full-width paging FlatList inside RevealGallery.
     marginBottom: space.base,
   },
   imagePlaceholder: {
-    width: '100%',
+    width: width - space.lg * 2,
+    alignSelf: 'center',
     aspectRatio: 4 / 3,
     borderRadius: IMG_RADIUS,
     backgroundColor: C.surface,
@@ -1316,13 +1465,6 @@ const s = StyleSheet.create({
     fontFamily: 'Geist_500Medium',
     color: 'rgba(255,255,255,0.75)',
     lineHeight: 14,
-  },
-  pillPrice: {
-    fontSize: 15,
-    fontWeight: '700',
-    fontFamily: 'Geist_700Bold',
-    color: '#fff',
-    lineHeight: 18,
   },
   pillAction: {
     fontSize: 15,

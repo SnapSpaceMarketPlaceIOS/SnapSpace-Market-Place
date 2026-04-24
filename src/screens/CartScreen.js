@@ -12,7 +12,6 @@ import {
 } from 'react-native';
 import CardImage from '../components/CardImage';
 import LensLoader from '../components/LensLoader';
-import AffiliateDisclosure from '../components/AffiliateDisclosure';
 import Svg, { Path, Circle, Line, Polyline, Rect, Ellipse } from 'react-native-svg';
 import theme from '../constants/theme';
 import { typeScale } from '../constants/tokens';
@@ -576,11 +575,6 @@ export default function CartScreen({ navigation }) {
 
         </View>
 
-        {/* FTC + Apple 2.3.1 affiliate disclosure. Cart surfaces products
-            that complete checkout on Amazon/Wayfair/Houzz — the commission
-            disclosure must be visible before the user taps Checkout. */}
-        <AffiliateDisclosure style={{ marginTop: 12 }} />
-
         <View style={{ height: 120 }} />
       </ScrollView>
 
@@ -883,16 +877,6 @@ const styles = StyleSheet.create({
     ...typeScale.caption,
     fontFamily: 'Geist_400Regular',
     color: C.textTertiary,
-  },
-
-  ftcDisclosure: {
-    fontSize: 11,
-    fontFamily: 'Geist_400Regular',
-    fontStyle: 'italic',
-    color: C.textTertiary,
-    textAlign: 'center',
-    marginTop: 16,
-    marginHorizontal: 20,
   },
 
   // ── Section 2D: Checkout Bar ─────────────────────────────────────────────────

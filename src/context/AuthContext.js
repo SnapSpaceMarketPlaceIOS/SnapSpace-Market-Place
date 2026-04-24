@@ -88,22 +88,6 @@ function withTimeout(promise, ms, message) {
   ]);
 }
 
-// Retries an async fn up to `attempts` times with a delay between retries.
-// On iOS simulators (esp. beta runtimes) the first network call can stall;
-// retrying immediately after a timeout usually succeeds.
-async function withRetry(fn, attempts = 3, delayMs = 500) {
-  let lastErr;
-  for (let i = 0; i < attempts; i++) {
-    try {
-      return await fn();
-    } catch (err) {
-      lastErr = err;
-      if (i < attempts - 1) await new Promise(r => setTimeout(r, delayMs));
-    }
-  }
-  throw lastErr;
-}
-
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -299,17 +283,22 @@ export function AuthProvider({ children }) {
     // shows A's profile/wishes/data as if it belonged to the new account.
     // See AuthContext bug report (Apr 2026): fresh info@homegenieios.com signup
     // rendered antrivera3193's profile because the old session was never cleared.
+    //
+    // 3-second timeout on the signOut call: if the server is slow or offline
+    // we must never block account creation forever. The local setUser(null)
+    // + fullAccountReset() runs regardless, so the new account still starts
+    // with a clean slate even if the server-side signOut never completes.
     try {
-      await supabase.auth.signOut();
-      setUser(null);
-      // Also purge device-wide caches AND module-level in-memory caches for
-      // the same reason — the new account (once verified) must start with a
-      // clean slate. fullAccountReset wipes both AsyncStorage keys and the
-      // style/preferences in-memory vars that survive a multiRemove alone.
-      await fullAccountReset();
+      await withTimeout(
+        supabase.auth.signOut(),
+        3000,
+        'pre-signup signOut timed out',
+      );
     } catch (e) {
       console.warn('[Auth] pre-signup signOut failed (non-fatal):', e?.message);
     }
+    setUser(null);
+    await fullAccountReset();
 
     const { data, error } = await supabase.auth.signUp({
       email: email.trim().toLowerCase(),
@@ -349,23 +338,25 @@ export function AuthProvider({ children }) {
     // first makes the late bootstrap a no-op.
     bootstrapSupersededRef.current = true;
 
-    // Build 28: reduce retry aggression. Previously 3 × 15s = up to 47s
-    // of silent spinner; users gave up and force-quit before auth completed.
-    // Now 2 × 10s = 21s max. The second attempt almost always succeeds
-    // because the first warmed TLS; three attempts was excess.
+    // Single 15s attempt. Prior retry logic (2 × 10s) was a workaround for
+    // the Supabase auth-lock queue: the first attempt would time out at 10s
+    // not because the server was slow, but because bootstrap's getSession()
+    // still held the SDK lock. The second attempt would succeed because by
+    // then the lock had released. With the lock disabled at the client
+    // level (see services/supabase.js), there is no queue to wait on —
+    // so one generous timeout is both simpler and better UX (no mid-flight
+    // "retrying..." that looks like a frozen spinner to the user).
     console.log('[Auth] signIn: calling Supabase...');
     const start = Date.now();
 
-    const attempt = () => withTimeout(
+    const { data, error } = await withTimeout(
       supabase.auth.signInWithPassword({
         email: email.trim().toLowerCase(),
         password,
       }),
-      10000,
-      'Connection timed out — retrying...',
+      15000,
+      'Sign-in timed out. Please check your connection and try again.',
     );
-
-    const { data, error } = await withRetry(attempt, 2, 1000);
     console.log(`[Auth] signIn: responded in ${Date.now() - start}ms`, error ? `error: ${error.message}` : 'success');
 
     if (error) {

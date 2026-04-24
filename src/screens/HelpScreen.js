@@ -86,10 +86,6 @@ const FAQ_SECTIONS = [
         a: 'Tap any product card to open its detail page, then tap "Add to Cart." You can also tap "Shop The Look" on any wish to see and cart all matched products at once. Your cart saves items as you browse.',
       },
       {
-        q: 'What does "We may earn a commission" mean?',
-        a: 'HomeGenie participates in the Amazon Associates affiliate program. When you purchase a product through a link in our app, we earn a small commission from Amazon. The price you pay is always identical to Amazon\'s listed price — there is no markup from HomeGenie.',
-      },
-      {
         q: 'Why do some product prices say "Price may vary"?',
         a: 'Amazon product prices change frequently. We display the price at the time we last synced our catalog, but the live price on Amazon may differ. Always check Amazon\'s product page for the current price before purchasing.',
       },
