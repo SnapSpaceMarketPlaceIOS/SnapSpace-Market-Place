@@ -1218,7 +1218,7 @@ export default function ExploreScreen({ navigation, route }) {
                           aspectRatio: 1,
                         }]}>
                           <View style={styles.cardImgBg} />
-                          <CardImage uri={product.imageUrl} style={styles.cardImgPhoto} resizeMode="cover" />
+                          <CardImage uri={product.imageUrl} style={styles.cardImgPhoto} resizeMode="contain" />
                         </View>
                         {/* 2-col: white info card; 3-col: image only; 1-col: generous info card */}
                         {gridCols !== 3 && (

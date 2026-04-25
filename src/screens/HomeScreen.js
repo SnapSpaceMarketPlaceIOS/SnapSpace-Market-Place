@@ -17,6 +17,7 @@ import {
   FlatList,
   Share,
   Linking,
+  AppState,
 } from 'react-native';
 import { BlurView } from 'expo-blur';
 // expo-sharing requires native module not in dev client — use RN Share instead
@@ -1329,6 +1330,47 @@ export default function HomeScreen({ navigation, route }) {
 
   // GenieLoader animation is self-contained — no manual start/stop needed here.
   // The `generating` prop drives it directly via <GenieLoader animating={generating} />.
+
+  // Stuck-loader recovery on app resume.
+  //
+  // When iOS suspends the JS runtime (app backgrounded), any in-flight FAL
+  // fetch socket is killed by the OS after ~30s. The promise on the JS side
+  // never resolves OR rejects — it just hangs forever once JS resumes. This
+  // leaves `generating === true` indefinitely, so the user sees the
+  // GenieLoader screen on every reopen until they swipe-kill the app.
+  //
+  // Fix: track when we go to background. On the active transition, if we
+  // were backgrounded long enough that the fetch is provably dead AND a
+  // generation was in flight, force-reset all generation state. Threshold
+  // is 60s — short enough to recover from any real-world hang, long enough
+  // that a genuinely-still-running short background (5s home button tap)
+  // isn't yanked out from under the user.
+  const backgroundedAtRef = useRef(null);
+  useEffect(() => {
+    const sub = AppState.addEventListener('change', (state) => {
+      if (state === 'background' || state === 'inactive') {
+        if (backgroundedAtRef.current == null) {
+          backgroundedAtRef.current = Date.now();
+        }
+        return;
+      }
+      if (state === 'active') {
+        const wentBgAt = backgroundedAtRef.current;
+        backgroundedAtRef.current = null;
+        if (wentBgAt == null) return;
+        const elapsed = Date.now() - wentBgAt;
+        if (elapsed > 60000 && generatingRef.current) {
+          console.log('[HomeScreen] resume after ' + Math.round(elapsed / 1000) + 's bg with stuck generation — resetting');
+          generatingRef.current = false;
+          setGenerating(false);
+          setGenStatus('');
+          setLoadingMessages([]);
+          stopLoadingBar(false);
+        }
+      }
+    });
+    return () => sub.remove();
+  }, [stopLoadingBar]);
 
   // Rotating loading messages — cycle every 3s with fade
   useEffect(() => {

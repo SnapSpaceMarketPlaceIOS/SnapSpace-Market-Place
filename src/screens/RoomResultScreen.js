@@ -29,6 +29,7 @@ import { getProductsForPrompt, getRecommendedProducts } from '../services/affili
 import { parseDesignPrompt } from '../utils/promptParser';
 import { saveUserDesign, updateDesignVisibility, updateDesignProducts } from '../services/supabase';
 import * as FileSystem from 'expo-file-system/legacy';
+import * as ImageManipulator from 'expo-image-manipulator';
 
 const { width } = Dimensions.get('window');
 const IMG_RADIUS = Math.round((width - space.lg * 2) * 0.025);
@@ -389,52 +390,54 @@ const revealStyles = StyleSheet.create({
 // If `before` is falsy (opening an old design from profile history) we skip
 // the gallery entirely and render the single-image RevealImage fallback,
 // so this is a zero-regression enhancement for existing flows.
-function BeforeCard({ before, borderRadius = 9 }) {
+function BeforeCard({ before, afterDimensions, borderRadius = 9 }) {
   const availableWidth = SCREEN_W - space.lg * 2;
-  const heightCap = SCREEN_H * 0.75;
-  const [dimensions, setDimensions] = useState(null);
+  const [normalizedUri, setNormalizedUri] = useState(null);
 
-  // Match RevealImage's AFTER-sized container so the two pages feel like
-  // a matched pair when swiping — same outer box, different contents.
-  // We still measure BEFORE here only as a fallback aspect if AFTER never
-  // resolved (shouldn't happen, but safe).
+  // EXIF-normalize the raw camera/picker URI. The camera writes portrait photos
+  // as landscape pixels + an EXIF orientation tag; React Native's <Image> and
+  // Image.getSize handle that tag inconsistently on iOS 26, so the raw URI
+  // rendered in this card showed up rotated 90° with black letterboxing.
+  // ImageManipulator re-encodes with the rotation baked into pixels → a plain
+  // upright JPEG that displays identically everywhere.
   useEffect(() => {
     if (!before) return;
-    Image.getSize(
-      before,
-      (w, h) => {
-        if (w > 0 && h > 0) {
-          const naturalRatio = w / h;
-          let finalW = availableWidth;
-          let finalH = availableWidth / naturalRatio;
-          if (finalH > heightCap) {
-            finalH = heightCap;
-            finalW = heightCap * naturalRatio;
-            if (finalW > availableWidth) finalW = availableWidth;
-          }
-          setDimensions({ width: finalW, height: finalH });
-        }
-      },
-      () => setDimensions({ width: availableWidth, height: availableWidth * 0.75 }),
-    );
-  }, [before, availableWidth, heightCap]);
+    let cancelled = false;
+    (async () => {
+      try {
+        const result = await ImageManipulator.manipulateAsync(
+          before,
+          [],
+          { compress: 0.9, format: ImageManipulator.SaveFormat.JPEG },
+        );
+        if (!cancelled) setNormalizedUri(result.uri);
+      } catch {
+        // If normalization fails, fall back to the raw URI — worst case the
+        // user still sees their photo, just with the original rotation quirk.
+        if (!cancelled) setNormalizedUri(before);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [before]);
 
+  // Match the AFTER frame exactly so both swipe pages feel like one object.
+  // Fallback keeps the card from collapsing while AFTER's dims are in flight.
   const containerStyle = {
-    width: dimensions ? dimensions.width : availableWidth,
-    height: dimensions ? dimensions.height : availableWidth * 0.75,
+    width: afterDimensions?.width || availableWidth,
+    height: afterDimensions?.height || availableWidth * 0.75,
     alignSelf: 'center',
     borderRadius,
     overflow: 'hidden',
     backgroundColor: '#111',
   };
 
-  if (!dimensions) return <View style={containerStyle} />;
+  if (!normalizedUri) return <View style={containerStyle} />;
 
   return (
     <View style={containerStyle}>
       {/* contain = show user's full original photo without cropping */}
       <Image
-        source={{ uri: before }}
+        source={{ uri: normalizedUri }}
         style={StyleSheet.absoluteFill}
         resizeMode="contain"
       />
@@ -446,12 +449,40 @@ function RevealGallery({ before, after, borderRadius = 9 }) {
   // All hooks at the top — rules-of-hooks compliance. Any early return
   // must come AFTER every hook call on every render path.
   const [activeIdx, setActiveIdx] = useState(0);
+  const [afterDimensions, setAfterDimensions] = useState(null);
   const onViewableItemsChanged = useRef(({ viewableItems }) => {
     if (viewableItems.length > 0) {
       setActiveIdx(viewableItems[0].index ?? 0);
     }
   }).current;
   const viewabilityConfig = useRef({ viewAreaCoveragePercentThreshold: 60 }).current;
+
+  // Compute the AFTER container dimensions once at the gallery level, so the
+  // BEFORE page can use the same frame — guarantees both swipe pages look like
+  // a matched pair (same box, different contents). Without this, BEFORE sized
+  // itself from its own aspect and drifted out of sync with AFTER.
+  useEffect(() => {
+    if (!after) return;
+    const availableWidth = SCREEN_W - space.lg * 2;
+    const heightCap = SCREEN_H * 0.75;
+    Image.getSize(
+      after,
+      (w, h) => {
+        if (w > 0 && h > 0) {
+          const naturalRatio = w / h;
+          let finalW = availableWidth;
+          let finalH = availableWidth / naturalRatio;
+          if (finalH > heightCap) {
+            finalH = heightCap;
+            finalW = heightCap * naturalRatio;
+            if (finalW > availableWidth) finalW = availableWidth;
+          }
+          setAfterDimensions({ width: finalW, height: finalH });
+        }
+      },
+      () => setAfterDimensions({ width: availableWidth, height: availableWidth * 0.75 }),
+    );
+  }, [after]);
 
   // No BEFORE → no point in a gallery. Render the single-image reveal
   // (which itself short-circuits to a plain Image when before is null).
@@ -485,7 +516,7 @@ function RevealGallery({ before, after, borderRadius = 9 }) {
           <View style={galleryStyles.page}>
             {item.type === 'reveal'
               ? <RevealImage before={before} after={after} borderRadius={borderRadius} />
-              : <BeforeCard before={before} borderRadius={borderRadius} />}
+              : <BeforeCard before={before} afterDimensions={afterDimensions} borderRadius={borderRadius} />}
           </View>
         )}
       />
@@ -1460,11 +1491,11 @@ const s = StyleSheet.create({
     flexDirection: 'column',
   },
   pillCount: {
-    fontSize: 11,
-    fontWeight: '500',
-    fontFamily: 'Geist_500Medium',
-    color: 'rgba(255,255,255,0.75)',
-    lineHeight: 14,
+    fontSize: 15,
+    fontWeight: '700',
+    fontFamily: 'Geist_700Bold',
+    color: '#fff',
+    lineHeight: 18,
   },
   pillAction: {
     fontSize: 15,
