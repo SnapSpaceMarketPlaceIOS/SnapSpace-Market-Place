@@ -18,6 +18,7 @@ import {
   Share,
   Linking,
   AppState,
+  Pressable,
 } from 'react-native';
 import { BlurView } from 'expo-blur';
 // expo-sharing requires native module not in dev client — use RN Share instead
@@ -60,6 +61,8 @@ import GenieLoader from '../components/GenieLoader';
 import { sendNotificationIfEnabled } from '../services/notifications';
 import { useOnboarding, ONBOARDING_STEPS } from '../context/OnboardingContext';
 import OnboardingOverlay, { OnboardingGlow } from '../components/OnboardingOverlay';
+import StyleCarousel from '../components/StyleCarousel';
+import { pickPromptVariation } from '../data/stylePresets';
 
 const { width, height } = Dimensions.get('window');
 
@@ -971,7 +974,36 @@ export default function HomeScreen({ navigation, route }) {
   const { isStepActive, nextStep, prevStep, finishOnboarding, startOnboarding, active: onboardingActive, loaded: onboardingLoaded } = useOnboarding();
   const onboardingAttempted = useRef(false); // prevent re-trigger on profile refreshes
   const [prompt, setPrompt] = useState('');
-  const [inputExpanded, setInputExpanded] = useState(false);
+  // Selected style preset (from the StyleCarousel below the input bar).
+  // When non-null, the prompt-chip strip above the input bar is replaced
+  // with a "selected style" pill (thumbnail + label + prompt preview + ×).
+  // Cleared automatically by the effect below if the user edits the prompt
+  // away from the preset's exact prompt — at that point the user's writing
+  // their own thing and the badge no longer represents what'll generate.
+  const [selectedStyle, setSelectedStyle] = useState(null);
+  // Counter that bumps every time the prompt is set programmatically (style
+  // pick / × clear / post-generation cleanup / Auth-wall restore). The
+  // TextInput uses this as its `key`, so each programmatic prompt change
+  // forces a full unmount + remount of the native UITextView underneath —
+  // which is the only reliable way to drop iOS' cached multiline content
+  // height. User-typed input does NOT bump this counter, so cursor position
+  // is preserved while the user is actively editing.
+  const [textInputResetKey, setTextInputResetKey] = useState(0);
+  const bumpInputKey = () => setTextInputResetKey((k) => k + 1);
+  useEffect(() => {
+    if (selectedStyle && prompt !== selectedStyle.prompt) {
+      setSelectedStyle(null);
+    }
+  }, [prompt, selectedStyle]);
+  // The input bar's height is now driven entirely by the multiline
+  // TextInput's intrinsic content size (capped by maxHeight on styles.inputBar).
+  // We no longer track expansion in React state — the previous approach used
+  // an `inputExpanded` boolean to flip border radius, which caused a one-frame
+  // flicker on style switches and didn't actually correlate with iOS' real
+  // height behavior. Border radius is now a constant (16). All collapse logic
+  // for the × button uses `promptInputRef.current?.clear()` to trigger iOS'
+  // native height recompute path — the only reliable way to drop the cached
+  // multi-line height when the controlled value goes from long → empty.
   const [greeting, setGreeting] = useState(getGreeting());
   const [recentlyViewed, setRecentlyViewed] = useState([]);
 
@@ -1016,6 +1048,18 @@ export default function HomeScreen({ navigation, route }) {
   const galleryScale = useRef(new Animated.Value(1)).current;
   const sendScale    = useRef(new Animated.Value(1)).current;
   const inputScale   = useRef(new Animated.Value(1)).current;
+  // Ref to the prompt TextInput so the × button on the selected-style pill
+  // can call .clear() — iOS' native reset path that recomputes the multiline
+  // content height. Setting `value=''` on a controlled multiline TextInput
+  // is unreliable for shrinking back to its compact size on iOS.
+  const promptInputRef = useRef(null);
+  // Tracks the last prompt-variation index shown for each style preset, so
+  // consecutive taps of the same card always land on a different variation.
+  // useRef instead of state because no UI needs to react to changes — the
+  // map just informs pickPromptVariation() which index to AVOID next time.
+  // Resets on cold-start (acceptable; user gets full variation cycle each
+  // session).
+  const lastPromptIdxRef = useRef({});
   const mediaPermGranted = useRef(false);
 
   // Pre-warm media library permission on mount so the picker opens instantly
@@ -1025,15 +1069,9 @@ export default function HomeScreen({ navigation, route }) {
       .catch(() => {});
   }, []);
 
-  // Bug 4A: keep inputExpanded in sync with the prompt. TextInput's
-  // onContentSizeChange is unreliable when the prompt is cleared through
-  // paths other than successful generation (e.g. after hitting the Auth
-  // wall and returning), so the bar used to stay stuck in its expanded
-  // multi-line shape with an empty value. Forcing collapse whenever the
-  // prompt is empty makes the two states impossible to desync.
-  useEffect(() => {
-    if (!prompt) setInputExpanded(false);
-  }, [prompt]);
+  // (Bug 4A useEffect removed — `inputExpanded` no longer exists. The fix
+  // it was originally addressing is now handled by promptInputRef.clear()
+  // in the × handler, which forces iOS' native height recompute path.)
 
   // Bug 4B: restore a pending prompt saved by the Auth-wall gate below.
   // When a logged-out user taps Generate, we stash the prompt before
@@ -1059,7 +1097,13 @@ export default function HomeScreen({ navigation, route }) {
         if (Date.now() - savedAt > 5 * 60 * 1000) return;
         // Defensive: don't clobber a prompt the user has already started
         // typing on the fresh mount. Only restore into an empty field.
-        setPrompt((prev) => (prev ? prev : saved));
+        setPrompt((prev) => {
+          if (prev) return prev;
+          // We're actually replacing the value — force the TextInput to
+          // remount so iOS measures the restored content fresh.
+          bumpInputKey();
+          return saved;
+        });
       } catch (e) {
         // Best-effort — never block the home screen on a storage hiccup
       }
@@ -1216,10 +1260,12 @@ export default function HomeScreen({ navigation, route }) {
       }
       mediaPermGranted.current = true;
     }
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ['images'],
-      // allowsEditing removed — the native crop UI is the 1-2s bottleneck on iOS simulator
-      quality: 0.6,
+    let result;
+    try {
+      result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ['images'],
+        // allowsEditing removed — the native crop UI is the 1-2s bottleneck on iOS simulator
+        quality: 0.6,
       // exif: true so we can read Orientation and log it for diagnostics.
       // Was `false` previously, which combined with the missing normalize
       // call below to silently ship sideways pixels to Replicate — the
@@ -1227,7 +1273,16 @@ export default function HomeScreen({ navigation, route }) {
       // the SnapScreen path. This handler was a parallel entry point that
       // bypassed normalizeOrientation entirely.
       exif: true,
-    });
+      });
+    } catch (e) {
+      // The picker can throw on iOS 26 simulator if the photo library
+      // module isn't fully linked, or if a previous picker session left
+      // the modal stack in a weird state. Surface it as an Alert so the
+      // user gets feedback instead of a silent fail.
+      console.warn('[home/pickLib] launchImageLibraryAsync threw:', e?.name, e?.message);
+      Alert.alert('Photo Library Unavailable', String(e?.message || 'Could not open photo library.'));
+      return;
+    }
     if (result.canceled || !result.assets?.length) return;
     const asset = result.assets[0];
 
@@ -2352,10 +2407,36 @@ export default function HomeScreen({ navigation, route }) {
                   // a fresh seed, which covers transient CDN hiccups.
                   log('panel ready — using 2-image input (room + 2×2 panel) | url=' + String(panelResponse.url).substring(0, 80));
                   setGenStatus('Analyzing your room…');
+
+                  // ── Phantom-product fix ─────────────────────────────────
+                  // Previously we passed the FULL `reachableProducts` list
+                  // (typically 6) to generateWithProductPanel, which then
+                  // builds a prompt describing the FIRST 4 by position. But
+                  // composite-products may have skipped one of those first 4
+                  // (content-type/decode failure) and substituted product 5
+                  // or 6. When that happens, the prompt described positions
+                  // for products that aren't actually in the panel image —
+                  // flux receives contradictory cues and renders phantom
+                  // furniture the user can't shop.
+                  //
+                  // Read compositedIndices BEFORE the FAL call and filter
+                  // reachableProducts down to ONLY the 4 actually in the
+                  // panel. The prompt + panel are now perfectly aligned.
+                  // Hard fallback: if compositedIndices is missing/empty,
+                  // we use the original reachableProducts (no regression).
+                  panelCompositedIndices = panelResponse.compositedIndices;
+                  const productsForPrompt =
+                    Array.isArray(panelCompositedIndices) && panelCompositedIndices.length > 0
+                      ? panelCompositedIndices
+                          .map((i) => reachableProducts[i])
+                          .filter(Boolean)
+                      : reachableProducts;
+                  log('prompt-panel alignment | composited=[' + (panelCompositedIndices?.join(',') ?? '?') + '] | productsForPrompt=' + productsForPrompt.length);
+
                   const panelResult = await generateWithProductPanel(
                     roomPhotoUrl,
                     enrichedDesignPrompt,
-                    reachableProducts,
+                    productsForPrompt,
                     panelResponse.url,
                     aspectRatio,
                   );
@@ -2363,7 +2444,6 @@ export default function HomeScreen({ navigation, route }) {
                   genMeta.predictionId = panelResult.predictionId;
                   genMeta.seed = panelResult.seed;
                   genMeta.pipeline = 'panel';
-                  panelCompositedIndices = panelResponse.compositedIndices;
                   usedPanel = true;
                   log('panel gen complete | prediction=' + panelResult.predictionId + ' seed=' + panelResult.seed + ' | composited=[' + (panelCompositedIndices?.join(',') ?? '?') + ']');
                 } else {
@@ -2858,11 +2938,12 @@ export default function HomeScreen({ navigation, route }) {
       setPhoto(null);
       setPhotoSource(null);
       setPrompt('');
-      // Collapse the input bar back to single-line pill shape. Without this
-      // explicit reset, onContentSizeChange sometimes doesn't fire when the
-      // prompt is cleared programmatically, so the bar stays stuck in its
-      // expanded multi-line rounded-square state.
-      setInputExpanded(false);
+      // Force iOS to drop its cached multiline content-height for this
+      // TextInput. .clear() handles the native-reset path; bumping the
+      // key remounts the component entirely, which guarantees iOS
+      // re-measures content from scratch on the next mount.
+      promptInputRef.current?.clear();
+      bumpInputKey();
 
       // Auto-save is now handled EXCLUSIVELY in RoomResultScreen's mount
       // useEffect. Previously HomeScreen ALSO auto-saved here right after
@@ -2943,6 +3024,13 @@ export default function HomeScreen({ navigation, route }) {
         scrollEventThrottle={16}
         showsVerticalScrollIndicator={false}
         bounces={false}
+        // 'handled' lets a tap on a child TouchableOpacity (e.g. the × on
+        // the selected-style pill, or any style card in the StyleCarousel)
+        // fire its onPress in the same gesture that dismisses the keyboard.
+        // Without this, when the TextInput is focused, iOS dismisses the
+        // keyboard FIRST and swallows the tap — so the user has to tap
+        // twice and the app feels broken.
+        keyboardShouldPersistTaps="handled"
       >
         {/* ── Hero section — fills visible screen ─────────────────────── */}
         <View style={styles.overlay}>
@@ -2988,50 +3076,99 @@ export default function HomeScreen({ navigation, route }) {
 
           {/* Input bar — centered in hero, drops below loader during generation */}
           <View style={[styles.heroBottom, generating && styles.heroBottomGenerating]}>
-            {/* Suggested prompt chips */}
-            {!generating && (
-              <ScrollView
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                style={styles.promptChipsScroll}
-                contentContainerStyle={styles.promptChipsContent}
-              >
-                {[
-                  'Minimalist living room, white linen sofa, oak coffee table, arc floor lamp, jute rug',
-                  'Dark luxe bedroom, velvet platform bed, brass nightstands, charcoal walls, statement pendant',
-                  'Japandi dining room, walnut table, rattan chairs, ceramic vase, warm pendant lighting',
-                  'Scandinavian home office, white oak desk, bouclé chair, open shelving, linen curtain',
-                  'Mid-century living room, walnut credenza, camel leather sofa, sunburst mirror, tripod lamp',
-                  'Coastal bedroom, white linen bedding, rattan headboard, driftwood nightstand, sea-grass rug',
-                  'Industrial kitchen, matte black fixtures, marble countertops, open metal shelving, Edison pendants',
-                  'Biophilic living room, terracotta sofa, live-edge coffee table, hanging plants, jute rug',
-                  'Glam dining room, jewel velvet chairs, gold chandelier, marble table, mirrored sideboard',
-                  'Bohemian bedroom, rust walls, layered textile bedding, macramé wall art, rattan pendant',
-                ].map((chip) => (
-                  <TouchableOpacity
-                    key={chip}
-                    style={styles.promptChip}
-                    onPress={() => setPrompt(chip)}
-                    activeOpacity={0.7}
-                  >
-                    <Text style={styles.promptChipText}>{chip}</Text>
-                  </TouchableOpacity>
-                ))}
-              </ScrollView>
+            {/* Above-input zone:
+                - Default: empty. The legacy "recommended prompt" chip strip
+                  was retired once the StyleCarousel below the input bar
+                  became the canonical way to seed a wish — keeping both
+                  surfaces was redundant and visually noisy.
+                - After the user taps a card in the StyleCarousel: this zone
+                  renders the "selected style" pill (thumbnail + label +
+                  prompt preview + × clear button). The pill is the only
+                  thing that ever appears above the input bar going forward. */}
+            {!generating && selectedStyle && (
+              <View style={styles.selectedStylePill}>
+                <Image source={selectedStyle.image} style={styles.selectedStyleThumb} resizeMode="cover" />
+                <View style={styles.selectedStyleTextBlock}>
+                  <Text style={styles.selectedStyleLabel} numberOfLines={1}>{selectedStyle.label}</Text>
+                  <Text style={styles.selectedStylePrompt} numberOfLines={1}>{selectedStyle.prompt}</Text>
+                </View>
+                <TouchableOpacity
+                  style={styles.selectedStyleClear}
+                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                  onPress={() => {
+                    // Full reset on ×. The order matters:
+                    //   1. ref.clear() — iOS-native text reset that ALSO
+                    //      forces the multiline TextInput to recompute its
+                    //      content height. Without this, the bar stays
+                    //      stuck at its expanded pixel height even though
+                    //      `value` becomes ''.
+                    //   2. ref.blur() — drops keyboard focus.
+                    //   3. setPrompt('') — keeps React state in sync with
+                    //      the cleared native input so any consumer of
+                    //      `prompt` sees the empty value.
+                    //   4. setSelectedStyle(null) — dismisses the pill and
+                    //      brings the carousel back into focus as the
+                    //      primary affordance.
+                    //   5. Keyboard.dismiss() — belt-and-suspenders if blur
+                    //      didn't fully drop the keyboard (rare iOS edge).
+                    promptInputRef.current?.clear();
+                    promptInputRef.current?.blur();
+                    setPrompt('');
+                    setSelectedStyle(null);
+                    Keyboard.dismiss();
+                    // Force-remount the TextInput so iOS forgets any cached
+                    // content-height from the just-cleared preset prompt.
+                    // Without this, ×-then-pick-different-style sometimes
+                    // leaves the bar at the previous prompt's pixel height
+                    // because the iOS UITextView never re-measured.
+                    bumpInputKey();
+                  }}
+                  activeOpacity={0.6}
+                >
+                  <Text style={styles.selectedStyleClearX}>×</Text>
+                </TouchableOpacity>
+              </View>
             )}
             {/* Photo preview removed — the camera/gallery icons on the input
                 bar already show a blue checkmark badge when a photo is
                 attached. A full-size thumbnail above the input bar is
                 redundant and pushes the hero content down. */}
 
-            <OnboardingGlow visible={isStepActive('chat_bar') && !generating} borderRadius={inputExpanded ? 20 : 40} style={(isStepActive('chat_bar') && !generating) ? { padding: 4 } : undefined}>
-            <Animated.View style={[styles.inputBar, { borderRadius: inputExpanded ? 16 : 36, transform: [{ scale: inputScale }] }]}>
-              {/* Camera icon — badge only when photo came from camera */}
-              <View>
+            <OnboardingGlow visible={isStepActive('chat_bar') && !generating} borderRadius={20} style={(isStepActive('chat_bar') && !generating) ? { padding: 4 } : undefined}>
+            <Animated.View style={[styles.inputBar, { borderRadius: 16, transform: [{ scale: inputScale }] }]}>
+              {/* Camera + Gallery icons — restored to the EXACT same pattern
+                  as the working send button (just below): TouchableOpacity
+                  with activeOpacity={1}, onPressIn/Out spring scale animation
+                  on an inner Animated.View, wrapper View for the optional
+                  badge. ROOT CAUSE of the previous "buttons don't fire" bug:
+                  the multiline TextInput's iOS UITextView hit-area extends
+                  to the LEFT of its visible bounds and was absorbing the
+                  taps that should have reached the icons. The send button
+                  on the RIGHT was unaffected. zIndex: 1 on the wrapper Views
+                  elevates the camera/gallery above the TextInput in the
+                  stacking context so taps land where they should. */}
+              {/* Camera + Gallery icons.
+                  ROOT CAUSE of the "icons don't work without a style picked":
+                  the multiline TextInput's UITextView in iOS extends its
+                  tap-to-focus hit-area to fill the flex:1 space when its
+                  value is empty AND placeholder is showing. When a style is
+                  picked, the TextInput is populated with the preset prompt
+                  → its hit area collapses to its content bounds → the icons
+                  on the LEFT become reachable. When no style is picked
+                  (empty value), the UITextView's hit area expands LEFTWARD
+                  and absorbs the taps that should have hit the icons.
+                  Fix: zIndex 100 on BOTH the wrapper View AND the
+                  TouchableOpacity, plus elevation: 100 for Android parity.
+                  This forces iOS to put the icons in a stacking context
+                  that wins against the TextInput's expanded hit-area. */}
+              <View style={{ zIndex: 100, elevation: 100 }}>
                 <TouchableOpacity
-                  style={styles.inputIconBtn}
-                  onPress={() => navigation?.navigate('Wish')}
+                  style={[styles.inputIconBtn, { zIndex: 100, elevation: 100 }]}
                   activeOpacity={1}
+                  hitSlop={{ top: 14, bottom: 14, left: 8, right: 8 }}
+                  onPress={() => {
+                    if (navigation?.navigate) navigation.navigate('Wish');
+                  }}
                   onPressIn={() => springIn(cameraScale)}
                   onPressOut={() => springOut(cameraScale)}
                 >
@@ -3045,12 +3182,19 @@ export default function HomeScreen({ navigation, route }) {
                   </View>
                 )}
               </View>
-              {/* Gallery icon — badge only when photo came from library */}
-              <View>
+              <View style={{ zIndex: 100, elevation: 100 }}>
                 <TouchableOpacity
-                  style={styles.inputIconBtn}
-                  onPress={photo ? () => { setPhoto(null); setPhotoSource(null); } : handlePickFromLibrary}
+                  style={[styles.inputIconBtn, { zIndex: 100, elevation: 100 }]}
                   activeOpacity={1}
+                  hitSlop={{ top: 14, bottom: 14, left: 8, right: 8 }}
+                  onPress={() => {
+                    if (photo) {
+                      setPhoto(null);
+                      setPhotoSource(null);
+                    } else {
+                      handlePickFromLibrary();
+                    }
+                  }}
                   onPressIn={() => springIn(galleryScale)}
                   onPressOut={() => springOut(galleryScale)}
                 >
@@ -3065,6 +3209,14 @@ export default function HomeScreen({ navigation, route }) {
                 )}
               </View>
               <TextInput
+                // key changes only on programmatic prompt mutations (style
+                // pick / × / post-generation / Auth restore) — bumping it
+                // unmounts + remounts the TextInput so iOS measures the
+                // multiline content height from scratch. User typing does
+                // NOT bump the key, so cursor position is preserved during
+                // active editing.
+                key={textInputResetKey}
+                ref={promptInputRef}
                 style={styles.inputText}
                 placeholder={photo ? "Photo attached — what's your wish..." : "What's your wish..."}
                 placeholderTextColor="rgba(255,255,255,0.45)"
@@ -3077,7 +3229,11 @@ export default function HomeScreen({ navigation, route }) {
                 editable={!generating}
                 maxLength={200}
                 onSubmitEditing={runGeneration}
-                onContentSizeChange={(e) => setInputExpanded(e.nativeEvent.contentSize.height > 28)}
+                // No onContentSizeChange — the bar's height is now driven
+                // entirely by iOS' native multiline TextInput growth, capped
+                // by styles.inputBar.maxHeight. Tracking expansion in React
+                // state was the source of the radius-flicker bug and isn't
+                // needed once the radius is constant.
                 onFocus={() => springOut(inputScale)}
                 onBlur={() => Animated.spring(inputScale, { toValue: 1, useNativeDriver: true, tension: 200, friction: 7 }).start()}
               />
@@ -3124,7 +3280,12 @@ export default function HomeScreen({ navigation, route }) {
                 }}
                 onSkip={finishOnboarding}
                 tooltipPosition="below"
-                style={{ position: 'relative', marginTop: 24 }}
+                // 32pt above keeps the card clear of the input bar; 32pt
+                // below keeps it clear of the StyleCarousel cards rendered
+                // immediately after. The overlay should sit on its own
+                // visual island until the user taps Got it / Skip — no
+                // touching adjacent elements at any phone size.
+                style={{ position: 'relative', marginTop: 32, marginBottom: 32 }}
               />
             )}
             {/* Loading progress bar */}
@@ -3142,6 +3303,32 @@ export default function HomeScreen({ navigation, route }) {
                   ]}
                 />
               </View>
+            )}
+            {/* Style inspiration carousel — 4 visible cards, slow rightward
+                auto-drift, paused on touch. Tapping a card sets the matching
+                preset prompt and replaces the chip strip above with a
+                "selected style" pill. Hidden during generation so the
+                GenieLoader has the screen. */}
+            {!generating && (
+              <StyleCarousel
+                onSelect={(preset) => {
+                  // Pick a prompt variation that's NOT the same as the last
+                  // one shown for this preset. With 3 variations per style,
+                  // this guarantees consecutive taps of the same card produce
+                  // a different prompt → a different room render → a
+                  // different set of catalog products in the panel.
+                  const lastIdx = lastPromptIdxRef.current[preset.id];
+                  const { idx, prompt: pickedPrompt } = pickPromptVariation(preset, lastIdx);
+                  lastPromptIdxRef.current[preset.id] = idx;
+                  // Stash the picked prompt onto selectedStyle so the pill
+                  // can render it as a preview AND the auto-clear useEffect
+                  // (which compares prompt === selectedStyle.prompt) still
+                  // works without modification.
+                  setSelectedStyle({ ...preset, prompt: pickedPrompt });
+                  setPrompt(pickedPrompt);
+                  bumpInputKey();
+                }}
+              />
             )}
           </View>
         </View>
@@ -3759,6 +3946,64 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontWeight: '500',
     fontFamily: 'Geist_500Medium',
+  },
+
+  // Selected-style pill — replaces the prompt-chip strip when the user
+  // taps a card in the StyleCarousel. Same vertical band as the chips so
+  // the layout doesn't jump. Glassmorphic background to match the existing
+  // hero overlay aesthetic.
+  selectedStylePill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255,255,255,0.18)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.3)',
+    borderRadius: 12,
+    paddingVertical: 6,
+    paddingHorizontal: 8,
+    marginBottom: 8,
+  },
+  selectedStyleThumb: {
+    width: 36,
+    height: 36,
+    borderRadius: 8,
+    backgroundColor: 'rgba(255,255,255,0.10)',
+  },
+  selectedStyleTextBlock: {
+    flex: 1,
+    marginLeft: 10,
+    marginRight: 6,
+  },
+  selectedStyleLabel: {
+    color: '#FFFFFF',
+    fontSize: 12,
+    fontWeight: '700',
+    fontFamily: 'Geist_700Bold',
+    lineHeight: 14,
+  },
+  selectedStylePrompt: {
+    color: 'rgba(255,255,255,0.72)',
+    fontSize: 10,
+    fontWeight: '400',
+    fontFamily: 'Geist_400Regular',
+    lineHeight: 12,
+    marginTop: 1,
+  },
+  selectedStyleClear: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    backgroundColor: 'rgba(255,255,255,0.18)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  selectedStyleClearX: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    lineHeight: 18,
+    fontWeight: '600',
+    fontFamily: 'Geist_600SemiBold',
+    marginTop: -1,
   },
 
   // Input bar — vertically centered in hero

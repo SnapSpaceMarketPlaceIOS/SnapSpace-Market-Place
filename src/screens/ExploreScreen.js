@@ -1218,7 +1218,11 @@ export default function ExploreScreen({ navigation, route }) {
                           aspectRatio: 1,
                         }]}>
                           <View style={styles.cardImgBg} />
-                          <CardImage uri={product.imageUrl} style={styles.cardImgPhoto} resizeMode="contain" />
+                          {/* compact=true rewrites Amazon `_SL1500_` → `_SL400_` so the grid
+                              fetches a 400px asset instead of 1500px (~85% less data per card).
+                              Eliminates the concurrent-fetch throttling that was leaving
+                              products as gray placeholders on physical iPhones. PDP keeps full-res. */}
+                          <CardImage uri={product.imageUrl} style={styles.cardImgPhoto} resizeMode="contain" compact />
                         </View>
                         {/* 2-col: white info card; 3-col: image only; 1-col: generous info card */}
                         {gridCols !== 3 && (
@@ -1995,7 +1999,12 @@ const styles = StyleSheet.create({
   },
   cardImgBg: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: '#ECEEF2',
+    // Was '#ECEEF2' (light gray). With resizeMode="contain" on non-square
+    // product photos, the empty letterbox/pillarbox area let that gray show
+    // through as a visible band above and below the product. White matches
+    // Amazon's product-shot canvas, so contain'd images blend seamlessly into
+    // the card. Doubles as the loading placeholder color.
+    backgroundColor: '#FFFFFF',
   },
   cardImgPhoto: {
     ...StyleSheet.absoluteFillObject,

@@ -105,8 +105,20 @@ export function getQualityPrefix(userPrompt) {
 // These are belt-and-suspenders — the plain-English preservation sentence
 // above each one still runs. If FAL's flux-2-pro ignores the weighting
 // grammar, the effect is neutral (tokens still contribute semantically).
+// Tuning notes:
+//   - "no new decor objects" bumped 1.2 → 1.5 to more aggressively suppress
+//     phantom items (vases, side tables, plants) that flux likes to add even
+//     when the prompt-panel alignment is tight. This is the lowest-risk
+//     way to push phantom hit-rate down without touching guidance_scale.
+//   - "copy furniture from reference images exactly" bumped 1.5 → 1.7 to
+//     reinforce that the panel is authoritative when the user prompt's
+//     supplementary style intent mentions other furniture types. Pairs with
+//     the prompt-panel alignment fix in HomeScreen runGeneration so flux
+//     receives consistent signals from both the prompt and the panel image.
+//   - "preserve architecture" stays at 1.3 — already strong; bumping further
+//     can over-constrain and suppress legitimate decor/lighting changes.
 export const WEIGHTED_DIRECTIVES =
-  '(preserve architecture:1.3) (no new decor objects:1.2) (copy furniture from reference images exactly:1.5)';
+  '(preserve architecture:1.3) (no new decor objects:1.5) (copy furniture from reference images exactly:1.7)';
 
 // Cap total prompt words. Raised to 200: flux retains useful signal up to
 // ~200 words; beyond that the tokenizer starts dropping late tokens. The
