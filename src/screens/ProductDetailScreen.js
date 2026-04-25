@@ -64,7 +64,10 @@ const PAD_H       = layout.screenPaddingH;        // 20
 const SECTION_GAP = layout.sectionGap;             // 32
 const IMAGE_W     = SW - (PAD_H * 2);             // image width with side padding
 const IMAGE_H     = Math.round(IMAGE_W * 1.1);    // taller than square for breathing room
-const IMAGE_R     = 10;
+// Hero image corner radius. radius.xl (20pt) ≈ 5.7% of the image width on
+// iPhone 16 Pro Max — visibly rounded without softening the product shape.
+// Was 10pt previously, which read as nearly-square at typical viewing distance.
+const IMAGE_R     = radius.xl;
 const CARD_LIFT   = 0;                             // no overlap — bar sits between hero and card
 const FEAT_BG     = uiColors.accentBg;              // feature icon circle bg
 const DIVIDER_COLOR = 'rgba(0,0,0,0.06)';

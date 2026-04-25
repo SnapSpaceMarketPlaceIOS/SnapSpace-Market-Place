@@ -304,9 +304,13 @@ const ABOUT_ITEMS = [
 // ── Component ─────────────────────────────────────────────────────────────────
 
 const getInitialProfile = (user) => ({
-  displayName: user?.name || 'HomeGenie User',
-  username: user?.username || (user?.email ? user.email.split('@')[0].toLowerCase().replace(/\s/g, '.') : 'homegenie.user'),
-  bio: user?.bio || 'Building Dream Spaces\nOne Prompt At A Time...',
+  // Display name + bio MUST reflect only the user's own signup data.
+  // Never substitute a brand placeholder (HomeGenie/SnapSpace) or a
+  // marketing tagline — show empty and let the bio block hide entirely
+  // when there is nothing real to display.
+  displayName: user?.name || '',
+  username: user?.username || (user?.email ? user.email.split('@')[0].toLowerCase().replace(/\s/g, '.') : ''),
+  bio: user?.bio || '',
   avatarUri: user?.avatarUrl || null,
   bannerUri: null,
 });
@@ -548,8 +552,12 @@ export default function ProfileScreen({ navigation }) {
           </View>
           <Text style={styles.username}>@{profile.username}</Text>
 
-          {/* Bio */}
-          <Text style={styles.bio}>{profile.bio}</Text>
+          {/* Bio — rendered only when the user has actually written one.
+              The Text node has 20px of vertical margin baked into styles.bio,
+              so rendering it with an empty string would leave a visible gap
+              on profiles with no bio. Conditional render collapses the block
+              entirely instead. */}
+          {!!profile.bio && <Text style={styles.bio}>{profile.bio}</Text>}
 
           {/* Followers / Following — live counts, tappable */}
           <View style={styles.followRow}>

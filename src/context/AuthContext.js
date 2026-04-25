@@ -106,7 +106,11 @@ export function AuthProvider({ children }) {
   const buildUser = (session, profile) => ({
     id: session.user.id,
     email: session.user.email,
-    name: profile?.full_name || session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || 'HomeGenie User',
+    // Display name precedence: profile full_name → signup metadata full_name →
+    // email-derived username → empty. NEVER fall back to a brand string
+    // ("HomeGenie User", "SnapSpace User") — the user should only ever see
+    // identifiers tied to their own signup data.
+    name: profile?.full_name || session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || '',
     username: profile?.username || null,
     bio: profile?.bio || null,
     avatarUrl: profile?.avatar_url || null,

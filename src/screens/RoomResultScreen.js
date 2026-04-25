@@ -450,6 +450,13 @@ function RevealGallery({ before, after, borderRadius = 9 }) {
   // must come AFTER every hook call on every render path.
   const [activeIdx, setActiveIdx] = useState(0);
   const [afterDimensions, setAfterDimensions] = useState(null);
+  // FlatList ref so the segmented progress bar below can tap-to-jump
+  // between AFTER (0) and BEFORE (1) pages — matches the PDP hero
+  // ProgressBar tappability.
+  const flatListRef = useRef(null);
+  const scrollToPage = (i) => {
+    flatListRef.current?.scrollToIndex({ index: i, animated: true });
+  };
   const onViewableItemsChanged = useRef(({ viewableItems }) => {
     if (viewableItems.length > 0) {
       setActiveIdx(viewableItems[0].index ?? 0);
@@ -498,6 +505,7 @@ function RevealGallery({ before, after, borderRadius = 9 }) {
   return (
     <View>
       <FlatList
+        ref={flatListRef}
         data={pages}
         keyExtractor={(item) => item.key}
         horizontal
@@ -520,13 +528,22 @@ function RevealGallery({ before, after, borderRadius = 9 }) {
           </View>
         )}
       />
-      {/* Dot indicator — tells the user there's a second page to swipe to.
-          Without it, discoverability is near zero. */}
-      <View style={galleryStyles.dots}>
+      {/* Segmented progress bar — replaces the legacy dots indicator.
+          Same visual language as the ProductDetailScreen hero progress
+          bar: 2px tall track split into N equal segments, active segment
+          painted blueLight, inactive segments painted with the standard
+          border gray. Tap any segment to jump to that page. */}
+      <View style={galleryStyles.progressBar}>
         {pages.map((_, i) => (
-          <View
+          <TouchableOpacity
             key={i}
-            style={[galleryStyles.dot, i === activeIdx && galleryStyles.dotActive]}
+            onPress={() => scrollToPage(i)}
+            activeOpacity={0.7}
+            hitSlop={{ top: 12, bottom: 12, left: 2, right: 2 }}
+            style={[
+              galleryStyles.segment,
+              { backgroundColor: i === activeIdx ? colors.blueLight : C.border },
+            ]}
           />
         ))}
       </View>
@@ -540,22 +557,21 @@ const galleryStyles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  dots: {
+  // Segmented progress bar — mirrors the styles from ProductDetailScreen's
+  // ProgressBar so the BEFORE/AFTER swipe indicator matches the PDP hero
+  // pattern exactly. 2px track, equal-flex segments, paddingHorizontal lines
+  // up with the gallery's screen edge padding (space.lg = 20).
+  progressBar: {
     flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: 6,
-    marginTop: space.sm,
+    paddingHorizontal: space.lg,
+    marginTop: space.md,
+    marginBottom: space.sm,
+    borderRadius: 2,
+    overflow: 'hidden',
   },
-  dot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: 'rgba(0,0,0,0.18)',
-  },
-  dotActive: {
-    width: 18,
-    backgroundColor: colors.bluePrimary,
+  segment: {
+    flex: 1,
+    height: 2,
   },
 });
 
