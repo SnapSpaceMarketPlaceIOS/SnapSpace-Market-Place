@@ -3093,7 +3093,7 @@ export default function HomeScreen({ navigation, route }) {
                   <Text style={styles.selectedStylePrompt} numberOfLines={1}>{selectedStyle.prompt}</Text>
                 </View>
                 <TouchableOpacity
-                  style={styles.selectedStyleClear}
+                  style={[styles.selectedStyleClear, { zIndex: 100, elevation: 100 }]}
                   hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                   onPress={() => {
                     // Full reset on ×. The order matters:
@@ -3135,79 +3135,20 @@ export default function HomeScreen({ navigation, route }) {
                 redundant and pushes the hero content down. */}
 
             <OnboardingGlow visible={isStepActive('chat_bar') && !generating} borderRadius={20} style={(isStepActive('chat_bar') && !generating) ? { padding: 4 } : undefined}>
-            <Animated.View style={[styles.inputBar, { borderRadius: 16, transform: [{ scale: inputScale }] }]}>
-              {/* Camera + Gallery icons — restored to the EXACT same pattern
-                  as the working send button (just below): TouchableOpacity
-                  with activeOpacity={1}, onPressIn/Out spring scale animation
-                  on an inner Animated.View, wrapper View for the optional
-                  badge. ROOT CAUSE of the previous "buttons don't fire" bug:
-                  the multiline TextInput's iOS UITextView hit-area extends
-                  to the LEFT of its visible bounds and was absorbing the
-                  taps that should have reached the icons. The send button
-                  on the RIGHT was unaffected. zIndex: 1 on the wrapper Views
-                  elevates the camera/gallery above the TextInput in the
-                  stacking context so taps land where they should. */}
-              {/* Camera + Gallery icons.
-                  ROOT CAUSE of the "icons don't work without a style picked":
-                  the multiline TextInput's UITextView in iOS extends its
-                  tap-to-focus hit-area to fill the flex:1 space when its
-                  value is empty AND placeholder is showing. When a style is
-                  picked, the TextInput is populated with the preset prompt
-                  → its hit area collapses to its content bounds → the icons
-                  on the LEFT become reachable. When no style is picked
-                  (empty value), the UITextView's hit area expands LEFTWARD
-                  and absorbs the taps that should have hit the icons.
-                  Fix: zIndex 100 on BOTH the wrapper View AND the
-                  TouchableOpacity, plus elevation: 100 for Android parity.
-                  This forces iOS to put the icons in a stacking context
-                  that wins against the TextInput's expanded hit-area. */}
-              <View style={{ zIndex: 100, elevation: 100 }}>
-                <TouchableOpacity
-                  style={[styles.inputIconBtn, { zIndex: 100, elevation: 100 }]}
-                  activeOpacity={1}
-                  hitSlop={{ top: 14, bottom: 14, left: 8, right: 8 }}
-                  onPress={() => {
-                    if (navigation?.navigate) navigation.navigate('Wish');
-                  }}
-                  onPressIn={() => springIn(cameraScale)}
-                  onPressOut={() => springOut(cameraScale)}
-                >
-                  <Animated.View style={{ transform: [{ scale: cameraScale }] }}>
-                    <CameraSmallIcon />
-                  </Animated.View>
-                </TouchableOpacity>
-                {photo && photoSource === 'camera' && (
-                  <View style={styles.attachBadge}>
-                    <CheckIcon size={8} color="#fff" />
-                  </View>
-                )}
-              </View>
-              <View style={{ zIndex: 100, elevation: 100 }}>
-                <TouchableOpacity
-                  style={[styles.inputIconBtn, { zIndex: 100, elevation: 100 }]}
-                  activeOpacity={1}
-                  hitSlop={{ top: 14, bottom: 14, left: 8, right: 8 }}
-                  onPress={() => {
-                    if (photo) {
-                      setPhoto(null);
-                      setPhotoSource(null);
-                    } else {
-                      handlePickFromLibrary();
-                    }
-                  }}
-                  onPressIn={() => springIn(galleryScale)}
-                  onPressOut={() => springOut(galleryScale)}
-                >
-                  <Animated.View style={{ transform: [{ scale: galleryScale }] }}>
-                    <GalleryIcon />
-                  </Animated.View>
-                </TouchableOpacity>
-                {photo && photoSource === 'library' && (
-                  <View style={styles.attachBadge}>
-                    <CheckIcon size={8} color="#fff" />
-                  </View>
-                )}
-              </View>
+            {/* Wrapper sits between OnboardingGlow and the inputBar so the
+                camera/gallery icons can be ABSOLUTE SIBLINGS of the inputBar
+                — not children of it. This is the only structure that
+                survives iOS' UITextView hit-test claim: a multiline
+                UITextView's hitTest:withEvent: implementation in iOS
+                effectively grabs all touches inside its parent View's
+                bounds. As long as the icons live inside the inputBar
+                with the TextInput, they cannot receive touches. Moving
+                them up one level so they're a sibling of the inputBar
+                puts them in a parent (this wrapper) that has NO
+                UITextView child — wrapper.hitTest correctly returns the
+                topmost matching child without UITextView interference. */}
+            <View style={{ position: 'relative' }}>
+            <View style={[styles.inputBar, { borderRadius: 16, paddingLeft: 84 }]}>
               <TextInput
                 // key changes only on programmatic prompt mutations (style
                 // pick / × / post-generation / Auth restore) — bumping it
@@ -3219,7 +3160,7 @@ export default function HomeScreen({ navigation, route }) {
                 ref={promptInputRef}
                 style={styles.inputText}
                 placeholder={photo ? "Photo attached — what's your wish..." : "What's your wish..."}
-                placeholderTextColor="rgba(255,255,255,0.45)"
+                placeholderTextColor="rgba(255,255,255,0.85)"
                 value={prompt}
                 onChangeText={setPrompt}
                 multiline
@@ -3263,8 +3204,79 @@ export default function HomeScreen({ navigation, route }) {
                   </LinearGradient>
                 )}
               </TouchableOpacity>
-            </Animated.View>
+            </View>
+            </View>
             </OnboardingGlow>
+            {/* Camera + Gallery icons — at heroBottom level, NOT inside
+                OnboardingGlow / inputBar / wrapper. This is the LAST
+                resort architecture: physically separate the icons from
+                the entire subtree containing the multiline TextInput so
+                iOS' UITextView hit-test claim cannot reach them. iOS
+                hit-test on heroBottom finds these icons (rendered later
+                in JSX → on top in z-order) before checking OnboardingGlow.
+                Top offset is computed dynamically:
+                  - 58pt if a style pill is shown above the inputBar
+                  - +4pt if the OnboardingGlow is in its padded onboarding
+                    state
+                  - +6pt to align with inputBar's paddingVertical */}
+            <View
+              style={{
+                position: 'absolute',
+                top: (selectedStyle ? 56 : 0) + ((isStepActive('chat_bar') && !generating) ? 4 : 0) + 6,
+                left: 8,
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: 4,
+              }}
+            >
+              <View>
+                <TouchableOpacity
+                  style={styles.inputIconBtn}
+                  activeOpacity={1}
+                  hitSlop={{ top: 14, bottom: 14, left: 8, right: 8 }}
+                  onPress={() => {
+                    if (navigation?.navigate) navigation.navigate('Wish');
+                  }}
+                  onPressIn={() => springIn(cameraScale)}
+                  onPressOut={() => springOut(cameraScale)}
+                >
+                  <Animated.View style={{ transform: [{ scale: cameraScale }] }}>
+                    <CameraSmallIcon />
+                  </Animated.View>
+                </TouchableOpacity>
+                {photo && photoSource === 'camera' && (
+                  <View style={styles.attachBadge}>
+                    <CheckIcon size={8} color="#fff" />
+                  </View>
+                )}
+              </View>
+              <View>
+                <TouchableOpacity
+                  style={styles.inputIconBtn}
+                  activeOpacity={1}
+                  hitSlop={{ top: 14, bottom: 14, left: 8, right: 8 }}
+                  onPress={() => {
+                    if (photo) {
+                      setPhoto(null);
+                      setPhotoSource(null);
+                    } else {
+                      handlePickFromLibrary();
+                    }
+                  }}
+                  onPressIn={() => springIn(galleryScale)}
+                  onPressOut={() => springOut(galleryScale)}
+                >
+                  <Animated.View style={{ transform: [{ scale: galleryScale }] }}>
+                    <GalleryIcon />
+                  </Animated.View>
+                </TouchableOpacity>
+                {photo && photoSource === 'library' && (
+                  <View style={styles.attachBadge}>
+                    <CheckIcon size={8} color="#fff" />
+                  </View>
+                )}
+              </View>
+            </View>
             {/* Onboarding Step 1 tooltip — hidden during generation so the
                 "Describe Your Dream Room" card doesn't sit on top of the
                 GenieLoader / status text. When generation completes and
