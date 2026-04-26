@@ -50,15 +50,49 @@ const APPLE_ROOT_CA_G3_FINGERPRINT_SHA256 =
 // secrets, signature verification is bypassed and a warning logs. This
 // exists ONLY for StoreKit local-testing configurations where Apple
 // uses a self-signed test CA we can't pin to. Production must NEVER have
-// this flag set. A deployment-time check below refuses to start the
-// function if the flag is true AND the Supabase project ref looks prod.
+// this flag set.
+//
+// Build 84 (Bug B2 fix): the prior version had this comment claiming a
+// "deployment-time check below refuses to start the function if the
+// flag is true AND the Supabase project ref looks prod" — but that check
+// did not actually exist anywhere in the file. If the env var ever leaked
+// to prod, an authenticated user could hand-craft a JWS for any product
+// id and harvest infinite wishes / subs. Below is the actual guard:
+// throws at module-load time so the function refuses to serve in prod,
+// failing loud instead of silently bypassing all receipt validation.
 const DEV_SKIP_SIGNATURE_VERIFY =
   Deno.env.get('DEV_SKIP_APPLE_SIGNATURE_VERIFY') === 'true';
 
+// The production project ref is hard-coded so a Supabase Vault/Secrets
+// rename or environment misconfiguration cannot defeat the guard. This
+// is a defense-in-depth check; the secret SHOULD never be set in prod
+// in the first place, but if it is, this throw makes it impossible for
+// the function to handle even one request.
+const PROD_PROJECT_REF = 'lqjfnpibbjymhzupqtda';
+
+function isProductionEnvironment(): boolean {
+  const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
+  // Match either https://<ref>.supabase.co or any URL containing the prod ref.
+  return supabaseUrl.includes(PROD_PROJECT_REF);
+}
+
 if (DEV_SKIP_SIGNATURE_VERIFY) {
+  if (isProductionEnvironment()) {
+    // Refuse to boot. Module-load throws immediately; the function will
+    // 500 on every request until DEV_SKIP_APPLE_SIGNATURE_VERIFY is unset.
+    throw new Error(
+      '[validate-apple-receipt] FATAL: DEV_SKIP_APPLE_SIGNATURE_VERIFY=true ' +
+      'is set in a production environment (project ref ' + PROD_PROJECT_REF + '). ' +
+      'This flag bypasses Apple JWS receipt validation and would allow ' +
+      'authenticated users to forge purchases. Refusing to start. Unset ' +
+      'the env var via `supabase secrets unset DEV_SKIP_APPLE_SIGNATURE_VERIFY` ' +
+      'and redeploy.'
+    );
+  }
   console.warn(
     '[validate-apple-receipt] DEV_SKIP_APPLE_SIGNATURE_VERIFY is enabled — ' +
-    'signature verification is bypassed. THIS MUST NEVER RUN IN PRODUCTION.'
+    'signature verification is bypassed. Non-production environment detected. ' +
+    'THIS MUST NEVER RUN IN PRODUCTION.'
   );
 }
 

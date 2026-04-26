@@ -968,6 +968,7 @@ export default function HomeScreen({ navigation, route }) {
   const {
     subscription, shouldShowPaywall, refreshQuota, recordGeneration,
     tokenBalance, deductToken, refreshTokenBalance,
+    refundFailedGeneration,  // B8: re-credit a wish when generation fails
   } = useSubscription();
   const { addToCart, items: cartItems } = useCart();
   const { liked } = useLiked();

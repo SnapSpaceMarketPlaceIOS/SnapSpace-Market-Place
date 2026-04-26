@@ -298,10 +298,33 @@ export default function PaywallScreen({ navigation }) {
     try {
       if (activeTab === 'wishes') {
         const result = await purchaseTokens(selectedWish);
-        if (result?.success) navigation.goBack();
+        // Build 84 / Bug C2 fix: explicit post-purchase confirmation Alert.
+        // Previously the paywall just closed silently after a wish buy, which
+        // (a) failed to celebrate the purchase, and (b) left the user
+        // wondering whether anything happened — paid path felt worse than
+        // free share-bonus which already showed an alert.
+        if (result?.success) {
+          const pkg = WISH_PACKAGES.find(p => p.id === selectedWish);
+          const wishCount = pkg?.wishes ?? 0;
+          Alert.alert(
+            '✨ Wishes added!',
+            wishCount > 0
+              ? `${wishCount} wish${wishCount === 1 ? '' : 'es'} added to your account. Tap a style on Home to start designing.`
+              : 'Your purchase was successful. Tap a style on Home to start designing.',
+            [{ text: 'Start Designing', onPress: () => navigation.goBack() }],
+          );
+        }
       } else {
         const result = await purchaseSubscription(selectedSubTier.productId);
-        if (result?.success) navigation.goBack();
+        if (result?.success) {
+          // Subscription confirmation Alert. Mirrors the wish flow so paid
+          // path feels equally affirmative regardless of which product type.
+          Alert.alert(
+            '🎉 Subscription active',
+            `Welcome to ${selectedSubTier.name}! ${selectedSubTier.gens === -1 ? 'Unlimited' : selectedSubTier.gens} wishes per week. Renews automatically — manage anytime in your Apple ID settings.`,
+            [{ text: 'Start Designing', onPress: () => navigation.goBack() }],
+          );
+        }
       }
     } catch (e) {
       Alert.alert('Purchase Failed', e.message);
@@ -380,10 +403,17 @@ export default function PaywallScreen({ navigation }) {
 
   // ── CTA label ──────────────────────────────────────────────────────────
 
+  // Build 84 / Bug C4 fix: replace the muddled "HomeGenie Wishes" label
+  // with explicit "Buy N wishes" copy. App Review 3.1.2(a) calls for
+  // unambiguous pricing copy on IAP CTAs; the prior brand-only label was
+  // borderline non-compliant and gave no value-prop signal.
+  const selectedWishCount = WISH_PACKAGES.find(p => p.id === selectedWish)?.wishes ?? 0;
   const ctaLabel = purchasing
     ? 'Processing...'
     : activeTab === 'wishes'
-      ? `HomeGenie Wishes`
+      ? selectedWishCount > 0
+        ? `Buy ${selectedWishCount} Wish${selectedWishCount === 1 ? '' : 'es'}`
+        : 'Buy Wishes'
       : 'Subscribe Weekly';
 
   const ctaPrice = activeTab === 'wishes'
@@ -498,6 +528,20 @@ export default function PaywallScreen({ navigation }) {
                   outputRange: ['0%', '100%'],
                 }),
               }]} />
+            </View>
+          </View>
+          )}
+          {/* Build 84 / Bug C1 fix: render a separate "Purchased Wishes"
+              card whenever tokenBalance > 0 — regardless of tier — so a
+              user who already bought a wish pack sees their balance
+              acknowledged here. Previously the paywall only showed the
+              free-tier card, leading to confusion ("did my purchase
+              register?") and re-buy temptation. */}
+          {tokenBalance > 0 && (
+          <View style={[styles.progressCard, { marginTop: isFree ? 8 : 0 }]}>
+            <View style={styles.progressLabelRow}>
+              <Text style={styles.progressLabel}>Purchased Wishes</Text>
+              <Text style={styles.progressCount}>{tokenBalance} available</Text>
             </View>
           </View>
           )}

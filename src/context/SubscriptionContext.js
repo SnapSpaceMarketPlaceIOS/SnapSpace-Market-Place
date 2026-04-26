@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useCallback, useEffect, useRef } from 'react';
+import { Alert } from 'react-native';
 import {
   initConnection,
   endConnection,
@@ -170,19 +171,84 @@ export function SubscriptionProvider({ children }) {
 
       const isTokenPurchase = ALL_TOKEN_PRODUCT_IDS.includes(purchase.productId);
 
-      try {
-        // Validate with server (handles both tokens and subscriptions)
-        const result = await validateReceipt(jws, user.id);
+      // Build 84 (Bug B4 + B10 fix): retry server validation up to 3x with
+      // exponential backoff before declaring failure. The previous version
+      // ate any error and called finishTransaction immediately, which acked
+      // the receipt to Apple — leaving a charged user with no entitlement
+      // and no recovery path. New flow:
+      //   1. Try validation up to 3 times (network blips, DB warmup, etc.)
+      //   2. On final failure, DO NOT finishTransaction — Apple keeps
+      //      redelivering the purchase via this listener on next app launch
+      //      so we get a free retry next time the user opens the app.
+      //   3. Surface a user-visible Alert so they know the purchase was
+      //      received but is being verified, and to relaunch if it persists.
+      const RETRY_DELAYS_MS = [0, 1500, 4000]; // total ~5.5s worst case
+      let lastError = null;
+      let result = null;
+      // Snapshot user.id for the duration of this retry loop. If the user
+      // signs out mid-retry, abort instead of writing to a stale account.
+      // (Reviewer MEDIUM fix from Build 84 audit.)
+      const userIdSnapshot = user.id;
 
+      for (let attempt = 0; attempt < RETRY_DELAYS_MS.length; attempt++) {
+        if (RETRY_DELAYS_MS[attempt] > 0) {
+          await new Promise(r => setTimeout(r, RETRY_DELAYS_MS[attempt]));
+        }
+        // Bail if the user signed out or switched accounts since the
+        // retry loop started. Apple will redeliver the purchase on next
+        // app open under the correct account.
+        if (user?.id !== userIdSnapshot) {
+          console.warn(
+            '[Subscription] user identity changed during purchase retry — aborting retry loop'
+          );
+          return;
+        }
+        try {
+          result = await validateReceipt(jws, userIdSnapshot);
+          lastError = null;
+          break;
+        } catch (e) {
+          lastError = e;
+          console.warn(
+            `[Subscription] purchase validation attempt ${attempt + 1}/${RETRY_DELAYS_MS.length} ` +
+            `failed: ${e?.message || e}`
+          );
+        }
+      }
+
+      if (lastError || !result) {
+        // All retries exhausted. DO NOT call finishTransaction — Apple will
+        // redeliver the purchase on next app open and we'll retry again.
+        // Surface the issue to the user so they don't feel scammed.
+        console.error('[Subscription] purchase validation failed after retries:', lastError?.message);
+        Alert.alert(
+          'Purchase received',
+          'Your purchase is being verified. If your wishes don\'t appear within a minute, ' +
+          'please force-quit and reopen HomeGenie. Your charge is safe — Apple will redeliver ' +
+          'the receipt for verification.',
+          [{ text: 'OK' }],
+        );
+        return;
+      }
+
+      // Validation succeeded — apply state changes BEFORE finishTransaction
+      // so the user sees the new balance/tier immediately. If the merge into
+      // local state fails for any reason, we still finish the receipt
+      // (the server-side grant already committed; client state catches up
+      // on next refreshTokenBalance / refreshQuota call).
+      try {
         if (result.type === 'tokens') {
-          // Finish as consumable
-          await finishTransaction({ purchase, isConsumable: true });
-          // Update token balance
-          setTokenBalance(result.newBalance);
+          // B10 fix: trust newBalance ONLY when result is a confirmed success.
+          // Refresh from server as a safety net so a stale local read can't
+          // hide the freshly-credited balance.
+          if (typeof result.newBalance === 'number' && result.newBalance >= 0) {
+            setTokenBalance(result.newBalance);
+          } else {
+            // Server didn't return a balance — fetch authoritative.
+            const fresh = await fetchTokenBalance(user.id).catch(() => null);
+            if (fresh?.balance !== undefined) setTokenBalance(fresh.balance);
+          }
         } else {
-          // Finish as non-consumable (subscription)
-          await finishTransaction({ purchase, isConsumable: false });
-          // Update subscription state
           setSubscription(prev => ({
             ...prev,
             tier: result.tier,
@@ -194,10 +260,17 @@ export function SubscriptionProvider({ children }) {
             subscriptionExpiresAt: result.subscriptionExpiresAt,
           }));
         }
-      } catch (e) {
-        console.error('[Subscription] purchase validation failed:', e.message);
-        // Still finish transaction to avoid stuck pending state
-        try { await finishTransaction({ purchase, isConsumable: isTokenPurchase }); } catch {}
+      } catch (mergeErr) {
+        console.warn('[Subscription] state merge after purchase failed:', mergeErr?.message);
+      }
+
+      // Now safe to finish — the entitlement is reflected in either local
+      // state or will be on next refresh. This finalizes the receipt with
+      // Apple so they stop redelivering it.
+      try {
+        await finishTransaction({ purchase, isConsumable: isTokenPurchase });
+      } catch (finErr) {
+        console.warn('[Subscription] finishTransaction failed:', finErr?.message);
       }
     });
 
@@ -286,6 +359,39 @@ export function SubscriptionProvider({ children }) {
         setTokenBalance(prev => prev + 1);
         throw e;
       }
+    }
+  }, [user?.id]);
+
+  // ── Re-credit a single token after a paid generation fails downstream ──
+  // Build 84 / Bug B8 fix. Previously when deductToken succeeded but the AI
+  // generation itself failed (FAL outage, network drop, render rejected),
+  // the user lost the wish with no recovery path. This function calls the
+  // refund_token RPC (migration 027) which atomically increments balance,
+  // decrements total_used, and writes a 'generation_failed' ledger row keyed
+  // by generation_id. UNIQUE(reference_id) makes it idempotent — if the
+  // caller retries with the same generation_id, the RPC short-circuits.
+  const refundFailedGeneration = useCallback(async (generationId) => {
+    if (!user?.id || !generationId) return;
+    try {
+      const { data, error } = await supabase.rpc('refund_token', {
+        p_user_id:       user.id,
+        p_generation_id: generationId,
+      });
+      if (error) throw error;
+      if (data?.[0]?.new_balance !== undefined) {
+        setTokenBalance(data[0].new_balance);
+      } else {
+        // RPC succeeded but didn't return the new balance — fetch authoritative.
+        const fresh = await fetchTokenBalance(user.id).catch(() => null);
+        if (fresh?.balance !== undefined) setTokenBalance(fresh.balance);
+      }
+    } catch (e) {
+      console.warn('[Subscription] refund_token failed:', e?.message || e);
+      // Don't throw — failed refund shouldn't block the user-facing error
+      // they're already seeing for the underlying gen failure. Refresh
+      // balance so the optimistic decrement isn't permanently visible.
+      const fresh = await fetchTokenBalance(user.id).catch(() => null);
+      if (fresh?.balance !== undefined) setTokenBalance(fresh.balance);
     }
   }, [user?.id]);
 
@@ -477,6 +583,7 @@ export function SubscriptionProvider({ children }) {
         tokenBalance,
         refreshTokenBalance,
         deductToken,
+        refundFailedGeneration,  // B8: re-credit a wish when AI generation fails
         purchaseTokens,
         TOKEN_PACKAGES,
         WISH_PACKAGES,
