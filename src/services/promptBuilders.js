@@ -94,31 +94,42 @@ export function getQualityPrefix(userPrompt) {
   return `Editorial architectural photography, ultra-sharp focus, crisp detail, ${light}, magazine-quality interior, Architectural Digest style.`;
 }
 
-// Build 71 (Commit A): parenthetical weighting directives appended to the
-// end of each edit prompt. flux honors (text:weight) syntax; weights above
-// 1.0 amplify the directive. Three pins:
-//   1.3 architecture  — keep walls/windows/ceiling stable across the edit
-//   1.2 no new decor  — suppress prop drift (extra pillows, side tables)
-//   1.5 exact refs    — force higher fidelity to the product reference
-//                        images. Address for the "catalog shows X, render
-//                        shows Y" mismatch on rugs / accent chairs.
-// These are belt-and-suspenders — the plain-English preservation sentence
-// above each one still runs. If FAL's flux-2-pro ignores the weighting
-// grammar, the effect is neutral (tokens still contribute semantically).
-// Tuning notes:
-//   - "no new decor objects" bumped 1.2 → 1.5 to more aggressively suppress
-//     phantom items (vases, side tables, plants) that flux likes to add even
-//     when the prompt-panel alignment is tight. This is the lowest-risk
-//     way to push phantom hit-rate down without touching guidance_scale.
-//   - "copy furniture from reference images exactly" bumped 1.5 → 1.7 to
-//     reinforce that the panel is authoritative when the user prompt's
-//     supplementary style intent mentions other furniture types. Pairs with
-//     the prompt-panel alignment fix in HomeScreen runGeneration so flux
-//     receives consistent signals from both the prompt and the panel image.
-//   - "preserve architecture" stays at 1.3 — already strong; bumping further
-//     can over-constrain and suppress legitimate decor/lighting changes.
-export const WEIGHTED_DIRECTIVES =
-  '(preserve architecture:1.3) (no new decor objects:1.5) (copy furniture from reference images exactly:1.7)';
+// Phase 1 of the AI fidelity plan: plain-English fidelity imperatives,
+// appended to the end of every edit prompt.
+//
+// Why we rewrote this in plain English:
+// Build 71 used parenthetical weighting like `(directive:1.7)` — that's the
+// Stable Diffusion 1.5 / Automatic1111 convention. FAL's flux-2-pro/edit API
+// docs do NOT mention support for this syntax. Verified against
+// https://fal.ai/models/fal-ai/flux-2-pro/edit/api in 2026-04-26: only `prompt`,
+// `image_urls`, `image_size`, `seed`, `safety_tolerance`, `enable_safety_checker`,
+// `output_format`, and `sync_mode` are accepted. There's no documented prompt-
+// weighting parser. The `(directive:1.7)` text was almost certainly being
+// tokenized literally — wasting attention budget on `(`, `:`, `1`, `.`, `7`, `)`.
+//
+// Plain English wins on three axes:
+//   1. Every flux variant respects clear imperatives. No reliance on
+//      undocumented syntax.
+//   2. Tokens become semantically meaningful instead of literal punctuation.
+//   3. We can add anchor language flux's vision-language head reads more
+//      directly — the "all 4 products must appear" clause is the most
+//      important addition and impossible to express through (text:weight).
+//
+// What's pinned:
+//   - Architecture preservation (room geometry must not drift)
+//   - No new decor objects (suppress phantom side tables, vases, plants)
+//   - Exact reproduction of every panel product (no substitutions)
+//   - All 4 products must appear in the final image (the new anchor — this
+//     directly targets the 2-3/4 hit rate by giving flux an explicit count
+//     constraint instead of leaving omission as an acceptable outcome)
+export const FIDELITY_DIRECTIVES =
+  'Preserve all architecture exactly. Do not introduce any new decor objects. Copy each piece of furniture from the reference panel exactly. All 4 products must appear in the final image; do not omit any.';
+
+// Single-product variant for generateSingleProductInRoom (1 ref, not 4).
+// Same architecture/no-new-decor pins, but the all-4 anchor is replaced
+// with a single-product fidelity clause.
+export const FIDELITY_DIRECTIVES_SINGLE =
+  'Preserve all architecture exactly. Do not introduce any new decor objects. The product in the final image must match the reference exactly.';
 
 // Cap total prompt words. Raised to 200: flux retains useful signal up to
 // ~200 words; beyond that the tokenizer starts dropping late tokens. The
@@ -199,12 +210,27 @@ export function buildFinalPrompt(userPrompt, productHints, colorPalette) {
 export function buildPanelPrompt(userPrompt, products) {
   const posLabels = ['top-left', 'top-right', 'bottom-left', 'bottom-right'];
   const entries = (products || []).slice(0, 4).map((p, i) => {
-    const desc = describeProductForPrompt(p) || (p.category || 'furniture').replace(/-/g, ' ');
-    return `${posLabels[i]}: ${desc}`;
+    // Phase 1: close the "furniture" fallback leak. Previously a missing
+    // descriptor + missing category fell back to the bare word "furniture",
+    // giving flux training-data freedom to render anything generically
+    // matching the user's style words. Now we surface a warning AND swap in
+    // language that explicitly points flux at the panel cell rather than
+    // its training prior.
+    const desc = describeProductForPrompt(p);
+    if (!desc) {
+      console.warn(
+        `[promptBuilder/panel] Missing descriptor for product ${p?.id || '(no id)'} ` +
+        `category=${p?.category || '(none)'} — using panel-anchored fallback`,
+      );
+    }
+    const safeDesc = desc || 'the exact product shown in this cell of the reference panel';
+    // Phase 1: ordinal tag pairs with positional label so flux tracks
+    // 4 distinct items rather than treating them as a fungible list.
+    return `Product ${i + 1} (${posLabels[i]}): ${safeDesc}`;
   });
 
   const refLine = entries.length > 0
-    ? `Image 2 is a 2×2 product reference grid showing the EXACT pieces to place in the room. ${entries.join('. ')}. Match each piece's color, material, silhouette, and proportions precisely — do not substitute with similar-looking alternatives.`
+    ? `Image 2 is a 2×2 grid containing 4 reference products with white gutters between them. ${entries.join('. ')}. Each of these 4 products MUST appear in the final image. Do not swap their positions, do not substitute with similar-looking alternatives, do not omit any. Match each product's color, material, silhouette, finish, and proportions exactly.`
     : 'Replace furniture with pieces that complement the room style.';
 
   // User text is included as SUPPLEMENTARY style intent, NOT as the primary
@@ -221,13 +247,26 @@ export function buildPanelPrompt(userPrompt, products) {
     ? `While maintaining this overall style intent: ${cleanedPrompt}.`
     : '';
 
+  // Order matters — flux weights EARLIER tokens more heavily AND truncates
+  // late tokens past ~200 words. Phase 1: FIDELITY_DIRECTIVES moved BEFORE
+  // styleIntent (the user's supplementary prompt). Two reasons:
+  //   1. The "all 4 products must appear" anchor must NEVER be truncated —
+  //      it's the central guard against the 2-3/4 hit-rate. Putting it
+  //      after the user prompt risked truncation when Haiku-expanded
+  //      prompts pushed total length past 200 words.
+  //   2. Earlier tokens get more attention weight, so the fidelity directive
+  //      gets a stronger pull on flux's output than when it was last.
+  // styleIntent stays last because it's intentionally supplementary — the
+  // wrapping comment "While maintaining this overall style intent" tells
+  // flux to treat it as a hint rather than the canonical spec, so losing
+  // its tail to truncation is acceptable.
   return [
     getQualityPrefix(cleanedPrompt),
     'This is a precise scene edit, not a new generation.',
     'Preserve image 1 exactly: same walls, floor, ceiling, windows, lighting, camera angle, perspective, and spatial layout. Do not alter any architecture.',
     refLine,
+    FIDELITY_DIRECTIVES,
     styleIntent,
-    WEIGHTED_DIRECTIVES,
   ].filter(Boolean).join(' ');
 }
 
@@ -245,26 +284,38 @@ export function buildPanelPrompt(userPrompt, products) {
  */
 export function buildFlux2MaxPrompt(userPrompt, products) {
   const entries = (products || []).slice(0, 4).map((p, i) => {
-    const desc = describeProductForPrompt(p) || (p.category || 'furniture').replace(/-/g, ' ');
-    // Image 1 is the room, so products start at image 2.
-    return `image ${i + 2} is a ${desc}`;
+    // Phase 1: same fallback fix as buildPanelPrompt — never bare "furniture".
+    const desc = describeProductForPrompt(p);
+    if (!desc) {
+      console.warn(
+        `[promptBuilder/refs] Missing descriptor for product ${p?.id || '(no id)'} ` +
+        `category=${p?.category || '(none)'} — using image-anchored fallback`,
+      );
+    }
+    const safeDesc = desc || `the exact product shown in image ${i + 2}`;
+    // Phase 1: ordinal tag for tracking. Image 1 is the room, so products
+    // start at image 2.
+    return `Product ${i + 1} (image ${i + 2}) is a ${safeDesc}`;
   });
 
   const refLine = entries.length > 0
-    ? `Place these products into the room shown in image 1: ${entries.join(', ')}. Match each product's color, material, silhouette, and proportions precisely — do not substitute with similar-looking alternatives. Position each piece naturally where this type of furniture belongs in the room.`
+    ? `Place all 4 of these products into the room shown in image 1: ${entries.join('. ')}. Each of these 4 products MUST appear in the final image. Do not omit any, do not substitute with similar-looking alternatives. Match each product's color, material, silhouette, finish, and proportions exactly. Position each piece naturally where this type of furniture belongs in the room.`
     : 'Replace furniture with pieces that complement the room style.';
 
   const styleIntent = userPrompt
     ? `While maintaining this overall style intent: ${userPrompt}.`
     : '';
 
+  // Same order as buildPanelPrompt: FIDELITY_DIRECTIVES before styleIntent so
+  // the "all 4 products must appear" anchor stays in stable token position
+  // and never gets truncated when Haiku-expanded prompts run long.
   return [
     getQualityPrefix(userPrompt),
     'This is a precise scene edit, not a new generation.',
     'Preserve image 1 exactly: same walls, floor, ceiling, windows, lighting, camera angle, perspective, and spatial layout. Do not alter any architecture.',
     refLine,
+    FIDELITY_DIRECTIVES,
     styleIntent,
-    WEIGHTED_DIRECTIVES,
   ].filter(Boolean).join(' ');
 }
 

@@ -2,18 +2,22 @@
  * HomeGenie — Product Panel Compositor (client-side utility)
  *
  * Calls the composite-products Supabase Edge Function to stitch up to 4
- * product reference images into a single 512×512 2×2 panel JPEG.
+ * product reference images into a single 1280×1280 2×2 panel JPEG with white
+ * gutters between cells (Phase 0 / edge fn v9).
  *
- * Why: flux-2-max charges per input megapixel and scales GPU time with input
- * complexity. Sending 2 images (room + panel) instead of 5 (room + 4 individual
- * products) reduces attention compute by ~40-50%, targeting ~$0.15/gen vs $0.31.
+ * Why: flux-2-pro/edit reads the panel as 4 distinct product references
+ * instead of one composite image, improving 4/4 fidelity in renders. The
+ * client always sends 1 panel + 1 room photo regardless of panel resolution,
+ * so per-call FAL cost stays at $0.06.
  *
- * Panel layout (each cell 256×256 px):
- *   ┌──────────┬──────────┐
- *   │ product1 │ product2 │
- *   ├──────────┼──────────┤
- *   │ product3 │ product4 │
- *   └──────────┴──────────┘
+ * Panel layout (each cell 620×620 px, 20px gutter, 10px outer):
+ *   ┌──┬──────────┬──┬──────────┬──┐
+ *   │  │ product1 │  │ product2 │  │
+ *   │  │          │  │          │  │
+ *   │  ├──────────┘  └──────────┤  │
+ *   │  ├──────────┐  ┌──────────┤  │
+ *   │  │ product3 │  │ product4 │  │
+ *   └──┴──────────┴──┴──────────┴──┘
  *
  * The calling code (HomeScreen.js) falls back to individual product images if
  * this function returns null — no generation is ever blocked by panel failure.
@@ -102,11 +106,12 @@ export async function createProductPanel(products, userId) {
   // and fills the 2×2 grid from the remaining URLs. This guarantees 4 filled
   // cells as long as at least 4 of the 6 URLs are valid.
   //
-  // Use 1500px Amazon sources (not 300px) so the panel's 256×256 cells have
-  // sharp detail after Lanczos downsampling. The edge function resizes to
-  // 256×256 regardless, so the download is a one-time cost — and Replicate
-  // only sees the final 512×512 panel, so per-input MP billing is unchanged.
-  // Quality win: sharper product detail in attention map → sharper render.
+  // Use 1500px Amazon sources (not 300px) so the panel's 620×620 cells have
+  // sharp detail after Lanczos downsampling. The edge function letterbox-fits
+  // each source to ≤620×620 (preserving aspect ratio), so the 1500px request
+  // is a one-time cost — and FAL only sees the final 1280×1280 panel JPEG,
+  // so per-input billing is unchanged. Quality win: sharper product detail
+  // in flux's attention map → 4/4 fidelity in the render.
   const productUrls = products
     .filter(p => p.imageUrl && typeof p.imageUrl === 'string' && p.imageUrl.startsWith('http'))
     .slice(0, SEND_LIMIT)

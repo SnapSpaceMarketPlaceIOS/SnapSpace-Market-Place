@@ -1,8 +1,9 @@
 /**
- * HomeGenie — composite-products Edge Function (v8)
+ * HomeGenie — composite-products Edge Function (v9)
  *
- * Stitches up to 4 product images into a 768×768 2×2 panel JPEG (384×384 per
- * cell) so flux-2-max receives 2 inputs (room + panel) instead of 4-5.
+ * Stitches up to 4 product images into a 1280×1280 2×2 panel JPEG (620×620 per
+ * cell) with white gutters and hairline cell borders so flux-2-pro/edit reads
+ * the panel as 4 distinct product references instead of one composite image.
  *
  * Failure history — why previous versions crashed:
  *   v1: imagescript     — deno.land CDN cold-start import timeout → 500
@@ -17,28 +18,39 @@
  *       (was q85). Client sends 1500px Amazon sources so the downsample has
  *       more detail to work with.
  *   v8: cell size bump  — 256×256 → 384×384 per cell, panel 512×512 → 768×768.
- *       Each cell now carries 2.25× more pixels. The Lanczos downsample from
- *       1500px source is 1500/384 = 3.9× instead of 5.8×, preserving ~33%
- *       more high-frequency detail (leather grain, stitching, wood grain).
- *       Flux-2-max sees 2.25× more attention patches per product reference so
- *       the rendered item more closely matches the catalog silhouette.
- *       Cost impact: $0 (Replicate bills per output MP, not input). Edge fn
- *       compute ~2.25× more pixels to Lanczos — still sub-second.
+ *       Each cell now carries 2.25× more pixels.
+ *   v9: 4/4 fidelity    — Phase 0 of the AI product fidelity plan. Three
+ *       changes targeted at moving renders from 2-3/4 → 4/4:
+ *       (a) cell 384→620, panel 768→1280. ~2.6× more pixels per cell so
+ *           silhouette / finish / color survive flux's attention sampling.
+ *       (b) 20px white gutters between cells + 10px outer margin. Forces
+ *           flux to perceive 4 distinct items rather than a single composite.
+ *           Critical for product photos that have their own backgrounds — a
+ *           rug shot in a room scene was the documented 2026-04-25 failure.
+ *       (c) Letterbox-fit instead of stretch-fit. Source images preserve
+ *           aspect ratio; non-square photos sit centered on white padding
+ *           inside the cell. Stretching a 1500×1000 sofa to 620×620 was
+ *           distorting silhouettes flux had to reconstruct.
+ *       (d) 1px gray hairline border around each cell so flux's perceptual
+ *           boundary between cells is unambiguous even when a cell's product
+ *           image bleeds white-on-white at its edge.
+ *       Cost impact: $0 on FAL (it bills output MP, not input). Edge-fn
+ *       Lanczos compute scales ~2.6× — still well under 1s on the Deno
+ *       runtime. JPEG q95 panel ~150KB → ~250KB, negligible upload time.
  *
  * Supabase edge functions officially support `npm:` specifiers (Deno 1.31+).
- * With `npm:`, Deno loads the CJS module through its own Node.js compat layer
- * rather than relying on esm.sh's CJS→ESM transform which produces broken
- * default exports for some packages.
  *
- * Panel layout (each cell 384×384 px, panel 768×768):
- *   ┌──────────┬──────────┐
- *   │ product1 │ product2 │
- *   ├──────────┼──────────┤
- *   │ product3 │ product4 │
- *   └──────────┴──────────┘
+ * Panel layout (CELL=620, GUTTER=20, OUTER=10, PANEL=1280):
+ *   ┌──┬──────────┬──┬──────────┬──┐
+ *   │  │ product1 │  │ product2 │  │
+ *   │  ├──────────┘  └──────────┤  │
+ *   │  ├──────────┐  ┌──────────┤  │
+ *   │  │ product3 │  │ product4 │  │
+ *   └──┴──────────┴──┴──────────┴──┘
+ *   ↑outer        ↑gutter        ↑outer
  *
- * Input:  { product_urls: string[] (up to 6 backup candidates), user_id: string }
- * Output: { url: string, composited_count: number }
+ * Input:  { product_urls: string[] (up to 6 backup candidates) }   (user_id from JWT)
+ * Output: { url: string, composited_count: number, composited_indices: number[] }
  */
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
@@ -49,8 +61,17 @@ const CORS = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-const CELL  = 384;
-const PANEL = 768;
+// v9 layout: 10 + 620 + 20 + 620 + 10 = 1280 ✓
+const CELL   = 620;
+const GUTTER = 20;
+const OUTER  = 10;
+const PANEL  = 1280;
+
+// Hairline border color — light gray (RGB 220) — visible against white panel
+// background but doesn't distract from the product photos.
+const BORDER_R = 220;
+const BORDER_G = 220;
+const BORDER_B = 220;
 
 // Build 69 Commit H: SSRF allowlist for product image fetches.
 //
@@ -90,11 +111,16 @@ function isAllowedImageHost(url: string): boolean {
   }
 }
 
+// Cell origins for the 2×2 layout with OUTER margin and GUTTER between cells.
+// Column origins: [10, 650]. Row origins: [10, 650].
+//   x=10  ────────  x=10+620+20=650 ────  end of right cell at 650+620=1270 → +10 outer = 1280 ✓
+const COL_X = [OUTER, OUTER + CELL + GUTTER];
+const ROW_Y = [OUTER, OUTER + CELL + GUTTER];
 const POSITIONS = [
-  { x: 0,    y: 0    },   // top-left
-  { x: CELL, y: 0    },   // top-right
-  { x: 0,    y: CELL },   // bottom-left
-  { x: CELL, y: CELL },   // bottom-right
+  { x: COL_X[0], y: ROW_Y[0] },   // top-left:    (10, 10)
+  { x: COL_X[1], y: ROW_Y[0] },   // top-right:   (650, 10)
+  { x: COL_X[0], y: ROW_Y[1] },   // bottom-left: (10, 650)
+  { x: COL_X[1], y: ROW_Y[1] },   // bottom-right:(650, 650)
 ];
 
 Deno.serve(async (req: Request) => {
@@ -192,14 +218,17 @@ Deno.serve(async (req: Request) => {
   // and pull from the remaining pool, guaranteeing all 4 cells are filled as long
   // as at least 4 of the provided URLs are valid images.
   const candidateUrls = product_urls.slice(0, 6);
-  console.log(`[composite v8] ${candidateUrls.length} candidate URLs | user=${user_id} | cell=${CELL}×${CELL} panel=${PANEL}×${PANEL}`);
+  console.log(`[composite v9] ${candidateUrls.length} candidate URLs | user=${user_id} | cell=${CELL}×${CELL} panel=${PANEL}×${PANEL} gutter=${GUTTER} outer=${OUTER}`);
 
-  // ── Allocate 768×768 RGBA panel buffer — light gray background ─────────────
+  // ── Allocate 1280×1280 RGBA panel buffer — white background ──────────────────
+  // White is a stronger separator than light gray for flux's perceptual edge
+  // detection; a cell whose product photo also has a white background still
+  // gets a clean 1px gray border drawn around it (see drawCellBorder below).
   const panelRGBA = new Uint8Array(PANEL * PANEL * 4);
   for (let i = 0; i < panelRGBA.length; i += 4) {
-    panelRGBA[i]     = 240;  // R
-    panelRGBA[i + 1] = 240;  // G
-    panelRGBA[i + 2] = 240;  // B
+    panelRGBA[i]     = 255;  // R
+    panelRGBA[i + 1] = 255;  // G
+    panelRGBA[i + 2] = 255;  // B
     panelRGBA[i + 3] = 255;  // A
   }
 
@@ -244,16 +273,35 @@ Deno.serve(async (req: Request) => {
       const decoded = jpeg.decode(buf, { useTArray: true });
       // decoded.data is RGBA Uint8Array, decoded.width/decoded.height are dimensions
 
-      // Lanczos3 resize to CELL×CELL — sharper than bilinear on photographic
-      // product shots, preserves edge detail that matters for flux attention.
-      const resized = lanczosResize(decoded.data, decoded.width, decoded.height, CELL, CELL);
+      // ── Letterbox-fit (v9) — preserve aspect ratio ─────────────────────────
+      // Compute fit dimensions: scale longer dimension to CELL, scale shorter
+      // dimension proportionally. Non-square photos sit centered on the
+      // panel's white background inside the cell. Stretching a 1500×1000
+      // sofa to 620×620 (the v8 behavior) was distorting silhouettes flux
+      // had to reconstruct — a known contributor to 2-3/4 mismatch.
+      const aspectSrc = decoded.width / decoded.height;
+      let fitW = CELL;
+      let fitH = CELL;
+      if (aspectSrc > 1) {
+        fitH = Math.max(1, Math.round(CELL / aspectSrc));
+      } else if (aspectSrc < 1) {
+        fitW = Math.max(1, Math.round(CELL * aspectSrc));
+      }
+      const padX = Math.floor((CELL - fitW) / 2);
+      const padY = Math.floor((CELL - fitH) / 2);
 
-      // Copy resized pixels into the panel at the next available 2×2 grid cell
+      // Lanczos3 resize to fitW×fitH — sharper than bilinear on photographic
+      // product shots, preserves edge detail that matters for flux attention.
+      const resized = lanczosResize(decoded.data, decoded.width, decoded.height, fitW, fitH);
+
+      // Composite letterboxed image at the center of the cell. The cell's
+      // surrounding pixels remain white (panel background), creating natural
+      // padding that separates this product from its neighbors.
       const { x: ox, y: oy } = POSITIONS[composited];
-      for (let row = 0; row < CELL; row++) {
-        for (let col = 0; col < CELL; col++) {
-          const src = (row * CELL + col) * 4;
-          const dst = ((oy + row) * PANEL + (ox + col)) * 4;
+      for (let row = 0; row < fitH; row++) {
+        for (let col = 0; col < fitW; col++) {
+          const src = (row * fitW + col) * 4;
+          const dst = ((oy + padY + row) * PANEL + (ox + padX + col)) * 4;
           panelRGBA[dst]     = resized[src];
           panelRGBA[dst + 1] = resized[src + 1];
           panelRGBA[dst + 2] = resized[src + 2];
@@ -261,9 +309,15 @@ Deno.serve(async (req: Request) => {
         }
       }
 
+      // 1px gray hairline around the CELL bounds (not the letterboxed image
+      // bounds) so flux sees a clean frame between this cell and its
+      // neighbors. Drawn AFTER the image composite so it sits on top of any
+      // edge pixels when fitW/fitH equal CELL.
+      drawCellBorder(panelRGBA, ox, oy, CELL, CELL, PANEL, BORDER_R, BORDER_G, BORDER_B);
+
       composited++;
       compositedIndices.push(urlIdx);
-      console.log(`[composite] Cell ${composited}/4 filled from URL ${urlIdx + 1} at grid pos (${POSITIONS[composited - 1].x}, ${POSITIONS[composited - 1].y})`);
+      console.log(`[composite v9] Cell ${composited}/4 filled from URL ${urlIdx + 1} | src=${decoded.width}×${decoded.height} → fit=${fitW}×${fitH} pad=${padX},${padY} | grid=(${ox},${oy})`);
     } catch (e: any) {
       console.warn(`[composite] URL ${urlIdx + 1} error: ${e?.message ?? String(e)} — skipping`);
     }
@@ -409,6 +463,36 @@ function clamp8(v: number): number {
   if (v <= 0) return 0;
   if (v >= 255) return 255;
   return Math.round(v);
+}
+
+// ── Cell border drawer (v9) ────────────────────────────────────────────────────
+//
+// Draws a 1px rectangle around (ox, oy, w, h) in the given RGBA panel buffer.
+// Used after compositing each cell's letterboxed product photo so flux's
+// perceptual edge detection has an unambiguous boundary even when the
+// product photo bleeds white-on-white at its edge (common with studio
+// product shots that have white backgrounds).
+function drawCellBorder(
+  pixels: Uint8Array,
+  ox: number, oy: number,
+  w: number, h: number,
+  panelW: number,
+  r: number, g: number, b: number,
+): void {
+  // Top + bottom edges
+  for (let col = 0; col < w; col++) {
+    const top = (oy * panelW + (ox + col)) * 4;
+    const bot = ((oy + h - 1) * panelW + (ox + col)) * 4;
+    pixels[top]     = r; pixels[top + 1] = g; pixels[top + 2] = b; pixels[top + 3] = 255;
+    pixels[bot]     = r; pixels[bot + 1] = g; pixels[bot + 2] = b; pixels[bot + 3] = 255;
+  }
+  // Left + right edges (skip corners — already drawn by top/bottom passes)
+  for (let row = 1; row < h - 1; row++) {
+    const left  = ((oy + row) * panelW + ox) * 4;
+    const right = ((oy + row) * panelW + (ox + w - 1)) * 4;
+    pixels[left]     = r; pixels[left + 1] = g; pixels[left + 2] = b; pixels[left + 3] = 255;
+    pixels[right]    = r; pixels[right + 1] = g; pixels[right + 2] = b; pixels[right + 3] = 255;
+  }
 }
 
 // ── Error helper ───────────────────────────────────────────────────────────────
