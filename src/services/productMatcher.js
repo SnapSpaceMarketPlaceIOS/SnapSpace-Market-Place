@@ -132,9 +132,15 @@ const MATERIAL_AFFINITY = {
  * @param {number} limit        - Max products to return (default 6)
  * @param {object[]} catalog    - Product catalog to search (default PRODUCT_CATALOG)
  * @param {object|null} userPrefs - User preference data from getUserPreferences() (default null — no bonus)
+ * @param {Set<string>|null} recentlyShownIds - Build 83 soft exclusion: product
+ *   IDs the user just saw in the last few generations. The diversifier will
+ *   prefer non-recent candidates per category so consecutive generations across
+ *   different design styles don't keep showing the same versatile chair / table.
+ *   Soft mode: if every candidate in a category was recent (thin catalog), the
+ *   exclusion is dropped for that category — quality > variety.
  * @returns {object[]}          - Sorted, diversified product array
  */
-export function matchProducts(parsedPrompt, limit = 6, catalog = PRODUCT_CATALOG, userPrefs = null) {
+export function matchProducts(parsedPrompt, limit = 6, catalog = PRODUCT_CATALOG, userPrefs = null, recentlyShownIds = null) {
   const {
     roomType,
     styles,
@@ -237,7 +243,7 @@ export function matchProducts(parsedPrompt, limit = 6, catalog = PRODUCT_CATALOG
 
   scored.sort((a, b) => b._score - a._score);
 
-  const diversified = diversify(scored, limit, roomType);
+  const diversified = diversify(scored, limit, roomType, recentlyShownIds);
 
   // ── Full-catalog expansion for thin room pools (Phase C2) ─────────────────
   // bathroom/outdoor/nursery catalogs can't fill 6 diverse slots. Score the
@@ -732,7 +738,7 @@ const CATEGORY_FALLBACK = [
  * @param {number}   limit    - Max products to return
  * @param {string}   roomType - Detected room type for essential selection
  */
-function diversify(sorted, limit, roomType = 'living-room') {
+function diversify(sorted, limit, roomType = 'living-room', recentlyShownIds = null) {
   const essentials = ROOM_ESSENTIALS[roomType] || ROOM_ESSENTIALS['living-room'];
   const categoryCounts = {};
   const result = [];
@@ -742,13 +748,27 @@ function diversify(sorted, limit, roomType = 'living-room') {
   // category. Probability of each pool entry = score / sum(scores), so
   // the top-matched product wins most of the time and weak matches very
   // rarely sneak in. When there's a single candidate we always return it.
+  //
+  // Build 83 (soft session-level deduplication): if `recentlyShownIds` is
+  // provided, split candidates into FRESH (not recently shown) and STALE
+  // (recently shown). Pick from FRESH if non-empty, otherwise fall back to
+  // the full candidate list. This means consecutive generations across
+  // different design styles will rotate through different products WHEN
+  // the catalog has alternatives. On thin categories where every candidate
+  // was recently shown, we still pick — quality > variety.
   function pickFromCategory(cat) {
     const candidates = sorted.filter(
       (p) => p.category === cat && !usedIds.has(p.id) && (categoryCounts[cat] || 0) < MAX_PER_CATEGORY
     );
     if (candidates.length === 0) return null;
 
-    const pool = candidates.slice(0, RANDOM_POOL_SIZE);
+    // Soft exclusion: prefer fresh candidates, fall back to all if needed.
+    const fresh = (recentlyShownIds && recentlyShownIds.size > 0)
+      ? candidates.filter((p) => !recentlyShownIds.has(p.id))
+      : candidates;
+    const effective = fresh.length > 0 ? fresh : candidates;
+
+    const pool = effective.slice(0, RANDOM_POOL_SIZE);
     if (pool.length === 1) return pool[0];
 
     // Use a floored score (min 1) so candidates with score 0 still have
@@ -844,13 +864,19 @@ function diversify(sorted, limit, roomType = 'living-room') {
 
       // Build wildcard pool: top scorers not already in result, not
       // duplicating an existing category, respecting category-room lock.
-      const wildcardPool = sorted
+      // Build 83: same soft exclusion as pickFromCategory — prefer fresh
+      // candidates, fall back to recently-shown only if no fresh exist.
+      const wildcardPoolPre = sorted
         .filter(p => !usedIds.has(p.id))
         .filter(p => !otherSlotCats.has(p.category))
         .filter(p => {
           const lock = CATEGORY_ROOM_LOCK[p.category];
           return !lock || lock.includes(roomType);
-        })
+        });
+      const wildcardFresh = (recentlyShownIds && recentlyShownIds.size > 0)
+        ? wildcardPoolPre.filter(p => !recentlyShownIds.has(p.id))
+        : wildcardPoolPre;
+      const wildcardPool = (wildcardFresh.length > 0 ? wildcardFresh : wildcardPoolPre)
         .slice(0, WILDCARD_POOL_SIZE);
 
       if (wildcardPool.length > 0) {

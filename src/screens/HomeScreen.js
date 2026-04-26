@@ -1060,6 +1060,15 @@ export default function HomeScreen({ navigation, route }) {
   // Resets on cold-start (acceptable; user gets full variation cycle each
   // session).
   const lastPromptIdxRef = useRef({});
+  // Build 83 — recently-shown product IDs across the last N generations.
+  // Used as a soft exclusion hint to getProductsForPrompt so the matcher
+  // prefers fresh catalog entries on consecutive generations across different
+  // design styles. Soft: if every candidate in a category was recent, the
+  // matcher drops the exclusion for that category — quality > variety.
+  // RECENT_PRODUCT_WINDOW = 3 generations × ~6 products = up to ~18 IDs in
+  // the rolling set, which the matcher uses as a Set lookup.
+  const recentProductIdsRef = useRef([]);  // queue of arrays, most-recent-first
+  const RECENT_PRODUCT_WINDOW = 3;
   const mediaPermGranted = useRef(false);
 
   // Pre-warm media library permission on mount so the picker opens instantly
@@ -1882,8 +1891,21 @@ export default function HomeScreen({ navigation, route }) {
       let matchedProducts = [];
       if (!isSingleProductMode) {
         setGenStatus('Finding products for your space…');
-        matchedProducts = getProductsForPrompt(designPrompt, 6);
-        log('pre-matched', matchedProducts.length, 'products:', matchedProducts.map(p => p.category).join(','));
+        // Build 83 soft exclusion: flatten the last RECENT_PRODUCT_WINDOW
+        // generations' product IDs into a single Set the matcher uses as a
+        // "prefer-not-to-show" hint. Per-category fresh candidates are
+        // preferred; thin categories where every candidate was recently
+        // shown still pick (quality > variety).
+        const recentIdsSet = new Set();
+        for (const arr of recentProductIdsRef.current) {
+          for (const id of arr) recentIdsSet.add(id);
+        }
+        matchedProducts = getProductsForPrompt(designPrompt, 6, recentIdsSet);
+        log('pre-matched', matchedProducts.length, 'products:', matchedProducts.map(p => p.category).join(','),
+          '| recent-exclusion-set size:', recentIdsSet.size);
+        // Push this generation's IDs onto the queue (most-recent-first), trim to window.
+        const thisGenIds = matchedProducts.map(p => p.id).filter(Boolean);
+        recentProductIdsRef.current = [thisGenIds, ...recentProductIdsRef.current].slice(0, RECENT_PRODUCT_WINDOW);
       }
 
       // ── URL pre-flight (full-room only — single-product does its own check) ──

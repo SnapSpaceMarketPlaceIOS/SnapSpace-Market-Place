@@ -213,8 +213,43 @@ function RevealImage({ before, after, borderRadius = 9 }) {
   const availableWidth = SCREEN_W - space.lg * 2;
   const heightCap = SCREEN_H * 0.75;
   const [dimensions, setDimensions] = useState(null);
+  // Build 83 fix: BEFORE EXIF-normalization. iOS 26 writes camera/picker JPEGs
+  // as landscape pixels + an EXIF orientation tag; React Native's <Image> in
+  // an Animated.View context honors that tag inconsistently and the BEFORE
+  // layer renders rotated 90°. BeforeCard already handles this via
+  // ImageManipulator.manipulateAsync — we mirror the exact same pattern here
+  // so the reveal animation's BEFORE renders upright. The animation waits
+  // on `normalizedBefore` instead of raw `before` so the sweep never plays
+  // with a sideways photo.
+  const [normalizedBefore, setNormalizedBefore] = useState(null);
   const progress = useRef(new Animated.Value(0)).current;
   const hasPlayed = useRef(false);
+
+  // Re-encode BEFORE through ImageManipulator to bake EXIF rotation into pixels.
+  // No edits — empty actions array — just a re-save as JPEG. Cheap (<200ms on
+  // typical iPhone photos) and only runs once per component instance.
+  useEffect(() => {
+    if (!before) {
+      setNormalizedBefore(null);
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      try {
+        const result = await ImageManipulator.manipulateAsync(
+          before,
+          [],
+          { compress: 0.9, format: ImageManipulator.SaveFormat.JPEG },
+        );
+        if (!cancelled) setNormalizedBefore(result.uri);
+      } catch {
+        // Fallback: use raw URI. Worst case the user sees the rotation quirk —
+        // the bug we're fixing — but they're not blocked from seeing the result.
+        if (!cancelled) setNormalizedBefore(before);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [before]);
 
   // Resolve natural dims from the AFTER image (same heuristic as AutoImage)
   useEffect(() => {
@@ -238,9 +273,11 @@ function RevealImage({ before, after, borderRadius = 9 }) {
     );
   }, [after, availableWidth, heightCap]);
 
-  // Kick off the reveal once dims are known AND we have a before image.
+  // Kick off the reveal once dims are known AND the normalized BEFORE is ready.
+  // Was: gated on raw `before` — could fire while normalization was in flight,
+  // playing the sweep on a sideways photo for the first frame.
   useEffect(() => {
-    if (!dimensions || !before || hasPlayed.current) return;
+    if (!dimensions || !normalizedBefore || hasPlayed.current) return;
     hasPlayed.current = true;
     Animated.sequence([
       Animated.delay(200),  // brief hold so user registers "before"
@@ -251,7 +288,7 @@ function RevealImage({ before, after, borderRadius = 9 }) {
         useNativeDriver: true,
       }),
     ]).start();
-  }, [dimensions, before, progress]);
+  }, [dimensions, normalizedBefore, progress]);
 
   // Use the COMPUTED width from Image.getSize, not a fixed availableWidth.
   // Previously width was pinned to availableWidth even when the height cap
@@ -280,8 +317,10 @@ function RevealImage({ before, after, borderRadius = 9 }) {
     );
   }
 
-  // If dims not yet known, show a solid placeholder (matches AutoImage idle state)
-  if (!dimensions) {
+  // If dims OR normalized BEFORE not yet ready, show a solid placeholder.
+  // Build 83 fix: also wait on normalizedBefore so the sweep can never fire
+  // with a sideways raw URI in flight.
+  if (!dimensions || !normalizedBefore) {
     return <View style={containerStyle} />;
   }
 
@@ -317,7 +356,10 @@ function RevealImage({ before, after, borderRadius = 9 }) {
           { transform: [{ translateY: beforeTranslateY }] },
         ]}
       >
-        <Image source={{ uri: before }} style={StyleSheet.absoluteFill} resizeMode="cover" />
+        {/* Build 83 fix: render the EXIF-normalized URI (re-encoded with
+            rotation baked into pixels) instead of raw `before`. iOS 26
+            picker URIs displayed sideways under animation. */}
+        <Image source={{ uri: normalizedBefore }} style={StyleSheet.absoluteFill} resizeMode="cover" />
       </Animated.View>
 
       {/* Glow line — tracks the reveal edge */}

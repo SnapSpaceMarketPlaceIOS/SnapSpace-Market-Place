@@ -84,11 +84,15 @@ function getCombinedCatalog() {
  *
  * @param {string} promptText - The user's AI generation prompt
  * @param {number} limit      - Number of products to return (default 6)
+ * @param {Set<string>|null} recentlyShownIds - Build 83: optional product-ID
+ *   set the matcher should prefer to skip (soft exclusion). Lets HomeScreen
+ *   rotate through the catalog across consecutive generations on different
+ *   styles so the same versatile chair / table doesn't appear every time.
  * @returns {object[]}        - Matched products with affiliate URLs
  */
-export function getProductsForPrompt(promptText, limit = 6) {
+export function getProductsForPrompt(promptText, limit = 6, recentlyShownIds = null) {
   const parsed = parseDesignPrompt(promptText);
-  const products = matchProducts(parsed, limit, getCombinedCatalog());
+  const products = matchProducts(parsed, limit, getCombinedCatalog(), null, recentlyShownIds);
   return products.map(normalizeProduct);
 }
 
