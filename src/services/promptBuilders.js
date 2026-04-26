@@ -243,8 +243,15 @@ export function buildPanelPrompt(userPrompt, products) {
   // wrapper added another `.` giving "..throughout.." in live FAL logs.
   // Strip trailing periods/whitespace before we add our own terminator.
   const cleanedPrompt = (userPrompt || '').replace(/[.\s]+$/, '');
+  // Build 82 fix: scope the user prompt to AESTHETIC ONLY, not furniture.
+  // Haiku-expanded prompts often name specific items (e.g. "white-washed oak
+  // console, blue striped throw pillows") that compete with the panel and
+  // cause flux to render the prompt's items instead of the panel's items —
+  // especially noticeable on evocative styles like coastal, mid-century, etc.
+  // This rewrite tells flux: use this for vibe (lighting, palette, mood) but
+  // never for furniture, which comes exclusively from the panel.
   const styleIntent = cleanedPrompt
-    ? `While maintaining this overall style intent: ${cleanedPrompt}.`
+    ? `For lighting, color palette, and overall aesthetic only — do not render any furniture or decor described here, all furniture comes exclusively from the reference panel: ${cleanedPrompt}.`
     : '';
 
   // Order matters — flux weights EARLIER tokens more heavily AND truncates
@@ -302,8 +309,11 @@ export function buildFlux2MaxPrompt(userPrompt, products) {
     ? `Place all 4 of these products into the room shown in image 1: ${entries.join('. ')}. Each of these 4 products MUST appear in the final image. Do not omit any, do not substitute with similar-looking alternatives. Match each product's color, material, silhouette, finish, and proportions exactly. Position each piece naturally where this type of furniture belongs in the room.`
     : 'Replace furniture with pieces that complement the room style.';
 
+  // Build 82 fix: same aesthetic-only scoping as buildPanelPrompt — keeps
+  // flux from substituting prompt-described items for the actual reference
+  // products on evocative styles.
   const styleIntent = userPrompt
-    ? `While maintaining this overall style intent: ${userPrompt}.`
+    ? `For lighting, color palette, and overall aesthetic only — do not render any furniture or decor described here, all furniture comes exclusively from the reference images: ${userPrompt}.`
     : '';
 
   // Same order as buildPanelPrompt: FIDELITY_DIRECTIVES before styleIntent so

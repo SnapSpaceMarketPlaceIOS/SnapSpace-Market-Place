@@ -3222,7 +3222,14 @@ export default function HomeScreen({ navigation, route }) {
             <View
               style={{
                 position: 'absolute',
-                top: (selectedStyle ? 56 : 0) + ((isStepActive('chat_bar') && !generating) ? 4 : 0) + 6,
+                // Build 82 fix: gate the +56 pill offset on `!generating`. The
+                // selected-style pill is hidden during generation (its render
+                // condition is `selectedStyle && !generating` above), so when
+                // generating we must drop the 56pt offset and re-anchor the
+                // icons to the top of the inputBar. Otherwise the icons sat
+                // ~62pt below heroBottom's top — i.e. lower-middle of the
+                // grown bar — which the user reported as "icons moved down".
+                top: ((selectedStyle && !generating) ? 56 : 0) + ((isStepActive('chat_bar') && !generating) ? 4 : 0) + 6,
                 left: 8,
                 flexDirection: 'row',
                 alignItems: 'center',

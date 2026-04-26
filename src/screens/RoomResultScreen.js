@@ -435,11 +435,17 @@ function BeforeCard({ before, afterDimensions, borderRadius = 9 }) {
 
   return (
     <View style={containerStyle}>
-      {/* contain = show user's full original photo without cropping */}
+      {/* cover = fill the same frame as the AFTER image so the swipe between
+          pages feels like one object. Was 'contain' which produced black
+          pillarbox bars when the user's photo aspect didn't perfectly match
+          the AFTER container's aspect. With cover, the photo fills the frame
+          edge-to-edge identically to AFTER's display. Minor edge crop is
+          acceptable and matches user-stated intent ("cropped at the same
+          frame as the actual image"). */}
       <Image
         source={{ uri: normalizedUri }}
         style={StyleSheet.absoluteFill}
-        resizeMode="contain"
+        resizeMode="cover"
       />
     </View>
   );
