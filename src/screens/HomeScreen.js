@@ -1160,6 +1160,22 @@ export default function HomeScreen({ navigation, route }) {
   const heroCurrentIdx = useRef(0);
   const heroTimerRef = useRef(null);
 
+  // Build 89 / F3: lazy-mount hero images.
+  //
+  // Previously every HERO_IMAGES entry rendered an <Image> on first paint —
+  // iOS decoded all 7 JPEGs (~1.3 MB GPU/decode) before the Home screen was
+  // interactive. Now we only mount the indices that have actually been
+  // visited; first paint mounts index 0 only. The crossfade scheduler adds
+  // the nextIdx to the mounted set right before fading it in. After one full
+  // cycle (~38s) every image is mounted, just like before.
+  //
+  // This is a lazy-mount, not a swap-in-place — we still want each image's
+  // <Image> to stay mounted after first show so iOS keeps the texture cached
+  // (avoids re-decode on subsequent cycles). The whole point is to spread
+  // the decode cost across the first 38 seconds rather than incurring all
+  // of it in the first frame.
+  const [mountedHeroSet, setMountedHeroSet] = useState(() => new Set([0]));
+
   useEffect(() => {
     let cancelled = false;
 
@@ -1168,6 +1184,16 @@ export default function HomeScreen({ navigation, route }) {
         if (cancelled) return;
         const currentIdx = heroCurrentIdx.current;
         const nextIdx = (currentIdx + 1) % HERO_IMAGES.length;
+
+        // Mount nextIdx if not yet mounted. iOS will start decoding as soon
+        // as <Image> mounts; opacity ramps up over HERO_FADE_MS (1200ms),
+        // which is well above bundled-JPEG decode time (~50-100ms).
+        setMountedHeroSet(prev => {
+          if (prev.has(nextIdx)) return prev;
+          const next = new Set(prev);
+          next.add(nextIdx);
+          return next;
+        });
 
         // Crossfade: fade out current + fade in next simultaneously
         Animated.parallel([
@@ -3050,15 +3076,20 @@ export default function HomeScreen({ navigation, route }) {
 
   return (
     <TabScreenFade style={styles.container}>
-      {/* Hero background — crossfading slideshow */}
+      {/* Hero background — crossfading slideshow.
+          Build 89: <Image> mounts gated on `mountedHeroSet.has(i)` so iOS
+          only decodes images we've actually displayed. See lazy-mount
+          comment on the heroOpacities useEffect above. */}
       <View style={styles.bgImage}>
         {HERO_IMAGES.map((src, i) => (
           <Animated.View key={i} style={[StyleSheet.absoluteFill, { opacity: heroOpacities[i], justifyContent: 'center' }]}>
-            <Image
-              source={src}
-              style={{ width: '100%', height: '100%' }}
-              resizeMode="cover"
-            />
+            {mountedHeroSet.has(i) && (
+              <Image
+                source={src}
+                style={{ width: '100%', height: '100%' }}
+                resizeMode="cover"
+              />
+            )}
           </Animated.View>
         ))}
       </View>

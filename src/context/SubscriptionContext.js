@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useCallback, useEffect, useRef } from 'react';
-import { Alert } from 'react-native';
+import { Alert, InteractionManager } from 'react-native';
 import {
   initConnection,
   endConnection,
@@ -153,10 +153,37 @@ export function SubscriptionProvider({ children }) {
       }
     }
 
-    connectIAP();
+    // Build 89 / L2: defer IAP connection until after first interaction.
+    //
+    // initConnection() + 2× fetchProducts() are native StoreKit RPCs that
+    // routinely cost 300-800ms cold. The user can't see the paywall until
+    // their 6th generation, so blocking cold path on this is wasteful.
+    //
+    // InteractionManager.runAfterInteractions waits for the JS scheduler
+    // to finish any in-flight animations + interactions before running
+    // its callback. On cold launch this lands ~100-300ms after first
+    // interactive frame. iapReady stays false until then; all IAP code
+    // paths already gate on `if (!iapReady) return`.
+    //
+    // We also keep a fallback timeout: if the user never interacts (idle
+    // on Home), we connect after 2s anyway so Restore Purchases on the
+    // Profile tab still works without a tap-anywhere prerequisite.
+    let interactionHandle = null;
+    let fallbackTimer = setTimeout(() => {
+      if (mounted) connectIAP();
+    }, 2000);
+    interactionHandle = InteractionManager.runAfterInteractions(() => {
+      clearTimeout(fallbackTimer);
+      fallbackTimer = null;
+      if (mounted) connectIAP();
+    });
 
     return () => {
       mounted = false;
+      if (fallbackTimer) clearTimeout(fallbackTimer);
+      if (interactionHandle && typeof interactionHandle.cancel === 'function') {
+        interactionHandle.cancel();
+      }
       endConnection().catch(() => {});
     };
   }, []);

@@ -352,20 +352,34 @@ function TabNavigator() {
 
 // ─── Root Navigator ──────────────────────────────────────────────
 function RootNavigator() {
-  const { loading, user } = useAuth();
+  const { user } = useAuth();
 
-  if (loading) {
-    return (
-      <View style={styles.loadingScreen}>
-        <Text style={styles.loadingWordmark}>HomeGenie</Text>
-        {/* Build 89: animating={false} on boot screens. Boot is transient
-            (<1.5s); the orbiting-particle animation was competing with JS
-            bundle parse + auth bootstrap for the same main thread. The
-            in-app GenieLoader (generation wait) keeps full animation. */}
-        <GenieLoader size={80} animating={false} style={{ marginTop: 48 }} />
-      </View>
-    );
-  }
+  // Build 89 / L1: dropped the `loading` gate.
+  //
+  // PRIOR BEHAVIOR: rendered a HomeGenie loading screen while AuthContext
+  // bootstrapped (Supabase getSession + fetchProfile + cold AsyncStorage).
+  // On iOS 26 cold-launch this routinely cost 600-2000ms before Home was
+  // even constructed.
+  //
+  // NEW BEHAVIOR: render the tab tree immediately with `user=null`. The
+  // soft auth wall (Build 69 Commit G) means Home is public; any gated
+  // action (Explore/Wish/Cart/Profile tabs, tapping a gated CTA) is
+  // already wrapped in `useRequireAuth` and routes to Auth on tap.
+  // ExploreScreen has its own `if (authLoading) return <View />` guard
+  // to suppress an AuthScreen flash during the brief bootstrap window.
+  //
+  // SAFETY: bootstrapSupersededRef in AuthContext protects against late
+  // bootstrap results clobbering user-initiated auth actions. The 15s
+  // bootstrap timeout still releases `loading` for any consumers that
+  // care (CartContext, SubscriptionContext both gate their hydration on
+  // `if (authLoading) return`). onAuthStateChange continues to populate
+  // user state when the session arrives.
+  //
+  // For signed-in users with a persisted session: there's a brief window
+  // (~200-1500ms) where user is null while bootstrap runs in background.
+  // During that window, Home renders as if guest. As soon as the session
+  // resolves, useAuth() provides the user and any user-keyed UI updates.
+  // No screen flashes the AuthScreen because Home doesn't gate on auth.
 
   // Build 69 Commit G: soft auth wall.
   //
@@ -485,20 +499,14 @@ export default function App() {
     lockPortrait();
   }, []);
 
-  if (!fontsLoaded) {
-    return (
-      <View style={styles.loadingScreen}>
-        <Text style={styles.loadingWordmark}>
-          HomeGenie
-        </Text>
-        {/* Build 89: animating={false} on boot screens. Boot is transient
-            (<1.5s); the orbiting-particle animation was competing with JS
-            bundle parse + auth bootstrap for the same main thread. The
-            in-app GenieLoader (generation wait) keeps full animation. */}
-        <GenieLoader size={80} animating={false} style={{ marginTop: 48 }} />
-      </View>
-    );
-  }
+  // Build 89 / 🚩1: dropped the `if (!fontsLoaded) return loading-screen`
+  // gate. Geist fonts are bundled (no network) but still parsed by iOS
+  // CoreText which adds 150-400ms to cold path. Rendering the tree
+  // immediately produces a brief (~50-200ms) flash where text uses iOS
+  // system font, then reflows to Geist when ready. Premium apps do
+  // this (Instagram, Airbnb). The trade is documented + accepted.
+  // fontsLoaded is intentionally read but its truthiness is not gated on.
+  void fontsLoaded;
 
   return (
     <SafeAreaProvider>
