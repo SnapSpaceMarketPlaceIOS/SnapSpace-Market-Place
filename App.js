@@ -358,7 +358,11 @@ function RootNavigator() {
     return (
       <View style={styles.loadingScreen}>
         <Text style={styles.loadingWordmark}>HomeGenie</Text>
-        <GenieLoader size={80} animating style={{ marginTop: 48 }} />
+        {/* Build 89: animating={false} on boot screens. Boot is transient
+            (<1.5s); the orbiting-particle animation was competing with JS
+            bundle parse + auth bootstrap for the same main thread. The
+            in-app GenieLoader (generation wait) keeps full animation. */}
+        <GenieLoader size={80} animating={false} style={{ marginTop: 48 }} />
       </View>
     );
   }
@@ -460,7 +464,11 @@ export default function App() {
         <Text style={styles.loadingWordmark}>
           HomeGenie
         </Text>
-        <GenieLoader size={80} animating style={{ marginTop: 48 }} />
+        {/* Build 89: animating={false} on boot screens. Boot is transient
+            (<1.5s); the orbiting-particle animation was competing with JS
+            bundle parse + auth bootstrap for the same main thread. The
+            in-app GenieLoader (generation wait) keeps full animation. */}
+        <GenieLoader size={80} animating={false} style={{ marginTop: 48 }} />
       </View>
     );
   }

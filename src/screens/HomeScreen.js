@@ -1072,12 +1072,12 @@ export default function HomeScreen({ navigation, route }) {
   const RECENT_PRODUCT_WINDOW = 3;
   const mediaPermGranted = useRef(false);
 
-  // Pre-warm media library permission on mount so the picker opens instantly
-  useEffect(() => {
-    ImagePicker.requestMediaLibraryPermissionsAsync()
-      .then(({ status }) => { if (status === 'granted') mediaPermGranted.current = true; })
-      .catch(() => {});
-  }, []);
+  // Build 89: removed eager media-library pre-warm. It was a TurboModule
+  // call on every cold start asking the OS for photo permission status
+  // BEFORE the user had ever expressed interest in the gallery. Better UX:
+  // ask only when the user taps the gallery icon (handled by
+  // handlePickFromLibrary below), and let mediaPermGranted cache it for
+  // subsequent taps. Saves ~50-200ms from the cold path.
 
   // (Bug 4A useEffect removed — `inputExpanded` no longer exists. The fix
   // it was originally addressing is now handled by promptInputRef.clear()
@@ -1093,28 +1093,48 @@ export default function HomeScreen({ navigation, route }) {
   // 5-minute TTL so a prompt abandoned last week doesn't resurrect out
   // of nowhere. Best-effort: any JSON/storage error falls through to a
   // clean empty state.
+  // Build 89: batched the two on-mount AsyncStorage reads (pending prompt +
+  // recently viewed) into a single multiGet. iOS 26's AsyncStorage TurboModule
+  // serialises calls — separate getItems contend on the same single-threaded
+  // bridge. multiGet returns both keys in one round-trip.
   useEffect(() => {
     (async () => {
       try {
-        const raw = await AsyncStorage.getItem('@homegenie_pending_prompt');
-        if (!raw) return;
-        // Always clear the key, even if we decide not to restore — it's
-        // a one-shot handoff, not a persistent preference.
-        await AsyncStorage.removeItem('@homegenie_pending_prompt');
-        const parsed = JSON.parse(raw);
-        const { prompt: saved, savedAt } = parsed || {};
-        if (!saved || !savedAt) return;
-        if (Date.now() - savedAt > 5 * 60 * 1000) return;
-        // Defensive: don't clobber a prompt the user has already started
-        // typing on the fresh mount. Only restore into an empty field.
-        setPrompt((prev) => {
-          if (prev) return prev;
-          // We're actually replacing the value — force the TextInput to
-          // remount so iOS measures the restored content fresh.
-          bumpInputKey();
-          return saved;
-        });
-      } catch (e) {
+        const pairs = await AsyncStorage.multiGet([
+          '@homegenie_pending_prompt',
+          'snapspace_recently_viewed',
+        ]);
+        const map = Object.fromEntries(pairs);
+        const pendingRaw = map['@homegenie_pending_prompt'];
+        const recentRaw = map['snapspace_recently_viewed'];
+
+        // Hydrate recently viewed first (cheap, no side-effects)
+        if (recentRaw) {
+          try { setRecentlyViewed(JSON.parse(recentRaw).slice(0, 6)); } catch (_) {}
+        }
+
+        // Pending prompt restoration (with TTL + handoff cleanup)
+        if (pendingRaw) {
+          // Always clear the key, even if we decide not to restore — it's
+          // a one-shot handoff, not a persistent preference.
+          await AsyncStorage.removeItem('@homegenie_pending_prompt');
+          try {
+            const parsed = JSON.parse(pendingRaw);
+            const { prompt: saved, savedAt } = parsed || {};
+            if (saved && savedAt && Date.now() - savedAt <= 5 * 60 * 1000) {
+              // Defensive: don't clobber a prompt the user has already started
+              // typing on the fresh mount. Only restore into an empty field.
+              setPrompt((prev) => {
+                if (prev) return prev;
+                // We're actually replacing the value — force the TextInput
+                // to remount so iOS measures the restored content fresh.
+                bumpInputKey();
+                return saved;
+              });
+            }
+          } catch (_) {}
+        }
+      } catch (_) {
         // Best-effort — never block the home screen on a storage hiccup
       }
     })();
@@ -1173,8 +1193,12 @@ export default function HomeScreen({ navigation, route }) {
     return () => { cancelled = true; clearTimeout(heroTimerRef.current); };
   }, []);
 
-  // Scroll ref (used by other scroll-dependent logic)
-  const scrollY = useRef(new Animated.Value(0)).current;
+  // Build 89: removed `scrollY` Animated.Value. It was being written by a
+  // 60Hz onScroll handler on the home ScrollView but read by NOTHING — pure
+  // dead bridge traffic on the most-rendered screen, sibling pattern to the
+  // StyleCarousel rAF loop fixed in Build 88. If a future scroll-dependent
+  // animation is added, reintroduce as `Animated.event([...], { useNativeDriver: true })`
+  // and consume via interpolate() in styles, never via setValue + JS read.
 
   // ── Personalization ─────────────────────────────────────────────────────────
 
@@ -1223,13 +1247,7 @@ export default function HomeScreen({ navigation, route }) {
     return () => clearInterval(timer);
   }, []);
 
-  useEffect(() => {
-    AsyncStorage.getItem('snapspace_recently_viewed').then(raw => {
-      if (raw) {
-        try { setRecentlyViewed(JSON.parse(raw).slice(0, 6)); } catch (_) {}
-      }
-    });
-  }, []);
+  // (Build 89: snapspace_recently_viewed read folded into the multiGet above.)
 
   // Receive photo captured from Snap tab (and optional single product for visualize flow)
   useEffect(() => {
@@ -1461,7 +1479,10 @@ export default function HomeScreen({ navigation, route }) {
       });
     }, 3000);
     return () => clearInterval(interval);
-  }, [generating, loadingMessages]);
+    // Build 89: depend on .length not the array ref. setLoadingMessages is
+    // sometimes called with a freshly-built array of the same length, which
+    // was tearing down + rebuilding the interval mid-generation.
+  }, [generating, loadingMessages.length]);
 
   // ── Result actions ──────────────────────────────────────────────────────────
 
@@ -3046,8 +3067,6 @@ export default function HomeScreen({ navigation, route }) {
       <ScrollView
         style={StyleSheet.absoluteFill}
         contentContainerStyle={styles.scrollContent}
-        onScroll={(e) => scrollY.setValue(e.nativeEvent.contentOffset.y)}
-        scrollEventThrottle={16}
         showsVerticalScrollIndicator={false}
         bounces={false}
         // 'handled' lets a tap on a child TouchableOpacity (e.g. the × on
