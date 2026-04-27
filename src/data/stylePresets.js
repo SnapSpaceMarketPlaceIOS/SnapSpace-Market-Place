@@ -1,28 +1,41 @@
 /**
- * Style presets — the 12 design styles surfaced in the Home-screen
+ * Style presets — the 16 design styles surfaced in the Home-screen
  * StyleCarousel under the wish input bar. Tapping a preset:
  *   1) Replaces the prompt-chip strip above the input bar with a
  *      "selected style" pill (thumbnail + label + prompt preview).
  *   2) Auto-populates the prompt input with one of the curated variations.
  *
- * `prompts` shape rationale: each style ships with 3 variations so
- * consecutive taps of the same card produce DIFFERENT generations. The
- * variations all keep the canonical style keyword (so productMatcher's
- * 40% style-score still lands every time) but rotate furniture pieces,
- * materials, and palette so the matcher's category-diversity filter
- * pulls genuinely different catalog products into the panel each pick.
+ * Build 95 — Cinematography + Catalog-Aligned Vocabulary rewrite.
  *
- * All variations stay within the same room type as the carousel photo
- * (currently all living rooms) so there's no visual disconnect between
- * what the user sees on the card and what the AI generates.
+ * Earlier preset prompts named specific furniture items ("scalloped
+ * emerald velvet sofa, polished marble side table, fluted gold sconces,
+ * geometric area rug"). Flux read those as authoritative furniture
+ * directives and rendered them — even though the matched product panel
+ * had different items. Result: prompt items vs. panel items vs. rendered
+ * items diverged. User saw 2/4 fidelity in the Shop Room strip vs. the
+ * generated photo.
  *
- * Each prompt is ~15 words: long enough to seed style/material/furniture
- * cues for productMatcher, short enough that promptExpander (Haiku) can
- * pass through with light expansion under its 30-word ceiling.
+ * Two structural changes per the user's theory:
  *
- * `label` is the short two-word card title (display only — never sent to
- * the AI). Images are bundled via require() so they ship inside the JS
- * bundle — no network fetch, no race conditions, identical on every iPhone.
+ *   (a) Catalog-aligned vocabulary — every material, texture, and color
+ *       descriptor below was extracted from the live productCatalog.js
+ *       for that style's tagged products. The matcher's tag-scoring lands
+ *       on real products; flux's text path describes textures the panel
+ *       actually shows. The puzzle pieces fit.
+ *
+ *   (b) Cinematography over inventory — the prompt's job is now lighting,
+ *       contrast, shadow, color temperature, and mood. NEVER specific
+ *       furniture items. Same panel furniture, shown under 16 different
+ *       cinematographic moods, gives the user 16 distinct experiences.
+ *       Small catalog feels huge.
+ *
+ * Each style still ships with 3 variations so consecutive taps produce
+ * different generations. Variations rotate the cinematography + texture
+ * vocabulary while preserving the canonical style keyword (productMatcher's
+ * 40% style-score still lands every time).
+ *
+ * `label` is the short card title (display only — never sent to the AI).
+ * Images are bundled via require() so they ship inside the JS bundle.
  */
 export const STYLE_PRESETS = [
   {
@@ -30,9 +43,9 @@ export const STYLE_PRESETS = [
     label: 'Modern Minimal',
     image: require('../assets/styles/modern-minimal.jpg'),
     prompts: [
-      'Modern minimalist living room, white linen sofa, oak coffee table, jute rug, arc floor lamp',
-      'Modern minimalist living room, bouclé sectional, travertine coffee table, ivory area rug, paper pendant',
-      'Modern minimalist living room, cream slipcover sofa, oak nesting tables, sheer linen curtains, ceramic vase',
+      'Modern minimalist living room, bright diffused daylight, soft shadows, linen and pale-wood textures, neutral palette, editorial restraint and quiet calm.',
+      'Modern minimalist living room, soft north-window glow, low-contrast clarity, ceramic and oak warmth balanced by metal cool, ivory and stone palette, refined stillness.',
+      'Modern minimalist living room, even diffused daylight, gentle shadows, upholstered linen and leather softness, white and charcoal palette, airy editorial composure.',
     ],
   },
   {
@@ -40,9 +53,9 @@ export const STYLE_PRESETS = [
     label: 'Mid-Century',
     image: require('../assets/styles/mid-century.jpg'),
     prompts: [
-      'Mid-century living room, walnut credenza, camel leather sofa, sunburst mirror, tripod lamp',
-      'Mid-century living room, teak coffee table, mustard velvet accent chair, brass floor lamp, abstract gallery wall',
-      'Mid-century living room, rosewood sideboard, charcoal tweed sofa, cone pendant lamp, geometric area rug',
+      'Mid-century living room, warm afternoon sunlight, golden-hour tones, walnut and tan-leather warmth, retro earth palette, refined nostalgia and confident ease.',
+      'Mid-century living room, low golden lamplight, medium-contrast warmth, walnut wood and tufted upholstered textures, brown and amber tones, lived-in modernist calm.',
+      'Mid-century living room, soft afternoon glow, gentle directional light, boucle and walnut warmth, rust and caramel accents, retro elegance with quiet confidence.',
     ],
   },
   {
@@ -50,9 +63,9 @@ export const STYLE_PRESETS = [
     label: 'Scandinavian',
     image: require('../assets/styles/scandinavian.jpg'),
     prompts: [
-      'Scandinavian living room, white oak coffee table, bouclé lounge chair, linen curtains, sheepskin throw',
-      'Scandinavian living room, ash wood console, ivory wool sofa, paper sphere pendant, wool felt rug',
-      'Scandinavian living room, pale birch shelving, oat-tone slipcover sofa, knit pouf, woven wall art',
+      'Scandinavian living room, bright north light, airy soft shadows, pale wood and boucle softness, ivory and oat palette, hygge calm and serene minimalism.',
+      'Scandinavian living room, soft diffused daylight, low-contrast clarity, light wood and ceramic warmth, white with black accents, nordic stillness and lived-in quiet.',
+      'Scandinavian living room, gentle morning glow, breathy shadows, curved boucle and linen plushness, oat and bone palette, hygge airiness and serene restraint.',
     ],
   },
   {
@@ -60,9 +73,9 @@ export const STYLE_PRESETS = [
     label: 'Japandi',
     image: require('../assets/styles/Japandi.jpg'),
     prompts: [
-      'Japandi living room, walnut bench, rattan lounge chair, linen sofa, ceramic vase, paper pendant',
-      'Japandi living room, low oak coffee table, charcoal linen sectional, washi paper lantern, jute rug',
-      'Japandi living room, white oak shelving, beige bouclé chair, ceramic stoneware vessels, woven floor cushion',
+      'Japandi living room, soft overcast diffusion, gentle shadows, sculptural ceramic and natural wood textures, white and warm-natural palette, zen quiet and grounded calm.',
+      'Japandi living room, soft daylight, restrained shadows, ceramic and oak balance, ivory and earth tones, minimalist meditation and quiet refinement.',
+      'Japandi living room, diffused window light, low-contrast hush, wood and linen textures with sculptural ceramic accents, neutral palette, grounded zen stillness.',
     ],
   },
   {
@@ -70,9 +83,9 @@ export const STYLE_PRESETS = [
     label: 'Cozy Cabin',
     image: require('../assets/styles/cozy-cabin.jpg'),
     prompts: [
-      'Cozy cabin living room, leather armchair, reclaimed wood coffee table, woven throw blanket, brass sconce',
-      'Cozy cabin living room, plaid wool sofa, hewn-log side table, sheepskin rug, wrought-iron pendant',
-      'Cozy cabin living room, distressed leather sectional, cedar coffee table, layered Berber rugs, antler chandelier',
+      'Cozy cabin living room, warm firelight glow, deep amber shadows, rustic wood and soft linen textures, brown and beige palette, lived-in stillness and golden warmth.',
+      'Cozy cabin living room, low lamp glow, layered amber tones, rustic wood and velvet softness, warm earth palette, hygge weight and comfortable hush.',
+      'Cozy cabin living room, soft hearth-light warmth, deep wood-toned shadows, rattan and linen textures, brown and cream palette, weathered stillness and intimate calm.',
     ],
   },
   {
@@ -80,9 +93,9 @@ export const STYLE_PRESETS = [
     label: 'Farmhouse',
     image: require('../assets/styles/farmhouse.jpg'),
     prompts: [
-      'Modern farmhouse living room, weathered wood console, linen sofa, jute rug, pendant lighting',
-      'Modern farmhouse living room, shiplap accent wall, beige slipcover sofa, barn-wood coffee table, mason-jar pendant',
-      'Modern farmhouse living room, reclaimed pine sideboard, plaid throw, ivory linen armchair, rope chandelier',
+      'Modern farmhouse living room, soft morning daylight, gentle warmth, weathered wood and linen textures, beige and cream palette, country quietude and lived-in ease.',
+      'Modern farmhouse living room, bright country light, soft shadows, wood and ceramic textures with striped soft furnishings, ivory and warm-brown palette, refined rustic calm.',
+      'Modern farmhouse living room, golden morning glow, gentle directional warmth, rustic wood and vintage metal accents, cream and earth tones, country charm and grounded composure.',
     ],
   },
   {
@@ -90,9 +103,9 @@ export const STYLE_PRESETS = [
     label: 'Coastal',
     image: require('../assets/styles/coastal-modern.jpg'),
     prompts: [
-      'Coastal modern living room, white linen sofa, rattan lounge chair, driftwood coffee table, sea-grass rug',
-      'Coastal modern living room, slipcovered ivory sectional, woven jute coffee table, capiz-shell pendant, sandstone vase',
-      'Coastal modern living room, white-washed oak console, blue striped throw pillows, rope-bound mirror, sisal rug',
+      'Coastal modern living room, bright airy daylight, soft sea-glass tones, rattan and linen textures, ivory and natural-fiber palette, breezy stillness and weightless calm.',
+      'Coastal modern living room, sun-washed soft light, low-contrast brightness, wicker and ceramic warmth, white and sand palette, breezy ease and lived-in clarity.',
+      'Coastal modern living room, diffused beach-house glow, gentle shadows, woven natural-fiber textures, cream and pale-driftwood palette, airy serenity and quiet ocean breath.',
     ],
   },
   {
@@ -100,9 +113,9 @@ export const STYLE_PRESETS = [
     label: 'Industrial',
     image: require('../assets/styles/industrial.jpg'),
     prompts: [
-      'Industrial living room, dark leather sofa, metal coffee table, Edison pendant lamp, exposed brick',
-      'Industrial living room, blackened-steel shelving, oxblood leather club chair, factory-style pendant, concrete coffee table',
-      'Industrial living room, riveted metal console, distressed leather sectional, gooseneck floor lamp, raw timber accents',
+      'Industrial living room, hard directional sidelight, cool steel shadows, metal and dark-wood textures, black and graphite palette, gritty editorial weight.',
+      'Industrial living room, low cool sidelight, sharp shadow geometry, raw metal and leather textures, charcoal and dark-wood tones, moody atmospheric density.',
+      'Industrial living room, single-source window light, deep contrast shadows, metal-frame and reclaimed-wood textures, black and earth palette, raw urban composure.',
     ],
   },
   {
@@ -110,9 +123,9 @@ export const STYLE_PRESETS = [
     label: 'Biophilic',
     image: require('../assets/styles/biophilic.jpg'),
     prompts: [
-      'Biophilic living room, terracotta sofa, live-edge coffee table, hanging plants, jute rug, woven pendant',
-      'Biophilic living room, sage linen sectional, fiddle-leaf fig, oak slat console, rattan pendant, moss-toned rug',
-      'Biophilic living room, clay-toned bouclé chair, stone coffee table, trailing pothos shelf, hemp area rug',
+      'Biophilic living room, soft green-filtered daylight, organic warmth, ceramic and natural-fiber textures, sage and ivory palette, garden-room calm and living serenity.',
+      'Biophilic living room, dappled plant-filtered light, gentle shadows, ceramic and woven natural textures, soft green and stone palette, conservatory hush and breath of growth.',
+      'Biophilic living room, soft daylight through hanging foliage, organic dappling, ceramic and natural-fiber warmth, sage and warm-cream palette, indoor-garden serenity.',
     ],
   },
   {
@@ -120,9 +133,9 @@ export const STYLE_PRESETS = [
     label: 'Maximalist',
     image: require('../assets/styles/maximalist.jpg'),
     prompts: [
-      'Maximalist living room, jewel velvet sofa, brass coffee table, layered textiles, gallery wall, statement chandelier',
-      'Maximalist living room, emerald velvet sectional, lacquered ruby side table, Persian rug, brass starburst chandelier',
-      'Maximalist living room, sapphire damask armchair, mirrored chest, layered Oushak rugs, opulent crystal pendant',
+      'Maximalist living room, rich saturated lamplight, bold layered color, velvet and metal textures, jewel-tone palette, theatrical depth and abundant warmth.',
+      'Maximalist living room, dramatic warm lighting, layered shadow and highlight, velvet and ceramic textures with bold textile mixing, ruby and emerald palette, opulent storytelling and exuberant richness.',
+      'Maximalist living room, golden lamplight saturation, theatrical contrast, velvet and metal warmth, jewel tones layered with brass accents, unapologetic abundance and curated drama.',
     ],
   },
   {
@@ -130,9 +143,9 @@ export const STYLE_PRESETS = [
     label: 'Rustic',
     image: require('../assets/styles/rustic.jpg'),
     prompts: [
-      'Rustic living room, leather sofa, reclaimed wood coffee table, woven wool rug, iron pendant lamp',
-      'Rustic living room, hewn-log mantle, oxblood leather armchair, kilim rug, hammered-copper accents',
-      'Rustic living room, weathered timber sideboard, plaid wool throw, slate-tone area rug, wrought-iron candelabra',
+      'Rustic living room, golden lamplight, deep wood-toned shadows, weathered wood and linen textures, brown and warm-earth palette, weathered warmth and timeworn ease.',
+      'Rustic living room, low warm pendant glow, deep amber shadows, solid-wood and metal textures, dark-walnut and tan palette, time-burnished hush and grounded stillness.',
+      'Rustic living room, soft golden-hour lamplight, layered earthy shadows, rattan and aged-wood warmth, ochre and cocoa palette, lived-in patina and gentle quiet.',
     ],
   },
   {
@@ -140,9 +153,9 @@ export const STYLE_PRESETS = [
     label: 'Brutalist',
     image: require('../assets/styles/brutalist.jpg'),
     prompts: [
-      'Brutalist living room, concrete coffee table, dark leather sofa, raw stone accents, sculptural floor lamp',
-      'Brutalist living room, monolithic stone console, charcoal mohair sectional, geometric pendant, polished concrete floor',
-      'Brutalist living room, board-formed concrete shelf, blackened-steel armchair, slab marble side table, alabaster pendant',
+      'Brutalist living room, harsh single-source light, deep concrete-toned shadows, raw metal and dark-wood textures, black and stone palette, monolithic weight and architectural restraint.',
+      'Brutalist living room, hard directional sidelight, sculptural shadow play, raw stone and metal textures, charcoal and graphite palette, austere drama and structural stillness.',
+      'Brutalist living room, low-key dramatic lighting, deep void shadows, raw concrete and metal textures, black and bone palette, monolithic gravity and architectural calm.',
     ],
   },
   {
@@ -150,9 +163,9 @@ export const STYLE_PRESETS = [
     label: 'Bohemian',
     image: require('../assets/styles/bohemian.jpg'),
     prompts: [
-      'Bohemian living room, terracotta sofa, rattan lounge chair, kilim rug, macramé wall hanging, brass pendant',
-      'Bohemian living room, vintage Persian rug, woven seagrass coffee table, layered textiles, hanging plants, paper lantern',
-      'Bohemian living room, warm sienna velvet sofa, hand-carved wood console, layered jute rugs, fringed throw pillows',
+      'Bohemian living room, warm sunset lamplight, layered amber tones, linen and rattan textures, terracotta and natural-fiber palette, eclectic warmth and lived-in soul.',
+      'Bohemian living room, soft golden-hour glow, deep amber shadows, woven natural fibers and ceramic warmth, beige and rust palette, layered storytelling and weathered ease.',
+      'Bohemian living room, low warm lamplight, rich layered shadows, linen and rattan with vintage ceramic accents, sienna and warm-earth palette, free-spirited warmth and grounded soul.',
     ],
   },
   {
@@ -160,9 +173,9 @@ export const STYLE_PRESETS = [
     label: 'Glam',
     image: require('../assets/styles/glam.jpg'),
     prompts: [
-      'Glam living room, jewel velvet sofa, mirrored coffee table, crystal chandelier, gold accents, lacquered console',
-      'Glam living room, channel-tufted blush velvet sofa, polished brass coffee table, beveled mirror panels, opulent crystal pendant',
-      'Glam living room, sapphire velvet armchair, lacquered black side table, gilded mirror, plush silk curtains, marble fireplace',
+      'Glam living room, dramatic high-contrast lighting, gold-leaf highlights, velvet and polished-metal textures, jewel-tone palette with gold accents, refined opulence and crystalline shine.',
+      'Glam living room, theatrical accent lighting, deep velvet shadows, curved upholstered and marble textures, ivory and gold palette, polished sophistication and luminous statement.',
+      'Glam living room, dramatic spotlight contrast, gold-leaf reflections, velvet and crystal accent textures, white and champagne palette with jewel highlights, opulent restraint and shimmering composure.',
     ],
   },
   {
@@ -170,9 +183,9 @@ export const STYLE_PRESETS = [
     label: 'Art Deco',
     image: require('../assets/styles/art-deco.jpg'),
     prompts: [
-      'Art deco living room, geometric brass coffee table, channel-tufted velvet sofa, sunburst mirror, lacquer console',
-      'Art deco living room, scalloped emerald velvet sofa, polished marble side table, fluted gold sconces, geometric area rug',
-      'Art deco living room, black-and-gold cabinet, curved bouclé chair, fan-pattern rug, alabaster pendant, walnut burl coffee table',
+      'Art Deco living room, jewel-toned chiaroscuro lighting, geometric shadow play, velvet and polished-metal textures, gold and deep-jewel palette, sophisticated drama and sculptural statement.',
+      'Art Deco living room, dramatic accent lighting, sharp geometric shadows, velvet and marble textures with gold-leaf detail, sapphire and gold palette, refined glamour and architectural elegance.',
+      'Art Deco living room, low-key dramatic lighting, geometric chiaroscuro contrast, velvet and crystal-accent textures, black, gold and jewel palette, sculptural opulence and editorial drama.',
     ],
   },
   {
@@ -180,9 +193,9 @@ export const STYLE_PRESETS = [
     label: 'Dark Luxe',
     image: require('../assets/styles/dark-luxe.jpg'),
     prompts: [
-      'Dark luxe living room, charcoal velvet sofa, blackened bronze coffee table, sculptural floor lamp, smoked glass accents',
-      'Dark luxe living room, deep espresso leather sectional, marble side table, brass orb pendant, moody charcoal wall',
-      'Dark luxe living room, oxblood velvet armchair, blackened steel shelving, smoky-glass coffee table, sculptural alabaster lamp',
+      'Dark Luxe living room, low-key cinematic lighting, single accent lamp glow, plush velvet and leather textures, midnight black with gold-accent palette, opulent restraint and refined hush.',
+      'Dark Luxe living room, single-source dramatic lamplight, deep velvet shadows, plush upholstered and canvas-art textures, charcoal and gold palette, sophisticated stillness and cinematic gravity.',
+      'Dark Luxe living room, low-key chiaroscuro lighting, deep void shadows, velvet and ceramic textures with gold-accent detail, midnight palette, refined opulence and quiet drama.',
     ],
   },
 ];

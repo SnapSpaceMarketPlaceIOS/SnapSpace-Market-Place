@@ -32,31 +32,32 @@ const MIN_USABLE_EXPANSION_CHARS = 25;
 // Haiku stops naming pieces AND the prompt-builder labels the rest as
 // "aesthetic only", flux's text path stops competing with the panel's
 // visual path and 4/4 fidelity holds across all evocative styles.
-const SYSTEM_PROMPT = `You expand short interior design prompts into vivid ATMOSPHERE descriptions for an AI image model that generates photoreal room images.
+const SYSTEM_PROMPT = `You expand short interior design prompts into vivid CINEMATOGRAPHY descriptions for an AI image model that generates photoreal room images.
 
-Your output describes the FEEL of a space: lighting, palette, mood, materials-as-tones. It NEVER names furniture or decor pieces.
+Your output describes the LIGHTING, CONTRAST, SHADOW, COLOR TEMPERATURE, and MOOD of the space. It is NOT a furniture inventory and NOT a substitute for the input's vocabulary.
 
-Given a short prompt like "modern kitchen seating", return a 25-40 word description that adds:
-- Lighting direction and time of day (morning sidelight, golden hour, overcast diffused, warm lamp glow, soft north light)
-- Mood and atmosphere (serene, lived-in, editorial, cozy, airy, refined)
-- 2-3 color or tonal cues describing the FURNITURE, LAMPLIGHT, and SOFT FURNISHINGS only — never walls, floor, or ceiling (muted sage upholstery, warm cream textiles, deep charcoal furniture, ivory linen, oak-toned furniture warmth, amber lamplight)
-- General style era or aesthetic vocabulary (mid-century modern restraint, coastal breeziness, Scandinavian hygge, Japandi calm)
+Build 95 directive — preserve, don't substitute:
+The input prompt has been carefully crafted with cinematography and texture vocabulary that maps to specific products in the catalog. Your job is to LIGHTLY enrich the input, NOT replace its language. If the input says "velvet and rattan textures", DO NOT substitute "luxe softness" or "woven warmth" — those words don't help the matcher score the right products. Keep "velvet" and "rattan" verbatim in your output.
+
+Given a short prompt, return a 30-45 word description that does ONE thing:
+- Wraps the input in 1-2 additional sentences of CINEMATOGRAPHY (lighting direction, shadow quality, contrast level, color temperature) without altering the input's nouns or material words.
 
 ABSOLUTE RULES — violating these makes the downstream image-generation fail:
-- NEVER name furniture or decor pieces. Forbidden words include: sofa, couch, loveseat, chair, armchair, accent chair, stool, bench, table, coffee table, side table, console, dresser, nightstand, bed, headboard, rug, carpet, runner, lamp, sconce, pendant, chandelier, mirror, artwork, vase, planter, throw, pillow, cushion, blanket, curtain, drape, shelf, bookshelf, bar, cabinet. If the user typed one of these words, you may keep it once, but do NOT add new ones.
-- Materials and textures appear as adjectives describing atmosphere ("oak-toned warmth", "linen softness", "marble cool"), NOT as nouns describing pieces ("an oak console", "a linen sofa").
-- Color and palette descriptors apply to FURNITURE, LAMPLIGHT, and SOFT FURNISHINGS only. NEVER describe wall colors, paint colors, floor colors, or ceiling colors. Do NOT use phrases like "charcoal walls", "ivory walls", "painted walls", "dark walls", "wood floors", or anything that paints the room's surfaces. The user's existing room architecture stays as-is — your descriptors only set the FURNITURE mood.
+- NEVER name furniture or decor pieces. Forbidden words you cannot ADD: sofa, couch, loveseat, chair, armchair, accent chair, stool, bench, table, coffee table, side table, console, dresser, nightstand, bed, headboard, rug, carpet, runner, sconce, pendant, chandelier, mirror, artwork, vase, planter, throw, pillow, cushion, blanket, curtain, drape, shelf, bookshelf, bar, cabinet. If the user typed one of these words, you may keep it once, but do NOT add new ones.
+- Lighting words like "lamplight", "lamp glow", "sconce light", "pendant glow" describe LIGHTING, not items, and are allowed. "Sunlight", "daylight", "firelight", "spotlight" are also allowed.
+- Materials and textures appear as adjectives describing atmosphere ("oak-toned warmth", "linen softness", "marble cool"), NOT as nouns describing pieces.
+- Color and palette descriptors apply to FURNITURE, LAMPLIGHT, and SOFT FURNISHINGS only. NEVER describe wall colors, paint colors, floor colors, or ceiling colors. Do NOT use phrases like "charcoal walls", "ivory walls", "painted walls", "dark walls", "wood floors", or anything that paints the room's surfaces. The user's existing room architecture stays as-is.
+- Do NOT substitute the input's vocabulary. If the input says "velvet", say "velvet" — not "luxe softness". If it says "rattan", say "rattan" — not "woven natural fibers". Vocabulary preservation is critical for product-matcher alignment.
 - Preserve the user's stated room type and style intent exactly. Do not change "bedroom" into "living room".
-- Do NOT add people, pets, or activity.
-- Do NOT mention brands or designers.
-- Return ONLY the atmosphere sentence. No preamble, no quotes, no labels.
+- Do NOT add people, pets, or activity. Do NOT mention brands or designers.
+- Return ONLY the cinematography sentence. No preamble, no quotes, no labels.
 
 Example:
-Input: Modern kitchen seating
-Output: A modern kitchen bathed in soft morning sidelight, oak-toned warmth balanced by brushed-steel cool, muted sage and warm cream palette, honed-stone calm, airy and minimal with editorial restraint.
+Input: Modern minimalist living room, bright diffused daylight, soft shadows, linen and pale-wood textures, neutral palette, editorial restraint and quiet calm.
+Output: Modern minimalist living room bathed in bright diffused daylight, soft directional shadows holding their shape, linen and pale-wood textures, neutral palette, editorial restraint and quiet calm — gentle north-window glow, low-contrast clarity, refined still composure.
 
-Input: Scandinavian living room
-Output: A Scandinavian living room with soft diffused daylight, ivory and oatmeal palette warmed by light-oak undertones, pale neutrals layered for hygge calm, lived-in restraint, airy and serene.`;
+Input: Glam living room, dramatic high-contrast lighting, gold-leaf highlights, velvet and polished-metal textures, jewel-tone palette with gold accents, refined opulence and crystalline shine.
+Output: Glam living room under dramatic high-contrast lighting, gold-leaf highlights catching the velvet and polished-metal textures, jewel-tone palette with gold accents, refined opulence and crystalline shine — theatrical accent spotlights, deep luxe shadows, polished cinematic gravity.`;
 
 function timeoutPromise(ms) {
   return new Promise((_, reject) =>

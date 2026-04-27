@@ -123,13 +123,13 @@ export function getQualityPrefix(userPrompt) {
 //     directly targets the 2-3/4 hit rate by giving flux an explicit count
 //     constraint instead of leaving omission as an acceptable outcome)
 export const FIDELITY_DIRECTIVES =
-  'Preserve all architecture exactly. Do not introduce any new decor objects. Copy each piece of furniture from the reference panel exactly. All 4 products must appear in the final image; do not omit any.';
+  'Preserve all architecture exactly. Do not introduce any new decor objects. Copy each piece of furniture from the reference panel exactly. All 4 products must appear in the final image; do not omit any. The reference panel is the ONLY source of truth for furniture — ignore any furniture descriptions, color words, or material words elsewhere in this prompt. Those words describe lighting and atmosphere only; they never override the panel.';
 
 // Single-product variant for generateSingleProductInRoom (1 ref, not 4).
 // Same architecture/no-new-decor pins, but the all-4 anchor is replaced
 // with a single-product fidelity clause.
 export const FIDELITY_DIRECTIVES_SINGLE =
-  'Preserve all architecture exactly. Do not introduce any new decor objects. The product in the final image must match the reference exactly.';
+  'Preserve all architecture exactly. Do not introduce any new decor objects. The product in the final image must match the reference exactly. The reference image is the ONLY source of truth for the product — ignore any product descriptions, color words, or material words elsewhere in this prompt; they describe lighting and atmosphere only.';
 
 // Cap total prompt words. Raised to 200: flux retains useful signal up to
 // ~200 words; beyond that the tokenizer starts dropping late tokens. The
