@@ -132,16 +132,24 @@ export const STYLE_AFFINITY = {
   minimalist:     { minimalist: 1, scandi: 0.8, scandinavian: 0.8, japandi: 0.8, contemporary: 0.6, modern: 0.7, transitional: 0.4, 'wabi-sabi': 0.4 },
   japandi:        { japandi: 1, minimalist: 0.8, 'wabi-sabi': 0.8, scandi: 0.5, scandinavian: 0.5, modern: 0.5, contemporary: 0.4, biophilic: 0.4 },
   rustic:         { rustic: 1, farmhouse: 0.8, 'mid-century': 0.3, bohemian: 0.4, 'french-country': 0.5, mediterranean: 0.4 },
-  industrial:     { industrial: 1, 'mid-century': 0.4, 'dark-luxe': 0.5, contemporary: 0.4, modern: 0.5, 'art-deco': 0.3 },
+  // Audit 2026-04-27: weakened industrial↔dark-luxe (0.5→0.2). Industrial is raw/exposed/metal;
+  // dark-luxe is fabric/velvet/moody — visually opposite. Old 0.5 let dark-luxe products
+  // surface in industrial sets at 50% credit and vice versa.
+  industrial:     { industrial: 1, 'mid-century': 0.4, 'dark-luxe': 0.2, contemporary: 0.4, modern: 0.5, 'art-deco': 0.3 },
   coastal:        { coastal: 1, mediterranean: 0.6, bohemian: 0.4, transitional: 0.5, farmhouse: 0.4, scandi: 0.3, scandinavian: 0.3 },
   // 'luxury: 0.7' removed — dead target. Added dark-luxe / industrial / mid-century routes.
   'art-deco':     { 'art-deco': 1, glam: 0.8, maximalist: 0.5, 'dark-luxe': 0.5, industrial: 0.3, 'mid-century': 0.4 },
   'mid-century':  { 'mid-century': 1, contemporary: 0.5, modern: 0.5, industrial: 0.4, transitional: 0.5, 'art-deco': 0.3, minimalist: 0.4 },
-  bohemian:       { bohemian: 1, 'wabi-sabi': 0.5, rustic: 0.4, maximalist: 0.6, coastal: 0.4, 'mid-century': 0.3, biophilic: 0.5 },
+  // Audit 2026-04-27: weakened bohemian↔wabi-sabi (0.5→0.2) and bohemian↔maximalist (0.6→0.4).
+  // Wabi-sabi is minimal/imperfect; bohemian is layered/eclectic — overlap is thin. Maximalist
+  // is bold/saturated; bohemian is warm/earthy — old 0.6 let boho rugs win for maximalist requests.
+  bohemian:       { bohemian: 1, 'wabi-sabi': 0.2, rustic: 0.4, maximalist: 0.4, coastal: 0.4, 'mid-century': 0.3, biophilic: 0.5 },
   scandi:         { scandi: 1, scandinavian: 1, minimalist: 0.9, japandi: 0.6, transitional: 0.5, contemporary: 0.6, modern: 0.6, coastal: 0.3, biophilic: 0.3 },
   scandinavian:   { scandinavian: 1, scandi: 1, minimalist: 0.9, japandi: 0.6, transitional: 0.5, contemporary: 0.6, modern: 0.6, coastal: 0.3, biophilic: 0.3 },
   // 'luxury: 0.8' removed — dead target. Added art-deco (strong) / mid-century routes.
-  'dark-luxe':    { 'dark-luxe': 1, glam: 0.6, industrial: 0.4, 'mid-century': 0.4, 'art-deco': 0.6, maximalist: 0.3 },
+  // Audit 2026-04-27: weakened dark-luxe↔industrial (0.4→0.2) — industrial is raw/exposed metal;
+  // dark-luxe is moody fabric/velvet. Symmetric with the industrial-row tweak above.
+  'dark-luxe':    { 'dark-luxe': 1, glam: 0.6, industrial: 0.2, 'mid-century': 0.4, 'art-deco': 0.6, maximalist: 0.3 },
   // Biophilic (8 products) — widened neighbor set so prompts don't dead-end.
   biophilic:      { biophilic: 1, bohemian: 0.5, rustic: 0.4, 'wabi-sabi': 0.6, scandi: 0.4, scandinavian: 0.4, minimalist: 0.4, japandi: 0.5, coastal: 0.3 },
   transitional:   { transitional: 1, contemporary: 0.7, modern: 0.6, minimalist: 0.5, scandi: 0.5, scandinavian: 0.5, 'mid-century': 0.4, farmhouse: 0.3 },

@@ -145,6 +145,46 @@ export const STYLE_PRESETS = [
       'Brutalist living room, board-formed concrete shelf, blackened-steel armchair, slab marble side table, alabaster pendant',
     ],
   },
+  {
+    id: 'bohemian',
+    label: 'Bohemian',
+    image: require('../assets/styles/bohemian.jpg'),
+    prompts: [
+      'Bohemian living room, terracotta sofa, rattan lounge chair, kilim rug, macramé wall hanging, brass pendant',
+      'Bohemian living room, vintage Persian rug, woven seagrass coffee table, layered textiles, hanging plants, paper lantern',
+      'Bohemian living room, warm sienna velvet sofa, hand-carved wood console, layered jute rugs, fringed throw pillows',
+    ],
+  },
+  {
+    id: 'glam',
+    label: 'Glam',
+    image: require('../assets/styles/glam.jpg'),
+    prompts: [
+      'Glam living room, jewel velvet sofa, mirrored coffee table, crystal chandelier, gold accents, lacquered console',
+      'Glam living room, channel-tufted blush velvet sofa, polished brass coffee table, beveled mirror panels, opulent crystal pendant',
+      'Glam living room, sapphire velvet armchair, lacquered black side table, gilded mirror, plush silk curtains, marble fireplace',
+    ],
+  },
+  {
+    id: 'art-deco',
+    label: 'Art Deco',
+    image: require('../assets/styles/art-deco.jpg'),
+    prompts: [
+      'Art deco living room, geometric brass coffee table, channel-tufted velvet sofa, sunburst mirror, lacquer console',
+      'Art deco living room, scalloped emerald velvet sofa, polished marble side table, fluted gold sconces, geometric area rug',
+      'Art deco living room, black-and-gold cabinet, curved bouclé chair, fan-pattern rug, alabaster pendant, walnut burl coffee table',
+    ],
+  },
+  {
+    id: 'dark-luxe',
+    label: 'Dark Luxe',
+    image: require('../assets/styles/dark-luxe.jpg'),
+    prompts: [
+      'Dark luxe living room, charcoal velvet sofa, blackened bronze coffee table, sculptural floor lamp, smoked glass accents',
+      'Dark luxe living room, deep espresso leather sectional, marble side table, brass orb pendant, moody charcoal wall',
+      'Dark luxe living room, oxblood velvet armchair, blackened steel shelving, smoky-glass coffee table, sculptural alabaster lamp',
+    ],
+  },
 ];
 
 export function getStylePresetById(id) {

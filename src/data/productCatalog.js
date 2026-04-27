@@ -1997,7 +1997,8 @@ export const PRODUCT_CATALOG = [
     ],
     category: 'wall-art',
     roomType: ['living-room'],
-    styles: ['dark-luxe', 'bohemian', 'art-deco'],
+    // Audit 2026-04-27: removed 'dark-luxe' — graffiti line art reads bohemian/art-deco, not moody dark-luxe.
+    styles: ['bohemian', 'art-deco'],
     materials: [],
     tags: ['graffiti', 'line-art', 'brown', 'gold', 'abstract', 'expressive', 'bold', 'oversized', 'dramatic', 'artistic', 'eclectic', 'bohemian', 'living-room', 'studio', 'creative', 'warm-tone', 'statement', 'unique', 'moody', 'textured'],
     source: 'amazon',
@@ -18615,7 +18616,8 @@ export const PRODUCT_CATALOG = [
     ],
     category: 'throw-blanket',
     roomType: ['living-room', 'bedroom'],
-    styles: ['bohemian', 'contemporary', 'transitional', 'dark-luxe'],
+    // Audit 2026-04-27: removed 'dark-luxe' — rust/terracotta fleece is warm/earthy bohemian, not moody.
+    styles: ['bohemian', 'contemporary', 'transitional'],
     materials: ['fleece'],
     tags: ['fleece', 'rust', 'terracotta', 'oversized', '50x70', 'aesthetic', 'plush'],
     source: 'amazon',
@@ -18796,7 +18798,8 @@ export const PRODUCT_CATALOG = [
     ],
     category: 'throw-blanket',
     roomType: ['living-room', 'bedroom'],
-    styles: ['bohemian', 'glam', 'dark-luxe', 'transitional'],
+    // Audit 2026-04-27: removed 'dark-luxe' — tie-dye brown faux-fur is playful boho/glam, not moody.
+    styles: ['bohemian', 'glam', 'transitional'],
     materials: ['faux-fur'],
     tags: ['faux-fur', 'bubble', 'plush', 'tie-dye', 'brown', 'rabbit-fur', 'luxury', '50x60'],
     source: 'amazon',
@@ -20136,7 +20139,9 @@ export const PRODUCT_CATALOG = [
     ],
     category: 'vase',
     roomType: ['living-room', 'bedroom', 'office', 'dining-room'],
-    styles: ['minimalist', 'bohemian', 'scandinavian', 'dark-luxe', 'contemporary'],
+    // Audit 2026-04-27: removed 'bohemian' + 'dark-luxe'. Pampas-grass vase reads minimal/scandi/contemporary;
+    // 5-style bloat caused matcher score-noise and contaminated dark-luxe + bohemian sets.
+    styles: ['minimalist', 'scandinavian', 'contemporary'],
     materials: ['ceramic'],
     tags: ['ceramic', 'set-of-2', 'black', 'round', 'boho', 'nordic', 'pampas-grass', 'matte', 'shelf', 'centerpiece'],
     source: 'amazon',
