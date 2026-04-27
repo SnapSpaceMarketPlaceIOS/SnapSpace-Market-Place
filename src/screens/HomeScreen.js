@@ -363,7 +363,7 @@ const HERO_FADE_MS  = 1200;  // 1.2 second smooth crossfade
 const STYLE_IMG_JAPANDI      = require('../assets/styles/Japandi.jpg');
 const STYLE_IMG_SCANDI       = require('../assets/styles/Scandanavian.jpg');
 const STYLE_IMG_MINIMALIST   = require('../assets/styles/Minimalist.jpg');
-const STYLE_IMG_GLAM         = require('../assets/styles/Glam.jpg');
+const STYLE_IMG_GLAM         = require('../assets/styles/glam.jpg');
 const STYLE_IMG_MODERN       = require('../assets/styles/Modern.jpg');
 
 const STYLE_CATEGORIES = [
