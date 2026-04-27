@@ -250,8 +250,16 @@ export function buildPanelPrompt(userPrompt, products) {
   // especially noticeable on evocative styles like coastal, mid-century, etc.
   // This rewrite tells flux: use this for vibe (lighting, palette, mood) but
   // never for furniture, which comes exclusively from the panel.
+  // Build 94 architecture-bleed fix: scope the style guidance ONLY to the
+  // furniture upholstery, textile colors, lamp glow, and overall mood — NOT
+  // to the room's walls, floor, ceiling, or any architectural surface.
+  // Without this scoping, palette language like "deep charcoal palette" gets
+  // interpreted as a wall-paint directive (verified live: an Art Deco prompt
+  // turned a white-walled room charcoal in Build 93). Now palette descriptors
+  // bind to furniture and lighting tones, leaving the existing room surfaces
+  // identical.
   const styleIntent = cleanedPrompt
-    ? `For lighting, color palette, and overall aesthetic only — do not render any furniture or decor described here, all furniture comes exclusively from the reference panel: ${cleanedPrompt}.`
+    ? `Apply this style guidance ONLY to the upholstery and textile colors of the reference furniture, the lamp glow, and the overall mood — never to walls, wall paint, floor, ceiling, or any architectural surface. Color and palette words describe furniture and lighting tones, not room surfaces. Do not render any new furniture or decor described here; all furniture comes exclusively from the reference panel: ${cleanedPrompt}.`
     : '';
 
   // Order matters — flux weights EARLIER tokens more heavily AND truncates
@@ -270,7 +278,7 @@ export function buildPanelPrompt(userPrompt, products) {
   return [
     getQualityPrefix(cleanedPrompt),
     'This is a precise scene edit, not a new generation.',
-    'Preserve image 1 exactly: same walls, floor, ceiling, windows, lighting, camera angle, perspective, and spatial layout. Do not alter any architecture.',
+    'Preserve image 1 exactly: keep the existing wall paint and color, floor surface and color, ceiling, windows, doorways, mouldings, mirrors and wall art positions, camera angle, perspective, and spatial layout. Do not repaint walls. Do not change the floor. Do not change wall color. Do not move or remove architectural elements. The room\'s existing surfaces stay identical.',
     refLine,
     FIDELITY_DIRECTIVES,
     styleIntent,
@@ -312,8 +320,10 @@ export function buildFlux2MaxPrompt(userPrompt, products) {
   // Build 82 fix: same aesthetic-only scoping as buildPanelPrompt — keeps
   // flux from substituting prompt-described items for the actual reference
   // products on evocative styles.
+  // Build 94 architecture-bleed fix: same scoping as buildPanelPrompt — palette
+  // language binds to furniture/lamps/textiles only, never wall paint or floor.
   const styleIntent = userPrompt
-    ? `For lighting, color palette, and overall aesthetic only — do not render any furniture or decor described here, all furniture comes exclusively from the reference images: ${userPrompt}.`
+    ? `Apply this style guidance ONLY to the upholstery and textile colors of the reference furniture, the lamp glow, and the overall mood — never to walls, wall paint, floor, ceiling, or any architectural surface. Color and palette words describe furniture and lighting tones, not room surfaces. Do not render any new furniture or decor described here; all furniture comes exclusively from the reference images: ${userPrompt}.`
     : '';
 
   // Same order as buildPanelPrompt: FIDELITY_DIRECTIVES before styleIntent so
@@ -322,7 +332,7 @@ export function buildFlux2MaxPrompt(userPrompt, products) {
   return [
     getQualityPrefix(userPrompt),
     'This is a precise scene edit, not a new generation.',
-    'Preserve image 1 exactly: same walls, floor, ceiling, windows, lighting, camera angle, perspective, and spatial layout. Do not alter any architecture.',
+    'Preserve image 1 exactly: keep the existing wall paint and color, floor surface and color, ceiling, windows, doorways, mouldings, mirrors and wall art positions, camera angle, perspective, and spatial layout. Do not repaint walls. Do not change the floor. Do not change wall color. Do not move or remove architectural elements. The room\'s existing surfaces stay identical.',
     refLine,
     FIDELITY_DIRECTIVES,
     styleIntent,
