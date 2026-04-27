@@ -1025,6 +1025,15 @@ export default function HomeScreen({ navigation, route }) {
   const loadingMsgOpacity = useRef(new Animated.Value(1)).current;
   const [resultData, setResultData] = useState(null); // { imageUri, resultUri, prompt, products }
   const [showResult, setShowResult] = useState(false);
+  // Build 91: climax orchestration state.
+  // climaxFiring = true while the GenieLoader plays its 400ms reveal burst.
+  // pendingNavRef stashes the RoomResult navigation params so they can be
+  // dispatched from onClimaxComplete instead of immediately on result-ready.
+  // Together these make the success flow: result ready → setResultData →
+  // stopLoadingBar(true) (push progress to 1 → Act III) → setClimaxFiring →
+  // GenieLoader bursts → onClimaxComplete → setGenerating(false) + navigate.
+  const [climaxFiring, setClimaxFiring] = useState(false);
+  const pendingNavRef = useRef(null);
   const [showPostSheet, setShowPostSheet] = useState(false);
   const [posting, setPosting] = useState(false);
   const [autoSavedDesignId, setAutoSavedDesignId] = useState(null);
@@ -1439,6 +1448,26 @@ export default function HomeScreen({ navigation, route }) {
 
   // GenieLoader animation is self-contained — no manual start/stop needed here.
   // The `generating` prop drives it directly via <GenieLoader animating={generating} />.
+
+  // Build 91: climax-complete handler. Fires after the GenieLoader's 400ms
+  // burst animation finishes. This is the moment we transition from "loader
+  // doing its thing" to "Room Result revealed." Order matters:
+  //   1. setGenerating(false) — unmounts GenieLoader on next render
+  //   2. setClimaxFiring(false) — resets one-shot for the next generation
+  //   3. navigation.navigate(...) — pushes RoomResult on top (sync)
+  // Because navigation push is sync but state updates are batched, the user
+  // visually sees: climax done → RoomResult slides up → Home is replaced.
+  // GenieLoader unmount on Home is invisible underneath.
+  const handleClimaxComplete = useCallback(() => {
+    setGenerating(false);
+    setGenStatus('');
+    setClimaxFiring(false);
+    if (pendingNavRef.current) {
+      const params = pendingNavRef.current;
+      pendingNavRef.current = null;
+      navigation.navigate('RoomResult', params);
+    }
+  }, [navigation]);
 
   // Stuck-loader recovery on app resume.
   //
@@ -2971,8 +3000,16 @@ export default function HomeScreen({ navigation, route }) {
       const durationMs = Date.now() - startedAt;
       log('done | ' + durationMs + 'ms | pipeline=' + genMeta.pipeline + ' | verified=' + verifyMeta.verifiedCount + '/' + finalMatchedProducts.length);
 
-      setGenerating(false);
-      setGenStatus('');
+      // Build 91: REORDERED for the climax burst.
+      //   PRIOR: setGenerating(false) → setResultData → navigate immediately
+      //   NEW:   setResultData → stash nav params → stopLoadingBar(true)
+      //          (forces progress to 1 → Act III) → setClimaxFiring(true).
+      //          The 400ms burst plays in the GenieLoader, then
+      //          handleClimaxComplete fires setGenerating(false) + navigate.
+      //
+      // We KEEP generating=true through the climax so the BlurView + loader
+      // stay rendered. The state cleanups (photo, prompt, key bump) move
+      // here too because they don't affect the loader's visibility.
       setResultData({
         imageUri: savedPhoto.uri,
         resultUri: resultUrl,
@@ -2988,8 +3025,9 @@ export default function HomeScreen({ navigation, route }) {
         { screen: 'RoomResult' }
       ).catch(() => {});
 
-      // Navigate to the full RoomResult screen instead of showing inline modal
-      navigation.navigate('RoomResult', {
+      // Stash the RoomResult navigation params in the ref. handleClimaxComplete
+      // reads + clears it after the burst.
+      pendingNavRef.current = {
         prompt: designPrompt,
         resultUri: resultUrl,
         // Build 69 Commit D: pass the original photo URI so RoomResultScreen
@@ -3007,7 +3045,18 @@ export default function HomeScreen({ navigation, route }) {
           photoWidth: savedPhoto.width,
           photoHeight: savedPhoto.height,
         },
-      });
+      };
+
+      // Push loadingProgress to 1 over 200ms — forces the GenieLoader into
+      // Act III briefly before the climax (so the burst follows the
+      // "almost there..." peak intensity, not a calmer earlier act).
+      stopLoadingBar(true);
+
+      // Trigger the climax burst. GenieLoader runs its 400ms reveal sequence
+      // and calls handleClimaxComplete when done.
+      setClimaxFiring(true);
+
+      // State cleanups that don't affect loader visibility — safe to do now.
       setPhoto(null);
       setPhotoSource(null);
       setPrompt('');
@@ -3155,10 +3204,18 @@ export default function HomeScreen({ navigation, route }) {
             <BlurView intensity={40} tint="dark" style={StyleSheet.absoluteFill} />
           )}
 
-          {/* Generation status — GenieLoader animation */}
+          {/* Generation status — GenieLoader animation.
+              Build 91: progress drives the 3-act phase escalation; climaxTrigger
+              fires the 400ms reveal burst when the result is ready. */}
           {generating && (
             <View style={styles.heroCentered}>
-              <GenieLoader size={100} animating={generating} />
+              <GenieLoader
+                size={100}
+                animating={generating}
+                progress={loadingProgress}
+                climaxTrigger={climaxFiring}
+                onClimaxComplete={handleClimaxComplete}
+              />
               <Animated.Text style={[styles.genStatusText, { opacity: loadingMsgOpacity }]}>
                 {loadingMessages[loadingMsgIndex] || genStatus || 'Designing your space…'}
               </Animated.Text>
