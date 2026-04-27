@@ -31,6 +31,7 @@ import {
   Dimensions,
   Alert,
   Animated,
+  Easing,
   Linking,
   Share,
   Pressable,
@@ -964,9 +965,11 @@ function ProductDetails({ details }) {
   const rotation = useRef(new Animated.Value(0)).current;
 
   const toggle = () => {
+    // Build 89: 200ms linear → 240ms easeInOut. Linear rotation reads robotic.
     Animated.timing(rotation, {
       toValue: open ? 0 : 1,
-      duration: 200,
+      duration: 240,
+      easing: Easing.inOut(Easing.cubic),
       useNativeDriver: true,
     }).start();
     setOpen(o => !o);
@@ -1086,9 +1089,11 @@ function KeyFeatures({ features }) {
   const rotation = useRef(new Animated.Value(0)).current;
 
   const toggle = () => {
+    // Build 89: 200ms linear → 240ms easeInOut. Linear rotation reads robotic.
     Animated.timing(rotation, {
       toValue: open ? 0 : 1,
-      duration: 200,
+      duration: 240,
+      easing: Easing.inOut(Easing.cubic),
       useNativeDriver: true,
     }).start();
     setOpen(o => !o);
@@ -1511,14 +1516,16 @@ export default function ProductDetailScreen({ route, navigation }) {
       source: product?.source ?? 'amazon',
       asin: activeAsin,
     });
+    // Build 89: 150ms crossfades were sub-perceptible — confirmation read
+    // as a glitch, not a state change. Bumped to 220ms with Easing.inOut.
     Animated.parallel([
-      Animated.timing(cartLabelOpacity,  { toValue: 0, duration: 150, useNativeDriver: true }),
-      Animated.timing(addedLabelOpacity, { toValue: 1, duration: 150, useNativeDriver: true }),
+      Animated.timing(cartLabelOpacity,  { toValue: 0, duration: 220, easing: Easing.inOut(Easing.quad), useNativeDriver: true }),
+      Animated.timing(addedLabelOpacity, { toValue: 1, duration: 220, easing: Easing.inOut(Easing.quad), useNativeDriver: true }),
     ]).start(() => {
       setTimeout(() => {
         Animated.parallel([
-          Animated.timing(cartLabelOpacity,  { toValue: 1, duration: 150, useNativeDriver: true }),
-          Animated.timing(addedLabelOpacity, { toValue: 0, duration: 150, useNativeDriver: true }),
+          Animated.timing(cartLabelOpacity,  { toValue: 1, duration: 220, easing: Easing.inOut(Easing.quad), useNativeDriver: true }),
+          Animated.timing(addedLabelOpacity, { toValue: 0, duration: 220, easing: Easing.inOut(Easing.quad), useNativeDriver: true }),
         ]).start();
       }, 1500);
     });

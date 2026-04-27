@@ -153,7 +153,7 @@ function MiniLensLoader({ color = colors.bluePrimary, size = 24 }) {
   const spin = useRef(new Animated.Value(0)).current;
   useEffect(() => {
     const loop = Animated.loop(
-      Animated.timing(spin, { toValue: 1, duration: 1800, useNativeDriver: true })
+      Animated.timing(spin, { toValue: 1, duration: 1100, useNativeDriver: true })
     );
     loop.start();
     return () => loop.stop();

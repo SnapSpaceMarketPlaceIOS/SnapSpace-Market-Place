@@ -102,12 +102,15 @@ export default function GenieLoader({ size = 80, animating = true, style }) {
   }
 
   // ── Mid-air rattle — quick horizontal shake while airborne ──────────────
+  // Build 89: 30-40ms segments were sub-frame on slower hardware (40ms ≈ 2.4
+  // frames at 60fps). Bumped to 60ms each so every segment renders reliably.
+  // Linear easing kept — correct curve for a mechanical vibration feel.
   function createMidAirShake() {
     return Animated.sequence([
-      Animated.timing(genieShakeX, { toValue:  1.2, duration: 40, easing: Easing.linear, useNativeDriver: true }),
-      Animated.timing(genieShakeX, { toValue: -1.2, duration: 40, easing: Easing.linear, useNativeDriver: true }),
-      Animated.timing(genieShakeX, { toValue:  0.6, duration: 35, easing: Easing.linear, useNativeDriver: true }),
-      Animated.timing(genieShakeX, { toValue:  0,   duration: 30, easing: Easing.linear, useNativeDriver: true }),
+      Animated.timing(genieShakeX, { toValue:  1.2, duration: 60, easing: Easing.linear, useNativeDriver: true }),
+      Animated.timing(genieShakeX, { toValue: -1.2, duration: 60, easing: Easing.linear, useNativeDriver: true }),
+      Animated.timing(genieShakeX, { toValue:  0.6, duration: 60, easing: Easing.linear, useNativeDriver: true }),
+      Animated.timing(genieShakeX, { toValue:  0,   duration: 60, easing: Easing.linear, useNativeDriver: true }),
     ]);
   }
 

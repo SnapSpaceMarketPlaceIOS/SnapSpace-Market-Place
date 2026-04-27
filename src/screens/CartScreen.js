@@ -301,18 +301,22 @@ function AnimatedQtyText({ value, style }) {
     const dir = value > prevValue.current ? -1 : 1;
     prevValue.current = value;
 
+    // Build 89: durations bumped above the 150ms perception threshold; both
+    // phases now use Easing.out(Easing.cubic) for a calm, decelerating feel.
+    // Previous: 75ms exit / 150ms enter — exit was sub-perceptible (read as
+    // a flicker), enter used Easing.out(Easing.ease) which is shallow.
     Animated.sequence([
       Animated.parallel([
-        Animated.timing(translateY, { toValue: dir * 12, duration: 75, easing: Easing.in(Easing.ease), useNativeDriver: true }),
-        Animated.timing(opacity,    { toValue: 0,        duration: 75,  useNativeDriver: true }),
+        Animated.timing(translateY, { toValue: dir * 12, duration: 180, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
+        Animated.timing(opacity,    { toValue: 0,        duration: 180, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
       ]),
       Animated.parallel([
         Animated.timing(translateY, { toValue: -dir * 12, duration: 0, useNativeDriver: true }),
-        Animated.timing(opacity,    { toValue: 0,         duration: 0,  useNativeDriver: true }),
+        Animated.timing(opacity,    { toValue: 0,         duration: 0, useNativeDriver: true }),
       ]),
       Animated.parallel([
-        Animated.timing(translateY, { toValue: 0, duration: 150, easing: Easing.out(Easing.ease), useNativeDriver: true }),
-        Animated.timing(opacity,    { toValue: 1, duration: 150, useNativeDriver: true }),
+        Animated.timing(translateY, { toValue: 0, duration: 220, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
+        Animated.timing(opacity,    { toValue: 1, duration: 220, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
       ]),
     ]).start();
   }

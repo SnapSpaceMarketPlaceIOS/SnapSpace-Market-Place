@@ -166,11 +166,14 @@ function ProductMarquee({ products }) {
   useEffect(() => {
     if (totalW === 0) return;
     translateX.setValue(0);
+    // Build 89: linear loops on visible motion read mechanical and the loop
+    // seam jumps. Easing.inOut(Easing.sin) gives a breathing feel; same total
+    // period (40s), no perf cost, native driver preserved.
     const anim = Animated.loop(
       Animated.timing(translateX, {
         toValue: -totalW,
         duration: 40000,
-        easing: Easing.linear,
+        easing: Easing.inOut(Easing.sin),
         useNativeDriver: true,
       })
     );

@@ -1442,9 +1442,11 @@ export default function HomeScreen({ navigation, route }) {
     if (!generating || loadingMessages.length === 0) return;
     const interval = setInterval(() => {
       // Fade out
+      // Build 89: easing added — linear at the most-watched moment of AI gen reads cheap.
       Animated.timing(loadingMsgOpacity, {
         toValue: 0,
         duration: 300,
+        easing: Easing.inOut(Easing.cubic),
         useNativeDriver: true,
       }).start(() => {
         // Advance to next message
@@ -1453,6 +1455,7 @@ export default function HomeScreen({ navigation, route }) {
         Animated.timing(loadingMsgOpacity, {
           toValue: 1,
           duration: 400,
+          easing: Easing.inOut(Easing.cubic),
           useNativeDriver: true,
         }).start();
       });

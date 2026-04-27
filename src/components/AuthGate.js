@@ -165,11 +165,13 @@ function ProductMarquee({ products }) {
   useEffect(() => {
     if (totalW === 0) return;
     translateX.setValue(0);
+    // Build 89: same breathing-feel update as AuthScreen.js — easing.inOut(sin)
+    // eliminates the loop-seam jump that linear Animated.loop produces.
     const anim = Animated.loop(
       Animated.timing(translateX, {
         toValue: -totalW,
         duration: 40000,
-        easing: Easing.linear,
+        easing: Easing.inOut(Easing.sin),
         useNativeDriver: true,
       })
     );

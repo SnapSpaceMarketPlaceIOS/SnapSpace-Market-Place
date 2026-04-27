@@ -214,7 +214,7 @@ export default function SupplierApplicationStatusScreen({ navigation, route }) {
     } finally {
       setLoading(false);
       Animated.parallel([
-        Animated.timing(fadeAnim, { toValue: 1, duration: 320, useNativeDriver: true }),
+        Animated.timing(fadeAnim, { toValue: 1, duration: 250, useNativeDriver: true }),
         Animated.spring(scaleAnim, { toValue: 1, tension: 60, friction: 10, useNativeDriver: true }),
       ]).start();
     }

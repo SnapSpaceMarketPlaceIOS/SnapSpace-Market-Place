@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   Animated,
+  Easing,
   Linking,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -37,9 +38,11 @@ export default function ConsentModal() {
       timerRef.current = setTimeout(() => {
         if (cancelled) return;
         setVisible(true);
+        // Build 89: linear fades feel cheap. Symmetric 280ms with eased curves.
         Animated.timing(fadeAnim, {
           toValue: 1,
-          duration: 300,
+          duration: 280,
+          easing: Easing.out(Easing.cubic),
           useNativeDriver: true,
         }).start();
       }, SHOW_DELAY);
@@ -76,7 +79,8 @@ export default function ConsentModal() {
 
     Animated.timing(fadeAnim, {
       toValue: 0,
-      duration: 200,
+      duration: 280,
+      easing: Easing.in(Easing.cubic),
       useNativeDriver: true,
     }).start(() => setVisible(false));
   };
