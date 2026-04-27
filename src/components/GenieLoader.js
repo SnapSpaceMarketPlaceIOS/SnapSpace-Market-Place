@@ -1,53 +1,27 @@
 /**
  * GenieLoader — Branded loading animation using the HomeGenie logo.
  *
- * Build 91 — "Three Acts + The Wisp"
+ * Animation sequence:
+ *   1. Genie pot bounces (Pixar-lamp style vertical hop) → particles fade in
+ *   2. Loop: particles orbit (self-accelerating 5s→1.2s/rev),
+ *      genie bounces periodically (every ~2.5s), blue dot pulses, body breathes
  *
- * The loading experience is a 3-act dopamine-driven anticipation arc that
- * escalates as generation progresses, climaxing in a burst when the result
- * is ready. Driven by an optional `progress` Animated.Value (0..1) sourced
- * from the caller's loading bar; falls back to a calm Act-II equivalent
- * when no progress is provided (e.g. boot loaders, preview screens).
- *
- * Acts:
- *   I — Awakening   (0-30%)   gentle float, 8 dim particles, faint aura, no wisp
- *   II — Granting   (30-66%)  Pixar bounce, 16 particles, mid aura, 1 wisp
- *   III — Almost    (66-100%) hover + wobble, 24 particles, bright aura, 2 wisps,
- *                              per-particle twinkle, tighter orbit radius
- *
- * Climax (caller-triggered, 400ms): lamp scales to 0, particles burst outward,
- * aura expands and fades, white flash overlay flicks. onClimaxComplete fires
- * so the caller can transition to the result image. The trigger is a
- * one-shot boolean — it should be flipped from false → true exactly once per
- * generation cycle, at the moment the result image is ready.
- *
- * Anti-regression notes:
- *   - All animations use useNativeDriver: true (opacity + transform only).
- *     No color interpolation, no layout interpolation. JS thread stays free.
- *   - Phase derivation listens to progress on the JS side. Listener fires
- *     on every value update (~60Hz when progress is animating) but only
- *     calls setState on threshold crossings (≤3 times across the 30s window).
- *   - All loops, listeners, and timers cleaned up on unmount via mountedRef
- *     + dedicated stop calls. No leaks.
- *   - When `progress` is undefined, the component behaves exactly like
- *     Build 90's GenieLoader (Act II steady state). Backwards compatible.
- *   - When `animating === false`, all loops are inert; particles render
- *     with opacity 0. Same as Build 89 boot-loader behavior.
+ * Build 92 — restored to Build 90 baseline. The Build 91 escalation
+ * experiment (3-act phase progression, aura halo, wisps, twinkle, tighter
+ * orbit in Act III) was reverted because the build-up read sloppy. The ONE
+ * Build 91 element kept is the climax burst — when the result is ready,
+ * the lamp scales down, particles burst outward, and a brief white flash
+ * overlay reveals the Room Result. Caller-triggered, not progress-based.
  *
  * Props:
  *   size            — pixel diameter (default 80)
  *   animating       — boolean to start/stop (default true)
  *   style           — pass-through View styles
- *   progress        — Animated.Value 0..1 (optional). When provided, drives
- *                     the 3-act phase escalation. When omitted, stays at
- *                     Act II.
  *   climaxTrigger   — boolean (optional). Flip false → true to fire the
- *                     400ms burst sequence.
- *   onClimaxComplete— () => void callback fired after the climax animation
- *                     completes. Caller uses this to transition to the
- *                     result image.
+ *                     400ms reveal burst exactly once per mount.
+ *   onClimaxComplete— () => void callback fired after the burst completes.
  */
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { View, Animated, Easing } from 'react-native';
 import Svg, {
   Rect, Path, Circle, Defs,
@@ -64,19 +38,12 @@ const DOT   = '#5AA4E4';
 //   DARK  → small (1×)
 //   LIGHT → medium (1.6×)
 //   WHITE → large (2×)
-// Build 91: each particle is also assigned a `firstPhase` so Act-I shows
-// 8, Act-II shows 16, Act-III shows all 24. Distribution is interleaved so
-// each phase gets a mix of colors/sizes (not all-dark in Act I etc.).
 const PARTICLES = [];
 const PALETTE = [DARK, LIGHT, WHITE];
 const SIZE_MULT = { [DARK]: 1, [LIGHT]: 1.6, [WHITE]: 2 };
 for (let i = 0; i < 24; i++) {
   const color = PALETTE[i % PALETTE.length];
-  // Interleave first-phase: every 3rd particle from index 0 is phase 1,
-  // every 3rd from index 1 is phase 2, every 3rd from index 2 is phase 3.
-  // Yields 8/8/8 split with mixed colors per phase.
-  const firstPhase = (i % 3) + 1;
-  PARTICLES.push({ color, sizeMult: SIZE_MULT[color], firstPhase });
+  PARTICLES.push({ color, sizeMult: SIZE_MULT[color] });
 }
 
 // ── SVG path data (extracted from HomeGenie logo) ───────────────────────────
@@ -91,92 +58,64 @@ export default function GenieLoader({
   size = 80,
   animating = true,
   style,
-  progress,           // Animated.Value 0..1 (optional)
   climaxTrigger,      // boolean (optional) — flip false→true to fire the burst
   onClimaxComplete,   // () => void
 }) {
-  // ── Animated values (existing) ─────────────────────────────────────────
-  const genieBounceY    = useRef(new Animated.Value(0)).current;
-  const genieScaleY     = useRef(new Animated.Value(1)).current;
-  const genieShakeX     = useRef(new Animated.Value(0)).current;
+  // Animated values (Build 90 baseline)
+  const genieBounceY    = useRef(new Animated.Value(0)).current;   // vertical hop
+  const genieScaleY     = useRef(new Animated.Value(1)).current;   // squash/stretch
+  const genieShakeX     = useRef(new Animated.Value(0)).current;   // mid-air rattle
   const breatheScale    = useRef(new Animated.Value(1)).current;
   const dotPulse        = useRef(new Animated.Value(0.4)).current;
   const orbitProgress   = useRef(new Animated.Value(0)).current;
   const particleOpacity = useRef(new Animated.Value(0)).current;
 
-  // ── Animated values (Build 91 additions) ───────────────────────────────
-  // Aura halo: a soft circle behind the lamp. Breathes via scale loop;
-  // overall opacity comes from progress interpolation (set once below).
-  const auraBreathe = useRef(new Animated.Value(1)).current;
-  // Wisps: 2 instances. Each loop translateY 0 → -50pt + opacity 0 → 0.3 → 0.
-  // wispTY[0] runs in Acts II + III; wispTY[1] runs in Act III only.
-  const wispTY      = useRef([new Animated.Value(0), new Animated.Value(0)]).current;
-  const wispOp      = useRef([new Animated.Value(0), new Animated.Value(0)]).current;
-  // Twinkle (Act III only): each particle gets its own opacity oscillator
-  // with a per-instance phase offset. Idle at 1 outside Act III.
-  const twinkle     = useRef(PARTICLES.map(() => new Animated.Value(1))).current;
-  // Climax: lamp scale, particle outward burst, aura expand+fade, white flash.
-  const climaxLamp     = useRef(new Animated.Value(1)).current; // 1 → 0
-  const climaxBurst    = useRef(new Animated.Value(0)).current; // 0 = normal, 1 = burst-out
-  const climaxAura     = useRef(new Animated.Value(1)).current; // 1 → 1.8
-  const climaxAuraFade = useRef(new Animated.Value(1)).current; // 1 → 0
-  const whiteFlash     = useRef(new Animated.Value(0)).current; // 0 → 0.4 → 0
+  // Climax-only animated values (Build 92 — the only Build 91 element kept)
+  const climaxLamp     = useRef(new Animated.Value(1)).current; // lamp scale 1 → 0
+  const climaxBurst    = useRef(new Animated.Value(0)).current; // particles 0 (normal) → 1 (burst out)
+  const whiteFlash     = useRef(new Animated.Value(0)).current; // overlay 0 → 0.4 → 0
 
-  // ── Loop / animation handles for cleanup ───────────────────────────────
+  // Animation handles for cleanup
   const introRef    = useRef(null);
   const loopRef     = useRef(null);
   const orbitRef    = useRef(null);
   const bounceRef   = useRef(null);
-  const auraLoopRef = useRef(null);
-  const wispLoopRefs   = useRef([null, null]);
-  const twinkleLoopRefs = useRef([]);
   const climaxRef   = useRef(null);
   const mountedRef  = useRef(true);
   const orbitDurRef = useRef(5000);
   const climaxFiredRef = useRef(false);
 
-  // ── Phase state (Build 91) ──────────────────────────────────────────────
-  // 1 = Awakening, 2 = Granting, 3 = Almost There. Default to 2 so the
-  // loader looks "active" when no progress is supplied (boot, preview).
-  const [phase, setPhase] = useState(2);
-
   // Base particle size (small ones ~2px at size=100)
   const baseDot     = Math.max(2, Math.round(size * 0.018));
-  // Orbit radius — slightly tighter in Act III to suggest "gathering toward
-  // the lamp." Computed at render time from current phase.
-  const orbitRadiusBase  = size * 0.80;
-  const orbitRadiusTight = size * 0.65;
-  const orbitRadius = phase === 3 ? orbitRadiusTight : orbitRadiusBase;
+  // Wider orbit — particles well clear of icon edges
+  const orbitRadius = size * 0.80;
 
-  // ── Progress → phase listener ──────────────────────────────────────────
-  // Listens to the Animated.Value passed in by the caller. setState only
-  // fires on threshold crossings (max 3 times in a typical 30s gen).
   useEffect(() => {
-    if (!progress || typeof progress.addListener !== 'function') return;
-    const id = progress.addListener(({ value }) => {
-      const next = value < 0.30 ? 1 : value < 0.66 ? 2 : 3;
-      setPhase(prev => (prev === next ? prev : next));
-    });
-    return () => progress.removeListener(id);
-  }, [progress]);
+    mountedRef.current = true;
+    if (animating) {
+      startAnimation();
+    } else {
+      stopAnimation();
+    }
+    return () => {
+      mountedRef.current = false;
+      stopAnimation();
+    };
+  }, [animating]);
 
-  // ── Climax trigger ─────────────────────────────────────────────────────
-  // Fires the 400ms burst exactly once per mount. Stops all running loops
+  // ── Climax burst (Build 92) ─────────────────────────────────────────────
+  // Fires the 400ms reveal exactly once per mount. Stops every running loop
   // first so they don't fight the burst. onClimaxComplete fires when done
   // so the caller can transition to the result image.
   useEffect(() => {
     if (!climaxTrigger) return;
-    if (climaxFiredRef.current) return;  // one-shot per mount
+    if (climaxFiredRef.current) return;
     climaxFiredRef.current = true;
 
-    // Stop all running loops (they'd visually fight the burst)
     introRef.current?.stop();
     loopRef.current?.stop();
     orbitRef.current?.stop();
     bounceRef.current?.stop();
-    auraLoopRef.current?.stop();
-    wispLoopRefs.current.forEach(r => r?.stop?.());
-    twinkleLoopRefs.current.forEach(r => r?.stop?.());
 
     climaxRef.current = Animated.parallel([
       // Lamp scales down to nothing
@@ -186,29 +125,14 @@ export default function GenieLoader({
         easing: Easing.in(Easing.cubic),
         useNativeDriver: true,
       }),
-      // Particles burst outward: translateY radius doubles, opacity fades
+      // Particles burst outward + fade
       Animated.timing(climaxBurst, {
         toValue: 1,
         duration: 400,
         easing: Easing.out(Easing.cubic),
         useNativeDriver: true,
       }),
-      // Aura scales up to 1.8× and fades
-      Animated.parallel([
-        Animated.timing(climaxAura, {
-          toValue: 1.8,
-          duration: 400,
-          easing: Easing.out(Easing.cubic),
-          useNativeDriver: true,
-        }),
-        Animated.timing(climaxAuraFade, {
-          toValue: 0,
-          duration: 400,
-          easing: Easing.out(Easing.cubic),
-          useNativeDriver: true,
-        }),
-      ]),
-      // White flash: ramp to 0.4 over first 100ms, decay over 300ms
+      // White flash overlay: 0 → 0.4 in 100ms, → 0 in 300ms
       Animated.sequence([
         Animated.timing(whiteFlash, { toValue: 0.4, duration: 100, useNativeDriver: true }),
         Animated.timing(whiteFlash, { toValue: 0,   duration: 300, useNativeDriver: true }),
@@ -290,150 +214,14 @@ export default function GenieLoader({
     ]);
   }
 
-  // Act I: gentle float (no shake, no scale change). Soft up-down breath.
-  function createGentleFloat() {
-    return Animated.sequence([
-      Animated.timing(genieBounceY, { toValue: -1.5, duration: 1200, easing: Easing.inOut(Easing.sin), useNativeDriver: true }),
-      Animated.timing(genieBounceY, { toValue:  0,   duration: 1200, easing: Easing.inOut(Easing.sin), useNativeDriver: true }),
-    ]);
-  }
-
-  // Act III: continuous hover with subtle rattle. No settle landing.
-  function createHover() {
-    return Animated.sequence([
-      Animated.parallel([
-        Animated.timing(genieBounceY, { toValue: -3, duration: 800, easing: Easing.inOut(Easing.sin), useNativeDriver: true }),
-        Animated.timing(genieShakeX,  { toValue:  0.6, duration: 800, easing: Easing.inOut(Easing.sin), useNativeDriver: true }),
-      ]),
-      Animated.parallel([
-        Animated.timing(genieBounceY, { toValue: -1, duration: 800, easing: Easing.inOut(Easing.sin), useNativeDriver: true }),
-        Animated.timing(genieShakeX,  { toValue: -0.6, duration: 800, easing: Easing.inOut(Easing.sin), useNativeDriver: true }),
-      ]),
-    ]);
-  }
-
   function startBounceLoop() {
     if (!mountedRef.current) return;
-    // Pick the lamp behavior based on current phase. Recreated each cycle
-    // so phase changes mid-30s pick up the new behavior on the next loop
-    // iteration (no harsh tear-down).
-    let next;
-    if (phase === 1)      next = createGentleFloat();
-    else if (phase === 3) next = createHover();
-    else                  next = createBounce();
-    bounceRef.current = next;
-    next.start(({ finished }) => {
+    const bounce = createBounce();
+    bounceRef.current = bounce;
+    bounce.start(({ finished }) => {
       if (finished && mountedRef.current) startBounceLoop();
     });
   }
-
-  // ── Aura breathing loop ─────────────────────────────────────────────────
-  function startAuraLoop() {
-    if (!mountedRef.current) return;
-    auraLoopRef.current = Animated.loop(
-      Animated.sequence([
-        Animated.timing(auraBreathe, { toValue: 1.12, duration: 1800, easing: Easing.inOut(Easing.sin), useNativeDriver: true }),
-        Animated.timing(auraBreathe, { toValue: 0.94, duration: 1800, easing: Easing.inOut(Easing.sin), useNativeDriver: true }),
-      ])
-    );
-    auraLoopRef.current.start();
-  }
-
-  // ── Wisp loop: drift up + fade in & out ─────────────────────────────────
-  function startWispLoop(idx, initialDelay) {
-    if (!mountedRef.current) return;
-    const ty = wispTY[idx];
-    const op = wispOp[idx];
-    ty.setValue(0);
-    op.setValue(0);
-    const seq = Animated.sequence([
-      Animated.delay(initialDelay),
-      Animated.parallel([
-        Animated.timing(ty, { toValue: -50, duration: 4000, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
-        Animated.sequence([
-          Animated.timing(op, { toValue: 0.30, duration: 1500, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
-          Animated.timing(op, { toValue: 0,    duration: 2500, easing: Easing.in(Easing.cubic),  useNativeDriver: true }),
-        ]),
-      ]),
-    ]);
-    wispLoopRefs.current[idx] = seq;
-    seq.start(({ finished }) => {
-      if (finished && mountedRef.current) startWispLoop(idx, 0);  // immediate restart after first delay
-    });
-  }
-
-  // ── Twinkle loops (Act III only) ────────────────────────────────────────
-  function startTwinkleLoops() {
-    if (!mountedRef.current) return;
-    twinkleLoopRefs.current = PARTICLES.map((_, i) => {
-      const delay = (i * 73) % 1000; // pseudo-random per-particle phase offset
-      const dur = 600 + (i * 31) % 600; // 600-1200ms per oscillation
-      const loop = Animated.loop(
-        Animated.sequence([
-          Animated.delay(delay),
-          Animated.timing(twinkle[i], { toValue: 0.4, duration: dur,     easing: Easing.inOut(Easing.sin), useNativeDriver: true }),
-          Animated.timing(twinkle[i], { toValue: 1,   duration: dur,     easing: Easing.inOut(Easing.sin), useNativeDriver: true }),
-        ])
-      );
-      loop.start();
-      return loop;
-    });
-  }
-
-  function stopTwinkleLoops() {
-    twinkleLoopRefs.current.forEach(l => l?.stop?.());
-    twinkleLoopRefs.current = [];
-    twinkle.forEach(v => v.setValue(1));
-  }
-
-  // ── Phase-driven side-effects ───────────────────────────────────────────
-  // Wisp[0] runs in phases 2 & 3. Wisp[1] runs in phase 3 only with offset.
-  // Twinkle runs in phase 3 only.
-  useEffect(() => {
-    if (!animating) return;
-    if (climaxFiredRef.current) return;
-
-    // Wisp[0]
-    if (phase >= 2) {
-      if (!wispLoopRefs.current[0]) startWispLoop(0, 0);
-    } else {
-      wispLoopRefs.current[0]?.stop?.();
-      wispLoopRefs.current[0] = null;
-      wispTY[0].setValue(0);
-      wispOp[0].setValue(0);
-    }
-
-    // Wisp[1]
-    if (phase >= 3) {
-      if (!wispLoopRefs.current[1]) startWispLoop(1, 1500);  // 1.5s offset for visual variety
-    } else {
-      wispLoopRefs.current[1]?.stop?.();
-      wispLoopRefs.current[1] = null;
-      wispTY[1].setValue(0);
-      wispOp[1].setValue(0);
-    }
-
-    // Twinkle
-    if (phase === 3) {
-      if (twinkleLoopRefs.current.length === 0) startTwinkleLoops();
-    } else {
-      stopTwinkleLoops();
-    }
-  }, [phase, animating]);
-
-  // ── Top-level animation lifecycle ───────────────────────────────────────
-  useEffect(() => {
-    mountedRef.current = true;
-    if (animating) {
-      startAnimation();
-    } else {
-      stopAnimation();
-    }
-    return () => {
-      mountedRef.current = false;
-      stopAnimation();
-    };
-  }, [animating]);
 
   function startAnimation() {
     // Reset all values
@@ -444,19 +232,13 @@ export default function GenieLoader({
     dotPulse.setValue(0.4);
     orbitProgress.setValue(0);
     particleOpacity.setValue(0);
-    auraBreathe.setValue(1);
     climaxLamp.setValue(1);
     climaxBurst.setValue(0);
-    climaxAura.setValue(1);
-    climaxAuraFade.setValue(1);
     whiteFlash.setValue(0);
-    twinkle.forEach(v => v.setValue(1));
-    wispTY.forEach(v => v.setValue(0));
-    wispOp.forEach(v => v.setValue(0));
     orbitDurRef.current = 5000;
     climaxFiredRef.current = false;
 
-    // Intro: a single bigger Pixar bounce + mid-air shake → particle fade-in
+    // Phase 1: Initial Pixar bounce + mid-air shake (slightly bigger than loop)
     const introBounce = Animated.sequence([
       Animated.timing(genieScaleY, {
         toValue: 0.93, duration: 100, easing: Easing.out(Easing.ease), useNativeDriver: true,
@@ -490,6 +272,7 @@ export default function GenieLoader({
       }),
     ]);
 
+    // Phase 2: Particle fade-in
     const fadeIn = Animated.timing(particleOpacity, {
       toValue: 1, duration: 250, useNativeDriver: true,
     });
@@ -498,22 +281,16 @@ export default function GenieLoader({
     introRef.current.start(() => {
       if (!mountedRef.current) return;
 
-      // Self-accelerating orbit
       startOrbitCycle(5000);
-
-      // Phase-aware bounce loop
       startBounceLoop();
 
-      // Aura breathing
-      startAuraLoop();
-
-      // Body breath + dot pulse (existing behavior)
       const dotLoop = Animated.loop(
         Animated.sequence([
           Animated.timing(dotPulse, { toValue: 1,   duration: 900, easing: Easing.inOut(Easing.ease), useNativeDriver: true }),
           Animated.timing(dotPulse, { toValue: 0.4, duration: 900, easing: Easing.inOut(Easing.ease), useNativeDriver: true }),
         ])
       );
+
       const breatheLoop = Animated.loop(
         Animated.sequence([
           Animated.timing(breatheScale, { toValue: 1.05, duration: 933, easing: Easing.inOut(Easing.ease), useNativeDriver: true }),
@@ -521,6 +298,7 @@ export default function GenieLoader({
           Animated.timing(breatheScale, { toValue: 1,    duration: 934, easing: Easing.inOut(Easing.ease), useNativeDriver: true }),
         ])
       );
+
       loopRef.current = Animated.parallel([dotLoop, breatheLoop]);
       loopRef.current.start();
     });
@@ -531,19 +309,12 @@ export default function GenieLoader({
     loopRef.current?.stop();
     orbitRef.current?.stop();
     bounceRef.current?.stop();
-    auraLoopRef.current?.stop();
     climaxRef.current?.stop();
-    wispLoopRefs.current.forEach(r => r?.stop?.());
-    twinkleLoopRefs.current.forEach(r => r?.stop?.());
     introRef.current = null;
     loopRef.current  = null;
     orbitRef.current = null;
     bounceRef.current = null;
-    auraLoopRef.current = null;
     climaxRef.current = null;
-    wispLoopRefs.current = [null, null];
-    twinkleLoopRefs.current = [];
-
     genieBounceY.setValue(0);
     genieScaleY.setValue(1);
     genieShakeX.setValue(0);
@@ -551,29 +322,15 @@ export default function GenieLoader({
     dotPulse.setValue(0.4);
     orbitProgress.setValue(0);
     particleOpacity.setValue(0);
-    auraBreathe.setValue(1);
     climaxLamp.setValue(1);
     climaxBurst.setValue(0);
-    climaxAura.setValue(1);
-    climaxAuraFade.setValue(1);
     whiteFlash.setValue(0);
-    twinkle.forEach(v => v.setValue(1));
-    wispTY.forEach(v => v.setValue(0));
-    wispOp.forEach(v => v.setValue(0));
     orbitDurRef.current = 5000;
   }
 
-  // ── Phase-derived render values ─────────────────────────────────────────
-  // Aura opacity: dim in Act I, brightest in Act III. Multiplied by climax
-  // fade so the aura disappears smoothly during the burst.
-  const auraOpacityByPhase = phase === 1 ? 0.10 : phase === 2 ? 0.20 : 0.30;
-  // Aura final opacity composes phase-base × climaxAuraFade.
-  const auraOpacityAnim = Animated.multiply(climaxAuraFade, auraOpacityByPhase);
-  // Aura scale composes breathing × climax-burst-scale.
-  const auraScaleAnim = Animated.multiply(auraBreathe, climaxAura);
-
-  // Particle climax burst: translateY ramps from -orbitRadius to -orbitRadius * 1.5,
-  // and overall opacity fades to 0 in the second half of the climax.
+  // ── Climax-derived render values ────────────────────────────────────────
+  // Particle translateY ramps from -orbitRadius to -orbitRadius * 1.5 during
+  // burst; opacity fades to 0 in the second half.
   const particleClimaxRadius = climaxBurst.interpolate({
     inputRange: [0, 1],
     outputRange: [-orbitRadius, -orbitRadius * 1.5],
@@ -583,50 +340,19 @@ export default function GenieLoader({
     outputRange: [1, 1, 0],
   });
 
-  // Wisp render position (anchored above lamp top, centered horizontally).
-  // wispBaseX positions the wisp at lamp's spout area; the spout in the
-  // SVG is roughly at viewBox X=326 / 450 ≈ 72% from left, but the lamp
-  // breathes so we anchor at lamp center horizontally for stability.
-  // Wisp size scales with loader size so it reads at all scales.
-  const wispWidth = Math.max(4, Math.round(size * 0.10));
-  const wispHeight = Math.max(6, Math.round(size * 0.16));
-
   return (
     <View style={[{ width: size, height: size, alignItems: 'center', justifyContent: 'center', overflow: 'visible' }, style]}>
-      {/* ── Aura halo (behind everything) ──────────────────────────── */}
-      <Animated.View
-        pointerEvents="none"
-        style={{
-          position: 'absolute',
-          width: size * 1.6,
-          height: size * 1.6,
-          borderRadius: size * 0.8,
-          backgroundColor: LIGHT,
-          opacity: auraOpacityAnim,
-          transform: [{ scale: auraScaleAnim }],
-        }}
-      />
-
-      {/* ── Orbiting particles ─────────────────────────────────────── */}
-      {PARTICLES.map(({ color, sizeMult, firstPhase }, i) => {
+      {/* ── Orbiting particles (behind logo) ───────────────────── */}
+      {PARTICLES.map(({ color, sizeMult }, i) => {
         const pSize = Math.max(2, Math.round(baseDot * sizeMult));
-        // Particle is invisible until its first phase is reached. Once
-        // visible, opacity = particleOpacity (intro fade-in) × twinkle[i]
-        // (Act III oscillation) × particleClimaxOpacity (climax fade-out).
-        const visible = phase >= firstPhase;
-        const composedOpacity = Animated.multiply(
-          Animated.multiply(particleOpacity, twinkle[i]),
-          particleClimaxOpacity
-        );
         return (
           <Animated.View
             key={i}
-            pointerEvents="none"
             style={{
               position: 'absolute',
               width: pSize,
               height: pSize,
-              opacity: visible ? composedOpacity : 0,
+              opacity: Animated.multiply(particleOpacity, particleClimaxOpacity),
               transform: [
                 {
                   rotate: orbitProgress.interpolate({
@@ -653,37 +379,7 @@ export default function GenieLoader({
         );
       })}
 
-      {/* ── Wish-energy wisps (Acts II + III) ─────────────────────── */}
-      {/* Anchored at top-center of the loader; drift upward + fade as
-          they rise. Two instances with offset start times in Act III. */}
-      {[0, 1].map(idx => (
-        <Animated.View
-          key={`wisp-${idx}`}
-          pointerEvents="none"
-          style={{
-            position: 'absolute',
-            top: size * 0.14,
-            left: size * 0.5 - wispWidth / 2 + (idx === 0 ? -2 : 2),
-            width: wispWidth,
-            height: wispHeight,
-            opacity: wispOp[idx],
-            transform: [{ translateY: wispTY[idx] }],
-          }}
-        >
-          <View style={{
-            width: wispWidth,
-            height: wispHeight,
-            borderRadius: wispWidth,
-            backgroundColor: LIGHT,
-            shadowColor: LIGHT,
-            shadowOffset: { width: 0, height: 0 },
-            shadowOpacity: 0.6,
-            shadowRadius: 4,
-          }} />
-        </Animated.View>
-      ))}
-
-      {/* ── Logo: Base layer (bg + house — stays still) ──────────── */}
+      {/* ── Logo: Base layer (bg + house — stays still) ──────── */}
       <Animated.View style={{
         transform: [
           { scale: Animated.multiply(breatheScale, climaxLamp) },
@@ -697,7 +393,10 @@ export default function GenieLoader({
             </SvgLinearGradient>
           </Defs>
 
+          {/* Background rounded rect */}
           <Rect width="450" height="450" rx="100" fill="url(#bgGrad)" />
+
+          {/* House silhouette */}
           <Path fillRule="evenodd" clipRule="evenodd" d={HOUSE_D} fill={WHITE} />
         </Svg>
 
@@ -719,18 +418,22 @@ export default function GenieLoader({
                 <Stop offset="0.861" stopColor={DARK} />
               </SvgLinearGradient>
             </Defs>
+
+            {/* Genie character */}
             <Path d={GENIE_D} fill="url(#genieGrad2)" />
           </Svg>
         </Animated.View>
       </Animated.View>
 
-      {/* ── Blue dot pulse overlay ────────────────────────────────── */}
+      {/* ── Blue dot pulse overlay ─────────────────────────────── */}
       <Animated.View style={{
         position: 'absolute',
         opacity: Animated.multiply(dotPulse, climaxLamp),
       }}>
         <Svg width={size} height={size} viewBox="0 0 450 450">
+          {/* Glow ring */}
           <Circle cx="225" cy="110.548" r="18" fill={DOT} opacity={0.25} />
+          {/* Core dot */}
           <Circle cx="225" cy="110.548" r="10" fill={DOT} />
         </Svg>
       </Animated.View>

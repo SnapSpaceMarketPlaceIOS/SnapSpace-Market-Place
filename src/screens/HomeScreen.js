@@ -3047,13 +3047,12 @@ export default function HomeScreen({ navigation, route }) {
         },
       };
 
-      // Push loadingProgress to 1 over 200ms — forces the GenieLoader into
-      // Act III briefly before the climax (so the burst follows the
-      // "almost there..." peak intensity, not a calmer earlier act).
-      stopLoadingBar(true);
-
       // Trigger the climax burst. GenieLoader runs its 400ms reveal sequence
       // and calls handleClimaxComplete when done.
+      // Build 92: removed the stopLoadingBar(true) call that pushed
+      // loadingProgress to 1 — that was only needed for Build 91's Act III
+      // phase escalation which has been reverted. The loading bar timer
+      // continues offscreen until the next generation resets it.
       setClimaxFiring(true);
 
       // State cleanups that don't affect loader visibility — safe to do now.
@@ -3205,14 +3204,14 @@ export default function HomeScreen({ navigation, route }) {
           )}
 
           {/* Generation status — GenieLoader animation.
-              Build 91: progress drives the 3-act phase escalation; climaxTrigger
-              fires the 400ms reveal burst when the result is ready. */}
+              Build 92: reverted Build 91's 3-act phase progression. Only the
+              climax burst is kept — when the result is ready, climaxTrigger
+              flips to true and the GenieLoader plays its 400ms reveal. */}
           {generating && (
             <View style={styles.heroCentered}>
               <GenieLoader
                 size={100}
                 animating={generating}
-                progress={loadingProgress}
                 climaxTrigger={climaxFiring}
                 onClimaxComplete={handleClimaxComplete}
               />
