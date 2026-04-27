@@ -1399,6 +1399,7 @@ export default function ExploreScreen({ navigation, route }) {
                             uri={p.imageUrl}
                             style={{ width: '100%', height: '100%' }}
                             resizeMode="cover"
+                            compact
                           />
                         ) : (
                           <ImagePlaceholderIcon />

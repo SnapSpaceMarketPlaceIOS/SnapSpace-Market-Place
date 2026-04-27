@@ -608,6 +608,7 @@ function VariantSelector({ variants, selectedId, onSelect }) {
                     style={va.swatchImg}
                     resizeMode="contain"
                     placeholderColor={uiColors.surface}
+                    compact
                   />
                 ) : v.mainImage ? (
                   <CardImage
@@ -615,6 +616,7 @@ function VariantSelector({ variants, selectedId, onSelect }) {
                     style={va.swatchImg}
                     resizeMode="contain"
                     placeholderColor={uiColors.surface}
+                    compact
                   />
                 ) : v.color ? (
                   <View style={[va.colorBlock, { backgroundColor: v.color }]} />

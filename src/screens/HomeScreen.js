@@ -3611,7 +3611,7 @@ export default function HomeScreen({ navigation, route }) {
               >
                 {/* ── Image area ── */}
                 <View style={styles.featuredProductImgWrap}>
-                  <CardImage uri={product.imageUrl} style={styles.featuredProductImg} placeholderColor="#E8EDF5" />
+                  <CardImage uri={product.imageUrl} style={styles.featuredProductImg} placeholderColor="#E8EDF5" compact />
                 </View>
 
                 {/* ── Info below image ── */}
@@ -3719,6 +3719,7 @@ export default function HomeScreen({ navigation, route }) {
                         uri={product.imageUrl}
                         style={resultStyles.hCardImg}
                         resizeMode="cover"
+                        compact
                       />
                       <View style={resultStyles.hCardBody}>
                         <Text style={resultStyles.hCardName} numberOfLines={2}>{product.name}</Text>

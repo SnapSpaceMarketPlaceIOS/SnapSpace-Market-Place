@@ -460,7 +460,7 @@ export default function CartScreen({ navigation }) {
 
               {/* Product image — 88×88 square, light gray bg, radius-lg */}
               <View style={styles.itemImageWrap}>
-                <CardImage uri={item.imageUrl} style={styles.itemImage} resizeMode="cover" />
+                <CardImage uri={item.imageUrl} style={styles.itemImage} resizeMode="cover" compact />
               </View>
 
               {/* Content column — stacks top-to-bottom, synced to 100px image */}

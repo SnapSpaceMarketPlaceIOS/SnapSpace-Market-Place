@@ -179,7 +179,7 @@ function ProductCard({ product, inCart, onAddToCart, onPress }) {
 
   return (
     <TouchableOpacity style={s.hCard} activeOpacity={0.7} onPress={onPress}>
-      <CardImage uri={product.imageUrl} style={s.hCardImg} resizeMode="cover" placeholderColor="#D0D7E3" />
+      <CardImage uri={product.imageUrl} style={s.hCardImg} resizeMode="cover" placeholderColor="#D0D7E3" compact />
       <View style={s.hCardBody}>
         <Text style={s.hCardName} numberOfLines={2}>{product.name}</Text>
         <Text style={s.hCardBrand} numberOfLines={1}>{product.brand}</Text>

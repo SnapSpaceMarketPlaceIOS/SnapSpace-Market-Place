@@ -142,7 +142,7 @@ function OrderCard({ order }) {
           {order.items.map((item, idx) => (
             <View key={item.key || idx} style={styles.itemRow}>
               <View style={[styles.itemThumb, { backgroundColor: getThumbColor(item.name) }]}>
-                <CardImage uri={item.imageUrl} style={styles.itemThumbPhoto} resizeMode="cover" />
+                <CardImage uri={item.imageUrl} style={styles.itemThumbPhoto} resizeMode="cover" compact />
               </View>
               <View style={styles.itemInfo}>
                 <Text style={styles.itemName} numberOfLines={1}>{item.name}</Text>
