@@ -300,11 +300,15 @@ export default function AdminApplicationsScreen({ navigation }) {
           <LensLoader size={48} />
         </View>
       ) : (
+        // Build 89: virtualization tuning for admin applications list.
         <FlatList
           data={filtered}
           keyExtractor={(item) => item.id}
           contentContainerStyle={styles.list}
           showsVerticalScrollIndicator={false}
+          initialNumToRender={6}
+          windowSize={7}
+          removeClippedSubviews
           refreshControl={
             <RefreshControl
               refreshing={refreshing}

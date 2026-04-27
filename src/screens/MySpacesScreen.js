@@ -286,11 +286,15 @@ export default function MySpacesScreen({ navigation }) {
           </Text>
         </View>
       ) : (
+        // Build 89: virtualization tuning for the 2-column design grid.
         <FlatList
           data={designs}
           keyExtractor={(item) => item.id?.toString() || String(Math.random())}
           numColumns={2}
           showsVerticalScrollIndicator={false}
+          initialNumToRender={4}
+          windowSize={5}
+          removeClippedSubviews
           contentContainerStyle={s.grid}
           columnWrapperStyle={{ gap: GRID_GAP }}
           ItemSeparatorComponent={() => <View style={{ height: GRID_GAP }} />}

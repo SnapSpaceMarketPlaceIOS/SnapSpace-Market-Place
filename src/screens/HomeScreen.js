@@ -3665,10 +3665,14 @@ export default function HomeScreen({ navigation, route }) {
       </ScrollView>
 
       {/* ── Result Popup Modal ─────────────────────────────────────────── */}
+      {/* Build 89 🚩3: presentationStyle="pageSheet" gives iOS-native
+          rubber-band swipe-down + sheet chrome. Previously a full-screen
+          opaque slide where the close X was hard to find. The X button
+          remains as the explicit dismiss; the swipe-down is additive. */}
       <Modal
         visible={showResult}
         animationType="slide"
-        transparent={false}
+        presentationStyle="pageSheet"
         onRequestClose={() => setShowResult(false)}
       >
         <View style={resultStyles.container}>
@@ -3722,11 +3726,18 @@ export default function HomeScreen({ navigation, route }) {
                     </TouchableOpacity>
                   </View>
                 </View>
+                {/* Build 89: virtualization tuning — initialNumToRender + windowSize
+                    keep memory bounded for the SHOP YOUR ROOM strip even when
+                    matching returns many products. removeClippedSubviews safe
+                    for horizontal lists on iOS. */}
                 <FlatList
                   data={resultData.products}
                   keyExtractor={(item, idx) => item.id || String(idx)}
                   horizontal
                   showsHorizontalScrollIndicator={false}
+                  initialNumToRender={3}
+                  windowSize={5}
+                  removeClippedSubviews
                   contentContainerStyle={{ paddingRight: 20, gap: 10 }}
                   renderItem={({ item: product }) => (
                     <TouchableOpacity

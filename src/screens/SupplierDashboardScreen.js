@@ -222,8 +222,11 @@ function FulfillModal({ visible, order, onClose, onFulfill }) {
     }
   };
 
+  // Build 89: removed redundant `transparent` prop. formSheet is opaque
+  // by design — combining `transparent` + `presentationStyle="formSheet"`
+  // is a contradictory iOS hint that produces inconsistent rendering.
   return (
-    <Modal visible={visible} animationType="slide" presentationStyle="formSheet" transparent onRequestClose={onClose}>
+    <Modal visible={visible} animationType="slide" presentationStyle="formSheet" onRequestClose={onClose}>
       <KeyboardAvoidingView style={fulfillStyles.overlay} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <View style={fulfillStyles.sheet}>
           <View style={fulfillStyles.drag} />

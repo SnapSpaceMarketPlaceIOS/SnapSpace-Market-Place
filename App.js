@@ -390,7 +390,17 @@ function RootNavigator() {
     <Stack.Navigator
       screenOptions={{
         headerShown: false,
+        // Build 89: explicitly set the default push animation. Previously
+        // `animationDuration: 300` was set but `animation:` was not, which
+        // meant the duration token was never actually applied — react-native-
+        // screens fell back to its built-in default. Wiring `slide_from_right`
+        // here makes the 300ms duration meaningful for every stack screen
+        // that doesn't override (Auth, VerifyEmailSent, RoomResult, Paywall).
+        animation: 'slide_from_right',
         animationDuration: 300,
+        // Generous swipe-back area: standard premium-app behavior (Linear,
+        // Airbnb). Default is ~25pt edge — too tight on a 393pt screen.
+        gestureResponseDistance: 50,
         // Paint the card bg white during stack transitions. Without this,
         // iOS briefly shows black between screens on back-navigation (the
         // native stack container defaults to no bg), which was visible as
@@ -408,10 +418,25 @@ function RootNavigator() {
         options={{ presentation: 'modal', animation: 'slide_from_bottom' }}
       />
       <Stack.Screen name="VerifyEmailSent" component={VerifyEmailSentScreen} options={{ animation: 'fade' }} />
-      <Stack.Screen name="RoomResult" component={RoomResultScreen} options={{ animation: 'slide_from_bottom' }} />
-      <Stack.Screen name="ProductDetail" component={ProductDetailScreen} />
-      <Stack.Screen name="ShopTheLook" component={ShopTheLookScreen} />
-      <Stack.Screen name="UserProfile" component={UserProfileScreen} />
+      {/* Build 89 🚩2: switched from slide_from_bottom + card to formSheet.
+          RoomResult is "result" content, not a destination — formSheet's
+          rubber-band swipe-down + grabber + rounded corners match content
+          gravity. iOS-native sheet rendering (smoother than custom slide). */}
+      <Stack.Screen
+        name="RoomResult"
+        component={RoomResultScreen}
+        options={{
+          presentation: 'formSheet',
+          sheetGrabberVisible: true,
+          sheetCornerRadius: 20,
+        }}
+      />
+      {/* Build 89: enable full-screen swipe-back on the most-traversed
+          routes. Lets users drag from anywhere mid-screen, not just the
+          25pt edge. Standard premium-app pattern. */}
+      <Stack.Screen name="ProductDetail" component={ProductDetailScreen} options={{ fullScreenGestureEnabled: true }} />
+      <Stack.Screen name="ShopTheLook" component={ShopTheLookScreen} options={{ fullScreenGestureEnabled: true }} />
+      <Stack.Screen name="UserProfile" component={UserProfileScreen} options={{ fullScreenGestureEnabled: true }} />
       <Stack.Screen name="Liked" component={LikedScreen} />
       <Stack.Screen name="Shared" component={SharedScreen} />
       <Stack.Screen name="OrderHistory" component={OrderHistoryScreen} />
@@ -432,7 +457,9 @@ function RootNavigator() {
       <Stack.Screen name="SupplierDashboard" component={SupplierDashboardScreen} />
       <Stack.Screen name="Browse" component={BrowseScreen} />
       <Stack.Screen name="AllCollections" component={AllCollectionsScreen} />
-      <Stack.Screen name="Paywall" component={PaywallScreen} options={{ presentation: 'transparentModal', headerShown: false }} />
+      {/* Build 89: was snapping in instantly because transparentModal +
+          no animation = pop-in. 250ms fade reads as intentional. */}
+      <Stack.Screen name="Paywall" component={PaywallScreen} options={{ presentation: 'transparentModal', headerShown: false, animation: 'fade', animationDuration: 250 }} />
       <Stack.Screen name="FollowList" component={FollowListScreen} />
     </Stack.Navigator>
   );
