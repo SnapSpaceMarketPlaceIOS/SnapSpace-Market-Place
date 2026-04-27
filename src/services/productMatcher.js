@@ -821,7 +821,33 @@ function diversify(
     const fresh = (recentlyShownIds && recentlyShownIds.size > 0)
       ? candidates.filter((p) => !recentlyShownIds.has(p.id))
       : candidates;
-    const effective = fresh.length > 0 ? fresh : candidates;
+    let effective = fresh.length > 0 ? fresh : candidates;
+
+    // Build 94 — HARD no-repeat guarantee for the first 3 generations.
+    //
+    // User requirement: "The user should not see the same product within the
+    // first three generation photos." Concretely, products from the previous
+    // 2 gens (gensAgo ≤ 2 → still inside the rolling 3-gen window) are
+    // hard-excluded from the candidate pool. Only on a 4th+ generation does
+    // the existing soft-freshness multiplier (further down) handle rotation.
+    //
+    // Escape valve: if the hard exclusion would empty this category's pool
+    // (e.g. Dark Luxe sofas — only 2 products in the entire catalog), we
+    // gracefully relax to the soft pool. Pool exhaustion is the only reason
+    // a repeat can occur within the 3-gen window — exactly the user-approved
+    // trade-off given the small catalog.
+    if (productHistory && productHistory.entries) {
+      const hardCutoff = currentGenIdx - 2; // gensAgo ≤ 2 means lastSeenGenIdx ≥ currentGenIdx - 2
+      const strictlyFresh = effective.filter((p) => {
+        const h = productHistory.entries[p.id];
+        return !h || (h.lastSeenGenIdx || 0) < hardCutoff;
+      });
+      if (strictlyFresh.length > 0) {
+        effective = strictlyFresh;
+      }
+      // else: pool would be empty after the hard cut — keep the soft pool and
+      //       let the freshness multiplier downstream still penalise repeats.
+    }
 
     const pool = effective.slice(0, RANDOM_POOL_SIZE);
     if (pool.length === 1) return pool[0];
