@@ -432,25 +432,22 @@ function RootNavigator() {
         options={{ presentation: 'modal', animation: 'slide_from_bottom' }}
       />
       <Stack.Screen name="VerifyEmailSent" component={VerifyEmailSentScreen} options={{ animation: 'fade' }} />
-      {/* Build 89 🚩2: switched from slide_from_bottom + card to formSheet.
-          RoomResult is "result" content, not a destination — formSheet's
-          rubber-band swipe-down + grabber + rounded corners match content
-          gravity. iOS-native sheet rendering (smoother than custom slide). */}
-      <Stack.Screen
-        name="RoomResult"
-        component={RoomResultScreen}
-        options={{
-          presentation: 'formSheet',
-          sheetGrabberVisible: true,
-          sheetCornerRadius: 20,
-        }}
-      />
-      {/* Build 89: enable full-screen swipe-back on the most-traversed
-          routes. Lets users drag from anywhere mid-screen, not just the
-          25pt edge. Standard premium-app pattern. */}
-      <Stack.Screen name="ProductDetail" component={ProductDetailScreen} options={{ fullScreenGestureEnabled: true }} />
-      <Stack.Screen name="ShopTheLook" component={ShopTheLookScreen} options={{ fullScreenGestureEnabled: true }} />
-      <Stack.Screen name="UserProfile" component={UserProfileScreen} options={{ fullScreenGestureEnabled: true }} />
+      {/* Build 90 fix: REVERTED Build 89's formSheet experiment. formSheet
+          on iPhone constrains the screen to ~90% height, which clipped the
+          full-bleed AI-generated room photo (user could only see half).
+          The original full-screen slide_from_bottom is the right gravity
+          for a "result reveal" — the image fills the screen as intended. */}
+      <Stack.Screen name="RoomResult" component={RoomResultScreen} options={{ animation: 'slide_from_bottom' }} />
+      {/* Build 90: REMOVED Build 89's fullScreenGestureEnabled experiment.
+          PDP has a horizontal hero-image FlatList; ShopTheLook + UserProfile
+          have horizontal product/post strips. Full-screen back-gesture
+          could be ambiguous against in-content horizontal swipes. The
+          global gestureResponseDistance: 50 (in screenOptions) already
+          doubles the edge-swipe area without conflicting with child
+          horizontal scrolls — sufficient polish without the risk. */}
+      <Stack.Screen name="ProductDetail" component={ProductDetailScreen} />
+      <Stack.Screen name="ShopTheLook" component={ShopTheLookScreen} />
+      <Stack.Screen name="UserProfile" component={UserProfileScreen} />
       <Stack.Screen name="Liked" component={LikedScreen} />
       <Stack.Screen name="Shared" component={SharedScreen} />
       <Stack.Screen name="OrderHistory" component={OrderHistoryScreen} />

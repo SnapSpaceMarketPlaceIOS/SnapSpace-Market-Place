@@ -3117,7 +3117,22 @@ export default function HomeScreen({ navigation, route }) {
               "HomeGenie" wordmark or tagline. */}
           <View style={[styles.topBar, generating && styles.topBarGenerating]}>
             <View style={styles.logoRow}>
-              <Text style={styles.logo} allowFontScaling={false}>HomeGenie</Text>
+              {/* Build 90 fix: numberOfLines + adjustsFontSizeToFit defends
+                  against the wordmark clipping when Geist_700Bold hasn't
+                  finished loading yet (Build 89 / 🚩1 unblocked the font
+                  gate so renders can race the font load). The tagline
+                  below already has these — bringing the logo to parity.
+                  Steady-state behavior unchanged: when Geist is loaded,
+                  the text fits at full 46pt and no scaling triggers. */}
+              <Text
+                style={styles.logo}
+                allowFontScaling={false}
+                numberOfLines={1}
+                adjustsFontSizeToFit
+                minimumFontScale={0.85}
+              >
+                HomeGenie
+              </Text>
               {!generating && (
                 <View style={styles.logoIcon}>
                   <HeaderLogoIcon size={44} />
@@ -3696,14 +3711,16 @@ export default function HomeScreen({ navigation, route }) {
       </ScrollView>
 
       {/* ── Result Popup Modal ─────────────────────────────────────────── */}
-      {/* Build 89 🚩3: presentationStyle="pageSheet" gives iOS-native
-          rubber-band swipe-down + sheet chrome. Previously a full-screen
-          opaque slide where the close X was hard to find. The X button
-          remains as the explicit dismiss; the swipe-down is additive. */}
+      {/* Build 90 fix: REVERTED Build 89's pageSheet experiment. pageSheet
+          on iPhone constrains the modal to ~90% height, clipping the full-
+          bleed AI-generated room photo. Restored the full-screen opaque
+          slide so the image displays at native aspect, no scrolling needed
+          to see the whole result. The X button remains the explicit
+          dismiss. */}
       <Modal
         visible={showResult}
         animationType="slide"
-        presentationStyle="pageSheet"
+        transparent={false}
         onRequestClose={() => setShowResult(false)}
       >
         <View style={resultStyles.container}>
