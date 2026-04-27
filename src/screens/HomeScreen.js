@@ -63,7 +63,8 @@ import { sendNotificationIfEnabled } from '../services/notifications';
 import { useOnboarding, ONBOARDING_STEPS } from '../context/OnboardingContext';
 import OnboardingOverlay, { OnboardingGlow } from '../components/OnboardingOverlay';
 import StyleCarousel from '../components/StyleCarousel';
-import { pickPromptVariation } from '../data/stylePresets';
+import { STYLE_PRESETS, pickPromptVariation } from '../data/stylePresets';
+import { appendStyleHistory } from '../utils/pickRemixStyle';
 
 const { width, height } = Dimensions.get('window');
 
@@ -1071,6 +1072,14 @@ export default function HomeScreen({ navigation, route }) {
   // Resets on cold-start (acceptable; user gets full variation cycle each
   // session).
   const lastPromptIdxRef = useRef({});
+  // Rolling history of recent style IDs (most-recent-last, capped at 3) — used
+  // by the Remix FAB on RoomResultScreen to skip styles the user just saw.
+  // This is the SAME 3-deep window enforced by Build 95's anti-repetition rule
+  // for fresh carousel taps; remixes inherit it so the experience feels
+  // consistent regardless of which entry point triggered the generation.
+  // Lives on a ref because the carousel/FAB don't need to re-render on
+  // changes — pickRemixStyle just reads the latest snapshot.
+  const recentStyleIdsRef = useRef([]);
   // Build 83 — recently-shown product IDs across the last N generations.
   // Used as a soft exclusion hint to getProductsForPrompt so the matcher
   // prefers fresh catalog entries on consecutive generations across different
@@ -1333,6 +1342,81 @@ export default function HomeScreen({ navigation, route }) {
       singleProductTriggered.current = false;
     }
   }, [photo, singleProduct, generating]);
+
+  // ── Remix intent (from RoomResultScreen Remix FAB) ──────────────────────
+  // Two-stage handshake:
+  //   Stage 1: receive remixIntent param → restore photo + style + prompt
+  //            from the previous generation, then clear the param so a back
+  //            navigation doesn't re-fire the effect.
+  //   Stage 2: once photo+prompt are set in state and generating is false,
+  //            kick runGeneration. We can't call runGeneration synchronously
+  //            in stage 1 because setPhoto/setPrompt are async — runGeneration
+  //            would read stale state and bail on the empty-prompt validator.
+  // The two refs split the lifecycle: `remixPending` flips on stage 1 so
+  // stage 2 knows to fire; `remixFiredRef` blocks the auto-fire effect from
+  // re-triggering once gen has been kicked off.
+  const remixPendingRef = useRef(false);
+  const remixFiredRef = useRef(false);
+  useEffect(() => {
+    const remix = route?.params?.remixIntent;
+    if (!remix) return;
+    if (remixPendingRef.current) return;       // already processing this intent
+    remixPendingRef.current = true;
+    remixFiredRef.current = false;             // arm stage 2
+
+    // Restore photo state. The photo file at remix.photoMeta.uri still has
+    // EXIF on disk, so even if a field is missing, runGeneration's existing
+    // safety nets (Image.getSize fallback, readFileExif, etc.) recover.
+    if (remix.photoMeta) {
+      setPhoto(remix.photoMeta);
+      setPhotoSource(remix.photoSource || null);
+    }
+
+    // Honor the remixed style: set the carousel pill so the user sees what
+    // they're regenerating into, and seed the input with the new prompt.
+    const preset = STYLE_PRESETS.find(p => p.id === remix.styleId) || null;
+    if (preset && remix.prompt) {
+      setSelectedStyle({ ...preset, prompt: remix.prompt });
+    }
+    if (remix.prompt) {
+      setPrompt(remix.prompt);
+      bumpInputKey();
+    }
+
+    // Seed the rolling history from the previous RoomResult. The current
+    // style we're about to render is appended in stage 2 right before
+    // navigation, not here — that keeps history aligned with the user's
+    // visual experience (history grows once you SEE a style, not when you
+    // request it).
+    if (Array.isArray(remix.recentStyleIds)) {
+      recentStyleIdsRef.current = remix.recentStyleIds.slice(-3);
+    }
+
+    // Clear the param so back-nav from the upcoming RoomResult doesn't
+    // re-fire this effect. setParams with undefined removes the entry.
+    navigation.setParams({ remixIntent: undefined });
+  }, [route?.params?.remixIntent]);
+
+  // Stage 2 — once stage 1's setState calls have committed (photo + prompt
+  // present) and we're not already generating, kick runGeneration. The 300ms
+  // delay mirrors the single-product auto-trigger so the GenieLoader UI has
+  // time to mount before the network call begins.
+  useEffect(() => {
+    if (
+      remixPendingRef.current &&
+      !remixFiredRef.current &&
+      photo &&
+      prompt &&
+      !generating
+    ) {
+      remixFiredRef.current = true;
+      setTimeout(() => {
+        runGeneration();
+        // Clear pending after firing so a fresh remixIntent param can re-arm.
+        remixPendingRef.current = false;
+      }, 300);
+    }
+  }, [photo, prompt, generating]);
 
   const handlePickFromLibrary = useCallback(async () => {
     if (generating) return;
@@ -1707,6 +1791,13 @@ export default function HomeScreen({ navigation, route }) {
     }
     const rawPrompt = isSingleProductMode ? '' : prompt.trim();
     const savedPhoto = { ...photo };
+    const savedPhotoSource = photoSource;
+    // Snapshot the carousel selection at gen-start so the value passed to
+    // RoomResult is stable across the ~30s pipeline. selectedStyle is reactive
+    // state that auto-clears if the prompt is edited mid-flight (line ~1003
+    // useEffect); without this snapshot the RoomResult Remix FAB could land
+    // with a null styleId on edge-case races.
+    const savedStyleId = selectedStyle?.id || null;
     Keyboard.dismiss();
 
     // ── Observability: one ID per generation attempt ───────────────────────
@@ -3069,6 +3160,17 @@ export default function HomeScreen({ navigation, route }) {
         { screen: 'RoomResult' }
       ).catch(() => {});
 
+      // Snapshot the rolling style history BEFORE this style is appended.
+      // RoomResult receives the "before" history so its Remix FAB can compute
+      // the next style with `pickRemixStyle(POOL, current, beforeHistory)` —
+      // the FAB itself appends `savedStyleId` when sending the remix intent
+      // back, keeping history aligned with what the user actually saw.
+      const recentStyleIdsBefore = recentStyleIdsRef.current.slice();
+      // Advance history for any *future* gen kicked off from HomeScreen
+      // (carousel tap, typed prompt) so it inherits the same anti-repetition
+      // behavior remixes get. Capped at 3 by appendStyleHistory.
+      recentStyleIdsRef.current = appendStyleHistory(recentStyleIdsRef.current, savedStyleId, 3);
+
       // Stash the RoomResult navigation params in the ref. handleClimaxComplete
       // reads + clears it after the burst.
       pendingNavRef.current = {
@@ -3081,6 +3183,15 @@ export default function HomeScreen({ navigation, route }) {
         // history, where the original photo isn't available).
         beforeUri: savedPhoto?.uri || null,
         products: finalMatchedProducts,
+        // Remix-FAB inputs (Build 99). styleId/photoMeta/photoSource let the
+        // FAB rebuild a remixIntent and bounce back to HomeScreen, which will
+        // re-run runGeneration with the same photo and a different style.
+        // recentStyleIds is the rolling 3-deep window of styles seen BEFORE
+        // this one — pickRemixStyle excludes current + this list.
+        styleId: savedStyleId,
+        photoMeta: savedPhoto,
+        photoSource: savedPhotoSource,
+        recentStyleIds: recentStyleIdsBefore,
         // Dev-only debug metadata — RoomResultScreen renders an overlay when __DEV__
         debug: {
           ...genMeta,

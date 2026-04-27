@@ -30,6 +30,9 @@ import { parseDesignPrompt } from '../utils/promptParser';
 import { saveUserDesign, updateDesignVisibility, updateDesignProducts } from '../services/supabase';
 import * as FileSystem from 'expo-file-system/legacy';
 import * as ImageManipulator from 'expo-image-manipulator';
+import { LinearGradient } from 'expo-linear-gradient';
+import { STYLE_PRESETS, pickPromptVariation } from '../data/stylePresets';
+import { pickRemixStyle, appendStyleHistory } from '../utils/pickRemixStyle';
 
 const { width } = Dimensions.get('window');
 const IMG_RADIUS = Math.round((width - space.lg * 2) * 0.025);
@@ -144,6 +147,33 @@ function PostIcon({ color = '#9CA3AF' }) {
         d="M15 0C23.2843 0 30 6.71573 30 15C30 23.2843 23.2843 30 15 30C6.71573 30 0 23.2843 0 15C0 6.71573 6.71573 0 15 0ZM15 6.16602C14.7241 6.16602 14.5004 6.39017 14.5 6.66602V14.5H6.66699C6.39085 14.5 6.16699 14.7239 6.16699 15C6.16699 15.2761 6.39085 15.5 6.66699 15.5H14.5V23.333C14.5 23.6091 14.7239 23.833 15 23.833C15.2761 23.833 15.5 23.6091 15.5 23.333V15.5H23.333C23.609 15.4998 23.833 15.276 23.833 15C23.833 14.724 23.609 14.5002 23.333 14.5H15.5V6.66602C15.4996 6.39017 15.2759 6.16602 15 6.16602Z"
         fill={color}
       />
+    </Svg>
+  );
+}
+
+// Two-arrows-crossing remix glyph (Lucide-style "shuffle" — two arrows in
+// an X with arrowheads at top-right and bottom-right). Reads instantly as
+// "regenerate / re-roll" without needing a label. White fill on the brand-
+// blue FAB gradient.
+function RemixIcon({ color = '#FFFFFF', size = 22 }) {
+  return (
+    <Svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke={color}
+      strokeWidth={2.2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      {/* Top arrow: enters bottom-left, exits top-right with arrowhead */}
+      <Polyline points="16 3 21 3 21 8" />
+      <Line x1={4} y1={20} x2={21} y2={3} />
+      {/* Bottom arrow: enters top-left, exits bottom-right with arrowhead */}
+      <Polyline points="21 16 21 21 16 21" />
+      <Line x1={15} y1={15} x2={21} y2={21} />
+      <Line x1={4} y1={4} x2={9} y2={9} />
     </Svg>
   );
 }
@@ -727,6 +757,18 @@ export default function RoomResultScreen({ route, navigation }) {
   const debug = route?.params?.debug || null;
   const [showDebug, setShowDebug] = useState(false);
 
+  // Remix-FAB inputs (Build 99). Passed by HomeScreen at the end of
+  // runGeneration. Absence of any of these (e.g. legacy designs opened from
+  // MySpaces history, or single-product visualize results that have no
+  // prompt) disables the FAB — no point letting the user tap a button that
+  // can't reconstruct a generation.
+  const styleId = route?.params?.styleId || null;
+  const photoMeta = route?.params?.photoMeta || null;
+  const photoSource = route?.params?.photoSource || null;
+  const recentStyleIds = Array.isArray(route?.params?.recentStyleIds)
+    ? route.params.recentStyleIds
+    : [];
+
   // Post-to-Profile modal image aspect — fetched from the actual image so the
   // preview container fits landscape OR portrait output without black letterbox.
   // Null = not yet measured; default to 16/9 at render time.
@@ -834,6 +876,72 @@ export default function RoomResultScreen({ route, navigation }) {
     if (added > 0) Alert.alert('Added to Cart', `${added} item${added > 1 ? 's' : ''} added to your cart.`);
     else Alert.alert('Already in Cart', 'All products are already in your cart.');
   };
+
+  // ── Remix FAB ─────────────────────────────────────────────────────────────
+  // The FAB only renders when we have everything required to reconstruct a
+  // generation: a photo on disk + a prompt to compare against. Legacy
+  // designs from profile history won't have photoMeta; single-product
+  // visualize results won't have a prompt. Either case → hide the FAB.
+  const remixEnabled = !!(photoMeta && photoMeta.uri && prompt && prompt.trim().length > 0);
+
+  // Single in-flight guard. Without this, a fast double-tap during the
+  // brief moment before navigation transitions away can fire two remix
+  // intents — runGeneration's own generatingRef would catch the duplicate
+  // on the HomeScreen side, but we'd waste a navigate cycle and a wish-
+  // balance check. Reset onFocus by useEffect below.
+  const remixInFlightRef = useRef(false);
+  useEffect(() => {
+    // When the screen gains focus (i.e. user navigated back to a fresh
+    // RoomResult), allow remix again.
+    const unsub = navigation.addListener('focus', () => {
+      remixInFlightRef.current = false;
+    });
+    return unsub;
+  }, [navigation]);
+
+  const handleRemix = useCallback(() => {
+    if (!remixEnabled) return;
+    if (remixInFlightRef.current) return;
+    remixInFlightRef.current = true;
+
+    // Pick a style different from current + last 3 the user just saw.
+    const next = pickRemixStyle(STYLE_PRESETS, styleId, recentStyleIds, 3);
+    if (!next) {
+      remixInFlightRef.current = false;
+      Alert.alert('Remix Unavailable', 'No alternate style is available right now.');
+      return;
+    }
+    // Random prompt variation for the chosen style. Passing undefined as
+    // lastIdx means "any of the 3 variations" — across-style anti-repetition
+    // already gives us natural diversity, so a same-style same-prompt collision
+    // would only happen if the user remixed for 4+ rounds and looped back to
+    // a style whose lastIdx isn't tracked here (HomeScreen owns lastPromptIdx
+    // for the carousel). Acceptable; the prompt's own 3-variation pool keeps
+    // surface variation high enough that the AI output won't feel repetitive.
+    const { prompt: nextPrompt } = pickPromptVariation(next, undefined);
+
+    // Append the *current* styleId to the rolling history so the next
+    // generation's RoomResult will see it as "already shown" and the
+    // following remix can correctly exclude it.
+    const updatedHistory = appendStyleHistory(recentStyleIds, styleId, 3);
+
+    // Bounce back to the Home tab inside Main with a remixIntent param.
+    // HomeScreen's useEffect on route.params.remixIntent picks this up,
+    // restores photo+style+prompt, and auto-fires runGeneration. The user
+    // sees the existing GenieLoader screen and lands on a fresh RoomResult.
+    navigation.navigate('Main', {
+      screen: 'Home',
+      params: {
+        remixIntent: {
+          styleId: next.id,
+          prompt: nextPrompt,
+          photoMeta,
+          photoSource,
+          recentStyleIds: updatedHistory,
+        },
+      },
+    });
+  }, [remixEnabled, styleId, recentStyleIds, photoMeta, photoSource, navigation]);
 
   const handleShare = async () => {
     setShareActive(true);
@@ -1103,6 +1211,37 @@ export default function RoomResultScreen({ route, navigation }) {
 
         <View style={{ height: 120 }} />
       </ScrollView>
+
+      {/* ── Remix FAB (Build 99) ────────────────────────────────────
+          Circular button anchored bottom-right, sits above the sticky
+          Add-to-Cart bar. Tapping rerolls the room into a different
+          carousel style and sends the user through the existing
+          generation pipeline. Hidden when the route lacks the
+          metadata needed to remix (legacy designs, single-product). */}
+      {remixEnabled && (
+        <TouchableOpacity
+          activeOpacity={0.85}
+          onPress={handleRemix}
+          style={s.remixFab}
+          accessibilityLabel="Remix this room with a different style"
+          accessibilityRole="button"
+          accessibilityHint="Generates a new room using one of your remaining wishes"
+          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+        >
+          <LinearGradient
+            // bluePrimary → blueDeep gives a subtle but visible top-left to
+            // bottom-right ramp. heroStart/heroEnd are both blueDeep in this
+            // codebase so they'd render flat — these two are the actual
+            // brand-blue endpoints.
+            colors={[colors.bluePrimary, colors.blueDeep]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={s.remixFabBg}
+          >
+            <RemixIcon color="#FFFFFF" size={22} />
+          </LinearGradient>
+        </TouchableOpacity>
+      )}
 
       {/* ── Sticky Bottom Bar ──────────────────────────────────────── */}
       <View style={s.bottomBar}>
@@ -1521,6 +1660,36 @@ const s = StyleSheet.create({
     shadowOpacity: 0.03,
     shadowRadius: 8,
     elevation: 4,
+  },
+
+  // ── Remix FAB (Build 99) ──────────────────────────────────────────────
+  // Anchored bottom-right, sits ABOVE the sticky bottomBar. The
+  // bottomBar measures: 56pt pill + 12pt paddingTop + 34pt paddingBottom
+  // = 102pt. We add 16pt breathing room so the FAB doesn't kiss the bar's
+  // top edge. right uses screen padding (20pt) so the FAB lines up with
+  // the rest of the layout's right gutter.
+  remixFab: {
+    position: 'absolute',
+    bottom: 102 + 16,
+    right: space.lg,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    // Shadow lives on the outer Touchable so the gradient (which clips
+    // to the rounded shape) doesn't try to render its own shadow.
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.18,
+    shadowRadius: 14,
+    elevation: 8,
+  },
+  remixFabBg: {
+    flex: 1,
+    width: '100%',
+    height: '100%',
+    borderRadius: 28,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   addAllPill: {
     flexDirection: 'row',
