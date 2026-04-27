@@ -42,6 +42,7 @@ import { useCart } from '../context/CartContext';
 import { DESIGNS } from '../data/designs';
 import { SELLERS } from '../data/sellers';
 import { searchProducts, getSourceColor, getProductsForPrompt, getNormalizedProductsByIds } from '../services/affiliateProducts';
+import { loadProductHistory, appendPicksToHistory } from '../services/productHistory';
 import { parseDesignPrompt } from '../utils/promptParser';
 import { buildFinalPrompt, generateWithProductPanel, generateWithProductRefs, generateSingleProductInRoom, pickAspectRatio } from '../services/aiProvider';
 import { expandPrompt } from '../services/promptExpander';
@@ -1079,6 +1080,27 @@ export default function HomeScreen({ navigation, route }) {
   // the rolling set, which the matcher uses as a Set lookup.
   const recentProductIdsRef = useRef([]);  // queue of arrays, most-recent-first
   const RECENT_PRODUCT_WINDOW = 3;
+
+  // Build 93 — persistent product-recency history (across app restarts).
+  // Loaded once per signed-in user; refreshed whenever auth changes. The
+  // matcher reads this snapshot to apply a freshness multiplier in its
+  // weighted draw — products seen in recent generations get a 0.3–1.0
+  // multiplier (lower = stale, higher = fresh) so the user naturally rotates
+  // through their style's catalog instead of seeing the same top scorer every
+  // time. Saturation point is per-category-pool-size, so thin styles like
+  // Dark Luxe (16 products) degrade gracefully rather than dead-ending.
+  //
+  // Read-only ref. The matcher consumes a snapshot, then we persist the
+  // newly-picked IDs via appendPicksToHistory() AFTER generation completes —
+  // the next generation's matcher then sees an updated snapshot via reload.
+  const productHistoryRef = useRef({ genIdx: 0, entries: {} });
+  useEffect(() => {
+    let cancelled = false;
+    loadProductHistory(user?.id).then((snap) => {
+      if (!cancelled) productHistoryRef.current = snap;
+    });
+    return () => { cancelled = true; };
+  }, [user?.id]);
   const mediaPermGranted = useRef(false);
 
   // Build 89: removed eager media-library pre-warm. It was a TurboModule
@@ -1980,12 +2002,34 @@ export default function HomeScreen({ navigation, route }) {
         for (const arr of recentProductIdsRef.current) {
           for (const id of arr) recentIdsSet.add(id);
         }
-        matchedProducts = getProductsForPrompt(designPrompt, 6, recentIdsSet);
+        // Build 93: liked products that are STILL FRESH get a +10% weight
+        // bonus inside the matcher. We pass the IDs as a Set; the matcher
+        // skips the bonus for items that are stale (already shown recently).
+        const likedIdsSet = new Set(
+          Object.keys(liked || {}).filter((id) => liked[id])
+        );
+        matchedProducts = getProductsForPrompt(
+          designPrompt,
+          6,
+          recentIdsSet,
+          productHistoryRef.current,
+          likedIdsSet,
+          null, // cartIds: deferred — cart uses name+brand keys, not IDs
+        );
         log('pre-matched', matchedProducts.length, 'products:', matchedProducts.map(p => p.category).join(','),
-          '| recent-exclusion-set size:', recentIdsSet.size);
+          '| recent-exclusion-set size:', recentIdsSet.size,
+          '| history-genIdx:', productHistoryRef.current?.genIdx || 0,
+          '| liked-set size:', likedIdsSet.size);
         // Push this generation's IDs onto the queue (most-recent-first), trim to window.
         const thisGenIds = matchedProducts.map(p => p.id).filter(Boolean);
         recentProductIdsRef.current = [thisGenIds, ...recentProductIdsRef.current].slice(0, RECENT_PRODUCT_WINDOW);
+        // Build 93: persist picks to AsyncStorage and refresh the in-memory
+        // snapshot so the NEXT generation reads the updated genIdx + entries.
+        // Fire-and-forget — never blocks generation. On any error the matcher
+        // gracefully proceeds with the prior snapshot on the next call.
+        appendPicksToHistory(user?.id, thisGenIds).then((nextSnap) => {
+          productHistoryRef.current = nextSnap;
+        }).catch(() => { /* swallowed in productHistory.js */ });
       }
 
       // ── URL pre-flight (full-room only — single-product does its own check) ──

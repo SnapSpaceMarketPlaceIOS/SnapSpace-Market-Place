@@ -138,9 +138,34 @@ const MATERIAL_AFFINITY = {
  *   different design styles don't keep showing the same versatile chair / table.
  *   Soft mode: if every candidate in a category was recent (thin catalog), the
  *   exclusion is dropped for that category — quality > variety.
+ * @param {object|null} productHistory - Build 93 persistent freshness layer.
+ *   Shape: `{ genIdx: number, entries: { [productId]: { lastSeenGenIdx, seenCount } } }`.
+ *   Loaded from AsyncStorage by the caller (productHistory.js). Used inside the
+ *   weighted draw to penalise recently-seen products with a freshness multiplier.
+ *   Penalty is GRACEFUL: a 0.3 floor means even fully-stale products can still
+ *   win if their score dominates a thin pool, so the matcher never dead-ends.
+ *   Saturation point is per-category-pool-size — Bohemian rotates aggressively
+ *   while Dark Luxe (16 products) degrades softly.
+ * @param {Set<string>|null} likedIds - Build 93: product IDs the user liked.
+ *   Liked products that are STILL fresh (>0.5 freshness) get a +10% weight bonus
+ *   — small validation nudge. Stale liked products do NOT get a bonus (don't
+ *   spam the user with already-shown items).
+ * @param {Set<string>|null} cartIds - Build 93: product IDs already in cart.
+ *   These are HARD-excluded from the pool — don't waste a slot reselling
+ *   something the user has already added. Falls back to including them only
+ *   if the cart-exclusion would empty a category entirely.
  * @returns {object[]}          - Sorted, diversified product array
  */
-export function matchProducts(parsedPrompt, limit = 6, catalog = PRODUCT_CATALOG, userPrefs = null, recentlyShownIds = null) {
+export function matchProducts(
+  parsedPrompt,
+  limit = 6,
+  catalog = PRODUCT_CATALOG,
+  userPrefs = null,
+  recentlyShownIds = null,
+  productHistory = null,
+  likedIds = null,
+  cartIds = null,
+) {
   const {
     roomType,
     styles,
@@ -252,7 +277,7 @@ export function matchProducts(parsedPrompt, limit = 6, catalog = PRODUCT_CATALOG
 
   scored.sort((a, b) => b._score - a._score);
 
-  const diversified = diversify(scored, limit, roomType, recentlyShownIds);
+  const diversified = diversify(scored, limit, roomType, recentlyShownIds, productHistory, likedIds, cartIds);
 
   // ── Full-catalog expansion for thin room pools (Phase C2) ─────────────────
   // bathroom/outdoor/nursery catalogs can't fill 6 diverse slots. Score the
@@ -747,31 +772,52 @@ const CATEGORY_FALLBACK = [
  * @param {number}   limit    - Max products to return
  * @param {string}   roomType - Detected room type for essential selection
  */
-function diversify(sorted, limit, roomType = 'living-room', recentlyShownIds = null) {
+function diversify(
+  sorted,
+  limit,
+  roomType = 'living-room',
+  recentlyShownIds = null,
+  productHistory = null,
+  likedIds = null,
+  cartIds = null,
+) {
   const essentials = ROOM_ESSENTIALS[roomType] || ROOM_ESSENTIALS['living-room'];
   const categoryCounts = {};
   const result = [];
   const usedIds = new Set();
 
+  // Persistent history snapshot — Build 93 anti-repetition.
+  // The +1 forecasts the index this generation will write to; products seen
+  // in the LAST generation will compute gensAgo=1 (still very stale).
+  const historyEntries = (productHistory && productHistory.entries) || {};
+  const currentGenIdx = ((productHistory && productHistory.genIdx) || 0) + 1;
+
   // Helper: weighted-random pick from the top-scored candidates for a
-  // category. Probability of each pool entry = score / sum(scores), so
-  // the top-matched product wins most of the time and weak matches very
-  // rarely sneak in. When there's a single candidate we always return it.
+  // category. Probability of each pool entry = sqrt(score) × freshness, so
+  // the top-matched product wins most of the time, recently-seen products
+  // are penalised, and liked-but-fresh products get a small boost.
   //
-  // Build 83 (soft session-level deduplication): if `recentlyShownIds` is
-  // provided, split candidates into FRESH (not recently shown) and STALE
-  // (recently shown). Pick from FRESH if non-empty, otherwise fall back to
-  // the full candidate list. This means consecutive generations across
-  // different design styles will rotate through different products WHEN
-  // the catalog has alternatives. On thin categories where every candidate
-  // was recently shown, we still pick — quality > variety.
+  // Build 83 (in-memory session dedup): `recentlyShownIds` filters HARD —
+  // we prefer fresh candidates, fall back to all if a category is empty.
+  // Build 93 (persistent freshness): `productHistory` adds a SOFT multiplier
+  // — recently-seen products keep non-zero odds (0.3 floor), but their
+  // weight drops as `gensAgo` shrinks, so users naturally rotate through
+  // their style's catalog rather than seeing the same top scorer every gen.
   function pickFromCategory(cat) {
-    const candidates = sorted.filter(
+    let candidates = sorted.filter(
       (p) => p.category === cat && !usedIds.has(p.id) && (categoryCounts[cat] || 0) < MAX_PER_CATEGORY
     );
     if (candidates.length === 0) return null;
 
-    // Soft exclusion: prefer fresh candidates, fall back to all if needed.
+    // Cart-exclusion (Build 93): products already in the user's cart are
+    // hidden — don't waste a slot reselling. Falls back to including them
+    // if the exclusion would empty the pool entirely.
+    if (cartIds && cartIds.size > 0) {
+      const withoutCart = candidates.filter((p) => !cartIds.has(p.id));
+      if (withoutCart.length > 0) candidates = withoutCart;
+    }
+
+    // Soft session exclusion: prefer fresh candidates, fall back to all.
     const fresh = (recentlyShownIds && recentlyShownIds.size > 0)
       ? candidates.filter((p) => !recentlyShownIds.has(p.id))
       : candidates;
@@ -780,19 +826,45 @@ function diversify(sorted, limit, roomType = 'living-room', recentlyShownIds = n
     const pool = effective.slice(0, RANDOM_POOL_SIZE);
     if (pool.length === 1) return pool[0];
 
-    // Compressed weighted draw — Audit 2026-04-27.
+    // Saturation point: bigger candidate pools rotate slower (saturate later);
+    // thin pools like Dark Luxe sofas saturate at gensAgo≥3 so the
+    // freshness multiplier doesn't permanently lock products out.
+    const saturationPoint = Math.max(3, Math.floor(candidates.length * 0.6));
+
+    // Compressed weighted draw + freshness multiplier — Audit 2026-04-27.
     //
-    // Old: weights = max(1, raw score). With a top score of ~85 and 7th of ~45
-    // the top product won ~28% of the time (ratio 85:560 across pool of 7).
-    // New: weights = sqrt(max(1, score)). The compression flattens the curve
-    // so top → ~17%, 7th → ~12%. Quality bias is preserved (top still wins
-    // most often) but the 7th candidate has 35% better odds, which directly
-    // reduces "same product over and over" repetition. Tested against the
-    // full distribution: average top-product win rate drops from 28% to ~17%
-    // per slot; expected unique products across 10 generations rises from
-    // ~34/60 to ~42/60 (~24% lift, before persistent history is layered on).
-    const weights = pool.map((p) => Math.sqrt(Math.max(1, p._score || 0)));
+    // Step 1: sqrt-compressed base weight. Compresses the score curve so the
+    // top product wins ~17% of slots instead of ~28% (was raw score). The
+    // 7th candidate's odds rise from ~9% to ~12%.
+    //
+    // Step 2: freshness multiplier from persistent history. Products seen
+    // recently get a 0.3–1.0 multiplier based on:
+    //   - gensAgo / saturationPoint  (linear ramp; 1.0 once fully saturated)
+    //   - 1 / (1 + 0.15 * (seenCount - 1))  (frequency penalty for repeat shows)
+    // 0.3 floor preserves graceful degradation — even fully-stale items stay
+    // in the running so thin pools don't dead-end.
+    //
+    // Step 3: liked-and-fresh bonus. Items the user liked AND that are still
+    // fresh (>0.5 multiplier) get a +10% nudge. Stale liked items are NOT
+    // boosted — don't spam the user with the same liked item repeatedly.
+    const weights = pool.map((p) => {
+      const baseWeight = Math.sqrt(Math.max(1, p._score || 0));
+      const h = historyEntries[p.id];
+      let freshness = 1.0;
+      if (h) {
+        const gensAgo = currentGenIdx - (h.lastSeenGenIdx || 0);
+        const ramp = Math.min(1.0, gensAgo / saturationPoint);
+        const frequencyPenalty = 1 / (1 + 0.15 * Math.max(0, (h.seenCount || 1) - 1));
+        freshness = Math.max(0.3, ramp * frequencyPenalty);
+      }
+      let weight = baseWeight * freshness;
+      if (likedIds && likedIds.has(p.id) && freshness > 0.5) {
+        weight *= 1.10;
+      }
+      return weight;
+    });
     const total = weights.reduce((a, b) => a + b, 0);
+    if (total <= 0) return pool[0]; // numerical safety
     let r = Math.random() * total;
     for (let i = 0; i < pool.length; i++) {
       r -= weights[i];

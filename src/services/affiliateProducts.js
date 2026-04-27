@@ -88,11 +88,33 @@ function getCombinedCatalog() {
  *   set the matcher should prefer to skip (soft exclusion). Lets HomeScreen
  *   rotate through the catalog across consecutive generations on different
  *   styles so the same versatile chair / table doesn't appear every time.
+ * @param {object|null} productHistory - Build 93 persistent freshness layer.
+ *   Snapshot from productHistory.loadProductHistory(). Null = fresh start.
+ * @param {Set<string>|null} likedIds - Build 93: optional liked product IDs
+ *   (small +10% bonus when those products are still fresh).
+ * @param {Set<string>|null} cartIds - Build 93: optional in-cart product IDs
+ *   (hard-excluded — don't reshow already-in-cart items).
  * @returns {object[]}        - Matched products with affiliate URLs
  */
-export function getProductsForPrompt(promptText, limit = 6, recentlyShownIds = null) {
+export function getProductsForPrompt(
+  promptText,
+  limit = 6,
+  recentlyShownIds = null,
+  productHistory = null,
+  likedIds = null,
+  cartIds = null,
+) {
   const parsed = parseDesignPrompt(promptText);
-  const products = matchProducts(parsed, limit, getCombinedCatalog(), null, recentlyShownIds);
+  const products = matchProducts(
+    parsed,
+    limit,
+    getCombinedCatalog(),
+    null,
+    recentlyShownIds,
+    productHistory,
+    likedIds,
+    cartIds,
+  );
   return products.map(normalizeProduct);
 }
 
