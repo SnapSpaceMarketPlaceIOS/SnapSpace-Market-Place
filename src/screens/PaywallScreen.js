@@ -260,13 +260,62 @@ export default function PaywallScreen({ navigation }) {
     return () => { cancelled = true; clearTimeout(heroTimerRef.current); };
   }, []);
 
-  // Quota progress — show for free-tier users so they see remaining wishes
+  // ── Unified wishes counter (Build 84 follow-up) ──────────────────────────
+  // Build 84 user feedback: the prior card showed a static "Free Wishes:
+  // 3 remaining" even after the user paid for additional wishes. The new
+  // card reflects the user's TOTAL available wishes from whatever source
+  // they purchased — buying 4 wishes makes the count jump from 3 → 7.
+  // Subscribers see their tier-correct weekly cap. The card adapts to
+  // four states: free-only, free + purchased, subscribed, premium-unlimited.
+  const isFree            = subscription.tier === 'free';
+  const isUnlimitedSub    = subscription.quotaLimit === -1; // premium tier
+  const renewableTotal    = isFree ? 5 : (isUnlimitedSub ? 0 : subscription.quotaLimit);
+  const renewableRemaining = isFree
+    ? Math.max(0, 5 - subscription.generationsUsed)
+    : (isUnlimitedSub ? 0 : subscription.generationsRemaining);
+  const purchasedCount    = tokenBalance;
+  const tierName          = subscription.tier
+    ? subscription.tier.charAt(0).toUpperCase() + subscription.tier.slice(1)
+    : 'Free';
+
+  // Card content — labels + counts + optional subline
+  let cardLabel, cardCount, cardSubline;
+  if (isUnlimitedSub) {
+    cardLabel   = 'Premium Plan';
+    cardCount   = 'Unlimited';
+    cardSubline = purchasedCount > 0
+      ? `Renews weekly + ${purchasedCount} purchased`
+      : 'Renews weekly';
+  } else if (!isFree) {
+    cardLabel   = `${tierName} Plan`;
+    cardCount   = `${renewableRemaining} remaining`;
+    cardSubline = purchasedCount > 0
+      ? `${renewableRemaining} of ${renewableTotal} weekly + ${purchasedCount} purchased`
+      : `${renewableTotal} wishes weekly`;
+  } else if (purchasedCount > 0) {
+    // Free user with purchased wishes — combine into one total.
+    cardLabel   = 'Wishes Available';
+    cardCount   = `${renewableRemaining + purchasedCount} remaining`;
+    cardSubline = `${renewableRemaining} free + ${purchasedCount} purchased`;
+  } else {
+    // Pure free user — preserve original "Free Wishes" label + count.
+    cardLabel   = 'Free Wishes';
+    cardCount   = `${renewableRemaining} remaining`;
+    cardSubline = null;
+  }
+
+  // Progress bar represents renewable-quota-remaining-share. Hidden for
+  // premium (no cap to graph). Bar starts full (100% = all wishes
+  // available) and depletes toward 0%.
+  const showProgressBar = !isUnlimitedSub && renewableTotal > 0;
+  const progressPct     = renewableTotal > 0
+    ? Math.min(1, renewableRemaining / renewableTotal)
+    : 0;
+
+  // Legacy aliases retained for any downstream reference (keep blast radius small)
+  const remaining = renewableRemaining;
+  const totalFree = isFree ? 5 : renewableTotal;
   const usedCount = subscription.generationsUsed;
-  const isFree = subscription.tier === 'free';
-  const totalFree = isFree ? 5 : subscription.quotaLimit;
-  const remaining = Math.max(0, totalFree - usedCount);
-  // Bar starts full (100% = all wishes available) and depletes toward 0%
-  const progressPct = totalFree > 0 ? Math.min(1, remaining / totalFree) : 0;
 
   // Entrance animation — bar fills from 0 to actual value once on mount
   const progressAnim = useRef(new Animated.Value(0)).current;
@@ -515,36 +564,33 @@ export default function PaywallScreen({ navigation }) {
               (clearly: you have none left). The progress bar still fills
               from 0% up to 100% representing remaining share — unchanged.
           */}
-          {isFree && (
+          {/* Build 84 follow-up — unified wishes counter. One card replaces
+              the prior dual-card setup (free + purchased). Adapts to all
+              four states (free-only, free + purchased, subscribed,
+              premium-unlimited) so the user sees ONE clear number that
+              reflects their total available wishes from whatever source
+              they paid for. Buying 4 wishes makes the count jump from
+              3 → 7, providing the transparent purchase feedback the user
+              asked for. */}
           <View style={styles.progressCard}>
             <View style={styles.progressLabelRow}>
-              <Text style={styles.progressLabel}>Free Wishes</Text>
-              <Text style={styles.progressCount}>{remaining} remaining</Text>
+              <Text style={styles.progressLabel}>{cardLabel}</Text>
+              <Text style={styles.progressCount}>{cardCount}</Text>
             </View>
-            <View style={styles.progressTrack}>
-              <Animated.View style={[styles.progressFill, {
-                width: progressAnim.interpolate({
-                  inputRange: [0, 1],
-                  outputRange: ['0%', '100%'],
-                }),
-              }]} />
-            </View>
+            {showProgressBar && (
+              <View style={styles.progressTrack}>
+                <Animated.View style={[styles.progressFill, {
+                  width: progressAnim.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: ['0%', '100%'],
+                  }),
+                }]} />
+              </View>
+            )}
+            {cardSubline && (
+              <Text style={styles.progressSubline}>{cardSubline}</Text>
+            )}
           </View>
-          )}
-          {/* Build 84 / Bug C1 fix: render a separate "Purchased Wishes"
-              card whenever tokenBalance > 0 — regardless of tier — so a
-              user who already bought a wish pack sees their balance
-              acknowledged here. Previously the paywall only showed the
-              free-tier card, leading to confusion ("did my purchase
-              register?") and re-buy temptation. */}
-          {tokenBalance > 0 && (
-          <View style={[styles.progressCard, { marginTop: isFree ? 8 : 0 }]}>
-            <View style={styles.progressLabelRow}>
-              <Text style={styles.progressLabel}>Purchased Wishes</Text>
-              <Text style={styles.progressCount}>{tokenBalance} available</Text>
-            </View>
-          </View>
-          )}
 
           {/* ── Toggle pill ───────────────────────────────────────── */}
           <View style={styles.toggleWrapper}>
@@ -757,6 +803,12 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.6,
     shadowRadius: 6,
     elevation: 4,
+  },
+  progressSubline: {
+    ...typeScale.caption,
+    fontFamily: 'Geist_400Regular',
+    color: C.textSecondary,
+    marginTop: space.xs,
   },
 
   // ── Toggle pill — matches mockup: blue filled active, transparent inactive

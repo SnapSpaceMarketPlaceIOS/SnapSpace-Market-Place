@@ -3431,8 +3431,25 @@ export default function HomeScreen({ navigation, route }) {
             </View>
 
             <TouchableOpacity
-              activeOpacity={0.95}
-              onPress={() => navigation?.navigate('ProductDetail', { product: dealProduct })}
+              activeOpacity={0.7}
+              onPress={() => {
+                // Build 85 fix — explicit defensive navigation. Prior code
+                // was `navigation?.navigate(...)` which silently no-oped
+                // when navigation was unexpectedly undefined (rare but
+                // possible with deep-linked or remounted screens). The
+                // Alert surfaces the failure instead of leaving the user
+                // tapping a card that visually responds but never opens.
+                if (!navigation || typeof navigation.navigate !== 'function') {
+                  Alert.alert('Navigation unavailable', 'Please force-quit and reopen the app.');
+                  return;
+                }
+                try {
+                  navigation.navigate('ProductDetail', { product: dealProduct });
+                } catch (navErr) {
+                  console.warn('[Home/deal] navigate failed:', navErr?.message);
+                  Alert.alert('Could not open product', navErr?.message || 'Try again.');
+                }
+              }}
               style={styles.dealCard}
             >
               {/* ── Hero image (full-width, top) ── */}
@@ -3554,19 +3571,43 @@ export default function HomeScreen({ navigation, route }) {
             noTopMargin
             title="FEATURED PRODUCTS"
             actionLabel="Shop all"
-            onAction={() => navigation?.navigate('Explore', {
-              mode: 'products',
-              title: 'Featured',
-              featuredProductIds: FEATURED_PRODUCTS.map(p => p.id),
-            })}
+            onAction={() => {
+              // Build 85 fix — defensive navigate, mirrors deal card.
+              if (!navigation || typeof navigation.navigate !== 'function') {
+                Alert.alert('Navigation unavailable', 'Please force-quit and reopen the app.');
+                return;
+              }
+              try {
+                navigation.navigate('Explore', {
+                  mode: 'products',
+                  title: 'Featured',
+                  featuredProductIds: FEATURED_PRODUCTS.map(p => p.id),
+                });
+              } catch (navErr) {
+                console.warn('[Home/featured] Shop all navigate failed:', navErr?.message);
+                Alert.alert('Could not open featured', navErr?.message || 'Try again.');
+              }
+            }}
           />
           <View style={styles.collectionsGrid}>
             {FEATURED_PRODUCTS.slice(0, 4).map((product, i) => (
               <TouchableOpacity
                 key={product.id || i}
                 style={styles.featuredProductCard}
-                activeOpacity={0.88}
-                onPress={() => navigation?.navigate('ProductDetail', { product })}
+                activeOpacity={0.7}
+                onPress={() => {
+                  // Build 85 fix — defensive navigate.
+                  if (!navigation || typeof navigation.navigate !== 'function') {
+                    Alert.alert('Navigation unavailable', 'Please force-quit and reopen the app.');
+                    return;
+                  }
+                  try {
+                    navigation.navigate('ProductDetail', { product });
+                  } catch (navErr) {
+                    console.warn('[Home/featured] navigate failed:', navErr?.message);
+                    Alert.alert('Could not open product', navErr?.message || 'Try again.');
+                  }
+                }}
               >
                 {/* ── Image area ── */}
                 <View style={styles.featuredProductImgWrap}>
