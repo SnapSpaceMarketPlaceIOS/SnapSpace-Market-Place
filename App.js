@@ -24,6 +24,14 @@ import {
 
 import { NavigationContainer } from '@react-navigation/native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { PostHogProvider, usePostHog } from 'posthog-react-native';
+import { registerClient as registerAnalyticsClient } from './src/services/analytics';
+
+// PostHog config — public client token (phc_) is safe to embed in app
+// bundles by PostHog's design. Read from .env so it can be rotated without
+// shipping a new build, but fall back to inline value as a safety net.
+const POSTHOG_API_KEY = process.env.EXPO_PUBLIC_POSTHOG_API_KEY;
+const POSTHOG_HOST = process.env.EXPO_PUBLIC_POSTHOG_HOST || 'https://us.i.posthog.com';
 import LensLoader from './src/components/LensLoader';
 import GenieLoader from './src/components/GenieLoader';
 import { LikedProvider } from './src/context/LikedContext';
@@ -505,28 +513,79 @@ export default function App() {
   // fontsLoaded is intentionally read but its truthiness is not gated on.
   void fontsLoaded;
 
+  // PostHog gets a render-only branch: if the API key isn't set (dev build,
+  // env var missing), render the app WITHOUT the provider. The analytics
+  // helpers no-op when no client is registered, so every trackEvent call
+  // is still safe; we just don't report anything. Ships robust code that
+  // doesn't crash on a missing env var.
+  const appTree = (
+    <AuthProvider>
+      <SubscriptionProvider>
+      <CartProvider>
+        <OrderHistoryProvider>
+          <LikedProvider>
+            <SharedProvider>
+              <OnboardingProvider>
+                <NavigationContainer>
+                  <RootNavigator />
+                  <ConsentModal />
+                </NavigationContainer>
+              </OnboardingProvider>
+            </SharedProvider>
+          </LikedProvider>
+        </OrderHistoryProvider>
+      </CartProvider>
+      </SubscriptionProvider>
+    </AuthProvider>
+  );
+
   return (
     <SafeAreaProvider>
-      <AuthProvider>
-        <SubscriptionProvider>
-        <CartProvider>
-          <OrderHistoryProvider>
-            <LikedProvider>
-              <SharedProvider>
-                <OnboardingProvider>
-                  <NavigationContainer>
-                    <RootNavigator />
-                    <ConsentModal />
-                  </NavigationContainer>
-                </OnboardingProvider>
-              </SharedProvider>
-            </LikedProvider>
-          </OrderHistoryProvider>
-        </CartProvider>
-        </SubscriptionProvider>
-      </AuthProvider>
+      {POSTHOG_API_KEY ? (
+        <PostHogProvider
+          apiKey={POSTHOG_API_KEY}
+          options={{
+            host: POSTHOG_HOST,
+            // Auto-capture lifecycle (app_opened, app_backgrounded, etc.)
+            // and screen views from React Navigation. Custom events still
+            // fire through trackEvent() in src/services/analytics.js.
+            captureAppLifecycleEvents: true,
+            // Disable session replay by default — it's a separate package
+            // and would require the session-replay npm dep + native code.
+            // Can be enabled later if we decide we want it.
+            enableSessionReplay: false,
+          }}
+          autocapture={{
+            captureScreens: true,
+            captureLifecycleEvents: true,
+            captureTouches: false, // disable global touch capture — we'll
+                                   // use explicit trackEvent() calls so
+                                   // the data is curated, not noisy
+          }}
+        >
+          <PostHogClientRegistrar />
+          {appTree}
+        </PostHogProvider>
+      ) : (
+        appTree
+      )}
     </SafeAreaProvider>
   );
+}
+
+/**
+ * Tiny helper that runs once after PostHogProvider mounts. It pulls the
+ * client out of the React context via usePostHog() and stashes it in the
+ * analytics service module so non-component code (services, context
+ * callbacks, async handlers) can call trackEvent without hooks. Renders
+ * nothing.
+ */
+function PostHogClientRegistrar() {
+  const client = usePostHog();
+  useEffect(() => {
+    if (client) registerAnalyticsClient(client);
+  }, [client]);
+  return null;
 }
 
 // ─── Styles ──────────────────────────────────────────────────────

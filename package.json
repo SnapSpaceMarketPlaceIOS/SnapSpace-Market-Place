@@ -43,6 +43,7 @@
     "expo-sharing": "~55.0.18",
     "expo-status-bar": "~55.0.5",
     "piexifjs": "^1.0.6",
+    "posthog-react-native": "^4.43.10",
     "react": "19.2.0",
     "react-dom": "^19.2.0",
     "react-native": "0.83.4",
