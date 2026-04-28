@@ -205,6 +205,79 @@ export async function applyReferralCode(userId, referralCode) {
 }
 
 /**
+ * Try to redeem a promo code at signup. The user-facing input on AuthScreen
+ * accepts EITHER a promo code (server-issued, fixed wish bonus to the
+ * REDEEMER) OR a referral code (user-to-user, 2 wishes to the REFERRER).
+ * Promo is checked first because:
+ *   • A promo match short-circuits — we never want to forward a known
+ *     promo to apply_referral (which would just no-op + log noise).
+ *   • Referral codes are 6-char user IDs; promo codes use the HG-... shape,
+ *     so they don't collide in practice.
+ *
+ * @param {string} userId  — the signing-up user's id
+ * @param {string} code    — what the user typed (any case, may have spaces)
+ * @returns {Promise<{
+ *   matched: 'promo' | 'referral' | 'none',
+ *   wishesPending: number,   // promo only — wishes credited on email verify
+ *   status: string,           // server status string for UI
+ * }>}
+ *
+ * Server status strings (promo path):
+ *   PENDING_VERIFY    — code valid, wishes credit on email verify
+ *   EMPTY_CODE        — input was empty
+ *   INVALID_CODE      — no matching active+unexpired promo (caller falls
+ *                       through to referral attempt)
+ *   ALREADY_REDEEMED  — this user has already redeemed any promo code
+ *   CODE_EXHAUSTED    — code's max_redemptions cap is reached
+ */
+export async function redeemSignupCode(userId, code) {
+  const trimmed = (code || '').trim();
+  if (!trimmed) {
+    return { matched: 'none', wishesPending: 0, status: 'EMPTY_CODE' };
+  }
+
+  const { supabase } = await import('./supabase');
+
+  // Step 1: try promo redemption.
+  const { data: promoData, error: promoError } = await supabase
+    .rpc('redeem_promo_code', { p_user_id: userId, p_code: trimmed });
+
+  // Hard error (network, RPC missing, etc.) — surface to caller.
+  if (promoError) throw new Error(promoError.message);
+
+  const row = Array.isArray(promoData) ? promoData[0] : promoData;
+  const status = row?.status || 'INVALID_CODE';
+
+  if (row?.success === true) {
+    return {
+      matched: 'promo',
+      wishesPending: row.wishes_pending ?? 0,
+      status,
+    };
+  }
+
+  // Promo says ALREADY_REDEEMED / CODE_EXHAUSTED — those are terminal,
+  // no point falling through to the referral path. Return as-is.
+  if (status === 'ALREADY_REDEEMED' || status === 'CODE_EXHAUSTED') {
+    return { matched: 'promo', wishesPending: 0, status };
+  }
+
+  // INVALID_CODE: not a promo. Try as a referral instead. We don't await
+  // any wish credit here — apply_referral creates a pending row that the
+  // existing trigger settles later. Failures are non-fatal so a typo'd
+  // code doesn't block the signup flow.
+  try {
+    await applyReferralCode(userId, trimmed);
+    return { matched: 'referral', wishesPending: 0, status: 'REFERRAL_PENDING' };
+  } catch (e) {
+    // Referral RPC raised — likely an invalid referral code. Treat as
+    // "neither matched" so the UI can show a soft notice, but don't
+    // throw because signup itself succeeded.
+    return { matched: 'none', wishesPending: 0, status: 'INVALID_CODE' };
+  }
+}
+
+/**
  * Get or generate the current user's referral code.
  * @param {string} userId
  * @returns {Promise<string>} — 6-char referral code
