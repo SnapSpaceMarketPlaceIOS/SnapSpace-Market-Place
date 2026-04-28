@@ -38,7 +38,7 @@ This Privacy Policy applies to all users of the App, including consumers, Verifi
     body: `When you use the AI generation feature, your photos and prompts are processed as follows:
 
 1. Your room photo is uploaded to our secure cloud storage (Supabase Storage) and transmitted over encrypted connections (TLS/SSL)
-2. Your photo and prompt are sent to third-party AI model providers (Replicate, Inc. and/or Black Forest Labs GmbH) for image generation
+2. Your photo and prompt are sent to a third-party AI model provider (currently fal.ai (Fal, Inc.); Black Forest Labs GmbH and Replicate, Inc. may serve as fallback providers) for image generation
 3. The AI-generated result is returned to you and saved to your HomeGenie account
 4. Your original room photos are stored in our cloud storage for the purpose of displaying them in your "My Wishes" history
 
