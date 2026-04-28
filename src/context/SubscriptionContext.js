@@ -380,18 +380,53 @@ export function SubscriptionProvider({ children }) {
       // local state fails for any reason, we still finish the receipt
       // (the server-side grant already committed; client state catches up
       // on next refreshTokenBalance / refreshQuota call).
+      //
+      // Build 110: comprehensive observability + force-refresh defense.
+      // The Build 109 user reported "Wishes added!" Alert fired but the
+      // widget stayed at 0 — so somewhere in this block setTokenBalance
+      // was getting an incorrect value (most likely the edge fn idempotency
+      // bug, fixed in this build). Adding aggressive logging so any
+      // future re-occurrence is immediately diagnosable.
+      console.log(
+        '[Subscription] purchase validated — type:', result.type,
+        'newBalance:', result.newBalance,
+        'tokensAdded:', result.tokensAdded,
+        'tier:', result.tier
+      );
       try {
         if (result.type === 'tokens') {
-          // B10 fix: trust newBalance ONLY when result is a confirmed success.
-          // Refresh from server as a safety net so a stale local read can't
-          // hide the freshly-credited balance.
+          // Trust the server-returned balance first (post Build 110 edge fn fix,
+          // this is always >= wishCount on a fresh credit). Always log the
+          // value being committed so we can verify in Console.app.
           if (typeof result.newBalance === 'number' && result.newBalance >= 0) {
+            console.log('[Subscription] setTokenBalance →', result.newBalance, '(from listener result)');
             setTokenBalance(result.newBalance);
           } else {
             // Server didn't return a balance — fetch authoritative.
+            console.warn('[Subscription] result.newBalance was invalid; falling back to fetchTokenBalance');
             const fresh = await fetchTokenBalance(user.id).catch(() => null);
-            if (fresh?.balance !== undefined) setTokenBalance(fresh.balance);
+            if (fresh?.balance !== undefined) {
+              console.log('[Subscription] setTokenBalance →', fresh.balance, '(from fallback fetch)');
+              setTokenBalance(fresh.balance);
+            }
           }
+
+          // Build 110: belt-and-suspenders force-refresh. Even if the listener
+          // got the right value above, fetch the authoritative server balance
+          // ~250ms later as a self-healing measure. If the server is the
+          // source of truth and somehow drifted from what the listener
+          // recorded, this fixes it without requiring a paywall reopen.
+          setTimeout(async () => {
+            try {
+              const fresh = await fetchTokenBalance(user.id);
+              if (typeof fresh?.balance === 'number') {
+                console.log('[Subscription] post-purchase server reconcile →', fresh.balance);
+                setTokenBalance(fresh.balance);
+              }
+            } catch (e) {
+              console.warn('[Subscription] post-purchase reconcile failed:', e?.message);
+            }
+          }, 250);
         } else {
           setSubscription(prev => ({
             ...prev,
@@ -403,6 +438,7 @@ export function SubscriptionProvider({ children }) {
             subscriptionStatus: result.subscriptionStatus,
             subscriptionExpiresAt: result.subscriptionExpiresAt,
           }));
+          console.log('[Subscription] subscription activated:', result.tier, result.quotaLimit);
         }
       } catch (mergeErr) {
         console.warn('[Subscription] state merge after purchase failed:', mergeErr?.message);

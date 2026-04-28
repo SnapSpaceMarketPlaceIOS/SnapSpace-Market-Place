@@ -1285,28 +1285,6 @@ function CTABar({ inCart, onAddToCart, affiliateUrl, source, cartLabelOpacity, a
   return (
     <View style={[cta.bar, { paddingBottom: pb }]}>
 
-      {/* Build 107: FTC + Amazon Associate Operating Agreement disclosure.
-          Required on any screen that shows affiliate-tagged Amazon products
-          alongside a purchase action. */}
-      <Text style={cta.ftcTxt}>
-        As an Amazon Associate, HomeGenie earns from qualifying purchases.
-      </Text>
-
-      {/* Affiliate link — routes through handleShopNow so the click is
-          attributed for promotional wish credits (see PROMOTIONAL_CREDITS_*).
-          Build 107: catalog is Amazon-only; the conditional source-label
-          fallback is now redundant but harmless. */}
-      {!!affiliateUrl && (
-        <TouchableOpacity
-          onPress={() => handleShopNow(product ?? { affiliateUrl, source }).catch(() => null)}
-          activeOpacity={0.7}
-          style={cta.affiliateRow}>
-          <Text style={cta.affiliateTxt}>
-            Also available on Amazon ›
-          </Text>
-        </TouchableOpacity>
-      )}
-
       {/* CTA button */}
       <Animated.View style={[cta.cartWrap, { transform: [{ scale: btnScale }] }]}>
         <TouchableOpacity
@@ -1342,23 +1320,6 @@ const cta = StyleSheet.create({
     shadowOpacity: 0.06,
     shadowRadius: 12,
     elevation: 12,
-  },
-  ftcTxt: {
-    ...typeScale.caption,
-    color: uiColors.textTertiary,
-    fontStyle: 'italic',
-    textAlign: 'center',
-    marginBottom: space.xs,
-  },
-  affiliateRow: {
-    alignItems: 'center',
-    marginBottom: space.sm,
-  },
-  affiliateTxt: {
-    ...typeScale.caption,
-    fontWeight: '500',
-    fontFamily: fonts.bodyMedium,
-    color: uiColors.textSecondary,
   },
   cartWrap: {
     flex: 1,

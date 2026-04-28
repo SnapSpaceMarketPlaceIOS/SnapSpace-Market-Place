@@ -342,28 +342,36 @@ Deno.serve(async (req: Request) => {
     if (isWish) {
       const wishCount = WISH_PRODUCT_MAP[productId];
 
-      // Idempotency: check if this transactionId was already processed
-      const { data: existingTx } = await supabase
-        .from('token_transactions')
-        .select('id')
-        .eq('reference_id', transactionId)
-        .limit(1);
-
-      if (existingTx && existingTx.length > 0) {
-        // Already processed — return current balance without double-crediting
-        const { data: balData } = await supabase.rpc('get_token_balance', { p_user_id: userId });
-        const bal = balData?.[0]?.balance ?? 0;
-        return new Response(JSON.stringify({
-          success: true, type: 'tokens',
-          tokens_added: wishCount, new_balance: bal,
-          transaction_id: transactionId, environment,
-        }), {
-          status: 200,
-          headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' },
-        });
-      }
-
-      // Credit wishes (tokens)
+      // Build 110 — CRITICAL FIX: removed the redundant idempotency check
+      // that previously sat between the receipt-receive and add_tokens.
+      // The OLD path was:
+      //
+      //   1. Query token_transactions for existing reference_id
+      //   2. If found → return get_token_balance (which auto-creates the
+      //      user_tokens row with balance=0 if missing)
+      //   3. If not found → call add_tokens
+      //
+      // The bug: if a previous invocation crashed AFTER inserting the
+      // token_transactions row but BEFORE committing the user_tokens
+      // upsert (extremely rare, but possible during edge-fn timeouts or
+      // a connection drop), the next delivery would hit the idempotency
+      // path, find no user_tokens row, auto-create one with balance=0,
+      // and return new_balance=0. The user saw "Wishes added!" but the
+      // widget never updated because the balance really was 0.
+      //
+      // Fix: drop the edge-function-level idempotency check entirely.
+      // add_tokens (migration 012/028) ALREADY has its own internal
+      // idempotency check on reference_id, AND that check returns the
+      // CURRENT balance from user_tokens — which add_tokens itself
+      // ensures is consistent because the upsert and ledger insert run
+      // in the same plpgsql transaction. So calling add_tokens
+      // unconditionally:
+      //   • First call: credits balance + writes ledger row → returns N
+      //   • Replay call: idempotency hit → returns current balance (≥ N)
+      //   • Never returns 0 for a successfully-credited transaction
+      //
+      // This single change eliminates the "Wishes Added but balance is 0"
+      // class of bug.
       const { data: addData, error: addError } = await supabase.rpc('add_tokens', {
         p_user_id:      userId,
         p_amount:       wishCount,
@@ -380,7 +388,23 @@ Deno.serve(async (req: Request) => {
         });
       }
 
-      const newBalance = addData?.[0]?.new_balance ?? wishCount;
+      // Defensive: if add_tokens returned a balance < wishCount, something
+      // is genuinely wrong (FK violation, RLS, schema drift). Re-fetch
+      // authoritative balance via get_token_balance and surface the
+      // anomaly in logs so we can trace it.
+      let newBalance = addData?.[0]?.new_balance;
+      if (typeof newBalance !== 'number' || newBalance < wishCount) {
+        console.warn(
+          '[validate-apple-receipt] add_tokens returned suspect balance — refetching:',
+          'returned=', newBalance, 'expected≥', wishCount
+        );
+        const { data: balData, error: balErr } = await supabase.rpc('get_token_balance', { p_user_id: userId });
+        if (balErr) {
+          console.error('[validate-apple-receipt] get_token_balance error:', balErr);
+        } else {
+          newBalance = balData?.[0]?.balance ?? wishCount;
+        }
+      }
 
       return new Response(JSON.stringify({
         success: true, type: 'tokens',

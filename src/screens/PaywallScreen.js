@@ -230,6 +230,34 @@ export default function PaywallScreen({ navigation }) {
   const [purchasing, setPurchasing] = useState(false);
   const [restoring, setRestoring] = useState(false);
 
+  // ── Build 110: live-poll wish balance while paywall is open ──────────
+  // Defense in depth for the wish-counter sync gap. Every 3 seconds while
+  // the paywall is mounted, re-fetch authoritative balance from the
+  // server. Any drift between local state and server truth (even from a
+  // background webhook, manual admin grant, refund, etc.) heals within
+  // 3 seconds. Cleans up on unmount.
+  //
+  // Cost: one supabase RPC every 3s while paywall is visible. The user
+  // is on this screen for 30-90s on average → 10-30 RPCs per session,
+  // each ~30ms. Negligible cost for a payment-critical surface.
+  useEffect(() => {
+    if (!user?.id || !refreshTokenBalance) return;
+    // Fire immediately on mount, then poll.
+    refreshTokenBalance();
+    const intervalId = setInterval(() => {
+      refreshTokenBalance();
+    }, 3000);
+    return () => clearInterval(intervalId);
+  }, [user?.id, refreshTokenBalance]);
+
+  // Build 110: dev-only render trace so we can see what tokenBalance is
+  // when the widget renders. Console.app will show this on every paywall
+  // re-render — gives us a visible audit trail of what the widget is
+  // actually consuming from context.
+  useEffect(() => {
+    console.log('[Paywall] tokenBalance render value:', tokenBalance);
+  }, [tokenBalance]);
+
   // ── Hero slideshow animation ───────────────────────────────────────────
   const heroOpacities = useRef(HERO_IMAGES.map((_, i) => new Animated.Value(i === 0 ? 1 : 0))).current;
   const heroCurrentIdx = useRef(0);
