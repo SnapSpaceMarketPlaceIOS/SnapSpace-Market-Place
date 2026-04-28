@@ -24867,6 +24867,54 @@ export const PRODUCT_CATALOG = [
     ],
   },
 
+  {
+    id: 'B0GDWKN2Q8',
+    asin: 'B0GDWKN2Q8',
+    name: 'Hclzieamte 55" Modern Rotatable Wood Coffee Table with Layered Design & Steel Base, Fully Assembled (Walnut)',
+    brand: 'Hclzieamte',
+    price: 679.99,
+    priceDisplay: '$679.99',
+    compareAtPrice: 679.99,
+    compareAtPriceDisplay: '$679.99',
+    imageUrl: 'https://m.media-amazon.com/images/I/71WsIizbtpL._AC_SL1500_.jpg',
+    images: [
+      'https://m.media-amazon.com/images/I/71WsIizbtpL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/51CkbYy-4QL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/41Qaf209dOL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/516ggiMTz3L._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/51s2xdHKMoL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/51DXEEi0RWL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/51rguoGqh-L._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/51DeMogxB2L._AC_SL1500_.jpg',
+    ],
+    category: 'coffee-table',
+    roomType: ['living-room', 'office'],
+    styles: ['modern', 'contemporary', 'mid-century', 'industrial', 'transitional'],
+    materials: ['wood', 'metal'],
+    tags: [
+      'coffee-table', 'rotatable', 'rotating', 'wood-coffee-table', 'walnut',
+      'steel-base', 'metal-base', 'layered-design', 'rounded-edge',
+      'no-assembly', 'fully-assembled', 'family-friendly', 'easy-clean',
+      'living-room', 'office', 'modern', 'contemporary', 'mid-century',
+      'industrial', 'transitional', 'hclzieamte', '55-inch',
+    ],
+    source: 'amazon',
+    affiliateUrl: 'https://www.amazon.com/dp/B0GDWKN2Q8?tag=' + TAG,
+    rating: 5.0,
+    reviewCount: 1,
+    description: 'Hclzieamte 55" modern rotatable coffee table with layered tabletop design — pivot the upper tier to expand or compact your surface area. Solid walnut wood top on a strong steel base for stable support and visual contrast. Smooth rounded edges keep it family-safe. Ships fully assembled.',
+    features: [
+      'Innovative rotating layered tabletop — pivot to expand or compact surface area',
+      '55.12" wide walnut wood top paired with a sculptural steel base for industrial-modern contrast',
+      'Rounded edges keep the table family-safe; ideal for households with children',
+      'Easy maintenance — smooth surfaces wipe clean with a damp cloth',
+      'Ships fully assembled — instant addition to your living room or office',
+    ],
+    variants: [
+      { id: '1', label: 'Walnut', asin: 'B0GDWKN2Q8', price: 679.99, swatchImage: 'https://m.media-amazon.com/images/I/51CkbYy-4QL._AC_SL1500_.jpg', mainImage: 'https://m.media-amazon.com/images/I/71WsIizbtpL._AC_SL1500_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0GDWKN2Q8?tag=' + TAG },
+    ],
+  },
+
 ];
 
 // ─── Enrichment status helper ────────────────────────────────────────────────
