@@ -25860,6 +25860,58 @@ export const PRODUCT_CATALOG = [
     ],
   },
 
+  {
+    id: 'B0BZ7H7GXZ',
+    asin: 'B0BZ7H7GXZ',
+    name: 'HomeStock Timeless Tradition Lincoln Leather Accent Armchair / Loveseat with Gold Mirrored Stainless Steel Legs',
+    brand: 'HomeStock',
+    price: 688.90,
+    priceDisplay: '$688.90',
+    compareAtPrice: 688.90,
+    compareAtPriceDisplay: '$688.90',
+    imageUrl: 'https://m.media-amazon.com/images/I/613ghMZA2TL._AC_SL1500_.jpg',
+    images: [
+      'https://m.media-amazon.com/images/I/613ghMZA2TL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/31aPoByMsSL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/51J5E+bkbLL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/31+k21HrP5L._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/41LAdSMU0PL._AC_SL1500_.jpg',
+    ],
+    category: 'accent-chair',
+    roomType: ['living-room', 'bedroom', 'office'],
+    styles: ['glam', 'art-deco', 'mid-century', 'modern', 'contemporary', 'transitional'],
+    materials: ['leather', 'metal', 'wood'],
+    tags: [
+      'accent-chair', 'arm-chair', 'loveseat', 'small-sofa',
+      'leather', 'soft-leather', 'gold-legs', 'mirrored-legs',
+      'stainless-steel', 'hardwood-frame', 'pocket-springs',
+      'removable-cushions', 'no-assembly', 'fully-assembled',
+      'living-room', 'bedroom', 'office', 'reading-chair',
+      'glam', 'art-deco', 'mid-century', 'modern', 'contemporary',
+      'transitional', 'luxury', 'elegant', 'timeless',
+      'homestock', 'lincoln-collection', 'gold-frame', 'mirrored-finish',
+      'grey', 'gray', 'navy-blue', 'navy', 'black',
+    ],
+    source: 'amazon',
+    affiliateUrl: 'https://www.amazon.com/dp/B0BZ7H7GXZ?tag=' + TAG,
+    rating: null,
+    reviewCount: null,
+    description: 'HomeStock Timeless Tradition Lincoln collection — leather accent armchair and matching loveseat with sculptural gold mirrored stainless steel legs. Hardwood frame with pocket springs for lasting support; soft leather upholstery filled with foam. Removable seat and back cushions for easy care. Plastic foot pads protect floors. Ships fully assembled. Glam / art-deco / mid-century centerpiece for luxury living rooms, bedrooms, and home offices.',
+    features: [
+      'Sculptural gold mirrored stainless steel legs — glam / art-deco statement',
+      'Soft leather upholstery filled with foam over a hardwood frame with pocket springs',
+      'Removable seat and back cushions for easy cleaning and care',
+      'Ships fully assembled — no tools required',
+      'Available as armchair (single) or loveseat (2-seat) in multiple colorways',
+    ],
+    variants: [
+      { id: '1', label: 'Armchair - Grey',       asin: 'B0BZ7H7GXZ', price: 688.90, swatchImage: 'https://m.media-amazon.com/images/I/31aPoByMsSL._AC_SL300_.jpg', mainImage: 'https://m.media-amazon.com/images/I/613ghMZA2TL._AC_SL1500_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0BZ7H7GXZ?tag=' + TAG },
+      { id: '2', label: 'Armchair - Navy Blue',  asin: 'B0BYZ6R32L', price: 688.90, swatchImage: 'https://m.media-amazon.com/images/I/31yxfmmkkFL._AC_SL300_.jpg', mainImage: 'https://m.media-amazon.com/images/I/61r5apeVpUL._AC_SL1500_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0BYZ6R32L?tag=' + TAG },
+      { id: '3', label: 'Loveseat - Grey',       asin: 'B0BZ784K8N', price: 688.90, swatchImage: 'https://m.media-amazon.com/images/I/319rSXvHSoL._AC_SL300_.jpg', mainImage: 'https://m.media-amazon.com/images/I/61vCoEM4enL._AC_SL1500_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0BZ784K8N?tag=' + TAG },
+      { id: '4', label: 'Loveseat - Black',      asin: 'B0BYZ7D6VK', price: 688.90, swatchImage: 'https://m.media-amazon.com/images/I/31lhOC0jpYL._AC_SL300_.jpg', mainImage: 'https://m.media-amazon.com/images/I/51M9cSExwXL._AC_SL1500_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0BYZ7D6VK?tag=' + TAG },
+    ],
+  },
+
 ];
 
 // ─── Enrichment status helper ────────────────────────────────────────────────
