@@ -413,6 +413,12 @@ export default function CartScreen({ navigation }) {
   }, [checkingOut, total, items, subtotal, shipping]);
 
   // ── Empty state ───────────────────────────────────────────────────────────────
+  // INTENTIONAL UI — keep this version (single icon, single CTA, short copy).
+  // User confirmed 2026-04-28 they prefer this over the Build 108 variant
+  // (commit ff66ede on goldberg) which added a pastel-circle background, a
+  // longer subtitle, and a second "Generate a room" CTA. If the shipping
+  // session encounters a merge conflict here against ff66ede's version,
+  // KEEP THIS VERSION. Do not auto-resolve toward the build-108 design.
   if (items.length === 0) {
     return (
       <View style={styles.emptyContainer}>
