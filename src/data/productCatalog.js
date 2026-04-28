@@ -24560,6 +24560,57 @@ export const PRODUCT_CATALOG = [
     ],
   },
 
+  {
+    id: 'B0FDWQ8BKL',
+    asin: 'B0FDWQ8BKL',
+    name: 'LINSY Blossom Velvet Barrel Accent Chair with Ottoman, Modern Comfy Reading Armchair (Large)',
+    brand: 'LINSY',
+    price: 107.99,
+    priceDisplay: '$107.99',
+    compareAtPrice: 107.99,
+    compareAtPriceDisplay: '$107.99',
+    imageUrl: 'https://m.media-amazon.com/images/I/91Qg4DGpK2L._AC_SL1500_.jpg',
+    images: [
+      'https://m.media-amazon.com/images/I/91Qg4DGpK2L._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/51r6fcKEegL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/414-7Ona2HL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/41NFn3KESBL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/51BPLr3fitL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/41VsV9gRS5L._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/51DVuNCK8VL._AC_SL1500_.jpg',
+    ],
+    category: 'accent-chair',
+    roomType: ['living-room', 'bedroom', 'office'],
+    styles: ['modern', 'contemporary', 'mid-century', 'transitional', 'glam', 'minimalist'],
+    materials: ['velvet'],
+    tags: [
+      'accent-chair', 'barrel-chair', 'arm-chair', 'with-ottoman', 'footrest',
+      'reading-chair', 'velvet', 'blossom-chair', 'fan-back', 'plush-cushion',
+      'living-room', 'bedroom', 'reading-nook', 'small-space',
+      'modern', 'contemporary', 'mid-century', 'transitional', 'glam', 'minimalist',
+      'linsy', 'flooring-friendly-legs', 'large',
+      'beige', 'yellow', 'grey', 'blue',
+    ],
+    source: 'amazon',
+    affiliateUrl: 'https://www.amazon.com/dp/B0FDWQ8BKL?tag=' + TAG,
+    rating: 4.3,
+    reviewCount: 359,
+    description: 'LINSY Blossom barrel accent chair (Large) with matching ottoman footrest. The signature fan-out backrest and arms create a hug-like silhouette resembling a corolla flower. 5% deeper seat and 21% wider than the small version, with plush thicker cushions for an enveloping seating experience. Velvet upholstery with flooring-friendly legs. Includes ottoman footrest.',
+    features: [
+      'Includes matching ottoman footrest — the perfect reading lounge pairing',
+      'Distinctive Blossom silhouette: backrest and arms fan out for a hug-like feel',
+      '5% deeper seats and 21% wider than the small version — large, plush, accommodating',
+      'Velvet upholstery with thick, plush cushions for cozy reading or TV time',
+      'Flooring-friendly legs protect hardwood, tile, and laminate floors',
+    ],
+    variants: [
+      { id: '1', label: 'Beige',  asin: 'B0FDWQ8BKL', price: 107.99, swatchImage: 'https://m.media-amazon.com/images/I/51r6fcKEegL._AC_SL300_.jpg', mainImage: 'https://m.media-amazon.com/images/I/91Qg4DGpK2L._AC_SL1500_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FDWQ8BKL?tag=' + TAG },
+      { id: '2', label: 'Yellow', asin: 'B0FDWTDZMP', price: 107.99, swatchImage: 'https://m.media-amazon.com/images/I/516XBFkMLjL._AC_SL300_.jpg', mainImage: 'https://m.media-amazon.com/images/I/9159p0dWFmL._AC_SL1500_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FDWTDZMP?tag=' + TAG },
+      { id: '3', label: 'Grey',   asin: 'B0FDWTL9MY', price: 107.99, swatchImage: 'https://m.media-amazon.com/images/I/51FHBZc6hvL._AC_SL300_.jpg', mainImage: 'https://m.media-amazon.com/images/I/913fWdqUuFL._AC_SL1500_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FDWTL9MY?tag=' + TAG },
+      { id: '4', label: 'Blue',   asin: 'B0FDWVLDBT', price: 107.99, swatchImage: 'https://m.media-amazon.com/images/I/51Vt-nrMl0L._AC_SL300_.jpg', mainImage: 'https://m.media-amazon.com/images/I/91Fsy+eTwYL._AC_SL1500_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FDWVLDBT?tag=' + TAG },
+    ],
+  },
+
 ];
 
 // ─── Enrichment status helper ────────────────────────────────────────────────
