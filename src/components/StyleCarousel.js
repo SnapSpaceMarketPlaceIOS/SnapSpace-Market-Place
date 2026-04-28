@@ -68,10 +68,12 @@ const CARD_W = Math.floor((SCREEN_W - SIDE_PAD * 2 - GAP * (VISIBLE_CARDS - 1)) 
 // shot" thumbnail at small sizes. Label sits below the image.
 const IMAGE_H = Math.round(CARD_W * 1.15);
 
-// Drift speed. ~33 pt/s = one card sliding past roughly every 3s, which
-// reads as "alive and continuous" without being distracting. Adjust here
-// to make the carousel faster / slower without restructuring.
-const DRIFT_SPEED_PX_PER_SEC = 33;
+// Drift speed. At 33 pt/s the per-frame motion at 60fps was only ~0.55pt,
+// which read as "ticking" / staircased on device — the eye saw discrete
+// steps instead of a glide. 60 pt/s = ~1pt per frame, which is the floor
+// for sub-pixel-smooth perceived motion. One card slides past every ~1.6s
+// at the baseline 4-visible layout.
+const DRIFT_SPEED_PX_PER_SEC = 60;
 
 export default function StyleCarousel({ onSelect, presets = STYLE_PRESETS }) {
   const translateX = useRef(new Animated.Value(0)).current;
@@ -151,10 +153,14 @@ const styles = StyleSheet.create({
   },
   row: {
     flexDirection: 'row',
-    // Initial left padding gives the first card breathing room from the
-    // screen edge at translateX=0. Once the drift starts, this padding
-    // scrolls off-screen — that's the intended infinite-feed look.
-    paddingLeft: SIDE_PAD,
+    // No paddingLeft on the row — the previous version had paddingLeft:
+    // SIDE_PAD here, which broke the loop seam: at translateX=0 the
+    // leftmost 20pt of the viewport was empty padding, but at
+    // translateX=-rowWidth (just before reset) those same 20pt showed the
+    // trailing edge of set A's last card. The loop reset would then snap
+    // those 20pt back to empty — visible as the "jump back to the start"
+    // bug. Removing the padding makes the seam pixel-perfect: set A
+    // immediately follows set B with no offset, so the reset is invisible.
   },
   card: {
     width: CARD_W,
