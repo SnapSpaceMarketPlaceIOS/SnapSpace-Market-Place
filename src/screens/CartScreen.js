@@ -338,7 +338,18 @@ export default function CartScreen({ navigation }) {
   const shipping   = items.length > 0 ? 29 : 0;
   const total      = subtotal + shipping;
   const totalItems = items.reduce((sum, i) => sum + i.quantity, 0);
-  const allAmazon  = items.length > 0 && items.every((i) => i.source === 'amazon');
+  // Build 107: catalog is Amazon-only. Treat any item with an ASIN OR an
+  // amazon.com affiliate URL OR explicit `source === 'amazon'` as Amazon.
+  // Previously this required `source === 'amazon'` strictly, which broke
+  // checkout when the source field dropped through the AI matcher (very
+  // common — products would be added to cart with `source: null` and
+  // silently fail the strict-equality filter, leaving the user with the
+  // "Non-Amazon items not supported" dead end).
+  const isAmazonItem = (i) =>
+    i.source === 'amazon'
+    || !!i.asin
+    || (typeof i.affiliateUrl === 'string' && i.affiliateUrl.includes('amazon.com'));
+  const allAmazon  = items.length > 0 && items.every(isAmazonItem);
 
   // ── ALL checkout logic unchanged ─────────────────────────────────────────────
   const handleCheckout = useCallback(async () => {
@@ -348,8 +359,11 @@ export default function CartScreen({ navigation }) {
     // can still work (e.g. user returns from Amazon and taps again).
     const releaseGuard = () => setTimeout(() => setCheckingOut(false), 1200);
 
-    // All curated products are Amazon affiliate items — build a single multi-cart URL
-    const amazonItems = items.filter((i) => i.source === 'amazon');
+    // All curated products are Amazon affiliate items — build a single multi-cart URL.
+    // Build 107: use the permissive isAmazonItem predicate (any ASIN or
+    // amazon.com URL counts) so cart items with missing/null source still
+    // route through Amazon checkout.
+    const amazonItems = items.filter(isAmazonItem);
     if (amazonItems.length === items.length && items.length > 0) {
       // Amazon multi-cart URL: adds ALL items to the user's Amazon cart in one tap
       // Format: /gp/aws/cart/add.html?ASIN.1=XXX&Quantity.1=1&...&tag=<partner>
@@ -403,11 +417,17 @@ export default function CartScreen({ navigation }) {
       return;
     }
 
-    // Non-Amazon items — not currently supported
+    // Build 107: dead branch. Catalog is Amazon-only, the permissive
+    // isAmazonItem predicate above accepts anything with an ASIN or
+    // amazon.com URL — items reaching here would have to be entirely
+    // un-Amazon (no source, no asin, no amazon URL), which the catalog
+    // can no longer produce. Kept as a defensive fallback so the user
+    // never sees a silent failure — they'll see a clear message instead
+    // of nothing happening.
     Alert.alert(
-      'Checkout with Amazon',
-      'All items check out directly through Amazon. Multi-vendor checkout is coming in a future update.',
-      [{ text: 'Got it' }]
+      'Cannot Check Out',
+      'These items don\'t have a valid checkout link. Please remove and re-add them.',
+      [{ text: 'OK' }]
     );
     releaseGuard();
   }, [checkingOut, total, items, subtotal, shipping]);

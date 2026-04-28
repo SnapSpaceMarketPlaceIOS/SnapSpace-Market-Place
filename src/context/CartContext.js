@@ -55,7 +55,13 @@ export function CartProvider({ children }) {
               ...item,
               imageUrl:     item.imageUrl     || match.imageUrl     || null,
               affiliateUrl: item.affiliateUrl || match.affiliateUrl || null,
-              source:       item.source       || match.source       || null,
+              // Build 107 fix: default to 'amazon' rather than null. The
+              // catalog is now Amazon-only and the cart's checkout flow
+              // requires `source === 'amazon'` to engage the multi-cart
+              // URL builder. Items with `source: null` (legacy carts from
+              // old builds, or AI-matched products where source dropped
+              // through the matcher) were silently failing checkout.
+              source:       item.source       || match.source       || 'amazon',
               asin:         item.asin         || match.asin         || null,
             };
           });
@@ -97,7 +103,12 @@ export function CartProvider({ children }) {
           priceDisplay: typeof product.price === 'string' ? product.price : `$${product.price}`,
           imageUrl: product.imageUrl || null,
           affiliateUrl: product.affiliateUrl || null,
-          source: product.source || null,
+          // Build 107 fix: default to 'amazon'. Catalog is Amazon-only;
+          // missing source means the upstream call site forgot to
+          // forward it, not that the item is from another vendor. This
+          // closes the bug where some products in the cart silently
+          // failed the "Buy on Amazon" checkout filter.
+          source: product.source || 'amazon',
           asin: product.asin || null,
           rating: product.rating || null,
           reviewCount: product.reviewCount || null,

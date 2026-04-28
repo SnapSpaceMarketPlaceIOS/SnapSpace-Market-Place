@@ -212,33 +212,27 @@ function normalizeProduct(product) {
 
 /**
  * Returns the source label for display in UI.
- * e.g. "Buy on Amazon", "Buy on Wayfair"
+ * Build 107: catalog is Amazon-only. Wayfair / Houzz cases removed.
  */
 export function getSourceLabel(source) {
-  switch (source) {
-    case 'amazon':  return 'Buy on Amazon';
-    case 'wayfair': return 'Buy on Wayfair';
-    case 'houzz':   return 'Buy on Houzz';
-    default:        return 'Shop Now';
-  }
+  // Default to Amazon — any item reaching the cart now goes through
+  // Amazon checkout. The `default` branch keeps legacy items rendered
+  // sensibly (e.g. items added to cart before this build).
+  return 'Buy on Amazon';
 }
 
 /**
  * Returns the brand color for the source button.
- * Amazon uses the token value; others use well-known brand colors.
+ * Build 107: catalog is Amazon-only. Always returns the Amazon brand color.
  */
 export function getSourceColor(source) {
-  switch (source) {
-    case 'amazon':  return uiColors.amazon;   // #FF9900 from tokens
-    case 'wayfair': return '#7B2D8B';
-    case 'houzz':   return '#4DBC15';
-    default:        return uiColors.primary;  // #0B6DC3 from tokens
-  }
+  return uiColors.amazon;   // #FF9900 from tokens
 }
 
 /**
  * Generates the correct affiliate URL for a product.
- * Falls back through: product.affiliateUrl → generic search URL → null
+ * Build 107: Amazon-only. Falls back through:
+ *   product.affiliateUrl → Amazon search URL with partner tag → null
  *
  * @param {object} product - Normalized product object
  * @returns {string|null}  - Affiliate URL to open
@@ -249,23 +243,14 @@ export function getAffiliateUrl(product) {
   // Use product's own affiliate URL if present
   if (product.affiliateUrl) return product.affiliateUrl;
 
-  // Amazon fallback: construct search URL with partner tag
+  // Amazon fallback: construct a search URL with the partner tag.
+  // Treats source as Amazon by default since that's the only vendor
+  // in the catalog now — items with missing/null source still get a
+  // valid checkout URL instead of returning null.
   const partnerTag = process.env.EXPO_PUBLIC_AMAZON_PARTNER_TAG || 'snapspacemkt-20';
-  if (product.source === 'amazon' && product.name) {
+  if (product.name) {
     const query = encodeURIComponent(product.name);
     return `https://www.amazon.com/s?k=${query}&tag=${partnerTag}`;
-  }
-
-  // Wayfair fallback: search URL
-  if (product.source === 'wayfair' && product.name) {
-    const query = encodeURIComponent(product.name);
-    return `https://www.wayfair.com/keyword.php?keyword=${query}`;
-  }
-
-  // Houzz fallback: search URL
-  if (product.source === 'houzz' && product.name) {
-    const query = encodeURIComponent(product.name);
-    return `https://www.houzz.com/products/query/${query}`;
   }
 
   return null;

@@ -639,7 +639,7 @@ const galleryStyles = StyleSheet.create({
 });
 
 // Spring-bounce animated icon button — same feel as bottom tab bar
-function AnimatedIconBtn({ onPress, style, children, disabled }) {
+function AnimatedIconBtn({ onPress, style, children, disabled, accessibilityLabel, accessibilityHint, accessibilityRole = 'button' }) {
   const scale = useRef(new Animated.Value(1)).current;
   const handlePressIn = useCallback(() => {
     Animated.spring(scale, { toValue: 0.88, useNativeDriver: true, speed: 50, bounciness: 4 }).start();
@@ -648,7 +648,15 @@ function AnimatedIconBtn({ onPress, style, children, disabled }) {
     Animated.spring(scale, { toValue: 1, useNativeDriver: true, speed: 20, bounciness: 10 }).start();
   }, [scale]);
   return (
-    <Pressable onPress={onPress} onPressIn={handlePressIn} onPressOut={handlePressOut} disabled={disabled}>
+    <Pressable
+      onPress={onPress}
+      onPressIn={handlePressIn}
+      onPressOut={handlePressOut}
+      disabled={disabled}
+      accessibilityLabel={accessibilityLabel}
+      accessibilityHint={accessibilityHint}
+      accessibilityRole={accessibilityRole}
+    >
       <Animated.View style={[style, { transform: [{ scale }] }]}>
         {children}
       </Animated.View>
@@ -1084,11 +1092,11 @@ export default function RoomResultScreen({ route, navigation }) {
 
         {/* ── Header ───────────────────────────────────────────────── */}
         <View style={s.header}>
-          <TouchableOpacity style={s.headerBtn} onPress={() => navigation.goBack()} hitSlop={{ top: 4, bottom: 4, left: 4, right: 4 }}>
+          <TouchableOpacity style={s.headerBtn} onPress={() => navigation.goBack()} hitSlop={{ top: 4, bottom: 4, left: 4, right: 4 }} accessibilityLabel="Back" accessibilityRole="button">
             <BackIcon />
           </TouchableOpacity>
           <Text style={s.headerTitle}>Room Result</Text>
-          <TouchableOpacity style={s.headerBtn} onPress={() => navigation.navigate('Main', { screen: 'Cart' })} hitSlop={{ top: 4, bottom: 4, left: 4, right: 4 }}>
+          <TouchableOpacity style={s.headerBtn} onPress={() => navigation.navigate('Main', { screen: 'Cart' })} hitSlop={{ top: 4, bottom: 4, left: 4, right: 4 }} accessibilityLabel="Cart" accessibilityRole="button">
             <CartNavIcon />
           </TouchableOpacity>
         </View>
@@ -1115,6 +1123,8 @@ export default function RoomResultScreen({ route, navigation }) {
               onPress={handleDownload}
               disabled={saving}
               style={[s.iconCircleBtn, downloadActive && s.iconCircleBtnActive]}
+              accessibilityLabel="Download design"
+              accessibilityHint="Saves this design to your photo library"
             >
               {saving
                 ? <MiniLensLoader color={downloadActive ? colors.bluePrimary : '#9CA3AF'} />
@@ -1126,6 +1136,8 @@ export default function RoomResultScreen({ route, navigation }) {
                 onPress={handlePost}
                 disabled={posting}
                 style={s.postIconBtn}
+                accessibilityLabel="Post to profile"
+                accessibilityHint="Shares this design publicly to your HomeGenie profile"
               >
                 {posting
                   ? <MiniLensLoader color={postActive ? colors.bluePrimary : '#9CA3AF'} />
@@ -1136,6 +1148,8 @@ export default function RoomResultScreen({ route, navigation }) {
             <AnimatedIconBtn
               onPress={handleShare}
               style={[s.iconCircleBtn, shareActive && s.iconCircleBtnActive]}
+              accessibilityLabel="Share design"
+              accessibilityHint="Shares this design via the iOS share sheet"
             >
               <ShareIcon color={shareActive ? colors.bluePrimary : '#9CA3AF'} />
             </AnimatedIconBtn>
@@ -1214,6 +1228,16 @@ export default function RoomResultScreen({ route, navigation }) {
               </View>
             </View>
           </>
+        )}
+
+        {/* ── Build 107: FTC + Amazon Associate Operating Agreement
+              required disclosure. Must be visible on any screen showing
+              affiliate-tagged Amazon products. The exact wording below is
+              the Amazon-recommended canonical phrasing. */}
+        {(products.length > 0 || recommended.length > 0) && (
+          <Text style={s.ftcDisclosure}>
+            As an Amazon Associate, HomeGenie earns from qualifying purchases.
+          </Text>
         )}
 
         <View style={{ height: 120 }} />
@@ -1473,6 +1497,16 @@ const s = StyleSheet.create({
   tagsSection: {
     paddingHorizontal: space.lg,
     marginTop: space.base,
+  },
+  // Build 107: FTC + Amazon Associate disclosure styling. Subtle italic
+  // tertiary text — present and legible but not visually distracting.
+  ftcDisclosure: {
+    ...typeScale.caption,
+    color: C.textTertiary,
+    fontStyle: 'italic',
+    textAlign: 'center',
+    marginTop: space.xl,
+    marginHorizontal: space.lg,
   },
   tagsWrap: {
     flexDirection: 'row',

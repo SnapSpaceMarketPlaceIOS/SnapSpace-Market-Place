@@ -334,11 +334,11 @@ export default function ShopTheLookScreen({ route, navigation }) {
 
         {/* ── Header ───────────────────────────────────────────────── */}
         <View style={s.header}>
-          <TouchableOpacity style={s.headerBtn} onPress={() => navigation.goBack()} hitSlop={{ top: 4, bottom: 4, left: 4, right: 4 }}>
+          <TouchableOpacity style={s.headerBtn} onPress={() => navigation.goBack()} hitSlop={{ top: 4, bottom: 4, left: 4, right: 4 }} accessibilityLabel="Back" accessibilityRole="button">
             <BackIcon />
           </TouchableOpacity>
           <Text style={s.headerTitle}>Shop The Look</Text>
-          <TouchableOpacity style={s.headerBtn} onPress={() => navigation.navigate('Main', { screen: 'Cart' })} hitSlop={{ top: 4, bottom: 4, left: 4, right: 4 }}>
+          <TouchableOpacity style={s.headerBtn} onPress={() => navigation.navigate('Main', { screen: 'Cart' })} hitSlop={{ top: 4, bottom: 4, left: 4, right: 4 }} accessibilityLabel="Cart" accessibilityRole="button">
             <CartNavIcon />
           </TouchableOpacity>
         </View>
@@ -487,6 +487,11 @@ export default function ShopTheLookScreen({ route, navigation }) {
             </View>
           </View>
         )}
+
+        {/* Build 107: FTC + Amazon Associate Operating Agreement disclosure */}
+        <Text style={s.ftcDisclosure}>
+          As an Amazon Associate, HomeGenie earns from qualifying purchases.
+        </Text>
 
         <View style={{ height: 120 }} />
       </ScrollView>
@@ -706,6 +711,15 @@ const s = StyleSheet.create({
   tagsSection: {
     paddingHorizontal: space.lg,
     marginTop: space.base,
+  },
+  // Build 107: FTC + Amazon Associate disclosure
+  ftcDisclosure: {
+    ...typeScale.caption,
+    color: C.textTertiary,
+    fontStyle: 'italic',
+    textAlign: 'center',
+    marginTop: space.xl,
+    marginHorizontal: space.lg,
   },
   tagsWrap: {
     flexDirection: 'row',

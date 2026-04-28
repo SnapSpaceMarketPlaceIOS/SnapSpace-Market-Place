@@ -15,7 +15,7 @@ npx expo start --web    # Web preview
 - **Backend:** Supabase (auth, PostgreSQL, storage)
 - **AI:** Replicate API (`adirik/interior-design` model)
 - **Payments:** Apple IAP only (StoreKit 2 via `expo-iap`) — subscriptions + consumable wishes. No Stripe, no other processors.
-- **Affiliates:** Amazon PA-API, Wayfair (CJ), Houzz (ShareASale)
+- **Affiliates:** Amazon Associates only (tag: `snapspacemkt-20`). Wayfair (CJ) and Houzz (ShareASale) integrations removed in Build 107 — catalog is Amazon-only.
 
 ---
 
@@ -53,17 +53,13 @@ EXPO_PUBLIC_SUPABASE_ANON_KEY=
 EXPO_PUBLIC_REPLICATE_API_TOKEN=
 
 # Amazon Associates (PA-API — LOCKED until 10 qualifying sales)
-EXPO_PUBLIC_AMAZON_PARTNER_TAG=snapspace20-20
+EXPO_PUBLIC_AMAZON_PARTNER_TAG=snapspacemkt-20
 EXPO_PUBLIC_AMAZON_ACCESS_KEY=          # Available after 10 sales
 EXPO_PUBLIC_AMAZON_SECRET_KEY=          # Available after 10 sales
 
-# Wayfair (CJ Affiliate — pending signup)
-EXPO_PUBLIC_CJ_PUBLISHER_ID=
-EXPO_PUBLIC_WAYFAIR_ADVERTISER_ID=
-
-# Houzz (ShareASale — pending signup)
-EXPO_PUBLIC_SHAREASALE_AFFILIATE_ID=
-EXPO_PUBLIC_HOUZZ_MERCHANT_ID=
+# Wayfair (CJ) and Houzz (ShareASale) integrations were removed in
+# Build 107. Catalog is Amazon-only. No CJ_PUBLISHER_ID or
+# SHAREASALE_AFFILIATE_ID variables are read by the app anymore.
 ```
 
 ---
@@ -126,7 +122,7 @@ src/
     OrderHistoryContext.js # useOrderHistory() → { orders, addOrder }
   data/
     designs.js            # 42 seed designs with real Unsplash images + roomType/styles/productIds
-    productCatalog.js     # 160+ Amazon affiliate products (snapspace20-20 tag)
+    productCatalog.js     # 160+ Amazon affiliate products (snapspacemkt-20 tag)
     sellers.js            # 10 seller profiles
     styleMap.js           # Style taxonomy: ROOM_KEYWORDS, STYLE_KEYWORDS, MATERIAL_KEYWORDS, MOOD_KEYWORDS, ROOM_FURNITURE
   services/
@@ -681,7 +677,7 @@ summarizeParsed(parsed)
   roomType: 'living-room',
   styles: ['modern', 'minimalist'],
   materials: ['linen', 'wood'],
-  source: 'amazon',                       // 'amazon' | 'wayfair' | 'houzz'
+  source: 'amazon',                       // Amazon-only as of Build 107
   affiliateUrl: 'https://amzn.to/...',
   asin: 'B075X1KPLZ',
   description: '...',
@@ -786,9 +782,13 @@ User prompt/photo
 
 | Platform | Status | Tag/ID |
 |----------|--------|--------|
-| Amazon Associates | Active — tag: `snapspace20-20` | PA-API locked (needs 10 sales) |
-| CJ Affiliate (Wayfair) | Pending signup | — |
-| ShareASale (Houzz) | Pending signup | — |
+| Amazon Associates | Active — tag: `snapspacemkt-20` | PA-API locked (needs 10 sales) |
+
+Wayfair (CJ Affiliate) and Houzz (ShareASale) integrations were removed
+in Build 107. Catalog is Amazon-only. If multi-vendor is reintroduced
+later, restore the source-specific URL builders in
+`src/services/affiliateProducts.js` and the source filter in
+`src/screens/CartScreen.js`.
 
 **Amazon PA-API deprecation:** April 30, 2026 → migrating to Creators API (OAuth 2.0)
 
