@@ -24665,6 +24665,57 @@ export const PRODUCT_CATALOG = [
     ],
   },
 
+  {
+    id: 'B0C6LRSP19',
+    asin: 'B0C6LRSP19',
+    name: 'Deolme Mid-Century Microfiber Leather Accent Chair Set of 2 with Lumbar Pillow & Solid Wood Frame',
+    brand: 'Deolme',
+    price: 189.99,
+    priceDisplay: '$189.99',
+    compareAtPrice: 189.99,
+    compareAtPriceDisplay: '$189.99',
+    imageUrl: 'https://m.media-amazon.com/images/I/81CB5qpiGoL._AC_SL1500_.jpg',
+    images: [
+      'https://m.media-amazon.com/images/I/81CB5qpiGoL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/51tXQgGTO+L._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/51UIZ4J3ysL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/51kLUz0f-ZL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/51BzOYFTmVL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/31HD7WsFyPL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/41SlvhWoM8L._AC_SL1500_.jpg',
+    ],
+    category: 'accent-chair',
+    roomType: ['living-room', 'bedroom', 'office'],
+    styles: ['mid-century', 'modern', 'contemporary', 'industrial', 'transitional'],
+    materials: ['leather', 'wood'],
+    tags: [
+      'accent-chair', 'arm-chair', 'side-chair', 'lounge-chair', 'reading-chair',
+      'set-of-2', 'mid-century', 'mid-century-modern', 'microfiber-leather', 'leather',
+      'solid-wood', 'rubberwood-legs', 'wood-frame', 'high-density-foam',
+      'coil-spring', 'lumbar-pillow', '105-degree-recline',
+      'living-room', 'bedroom', 'office', 'reading-nook', 'reception-room',
+      'modern', 'contemporary', 'industrial', 'transitional', 'low-profile',
+      'deolme', 'waterproof', 'easy-clean', '300lb-capacity',
+      'coffee', 'black', 'brown',
+    ],
+    source: 'amazon',
+    affiliateUrl: 'https://www.amazon.com/dp/B0C6LRSP19?tag=' + TAG,
+    rating: 4.3,
+    reviewCount: 217,
+    description: 'Deolme mid-century low-profile lounge chair sold as a set of 2. Microfiber leather upholstery (waterproof, easy to wipe clean) over a solid wood + rubberwood frame. Ergonomic 105° recline angle with high-density foam back, coil-spring seat, and matching lumbar pillow. 300 lb capacity. 31"D × 25.9"W × 32.2"H — sized for small spaces, reading nooks, and reception areas.',
+    features: [
+      'Set of 2 — vintage low-profile mid-century silhouette in microfiber leather',
+      '105° ergonomic recline with curved armrests and matching lumbar pillow',
+      'High-resiliency cushion + coil-spring seat resists sagging over time',
+      'Solid wood frame + smooth rubberwood legs, 300 lb capacity',
+      'Waterproof microfiber leather wipes clean instantly; pet-friendly',
+    ],
+    variants: [
+      { id: '1', label: 'Coffee', asin: 'B0C6LRSP19', price: 189.99, swatchImage: 'https://m.media-amazon.com/images/I/51tXQgGTO+L._AC_SL300_.jpg', mainImage: 'https://m.media-amazon.com/images/I/81CB5qpiGoL._AC_SL1500_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0C6LRSP19?tag=' + TAG },
+      { id: '2', label: 'Black',  asin: 'B0C6LSD667', price: 189.99, swatchImage: 'https://m.media-amazon.com/images/I/51lRdueQPEL._AC_SL300_.jpg', mainImage: 'https://m.media-amazon.com/images/I/71+kOJrW56L._AC_SL1500_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0C6LSD667?tag=' + TAG },
+    ],
+  },
+
 ];
 
 // ─── Enrichment status helper ────────────────────────────────────────────────
