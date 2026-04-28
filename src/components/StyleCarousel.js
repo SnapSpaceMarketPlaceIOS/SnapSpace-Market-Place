@@ -1,51 +1,56 @@
 /**
  * StyleCarousel — Home-screen horizontal style-preset picker.
  *
- * Renders a row of bundled style images (label below image), where 4 cards
- * are visible at a time on a 393pt-wide iPhone 16 Pro Max. The user swipes
- * the row themselves to browse beyond the first 4. Tapping a card calls
- * onSelect(preset).
+ * Renders a row of bundled style images that drifts horizontally on its
+ * own at a slow, continuous pace. Tapping a card calls onSelect(preset).
  *
- * BUILD 88 FIX — auto-drift removed.
+ * AUTO-DRIFT — native driver, no JS bridge in the hot path.
  *
- * The previous version ran an unbounded `requestAnimationFrame` loop that
- * called `scrollRef.current.scrollTo({...})` every frame (60Hz) plus
- * `scrollEventThrottle={16}` with an `onScroll` handler — so each frame
- * crossed the JS↔native bridge twice (scrollTo out, scroll event back),
- * ~120 bridge events per second, FOREVER, regardless of whether the user
- * was even looking at the carousel. The loop only paused for 3s when the
- * user touched the carousel itself; touching anywhere else on the screen
- * left it ticking.
+ * Build 79–87 had a broken auto-drift that ran an unbounded
+ * `requestAnimationFrame` loop calling `scrollRef.current.scrollTo({...})`
+ * every frame plus `scrollEventThrottle={16}` with an `onScroll` handler
+ * — ~120 JS↔native bridge events per second, FOREVER. Bridge saturation
+ * starved RN's Pressability state machine, so TouchableOpacity / Pressable
+ * elsewhere on HomeScreen (camera + gallery icons, "Shop Now", Featured
+ * Products cards) visually received taps but `onPress` never fired.
+ * Build 88 fixed it by removing auto-drift entirely.
  *
- * Symptom: TouchableOpacity / Pressable elsewhere on HomeScreen (camera +
- * gallery icons in the input bar; "Shop Now" on Today's Highlight; cards
- * in Featured Products; "Shop all") would visually receive the user's tap
- * but `onPress` never fired. React Native's Pressability state machine
- * runs on JS — when the bridge is saturated, press-down → press-up state
- * transitions arrive too late or get dropped, and the touch dies in the
- * responder layer before any onPress handler runs. The defensive try/catch
- * + Alert handlers added in Build 85 never fired because they sit INSIDE
- * onPress. This was the root cause of every "tap doesn't work" report
- * since Build 79, when this component was introduced (commit 24a66bb).
+ * This version reintroduces the drift the SAFE way:
  *
- * The auto-drift was a polish flourish — "intentionally tiny so the motion
- * is felt, not seen" per the original spec — its absence will not be
- * perceived by users, but its removal restores reliable touch dispatch
- * for every TouchableOpacity inside HomeScreen.
+ *   1. No ScrollView. The cards live inside an `Animated.View` whose
+ *      `transform: [{ translateX }]` is driven by `Animated.loop` +
+ *      `Animated.timing` with `useNativeDriver: true`. The animation
+ *      runs entirely on the UI thread — JS doesn't get a frame callback,
+ *      `scrollTo` is never called, and there's no `onScroll` event back.
+ *      Zero bridge crossings during the animation. Pressability stays
+ *      responsive across the rest of HomeScreen.
  *
- * The ScrollView, the touch lifecycle props, and ALL ref-based drift
- * machinery are gone. Only the static horizontal scroll + tap-to-select
- * behavior remains.
+ *   2. The presets list is rendered TWICE back-to-back inside the
+ *      animated row. The animation translates from `0` to `-rowWidth`
+ *      (one full set of cards) and loops. Because set B is an exact copy
+ *      offset by `rowWidth`, when set A scrolls off-left, set B is
+ *      already in the position set A started — the loop reset is
+ *      visually invisible and the drift looks infinite.
+ *
+ *   3. `Easing.linear` over a long duration. The user asked for "slow,
+ *      continuous, modern" — no acceleration/deceleration that would
+ *      create a stop-and-go feeling.
+ *
+ *   4. Tap-to-select still works. RN's hit-test follows the native
+ *      transform so onPress fires on the visually-tapped card. We don't
+ *      pause on touch — at ~33 pt/s the drift during a 150ms tap is
+ *      ~5pt, which is imperceptible.
  */
-import React from 'react';
+import React, { useEffect, useRef, useMemo } from 'react';
 import {
   View,
   Text,
   Image,
-  ScrollView,
   TouchableOpacity,
   StyleSheet,
   Dimensions,
+  Animated,
+  Easing,
 } from 'react-native';
 import { space, radius, fontSize, fontWeight } from '../constants/tokens';
 import { STYLE_PRESETS } from '../data/stylePresets';
@@ -63,47 +68,93 @@ const CARD_W = Math.floor((SCREEN_W - SIDE_PAD * 2 - GAP * (VISIBLE_CARDS - 1)) 
 // shot" thumbnail at small sizes. Label sits below the image.
 const IMAGE_H = Math.round(CARD_W * 1.15);
 
+// Drift speed. ~33 pt/s = one card sliding past roughly every 3s, which
+// reads as "alive and continuous" without being distracting. Adjust here
+// to make the carousel faster / slower without restructuring.
+const DRIFT_SPEED_PX_PER_SEC = 33;
+
 export default function StyleCarousel({ onSelect, presets = STYLE_PRESETS }) {
+  const translateX = useRef(new Animated.Value(0)).current;
+
+  // Width of one full row of cards (each card occupies CARD_W + GAP, with
+  // the trailing GAP after the last card so the seam to the duplicate set
+  // matches the inter-card spacing inside each set).
+  const rowWidth = useMemo(
+    () => presets.length * (CARD_W + GAP),
+    [presets.length]
+  );
+
+  useEffect(() => {
+    if (presets.length < 2 || rowWidth <= 0) return;
+    translateX.setValue(0);
+    const duration = Math.round((rowWidth / DRIFT_SPEED_PX_PER_SEC) * 1000);
+    const anim = Animated.loop(
+      Animated.timing(translateX, {
+        toValue: -rowWidth,
+        duration,
+        easing: Easing.linear,
+        useNativeDriver: true,
+      }),
+      { resetBeforeIteration: true }
+    );
+    anim.start();
+    return () => anim.stop();
+  }, [presets.length, rowWidth, translateX]);
+
+  // Render presets TWICE back-to-back. The second set occupies x=rowWidth
+  // through x=2*rowWidth — when translateX hits -rowWidth, set B is in the
+  // position set A started, and the loop reset is invisible.
+  const doubled = useMemo(() => [...presets, ...presets], [presets]);
+
   return (
-    <ScrollView
-      horizontal
-      showsHorizontalScrollIndicator={false}
-      contentContainerStyle={styles.content}
-      style={styles.scroll}
-    >
-      {presets.map((preset) => (
-        <TouchableOpacity
-          key={preset.id}
-          style={styles.card}
-          activeOpacity={0.85}
-          onPress={() => onSelect?.(preset)}
-        >
-          {/* Image + overlay are stacked inside an outer container that
-              owns the border + radius. The 0.5pt white border (per design
-              spec) lives on the container, not the Image, so the rounded
-              corners clip cleanly without the border doubling on the
-              overlay's edge. */}
-          <View style={styles.imageContainer}>
-            <Image source={preset.image} style={styles.imageInner} resizeMode="cover" />
-            {/* 10% white overlay — softens the photo so the carousel reads
-                as inspirational, not literal. Sits inside the same rounded
-                clip as the image. */}
-            <View style={styles.imageOverlay} pointerEvents="none" />
-          </View>
-          <Text style={styles.label} numberOfLines={1}>{preset.label}</Text>
-        </TouchableOpacity>
-      ))}
-    </ScrollView>
+    <View style={styles.viewport}>
+      <Animated.View
+        style={[
+          styles.row,
+          { width: rowWidth * 2, transform: [{ translateX }] },
+        ]}
+      >
+        {doubled.map((preset, idx) => (
+          <TouchableOpacity
+            key={`${preset.id}-${idx}`}
+            style={styles.card}
+            activeOpacity={0.85}
+            onPress={() => onSelect?.(preset)}
+          >
+            {/* Image + overlay are stacked inside an outer container that
+                owns the border + radius. The 0.5pt white border (per design
+                spec) lives on the container, not the Image, so the rounded
+                corners clip cleanly without the border doubling on the
+                overlay's edge. */}
+            <View style={styles.imageContainer}>
+              <Image source={preset.image} style={styles.imageInner} resizeMode="cover" />
+              {/* 10% white overlay — softens the photo so the carousel reads
+                  as inspirational, not literal. Sits inside the same rounded
+                  clip as the image. */}
+              <View style={styles.imageOverlay} pointerEvents="none" />
+            </View>
+            <Text style={styles.label} numberOfLines={1}>{preset.label}</Text>
+          </TouchableOpacity>
+        ))}
+      </Animated.View>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  scroll: {
-    flexGrow: 0,
-  },
-  content: {
-    paddingHorizontal: SIDE_PAD,
+  viewport: {
+    // overflow:hidden clips the duplicated set off the right edge so we
+    // only see one row at a time. Without this the doubled cards would
+    // visibly extend past the screen.
+    overflow: 'hidden',
     paddingVertical: space.sm,
+  },
+  row: {
+    flexDirection: 'row',
+    // Initial left padding gives the first card breathing room from the
+    // screen edge at translateX=0. Once the drift starts, this padding
+    // scrolls off-screen — that's the intended infinite-feed look.
+    paddingLeft: SIDE_PAD,
   },
   card: {
     width: CARD_W,
