@@ -736,6 +736,11 @@ export default function RoomResultScreen({ route, navigation }) {
     shouldShowReviewPrompt,
     claimReviewBonus,
     markReviewPromptShown,
+    // Rating prompt (post-second-generation, no-incentive version)
+    subscription,
+    ratingPromptShown,
+    triggerRatingPrompt,
+    RATING_PROMPT_TRIGGER_GENERATION,
   } = useSubscription();
 
   const prompt = route?.params?.prompt || 'Modern minimalist redesign';
@@ -783,6 +788,46 @@ export default function RoomResultScreen({ route, navigation }) {
     const t = setTimeout(() => setReviewModalVisible(true), 1500);
     return () => clearTimeout(t);
   }, [shouldShowReviewPrompt, isFreshGeneration]);
+
+  // ── Rating prompt arming (post-second-generation) ──────────────────────
+  // Distinct from the review-bonus modal above: this fires AFTER the user
+  // leaves the screen following their N-th generation (currently N=2,
+  // configurable via RATING_PROMPT_TRIGGER_GENERATION). The modal itself
+  // is rendered globally by RatingPromptHost in App.js so it appears on
+  // top of whichever screen the user lands on. We just arm the trigger
+  // here, then schedule it via a navigation 'blur' listener.
+  //
+  // Why blur (not unmount): React Navigation keeps the previous screen
+  // mounted under the new one, so component-level unmount only fires when
+  // the screen is fully removed from the stack. Blur is the cleaner
+  // signal for "user has navigated away."
+  const ratingPromptArmedRef = useRef(false);
+  useEffect(() => {
+    if (
+      !ratingPromptShown &&
+      isFreshGeneration &&
+      subscription?.generationsUsed === RATING_PROMPT_TRIGGER_GENERATION
+    ) {
+      ratingPromptArmedRef.current = true;
+    }
+  }, [
+    ratingPromptShown,
+    isFreshGeneration,
+    subscription?.generationsUsed,
+    RATING_PROMPT_TRIGGER_GENERATION,
+  ]);
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('blur', () => {
+      if (!ratingPromptArmedRef.current) return;
+      ratingPromptArmedRef.current = false; // one-shot per arming
+      // Small delay so the navigation transition completes before the
+      // modal pops — feels like a beat of breath rather than an
+      // immediate interruption.
+      setTimeout(() => triggerRatingPrompt(), 1500);
+    });
+    return unsubscribe;
+  }, [navigation, triggerRatingPrompt]);
 
   // App Store config — same shape as ProfileScreen.js. Until the app is live
   // (TestFlight phase), APP_STORE_ID is empty and we silently grant the bonus

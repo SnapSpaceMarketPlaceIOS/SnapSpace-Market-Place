@@ -29,6 +29,20 @@ const REVIEW_PROMPT_SHOWN_KEY      = '@homegenie_review_bonus_prompt_shown';
 const reviewClaimedKey             = (uid) => (uid ? `${REVIEW_BONUS_CLAIMED_KEY}_${uid}` : null);
 const reviewShownKey               = (uid) => (uid ? `${REVIEW_PROMPT_SHOWN_KEY}_${uid}`  : null);
 
+// ── Rating prompt (post-second-generation, no incentive) ────────────────────
+// Distinct from the review-bonus flow above — this is a no-strings-attached
+// "if you like the app, leave us a review" prompt that fires after the user's
+// second room generation and exits the RoomResultScreen. One-shot per user
+// account; persisted via AsyncStorage so it doesn't repeat across launches.
+// The prompt itself is rendered globally (RatingPromptHost in App.js) so it
+// shows regardless of which screen the user lands on after RoomResult.
+const RATING_PROMPT_SHOWN_KEY = '@homegenie_rating_prompt_shown';
+const ratingPromptShownKey    = (uid) => (uid ? `${RATING_PROMPT_SHOWN_KEY}_${uid}` : null);
+// The generation count at which we trigger the rating prompt. Kept as a
+// constant so we can adjust it (or expand to multiple milestones) without
+// hunting through the codebase.
+export const RATING_PROMPT_TRIGGER_GENERATION = 2;
+
 // ── Tier definitions (weekly billing, 10% discount on Pro + Premium) ─────────
 export const TIERS = {
   free:    { id: 'free',    name: 'Free',    price: 0,    priceLabel: 'Free',       gens: 5,  displayLabel: '5',         weekly: false },
@@ -101,6 +115,13 @@ export function SubscriptionProvider({ children }) {
   const [reviewBonusClaimed, setReviewBonusClaimed]       = useState(false);
   const [reviewBonusPromptShown, setReviewBonusPromptShown] = useState(false);
 
+  // Post-second-generation rating prompt (no incentive). Persisted flag
+  // = "this account has already seen the prompt"; in-memory flag =
+  // "the prompt is currently visible." Separate so RoomResultScreen
+  // can schedule a trigger and the global host renders the modal.
+  const [ratingPromptShown, setRatingPromptShown] = useState(false);
+  const [shouldShowRatingPrompt, setShouldShowRatingPrompt] = useState(false);
+
   // Dev toggle — force-show paywall for UI iteration (off by default)
   const [devForcePaywall, setDevForcePaywall] = useState(false);
 
@@ -166,6 +187,9 @@ export function SubscriptionProvider({ children }) {
     // briefly leak into account B before the load resolves.
     setReviewBonusClaimed(false);
     setReviewBonusPromptShown(false);
+    // Same reasoning for the rating-prompt flag.
+    setRatingPromptShown(false);
+    setShouldShowRatingPrompt(false);
   }, [user?.id, authLoading]);
 
   // Hydrate review-bonus flags from AsyncStorage whenever the signed-in user
@@ -179,13 +203,15 @@ export function SubscriptionProvider({ children }) {
     let cancelled = false;
     (async () => {
       try {
-        const [claimedRaw, shownRaw] = await Promise.all([
+        const [claimedRaw, shownRaw, ratingShownRaw] = await Promise.all([
           AsyncStorage.getItem(reviewClaimedKey(uid)),
           AsyncStorage.getItem(reviewShownKey(uid)),
+          AsyncStorage.getItem(ratingPromptShownKey(uid)),
         ]);
         if (cancelled) return;
         setReviewBonusClaimed(claimedRaw === 'true');
         setReviewBonusPromptShown(shownRaw === 'true');
+        setRatingPromptShown(ratingShownRaw === 'true');
       } catch (e) {
         if (__DEV__) console.warn('[Subscription] review-bonus hydrate failed:', e?.message);
       }
@@ -663,6 +689,40 @@ export function SubscriptionProvider({ children }) {
     }
   }, [user?.id]);
 
+  // ── Rating-prompt actions (post-second-generation) ──────────────────────
+  // triggerRatingPrompt(): RoomResultScreen calls this AFTER the user has
+  //   left the screen following their second generation (with a small
+  //   delay scheduled by RoomResultScreen). Flips the in-memory visible
+  //   flag so the global RatingPromptHost in App.js renders the modal.
+  //   Idempotent — guarded against re-triggering once it's been shown.
+  // dismissRatingPrompt(): hides the modal but doesn't persist. Used as
+  //   the immediate close path. The PERSISTENT "don't show again" mark
+  //   is markRatingPromptShown.
+  // markRatingPromptShown(): writes the persisted flag so the prompt
+  //   never auto-fires again on this account. Called by the host on
+  //   either user action (engage or dismiss) — the prompt is one-shot.
+  const triggerRatingPrompt = useCallback(() => {
+    if (ratingPromptShown) return;
+    setShouldShowRatingPrompt(true);
+  }, [ratingPromptShown]);
+
+  const dismissRatingPrompt = useCallback(() => {
+    setShouldShowRatingPrompt(false);
+  }, []);
+
+  const markRatingPromptShown = useCallback(async () => {
+    setRatingPromptShown(true);
+    setShouldShowRatingPrompt(false);
+    const uid = user?.id;
+    const shownKey = ratingPromptShownKey(uid);
+    if (!shownKey) return;
+    try {
+      await AsyncStorage.setItem(shownKey, 'true');
+    } catch (e) {
+      if (__DEV__) console.warn('[Subscription] markRatingPromptShown persist failed:', e?.message);
+    }
+  }, [user?.id]);
+
   // ── Dev-only: quota tracking uses local state only ────────────────────────
   // In dev mode, we skip refreshQuota() entirely so the DB can't overwrite
   // local counts. The local DEFAULT_SUBSCRIPTION starts at 0/5 and
@@ -736,16 +796,23 @@ export function SubscriptionProvider({ children }) {
         purchaseTokens,
         TOKEN_PACKAGES,
         WISH_PACKAGES,
-        // Review-bonus split
+        // Review-bonus split (gen-1 modal with +2 wish incentive)
         reviewBonusClaimed,
         shouldShowReviewPrompt,
         claimReviewBonus,
         markReviewPromptShown,
+        // Rating prompt (gen-2 modal, no incentive)
+        ratingPromptShown,
+        shouldShowRatingPrompt,
+        triggerRatingPrompt,
+        dismissRatingPrompt,
+        markRatingPromptShown,
         // Constants
         TIERS,
         PAID_TIERS,
         FREE_WISH_INITIAL_CAP,
         FREE_WISH_FULL_CAP,
+        RATING_PROMPT_TRIGGER_GENERATION,
       }}
     >
       {children}
