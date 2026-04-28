@@ -24818,6 +24818,55 @@ export const PRODUCT_CATALOG = [
     ],
   },
 
+  {
+    id: 'B0FS6W8ZZG',
+    asin: 'B0FS6W8ZZG',
+    name: 'KEIKI 35" Fiberglass Square Coffee Table, Imitation Stone Top, Round Edge, No Assembly Required (Beige)',
+    brand: 'KEIKI',
+    price: 482.99,
+    priceDisplay: '$482.99',
+    compareAtPrice: 482.99,
+    compareAtPriceDisplay: '$482.99',
+    imageUrl: 'https://m.media-amazon.com/images/I/8110d9Tl-zL._AC_SL1500_.jpg',
+    images: [
+      'https://m.media-amazon.com/images/I/8110d9Tl-zL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/41FM0SUhVbL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/410cPrjtyZL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/51D+FqJDnlL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/51F0Fz5Fy8L._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/41cesH1idHL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/41fJScvHviL._AC_SL1500_.jpg',
+    ],
+    category: 'coffee-table',
+    roomType: ['living-room', 'bedroom', 'office'],
+    styles: ['modern', 'contemporary', 'minimalist', 'japandi', 'wabi-sabi', 'transitional'],
+    materials: ['concrete', 'glass'],
+    tags: [
+      'coffee-table', 'square-coffee-table', 'center-table', 'fiberglass',
+      'imitation-stone', 'faux-stone', 'stone-texture', 'concrete-look',
+      'beige', 'neutral', 'round-edge', 'polished-edge', 'safe-edge',
+      'no-assembly', 'ready-to-use', 'scratch-resistant', 'waterproof',
+      'living-room', 'bedroom', 'office', 'reception-room', 'lounge',
+      'modern', 'contemporary', 'minimalist', 'japandi', 'wabi-sabi', 'transitional',
+      'keiki', 'sculptural', 'monolithic', '35-inch',
+    ],
+    source: 'amazon',
+    affiliateUrl: 'https://www.amazon.com/dp/B0FS6W8ZZG?tag=' + TAG,
+    rating: 4.7,
+    reviewCount: 6,
+    description: 'KEIKI 35" square coffee table with a faux-stone fiberglass top in soft beige. Sculptural monolithic silhouette with polished round edges that eliminate sharp corners. Scratch-resistant and waterproof surface. Ships fully assembled — ready to use immediately. Perfect for minimalist, japandi, wabi-sabi, and modern living rooms.',
+    features: [
+      'Imitation-stone fiberglass top — sophisticated faux-stone texture in beige',
+      '35" square form with round polished edges — no sharp corners, easy to live with',
+      'Scratch-resistant and waterproof surface; wipes clean with a damp cloth',
+      'Solid fiberglass construction for long-lasting stability',
+      'Zero assembly — unbox and place; instant upgrade for any living space',
+    ],
+    variants: [
+      { id: '1', label: 'Beige', asin: 'B0FS6W8ZZG', price: 482.99, swatchImage: 'https://m.media-amazon.com/images/I/41FM0SUhVbL._AC_SL1500_.jpg', mainImage: 'https://m.media-amazon.com/images/I/8110d9Tl-zL._AC_SL1500_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FS6W8ZZG?tag=' + TAG },
+    ],
+  },
+
 ];
 
 // ─── Enrichment status helper ────────────────────────────────────────────────
