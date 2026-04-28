@@ -25,6 +25,7 @@ import { space, radius, shadow, typeScale, letterSpacing } from '../constants/to
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { useLiked } from '../context/LikedContext';
+import { useSubscription } from '../context/SubscriptionContext';
 import { getProductsForPrompt, getRecommendedProducts } from '../services/affiliateProducts';
 import { parseDesignPrompt } from '../utils/promptParser';
 import { saveUserDesign, updateDesignVisibility, updateDesignProducts } from '../services/supabase';
@@ -33,6 +34,8 @@ import * as ImageManipulator from 'expo-image-manipulator';
 import { LinearGradient } from 'expo-linear-gradient';
 import { STYLE_PRESETS, pickPromptVariation } from '../data/stylePresets';
 import { pickRemixStyle, appendStyleHistory } from '../utils/pickRemixStyle';
+import LeaveReviewModal from '../components/LeaveReviewModal';
+import { safeOpenURL } from '../utils/safeOpenURL';
 
 const { width } = Dimensions.get('window');
 const IMG_RADIUS = Math.round((width - space.lg * 2) * 0.025);
@@ -729,6 +732,11 @@ export default function RoomResultScreen({ route, navigation }) {
   const { addToCart, items } = useCart();
   const { user } = useAuth();
   const { liked } = useLiked();
+  const {
+    shouldShowReviewPrompt,
+    claimReviewBonus,
+    markReviewPromptShown,
+  } = useSubscription();
 
   const prompt = route?.params?.prompt || 'Modern minimalist redesign';
   const [resultUri, setResultUri] = useState(route?.params?.resultUri || null);
@@ -753,6 +761,71 @@ export default function RoomResultScreen({ route, navigation }) {
   const recentStyleIds = Array.isArray(route?.params?.recentStyleIds)
     ? route.params.recentStyleIds
     : [];
+
+  // ── Leave-a-Review modal (post-first-generation) ─────────────────────────
+  // New free users start at 3/3 wishes; the other 2 unlock when they tap
+  // "Leave a Review" on this modal. Trigger conditions are gated by
+  // SubscriptionContext.shouldShowReviewPrompt — we just delay slightly so
+  // the user actually sees their generated room before the modal pops up.
+  //
+  // Extra `styleId` guard: that route param is set only when the user
+  // arrived here from a fresh HomeScreen.runGeneration(). Saved designs
+  // opened from MySpaces don't carry it, so the modal stays quiet on
+  // revisits — feels natural ("you just generated, here's a question")
+  // rather than abrupt ("you opened an old design, here's a question").
+  const [reviewModalVisible, setReviewModalVisible] = useState(false);
+  const reviewPromptHandledRef = useRef(false);
+  const isFreshGeneration = !!styleId;
+  useEffect(() => {
+    if (!shouldShowReviewPrompt || !isFreshGeneration) return;
+    if (reviewPromptHandledRef.current) return;
+    reviewPromptHandledRef.current = true;
+    const t = setTimeout(() => setReviewModalVisible(true), 1500);
+    return () => clearTimeout(t);
+  }, [shouldShowReviewPrompt, isFreshGeneration]);
+
+  // App Store config — same shape as ProfileScreen.js. Until the app is live
+  // (TestFlight phase), APP_STORE_ID is empty and we silently grant the bonus
+  // without trying to deep-link anywhere. When the env var is set in
+  // production, the itms-apps:// URL deep-links into the in-app review sheet
+  // and falls back to the web App Store page if iOS rejects the scheme.
+  const APP_STORE_ID = process.env.EXPO_PUBLIC_APP_STORE_ID || '';
+  const HAS_APP_STORE_ID = /^\d+$/.test(APP_STORE_ID);
+  const APP_STORE_REVIEW_URL = HAS_APP_STORE_ID
+    ? `itms-apps://itunes.apple.com/app/id${APP_STORE_ID}?action=write-review`
+    : null;
+  const APP_STORE_URL = HAS_APP_STORE_ID
+    ? `https://apps.apple.com/app/id${APP_STORE_ID}`
+    : null;
+
+  const handleLeaveReview = useCallback(async () => {
+    setReviewModalVisible(false);
+    // Grant the bonus on tap regardless of whether the user actually posts a
+    // review. We can't observe their App Store action and the framing is
+    // "tap to unlock" — the carrot has to be unconditional or it feels broken.
+    await claimReviewBonus();
+    if (APP_STORE_REVIEW_URL) {
+      const opened = await safeOpenURL(APP_STORE_REVIEW_URL);
+      if (!opened && APP_STORE_URL) {
+        await safeOpenURL(APP_STORE_URL);
+      }
+    }
+    // Defer the success Alert by one frame so it doesn't fight the modal's
+    // dismiss animation. iOS will queue Alerts behind a closing Modal but
+    // the visual stutter is jarring.
+    setTimeout(() => {
+      Alert.alert(
+        '2 Wishes Unlocked',
+        'Thanks for the support! Your wishes are ready whenever you are.',
+        [{ text: 'OK' }],
+      );
+    }, 320);
+  }, [claimReviewBonus, APP_STORE_REVIEW_URL, APP_STORE_URL]);
+
+  const handleMaybeLater = useCallback(() => {
+    setReviewModalVisible(false);
+    markReviewPromptShown();
+  }, [markReviewPromptShown]);
 
   // Post-to-Profile modal image aspect — fetched from the actual image so the
   // preview container fits landscape OR portrait output without black letterbox.
@@ -1321,6 +1394,16 @@ export default function RoomResultScreen({ route, navigation }) {
           </View>
         </View>
       </Modal>
+
+      {/* ── Leave-a-Review Modal ──────────────────────────────────────
+          Pops once after the user's first generation lands here. Tap
+          "Leave a Review" → claim +2 wishes, deep-link to App Store.
+          Tap "Maybe Later" → mark shown so we don't auto-pop again. */}
+      <LeaveReviewModal
+        visible={reviewModalVisible}
+        onLeaveReview={handleLeaveReview}
+        onMaybeLater={handleMaybeLater}
+      />
     </View>
   );
 }
