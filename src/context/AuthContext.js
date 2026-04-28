@@ -125,13 +125,18 @@ export function AuthProvider({ children }) {
 
     const bootstrap = async () => {
       // Safety net: if getSession() hangs (no network, bad env vars), bail
-      // out after 15s so the app is never stuck on the loading screen.
+      // out after 30s so the app is never stuck on the loading screen.
       //
-      // Why 15s (was 8s, before that 2s): iOS post-update cold launches
+      // Why 30s (was 15s, was 8s, was 2s): iOS post-update cold launches
       // combine a cold AsyncStorage read (2–5s on iOS 26) with Supabase's
       // autoRefreshToken network round-trip (cold DNS + TLS routinely 3–8s
-      // after app update). The 8s budget was still too short on some
-      // devices, leaving the user with an auth wall until force-quit.
+      // after app update, occasionally 15+ seconds on bad networks). The
+      // 15s budget was STILL too short on some real devices — TestFlight
+      // reports of "stuck on auth wall, force-quit fixes it" continued
+      // through Build 104. Build 105 doubled this to 30s AND gated the
+      // auth-screen redirect on `loading` (see App.js gatedTabListener +
+      // useRequireAuth) so users can't be forced into AuthScreen while
+      // bootstrap is still in flight.
       //
       // CRITICAL Build 25 change: after the timer fires we NO LONGER refuse
       // late-arriving sessions. Previously the `!settled` guard in the
@@ -150,12 +155,12 @@ export function AuthProvider({ children }) {
       let settled = false;
       const timer = setTimeout(() => {
         if (!settled && mounted) {
-          console.log('[Auth] bootstrap timeout (15s) — rendering as guest, late session still allowed');
+          console.log('[Auth] bootstrap timeout (30s) — rendering as guest, late session still allowed');
           settled = true;
           loadingRef.current = false;
           setLoading(false);
         }
-      }, 15000);
+      }, 30000);
 
       try {
         const { data: { session } } = await supabase.auth.getSession();

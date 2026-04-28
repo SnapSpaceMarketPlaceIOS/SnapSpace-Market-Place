@@ -255,13 +255,31 @@ function TabNavigator() {
   // both real users and App Review, so we gate the whole tab instead.
   // See useRequireAuth for action-level gating used by individual
   // screens (like/share/add-to-cart, etc.).
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
 
   // Factory for the gated-tab listener. Each gated Tab.Screen wires this
   // to `listeners={...}` so a single signed-out tap preventDefaults the
   // tab switch and navigates to Auth instead.
+  //
+  // Build 105: gate on `authLoading` too. Previously we only checked
+  // `if (!user)` — but during the cold-launch bootstrap window (iOS post-
+  // update can take 5–15+ seconds to read the session from AsyncStorage +
+  // refresh the token), `user` is still null even when a valid persisted
+  // session is being loaded. Tapping any gated tab in that window bounced
+  // users to AuthScreen — and the only "fix" was force-quitting the app
+  // (which warmed the OS caches, making the next bootstrap fast enough to
+  // populate `user` before any tab tap). Skipping the redirect while
+  // bootstrap is in flight lets the destination screen's own auth-loading
+  // guard handle the brief gap, and the user lands inside their session
+  // naturally once it resolves.
   const gatedTabListener = ({ navigation: tabNav }) => ({
     tabPress: (e) => {
+      if (authLoading) {
+        // Bootstrap still in flight — let the tab change proceed. The
+        // destination screen has its own loading state. Do NOT bounce
+        // to Auth, the persisted session may be about to populate.
+        return;
+      }
       if (!user) {
         e.preventDefault();
         tabNav.getParent()?.navigate('Auth');

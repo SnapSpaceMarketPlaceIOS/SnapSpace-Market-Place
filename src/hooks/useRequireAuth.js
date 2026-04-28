@@ -39,7 +39,7 @@ import { useNavigation } from '@react-navigation/native';
 import { useAuth } from '../context/AuthContext';
 
 export function useRequireAuth() {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const navigation = useNavigation();
 
   return useCallback(
@@ -48,13 +48,27 @@ export function useRequireAuth() {
         if (typeof action === 'function') action();
         return true;
       }
-      // Not signed in — route to Auth. The AuthScreen is registered at
-      // the root stack level (see App.js), so this navigate call works
-      // from any depth.
+      // Build 105: don't bounce to Auth while the bootstrap is still in
+      // flight. During the cold-launch window (iOS post-update can be
+      // 5–15+ seconds), `user` is null but a valid persisted session may
+      // be about to populate — sending the user to AuthScreen here forced
+      // them through a sign-in they didn't need, which the user
+      // experienced as "stuck on auth wall, force-quit + reopen fixes it"
+      // (force-quit warmed iOS caches so the next bootstrap was fast
+      // enough to populate `user` before any gated tap). No-op the action
+      // and return false instead — a second tap once `loading` resolves
+      // will either run the action (session arrived) or correctly route
+      // to Auth (no session found).
+      if (loading) {
+        return false;
+      }
+      // Not signed in and bootstrap settled — route to Auth. The
+      // AuthScreen is registered at the root stack level (see App.js),
+      // so this navigate call works from any depth.
       navigation.navigate('Auth');
       return false;
     },
-    [user, navigation],
+    [user, loading, navigation],
   );
 }
 
