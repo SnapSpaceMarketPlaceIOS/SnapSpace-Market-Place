@@ -267,11 +267,17 @@ export default function PaywallScreen({ navigation }) {
   // they purchased — buying 4 wishes makes the count jump from 3 → 7.
   // Subscribers see their tier-correct weekly cap. The card adapts to
   // four states: free-only, free + purchased, subscribed, premium-unlimited.
+  //
+  // Review-bonus split: the free-tier total now comes from
+  // subscription.quotaLimit (which the SubscriptionContext caps to 3 until
+  // the user claims the review bonus, then exposes 5). We no longer hardcode
+  // 5 here — that would have shown "5 remaining" while the actual gate cuts
+  // at 3, confusing the user. Same for the recompute below.
   const isFree            = subscription.tier === 'free';
   const isUnlimitedSub    = subscription.quotaLimit === -1; // premium tier
-  const renewableTotal    = isFree ? 5 : (isUnlimitedSub ? 0 : subscription.quotaLimit);
+  const renewableTotal    = isUnlimitedSub ? 0 : subscription.quotaLimit;
   const renewableRemaining = isFree
-    ? Math.max(0, 5 - subscription.generationsUsed)
+    ? Math.max(0, subscription.quotaLimit - subscription.generationsUsed)
     : (isUnlimitedSub ? 0 : subscription.generationsRemaining);
   const purchasedCount    = tokenBalance;
   const tierName          = subscription.tier
@@ -314,7 +320,7 @@ export default function PaywallScreen({ navigation }) {
 
   // Legacy aliases retained for any downstream reference (keep blast radius small)
   const remaining = renewableRemaining;
-  const totalFree = isFree ? 5 : renewableTotal;
+  const totalFree = renewableTotal;
   const usedCount = subscription.generationsUsed;
 
   // Entrance animation — bar fills from 0 to actual value once on mount
