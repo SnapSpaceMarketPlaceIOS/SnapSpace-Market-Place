@@ -25183,6 +25183,56 @@ export const PRODUCT_CATALOG = [
     ],
   },
 
+  {
+    id: 'B0F48F67Q9',
+    asin: 'B0F48F67Q9',
+    name: 'ONNAHOMEStyle 78" L-Shaped Executive Desk, Black Industrial Office Workstation with LED Light, Drawers & Storage Cabinet',
+    brand: 'ONNAHOMEStyle',
+    price: 1859.99,
+    priceDisplay: '$1,859.99',
+    compareAtPrice: 1859.99,
+    compareAtPriceDisplay: '$1,859.99',
+    imageUrl: 'https://m.media-amazon.com/images/I/91hE2CRVsiL._AC_SL1500_.jpg',
+    images: [
+      'https://m.media-amazon.com/images/I/91hE2CRVsiL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/51SFXiLujEL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/41T+nO+ovlL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/41t017uTqoL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/51lEPjPRFiL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/51UrX7mEmkL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/41Lf0xKt9DL._AC_SL1500_.jpg',
+    ],
+    category: 'desk',
+    roomType: ['office'],
+    styles: ['industrial', 'modern', 'contemporary', 'mid-century', 'transitional'],
+    materials: ['wood', 'metal'],
+    tags: [
+      'desk', 'executive-desk', 'l-shaped-desk', 'office-desk', 'workstation',
+      'home-office', 'business-furniture', 'reception-counter',
+      'storage-cabinet', 'drawers', 'open-shelves', 'led-light', 'led-lighting',
+      'stainless-steel-frame', 'thickened-desktop', '3-15-inch-thick',
+      'scratch-resistant', 'laminate', 'large-desktop',
+      'industrial', 'modern', 'contemporary', 'mid-century', 'transitional',
+      'onnahomestyle', '78-inch', 'l-shape', 'black', 'big-desk',
+    ],
+    source: 'amazon',
+    affiliateUrl: 'https://www.amazon.com/dp/B0F48F67Q9?tag=' + TAG,
+    rating: null,
+    reviewCount: null,
+    description: 'ONNAHOMEStyle 78" L-shaped industrial executive desk in black. 70.87" × 31.5" desktop with 3.15" thickened laminate top on a stainless steel frame for heavy-equipment support. Built-in storage cabinet, drawers, open shelves, and integrated LED lighting create a polished modern workstation. Ideal as a home office, executive desk, or reception counter for shops, offices, salons, and restaurants.',
+    features: [
+      'Spacious 70.87" × 31.5" L-shaped desktop fits multiple monitors and work materials',
+      '3.15" thickened laminate top on stainless steel frame supports heavy equipment',
+      'Built-in storage cabinet, drawers, and open shelves keep essentials organized',
+      'Integrated LED lighting adds a contemporary glow to the industrial silhouette',
+      'Versatile for executive home offices, reception counters, salons, and shops',
+    ],
+    variants: [
+      { id: '1', label: '78"W × 63"D × 29.7"H (Left)', asin: 'B0F48F67Q9', price: 1859.99, swatchImage: 'https://m.media-amazon.com/images/I/51SFXiLujEL._AC_SL300_.jpg', mainImage: 'https://m.media-amazon.com/images/I/91hE2CRVsiL._AC_SL1500_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0F48F67Q9?tag=' + TAG },
+      { id: '2', label: '86"W × 63"D × 29.7"H (Left)', asin: 'B0F48FP2XR', price: 1859.99, swatchImage: 'https://m.media-amazon.com/images/I/51SFXiLujEL._AC_SL300_.jpg', mainImage: 'https://m.media-amazon.com/images/I/91hE2CRVsiL._AC_SL1500_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0F48FP2XR?tag=' + TAG },
+    ],
+  },
+
 ];
 
 // ─── Enrichment status helper ────────────────────────────────────────────────
