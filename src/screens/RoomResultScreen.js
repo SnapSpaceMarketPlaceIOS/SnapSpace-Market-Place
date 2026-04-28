@@ -1240,13 +1240,12 @@ export default function RoomResultScreen({ route, navigation }) {
             style={[s.remixFabInner, { transform: [{ scale: remixFabScale }] }]}
           >
             <LinearGradient
-              // bluePrimary → blueDeep gives a subtle but visible top-left to
-              // bottom-right ramp. heroStart/heroEnd are both blueDeep in this
-              // codebase so they'd render flat — these two are the actual
-              // brand-blue endpoints.
-              colors={[colors.bluePrimary, colors.blueDeep]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
+              // Matches the input bar's Send button exactly so the Remix FAB
+              // visually rhymes with the primary CTA the user already learned
+              // on Home. Top-to-bottom blueLight → bluePrimary fade with the
+              // same locations the Send gradient uses.
+              colors={[colors.blueLight, colors.bluePrimary]}
+              locations={[0.32, 0.86]}
               style={s.remixFabBg}
             >
               <RemixIcon size={20} />
