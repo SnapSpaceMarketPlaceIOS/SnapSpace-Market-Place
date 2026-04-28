@@ -25131,6 +25131,58 @@ export const PRODUCT_CATALOG = [
     ],
   },
 
+  {
+    id: 'B0FV8W34LD',
+    asin: 'B0FV8W34LD',
+    name: 'Residence Supply Rasu Floor Lamp, Handcrafted Solid Steel 2-Tier Structure, UL & CE Certified E27 Socket',
+    brand: 'Residence Supply',
+    price: 700.00,
+    priceDisplay: '$700.00',
+    compareAtPrice: 700.00,
+    compareAtPriceDisplay: '$700.00',
+    imageUrl: 'https://m.media-amazon.com/images/I/71NT6xKey7L._AC_SL1500_.jpg',
+    images: [
+      'https://m.media-amazon.com/images/I/71NT6xKey7L._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/41vL+QwK7SL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/41d5LfLqPRL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/41YFPNDMGEL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/51cBbxLy16L._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/41zRZkIHxiL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/41ryFLx32XL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/51dHtgTKQyL._AC_SL1500_.jpg',
+    ],
+    category: 'lamp',
+    roomType: ['living-room', 'bedroom', 'office'],
+    styles: ['modern', 'contemporary', 'minimalist', 'mid-century', 'art-deco', 'glam', 'industrial', 'transitional'],
+    materials: ['metal'],
+    tags: [
+      'floor-lamp', 'standing-lamp', 'globe-lamp', 'tiered-lamp', '2-tier',
+      'corner-lamp', 'reading-lamp', 'mood-lamp', 'silver', 'chrome',
+      'solid-steel', 'weighted-base', 'wobble-resistant',
+      'ul-certified', 'ce-certified', 'e27-socket', 'warm-white', '3000k',
+      'living-room', 'bedroom', 'office', 'home-office',
+      'modern', 'contemporary', 'minimalist', 'mid-century',
+      'art-deco', 'glam', 'industrial', 'transitional',
+      'residence-supply', 'rasu', 'handcrafted', 'sculptural', 'architectural',
+    ],
+    source: 'amazon',
+    affiliateUrl: 'https://www.amazon.com/dp/B0FV8W34LD?tag=' + TAG,
+    rating: null,
+    reviewCount: null,
+    description: 'Residence Supply Rasu floor lamp — handcrafted solid steel 2-tier structure with a weighted base that prevents wobble or tipping. Sculptural silhouette pairs with warm white (3000K) globe diffusion to layer mood lighting in living rooms, bedrooms, and offices. UL & CE certified E27 socket. Available in 2 heights (31.5" or 47" tall).',
+    features: [
+      'Solid steel 2-tier structure — handcrafted with sculptural architectural lines',
+      'Weighted base prevents wobble/tipping for unwavering stability',
+      'UL & CE certified E27 socket — reliable, safe, long-lasting',
+      'Warm white (3000K) globe diffusion creates a serene layered mood',
+      'Available in 2 sizes: 31.5" (80cm) or 47" (120cm) tall — same 15.7" base width',
+    ],
+    variants: [
+      { id: '1', label: '31.5" Tall - Silver', asin: 'B0FV8W34LD', price: 700.00, swatchImage: 'https://m.media-amazon.com/images/I/41vL+QwK7SL._AC_SL300_.jpg', mainImage: 'https://m.media-amazon.com/images/I/71NT6xKey7L._AC_SL1500_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FV8W34LD?tag=' + TAG },
+      { id: '2', label: '47" Tall - Silver',   asin: 'B0FV8V11XN', price: 700.00, swatchImage: 'https://m.media-amazon.com/images/I/41eZ2dlbRlL._AC_SL300_.jpg', mainImage: 'https://m.media-amazon.com/images/I/71hAHWpvVtL._AC_SL1500_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FV8V11XN?tag=' + TAG },
+    ],
+  },
+
 ];
 
 // ─── Enrichment status helper ────────────────────────────────────────────────
