@@ -25759,6 +25759,56 @@ export const PRODUCT_CATALOG = [
     ],
   },
 
+  {
+    id: 'B0GGZ47KS5',
+    asin: 'B0GGZ47KS5',
+    name: 'HULALA HOME Mid-Century Faux Leather Chesterfield Sectional Sofa, Button-Tufted Backrest, 5-Seater with Metal Legs',
+    brand: 'HULALA HOME',
+    price: 1099.99,
+    priceDisplay: '$1,099.99',
+    compareAtPrice: 1099.99,
+    compareAtPriceDisplay: '$1,099.99',
+    imageUrl: 'https://m.media-amazon.com/images/I/51dLCeFPV2L._AC_SL1500_.jpg',
+    images: [
+      'https://m.media-amazon.com/images/I/51dLCeFPV2L._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/31roL-YU56L._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/51rNbALCP2L._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/41+UI-t6WCL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/31crpAysRwL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/5174s4cejEL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/51uUi3-+LUL._AC_SL1500_.jpg',
+    ],
+    category: 'sofa',
+    roomType: ['living-room'],
+    styles: ['mid-century', 'modern', 'contemporary', 'transitional', 'industrial', 'art-deco', 'glam'],
+    materials: ['leather', 'metal'],
+    tags: [
+      'sofa', 'sectional', 'chesterfield', 'corner-sectional', 'modular',
+      '5-seater', 'faux-leather', 'leather', 'button-tufted', 'tufted-back',
+      'metal-legs', 'slim-legs', 'mid-century', 'mid-century-modern',
+      'living-room', 'modern', 'contemporary', 'transitional', 'industrial',
+      'art-deco', 'glam', 'hulala-home', 'wide-seat', 'deep-seat',
+      'charcoal', 'camel', 'blue', 'tan', 'caramel',
+    ],
+    source: 'amazon',
+    affiliateUrl: 'https://www.amazon.com/dp/B0GGZ47KS5?tag=' + TAG,
+    rating: null,
+    reviewCount: null,
+    description: 'HULALA HOME mid-century Chesterfield sectional sofa — clean lines, deep button-tufted backrest, smooth faux leather upholstery, and slim metal legs. 5-seater corner modular design connects securely for flexible room layouts. Wide deep seats provide generous lounging space; faux leather wipes clean for daily use. Ideal for mid-century, art-deco, glam, and industrial living rooms.',
+    features: [
+      '5-seater modular corner sectional with secure-locking section connectors',
+      'Deep button-tufted backrest — classic Chesterfield silhouette with retro character',
+      'Smooth faux leather upholstery — durable, easy to wipe clean',
+      'Slim metal legs add modern lift; mid-century mood with art-deco refinement',
+      'Wide deep seats; spacious for gatherings, movie nights, daily relaxation',
+    ],
+    variants: [
+      { id: '1', label: 'Charcoal', asin: 'B0GGZ47KS5', price: 1099.99, swatchImage: 'https://m.media-amazon.com/images/I/31roL-YU56L._AC_SL300_.jpg', mainImage: 'https://m.media-amazon.com/images/I/51dLCeFPV2L._AC_SL1500_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0GGZ47KS5?tag=' + TAG },
+      { id: '2', label: 'Camel',    asin: 'B0GGZ2LMC9', price: 1099.99, swatchImage: 'https://m.media-amazon.com/images/I/31mrScHwPLL._AC_SL300_.jpg', mainImage: 'https://m.media-amazon.com/images/I/51rdlcvVowL._AC_SL1500_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0GGZ2LMC9?tag=' + TAG },
+      { id: '3', label: 'Blue',     asin: 'B0GGYYPG7H', price: 1099.99, swatchImage: 'https://m.media-amazon.com/images/I/31uJ6Eh4LgL._AC_SL300_.jpg', mainImage: 'https://m.media-amazon.com/images/I/513oqjH5irL._AC_SL1500_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0GGYYPG7H?tag=' + TAG },
+    ],
+  },
+
 ];
 
 // ─── Enrichment status helper ────────────────────────────────────────────────
