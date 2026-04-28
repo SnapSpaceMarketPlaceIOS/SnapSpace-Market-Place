@@ -24457,6 +24457,57 @@ export const PRODUCT_CATALOG = [
     ],
   },
 
+  {
+    id: 'B0F7XVWQYL',
+    asin: 'B0F7XVWQYL',
+    name: 'JIASTING Mid-Century Modern PU Leather Accent Chair Set of 2, Solid Wood Frame, Padded Curved Armrests',
+    brand: 'JIASTING',
+    price: 259.99,
+    priceDisplay: '$259.99',
+    compareAtPrice: 259.99,
+    compareAtPriceDisplay: '$259.99',
+    imageUrl: 'https://m.media-amazon.com/images/I/811M9lz3zML._AC_SL1500_.jpg',
+    images: [
+      'https://m.media-amazon.com/images/I/811M9lz3zML._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/41SYDOr8t8L._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/41VMjFeHanL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/51YEUsS00uL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/41Nx6jafsIL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/41Kxv5JkxUL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/41MqP8EHMxL._AC_SL1500_.jpg',
+    ],
+    category: 'accent-chair',
+    roomType: ['living-room', 'bedroom', 'office'],
+    styles: ['mid-century', 'modern', 'contemporary', 'industrial', 'transitional'],
+    materials: ['leather', 'wood'],
+    tags: [
+      'accent-chair', 'arm-chair', 'side-chair', 'reading-chair', 'set-of-2',
+      'mid-century', 'mid-century-modern', 'pu-leather', 'leather', 'solid-wood',
+      'rubber-wood-legs', 'wood-frame', 'high-density-foam', 'spring-cushion',
+      '7-1-inch-thick', 'curved-armrest', 'ergonomic', '105-degree-recline',
+      'living-room', 'bedroom', 'office', 'reception-room', 'waiting-room',
+      'modern', 'contemporary', 'industrial', 'transitional',
+      'jiasting', 'easy-clean', 'pet-friendly', '330lb-capacity',
+      'black', 'brown',
+    ],
+    source: 'amazon',
+    affiliateUrl: 'https://www.amazon.com/dp/B0F7XVWQYL?tag=' + TAG,
+    rating: 4.7,
+    reviewCount: 15,
+    description: 'JIASTING mid-century modern accent chairs sold as a set of 2. PU leather upholstery wraps a solid wood frame with rubber wood legs, supporting up to 330 lbs. 7.1" thick high-density foam + spring cushions on seat and back, with a 105° backrest angle that follows the spine. Curved armrests with double-sided padded packaging. 10-minute one-person assembly.',
+    features: [
+      'Set of 2 — PU leather mid-century accent chairs with red-brown wood frame',
+      '7.1" thick high-density foam + spring cushions; 105° ergonomic backrest angle',
+      'Curved armrests with double-sided padded packaging for extra arm comfort',
+      'Solid wood frame + rubber wood legs, 330 lb capacity, anti-slip silicone foot pads',
+      'PU leather is breathable, durable, easy to wipe clean, and pet-friendly',
+    ],
+    variants: [
+      { id: '1', label: 'Black', asin: 'B0F7XVWQYL', price: 259.99, swatchImage: 'https://m.media-amazon.com/images/I/41SYDOr8t8L._AC_SL300_.jpg', mainImage: 'https://m.media-amazon.com/images/I/811M9lz3zML._AC_SL1500_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0F7XVWQYL?tag=' + TAG },
+      { id: '2', label: 'Brown', asin: 'B0FDYBGVHK', price: 259.99, swatchImage: 'https://m.media-amazon.com/images/I/41+fMgnjVDL._AC_SL300_.jpg', mainImage: 'https://m.media-amazon.com/images/I/819MWGhz9gL._AC_SL1500_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FDYBGVHK?tag=' + TAG },
+    ],
+  },
+
 ];
 
 // ─── Enrichment status helper ────────────────────────────────────────────────
