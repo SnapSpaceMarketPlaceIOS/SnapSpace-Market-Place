@@ -2,42 +2,45 @@
  * StyleCarousel — Home-screen horizontal style-preset picker.
  *
  * Renders a row of bundled style images (label below image), where 4 cards
- * are visible at a time on a 393pt-wide iPhone 16 Pro Max. The user swipes
- * the row themselves to browse beyond the first 4. Tapping a card calls
- * onSelect(preset).
+ * are visible at a time on a 393pt-wide iPhone 16 Pro Max. The list slowly
+ * auto-drifts to the right and pauses for 3 seconds whenever the user
+ * touches the row, then resumes. Tapping a card calls onSelect(preset).
  *
- * BUILD 88 FIX — auto-drift removed.
+ * ── BUILD 101: AUTO-DRIFT RESTORED, BUT SAFE ──────────────────────────────
  *
- * The previous version ran an unbounded `requestAnimationFrame` loop that
- * called `scrollRef.current.scrollTo({...})` every frame (60Hz) plus
- * `scrollEventThrottle={16}` with an `onScroll` handler — so each frame
- * crossed the JS↔native bridge twice (scrollTo out, scroll event back),
- * ~120 bridge events per second, FOREVER, regardless of whether the user
- * was even looking at the carousel. The loop only paused for 3s when the
- * user touched the carousel itself; touching anywhere else on the screen
- * left it ticking.
+ * Build 79 introduced an auto-drift via `requestAnimationFrame` + per-frame
+ * `scrollTo` + `scrollEventThrottle={16}` + onScroll handler. That ran ~120
+ * bridge events/sec FOREVER, regardless of whether the carousel was even
+ * visible. Net effect: React Native's Pressability state machine starved on
+ * the saturated bridge, and TouchableOpacity / Pressable elsewhere on
+ * HomeScreen (camera + gallery icons in input bar, "Shop Now" on Today's
+ * Highlight, Featured Products cards, "Shop all") visually depressed but
+ * never fired onPress. Build 88 ripped the entire drift system out as the
+ * fix.
  *
- * Symptom: TouchableOpacity / Pressable elsewhere on HomeScreen (camera +
- * gallery icons in the input bar; "Shop Now" on Today's Highlight; cards
- * in Featured Products; "Shop all") would visually receive the user's tap
- * but `onPress` never fired. React Native's Pressability state machine
- * runs on JS — when the bridge is saturated, press-down → press-up state
- * transitions arrive too late or get dropped, and the touch dies in the
- * responder layer before any onPress handler runs. The defensive try/catch
- * + Alert handlers added in Build 85 never fired because they sit INSIDE
- * onPress. This was the root cause of every "tap doesn't work" report
- * since Build 79, when this component was introduced (commit 24a66bb).
+ * This restoration uses a fundamentally different cadence. The drift is
+ * driven by `setInterval` at 2 ticks/sec — each tick advances the offset
+ * by 30px and calls a SINGLE `scrollTo({animated: true})`, letting iOS's
+ * native scroll animator interpolate the move smoothly. Visual experience
+ * is continuous slow drift; bridge cost is 2 calls/sec instead of 60-120.
+ * That's a 60× reduction — well below the saturation threshold that broke
+ * Build 79.
  *
- * The auto-drift was a polish flourish — "intentionally tiny so the motion
- * is felt, not seen" per the original spec — its absence will not be
- * perceived by users, but its removal restores reliable touch dispatch
- * for every TouchableOpacity inside HomeScreen.
+ * Additional safety nets:
+ *   1. No `onScroll` handler, no `scrollEventThrottle`. Only
+ *      `onScrollEndDrag` and `onMomentumScrollEnd`, which fire ONCE per user
+ *      gesture (not continuously), so they update offsetRef without spam.
+ *   2. Drift pauses on touch, resumes 3s after release. Same as the original
+ *      Build 79 spec.
+ *   3. Drift pauses entirely when the app backgrounds (AppState listener),
+ *      so an off-screen carousel never burns even those 2 calls/sec.
+ *   4. Drift skips when content fits in viewport (maxOffset === 0).
  *
- * The ScrollView, the touch lifecycle props, and ALL ref-based drift
- * machinery are gone. Only the static horizontal scroll + tap-to-select
- * behavior remains.
+ * If a future change reintroduces tap-handler death on HomeScreen, look
+ * here FIRST — and verify these guarantees still hold before suspecting
+ * anything else.
  */
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -46,6 +49,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   Dimensions,
+  AppState,
 } from 'react-native';
 import { space, radius, fontSize, fontWeight } from '../constants/tokens';
 import { STYLE_PRESETS } from '../data/stylePresets';
@@ -63,13 +67,100 @@ const CARD_W = Math.floor((SCREEN_W - SIDE_PAD * 2 - GAP * (VISIBLE_CARDS - 1)) 
 // shot" thumbnail at small sizes. Label sits below the image.
 const IMAGE_H = Math.round(CARD_W * 1.15);
 
+// Drift cadence — 2 ticks/sec, 30px per tick → ~60px/sec (~1/3 of a card
+// per second). Slow enough to read as ambient motion, fast enough to be
+// noticeable. Each scrollTo's native animation interpolates between ticks
+// so the visual is continuous, not stair-stepped.
+const TICK_INTERVAL_MS = 500;
+const DRIFT_PX_PER_TICK = 30;
+// How long to wait after a user touch before resuming drift.
+const RESUME_DELAY_MS = 3000;
+
 export default function StyleCarousel({ onSelect, presets = STYLE_PRESETS }) {
+  const scrollRef = useRef(null);
+  const offsetRef = useRef(0);
+  const driftingRef = useRef(true);
+  const intervalRef = useRef(null);
+  const resumeTimerRef = useRef(null);
+  const contentWidthRef = useRef(0);
+  const containerWidthRef = useRef(0);
+  const appActiveRef = useRef(true);
+
+  useEffect(() => {
+    // Each tick: if drift is enabled, app is foregrounded, and the content
+    // overflows the viewport, advance the offset by one step and call
+    // scrollTo. iOS's native scroll animator handles the actual interpolation
+    // between ticks, so the user sees continuous smooth drift even though
+    // the JS bridge only fires twice per second.
+    intervalRef.current = setInterval(() => {
+      if (!driftingRef.current) return;
+      if (!appActiveRef.current) return;
+      if (!scrollRef.current) return;
+      const maxOffset = Math.max(0, contentWidthRef.current - containerWidthRef.current);
+      if (maxOffset <= 0) return;
+
+      offsetRef.current += DRIFT_PX_PER_TICK;
+      if (offsetRef.current >= maxOffset) {
+        // Reached the right edge — snap back to start. Brief flash is
+        // acceptable in the auto-drift use case (the user's hand isn't on
+        // the carousel; if it were, drift is paused).
+        offsetRef.current = 0;
+      }
+      scrollRef.current.scrollTo({ x: offsetRef.current, animated: true });
+    }, TICK_INTERVAL_MS);
+
+    // Pause drift entirely when the app is backgrounded so we don't keep
+    // firing scrollTo while the carousel isn't visible. Resume on active.
+    const appSub = AppState.addEventListener('change', (state) => {
+      appActiveRef.current = state === 'active';
+    });
+
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+      if (resumeTimerRef.current) clearTimeout(resumeTimerRef.current);
+      appSub.remove();
+    };
+  }, []);
+
+  const pauseDrift = () => {
+    driftingRef.current = false;
+    if (resumeTimerRef.current) clearTimeout(resumeTimerRef.current);
+  };
+
+  const scheduleResume = () => {
+    if (resumeTimerRef.current) clearTimeout(resumeTimerRef.current);
+    resumeTimerRef.current = setTimeout(() => {
+      driftingRef.current = true;
+    }, RESUME_DELAY_MS);
+  };
+
+  // Capture user-driven scroll position once per gesture (drag end + momentum
+  // end). NO continuous onScroll / scrollEventThrottle — those are exactly
+  // the props that caused Build 79's bridge storm. These handlers fire
+  // ONCE per user interaction, not per frame, so they're safe.
+  const onScrollEndDrag = (e) => {
+    offsetRef.current = e.nativeEvent.contentOffset.x;
+  };
+  const onMomentumScrollEnd = (e) => {
+    offsetRef.current = e.nativeEvent.contentOffset.x;
+  };
+
   return (
     <ScrollView
+      ref={scrollRef}
       horizontal
       showsHorizontalScrollIndicator={false}
       contentContainerStyle={styles.content}
       style={styles.scroll}
+      // Touch + scroll lifecycle: pause on first finger-down, resume after
+      // the user's fingers leave + the timer elapses.
+      onTouchStart={pauseDrift}
+      onTouchEnd={scheduleResume}
+      onTouchCancel={scheduleResume}
+      onScrollEndDrag={onScrollEndDrag}
+      onMomentumScrollEnd={onMomentumScrollEnd}
+      onContentSizeChange={(w) => { contentWidthRef.current = w; }}
+      onLayout={(e) => { containerWidthRef.current = e.nativeEvent.layout.width; }}
     >
       {presets.map((preset) => (
         <TouchableOpacity
