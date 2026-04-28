@@ -24406,6 +24406,57 @@ export const PRODUCT_CATALOG = [
     ],
   },
 
+  {
+    id: 'B0GTLL5J31',
+    asin: 'B0GTLL5J31',
+    name: 'Gaussen Oversized Chenille Lounge Accent Chair, Solid Wood Frame, High-Elastic Sponge Wide Backrest',
+    brand: 'Gaussen',
+    price: 139.99,
+    priceDisplay: '$139.99',
+    compareAtPrice: 139.99,
+    compareAtPriceDisplay: '$139.99',
+    imageUrl: 'https://m.media-amazon.com/images/I/81dzJ3B8KQL._AC_SL1500_.jpg',
+    images: [
+      'https://m.media-amazon.com/images/I/81dzJ3B8KQL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/51VM2+yRBrL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/416MNEuFOBL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/51hCGMa7TVL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/418Zoaj3j5L._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/51s0WqR8gSL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/41rlKEcaDML._AC_SL1500_.jpg',
+    ],
+    category: 'accent-chair',
+    roomType: ['living-room', 'bedroom', 'office'],
+    styles: ['modern', 'contemporary', 'minimalist', 'transitional', 'japandi'],
+    materials: ['chenille', 'wood'],
+    tags: [
+      'accent-chair', 'oversized', 'lounge-chair', 'arm-chair', 'reading-chair',
+      'chenille', 'wood-frame', 'solid-wood', 'high-elastic-sponge', 'wide-backrest',
+      'living-room', 'bedroom', 'apartment', 'waiting-room', 'office',
+      'modern', 'contemporary', 'minimalist', 'transitional', 'japandi',
+      'gaussen', 'vacuum-packed', 'easy-assembly', 'breathable',
+      'white', 'black', 'blue', 'green',
+    ],
+    source: 'amazon',
+    affiliateUrl: 'https://www.amazon.com/dp/B0GTLL5J31?tag=' + TAG,
+    rating: 5.0,
+    reviewCount: 1,
+    description: 'Gaussen oversized lounge accent chair upholstered in soft, breathable chenille over a solid wooden frame. Wide backrest with integrated armrests cradles your body for full relaxation. Thick high-elastic sponge cushions in seat and back (note: vacuum-packed sponge takes 24-72 hours to fully regain plush shape). Quick 20-minute assembly. Perfect for bedrooms, living rooms, apartments, and waiting areas.',
+    features: [
+      'Premium chenille upholstery — soft, breathable, skin-friendly texture',
+      'Thick high-elastic sponge in seat and backrest for superior support',
+      'Wide backrest + integrated armrests for full-body relaxation',
+      'Sturdy solid wood frame; quick 20-minute assembly with included tools',
+      'Vacuum-packed for shipping; sponge regains full plush shape in 24-72 hours',
+    ],
+    variants: [
+      { id: '1', label: 'White', asin: 'B0GTLL5J31', price: 139.99, swatchImage: 'https://m.media-amazon.com/images/I/51VM2+yRBrL._AC_SL300_.jpg', mainImage: 'https://m.media-amazon.com/images/I/81dzJ3B8KQL._AC_SL1500_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0GTLL5J31?tag=' + TAG },
+      { id: '2', label: 'Black', asin: 'B0GTLTBF5D', price: 139.99, swatchImage: 'https://m.media-amazon.com/images/I/51JbUNTadCL._AC_SL300_.jpg', mainImage: 'https://m.media-amazon.com/images/I/81Iy0CmIvKL._AC_SL1500_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0GTLTBF5D?tag=' + TAG },
+      { id: '3', label: 'Blue',  asin: 'B0GTLR8ZD6', price: 139.99, swatchImage: 'https://m.media-amazon.com/images/I/51oBQ2bNbZL._AC_SL300_.jpg', mainImage: 'https://m.media-amazon.com/images/I/81huuatRLRL._AC_SL1500_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0GTLR8ZD6?tag=' + TAG },
+      { id: '4', label: 'Green', asin: 'B0GTLTCB2R', price: 139.99, swatchImage: 'https://m.media-amazon.com/images/I/512uX47ILFL._AC_SL300_.jpg', mainImage: 'https://m.media-amazon.com/images/I/81PPhYBP1kL._AC_SL1500_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0GTLTCB2R?tag=' + TAG },
+    ],
+  },
+
 ];
 
 // ─── Enrichment status helper ────────────────────────────────────────────────
