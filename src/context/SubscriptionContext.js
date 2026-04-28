@@ -14,6 +14,21 @@ import {
 import { useAuth } from './AuthContext';
 import { validateReceipt, fetchQuota, fetchTokenBalance } from '../services/subscriptionService';
 import { supabase } from '../services/supabase';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+// ── Rating prompt (post-second-generation, no incentive) ────────────────────
+// No-strings-attached "if you like the app, leave us a review" prompt that
+// fires after the user's second room generation and exits the
+// RoomResultScreen. One-shot per user account; persisted via AsyncStorage so
+// it doesn't repeat across launches. The prompt itself is rendered globally
+// (RatingPromptHost in App.js) so it shows regardless of which screen the
+// user lands on after RoomResult.
+const RATING_PROMPT_SHOWN_KEY = '@homegenie_rating_prompt_shown';
+const ratingPromptShownKey    = (uid) => (uid ? `${RATING_PROMPT_SHOWN_KEY}_${uid}` : null);
+// The generation count at which we trigger the rating prompt. Kept as a
+// constant so we can adjust it (or expand to multiple milestones) without
+// hunting through the codebase.
+export const RATING_PROMPT_TRIGGER_GENERATION = 2;
 
 // ── Tier definitions (weekly billing, 10% discount on Pro + Premium) ─────────
 export const TIERS = {
@@ -80,6 +95,16 @@ export function SubscriptionProvider({ children }) {
   const [tokenBalance, setTokenBalance] = useState(0);
   const [tokenProducts, setTokenProducts] = useState([]);
 
+  // Post-second-generation rating prompt (no incentive). Persisted flag
+  // = "this account has already seen the prompt"; in-memory flag =
+  // "the prompt is currently visible." Separate so RoomResultScreen
+  // can schedule a trigger and the global host renders the modal.
+  // Important: NO incentive is tied to this prompt — Apple guideline
+  // 4.5.4 prohibits offering rewards/wishes/etc. in exchange for App
+  // Store reviews. This is a clean ask only.
+  const [ratingPromptShown, setRatingPromptShown] = useState(false);
+  const [shouldShowRatingPrompt, setShouldShowRatingPrompt] = useState(false);
+
   // Dev toggle — force-show paywall for UI iteration (off by default)
   const [devForcePaywall, setDevForcePaywall] = useState(false);
 
@@ -127,7 +152,32 @@ export function SubscriptionProvider({ children }) {
     // Actual user change (sign-out or account switch) — reset to defaults.
     setSubscription(DEFAULT_SUBSCRIPTION);
     setTokenBalance(0);
+    // Reset rating-prompt flag — the AsyncStorage hydration below
+    // repopulates it from the new user's keys.
+    setRatingPromptShown(false);
+    setShouldShowRatingPrompt(false);
   }, [user?.id, authLoading]);
+
+  // Hydrate the rating-prompt flag from AsyncStorage whenever the
+  // signed-in user changes. Per-user key keeps multiple accounts
+  // isolated on the same device. Best-effort: any read failure leaves
+  // the flag at default false (safe — at worst the user sees the
+  // prompt one extra time).
+  useEffect(() => {
+    const uid = user?.id;
+    if (!uid) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const ratingShownRaw = await AsyncStorage.getItem(ratingPromptShownKey(uid));
+        if (cancelled) return;
+        setRatingPromptShown(ratingShownRaw === 'true');
+      } catch (e) {
+        if (__DEV__) console.warn('[Subscription] rating-prompt hydrate failed:', e?.message);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [user?.id]);
 
   // ── Initialize IAP connection ────────────────────────────────────────────
   useEffect(() => {
@@ -729,6 +779,40 @@ export function SubscriptionProvider({ children }) {
     }
   }, [iapReady, user?.id]);
 
+  // ── Rating-prompt actions (post-second-generation) ──────────────────────
+  // triggerRatingPrompt(): RoomResultScreen calls this AFTER the user has
+  //   left the screen following their second generation (with a small
+  //   delay scheduled by RoomResultScreen). Flips the in-memory visible
+  //   flag so the global RatingPromptHost in App.js renders the modal.
+  //   Idempotent — guarded against re-triggering once it's been shown.
+  // dismissRatingPrompt(): hides the modal but doesn't persist. Used as
+  //   the immediate close path. The PERSISTENT "don't show again" mark
+  //   is markRatingPromptShown.
+  // markRatingPromptShown(): writes the persisted flag so the prompt
+  //   never auto-fires again on this account. Called by the host on
+  //   either user action (engage or dismiss) — the prompt is one-shot.
+  const triggerRatingPrompt = useCallback(() => {
+    if (ratingPromptShown) return;
+    setShouldShowRatingPrompt(true);
+  }, [ratingPromptShown]);
+
+  const dismissRatingPrompt = useCallback(() => {
+    setShouldShowRatingPrompt(false);
+  }, []);
+
+  const markRatingPromptShown = useCallback(async () => {
+    setRatingPromptShown(true);
+    setShouldShowRatingPrompt(false);
+    const uid = user?.id;
+    const shownKey = ratingPromptShownKey(uid);
+    if (!shownKey) return;
+    try {
+      await AsyncStorage.setItem(shownKey, 'true');
+    } catch (e) {
+      if (__DEV__) console.warn('[Subscription] markRatingPromptShown persist failed:', e?.message);
+    }
+  }, [user?.id]);
+
   // ── Dev-only: quota tracking uses local state only ────────────────────────
   // In dev mode, we skip refreshQuota() entirely so the DB can't overwrite
   // local counts. The local DEFAULT_SUBSCRIPTION starts at 0/5 and
@@ -798,9 +882,16 @@ export function SubscriptionProvider({ children }) {
         purchaseTokens,
         TOKEN_PACKAGES,
         WISH_PACKAGES,
+        // Rating prompt (post-second-generation, no incentive)
+        ratingPromptShown,
+        shouldShowRatingPrompt,
+        triggerRatingPrompt,
+        dismissRatingPrompt,
+        markRatingPromptShown,
         // Constants
         TIERS,
         PAID_TIERS,
+        RATING_PROMPT_TRIGGER_GENERATION,
       }}
     >
       {children}

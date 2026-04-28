@@ -83,6 +83,7 @@ import AllCollectionsScreen from './src/screens/AllCollectionsScreen';
 import PaywallScreen from './src/screens/PaywallScreen';
 import FollowListScreen from './src/screens/FollowListScreen';
 import ConsentModal from './src/components/ConsentModal';
+import RatingPromptHost from './src/components/RatingPromptHost';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -560,6 +561,11 @@ export default function App() {
                   <NavigationContainer>
                     <RootNavigator />
                     <ConsentModal />
+                    {/* Global host for the post-second-generation App
+                        Store rating prompt. Renders nothing until
+                        SubscriptionContext flips shouldShowRatingPrompt
+                        true (RoomResultScreen schedules that on blur). */}
+                    <RatingPromptHost />
                   </NavigationContainer>
                 </ErrorBoundary>
               </OnboardingProvider>

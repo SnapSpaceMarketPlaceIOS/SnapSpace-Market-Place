@@ -25,6 +25,7 @@ import { space, radius, shadow, typeScale, letterSpacing } from '../constants/to
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { useLiked } from '../context/LikedContext';
+import { useSubscription } from '../context/SubscriptionContext';
 import { getProductsForPrompt, getRecommendedProducts } from '../services/affiliateProducts';
 import { parseDesignPrompt } from '../utils/promptParser';
 import { saveUserDesign, updateDesignVisibility, updateDesignProducts } from '../services/supabase';
@@ -738,6 +739,12 @@ export default function RoomResultScreen({ route, navigation }) {
   const { addToCart, items } = useCart();
   const { user } = useAuth();
   const { liked } = useLiked();
+  const {
+    subscription,
+    ratingPromptShown,
+    triggerRatingPrompt,
+    RATING_PROMPT_TRIGGER_GENERATION,
+  } = useSubscription();
 
   const prompt = route?.params?.prompt || 'Modern minimalist redesign';
   const [resultUri, setResultUri] = useState(route?.params?.resultUri || null);
@@ -762,6 +769,53 @@ export default function RoomResultScreen({ route, navigation }) {
   const recentStyleIds = Array.isArray(route?.params?.recentStyleIds)
     ? route.params.recentStyleIds
     : [];
+
+  // True when the user arrived here from a fresh HomeScreen
+  // generation (vs. opening a saved design from MySpaces). The
+  // `styleId` route param is only attached on the fresh path, so it's
+  // a clean signal to gate prompts that should fire only after a real
+  // wish — like the post-second-generation rating prompt below.
+  const isFreshGeneration = !!styleId;
+
+  // ── Rating prompt arming (post-second-generation) ──────────────────────
+  // Fires AFTER the user leaves the screen following their N-th generation
+  // (currently N=2, configurable via RATING_PROMPT_TRIGGER_GENERATION).
+  // The modal itself is rendered globally by RatingPromptHost in App.js
+  // so it appears on top of whichever screen the user lands on. We just
+  // arm the trigger here, then schedule it via a navigation 'blur'
+  // listener.
+  //
+  // Why blur (not unmount): React Navigation keeps the previous screen
+  // mounted under the new one, so component-level unmount only fires when
+  // the screen is fully removed from the stack. Blur is the cleaner
+  // signal for "user has navigated away."
+  const ratingPromptArmedRef = useRef(false);
+  useEffect(() => {
+    if (
+      !ratingPromptShown &&
+      isFreshGeneration &&
+      subscription?.generationsUsed === RATING_PROMPT_TRIGGER_GENERATION
+    ) {
+      ratingPromptArmedRef.current = true;
+    }
+  }, [
+    ratingPromptShown,
+    isFreshGeneration,
+    subscription?.generationsUsed,
+    RATING_PROMPT_TRIGGER_GENERATION,
+  ]);
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('blur', () => {
+      if (!ratingPromptArmedRef.current) return;
+      ratingPromptArmedRef.current = false; // one-shot per arming
+      // Small delay so the navigation transition completes before the
+      // modal pops — feels like a beat of breath rather than an
+      // immediate interruption.
+      setTimeout(() => triggerRatingPrompt(), 1500);
+    });
+    return unsubscribe;
+  }, [navigation, triggerRatingPrompt]);
 
   // Post-to-Profile modal image aspect — fetched from the actual image so the
   // preview container fits landscape OR portrait output without black letterbox.

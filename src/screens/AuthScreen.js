@@ -19,7 +19,7 @@ import { useAuth } from '../context/AuthContext';
 import { useOnboarding } from '../context/OnboardingContext';
 import LensLoader from '../components/LensLoader';
 import CardImage from '../components/CardImage';
-import { applyReferralCode } from '../services/subscriptionService';
+import { redeemSignupCode } from '../services/subscriptionService';
 import { PRODUCT_CATALOG } from '../data/productCatalog';
 
 const { width: SCREEN_W } = Dimensions.get('window');
@@ -358,14 +358,51 @@ export default function AuthScreen({ navigation }) {
         // Enable onboarding for new accounts
         enableOnboarding();
 
-        // Apply referral code if provided (non-blocking — don't fail signup)
+        // Apply referral OR promo code if provided (non-blocking — don't
+        // fail signup). redeemSignupCode tries promo first, falls back to
+        // referral on INVALID_CODE so a single input field handles both.
+        // Save the redemption result so we can surface the wish-credit
+        // notice on the verify-email screen below.
+        let redeemResult = null;
         if (referralCode.trim()) {
           try {
             const userId = result.userId || result.user?.id;
-            if (userId) await applyReferralCode(userId, referralCode.trim());
+            if (userId) {
+              redeemResult = await redeemSignupCode(userId, referralCode.trim());
+            }
           } catch (e) {
-            console.warn('[Auth] referral code apply failed:', e.message);
+            console.warn('[Auth] signup code redeem failed:', e.message);
           }
+        }
+
+        // Tell the user what happened with their code BEFORE navigating.
+        // We use Alert so it lands on top of the verify-email screen and
+        // the user can't miss it. The wishes themselves credit on email
+        // verify (server-side trigger), so the message says "ready after
+        // you verify your email" — never promises wishes the server hasn't
+        // staged yet.
+        if (redeemResult?.matched === 'promo' && redeemResult.status === 'PENDING_VERIFY') {
+          Alert.alert(
+            `${redeemResult.wishesPending} Wishes Reserved`,
+            `Verify your email to unlock your ${redeemResult.wishesPending} bonus wishes — they'll be in your account the moment you confirm.`,
+          );
+        } else if (redeemResult?.status === 'ALREADY_REDEEMED') {
+          Alert.alert(
+            'Code Already Used',
+            'This code has already been redeemed on this account. Your account is set up and ready to go.',
+          );
+        } else if (redeemResult?.status === 'CODE_EXHAUSTED') {
+          Alert.alert(
+            'Code No Longer Available',
+            "That code has hit its redemption limit. Don't worry — your account is set up and you'll get your standard free wishes after verifying.",
+          );
+        } else if (redeemResult?.matched === 'none' && redeemResult?.status === 'INVALID_CODE') {
+          // Soft fail — code didn't match a promo OR a referral. Don't
+          // block the user; just let them know the code was ignored.
+          Alert.alert(
+            'Code Not Recognized',
+            "We couldn't find that code. Your account was created — verify your email to continue.",
+          );
         }
 
         if (result.needsEmailVerification) {
@@ -513,7 +550,7 @@ export default function AuthScreen({ navigation }) {
                   <Text style={styles.errorText}>{errors.confirmPassword}</Text>
                 )}
                 <MinimalInput
-                  placeholder="Referral Code (optional)"
+                  placeholder="Referral or Promo Code (optional)"
                   value={referralCode}
                   onChangeText={(text) => setReferralCode(text.toUpperCase())}
                   autoCapitalize="characters"
