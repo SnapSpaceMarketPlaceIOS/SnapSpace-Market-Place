@@ -260,17 +260,22 @@ export function SubscriptionProvider({ children }) {
     if (!iapReady) return;
 
     purchaseUpdateSub.current = purchaseUpdatedListener(async (purchase) => {
-      const jws = purchase?.transactionReceipt;
+      // Build 109 — CRITICAL FIX: expo-iap v3.x renamed the receipt field
+      // from `transactionReceipt` to `purchaseToken` (unified iOS JWS /
+      // Android purchase token). Reading the old field returned undefined,
+      // making the listener bail in Build 107 (silent) and surface a
+      // misleading error in Build 108. We try the new field first, then
+      // fall back to legacy names so this code survives a future v4 rename.
+      const jws =
+        purchase?.purchaseToken
+        || purchase?.jwsRepresentationIos
+        || purchase?.transactionReceipt;
 
-      // Build 108: surface every silent-bail path. Previously these returned
-      // without any signal — purchases were lost in the void with the
-      // call-site Alert promising "wishes added" anyway. Now we log loudly,
-      // and reject any pending promise so the call site can show a real
-      // error instead of an inaccurate success Alert.
       if (!jws) {
         console.warn(
-          '[Subscription] purchase listener fired without transactionReceipt — productId:',
-          purchase?.productId
+          '[Subscription] purchase listener fired without a receipt token — productId:',
+          purchase?.productId,
+          'keys:', purchase ? Object.keys(purchase).join(',') : 'null'
         );
         if (purchase?.productId) {
           const pending = pendingPurchases.current.get(purchase.productId);
@@ -440,7 +445,13 @@ export function SubscriptionProvider({ children }) {
     });
 
     purchaseErrorSub.current = purchaseErrorListener((error) => {
-      if (error.code !== 'E_USER_CANCELLED') {
+      // Build 109: expo-iap v3.x switched error codes to kebab-case
+      // ('user-cancelled') and dropped the legacy 'E_USER_CANCELLED'.
+      // Match both for resilience against any code path that still emits
+      // the old format (e.g. older expo-iap installs in dev).
+      const isUserCancel =
+        error.code === 'user-cancelled' || error.code === 'E_USER_CANCELLED';
+      if (!isUserCancel) {
         console.warn('[Subscription] purchase error:', error.code, error.message);
       }
       // Build 108: reject any pending purchase promises so the call site
@@ -765,12 +776,19 @@ export function SubscriptionProvider({ children }) {
       .filter(p => ALL_PRODUCT_IDS.includes(p.productId))
       .sort((a, b) => (b.transactionDate ?? 0) - (a.transactionDate ?? 0))[0];
 
-    if (!latest?.transactionReceipt || !user?.id) {
+    // Build 109: same field-rename as the listener — receipts now live on
+    // `purchaseToken`. Fall back to legacy names for resilience.
+    const latestJws =
+      latest?.purchaseToken
+      || latest?.jwsRepresentationIos
+      || latest?.transactionReceipt;
+
+    if (!latestJws || !user?.id) {
       return { success: true, restored: 0 };
     }
 
     try {
-      const result = await validateReceipt(latest.transactionReceipt, user.id);
+      const result = await validateReceipt(latestJws, user.id);
       setSubscription(prev => ({ ...prev, ...result }));
       return { success: true, restored: 1 };
     } catch (e) {

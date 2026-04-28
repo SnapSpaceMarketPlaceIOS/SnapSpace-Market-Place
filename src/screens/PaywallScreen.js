@@ -380,11 +380,13 @@ export default function PaywallScreen({ navigation }) {
         }
       }
     } catch (e) {
-      // Build 108: known-marker errors get specific, calmer copy. The
-      // listener already surfaced its own Alert for verification-pending,
-      // so we suppress the duplicate "Purchase Failed" generic. User cancel
-      // (E_USER_CANCELLED) shows nothing — they intentionally backed out.
-      if (e?.code === 'E_USER_CANCELLED') {
+      // Build 108/109: known-marker errors get specific, calmer copy.
+      // - User cancel: silent (they intentionally backed out). Match both
+      //   the new kebab-case code from expo-iap v3.x ('user-cancelled')
+      //   and the legacy 'E_USER_CANCELLED' for resilience.
+      // - Verification-pending: listener already showed its own Alert,
+      //   suppress this site so the user doesn't see two alerts.
+      if (e?.code === 'user-cancelled' || e?.code === 'E_USER_CANCELLED') {
         // Silent — user dismissed the StoreKit sheet on purpose.
       } else if (e?.code === 'PURCHASE_VERIFICATION_PENDING') {
         // The listener already showed "Purchase received... being verified".
