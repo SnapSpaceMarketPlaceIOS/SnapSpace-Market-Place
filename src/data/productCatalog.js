@@ -25014,6 +25014,56 @@ export const PRODUCT_CATALOG = [
     ],
   },
 
+  {
+    id: 'B0GLYRCF8B',
+    asin: 'B0GLYRCF8B',
+    name: 'HanStrong 33.89" Faux Travertine Square Coffee Table with Curved Layered Base, No Assembly Required (Beige)',
+    brand: 'HanStrong',
+    price: 289.99,
+    priceDisplay: '$289.99',
+    compareAtPrice: 289.99,
+    compareAtPriceDisplay: '$289.99',
+    imageUrl: 'https://m.media-amazon.com/images/I/91qcB8Mgz8L._AC_SL1500_.jpg',
+    images: [
+      'https://m.media-amazon.com/images/I/91qcB8Mgz8L._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/41ITOi7izXL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/31WtTPIpLUL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/41e3l6AgAzL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/41p7-32FJzL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/41U3uzejEuL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/41nWYwHACRL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/31pdnvX6EpL._AC_SL1500_.jpg',
+    ],
+    category: 'coffee-table',
+    roomType: ['living-room', 'bedroom', 'office'],
+    styles: ['contemporary', 'minimalist', 'japandi', 'wabi-sabi', 'modern', 'transitional'],
+    materials: ['wood', 'concrete'],
+    tags: [
+      'coffee-table', 'square-coffee-table', 'travertine', 'faux-travertine',
+      'stone-pattern', 'stone-texture', 'mdf', 'layered-base', 'curved-base',
+      'irregular', 'sculptural', 'beige', 'off-white', 'organic-texture',
+      'water-resistant', 'easy-clean', 'no-assembly', 'fully-assembled',
+      'living-room', 'bedroom', 'office', 'apartment',
+      'contemporary', 'minimalist', 'japandi', 'wabi-sabi', 'modern', 'transitional',
+      'hanstrong', '33-inch',
+    ],
+    source: 'amazon',
+    affiliateUrl: 'https://www.amazon.com/dp/B0GLYRCF8B?tag=' + TAG,
+    rating: 4.4,
+    reviewCount: 20,
+    description: 'HanStrong 33.89" square coffee table with a faux travertine veneer over MDF — luxurious natural-stone look at an accessible price. Eye-catching curved layered silhouette creates depth and a sculptural focal point. Soft off-white travertine tone elevates contemporary, minimalist, japandi, and wabi-sabi interiors. Water-resistant surface wipes clean. Ships fully assembled.',
+    features: [
+      'High-quality faux travertine veneer — luxurious natural stone look on MDF core',
+      'Curved layered base silhouette — sculptural with depth and modern artistry',
+      'Soft off-white organic texture suits contemporary, minimalist, japandi, wabi-sabi rooms',
+      'Water-resistant surface; daily stains wipe clean instantly',
+      'Zero assembly — unbox and place; instant focal point for any living space',
+    ],
+    variants: [
+      { id: '1', label: 'Beige', asin: 'B0GLYRCF8B', price: 289.99, swatchImage: 'https://m.media-amazon.com/images/I/41ITOi7izXL._AC_SL1500_.jpg', mainImage: 'https://m.media-amazon.com/images/I/91qcB8Mgz8L._AC_SL1500_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0GLYRCF8B?tag=' + TAG },
+    ],
+  },
+
 ];
 
 // ─── Enrichment status helper ────────────────────────────────────────────────
