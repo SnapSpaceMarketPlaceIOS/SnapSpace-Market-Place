@@ -24508,6 +24508,58 @@ export const PRODUCT_CATALOG = [
     ],
   },
 
+  {
+    id: 'B0FSPXKWYM',
+    asin: 'B0FSPXKWYM',
+    name: 'MALOL Mid-Century Modern PU Leather Accent Chair Set of 2 with Removable Cushions & Stitched Armrests',
+    brand: 'MALOL',
+    price: 289.99,
+    priceDisplay: '$289.99',
+    compareAtPrice: 289.99,
+    compareAtPriceDisplay: '$289.99',
+    imageUrl: 'https://m.media-amazon.com/images/I/81z8Shp3F4L._AC_SL1500_.jpg',
+    images: [
+      'https://m.media-amazon.com/images/I/81z8Shp3F4L._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/51n-ISxRohL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/41q0Twwx0qL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/51TL+LfS2xL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/51LJrR-CQfL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/51lV0gXInNL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/51rxzOv9vDL._AC_SL1500_.jpg',
+    ],
+    category: 'accent-chair',
+    roomType: ['living-room', 'bedroom', 'office'],
+    styles: ['mid-century', 'modern', 'contemporary', 'transitional', 'rustic', 'industrial'],
+    materials: ['leather', 'wood'],
+    tags: [
+      'accent-chair', 'arm-chair', 'set-of-2', 'mid-century', 'mid-century-modern',
+      'pu-leather', 'leather', 'solid-wood', 'wood-frame', 'plastic-legs',
+      'high-density-foam', 'removable-cushions', 'stitched-armrest', 't-shaped-stitch',
+      'living-room', 'bedroom', 'reading-nook', 'office',
+      'modern', 'contemporary', 'transitional', 'rustic', 'industrial',
+      'malol', 'waterproof', 'easy-clean', '300lb-capacity',
+      'chocolate-brown', 'beige', 'black', 'grey',
+    ],
+    source: 'amazon',
+    affiliateUrl: 'https://www.amazon.com/dp/B0FSPXKWYM?tag=' + TAG,
+    rating: 4.3,
+    reviewCount: 49,
+    description: 'MALOL mid-century modern PU leather accent chairs sold as a set of 2. Features T-shaped stitching on the backrest and mark-line detailing on padded armrests. Multilayered high-density foam cushions are removable for easy cleaning. Solid wood inner frame with strong plastic legs supports up to 300 lbs. PU leather is waterproof and wipes clean in seconds. Quick assembly with all tools included.',
+    features: [
+      'Set of 2 — mid-century PU leather accent chairs with T-shaped backrest stitching',
+      'Multilayered high-density foam cushions, removable covers for easy cleaning',
+      'Solid wood inner frame + strong plastic legs, 300 lb weight capacity',
+      'Waterproof, wear-resistant PU leather wipes clean in seconds',
+      'Hassle-free assembly with included tools and step-by-step instructions',
+    ],
+    variants: [
+      { id: '1', label: 'Chocolate Brown', asin: 'B0FSPXKWYM', price: 289.99, swatchImage: 'https://m.media-amazon.com/images/I/51n-ISxRohL._AC_SL300_.jpg', mainImage: 'https://m.media-amazon.com/images/I/81z8Shp3F4L._AC_SL1500_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FSPXKWYM?tag=' + TAG },
+      { id: '2', label: 'Beige',           asin: 'B0FSQ6MMJ5', price: 289.99, swatchImage: 'https://m.media-amazon.com/images/I/51CJ86KMsDL._AC_SL300_.jpg', mainImage: 'https://m.media-amazon.com/images/I/718Gnj8-ivL._AC_SL1500_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FSQ6MMJ5?tag=' + TAG },
+      { id: '3', label: 'Black',           asin: 'B0GRG2NWPV', price: 289.99, swatchImage: 'https://m.media-amazon.com/images/I/51FTUXS+OuL._AC_SL300_.jpg', mainImage: 'https://m.media-amazon.com/images/I/71HqSk-GDGL._AC_SL1500_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0GRG2NWPV?tag=' + TAG },
+      { id: '4', label: 'Grey',            asin: 'B0GRGD3D25', price: 289.99, swatchImage: 'https://m.media-amazon.com/images/I/51zTPZCP3nL._AC_SL300_.jpg', mainImage: 'https://m.media-amazon.com/images/I/7164h2LI5KL._AC_SL1500_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0GRGD3D25?tag=' + TAG },
+    ],
+  },
+
 ];
 
 // ─── Enrichment status helper ────────────────────────────────────────────────
