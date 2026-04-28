@@ -24242,6 +24242,57 @@ export const PRODUCT_CATALOG = [
     ],
   },
 
+  {
+    id: 'B0F9JBQ7YC',
+    asin: 'B0F9JBQ7YC',
+    name: 'JACH 104" L-Shape Modular Velvet Sectional Sofa with Reversible Chaise & Ottoman',
+    brand: 'JACH',
+    price: 929.99,
+    priceDisplay: '$929.99',
+    compareAtPrice: 929.99,
+    compareAtPriceDisplay: '$929.99',
+    imageUrl: 'https://m.media-amazon.com/images/I/41lBhShEPHL._AC_SL1500_.jpg',
+    images: [
+      'https://m.media-amazon.com/images/I/41lBhShEPHL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/21vgEAfp8cL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/4169DeHRLlL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/41ZQ-r3rC+L._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/41qd49HWWlL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/41caGS7fSZL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/51o-bvC8BVL._AC_SL1500_.jpg',
+    ],
+    category: 'sofa',
+    roomType: ['living-room'],
+    styles: ['glam', 'maximalist', 'art-deco', 'mid-century', 'modern', 'contemporary'],
+    materials: ['velvet', 'wood'],
+    tags: [
+      'sectional', 'l-shaped', 'modular', 'sofa', 'velvet', 'chaise', 'ottoman',
+      'reversible-chaise', '4-seat', 'tufted', 'tufted-rings', 'mid-century',
+      'glam', 'maximalist', 'art-deco', 'modern', 'minimalist', 'contemporary',
+      'living-room', 'apartment', 'jach', 'high-resilience-foam', 'serpentine-spring',
+      'pocket-spring', 'solid-wood-frame', '330lb-per-seat', '104-inch',
+      'orange', 'beige', 'green', 'black',
+    ],
+    source: 'amazon',
+    affiliateUrl: 'https://www.amazon.com/dp/B0F9JBQ7YC?tag=' + TAG,
+    rating: 4.3,
+    reviewCount: 30,
+    description: 'JACH 104" L-shape modular velvet sectional with a reversible chaise and ottoman that swaps to either side. Solid wood internal frame with serpentine pocket springs and high-resilience foam. Tufted ring detailing on each cushion adds a polished glam / art deco accent. Each seat supports 330 lbs. Quick 20-minute assembly. Standout statement piece for glam, maximalist, or art-deco living rooms.',
+    features: [
+      'Reversible chaise + free-combination modules — chaise swaps to either side',
+      'Velvet upholstery with tufted-ring cushion detailing — polished glam aesthetic',
+      'Solid wood internal frame + serpentine pocket springs + high-resilience foam',
+      '330 lb per seat capacity for confident daily use',
+      'Quick 20-minute partial assembly with simplified hooks-and-strings system',
+    ],
+    variants: [
+      { id: '1', label: 'Orange', asin: 'B0F9JBQ7YC', price: 929.99, swatchImage: 'https://m.media-amazon.com/images/I/21vgEAfp8cL._AC_SL300_.jpg', mainImage: 'https://m.media-amazon.com/images/I/41lBhShEPHL._AC_SL1500_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0F9JBQ7YC?tag=' + TAG },
+      { id: '2', label: 'Beige',  asin: 'B0CWH57N83', price: 929.99, swatchImage: 'https://m.media-amazon.com/images/I/21iw0KCi7CL._AC_SL300_.jpg', mainImage: 'https://m.media-amazon.com/images/I/415Op63F88L._AC_SL1500_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CWH57N83?tag=' + TAG },
+      { id: '3', label: 'Green',  asin: 'B0D49GCZ2F', price: 929.99, swatchImage: 'https://m.media-amazon.com/images/I/21bun172b8L._AC_SL300_.jpg', mainImage: 'https://m.media-amazon.com/images/I/41dlEkyBfkL._AC_SL1500_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0D49GCZ2F?tag=' + TAG },
+      { id: '4', label: 'Black',  asin: 'B0CBH7PWSS', price: 929.99, swatchImage: 'https://m.media-amazon.com/images/I/21Jw03nqGzL._AC_SL300_.jpg', mainImage: 'https://m.media-amazon.com/images/I/41j-2Rd-EEL._AC_SL1500_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CBH7PWSS?tag=' + TAG },
+    ],
+  },
+
 ];
 
 // ─── Enrichment status helper ────────────────────────────────────────────────
