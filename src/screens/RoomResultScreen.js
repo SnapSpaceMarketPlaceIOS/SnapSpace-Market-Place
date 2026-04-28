@@ -151,29 +151,14 @@ function PostIcon({ color = '#9CA3AF' }) {
   );
 }
 
-// Two-arrows-crossing remix glyph (Lucide-style "shuffle" — two arrows in
-// an X with arrowheads at top-right and bottom-right). Reads instantly as
-// "regenerate / re-roll" without needing a label. White fill on the brand-
-// blue FAB gradient.
-function RemixIcon({ color = '#FFFFFF', size = 22 }) {
+// Genie lamp glyph (white silhouette) — exact same path used by the input
+// bar's SendIcon on HomeScreen, so the Remix FAB visually rhymes with the
+// "generate" button the user already knows. Path data lifted verbatim from
+// HomeScreen.js#SendIcon to keep the two icons pixel-identical.
+function RemixIcon({ size = 18 }) {
   return (
-    <Svg
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke={color}
-      strokeWidth={2.2}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      {/* Top arrow: enters bottom-left, exits top-right with arrowhead */}
-      <Polyline points="16 3 21 3 21 8" />
-      <Line x1={4} y1={20} x2={21} y2={3} />
-      {/* Bottom arrow: enters top-left, exits bottom-right with arrowhead */}
-      <Polyline points="21 16 21 21 16 21" />
-      <Line x1={15} y1={15} x2={21} y2={21} />
-      <Line x1={4} y1={4} x2={9} y2={9} />
+    <Svg width={size} height={size} viewBox="92 176 266 155" fill="none">
+      <Path d="M326.155 194.661C306.203 193.551 286.596 223.576 265.287 232.582C259.954 218.661 247.863 208.794 233.603 206.723C231.53 206.386 230.008 204.515 230.02 202.32V201.347C230.044 200.249 230.428 199.189 231.123 198.353C233.699 195.023 234.837 190.732 234.262 186.491C233.675 182.25 231.945 180 228 180C223.945 180 221.632 183.609 221.596 188.674C221.56 192.191 222.71 195.622 224.819 198.353C225.49 199.201 225.862 200.262 225.886 201.347V202.32C225.934 204.441 224.52 206.287 222.53 206.723C206.748 209.006 193.77 220.794 189.432 236.748C178 232.457 167.143 226.669 157.138 219.497C130.008 200.91 117.852 197.824 106.271 197.234C106.271 197.234 104.761 197.234 101.739 199.004L97.5928 201.372V201.385C96.2007 201.953 95.6735 205.674 96.2008 206.672C96.7161 207.67 99.1384 208.944 100.229 209.031C114.118 209.518 127.527 211.489 138.924 219.771C164.952 237.721 180.062 295.913 228.116 295.913C275.031 295.913 295.993 209.304 326.155 209.304C346.886 209.304 342.714 254.499 330.898 264.778C319.082 275.069 307.291 264.503 296.637 264.503C283.719 264.503 284.33 277.476 291.281 278.287C292.862 278.524 294.468 278.05 295.69 276.99C296.925 275.93 297.668 274.37 297.74 272.711C304.33 277.464 312.024 280.283 320.029 280.845C338.699 280.845 354 250.642 354 228.464C353.964 218.248 349.175 195.896 326.155 194.661ZM262.64 247.836C251.579 251.878 239.943 253.936 228.21 253.923C216.502 253.923 204.878 251.877 193.818 247.873C190.93 246.888 189.324 243.67 190.235 240.639C202.326 245.591 215.196 248.123 228.186 248.11C241.176 248.098 254.058 245.566 266.161 240.639C266.593 242.111 266.449 243.682 265.754 245.042C265.059 246.389 263.885 247.399 262.471 247.836H262.64ZM272.322 318.425V318.961C258.158 324.387 243.154 327.106 228.054 326.994C212.955 327.144 197.964 324.462 183.774 319.061V318.524C184.302 316.204 185.704 314.196 187.669 312.973C189.634 311.751 191.995 311.414 194.212 312.038C201.378 314.532 209.275 312.088 213.972 305.925C215.099 304.341 215.974 302.582 216.561 300.711C220.3 301.522 224.098 301.921 227.921 301.921C231.732 301.909 235.519 301.397 239.198 300.374C240.552 305.152 243.763 309.119 248.053 311.339C252.343 313.547 257.316 313.809 261.798 312.038C264.003 311.414 266.364 311.763 268.317 312.986C270.282 314.208 271.673 316.204 272.2 318.524L272.322 318.425Z" fill="#FFFFFF" />
     </Svg>
   );
 }
@@ -899,6 +884,28 @@ export default function RoomResultScreen({ route, navigation }) {
     return unsub;
   }, [navigation]);
 
+  // Spring-scale press feedback for the FAB. Same speed/bounciness profile
+  // as AnimatedIconBtn elsewhere in this screen so the press behavior reads
+  // consistent across all the icon-style buttons. Uses native driver — pure
+  // transform, no JS-thread layout thrash.
+  const remixFabScale = useRef(new Animated.Value(1)).current;
+  const handleRemixPressIn = useCallback(() => {
+    Animated.spring(remixFabScale, {
+      toValue: 0.88,
+      useNativeDriver: true,
+      speed: 50,
+      bounciness: 4,
+    }).start();
+  }, [remixFabScale]);
+  const handleRemixPressOut = useCallback(() => {
+    Animated.spring(remixFabScale, {
+      toValue: 1,
+      useNativeDriver: true,
+      speed: 20,
+      bounciness: 10,
+    }).start();
+  }, [remixFabScale]);
+
   const handleRemix = useCallback(() => {
     if (!remixEnabled) return;
     if (remixInFlightRef.current) return;
@@ -1219,28 +1226,33 @@ export default function RoomResultScreen({ route, navigation }) {
           generation pipeline. Hidden when the route lacks the
           metadata needed to remix (legacy designs, single-product). */}
       {remixEnabled && (
-        <TouchableOpacity
-          activeOpacity={0.85}
+        <Pressable
           onPress={handleRemix}
-          style={s.remixFab}
+          onPressIn={handleRemixPressIn}
+          onPressOut={handleRemixPressOut}
           accessibilityLabel="Remix this room with a different style"
           accessibilityRole="button"
           accessibilityHint="Generates a new room using one of your remaining wishes"
           hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+          style={s.remixFab}
         >
-          <LinearGradient
-            // bluePrimary → blueDeep gives a subtle but visible top-left to
-            // bottom-right ramp. heroStart/heroEnd are both blueDeep in this
-            // codebase so they'd render flat — these two are the actual
-            // brand-blue endpoints.
-            colors={[colors.bluePrimary, colors.blueDeep]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={s.remixFabBg}
+          <Animated.View
+            style={[s.remixFabInner, { transform: [{ scale: remixFabScale }] }]}
           >
-            <RemixIcon color="#FFFFFF" size={22} />
-          </LinearGradient>
-        </TouchableOpacity>
+            <LinearGradient
+              // bluePrimary → blueDeep gives a subtle but visible top-left to
+              // bottom-right ramp. heroStart/heroEnd are both blueDeep in this
+              // codebase so they'd render flat — these two are the actual
+              // brand-blue endpoints.
+              colors={[colors.bluePrimary, colors.blueDeep]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={s.remixFabBg}
+            >
+              <RemixIcon size={20} />
+            </LinearGradient>
+          </Animated.View>
+        </Pressable>
       )}
 
       {/* ── Sticky Bottom Bar ──────────────────────────────────────── */}
@@ -1662,32 +1674,41 @@ const s = StyleSheet.create({
     elevation: 4,
   },
 
-  // ── Remix FAB (Build 99) ──────────────────────────────────────────────
+  // ── Remix FAB (Build 99 → Build 100) ─────────────────────────────────
   // Anchored bottom-right, sits ABOVE the sticky bottomBar. The
   // bottomBar measures: 56pt pill + 12pt paddingTop + 34pt paddingBottom
-  // = 102pt. We add 16pt breathing room so the FAB doesn't kiss the bar's
-  // top edge. right uses screen padding (20pt) so the FAB lines up with
-  // the rest of the layout's right gutter.
+  // = 102pt. 18pt breathing room above the bar — slightly more generous
+  // than Build 99 (16pt) since the FAB itself is smaller now.
+  // Build 100: shrunk 56→48 per design feedback ("a little bit smaller").
   remixFab: {
     position: 'absolute',
-    bottom: 102 + 16,
+    bottom: 102 + 18,
     right: space.lg,
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    // Shadow lives on the outer Touchable so the gradient (which clips
-    // to the rounded shape) doesn't try to render its own shadow.
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    // Shadow on the Pressable wrapper. Inner (Animated.View + gradient)
+    // does the scale animation; the shadow stays static so the press
+    // doesn't make the shadow pulse along with the button — that reads
+    // as "wobble" instead of crisp tap feedback.
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.18,
     shadowRadius: 14,
     elevation: 8,
   },
+  // Inner wrapper — receives the spring-scale transform so the gradient
+  // shrinks/snaps without dragging the shadow with it.
+  remixFabInner: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 24,
+  },
   remixFabBg: {
     flex: 1,
     width: '100%',
     height: '100%',
-    borderRadius: 28,
+    borderRadius: 24,
     alignItems: 'center',
     justifyContent: 'center',
   },
