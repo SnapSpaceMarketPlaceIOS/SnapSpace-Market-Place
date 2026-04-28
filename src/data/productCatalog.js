@@ -25809,6 +25809,57 @@ export const PRODUCT_CATALOG = [
     ],
   },
 
+  {
+    id: 'B0BX93XRN1',
+    asin: 'B0BX93XRN1',
+    name: 'Sdorens 103" Modern Chenille 3-Seat Sectional Sofa with Modular Free-Combination Design',
+    brand: 'Sdorens',
+    price: 699.95,
+    priceDisplay: '$699.95',
+    compareAtPrice: 699.95,
+    compareAtPriceDisplay: '$699.95',
+    imageUrl: 'https://m.media-amazon.com/images/I/41wt1Zeoe2L._AC_SL1500_.jpg',
+    images: [
+      'https://m.media-amazon.com/images/I/41wt1Zeoe2L._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/31yQK7vwQjL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/41tE6sZKMHL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/415mvG15yKL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/511DJqs61FL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/51nL5X7Ov8L._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/61PedmvX6FL._AC_SL1500_.jpg',
+    ],
+    category: 'sofa',
+    roomType: ['living-room'],
+    styles: ['modern', 'contemporary', 'mid-century', 'transitional', 'minimalist', 'maximalist'],
+    materials: ['chenille'],
+    tags: [
+      'sofa', 'sectional', '3-seat', 'modular', 'free-combination',
+      'chenille', 'soft-fabric', 'overstuffed', 'high-resilience-foam',
+      'living-room', 'apartment', 'office',
+      'modern', 'contemporary', 'mid-century', 'transitional', 'minimalist', 'maximalist',
+      'sdorens', '103-inch', 'three-seater',
+      'red', 'beige', 'green', 'black',
+    ],
+    source: 'amazon',
+    affiliateUrl: 'https://www.amazon.com/dp/B0BX93XRN1?tag=' + TAG,
+    rating: 4.9,
+    reviewCount: 13,
+    description: 'Sdorens 103" modern modular sectional sofa — 3-seat configuration with free-combination modules that rearrange to fit any layout. Soft skin-friendly chenille fabric over high-resilience foam and polyester fiber wadding for overstuffed pillow-like comfort. Easy partial assembly with included tools. Available in 4 colors (Red landing, Black, Green, Beige) plus larger 130" 4-Seat / U-Shape and smaller 77" 2-Seat companion sizes.',
+    features: [
+      'Modular free-combination design — rearrange modules to suit any room layout',
+      'Soft chenille upholstery with overstuffed pillow-like cushion comfort',
+      'High-resilience foam + polyester fiber wadding regains shape after each use',
+      '103.9"L × 38.58"W × 25.2"H — generous 3-seat sofa for living rooms or apartments',
+      'Partial assembly with included tools and easy-to-follow instructions',
+    ],
+    variants: [
+      { id: '1', label: 'Red (103" 3-Seat)',   asin: 'B0BX93XRN1', price: 699.95, swatchImage: 'https://m.media-amazon.com/images/I/31yQK7vwQjL._AC_SL300_.jpg', mainImage: 'https://m.media-amazon.com/images/I/41wt1Zeoe2L._AC_SL1500_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0BX93XRN1?tag=' + TAG },
+      { id: '2', label: 'Black (103" 3-Seat)', asin: 'B0CB8TVDDS', price: 699.95, swatchImage: 'https://m.media-amazon.com/images/I/41Y7SXw9CBL._AC_SL300_.jpg', mainImage: 'https://m.media-amazon.com/images/I/81Sjetr9iEL._AC_SL1500_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CB8TVDDS?tag=' + TAG },
+      { id: '3', label: 'Green (103" 3-Seat)', asin: 'B0CS9BT4FM', price: 699.95, swatchImage: 'https://m.media-amazon.com/images/I/41hL9c6nQLL._AC_SL300_.jpg', mainImage: 'https://m.media-amazon.com/images/I/81YLwdspjfL._AC_SL1500_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CS9BT4FM?tag=' + TAG },
+      { id: '4', label: 'Beige (103" 3-Seat)', asin: 'B0BX96XFFY', price: 699.95, swatchImage: 'https://m.media-amazon.com/images/I/214Np83CroL._AC_SL300_.jpg', mainImage: 'https://m.media-amazon.com/images/I/31PF+3H3AqL._AC_SL1500_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0BX96XFFY?tag=' + TAG },
+    ],
+  },
+
 ];
 
 // ─── Enrichment status helper ────────────────────────────────────────────────
