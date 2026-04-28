@@ -25292,6 +25292,58 @@ export const PRODUCT_CATALOG = [
     ],
   },
 
+  {
+    id: 'B0G3B28RJF',
+    asin: 'B0G3B28RJF',
+    name: 'Sand & Stone Home Harbor Oak 46" Oval Coffee Table with Handwoven Seagrass Accents and Lower Shelf',
+    brand: 'Sand & Stone Home',
+    price: 299.99,
+    priceDisplay: '$299.99',
+    compareAtPrice: 299.99,
+    compareAtPriceDisplay: '$299.99',
+    imageUrl: 'https://m.media-amazon.com/images/I/81p10Iuq6NL._AC_SL1500_.jpg',
+    images: [
+      'https://m.media-amazon.com/images/I/81p10Iuq6NL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/511cPDfzBZL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/41riv56p1cL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/51H8Pt4RktL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/51GvWZ-9tuL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/51+t-mEBfPL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/311WRvG0yTL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/417zyh4eUZL._AC_SL1500_.jpg',
+    ],
+    category: 'coffee-table',
+    roomType: ['living-room', 'bedroom', 'office'],
+    styles: ['coastal', 'farmhouse', 'bohemian', 'rustic', 'transitional', 'mediterranean'],
+    materials: ['wood', 'wicker', 'rattan'],
+    tags: [
+      'coffee-table', 'cocktail-table', 'oval-coffee-table', 'lower-shelf',
+      'oak', 'white-oak', 'oak-veneer', 'malaysian-oak', 'solid-wood',
+      'seagrass', 'handwoven', 'wicker', 'rattan', 'natural-fiber',
+      'coastal', 'coastal-farmhouse', 'beach-house', 'boho', 'bohemian',
+      'farmhouse', 'rustic', 'mediterranean', 'transitional', 'modern-boho',
+      'living-room', 'beach-cottage', 'coastal-cottage',
+      'sand-stone-home', 'harbor-oak', 'levelers', '46-inch',
+      'natural-oak', 'smoked-oak', 'natural-finish',
+    ],
+    source: 'amazon',
+    affiliateUrl: 'https://www.amazon.com/dp/B0G3B28RJF?tag=' + TAG,
+    rating: 5.0,
+    reviewCount: 1,
+    description: 'Sand & Stone Home Harbor Oak 46" oval coastal coffee table — solid Malaysian oak frame with white oak veneer top, handwoven seagrass accents on the lower shelf, and adjustable feet levelers. The seagrass texture brings warm coastal character; the oak finish suits coastal cottage, farmhouse, beach house, and modern boho interiors. Available in Natural Oak or Smoked Oak.',
+    features: [
+      'Handwoven seagrass accents bring coastal texture and beachy warmth',
+      'Solid Malaysian oak frame + white oak veneer top — durable rustic charm',
+      'Wide oval tabletop with lower shelf — generous storage and surface area',
+      'Adjustable feet levelers ensure stability on uneven floors',
+      'Two finish options: Natural Oak (landing) or Smoked Oak — both coastal-friendly',
+    ],
+    variants: [
+      { id: '1', label: 'Natural Oak', asin: 'B0G3B28RJF', price: 299.99, swatchImage: 'https://m.media-amazon.com/images/I/511cPDfzBZL._AC_SL300_.jpg', mainImage: 'https://m.media-amazon.com/images/I/81p10Iuq6NL._AC_SL1500_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0G3B28RJF?tag=' + TAG },
+      { id: '2', label: 'Smoked Oak',  asin: 'B0G3CQ3GQY', price: 299.99, swatchImage: 'https://m.media-amazon.com/images/I/515JwFZOztL._AC_SL300_.jpg', mainImage: 'https://m.media-amazon.com/images/I/81SobJVfANL._AC_SL1500_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0G3CQ3GQY?tag=' + TAG },
+    ],
+  },
+
 ];
 
 // ─── Enrichment status helper ────────────────────────────────────────────────
