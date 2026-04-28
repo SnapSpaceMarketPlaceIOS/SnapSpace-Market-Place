@@ -434,37 +434,25 @@ export default function CartScreen({ navigation }) {
   }, [checkingOut, total, items, subtotal, shipping]);
 
   // ── Empty state ───────────────────────────────────────────────────────────────
-  // Build 108: elevated empty-state polish. Soft pastel circle behind the icon
-  // gives the moment "weight" instead of feeling like a placeholder. Two CTAs
-  // — primary path back to Home (where the user can generate a room) and a
-  // ghost secondary to Explore (lighter discovery path). Premium feel, no
-  // dead-ends.
+  // INTENTIONAL UI — keep this version (single icon, single CTA, short copy).
+  // User confirmed 2026-04-28 they prefer this over the Build 108 variant
+  // (commit ff66ede on goldberg) which added a pastel-circle background, a
+  // longer subtitle, and a second "Generate a room" CTA. If the shipping
+  // session encounters a merge conflict here against ff66ede's version,
+  // KEEP THIS VERSION. Do not auto-resolve toward the build-108 design.
   if (items.length === 0) {
     return (
       <View style={styles.emptyContainer}>
-        <View style={styles.emptyIconCircle}>
-          <ShoppingBagIcon />
-        </View>
+        <ShoppingBagIcon />
         <Text style={styles.emptyTitle}>Your cart is empty</Text>
         <Text style={styles.emptySubtitle}>
-          Generate a room with the genie or browse curated picks — every item you
-          tap lands here, ready when you are.
+          Generate a room wish and discover furniture that matches your style.
         </Text>
         <TouchableOpacity
           style={styles.emptyBtn}
-          onPress={() => { hapticTap(); navigation?.navigate('Home'); }}
-          accessibilityRole="button"
-          accessibilityLabel="Generate a room"
+          onPress={() => navigation?.navigate('Explore')}
         >
-          <Text style={styles.emptyBtnText}>Generate a room</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.emptyBtnSecondary}
-          onPress={() => { hapticTap(); navigation?.navigate('Explore'); }}
-          accessibilityRole="button"
-          accessibilityLabel="Browse the Explore feed"
-        >
-          <Text style={styles.emptyBtnSecondaryText}>Browse Explore</Text>
+          <Text style={styles.emptyBtnText}>Start exploring</Text>
         </TouchableOpacity>
       </View>
     );
@@ -1003,18 +991,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: SP[8],       // 32px
   },
-  // Build 108: soft pastel disc behind the icon. The circle isn't decorative —
-  // it gives the empty state visual weight so it reads as intentional design,
-  // not "we forgot to load." The blue tint ties to brand palette without
-  // being loud.
-  emptyIconCircle: {
-    width: 128,
-    height: 128,
-    borderRadius: 64,
-    backgroundColor: 'rgba(11, 109, 195, 0.06)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   emptyTitle: {
     ...typeScale.title,
     fontFamily: 'Geist_700Bold',
@@ -1027,9 +1003,8 @@ const styles = StyleSheet.create({
     fontFamily: 'Geist_400Regular',
     color: C.textSecondary,
     textAlign: 'center',
-    maxWidth: 280,
+    maxWidth: 260,
     marginBottom: SP[6],
-    lineHeight: 22,
   },
   emptyBtn: {
     backgroundColor: C.primary,
@@ -1047,17 +1022,5 @@ const styles = StyleSheet.create({
     ...typeScale.button,
     fontFamily: 'Geist_600SemiBold',
     color: C.white,
-  },
-  // Build 108: ghost secondary CTA — lower-emphasis path to Explore.
-  emptyBtnSecondary: {
-    paddingHorizontal: SP[8],
-    height: 44,
-    justifyContent: 'center',
-    marginTop: SP[3],
-  },
-  emptyBtnSecondaryText: {
-    ...typeScale.button,
-    fontFamily: 'Geist_500Medium',
-    color: C.textSecondary,
   },
 });
