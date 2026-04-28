@@ -488,11 +488,6 @@ export default function ShopTheLookScreen({ route, navigation }) {
           </View>
         )}
 
-        {/* Build 107: FTC + Amazon Associate Operating Agreement disclosure */}
-        <Text style={s.ftcDisclosure}>
-          As an Amazon Associate, HomeGenie earns from qualifying purchases.
-        </Text>
-
         <View style={{ height: 120 }} />
       </ScrollView>
 
@@ -711,15 +706,6 @@ const s = StyleSheet.create({
   tagsSection: {
     paddingHorizontal: space.lg,
     marginTop: space.base,
-  },
-  // Build 107: FTC + Amazon Associate disclosure
-  ftcDisclosure: {
-    ...typeScale.caption,
-    color: C.textTertiary,
-    fontStyle: 'italic',
-    textAlign: 'center',
-    marginTop: space.xl,
-    marginHorizontal: space.lg,
   },
   tagsWrap: {
     flexDirection: 'row',

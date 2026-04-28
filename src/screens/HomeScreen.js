@@ -46,6 +46,7 @@ import { loadProductHistory, appendPicksToHistory } from '../services/productHis
 import { parseDesignPrompt } from '../utils/promptParser';
 import { buildFinalPrompt, generateWithProductPanel, generateWithProductRefs, generateSingleProductInRoom, pickAspectRatio } from '../services/aiProvider';
 import { expandPrompt } from '../services/promptExpander';
+import { hapticMedium, hapticSuccess, hapticError } from '../utils/haptics';
 import { createProductPanel } from '../utils/createProductPanel';
 import { withTimeout } from '../utils/withTimeout';
 import { readFileExifOrientation, readFileExif, getLastFileExifError } from '../utils/imageOptimizer';
@@ -1537,6 +1538,10 @@ export default function HomeScreen({ navigation, route }) {
       loadingAnim.current = null;
     }
     if (success) {
+      // Build 108: success haptic fires here so the user feels confirmation
+      // even before the climax animation peaks. Lands ~250ms before the
+      // navigation to RoomResult — a tactile "your room is ready" cue.
+      hapticSuccess();
       // Snap to 100% quickly
       Animated.timing(loadingProgress, {
         toValue: 1,
@@ -1548,6 +1553,11 @@ export default function HomeScreen({ navigation, route }) {
         setTimeout(() => loadingProgress.setValue(0), 400);
       });
     } else {
+      // Build 108: error haptic on every failed-generation exit path. Single
+      // central wire-in covers all 6+ stopLoadingBar(false) call sites
+      // (fetch error, timeout, foreground-recovery, etc.) without needing
+      // to touch each one.
+      hapticError();
       loadingProgress.setValue(0);
     }
   }, [loadingProgress]);
@@ -2061,6 +2071,9 @@ export default function HomeScreen({ navigation, route }) {
     setLoadingMessages(msgs);
     setLoadingMsgIndex(0);
     loadingMsgOpacity.setValue(1);
+    // Build 108: medium-impact haptic at gen start. Tactile "the magic is
+    // starting" cue — fires the moment GenieLoader takes over the screen.
+    hapticMedium();
     setGenerating(true);
     startLoadingBar();
 

@@ -1,6 +1,8 @@
 import React, { useRef, useCallback, useEffect } from 'react';
 import { View, Text, StyleSheet, Animated, Pressable, LogBox } from 'react-native';
 import { lockPortrait } from './src/utils/orientation';
+import { hapticTap, hapticSelect } from './src/utils/haptics';
+import ErrorBoundary from './src/components/ErrorBoundary';
 import { useFonts } from 'expo-font';
 
 // Silence known-harmless dev-mode warnings that LogBox promotes to red
@@ -203,6 +205,11 @@ function AnimatedTabButton({ children, onPress, style, accessibilityState, ...re
   }, [isFocused]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handlePressIn = useCallback(() => {
+    // Build 108: subtle selection-style haptic on tab press-in. Selection
+    // feels right (vs impact) because it matches what's happening — the
+    // user is moving their selected tab — and is the lightest tactile
+    // signal expo-haptics offers.
+    hapticSelect();
     Animated.spring(scale, {
       toValue: 0.95,
       useNativeDriver: true,
@@ -544,10 +551,17 @@ export default function App() {
           <LikedProvider>
             <SharedProvider>
               <OnboardingProvider>
-                <NavigationContainer>
-                  <RootNavigator />
-                  <ConsentModal />
-                </NavigationContainer>
+                {/* Build 108: ErrorBoundary wraps the navigation tree so any
+                    uncaught exception in a screen render shows a friendly
+                    "Try again" fallback instead of a frozen white screen.
+                    Sits inside the providers so retry preserves auth/cart
+                    state — only the navigation stack remounts. */}
+                <ErrorBoundary>
+                  <NavigationContainer>
+                    <RootNavigator />
+                    <ConsentModal />
+                  </NavigationContainer>
+                </ErrorBoundary>
               </OnboardingProvider>
             </SharedProvider>
           </LikedProvider>

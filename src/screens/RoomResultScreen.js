@@ -33,6 +33,7 @@ import * as ImageManipulator from 'expo-image-manipulator';
 import { LinearGradient } from 'expo-linear-gradient';
 import { STYLE_PRESETS, pickPromptVariation } from '../data/stylePresets';
 import { pickRemixStyle, appendStyleHistory } from '../utils/pickRemixStyle';
+import { hapticMedium } from '../utils/haptics';
 
 const { width } = Dimensions.get('window');
 const IMG_RADIUS = Math.round((width - space.lg * 2) * 0.025);
@@ -918,6 +919,10 @@ export default function RoomResultScreen({ route, navigation }) {
     if (!remixEnabled) return;
     if (remixInFlightRef.current) return;
     remixInFlightRef.current = true;
+    // Build 108: medium-impact haptic — Remix is the second-most-tactile
+    // action in the app. The genie-lamp tap should feel like flicking a
+    // switch.
+    hapticMedium();
 
     // Pick a style different from current + last 3 the user just saw.
     const next = pickRemixStyle(STYLE_PRESETS, styleId, recentStyleIds, 3);
@@ -1230,16 +1235,6 @@ export default function RoomResultScreen({ route, navigation }) {
           </>
         )}
 
-        {/* ── Build 107: FTC + Amazon Associate Operating Agreement
-              required disclosure. Must be visible on any screen showing
-              affiliate-tagged Amazon products. The exact wording below is
-              the Amazon-recommended canonical phrasing. */}
-        {(products.length > 0 || recommended.length > 0) && (
-          <Text style={s.ftcDisclosure}>
-            As an Amazon Associate, HomeGenie earns from qualifying purchases.
-          </Text>
-        )}
-
         <View style={{ height: 120 }} />
       </ScrollView>
 
@@ -1497,16 +1492,6 @@ const s = StyleSheet.create({
   tagsSection: {
     paddingHorizontal: space.lg,
     marginTop: space.base,
-  },
-  // Build 107: FTC + Amazon Associate disclosure styling. Subtle italic
-  // tertiary text — present and legible but not visually distracting.
-  ftcDisclosure: {
-    ...typeScale.caption,
-    color: C.textTertiary,
-    fontStyle: 'italic',
-    textAlign: 'center',
-    marginTop: space.xl,
-    marginHorizontal: space.lg,
   },
   tagsWrap: {
     flexDirection: 'row',

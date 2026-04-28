@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect, useCallback, use
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useAuth } from './AuthContext';
 import { toggleLike as toggleLikeRPC, getUserLikedIds } from '../services/supabase';
+import { hapticTap } from '../utils/haptics';
 
 const LikedContext = createContext(null);
 const STORAGE_KEY = '@snapspace_liked';
@@ -45,6 +46,7 @@ export function LikedProvider({ children }) {
   // Toggle a product like — stores full product object for display in Liked tab
   const toggleLikedProduct = useCallback((product) => {
     if (!product?.id) return;
+    hapticTap();
     setLikedProducts(prev => {
       const next = { ...prev };
       if (next[product.id]) {
@@ -106,6 +108,8 @@ export function LikedProvider({ children }) {
     const rawId = typeof designId === 'string' && designId.startsWith('user-')
       ? designId.replace('user-', '')
       : designId;
+
+    hapticTap();
 
     // Optimistic update
     const wasLiked = !!liked[rawId];

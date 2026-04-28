@@ -17,6 +17,7 @@ import { useLiked } from '../context/LikedContext';
 import { useAuth } from '../context/AuthContext';
 import { DESIGNS } from '../data/designs';
 import { getUserLikedDesigns } from '../services/supabase';
+import { hapticTap } from '../utils/haptics';
 
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = (width - 3) / 3;
@@ -107,19 +108,37 @@ export default function LikedScreen({ navigation }) {
       </SafeAreaView>
 
       {likedItems.length === 0 ? (
-        /* Empty state */
+        /* Build 108: elevated empty state — soft pink disc backing the heart
+           gives the moment color + intent. Two CTAs match Cart pattern: primary
+           "Generate a room" sends users to Home where the genie creates designs
+           they'll want to save; secondary "Browse Explore" supports passive
+           discovery. */
         <View style={styles.emptyState}>
-          <EmptyHeartIcon />
-          <Text style={styles.emptyTitle}>No liked designs yet</Text>
+          <View style={styles.emptyIconCircle}>
+            <EmptyHeartIcon />
+          </View>
+          <Text style={styles.emptyTitle}>Save designs you love</Text>
           <Text style={styles.emptySubtitle}>
-            Tap the heart on any design to save it here
+            Tap the heart on any room you like — it lands here, ready for when
+            you're back to shop the look or remix it.
           </Text>
           <TouchableOpacity
             style={styles.browseBtn}
-            onPress={() => navigation.navigate('Main', { screen: 'Explore' })}
+            onPress={() => { hapticTap(); navigation.navigate('Main', { screen: 'Home' }); }}
             activeOpacity={0.8}
+            accessibilityRole="button"
+            accessibilityLabel="Generate a room"
           >
-            <Text style={styles.browseBtnText}>Browse Designs</Text>
+            <Text style={styles.browseBtnText}>Generate a room</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.browseBtnSecondary}
+            onPress={() => { hapticTap(); navigation.navigate('Main', { screen: 'Explore' }); }}
+            activeOpacity={0.8}
+            accessibilityRole="button"
+            accessibilityLabel="Browse the Explore feed"
+          >
+            <Text style={styles.browseBtnSecondaryText}>Browse Explore</Text>
           </TouchableOpacity>
         </View>
       ) : (
@@ -284,6 +303,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 40,
     gap: 12,
   },
+  // Build 108: soft pink disc behind the heart icon — color picks up on
+  // emotional intent ("things you love") without veering saccharine.
+  emptyIconCircle: {
+    width: 128,
+    height: 128,
+    borderRadius: 64,
+    backgroundColor: 'rgba(239, 68, 68, 0.06)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   emptyTitle: {
     ...typeScale.title,
     fontFamily: 'Geist_700Bold',
@@ -295,6 +324,8 @@ const styles = StyleSheet.create({
     fontFamily: 'Geist_400Regular',
     color: C.textSecondary,
     textAlign: 'center',
+    maxWidth: 300,
+    lineHeight: 22,
   },
   browseBtn: {
     marginTop: 8,
@@ -310,5 +341,17 @@ const styles = StyleSheet.create({
     ...typeScale.button,
     fontFamily: 'Geist_600SemiBold',
     color: C.white,
+  },
+  // Build 108: ghost secondary CTA matching Cart empty-state pattern.
+  browseBtnSecondary: {
+    paddingHorizontal: 28,
+    height: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  browseBtnSecondaryText: {
+    ...typeScale.button,
+    fontFamily: 'Geist_500Medium',
+    color: C.textSecondary,
   },
 });

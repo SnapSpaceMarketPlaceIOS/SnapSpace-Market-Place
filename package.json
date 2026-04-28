@@ -31,6 +31,7 @@
     "expo-device": "~55.0.15",
     "expo-file-system": "~55.0.10",
     "expo-font": "~55.0.4",
+    "expo-haptics": "~55.0.14",
     "expo-iap": "^3.4.13",
     "expo-image-manipulator": "~55.0.15",
     "expo-image-picker": "~55.0.18",

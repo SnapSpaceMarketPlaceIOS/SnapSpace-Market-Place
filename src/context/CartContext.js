@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useMemo, useEffect, useRef 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { PRODUCT_CATALOG } from '../data/productCatalog';
 import { useAuth } from './AuthContext';
+import { hapticMedium } from '../utils/haptics';
 
 const CartContext = createContext();
 const STORAGE_KEY = '@snapspace_cart';
@@ -85,6 +86,11 @@ export function CartProvider({ children }) {
     // no-op rather than crash — the modal already guards its press handler,
     // so reaching here with no product means a programmer error downstream.
     if (!product || !product.name) return;
+    // Build 108: medium-impact haptic on every add-to-cart. This is one of
+    // the highest-value tactile moments in the app — users who feel the
+    // confirmation "thump" trust the action landed without watching the
+    // cart badge. Wired at the context level so every caller benefits.
+    hapticMedium();
     setItems((prev) => {
       const key = `${product.name}__${product.brand}`;
       const existing = prev.find((item) => item.key === key);

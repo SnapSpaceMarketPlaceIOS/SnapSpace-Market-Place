@@ -31,6 +31,7 @@ import AutoImage from '../components/AutoImage';
 import LensLoader from '../components/LensLoader';
 import { useAuth } from '../context/AuthContext';
 import { getUserDesigns, deleteUserDesign } from '../services/supabase';
+import { hapticTap } from '../utils/haptics';
 import { colors } from '../constants/colors';
 import { colors as C } from '../constants/theme';
 
@@ -279,11 +280,32 @@ export default function MySpacesScreen({ navigation }) {
           <LensLoader size={48} />
         </View>
       ) : designs.length === 0 ? (
+        /* Build 108: elevated empty state — soft blue disc with sparkle icon
+           pairs with the genie/magic motif. Single primary CTA back to Home
+           because the only way to populate this screen is to generate a
+           design — no need for a secondary path. */
         <View style={s.center}>
-          <Text style={s.emptyTitle}>No wishes yet</Text>
+          <View style={s.emptyIconCircle}>
+            <Svg width={48} height={48} viewBox="0 0 24 24" fill="none" stroke="#0B6DC3" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round">
+              <Path d="M12 3l1.6 4.4L18 9l-4.4 1.6L12 15l-1.6-4.4L6 9l4.4-1.6L12 3z" />
+              <Path d="M19 14l.7 1.9L21.6 17l-1.9.7L19 19.6l-.7-1.9L16.4 17l1.9-.7L19 14z" />
+              <Path d="M5 16l.5 1.4L7 18l-1.5.6L5 20.1l-.5-1.5L3 18l1.5-.6L5 16z" />
+            </Svg>
+          </View>
+          <Text style={s.emptyTitle}>Your wishes will live here</Text>
           <Text style={s.emptySubtitle}>
-            Generate a wish from the Wish tab, then post it to see it here.
+            Generate a room with the genie, then save or post it — every space
+            you create lands here, ready to revisit.
           </Text>
+          <TouchableOpacity
+            style={s.emptyBtn}
+            onPress={() => { hapticTap(); navigation.navigate('Main', { screen: 'Home' }); }}
+            activeOpacity={0.85}
+            accessibilityRole="button"
+            accessibilityLabel="Generate a room"
+          >
+            <Text style={s.emptyBtnText}>Generate a room</Text>
+          </TouchableOpacity>
         </View>
       ) : (
         // Build 89: virtualization tuning for the 2-column design grid.
@@ -352,8 +374,32 @@ const s = StyleSheet.create({
   headerTitle: { fontSize: 17, fontWeight: '700', color: '#111', fontFamily: 'Geist_700Bold'},
 
   center: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 40 },
+  // Build 108: elevated empty state styles
+  emptyIconCircle: {
+    width: 128,
+    height: 128,
+    borderRadius: 64,
+    backgroundColor: 'rgba(11, 109, 195, 0.06)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 20,
+  },
   emptyTitle: { fontSize: 18, fontWeight: '700', color: '#111', marginBottom: 8, textAlign: 'center', fontFamily: 'Geist_700Bold'},
-  emptySubtitle: { fontSize: 14, color: '#9CA3AF', textAlign: 'center', lineHeight: 20, fontFamily: 'Geist_400Regular'},
+  emptySubtitle: { fontSize: 14, color: '#9CA3AF', textAlign: 'center', lineHeight: 22, fontFamily: 'Geist_400Regular', maxWidth: 300, marginBottom: 24 },
+  emptyBtn: {
+    backgroundColor: '#0B6DC3',
+    paddingHorizontal: 32,
+    height: 52,
+    borderRadius: 9999,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.08,
+    shadowRadius: 3,
+    elevation: 2,
+  },
+  emptyBtnText: { fontSize: 14, fontWeight: '600', color: '#fff', fontFamily: 'Geist_600SemiBold' },
 
   // ── Grid ──
   grid: { padding: GRID_PAD, paddingBottom: 40 },

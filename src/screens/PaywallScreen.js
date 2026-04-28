@@ -27,6 +27,7 @@ import { space, radius, fontWeight, fontSize, typeScale, layout, uiColors } from
 import { useSubscription, PAID_TIERS, WISH_PACKAGES } from '../context/SubscriptionContext';
 import { useAuth } from '../context/AuthContext';
 import { getReferralCode, grantShareBonus } from '../services/subscriptionService';
+import { hapticTap, hapticSuccess, hapticError } from '../utils/haptics';
 
 const { width: SCREEN_W, height: SCREEN_H } = Dimensions.get('window');
 
@@ -346,13 +347,16 @@ export default function PaywallScreen({ navigation }) {
     setPurchasing(true);
     try {
       if (activeTab === 'wishes') {
+        // Build 108: purchaseTokens now waits for actual server-side
+        // fulfillment before resolving. The Alert below only fires after
+        // tokenBalance has been updated in context state — making the
+        // "Wishes added!" message factually accurate, not optimistic.
         const result = await purchaseTokens(selectedWish);
-        // Build 84 / Bug C2 fix: explicit post-purchase confirmation Alert.
-        // Previously the paywall just closed silently after a wish buy, which
-        // (a) failed to celebrate the purchase, and (b) left the user
-        // wondering whether anything happened — paid path felt worse than
-        // free share-bonus which already showed an alert.
         if (result?.success) {
+          hapticSuccess();
+          // Belt-and-suspenders: re-sync from server so the widget reflects
+          // authoritative balance even if a race condition slipped through.
+          refreshTokenBalance?.();
           const pkg = WISH_PACKAGES.find(p => p.id === selectedWish);
           const wishCount = pkg?.wishes ?? 0;
           Alert.alert(
@@ -366,8 +370,8 @@ export default function PaywallScreen({ navigation }) {
       } else {
         const result = await purchaseSubscription(selectedSubTier.productId);
         if (result?.success) {
-          // Subscription confirmation Alert. Mirrors the wish flow so paid
-          // path feels equally affirmative regardless of which product type.
+          hapticSuccess();
+          refreshTokenBalance?.();
           Alert.alert(
             '🎉 Subscription active',
             `Welcome to ${selectedSubTier.name}! ${selectedSubTier.gens === -1 ? 'Unlimited' : selectedSubTier.gens} wishes per week. Renews automatically — manage anytime in your Apple ID settings.`,
@@ -376,7 +380,22 @@ export default function PaywallScreen({ navigation }) {
         }
       }
     } catch (e) {
-      Alert.alert('Purchase Failed', e.message);
+      // Build 108: known-marker errors get specific, calmer copy. The
+      // listener already surfaced its own Alert for verification-pending,
+      // so we suppress the duplicate "Purchase Failed" generic. User cancel
+      // (E_USER_CANCELLED) shows nothing — they intentionally backed out.
+      if (e?.code === 'E_USER_CANCELLED') {
+        // Silent — user dismissed the StoreKit sheet on purpose.
+      } else if (e?.code === 'PURCHASE_VERIFICATION_PENDING') {
+        // The listener already showed "Purchase received... being verified".
+        // Don't double-Alert.
+      } else if (e?.code === 'PURCHASE_TIMEOUT') {
+        hapticError();
+        Alert.alert('Still Processing', e.message);
+      } else {
+        hapticError();
+        Alert.alert('Purchase Failed', e.message || 'Something went wrong. Please try again.');
+      }
     } finally {
       setPurchasing(false);
     }

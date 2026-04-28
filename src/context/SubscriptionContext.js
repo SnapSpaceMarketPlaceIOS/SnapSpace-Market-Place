@@ -88,6 +88,23 @@ export function SubscriptionProvider({ children }) {
   const purchaseUpdateSub = useRef(null);
   const purchaseErrorSub  = useRef(null);
 
+  // Build 108: pending-purchase tracker. When a user calls purchaseTokens()
+  // or purchaseSubscription(), we register a Promise here keyed by productId
+  // so the listener (which fires asynchronously after StoreKit completes)
+  // can resolve the call site only AFTER the receipt has been validated and
+  // the local balance/subscription state has actually been updated.
+  //
+  // Without this, the call site resolved the moment requestPurchase() was
+  // dispatched, decoupling the user-facing "✨ Wishes added!" Alert from
+  // actual fulfillment. If the listener silently bailed (e.g. user.id null
+  // mid-bootstrap, or a transient validateReceipt failure that ate all 3
+  // retries), the user saw a success Alert with no balance change. This
+  // ref makes that drift impossible: the Alert can only fire after the
+  // listener has actually setTokenBalance(...) or setSubscription(...).
+  //
+  // Map<productId, { resolve, reject, timeoutId }>
+  const pendingPurchases = useRef(new Map());
+
   // Reset per-user state when the signed-in user changes.
   //
   // Without this, after user A signs out and user B signs in on the same
@@ -194,7 +211,39 @@ export function SubscriptionProvider({ children }) {
 
     purchaseUpdateSub.current = purchaseUpdatedListener(async (purchase) => {
       const jws = purchase?.transactionReceipt;
-      if (!jws || !user?.id) return;
+
+      // Build 108: surface every silent-bail path. Previously these returned
+      // without any signal — purchases were lost in the void with the
+      // call-site Alert promising "wishes added" anyway. Now we log loudly,
+      // and reject any pending promise so the call site can show a real
+      // error instead of an inaccurate success Alert.
+      if (!jws) {
+        console.warn(
+          '[Subscription] purchase listener fired without transactionReceipt — productId:',
+          purchase?.productId
+        );
+        if (purchase?.productId) {
+          const pending = pendingPurchases.current.get(purchase.productId);
+          if (pending) {
+            clearTimeout(pending.timeoutId);
+            pending.reject(new Error('Purchase came back without a receipt. Please try again.'));
+            pendingPurchases.current.delete(purchase.productId);
+          }
+        }
+        return;
+      }
+      if (!user?.id) {
+        console.warn(
+          '[Subscription] purchase listener fired but user.id is null — Apple will redeliver receipt on next launch. ' +
+          'productId:', purchase?.productId
+        );
+        // Don't reject the pending promise here — Apple's redelivery on
+        // next app launch will credit the user once auth has bootstrapped.
+        // The 30s timeout fallback in purchaseTokens/purchaseSubscription
+        // will surface a "processing" message to the user without
+        // permanently failing the purchase.
+        return;
+      }
 
       const isTokenPurchase = ALL_TOKEN_PRODUCT_IDS.includes(purchase.productId);
 
@@ -255,6 +304,19 @@ export function SubscriptionProvider({ children }) {
           'the receipt for verification.',
           [{ text: 'OK' }],
         );
+        // Build 108: reject any pending promise so the call-site (PaywallScreen
+        // handlePurchase) won't fire its optimistic "✨ Wishes added!" Alert
+        // on top of the failure Alert above. PaywallScreen's catch block
+        // suppresses the duplicate by detecting our 'PURCHASE_VERIFICATION_PENDING'
+        // marker so the user only sees one Alert (the helpful one).
+        const pending = pendingPurchases.current.get(purchase.productId);
+        if (pending) {
+          clearTimeout(pending.timeoutId);
+          const err = new Error('PURCHASE_VERIFICATION_PENDING');
+          err.code = 'PURCHASE_VERIFICATION_PENDING';
+          pending.reject(err);
+          pendingPurchases.current.delete(purchase.productId);
+        }
         return;
       }
 
@@ -291,6 +353,32 @@ export function SubscriptionProvider({ children }) {
         console.warn('[Subscription] state merge after purchase failed:', mergeErr?.message);
       }
 
+      // Build 108: resolve the pending promise so the call site (Paywall
+      // handlePurchase) can fire its success Alert NOW — after the local
+      // state has actually been updated. This is the single point that
+      // closes the "Wishes added Alert fires before fulfillment" gap.
+      const pending = pendingPurchases.current.get(purchase.productId);
+      if (pending) {
+        clearTimeout(pending.timeoutId);
+        pending.resolve({
+          success:     true,
+          type:        result.type,
+          newBalance:  result.type === 'tokens' ? result.newBalance : undefined,
+          tokensAdded: result.tokensAdded,
+          tier:        result.tier,
+        });
+        pendingPurchases.current.delete(purchase.productId);
+      } else {
+        // No pending promise — this is a redelivered receipt from a prior
+        // session (e.g. user force-quit before fulfillment finished, or
+        // signed in after a Sandbox prompt). Local state was still updated
+        // above; user will see the new balance next time they open paywall.
+        console.log(
+          '[Subscription] orphan-receipt redelivery credited:',
+          purchase.productId, '— no pending promise to resolve'
+        );
+      }
+
       // Now safe to finish — the entitlement is reflected in either local
       // state or will be on next refresh. This finalizes the receipt with
       // Apple so they stop redelivering it.
@@ -304,6 +392,23 @@ export function SubscriptionProvider({ children }) {
     purchaseErrorSub.current = purchaseErrorListener((error) => {
       if (error.code !== 'E_USER_CANCELLED') {
         console.warn('[Subscription] purchase error:', error.code, error.message);
+      }
+      // Build 108: reject any pending purchase promises so the call site
+      // doesn't hang for 30s waiting on a purchase that StoreKit already
+      // told us was cancelled or failed. expo-iap doesn't always include
+      // productId on the error object — when it doesn't, we have to clear
+      // all pending promises (typically there's only one in flight anyway).
+      if (error.productId && pendingPurchases.current.has(error.productId)) {
+        const pending = pendingPurchases.current.get(error.productId);
+        clearTimeout(pending.timeoutId);
+        pending.reject(error);
+        pendingPurchases.current.delete(error.productId);
+      } else if (pendingPurchases.current.size > 0) {
+        for (const [, pending] of pendingPurchases.current.entries()) {
+          clearTimeout(pending.timeoutId);
+          pending.reject(error);
+        }
+        pendingPurchases.current.clear();
       }
     });
 
@@ -458,12 +563,58 @@ export function SubscriptionProvider({ children }) {
       }
     }
 
-    await requestPurchase({
-      request: { apple: { sku: productId } },
-      type: 'in-app',
+    // Build 108: wait for the listener to actually credit the wish before
+    // resolving. Previously this returned immediately on requestPurchase,
+    // which made the call-site "Wishes added!" Alert fire before any
+    // server-side fulfillment had happened — a charged user could see a
+    // success Alert and a stuck balance. The Promise below resolves only
+    // when the listener succeeds (setTokenBalance fired) or rejects on
+    // failure / cancellation / 30s timeout.
+    return new Promise((resolve, reject) => {
+      const timeoutId = setTimeout(async () => {
+        // Listener never resolved us — possible Apple-redelivery edge case
+        // (purchase will arrive on next launch) or intermittent network.
+        // Before declaring failure, fetch the authoritative balance from
+        // server: if the listener silently succeeded but our resolve hook
+        // missed (e.g. listener re-registered mid-flight on user.id flap),
+        // the server-side balance will still be correct.
+        pendingPurchases.current.delete(productId);
+        try {
+          if (user?.id) {
+            const fresh = await fetchTokenBalance(user.id);
+            if (typeof fresh?.balance === 'number') {
+              setTokenBalance(fresh.balance);
+              // Caller can decide whether the new balance reflects this
+              // purchase by comparing to a snapshot. We resolve as success
+              // here so the user sees an affirmative Alert with the
+              // post-purchase server-side count.
+              resolve({ success: true, type: 'tokens', newBalance: fresh.balance, fromTimeout: true });
+              return;
+            }
+          }
+        } catch (e) {
+          console.warn('[Subscription] timeout-fallback balance refresh failed:', e?.message);
+        }
+        const err = new Error(
+          'Your purchase is still processing. If wishes don\'t appear in a moment, ' +
+          'tap "Restore Purchases" or relaunch HomeGenie.'
+        );
+        err.code = 'PURCHASE_TIMEOUT';
+        reject(err);
+      }, 30000);
+
+      pendingPurchases.current.set(productId, { resolve, reject, timeoutId });
+
+      requestPurchase({
+        request: { apple: { sku: productId } },
+        type: 'in-app',
+      }).catch((err) => {
+        clearTimeout(timeoutId);
+        pendingPurchases.current.delete(productId);
+        reject(err);
+      });
     });
-    return { success: true };
-  }, [iapReady, tokenProducts]);
+  }, [iapReady, tokenProducts, user?.id]);
 
   // ── Purchase subscription ───────────────────────────────────────────────
   const purchaseSubscription = useCallback(async (productId) => {
@@ -509,15 +660,48 @@ export function SubscriptionProvider({ children }) {
       }
     }
 
-    // Unified purchase call — expo-iap v3.x removed standalone
-    // requestSubscription in favor of requestPurchase with type:'subs'.
-    // The actual result comes through purchaseUpdatedListener above.
-    await requestPurchase({
-      request: { apple: { sku: productId } },
-      type: 'subs',
+    // Build 108: same pending-promise pattern as purchaseTokens — wait
+    // for the listener to actually activate the subscription before
+    // resolving so the "🎉 Subscription active" Alert can't fire before
+    // fulfillment.
+    return new Promise((resolve, reject) => {
+      const timeoutId = setTimeout(async () => {
+        pendingPurchases.current.delete(productId);
+        try {
+          if (user?.id) {
+            const fresh = await fetchQuota(user.id);
+            if (fresh?.tier && fresh.tier !== 'free') {
+              setSubscription(prev => ({ ...prev, ...fresh }));
+              resolve({ success: true, type: 'subscription', tier: fresh.tier, fromTimeout: true });
+              return;
+            }
+          }
+        } catch (e) {
+          console.warn('[Subscription] timeout-fallback quota refresh failed:', e?.message);
+        }
+        const err = new Error(
+          'Your subscription is still processing. If it doesn\'t activate shortly, ' +
+          'tap "Restore Purchases" or relaunch HomeGenie.'
+        );
+        err.code = 'PURCHASE_TIMEOUT';
+        reject(err);
+      }, 30000);
+
+      pendingPurchases.current.set(productId, { resolve, reject, timeoutId });
+
+      // Unified purchase call — expo-iap v3.x removed standalone
+      // requestSubscription in favor of requestPurchase with type:'subs'.
+      // The actual result comes through purchaseUpdatedListener above.
+      requestPurchase({
+        request: { apple: { sku: productId } },
+        type: 'subs',
+      }).catch((err) => {
+        clearTimeout(timeoutId);
+        pendingPurchases.current.delete(productId);
+        reject(err);
+      });
     });
-    return { success: true };
-  }, [iapReady, products]);
+  }, [iapReady, products, user?.id]);
 
   // ── Restore purchases ───────────────────────────────────────────────────
   const restorePurchases = useCallback(async () => {

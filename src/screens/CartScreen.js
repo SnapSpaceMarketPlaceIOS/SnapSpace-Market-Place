@@ -20,6 +20,7 @@ import { useOrderHistory } from '../context/OrderHistoryContext';
 import { supabase } from '../services/supabase';
 import { trackAffiliateClickAndTagUrl } from '../services/purchaseTracking';
 import { safeOpenURL } from '../utils/safeOpenURL';
+import { hapticTap, hapticMedium } from '../utils/haptics';
 import { PRODUCT_CATALOG } from '../data/productCatalog';
 import TabScreenFade from '../components/TabScreenFade';
 
@@ -433,19 +434,37 @@ export default function CartScreen({ navigation }) {
   }, [checkingOut, total, items, subtotal, shipping]);
 
   // ── Empty state ───────────────────────────────────────────────────────────────
+  // Build 108: elevated empty-state polish. Soft pastel circle behind the icon
+  // gives the moment "weight" instead of feeling like a placeholder. Two CTAs
+  // — primary path back to Home (where the user can generate a room) and a
+  // ghost secondary to Explore (lighter discovery path). Premium feel, no
+  // dead-ends.
   if (items.length === 0) {
     return (
       <View style={styles.emptyContainer}>
-        <ShoppingBagIcon />
+        <View style={styles.emptyIconCircle}>
+          <ShoppingBagIcon />
+        </View>
         <Text style={styles.emptyTitle}>Your cart is empty</Text>
         <Text style={styles.emptySubtitle}>
-          Generate a room wish and discover furniture that matches your style.
+          Generate a room with the genie or browse curated picks — every item you
+          tap lands here, ready when you are.
         </Text>
         <TouchableOpacity
           style={styles.emptyBtn}
-          onPress={() => navigation?.navigate('Explore')}
+          onPress={() => { hapticTap(); navigation?.navigate('Home'); }}
+          accessibilityRole="button"
+          accessibilityLabel="Generate a room"
         >
-          <Text style={styles.emptyBtnText}>Start exploring</Text>
+          <Text style={styles.emptyBtnText}>Generate a room</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.emptyBtnSecondary}
+          onPress={() => { hapticTap(); navigation?.navigate('Explore'); }}
+          accessibilityRole="button"
+          accessibilityLabel="Browse the Explore feed"
+        >
+          <Text style={styles.emptyBtnSecondaryText}>Browse Explore</Text>
         </TouchableOpacity>
       </View>
     );
@@ -495,7 +514,7 @@ export default function CartScreen({ navigation }) {
                   <Text style={styles.itemName} numberOfLines={2}>{item.name}</Text>
                   <TouchableOpacity
                     style={styles.deleteBtn}
-                    onPress={() => removeFromCart(item.key)}
+                    onPress={() => { hapticMedium(); removeFromCart(item.key); }}
                     activeOpacity={0.7}
                     hitSlop={{ top: 2, bottom: 2, left: 2, right: 2 }}
                     accessibilityLabel="Remove item from cart"
@@ -531,7 +550,7 @@ export default function CartScreen({ navigation }) {
                   <View style={styles.qtyRow}>
                     <TouchableOpacity
                       style={styles.qtyBtn}
-                      onPress={() => updateQuantity(item.key, -1)}
+                      onPress={() => { hapticTap(); updateQuantity(item.key, -1); }}
                       activeOpacity={0.7}
                       hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                       accessibilityLabel="Decrease quantity"
@@ -541,7 +560,7 @@ export default function CartScreen({ navigation }) {
                     <AnimatedQtyText value={item.quantity} style={styles.qtyText} />
                     <TouchableOpacity
                       style={styles.qtyBtn}
-                      onPress={() => updateQuantity(item.key, 1)}
+                      onPress={() => { hapticTap(); updateQuantity(item.key, 1); }}
                       activeOpacity={0.7}
                       hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                       accessibilityLabel="Increase quantity"
@@ -984,6 +1003,18 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: SP[8],       // 32px
   },
+  // Build 108: soft pastel disc behind the icon. The circle isn't decorative —
+  // it gives the empty state visual weight so it reads as intentional design,
+  // not "we forgot to load." The blue tint ties to brand palette without
+  // being loud.
+  emptyIconCircle: {
+    width: 128,
+    height: 128,
+    borderRadius: 64,
+    backgroundColor: 'rgba(11, 109, 195, 0.06)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   emptyTitle: {
     ...typeScale.title,
     fontFamily: 'Geist_700Bold',
@@ -996,8 +1027,9 @@ const styles = StyleSheet.create({
     fontFamily: 'Geist_400Regular',
     color: C.textSecondary,
     textAlign: 'center',
-    maxWidth: 260,
+    maxWidth: 280,
     marginBottom: SP[6],
+    lineHeight: 22,
   },
   emptyBtn: {
     backgroundColor: C.primary,
@@ -1015,5 +1047,17 @@ const styles = StyleSheet.create({
     ...typeScale.button,
     fontFamily: 'Geist_600SemiBold',
     color: C.white,
+  },
+  // Build 108: ghost secondary CTA — lower-emphasis path to Explore.
+  emptyBtnSecondary: {
+    paddingHorizontal: SP[8],
+    height: 44,
+    justifyContent: 'center',
+    marginTop: SP[3],
+  },
+  emptyBtnSecondaryText: {
+    ...typeScale.button,
+    fontFamily: 'Geist_500Medium',
+    color: C.textSecondary,
   },
 });
