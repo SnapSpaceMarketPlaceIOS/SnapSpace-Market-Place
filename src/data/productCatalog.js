@@ -24965,6 +24965,55 @@ export const PRODUCT_CATALOG = [
     ],
   },
 
+  {
+    id: 'B0DXKYG19S',
+    asin: 'B0DXKYG19S',
+    name: 'Acanva 55" Modern High-Gloss Long Coffee Table with Curved Edges & Cylindrical Legs',
+    brand: 'Acanva',
+    price: 685.00,
+    priceDisplay: '$685.00',
+    compareAtPrice: 685.00,
+    compareAtPriceDisplay: '$685.00',
+    imageUrl: 'https://m.media-amazon.com/images/I/81CoNaNE-BL._AC_SL1500_.jpg',
+    images: [
+      'https://m.media-amazon.com/images/I/81CoNaNE-BL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/51PmXH1wlML._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/21RYn1HyU5L._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/415zSSf387L._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/21DQQAdc4EL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/21QWju-VZpL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/21mRdavEvFL._AC_SL1500_.jpg',
+    ],
+    category: 'coffee-table',
+    roomType: ['living-room', 'office'],
+    styles: ['modern', 'contemporary', 'minimalist', 'glam', 'art-deco', 'mid-century'],
+    materials: ['wood'],
+    tags: [
+      'coffee-table', 'long-coffee-table', 'high-gloss', 'glossy-finish',
+      'cylindrical-legs', 'curved-edge', 'rounded-edge', 'mdf', 'statement-piece',
+      'living-room', 'office', 'home-office', 'commercial',
+      'modern', 'contemporary', 'minimalist', 'glam', 'art-deco', 'mid-century',
+      'acanva', 'sculptural', 'architectural', '55-inch', 'low-profile',
+      'white', 'olive-green', 'green',
+    ],
+    source: 'amazon',
+    affiliateUrl: 'https://www.amazon.com/dp/B0DXKYG19S?tag=' + TAG,
+    rating: null,
+    reviewCount: null,
+    description: 'Acanva 55" modern long coffee table with a striking high-gloss top, softly rounded corners, and four substantial cylindrical legs. Bold architectural presence that anchors a living room or open office. MDF construction with a luxurious glossy finish that resists scratches and daily wear. 55"W × 29.5"D × 13.8"H. Wipes clean with a soft cloth.',
+    features: [
+      'High-gloss top with softly rounded curved edges — bold architectural focal point',
+      'Four substantial cylindrical legs — sculptural mid-century / art-deco proportions',
+      'Generous 55"W × 29.5"D — ample surface for entertaining and lounging',
+      'Premium MDF with glossy finish — scratch-resistant and easy to clean',
+      'Versatile for residential or commercial; clean modern lines, simple assembly',
+    ],
+    variants: [
+      { id: '1', label: 'White',       asin: 'B0DXKYG19S', price: 685.00, swatchImage: 'https://m.media-amazon.com/images/I/51PmXH1wlML._AC_SL300_.jpg', mainImage: 'https://m.media-amazon.com/images/I/81CoNaNE-BL._AC_SL1500_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DXKYG19S?tag=' + TAG },
+      { id: '2', label: 'Olive Green', asin: 'B0DXKVXXHV', price: 685.00, swatchImage: 'https://m.media-amazon.com/images/I/41PJ+c4RlHL._AC_SL300_.jpg', mainImage: 'https://m.media-amazon.com/images/I/81yyN2M-FcL._AC_SL1500_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0DXKVXXHV?tag=' + TAG },
+    ],
+  },
+
 ];
 
 // ─── Enrichment status helper ────────────────────────────────────────────────
