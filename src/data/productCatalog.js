@@ -24768,6 +24768,56 @@ export const PRODUCT_CATALOG = [
     ],
   },
 
+  {
+    id: 'B0F2N2FFT1',
+    asin: 'B0F2N2FFT1',
+    name: 'YUENINA Modern Luxury Leather Armless Lounge Chair with Headrest, Metal Frame, Ergonomic Support',
+    brand: 'YUENINA',
+    price: 599.00,
+    priceDisplay: '$599.00',
+    compareAtPrice: 599.00,
+    compareAtPriceDisplay: '$599.00',
+    imageUrl: 'https://m.media-amazon.com/images/I/81aWT7U0WRL._AC_SL1500_.jpg',
+    images: [
+      'https://m.media-amazon.com/images/I/81aWT7U0WRL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/51ZSkE1J55L._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/416FCc0TvLL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/41ReXV7jyZL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/31+Y-vJ7TcL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/41M1vHmYvTL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/41+d3eIDpZL._AC_SL1500_.jpg',
+    ],
+    category: 'accent-chair',
+    roomType: ['living-room', 'bedroom', 'office'],
+    styles: ['modern', 'contemporary', 'minimalist', 'industrial', 'glam', 'art-deco', 'mid-century'],
+    materials: ['leather', 'metal'],
+    tags: [
+      'accent-chair', 'armless', 'lounge-chair', 'leather', 'metal-frame',
+      'headrest', 'high-back', 'ergonomic', 'luxury', 'sleek',
+      'living-room', 'bedroom', 'office', 'lounge-area',
+      'modern', 'contemporary', 'minimalist', 'industrial', 'glam',
+      'art-deco', 'mid-century', 'luxe',
+      'yuenina', 'long-lasting',
+      'dark-brown', 'brown',
+    ],
+    source: 'amazon',
+    affiliateUrl: 'https://www.amazon.com/dp/B0F2N2FFT1?tag=' + TAG,
+    rating: 4.8,
+    reviewCount: 7,
+    description: 'YUENINA modern luxury armless leather lounge chair with high-back headrest. Sleek silhouette built on a robust metal frame for long-lasting stability. Ergonomic design promotes healthy posture for extended reading or relaxation. The luxe leather upholstery and architectural metal frame suit modern, industrial, glam, and art-deco rooms equally well.',
+    features: [
+      'Modern armless silhouette — clean, sculptural, perfect statement piece',
+      'High-back headrest for full neck and shoulder support during extended lounging',
+      'Robust metal frame ensures long-lasting stability and architectural lines',
+      'Premium leather upholstery in two warm brown tones',
+      'Ergonomic design promotes healthy posture for reading or leisure',
+    ],
+    variants: [
+      { id: '1', label: 'Dark Brown', asin: 'B0F2N2FFT1', price: 599.00, swatchImage: 'https://m.media-amazon.com/images/I/51ZSkE1J55L._AC_SL300_.jpg', mainImage: 'https://m.media-amazon.com/images/I/81aWT7U0WRL._AC_SL1500_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0F2N2FFT1?tag=' + TAG },
+      { id: '2', label: 'Brown',      asin: 'B0F2N11NBB', price: 599.00, swatchImage: 'https://m.media-amazon.com/images/I/51O8e95MBHL._AC_SL300_.jpg', mainImage: 'https://m.media-amazon.com/images/I/817MhObYyGL._AC_SL1500_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0F2N11NBB?tag=' + TAG },
+    ],
+  },
+
 ];
 
 // ─── Enrichment status helper ────────────────────────────────────────────────
