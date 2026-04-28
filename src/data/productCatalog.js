@@ -24915,6 +24915,56 @@ export const PRODUCT_CATALOG = [
     ],
   },
 
+  {
+    id: 'B0GBV3L7HQ',
+    asin: 'B0GBV3L7HQ',
+    name: 'Hclzieamte Cloud-Shaped 3-Piece Nesting Coffee Table Set, Walnut Veneer over Wood + Stainless Steel Base, Fully Assembled',
+    brand: 'Hclzieamte',
+    price: 698.99,
+    priceDisplay: '$698.99',
+    compareAtPrice: 698.99,
+    compareAtPriceDisplay: '$698.99',
+    imageUrl: 'https://m.media-amazon.com/images/I/71XywHOnxlL._AC_SL1500_.jpg',
+    images: [
+      'https://m.media-amazon.com/images/I/71XywHOnxlL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/518InL9StYL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/31gDsDdNAQL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/61BECi+keiL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/41sZa+iW8sL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/41ASAW828bL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/41WLyNotrXL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/21ZH9-tIq3L._AC_SL1500_.jpg',
+    ],
+    category: 'coffee-table',
+    roomType: ['living-room', 'office'],
+    styles: ['modern', 'contemporary', 'mid-century', 'minimalist', 'japandi', 'transitional'],
+    materials: ['wood', 'metal'],
+    tags: [
+      'coffee-table', 'nesting-table', '3-piece-set', '3-pieces', 'cloud-shaped',
+      'organic-shape', 'walnut', 'walnut-veneer', 'wood-coffee-table',
+      'stainless-steel-base', 'metal-base', 'rounded-edge', 'family-friendly',
+      'no-assembly', 'fully-assembled', 'pre-assembled', 'space-saving',
+      'living-room', 'office', 'home-office',
+      'modern', 'contemporary', 'mid-century', 'minimalist', 'japandi', 'transitional',
+      'hclzieamte', '63-inch', 'large-table', 'sculptural',
+    ],
+    source: 'amazon',
+    affiliateUrl: 'https://www.amazon.com/dp/B0GBV3L7HQ?tag=' + TAG,
+    rating: 5.0,
+    reviewCount: 1,
+    description: 'Hclzieamte 3-piece cloud-shaped nesting coffee table set. Large table at 63"W × 35.8"D × 16.1"H with 2 smaller nesting siblings. Genuine North American walnut veneer over a thickened engineered wood core, set on a rust-resistant stainless steel base. Substantial 87.9 lb build. Cloud silhouette and rounded edges suit mid-century, modern, japandi, and minimalist living rooms. Ships fully pre-assembled — no tools, no hardware, no manual.',
+    features: [
+      '3-piece nesting set — large 63" table + 2 smaller siblings, sized to nest or spread',
+      'North American walnut veneer over engineered wood core for rich natural tone',
+      'Stainless steel base — rust-resistant stability, modern architectural lines',
+      'Cloud silhouette with rounded edges — sculptural, family-safe, on-trend',
+      'Ships fully pre-assembled (87.9 lbs) — no tools, no hardware, ready immediately',
+    ],
+    variants: [
+      { id: '1', label: 'Walnut', asin: 'B0GBV3L7HQ', price: 698.99, swatchImage: 'https://m.media-amazon.com/images/I/518InL9StYL._AC_SL1500_.jpg', mainImage: 'https://m.media-amazon.com/images/I/71XywHOnxlL._AC_SL1500_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0GBV3L7HQ?tag=' + TAG },
+    ],
+  },
+
 ];
 
 // ─── Enrichment status helper ────────────────────────────────────────────────
