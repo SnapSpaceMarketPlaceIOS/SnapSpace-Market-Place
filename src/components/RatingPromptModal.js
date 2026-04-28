@@ -25,9 +25,11 @@ import { colors } from '../constants/colors';
  * that engagement after two real uses is a more honest signal than
  * a review-for-wishes trade.
  *
- * Distinct from LeaveReviewModal (post-first-generation), which DOES
- * carry the +2 wish bonus. Both can coexist — first generation gets
- * the carrot prompt, second generation gets the no-strings prompt.
+ * Important: do NOT add wish bonuses, free wishes, or any other
+ * compensation tied to tapping "Leave a Review." Apple guideline
+ * 4.5.4 explicitly prohibits offering rewards in exchange for App
+ * Store ratings/reviews; coupling the two is a likely review-time
+ * rejection.
  *
  * Props:
  *   visible       — boolean, drives the Modal
@@ -116,8 +118,7 @@ export default function RatingPromptModal({ visible, onLeaveReview, onMaybeLater
 }
 
 function FiveStarsIcon() {
-  // Single five-pointed solid white star. Same glyph as
-  // LeaveReviewModal so the two prompts feel related visually.
+  // Single five-pointed solid white star — visual shorthand for "rate."
   return (
     <Svg width={28} height={28} viewBox="0 0 24 24" fill="#FFFFFF">
       <Path d="M12 2.5l2.95 5.98 6.6.96-4.78 4.66 1.13 6.57L12 17.6l-5.9 3.07 1.13-6.57L2.45 9.44l6.6-.96L12 2.5z" />
