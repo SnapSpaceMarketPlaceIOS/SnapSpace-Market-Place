@@ -1,6 +1,5 @@
-import React, { createContext, useContext, useState, useCallback, useEffect, useRef, useMemo } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect, useRef } from 'react';
 import { Alert, InteractionManager } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   initConnection,
   endConnection,
@@ -15,19 +14,6 @@ import {
 import { useAuth } from './AuthContext';
 import { validateReceipt, fetchQuota, fetchTokenBalance } from '../services/subscriptionService';
 import { supabase } from '../services/supabase';
-
-// ── Review-bonus split (psychological onboarding) ────────────────────────────
-// New free users see 3/3 wishes instead of 5/5. The remaining 2 are unlocked
-// when they tap "Leave a Review" on the post-first-generation modal. Total
-// stays 5 — only the perceived starting amount changes. The bonus is granted
-// on tap (we can't actually verify the review), so the carrot is the prompt
-// itself: "leave a review → +2 wishes." Persisted per-user in AsyncStorage.
-export const FREE_WISH_INITIAL_CAP = 3;
-export const FREE_WISH_FULL_CAP    = 5;
-const REVIEW_BONUS_CLAIMED_KEY     = '@homegenie_review_bonus_claimed';
-const REVIEW_PROMPT_SHOWN_KEY      = '@homegenie_review_bonus_prompt_shown';
-const reviewClaimedKey             = (uid) => (uid ? `${REVIEW_BONUS_CLAIMED_KEY}_${uid}` : null);
-const reviewShownKey               = (uid) => (uid ? `${REVIEW_PROMPT_SHOWN_KEY}_${uid}`  : null);
 
 // ── Tier definitions (weekly billing, 10% discount on Pro + Premium) ─────────
 export const TIERS = {
@@ -94,47 +80,10 @@ export function SubscriptionProvider({ children }) {
   const [tokenBalance, setTokenBalance] = useState(0);
   const [tokenProducts, setTokenProducts] = useState([]);
 
-  // Review-bonus split (see header). Both flags are persisted per-user
-  // in AsyncStorage; the in-memory state is the source of truth during
-  // the session. Underlying `subscription.quotaLimit` stays at 5 — only
-  // the EXPOSED display values are capped to 3 until the bonus is claimed.
-  const [reviewBonusClaimed, setReviewBonusClaimed]       = useState(false);
-  const [reviewBonusPromptShown, setReviewBonusPromptShown] = useState(false);
-
   // Dev toggle — force-show paywall for UI iteration (off by default)
   const [devForcePaywall, setDevForcePaywall] = useState(false);
 
-  // Capped display values. While the user is on free tier and hasn't
-  // claimed the bonus, expose `quotaLimit = 3` and recompute remaining/
-  // canGenerate against that cap. Once claimed, fall back to the underlying
-  // server values (quotaLimit = 5). Paid / unlimited tiers and FORCE_PAID_TIER
-  // are passthrough — no cap.
-  const displaySubscription = useMemo(() => {
-    const isFree     = subscription.tier === 'free';
-    const capApplies = !FORCE_PAID_TIER && isFree && !reviewBonusClaimed;
-    if (!capApplies) return subscription;
-    const cap        = FREE_WISH_INITIAL_CAP;
-    const remaining  = Math.max(0, cap - subscription.generationsUsed);
-    return {
-      ...subscription,
-      quotaLimit:           cap,
-      generationsRemaining: remaining,
-      canGenerate:          remaining > 0,
-    };
-  }, [subscription, reviewBonusClaimed]);
-
-  const shouldShowPaywall = !FORCE_PAID_TIER && (devForcePaywall || (!displaySubscription.canGenerate && tokenBalance <= 0));
-
-  // True when we should show the "Leave a Review" modal on RoomResult mount.
-  // Conditions: free tier, has generated at least once, prompt has not been
-  // shown yet this account, and bonus has not been claimed. The modal itself
-  // is rendered by RoomResultScreen — this just exposes the trigger gate.
-  const shouldShowReviewPrompt =
-    !FORCE_PAID_TIER &&
-    subscription.tier === 'free' &&
-    subscription.generationsUsed >= 1 &&
-    !reviewBonusClaimed &&
-    !reviewBonusPromptShown;
+  const shouldShowPaywall = !FORCE_PAID_TIER && (devForcePaywall || (!subscription.canGenerate && tokenBalance <= 0));
 
   const purchaseUpdateSub = useRef(null);
   const purchaseErrorSub  = useRef(null);
@@ -161,37 +110,7 @@ export function SubscriptionProvider({ children }) {
     // Actual user change (sign-out or account switch) — reset to defaults.
     setSubscription(DEFAULT_SUBSCRIPTION);
     setTokenBalance(0);
-    // Reset review-bonus flags too — the AsyncStorage load below repopulates
-    // from the new user's keys. Without this, account A's claimed=true would
-    // briefly leak into account B before the load resolves.
-    setReviewBonusClaimed(false);
-    setReviewBonusPromptShown(false);
   }, [user?.id, authLoading]);
-
-  // Hydrate review-bonus flags from AsyncStorage whenever the signed-in user
-  // changes. Per-user keys keep multiple accounts isolated on the same
-  // device. Best-effort: any read failure leaves both flags at default false
-  // (i.e. fresh user state) which is the safe direction — at worst the user
-  // sees the prompt one extra time.
-  useEffect(() => {
-    const uid = user?.id;
-    if (!uid) return;
-    let cancelled = false;
-    (async () => {
-      try {
-        const [claimedRaw, shownRaw] = await Promise.all([
-          AsyncStorage.getItem(reviewClaimedKey(uid)),
-          AsyncStorage.getItem(reviewShownKey(uid)),
-        ]);
-        if (cancelled) return;
-        setReviewBonusClaimed(claimedRaw === 'true');
-        setReviewBonusPromptShown(shownRaw === 'true');
-      } catch (e) {
-        if (__DEV__) console.warn('[Subscription] review-bonus hydrate failed:', e?.message);
-      }
-    })();
-    return () => { cancelled = true; };
-  }, [user?.id]);
 
   // ── Initialize IAP connection ────────────────────────────────────────────
   useEffect(() => {
@@ -626,43 +545,6 @@ export function SubscriptionProvider({ children }) {
     }
   }, [iapReady, user?.id]);
 
-  // ── Review-bonus actions ────────────────────────────────────────────────
-  // claimReviewBonus(): user tapped "Leave a Review" on the post-first-gen
-  //   modal. Flip the cap off so the underlying 5-wish quota is exposed
-  //   instead of the 3-wish cap, and persist so subsequent app launches
-  //   don't ask again. Also marks the prompt shown for completeness.
-  // markReviewPromptShown(): user tapped "Maybe Later" or otherwise dismissed
-  //   the modal. Cap stays in effect; we just remember not to auto-popup
-  //   again (one-shot behavior — the carrot is the FIRST chance).
-  const claimReviewBonus = useCallback(async () => {
-    setReviewBonusClaimed(true);
-    setReviewBonusPromptShown(true);
-    const uid = user?.id;
-    const claimedKey = reviewClaimedKey(uid);
-    const shownKey   = reviewShownKey(uid);
-    if (!claimedKey || !shownKey) return;
-    try {
-      await Promise.all([
-        AsyncStorage.setItem(claimedKey, 'true'),
-        AsyncStorage.setItem(shownKey,   'true'),
-      ]);
-    } catch (e) {
-      if (__DEV__) console.warn('[Subscription] claimReviewBonus persist failed:', e?.message);
-    }
-  }, [user?.id]);
-
-  const markReviewPromptShown = useCallback(async () => {
-    setReviewBonusPromptShown(true);
-    const uid = user?.id;
-    const shownKey = reviewShownKey(uid);
-    if (!shownKey) return;
-    try {
-      await AsyncStorage.setItem(shownKey, 'true');
-    } catch (e) {
-      if (__DEV__) console.warn('[Subscription] markReviewPromptShown persist failed:', e?.message);
-    }
-  }, [user?.id]);
-
   // ── Dev-only: quota tracking uses local state only ────────────────────────
   // In dev mode, we skip refreshQuota() entirely so the DB can't overwrite
   // local counts. The local DEFAULT_SUBSCRIPTION starts at 0/5 and
@@ -712,11 +594,7 @@ export function SubscriptionProvider({ children }) {
   return (
     <SubscriptionContext.Provider
       value={{
-        // Capped display value — quotaLimit reads as 3 until the bonus is
-        // claimed, then 5. Underlying state still tracks generationsUsed
-        // against the real 5-wish quota, so the post-claim "X remaining"
-        // jump is automatic.
-        subscription: displaySubscription,
+        subscription,
         shouldShowPaywall,
         iapReady,
         products,           // StoreKit subscription product metadata
@@ -736,16 +614,9 @@ export function SubscriptionProvider({ children }) {
         purchaseTokens,
         TOKEN_PACKAGES,
         WISH_PACKAGES,
-        // Review-bonus split
-        reviewBonusClaimed,
-        shouldShowReviewPrompt,
-        claimReviewBonus,
-        markReviewPromptShown,
         // Constants
         TIERS,
         PAID_TIERS,
-        FREE_WISH_INITIAL_CAP,
-        FREE_WISH_FULL_CAP,
       }}
     >
       {children}
