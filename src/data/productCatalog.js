@@ -25398,6 +25398,55 @@ export const PRODUCT_CATALOG = [
     ],
   },
 
+  {
+    id: 'B0C69ZF8WJ',
+    asin: 'B0C69ZF8WJ',
+    name: 'Coastal Living Soft White Surfside Wing Chair, Cannes Navy Stripe Cotton Upholstery',
+    brand: 'Coastal Living',
+    price: 1420.00,
+    priceDisplay: '$1,420.00',
+    compareAtPrice: 1420.00,
+    compareAtPriceDisplay: '$1,420.00',
+    imageUrl: 'https://m.media-amazon.com/images/I/51+eUsLwxQL._AC_SL1500_.jpg',
+    images: [
+      'https://m.media-amazon.com/images/I/51+eUsLwxQL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/31gehOsfnoL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/41t045jwaoL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/41kRnWaQxKL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/21s5Oev5IvL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/21-eKSp4t2L._AC_SL1500_.jpg',
+    ],
+    category: 'accent-chair',
+    roomType: ['living-room', 'bedroom', 'office'],
+    styles: ['coastal', 'transitional', 'farmhouse', 'mediterranean', 'traditional', 'modern'],
+    materials: ['linen', 'wood'],
+    tags: [
+      'accent-chair', 'wing-chair', 'wingback', 'arm-chair', 'lounge-chair',
+      'cotton', 'cotton-upholstery', 'striped', 'navy-stripe', 'nautical',
+      'performance-fabric', 'nomad-snow', 'cannes-navy',
+      'coastal', 'coastal-cottage', 'beach-house', 'nautical', 'transitional',
+      'farmhouse', 'mediterranean', 'traditional', 'modern',
+      'living-room', 'bedroom', 'office', 'reading-chair',
+      'coastal-living', 'surfside', 'soft-white', 'midnight-navy',
+      'navy', 'navy-blue', 'white', 'striped-pattern',
+    ],
+    source: 'amazon',
+    affiliateUrl: 'https://www.amazon.com/dp/B0C69ZF8WJ?tag=' + TAG,
+    rating: 5.0,
+    reviewCount: 1,
+    description: 'Coastal Living Surfside wing chair — a premium coastal accent piece upholstered in 100% cotton Cannes New Navy Stripe (note: the navy stripe can appear very dark, almost black, depending on light). Soft white frame with a classic wing silhouette adds a refined nautical statement to coastal cottages, beach houses, and traditional living rooms. Performance fabric construction stands up to daily use.',
+    features: [
+      'Classic wing-back silhouette — timeless coastal accent statement',
+      '100% cotton Cannes New Navy Stripe upholstery — performance-grade construction',
+      'Soft white painted/finished frame complements coastal and traditional palettes',
+      'Premium Coastal Living brand quality at $1,420 — built for years of use',
+      'Versatile placement: living rooms, bedrooms, reading nooks, home offices',
+    ],
+    variants: [
+      { id: '1', label: 'Soft White / Midnight Navy Stripe', asin: 'B0C69ZF8WJ', price: 1420.00, swatchImage: 'https://m.media-amazon.com/images/I/31gehOsfnoL._AC_SL300_.jpg', mainImage: 'https://m.media-amazon.com/images/I/51+eUsLwxQL._AC_SL1500_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0C69ZF8WJ?tag=' + TAG },
+    ],
+  },
+
 ];
 
 // ─── Enrichment status helper ────────────────────────────────────────────────
