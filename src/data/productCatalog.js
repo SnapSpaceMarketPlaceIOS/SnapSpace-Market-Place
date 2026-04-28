@@ -24716,6 +24716,58 @@ export const PRODUCT_CATALOG = [
     ],
   },
 
+  {
+    id: 'B0FJYM42F7',
+    asin: 'B0FJYM42F7',
+    name: 'Hjaustevy Mid-Century Leather Accent Chair, Solid Wood Frame, Removable Padded Armrests with Bolster Pillows',
+    brand: 'Hjaustevy',
+    price: 199.98,
+    priceDisplay: '$199.98',
+    compareAtPrice: 199.98,
+    compareAtPriceDisplay: '$199.98',
+    imageUrl: 'https://m.media-amazon.com/images/I/71mZUDP7oIL._AC_SL1500_.jpg',
+    images: [
+      'https://m.media-amazon.com/images/I/71mZUDP7oIL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/41iY6HAu0wL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/41IDSn0LBYL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/41zdm4OtW8L._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/51s+GNhjcyL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/518G5q6nohL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/51RRBknsq5L._AC_SL1500_.jpg',
+    ],
+    category: 'accent-chair',
+    roomType: ['living-room', 'bedroom', 'office'],
+    styles: ['industrial', 'rustic', 'mid-century', 'modern', 'transitional', 'farmhouse'],
+    materials: ['leather', 'wood'],
+    tags: [
+      'accent-chair', 'arm-chair', 'lounge-chair', 'reading-chair', 'chaise-lounge',
+      'leather', 'oil-wax-leather', 'rubber-wood', 'solid-wood', 'wood-frame',
+      'removable-armrests', 'bolster-pillow', 'lumbar-pillow', 'contoured-cushion',
+      'mortise-and-tenon', 'tool-free-assembly',
+      'living-room', 'bedroom', 'balcony', 'reading-room', 'cabin', 'lounge',
+      'industrial', 'rustic', 'cabin-feel', 'mid-century', 'modern',
+      'transitional', 'farmhouse', 'vintage', 'retro',
+      'hjaustevy', 'scratch-resistant', 'stain-resistant', 'pet-friendly',
+      'antique-black', 'black', 'retro-orange', 'orange',
+    ],
+    source: 'amazon',
+    affiliateUrl: 'https://www.amazon.com/dp/B0FJYM42F7?tag=' + TAG,
+    rating: 4.6,
+    reviewCount: 3,
+    description: 'Hjaustevy mid-century leather lounge chair with a vintage industrial / cabin aesthetic. Oil-wax-coated leather upholstery resists water, spills, and pet scratches. Solid rubber wood frame with traditional mortise-and-tenon joinery for tool-free assembly. Contoured cushion supports neck, back, and legs; detachable armrests double as bolster or lumbar pillows. Perfect for cabin lounges, industrial reading rooms, and rustic studies.',
+    features: [
+      'Oil-wax coated leather — water-, scratch-, and pet-resistant; ages beautifully',
+      'Detachable padded armrests double as bolster pillow or lumbar support',
+      'Solid rubber wood frame with mortise-and-tenon joinery — tool-free assembly',
+      'Contoured cushion cradles neck, back, and legs for cloud-like relaxation',
+      'Removable cushion covers; wood frame resists moisture and insects',
+    ],
+    variants: [
+      { id: '1', label: 'Antique Black', asin: 'B0FJYM42F7', price: 199.98, swatchImage: 'https://m.media-amazon.com/images/I/41iY6HAu0wL._AC_SL300_.jpg', mainImage: 'https://m.media-amazon.com/images/I/71mZUDP7oIL._AC_SL1500_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FJYM42F7?tag=' + TAG },
+      { id: '2', label: 'Retro Orange', asin: 'B0GJYL1VQL', price: 199.98, swatchImage: 'https://m.media-amazon.com/images/I/51D8OBfzEfL._AC_SL300_.jpg', mainImage: 'https://m.media-amazon.com/images/I/81IvWiULo7L._AC_SL1500_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0GJYL1VQL?tag=' + TAG },
+    ],
+  },
+
 ];
 
 // ─── Enrichment status helper ────────────────────────────────────────────────
