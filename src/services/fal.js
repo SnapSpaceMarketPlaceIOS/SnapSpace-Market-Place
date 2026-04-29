@@ -410,29 +410,36 @@ export async function generateSingleProductInRoom(roomPhotoUrl, product, aspectR
 
   const descriptor = describeProductForPrompt(product) || (product.category || 'furniture').replace(/-/g, ' ');
 
-  // Cap Amazon product image to 512px max dimension — FAL's per-MP billing
-  // makes large product source images costly even though the model
-  // downsamples internally. Same regex strategy as replicate.js.
+  // Upscale Amazon product image to 1500px — flux-2-pro/edit needs
+  // high-resolution source detail (silhouette edges, fabric weave, wood
+  // grain) to faithfully copy the product into the room. Earlier code
+  // capped at 512px for a presumed FAL per-input-MP billing concern, but
+  // FAL bills on OUTPUT megapixels (model downsamples inputs internally
+  // to a fixed token grid regardless). The 512px cap was strictly losing
+  // quality for no cost protection. Matches the panel path's strategy
+  // in src/utils/createProductPanel.js (which has always used 1500px).
   let productImageUrl = product.imageUrl;
   try {
     const parsed = new URL(productImageUrl);
     if (parsed.hostname.includes('amazon') || parsed.hostname.includes('media-amazon')) {
-      productImageUrl = productImageUrl.replace(/\._[A-Z0-9_]+_\./, '._AC_SL512_.');
-      console.log('[flux-2-pro/edit] resized Amazon image to 512px:', productImageUrl.substring(productImageUrl.lastIndexOf('/') + 1));
+      productImageUrl = productImageUrl
+        .replace(/_AC_SL\d+_/g,  '_AC_SL1500_')
+        .replace(/_AC_UL\d+_/g,  '_AC_SL1500_')
+        .replace(/_SX\d+_/g,     '_AC_SL1500_')
+        .replace(/_SR\d+,\d+_/g, '_AC_SL1500_');
+      console.log('[flux-2-pro/edit] upscaled Amazon image to 1500px:', productImageUrl.substring(productImageUrl.lastIndexOf('/') + 1));
     }
   } catch {
     // URL parsing failed — use original URL unchanged
   }
 
-  // Single-product flow has no user style prompt — EDITORIAL (default) fits
-  // product-placement photography. Plain-English fidelity directives pin the
-  // panel as authoritative (Phase 1 of AI fidelity plan: replaced parenthetical
-  // weighting which flux-2-pro/edit doesn't document support for).
+  // Build 115: same structural cleanup as buildPanelPrompt — short
+  // positive imperatives, no anti-instructions. Single-product flow has
+  // no user style prompt, so the wrapper is even shorter (~50 words).
   const prompt = [
     getQualityPrefix(),
-    'This is a precise scene edit, not a new generation.',
-    'Preserve image 1 exactly: same walls, floor, ceiling, windows, lighting, camera angle, perspective, and spatial layout. Do not alter any architecture.',
-    `Place this EXACT product (image 2) into the room: ${descriptor}. The product in the final image must match image 2 exactly — its color, material, silhouette, finish, and proportions. Position it naturally where this type of furniture belongs in the room. Do not substitute with similar-looking alternatives.`,
+    'Scene edit: preserve image 1\'s walls, floor, ceiling, windows, lighting, and camera angle unchanged.',
+    `Place the product from image 2 into the room: a ${descriptor}. Match its color, material, silhouette, and proportions to the reference exactly.`,
     FIDELITY_DIRECTIVES_SINGLE,
   ].join(' ');
 
