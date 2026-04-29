@@ -26307,6 +26307,58 @@ export const PRODUCT_CATALOG = [
     ],
   },
 
+  {
+    id: 'B0C73NG4SN',
+    asin: 'B0C73NG4SN',
+    name: 'SAILINGSTORY Wooden Canoe Boat Coastal Nautical Coffee Table with Glass Top, Antique Honey Finish',
+    brand: 'SAILINGSTORY',
+    price: 626.00,
+    priceDisplay: '$626.00',
+    compareAtPrice: 626.00,
+    compareAtPriceDisplay: '$626.00',
+    imageUrl: 'https://m.media-amazon.com/images/I/71suQLl8pgL._AC_SL1500_.jpg',
+    images: [
+      'https://m.media-amazon.com/images/I/71suQLl8pgL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/41rvza1Ds4L._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/61aDJ+uj6VL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/41x7cDdKtuL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/41nXF4s0OIL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/41F6b+pCNSL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/51W0mhzSgiL._AC_SL1500_.jpg',
+    ],
+    category: 'coffee-table',
+    roomType: ['living-room', 'office'],
+    styles: ['coastal', 'nautical', 'rustic', 'mediterranean', 'transitional', 'eclectic', 'farmhouse', 'bohemian'],
+    materials: ['wood', 'glass'],
+    tags: [
+      'coffee-table', 'canoe-coffee-table', 'boat-coffee-table',
+      'wooden-canoe', 'sculptural', 'statement-piece', 'centerpiece',
+      'coastal', 'nautical', 'lake-house', 'beach-house', 'cabin', 'cabin-feel',
+      'rustic', 'farmhouse', 'mediterranean', 'transitional', 'eclectic', 'bohemian',
+      'glass-top', 'tempered-glass', 'antique-honey', 'honey-finish',
+      'basswood', 'basswood-veneer', 'handcrafted',
+      '54-inch', 'long-coffee-table',
+      'living-room', 'office', 'study', 'lake-cottage', 'beach-cottage',
+      'sailingstory', 'home-decor',
+      'brown', 'honey', 'natural-wood',
+    ],
+    source: 'amazon',
+    affiliateUrl: 'https://www.amazon.com/dp/B0C73NG4SN?tag=' + TAG,
+    rating: 3.3,
+    reviewCount: 5,
+    description: 'SAILINGSTORY handcrafted wooden canoe coffee table — a sculptural coastal centerpiece for lake houses, beach cottages, and nautical-themed living rooms. Built with basswood veneers on a frame with a solid basswood stand, finished in warm Antique Honey, topped with a glass surface for everyday use. 54"L × 17"W × 20"H. Decorative only — not water-floating. Easy assembly with included instructions.',
+    features: [
+      'Handcrafted canoe-boat silhouette — sculptural coastal/nautical statement',
+      'Basswood veneers on frame with solid basswood stand for stability',
+      'Glass top makes it usable as a coffee or accent table',
+      '54" long — generous surface for living rooms, lake cottages, beach houses',
+      'Antique honey finish — warm, vintage coastal patina',
+    ],
+    variants: [
+      { id: '1', label: 'Antique Honey', asin: 'B0C73NG4SN', price: 626.00, swatchImage: 'https://m.media-amazon.com/images/I/41rvza1Ds4L._AC_SL300_.jpg', mainImage: 'https://m.media-amazon.com/images/I/71suQLl8pgL._AC_SL1500_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0C73NG4SN?tag=' + TAG },
+    ],
+  },
+
 ];
 
 // ─── Enrichment status helper ────────────────────────────────────────────────
