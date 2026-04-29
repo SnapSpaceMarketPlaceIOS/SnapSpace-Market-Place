@@ -192,10 +192,16 @@ export const STYLE_PRESETS = [
     id: 'dark-luxe',
     label: 'Dark Luxe',
     image: require('../assets/styles/dark-luxe.jpg'),
+    // Build 116: replaced "gold" → "brass" across all three variations.
+    // 'gold' is in the glam keyword list, so "gold-accent palette" was
+    // pulling glam to TOP-1 over dark-luxe. Brass is dark-luxe-aligned
+    // (moody/restrained metallic) and isn't a primary trigger for any
+    // other style. Combined with the parser verbatim normalization fix,
+    // dark-luxe prompts now reliably score #1 against glam.
     prompts: [
-      'Dark Luxe living room, low-key cinematic lighting, single accent lamp glow, plush velvet and leather textures, midnight black with gold-accent palette, opulent restraint and refined hush.',
-      'Dark Luxe living room, single-source dramatic lamplight, deep velvet shadows, plush upholstered and canvas-art textures, charcoal and gold palette, sophisticated stillness and cinematic gravity.',
-      'Dark Luxe living room, low-key chiaroscuro lighting, deep void shadows, velvet and ceramic textures with gold-accent detail, midnight palette, refined opulence and quiet drama.',
+      'Dark Luxe living room, low-key cinematic lighting, single accent lamp glow, plush velvet and leather textures, midnight black with brass-accent palette, opulent restraint and refined hush.',
+      'Dark Luxe living room, single-source dramatic lamplight, deep velvet shadows, plush upholstered and canvas-art textures, charcoal and brass palette, sophisticated stillness and cinematic gravity.',
+      'Dark Luxe living room, low-key chiaroscuro lighting, deep void shadows, velvet and ceramic textures with brass-accent detail, midnight palette, refined opulence and quiet drama.',
     ],
   },
 ];

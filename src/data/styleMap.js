@@ -37,7 +37,7 @@ export const ROOM_FURNITURE = {
 // ─── Design Styles ─────────────────────────────────────────────────────────────
 export const DESIGN_STYLES = [
   'minimalist', 'japandi', 'rustic', 'industrial', 'brutalist', 'coastal',
-  'art-deco', 'mid-century', 'bohemian', 'scandi', 'dark-luxe', 'biophilic',
+  'art-deco', 'mid-century', 'bohemian', 'scandinavian', 'dark-luxe', 'biophilic',
   'transitional', 'contemporary', 'farmhouse', 'mediterranean',
   'wabi-sabi', 'maximalist', 'french-country', 'glam', 'luxury',
 ];
@@ -63,7 +63,14 @@ export const STYLE_KEYWORDS = {
   'mid-century':    ['mid century', 'midcentury', 'mid-century', 'retro', 'eames', 'atomic', 'teak', '1950', '1960'],
   // removed bare 'layered' — fired on rustic ("layered earthy shadows")
   'bohemian':       ['bohemian', 'boho', 'eclectic', 'free spirit', 'global', 'tribal', 'macrame'],
-  'scandi':         ['scandi', 'scandinavian', 'nordic', 'hygge', 'danish', 'swedish', 'norwegian', 'finnish'],
+  // Build 116 fix: parser key was 'scandi' but the catalog tags products as
+  // 'scandinavian' (31 products) vs 'scandi' (3 products). The matcher's
+  // tier-1 +15 exact-style bonus does product.styles.includes(parsedKey),
+  // so when parser returned 'scandi' it missed 31 of 34 Scandinavian
+  // products. Renamed the key to match the dominant catalog tag — the
+  // STYLE_AFFINITY map already has both rows so 'scandi'-tagged products
+  // still get full affinity routing.
+  'scandinavian':   ['scandi', 'scandinavian', 'nordic', 'hygge', 'danish', 'swedish', 'norwegian', 'finnish'],
   // removed bare 'dark' and 'black' — too common, fired on every dark-mood
   // prompt regardless of style intent. Multi-word forms preserve dark-luxe
   // intent without polluting brutalist/industrial parsing.

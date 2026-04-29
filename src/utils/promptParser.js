@@ -215,17 +215,29 @@ function detectAllRoomTypes(text) {
 // This converts the parser from "every-keyword-fires" to "top-3-by-fit",
 // dramatically reducing variance in matcher selection without changing
 // any downstream API.
+// Build 116 fix: normalize hyphens/spaces/underscores when checking
+// verbatim style-name match. The keyword 'dark luxe' (with space) and
+// the style key 'dark-luxe' (with hyphen) were different strings under
+// the prior `kw === style` check, so the 5× verbatim boost SILENTLY
+// failed to fire for 5 multi-word styles: dark-luxe, art-deco,
+// mid-century, wabi-sabi, french-country. With normalization,
+// "Dark Luxe living room..." correctly fires the dark-luxe verbatim
+// boost (×5) and dominates over glam keyword matches in the prompt.
+// Strictly EXPANDS what counts as verbatim — no existing match weakens.
+const _normalizeStyleToken = (s) => String(s || '').replace(/[\s\-_]+/g, '').toLowerCase();
+
 function detectStyles(text) {
   const scored = [];
   for (const [style, keywords] of Object.entries(STYLE_KEYWORDS)) {
     let score = 0;
+    const styleNorm = _normalizeStyleToken(style);
     for (const kw of keywords) {
       if (text.includes(kw)) {
         // Specificity weight: longer keywords are rarer and more intentional.
         // 'wabi-sabi' (9 chars) outweighs 'raw' (3 chars).
         const specificity = Math.max(1, kw.length / 3);
-        // Verbatim style-name match in prompt = explicit intent boost.
-        const verbatim = (kw === style) ? 5 : 1;
+        // Verbatim style-name match — normalized so 'dark luxe' === 'dark-luxe'.
+        const verbatim = (_normalizeStyleToken(kw) === styleNorm) ? 5 : 1;
         score += specificity * verbatim;
       }
     }
