@@ -1,0 +1,323 @@
+# Panel Audit Apply Log
+
+**Generated:** 2026-04-29T23:57:22.669Z
+**Mode:** APPLIED
+
+## Summary
+
+| Metric | Count |
+|---|---|
+| Eligible for swap | 307 |
+| Swapped | 236 |
+| Skipped (already matched) | 71 |
+| Not found / drift | 0 |
+
+## Per-product log
+
+- ✓ `B0FGD5615L` (coffee-table, score 88): imageUrl 81-a1cUJElL._AC_UL640_.jpg → 41ZGRunlOjL._AC_SL1500_.jpg
+- ✓ `B0DJ54DT2G` (coffee-table, score 92): imageUrl 51CLX01QPIL._AC_SL1500_.jpg → 41SfhdhPmnL._AC_SL1500_.jpg
+- ✓ `B0F21JRJ43` (coffee-table, score 85): imageUrl 41TJfxE1z1L._AC_SL1500_.jpg → 31-C87ucxnL._AC_SL1500_.jpg
+- ✓ `B0FFLPS4WJ` (coffee-table, score 92): imageUrl 51GvDKhS8tL._AC_SL1500_.jpg → 41dNgm27ZQL._AC_SL1500_.jpg
+- ✓ `B0CZNXN3NN` (coffee-table, score 92): imageUrl 518aIgqFXoL._AC_SL1500_.jpg → 41vmoUR1udL._AC_SL1500_.jpg
+- ✓ `B0DDQ3273X` (sofa, score 85): imageUrl 41LXeu0rW9L._AC_SL1500_.jpg → 212lR0SGw5L._AC_SL1500_.jpg
+- ✓ `B0CDWS3291` (sofa, score 92): imageUrl 41d-z4PNZTL._AC_SL1500_.jpg → 311PyizmGBL._AC_SL1500_.jpg
+- ✓ `B0DYD79JC6` (sofa, score 92): imageUrl 41inaNox5xL._AC_SL1500_.jpg → 41VsDxJCysL._AC_SL1500_.jpg
+- ✓ `B09P83DPX4` (sofa, score 72): imageUrl 518hjP4wuEL._AC_SL1500_.jpg → 41mXifcpWLL._AC_SL1500_.jpg
+- ✓ `B0FMR36SC4` (sofa, score 92): imageUrl 51-jdxnjraL._AC_SL1500_.jpg → 31wC29JcACL._AC_SL1500_.jpg
+- ✓ `B0D9BGNR7X` (sofa, score 88): imageUrl 51nuMMn8CvL._AC_SL1500_.jpg → 41w3HQvljOL._AC_SL1500_.jpg
+- ✓ `B0DSW5H4Z6` (sofa, score 92): imageUrl 51SQkE9VEYL._AC_SL1500_.jpg → 313fvgpQ8kL._AC_SL1500_.jpg
+- ✓ `B0FP55743T` (sofa, score 92): imageUrl 51DElNtqcML._AC_SL1500_.jpg → 41Hfpl9x0hL._AC_SL1500_.jpg
+- ✓ `B0D5HVTRCJ` (rug, score 78): imageUrl 41atb-T6TkL._AC_SL1500_.jpg → 51PXVccCKNL._AC_SL1500_.jpg
+- ✓ `B0DD3P3X2B` (rug, score 72): imageUrl 41JvugK4UfL._AC_SL1500_.jpg → 51sGYm8zX7L._AC_SL1500_.jpg
+- ✓ `B0DSM1TXLY` (rug, score 92): imageUrl 51xLSYWerbL._AC_SL1500_.jpg → 41AdW+l9MAL._AC_SL1500_.jpg
+- ✓ `B0C7G62S68` (mirror, score 72): imageUrl 51ly4BYo67L._AC_SL1500_.jpg → 51Xz53xP87L._AC_SL1500_.jpg
+- ✓ `B0FF4LW9FM` (wall-art, score 92): imageUrl 41zhqLpZl0L._AC_SL1500_.jpg → 51LyXaQ5z6L._AC_SL1500_.jpg
+- ✓ `B0F6CV3XQK` (wall-art, score 78): imageUrl 41cV5cKSSkL._AC_SL1500_.jpg → 41ZTD1mwWzL._AC_SL1500_.jpg
+- ⏭ `B0GRGK3J3W` (wall-art): audit pick == current imageUrl, no change
+- ⏭ `B09Y5SB61L` (wall-art): audit pick == current imageUrl, no change
+- ⏭ `B0DNLWN98Q` (wall-art): audit pick == current imageUrl, no change
+- ⏭ `B0DSJ47KCN` (wall-art): audit pick == current imageUrl, no change
+- ⏭ `B0DJFKHN8Y` (wall-art): audit pick == current imageUrl, no change
+- ✓ `B0FZTG8YP3` (sofa, score 92): imageUrl 51FLK7pbW8L._AC_SL1500_.jpg → 41MalCsG7OL._AC_SL1500_.jpg
+- ✓ `B0DLGTQTB8` (sofa, score 92): imageUrl 41EUfxYdFIL._AC_SL1500_.jpg → 411pWbfRG3L._AC_SL1500_.jpg
+- ✓ `B0FMXYHTL8` (accent-chair, score 92): imageUrl 41UWIV++NuL._AC_SL1500_.jpg → 41eYqqhEdwL._AC_SL1500_.jpg
+- ✓ `B0DQ1JZ87Y` (accent-chair, score 72): imageUrl 414pHZUDnEL._AC_SL1500_.jpg → 412WDgjz2vL._AC_SL1500_.jpg
+- ✓ `B0FCF9G1VG` (accent-chair, score 78): imageUrl 41idGumCZ4L._AC_SL1500_.jpg → 41KqPAoneqL._AC_SL1500_.jpg
+- ✓ `B0CM3JHFY6` (accent-chair, score 92): imageUrl 81rj2cvh3JL._AC_SL1500_.jpg → 61wqYdLZ0yL._AC_SL1500_.jpg
+- ✓ `B0D8TDK33F` (sofa, score 88): imageUrl 71OfL+a4CLL._AC_SL1500_.jpg → 41w-HnCA2hL._AC_SL1500_.jpg
+- ✓ `B0DYDGGMM1` (sofa, score 92): imageUrl 81U6yUUsOXL._AC_SL1500_.jpg → 41yA1CmUziL._AC_SL1500_.jpg
+- ✓ `B0FK57WSBD` (sofa, score 92): imageUrl 71HuA4RYrzL._AC_SL1500_.jpg → 31WyBg8SJsL._AC_SL1500_.jpg
+- ✓ `B0GKG2F82J` (sofa, score 82): imageUrl 91ktb2Ru8SL._AC_SL1500_.jpg → 412MQhkyTbL._AC_SL1500_.jpg
+- ✓ `B0FJM1TLKC` (sofa, score 95): imageUrl 81Jb-5oxMlL._AC_SL1500_.jpg → 41gmt1jysFL._AC_SL1500_.jpg
+- ✓ `B0FP554HJJ` (sofa, score 92): imageUrl 81DUI266dUL._AC_SL1500_.jpg → 41Hfpl9x0hL._AC_SL1500_.jpg
+- ✓ `B0FSS8SM4L` (sofa, score 85): imageUrl 814+gvO86dL._AC_SL1500_.jpg → 51ud2p-K79L._AC_SL1500_.jpg
+- ✓ `B0FYNRY6DH` (sofa, score 92): imageUrl 71jaR-WfJYL._AC_SL1500_.jpg → 212lR0SGw5L._AC_SL1500_.jpg
+- ✓ `B08R9M6LW7` (sofa, score 92): imageUrl 71eEudHMv0L._AC_SL1500_.jpg → 41BBTIQ750L._AC_SL1500_.jpg
+- ✓ `B0GGZ2LMC9` (sofa, score 72): imageUrl 81yfP1rYPCL._AC_SL1500_.jpg → 41aX3Y3BejL._AC_SL1500_.jpg
+- ✓ `B0DLB67LDW` (sofa, score 78): imageUrl 81CAfgZsDkL._AC_SL1500_.jpg → 517O0cESZyL._AC_SL1500_.jpg
+- ✓ `B0GTQP915M` (sofa, score 92): imageUrl 71-fomhTx-L._AC_SL1500_.jpg → 31puLaVrC+L._AC_SL1500_.jpg
+- ✓ `B0G52CMJ5F` (tv-stand, score 78): imageUrl 81hTwFDlbnL._AC_SL1500_.jpg → 71drSySNm-L._AC_SL1500_.jpg
+- ✓ `B0D52B73TS` (tv-stand, score 92): imageUrl 61Ny2V6-iWL._AC_SL1500_.jpg → 41cVqTWisEL._AC_SL1500_.jpg
+- ✓ `B0FX2L76N2` (tv-stand, score 88): imageUrl 714xGcYJ3pL._AC_SL1500_.jpg → 41WUCVT3C-L._AC_SL1500_.jpg
+- ✓ `B0FP1Y3525` (tv-stand, score 85): imageUrl 81xisi2mTrL._AC_SL1500_.jpg → 41-8iUiMakL._AC_SL1500_.jpg
+- ✓ `B0FF9X61KS` (tv-stand, score 92): imageUrl 91OzIjw5b7L._AC_SL1500_.jpg → 31iGgsxOz1L._AC_SL1500_.jpg
+- ✓ `B0GH6YX6FR` (coffee-table, score 85): imageUrl 71ACVWqJ8xL._AC_SL1500_.jpg → 51MbaS13NJL._AC_SL1500_.jpg
+- ✓ `B09JZ2QJSJ` (coffee-table, score 82): imageUrl 71ielDQgBaL._AC_SL1500_.jpg → 31yh4i1JEGL._AC_SL1500_.jpg
+- ✓ `B0FKT56B95` (coffee-table, score 82): imageUrl 51QBC4H3BSL._AC_SL1500_.jpg → 41f8aLN9WFL._AC_SL1500_.jpg
+- ✓ `B0F9KV76QL` (coffee-table, score 88): imageUrl 81QvRec-KUL._AC_SL1500_.jpg → 31fX974M7QL._AC_SL1500_.jpg
+- ✓ `B0G23TXQ3L` (coffee-table, score 92): imageUrl A1RjNSmX8JL._AC_SL1500_.jpg → 21ACdBRiSVL._AC_SL1500_.jpg
+- ✓ `B0F7LP7XQ2` (coffee-table, score 92): imageUrl 91U3cro6wyL._AC_SL1500_.jpg → 41ACbNNs76L._AC_SL1500_.jpg
+- ✓ `B0CD7BGYQY` (rug, score 72): imageUrl 81AS0o2ARVL._AC_SL1500_.jpg → 51vbTPVz+XL._AC_SL1500_.jpg
+- ✓ `B0D7928FM3` (accent-chair, score 92): imageUrl 81EcY2MhHDL._AC_SL1500_.jpg → 419EtEBBG9L._AC_SL1500_.jpg
+- ✓ `B0GGXB9ZL2` (accent-chair, score 85): imageUrl 81vsebgeLnL._AC_SL1500_.jpg → 41v8CFG9lqL._AC_SL1500_.jpg
+- ⏭ `B07C3H1LKQ` (mirror): audit pick == current imageUrl, no change
+- ⏭ `B07B4JPV9X` (mirror): audit pick == current imageUrl, no change
+- ⏭ `B087B3QGLN` (mirror): audit pick == current imageUrl, no change
+- ✓ `B06XY21ZHQ` (tv-stand, score 78): imageUrl 81luCdOb67L._AC_SL1500_.jpg → 81tdBGaAIoL._AC_SL1500_.jpg
+- ✓ `B0GNJ3V133` (bed, score 92): imageUrl 81cmOSWBzHL._AC_SL1500_.jpg → 51H8cqO36gL._AC_SL1500_.jpg
+- ✓ `B0DFTL8F7G` (bed, score 72): imageUrl 71ffnxrvQbL._AC_SL1500_.jpg → 51NF0bSGphL._AC_SL1500_.jpg
+- ✓ `B0DJNFRJ5P` (bed, score 72): imageUrl 81sCy-vfXuL._AC_SL1500_.jpg → 41RdndGJogL._AC_SL1500_.jpg
+- ✓ `B0GD2159L8` (bed, score 85): imageUrl 81w1oE9QQoL._AC_SL1500_.jpg → 417BSFXr1LL._AC_SL1500_.jpg
+- ✓ `B0GGB42BYR` (bed, score 85): imageUrl 91dHCdKBm4L._AC_SL1500_.jpg → 519CpI23q1L._AC_SL1500_.jpg
+- ✓ `B0GR426KHJ` (bed, score 92): imageUrl 71FdmrK2+gL._AC_SL1500_.jpg → 41LxMDTHkRL._AC_SL1500_.jpg
+- ✓ `B0FHBF4DPF` (bed, score 78): imageUrl 81Mb07tGu5L._AC_SL1500_.jpg → 41rc96FfuVL._AC_SL1500_.jpg
+- ✓ `B0G8HCHRCM` (bed, score 95): imageUrl 91h889MIkPL._AC_SL1500_.jpg → 41ftKa4wIjL._AC_SL1500_.jpg
+- ✓ `B0DTYMNWT4` (bed, score 85): imageUrl 81F0+qm4+5L._AC_SL1500_.jpg → 51lzY1KBmfL._AC_SL1500_.jpg
+- ✓ `B0DBZ467LQ` (bed, score 92): imageUrl 615XyqiskqL._AC_SL1500_.jpg → 41ByonuqvSL._AC_SL1500_.jpg
+- ✓ `B0GC5QHP8W` (bed, score 72): imageUrl 91jeA7ek1aL._AC_SL1500_.jpg → 51DoQLnVONL._AC_SL1500_.jpg
+- ✓ `B0DSJKP6WP` (table-lamp, score 92): imageUrl 71K5zrQ22KL._AC_SX679_.jpg → 41PCZmrdeLL._AC_SX679_.jpg
+- ✓ `B0FQPMLJ6Q` (table-lamp, score 82): imageUrl 81LBQkYpVKL._AC_SL1500_.jpg → 31Ap0ABe7NL._AC_SL1500_.jpg
+- ✓ `B0B499TR7T` (table-lamp, score 92): imageUrl 71XTCRhncvL._AC_SL1500_.jpg → 21MSj+idP3L._AC_SL1500_.jpg
+- ✓ `B0DH9WDN4K` (table-lamp, score 92): imageUrl 81QPCDFSEnL._AC_SL1500_.jpg → 21mVSgRXODL._AC_SL1500_.jpg
+- ⏭ `B00GTQ4LH2` (table-lamp): audit pick == current imageUrl, no change
+- ✓ `B0BVX7341N` (table-lamp, score 92): imageUrl 81rFb87loCL._AC_SL1500_.jpg → 21rS9M1j1BL._AC_SL1500_.jpg
+- ✓ `B0F3QDLYGK` (table-lamp, score 92): imageUrl 81Wezpd7WUL._AC_SL1500_.jpg → 31l1clYTvFL._AC_SL1500_.jpg
+- ⏭ `B000AS9A5I` (floor-lamp): audit pick == current imageUrl, no change
+- ✓ `B0BZSHSKJ7` (floor-lamp, score 92): imageUrl 81gE2gWvK+L._AC_SL1500_.jpg → 41he2BbctnL._AC_SL1500_.jpg
+- ✓ `B0DNFL3VLW` (kitchen-island, score 78): imageUrl 81Q7cYZLPVL._AC_SX679_.jpg → 41gH+G+t3rL._AC_SX679_.jpg
+- ✓ `B0FD6L5BJZ` (kitchen-island, score 75): imageUrl 71pTboCEZBL._AC_SL1500_.jpg → 41cFhv8kJML._AC_SL1500_.jpg
+- ✓ `B07X438YJ5` (kitchen-island, score 92): imageUrl 71sBHKVeFOL._AC_SL1500_.jpg → 41DvwqsY-6L._AC_SL1500_.jpg
+- ✓ `B001TH7G9G` (kitchen-island, score 78): imageUrl 819isHP6A4L._AC_SL1500_.jpg → 41x69-vO5dL._AC_SL1500_.jpg
+- ✓ `B0072VZ1EA` (kitchen-island, score 92): imageUrl 71ucL5CrIvL._AC_SL1500_.jpg → 41bsKxHMwcL._AC_SL1500_.jpg
+- ✓ `B00QM8ZCPW` (kitchen-island, score 85): imageUrl 41nhllUxsDL._AC_SL1500_.jpg → 41kq3XZsCuL._AC_SL1500_.jpg
+- ✓ `B0F8R98TVQ` (kitchen-island, score 72): imageUrl 71svg0hZGIL._AC_SL1500_.jpg → 41kON+bUWUL._AC_SL1500_.jpg
+- ✓ `B0DSFGJDPV` (kitchen-island, score 78): imageUrl 61k-uDGTwYL._AC_SL1500_.jpg → 4187cFEfeJL._AC_SL1500_.jpg
+- ✓ `B0GCMRQJWZ` (kitchen-island, score 92): imageUrl 71oMij2BFxL._AC_SL1500_.jpg → 3158vWBmEAL._AC_SL1500_.jpg
+- ✓ `B0GN2N5C9W` (dining-table, score 82): imageUrl 91f5pWUrIYL._AC_SX679_.jpg → 41lYr5fbb1L._AC_SX679_.jpg
+- ✓ `B0F1CWCQ62` (dining-table, score 82): imageUrl 81vN+moAdIL._AC_SX679_.jpg → 41s46v3tFXL._AC_SX679_.jpg
+- ✓ `B0FZTX43ST` (dining-table, score 72): imageUrl 91Y3EGktwiL._AC_SX679_.jpg → 41WkwdZfY3L._AC_SX679_.jpg
+- ✓ `B0DQJCZF9T` (dining-table, score 92): imageUrl 91ZA2Ys4NKL._AC_SX679_.jpg → 313x48GsuWL._AC_SX679_.jpg
+- ✓ `B0GKV5DQX6` (dining-table, score 92): imageUrl 81dKD9N5zJL._AC_SL1500_.jpg → 31-Z0d30AiL._AC_SL1500_.jpg
+- ✓ `B0DC6CGVJ4` (dining-chair, score 92): imageUrl 81dvuPJ1lkL._AC_SX679_.jpg → 413CoN1a5FL._AC_SX679_.jpg
+- ✓ `B097XXCZ3P` (side-table, score 92): imageUrl 71A-+JRUMfL._AC_SL1500_.jpg → 71s4Mv7aQRL._AC_SL1500_.jpg
+- ⏭ `B07FNHP3ZL` (side-table): audit pick == current imageUrl, no change
+- ⏭ `B002D1E37A` (side-table): audit pick == current imageUrl, no change
+- ⏭ `B07KGNFVS2` (side-table): audit pick == current imageUrl, no change
+- ⏭ `B07DKQS31H` (side-table): audit pick == current imageUrl, no change
+- ⏭ `B000W9Y046` (side-table): audit pick == current imageUrl, no change
+- ✓ `B099WQJLGK` (side-table, score 92): imageUrl 816a41CR8wL._AC_SL1500_.jpg → 81SIII5D9gL._AC_SL1500_.jpg
+- ⏭ `B0C9HNSM3X` (side-table): audit pick == current imageUrl, no change
+- ⏭ `B09B1PTSKD` (side-table): audit pick == current imageUrl, no change
+- ✓ `B0958X4G4C` (side-table, score 92): imageUrl 61D6hfKAJOL._AC_SL1500_.jpg → 61NH6Tfdx4L._AC_SL1500_.jpg
+- ✓ `B0CV622VQF` (side-table, score 92): imageUrl 61ib8i5h9mL._AC_SL1500_.jpg → 61CByhR1eXL._AC_SL1500_.jpg
+- ⏭ `B08R41LNFT` (nightstand): audit pick == current imageUrl, no change
+- ⏭ `B07MHJLSPT` (nightstand): audit pick == current imageUrl, no change
+- ⏭ `B0CF2BB66C` (nightstand): audit pick == current imageUrl, no change
+- ⏭ `B07KGMVC9Z` (nightstand): audit pick == current imageUrl, no change
+- ✓ `B07ZPCNXZZ` (nightstand, score 72): imageUrl 61sk+cbrFZL._AC_SL1500_.jpg → 61ynn41l08L._AC_SL1500_.jpg
+- ✓ `B0BF5TJD8H` (nightstand, score 85): imageUrl 81XB+oDLEPL._AC_SL1500_.jpg → 71STxXtGo9L._AC_SL1500_.jpg
+- ⏭ `B086XHYHQF` (nightstand): audit pick == current imageUrl, no change
+- ✓ `B0C98MQW5T` (nightstand, score 92): imageUrl 61Ac6NSilRL._AC_SL1500_.jpg → 615PHGI0zRL._AC_SL1500_.jpg
+- ⏭ `B09YTNJPYQ` (nightstand): audit pick == current imageUrl, no change
+- ✓ `B0FZFV8682` (nightstand, score 92): imageUrl 61vYs1rvreL._AC_SL1500_.jpg → 515z6504m8L._AC_SL1500_.jpg
+- ✓ `B09F98V13W` (dresser, score 92): imageUrl 81FaL4YM7yL._AC_SL1500_.jpg → 91jkR31gn8L._AC_SL1500_.jpg
+- ✓ `B0DSLQRQRT` (dresser, score 92): imageUrl 71ig5sVoxXL._AC_SL1500_.jpg → 81NEYlCtCEL._AC_SL1500_.jpg
+- ✓ `B08HR6J2NT` (dresser, score 92): imageUrl 81E8t5fhdEL._AC_SL1500_.jpg → 81ZNoaZ6euL._AC_SL1500_.jpg
+- ✓ `B0D1GPHCW7` (dresser, score 78): imageUrl 81MkWU72iDL._AC_SL1500_.jpg → 81P--mfwPYL._AC_SL1500_.jpg
+- ⏭ `B0C4T5D72R` (dresser): audit pick == current imageUrl, no change
+- ✓ `B0B6PGXJY3` (dresser, score 78): imageUrl 71MeBQ2NV5L._AC_SL1500_.jpg → 71d2NKgHcuL._AC_SL1500_.jpg
+- ✓ `B0CM31TXVK` (dresser, score 75): imageUrl 91GTtpbrd+L._AC_SL1500_.jpg → 91VKZTJHUYL._AC_SL1500_.jpg
+- ✓ `B0CWVHZVXT` (dresser, score 92): imageUrl 91ggZ9MXT7L._AC_SL1500_.jpg → 917nkTdYZqL._AC_SL1500_.jpg
+- ⏭ `B0D813DLBW` (dresser): audit pick == current imageUrl, no change
+- ✓ `B0CHR81YLB` (dresser, score 92): imageUrl 81logYKMn6L._AC_SL1500_.jpg → 816CDpJcObL._AC_SL1500_.jpg
+- ✓ `B0CCNTKHR6` (dresser, score 92): imageUrl 71HSVUG9zDL._AC_SL1500_.jpg → 917inRacD+L._AC_SL1500_.jpg
+- ✓ `B09LVW83S5` (dresser, score 92): imageUrl 81TNEJSupqL._AC_SL1500_.jpg → 81adUpta0OL._AC_SL1500_.jpg
+- ⏭ `B00UV7AQQK` (desk): audit pick == current imageUrl, no change
+- ✓ `B0895KHLNF` (desk, score 92): imageUrl 71YwBgB4R0L._AC_SL1500_.jpg → 71zk3BWuhoL._AC_SL1500_.jpg
+- ✓ `B08BXSXXDF` (desk, score 88): imageUrl 81pOPYngWBL._AC_SL1500_.jpg → 713QHd457eL._AC_SL1500_.jpg
+- ✓ `B09F664SX4` (desk, score 92): imageUrl 61y-fwiAYsL._AC_SL1500_.jpg → 612p3VAbfMS._AC_SL1500_.jpg
+- ✓ `B083HDTB3H` (desk, score 92): imageUrl 71-RJHGtg5L._AC_SL1500_.jpg → 51T9R3HySBL._AC_SL1500_.jpg
+- ✓ `B0CQLJ32TC` (desk-chair, score 92): imageUrl 41dV0wQ6iPL._AC_SL1500_.jpg → 418F+Ts-VGL._AC_SL1500_.jpg
+- ✓ `B0CWTZ2PHM` (desk-chair, score 92): imageUrl 81TIRoUQCIL._AC_SL1500_.jpg → 71kZ0YBIIOL._AC_SL1500_.jpg
+- ⏭ `B07BK25JJZ` (desk-chair): audit pick == current imageUrl, no change
+- ✓ `B0F91TJL3D` (desk-chair, score 92): imageUrl 71PcqF5ljdL._AC_SL1500_.jpg → 81R2IjnwnAL._AC_SL1500_.jpg
+- ✓ `B0FXMJ6DDK` (desk-chair, score 92): imageUrl 81iGibLxLxL._AC_SL1500_.jpg → 71d5CDV2whL._AC_SL1500_.jpg
+- ✓ `B0B41NM71X` (desk-chair, score 92): imageUrl 71a-ERBxUGL._AC_SL1500_.jpg → 7105lhueJQL._AC_SL1500_.jpg
+- ✓ `B0F8VPWGLS` (desk-chair, score 92): imageUrl 71K-pGGUR3L._AC_SL1500_.jpg → 719LGRFdNrL._AC_SL1500_.jpg
+- ⏭ `B0F62NG547` (desk-chair): audit pick == current imageUrl, no change
+- ⏭ `B0F5X1SMN4` (desk-chair): audit pick == current imageUrl, no change
+- ✓ `B0C8LYPQ3L` (desk-chair, score 85): imageUrl 61wqlB3rgkL._AC_SL1500_.jpg → 61oCxRU30xL._AC_SL1500_.jpg
+- ✓ `B0BDYN9N2R` (desk-chair, score 92): imageUrl 71R3lrdI0hL._AC_SL1500_.jpg → 71O6-vxOyZL._AC_SL1500_.jpg
+- ⏭ `B0B188DN36` (bookshelf): audit pick == current imageUrl, no change
+- ⏭ `B096ZX329L` (bookshelf): audit pick == current imageUrl, no change
+- ✓ `B0CQX91KJQ` (bookshelf, score 92): imageUrl 81cHAYc2ecL._AC_SL1500_.jpg → 61FCKflvHhL._AC_SL1500_.jpg
+- ✓ `B0FN3ZYC5L` (bookshelf, score 72): imageUrl 71pytDzNCHL._AC_SL1500_.jpg → 61a-hb21WdL._AC_SL1500_.jpg
+- ✓ `B0BVQQB5V9` (bookshelf, score 92): imageUrl 71RudUxkAXL._AC_SL1500_.jpg → 61ig1TOYdHL._AC_SL1500_.jpg
+- ✓ `B08TZVZ7RS` (bookshelf, score 72): imageUrl 919Gl+3FwVL._AC_SL1500_.jpg → 81QWg0cBdjL._AC_SL1500_.jpg
+- ✓ `B0BX8HD3QY` (bookshelf, score 92): imageUrl 81F83ofWnpL._AC_SL1500_.jpg → 61mRJR2gTeL._AC_SL1500_.jpg
+- ⏭ `B0B5FXQDSX` (bookshelf): audit pick == current imageUrl, no change
+- ✓ `B0C5RK4NBT` (bookshelf, score 58): imageUrl 81fUuSuZkAL._AC_SL1500_.jpg → 71Bxdkk2v+L._AC_SL1500_.jpg
+- ⏭ `B0CWNMSV2M` (bookshelf): audit pick == current imageUrl, no change
+- ⏭ `B07NYGYH16` (bookshelf): audit pick == current imageUrl, no change
+- ✓ `B09MK731BY` (pendant-light, score 72): imageUrl 71QmRfg5DfL._AC_SL1500_.jpg → 71k66ARV2oL._AC_SL1500_.jpg
+- ⏭ `B0968B7S51` (pendant-light): audit pick == current imageUrl, no change
+- ✓ `B08TC8KWJ9` (pendant-light, score 92): imageUrl 71ccJJMhCXL._AC_SL1500_.jpg → 71gxEvV+UqL._AC_SL1500_.jpg
+- ⏭ `B08JH56T5M` (pendant-light): audit pick == current imageUrl, no change
+- ✓ `B0F7KBBQV8` (pendant-light, score 92): imageUrl 71rPAgO-x5L._AC_SL1500_.jpg → 71P+VLmUmKL._AC_SL1500_.jpg
+- ✓ `B0D2LQR5MR` (pendant-light, score 92): imageUrl 71+VYQ+fItL._AC_SL1500_.jpg → 71l8tBsI5LL._AC_SL1500_.jpg
+- ✓ `B0CJPYVZ54` (pendant-light, score 75): imageUrl 41zTg+zUIbL._AC_SL1500_.jpg → 71DCcUChdOL._AC_SL1500_.jpg
+- ✓ `B08PVKQ7JW` (pendant-light, score 92): imageUrl 51hLd6gHRHL._AC_SL1500_.jpg → 617mcHGk4BL._AC_SL1500_.jpg
+- ✓ `B0DG64P38P` (pendant-light, score 92): imageUrl 71hr4b8B73L._AC_SL1500_.jpg → 71t+9CW4ZDL._AC_SL1500_.jpg
+- ✓ `B0D14HVKNS` (pendant-light, score 92): imageUrl 61jZPYKuzQL._AC_SL1500_.jpg → 615Le6HRKrL._AC_SL1500_.jpg
+- ⏭ `B0CJJ6JS44` (pendant-light): audit pick == current imageUrl, no change
+- ✓ `B0CJRD6111` (chandelier, score 92): imageUrl 81jqkn84tFL._AC_SL1500_.jpg → 51wmlAcBy1L._AC_SL1500_.jpg
+- ⏭ `B0DKT3B4RX` (chandelier): audit pick == current imageUrl, no change
+- ✓ `B0CJPNH4YR` (chandelier, score 85): imageUrl 81ftrbGvVSL._AC_SL1500_.jpg → 41PXUCclrZL._AC_SL1500_.jpg
+- ✓ `B0BZSXRG92` (chandelier, score 88): imageUrl 71EBo+zT42L._AC_SL1500_.jpg → 41XmsPPA2KL._AC_SL1500_.jpg
+- ⏭ `B0G5292QM8` (chandelier): audit pick == current imageUrl, no change
+- ✓ `B0DFPC28JB` (chandelier, score 92): imageUrl 61THyknp7vL._AC_SL1500_.jpg → 31LPOe9aPbL._AC_SL1500_.jpg
+- ✓ `B0D9V7Y8QF` (chandelier, score 72): imageUrl 71dpXyvNY2L._AC_SL1500_.jpg → 51yaAaT567L._AC_SL1500_.jpg
+- ⏭ `B0B93SNYQ8` (chandelier): audit pick == current imageUrl, no change
+- ⏭ `B093CSBWH4` (chandelier): audit pick == current imageUrl, no change
+- ✓ `B0BFVVKVSK` (throw-pillow, score 72): imageUrl 81RwIClSl0L._AC_SL1500_.jpg → 514oLvzF9vL._AC_SL1500_.jpg
+- ✓ `B0D1CBGMKP` (throw-pillow, score 92): imageUrl 81Bu0nsrbHL._AC_SL1500_.jpg → 51kCfxop8EL._AC_SL1500_.jpg
+- ✓ `B0C3B5BZ5Y` (throw-pillow, score 92): imageUrl 81CqZf7jRvL._AC_SL1500_.jpg → 51zDSY+7lKL._AC_SL1500_.jpg
+- ✓ `B0BLSN6FTZ` (throw-pillow, score 72): imageUrl 81MAdJ9Xb0L._AC_SL1500_.jpg → 514Z5yjipQL._AC_SL1500_.jpg
+- ✓ `B07FXDS1DD` (throw-pillow, score 72): imageUrl 91pX3XgEejL._AC_SL1500_.jpg → 51Wz1PZYf8L._AC_SL1500_.jpg
+- ✓ `B0D14RSYDD` (throw-pillow, score 85): imageUrl 81g-wfGYICL._AC_SL1500_.jpg → 51wij1MzusL._AC_SL1500_.jpg
+- ✓ `B0D93LQ8V6` (throw-pillow, score 92): imageUrl 61ZfQOgagOL._AC_SL1500_.jpg → 31641HoMo1L._AC_SL1500_.jpg
+- ✓ `B0CPC1NCZS` (throw-pillow, score 92): imageUrl 91KVnhHfYXL._AC_SL1500_.jpg → 61LFX2DYt4L._AC_SL1500_.jpg
+- ✓ `B0DBPFH621` (throw-pillow, score 86): imageUrl 81Ez4LqQS2L._AC_SL1500_.jpg → 51bkrR8A01L._AC_SL1500_.jpg
+- ✓ `B0BJ97M41F` (throw-pillow, score 85): imageUrl 71NnhT0BU8L._AC_SL1500_.jpg → 31HiR3FomnL._AC_SL1500_.jpg
+- ✓ `B0DZ71KMJJ` (throw-pillow, score 72): imageUrl 81yautWrxzL._AC_SL1500_.jpg → 51b6IbS6J8L._AC_SL1500_.jpg
+- ✓ `B0DGPWKWV9` (throw-pillow, score 78): imageUrl 81bNyG1kWeL._AC_SL1500_.jpg → 51iQE7qa-DL._AC_SL1500_.jpg
+- ✓ `B0D1K6L555` (throw-pillow, score 92): imageUrl 71FS7P4+KOL._AC_SL1500_.jpg → 31KZefGin8L._AC_SL1500_.jpg
+- ✓ `B0DBM3Q198` (throw-pillow, score 92): imageUrl 81HYZGdNrqL._AC_SL1500_.jpg → 51cAbna9yYL._AC_SL1500_.jpg
+- ✓ `B0DC3V6RD1` (throw-pillow, score 72): imageUrl 91avAb-WAbL._AC_SL1500_.jpg → 41TxqVrDnRL._AC_SL1500_.jpg
+- ⏭ `B01JEAKSN0` (throw-blanket): audit pick == current imageUrl, no change
+- ✓ `B0D14WQFZ9` (throw-blanket, score 92): imageUrl 81mdEx1mdQL._AC_SL1500_.jpg → 51KSLAADHgL._AC_SL1500_.jpg
+- ⏭ `B095WHFT8S` (throw-blanket): audit pick == current imageUrl, no change
+- ⏭ `B0B32ZXMTV` (throw-blanket): audit pick == current imageUrl, no change
+- ✓ `B0D1K5JMKV` (throw-blanket, score 92): imageUrl 810w6ShF8yL._AC_SL1500_.jpg → 41+AG6abVxL._AC_SL1500_.jpg
+- ✓ `B075F9ZTTL` (throw-blanket, score 92): imageUrl 9155UISWTML._AC_SL1500_.jpg → 61t8XVN1gpL._AC_SL1500_.jpg
+- ⏭ `B08LNZKYB9` (planter): audit pick == current imageUrl, no change
+- ✓ `B08KLRFPMR` (planter, score 95): imageUrl 71F9VKNluxL._AC_SL1500_.jpg → 31P95MZCbZL._AC_SL1500_.jpg
+- ⏭ `B0CJ7TVH3N` (planter): audit pick == current imageUrl, no change
+- ✓ `B0BHF9DW14` (planter, score 72): imageUrl 719c2k+UI8L._AC_SL1500_.jpg → 41GCRaikRDL._AC_SL1500_.jpg
+- ✓ `B0875KS59W` (planter, score 88): imageUrl 71zaTSAwufL._AC_SL1500_.jpg → 41CCMy9oflS._AC_SL1500_.jpg
+- ⏭ `B07VXWGH1S` (planter): audit pick == current imageUrl, no change
+- ✓ `B0DB871VCK` (planter, score 92): imageUrl 61vE5xuO3YL._AC_SL1500_.jpg → 41YjWBSuDTL._AC_SL1500_.jpg
+- ✓ `B0BRRM9BSB` (planter, score 78): imageUrl 71YTI68bBPL._AC_SL1500_.jpg → 41r64Z0Bl9L._AC_SL1500_.jpg
+- ⏭ `B0BD4Z21GC` (planter): audit pick == current imageUrl, no change
+- ⏭ `B07MLKDJS4` (planter): audit pick == current imageUrl, no change
+- ⏭ `B0D7H8TBS6` (planter): audit pick == current imageUrl, no change
+- ✓ `B089FC14SP` (planter, score 92): imageUrl 61lx75XXxKL._AC_SL1500_.jpg → 51NI1x-EsFL._AC_SL1500_.jpg
+- ✓ `B0CQMSY1ND` (planter, score 85): imageUrl 71AAdMtXn8L._AC_SL1500_.jpg → 41wWNYxEQBL._AC_SL1500_.jpg
+- ⏭ `B07L4J1P9P` (planter): audit pick == current imageUrl, no change
+- ✓ `B088822MP6` (planter, score 92): imageUrl 712rVUIlwNL._AC_SL1500_.jpg → 51+G4BUmEQL._AC_SL1500_.jpg
+- ✓ `B0B1JDF6RM` (vase, score 92): imageUrl 61Yri7GQ+6L._AC_SL1500_.jpg → 318Nae447BL._AC_SL1500_.jpg
+- ✓ `B09TTB4RCZ` (vase, score 92): imageUrl 61KVbKSnozL._AC_SL1500_.jpg → 41RWjBU-xtL._AC_SL1500_.jpg
+- ✓ `B0C8NJ3LTF` (vase, score 92): imageUrl 71asisPMFBL._AC_SL1500_.jpg → 417BbVoT39L._AC_SL1500_.jpg
+- ⏭ `B09X15H7BS` (vase): audit pick == current imageUrl, no change
+- ✓ `B0C7WH88W7` (vase, score 92): imageUrl 811ZeNw+9PL._AC_SL1500_.jpg → 51OGpRy8YdL._AC_SL1500_.jpg
+- ⏭ `B08W3XS9N2` (vase): audit pick == current imageUrl, no change
+- ✓ `B0BDR1X6PT` (vase, score 72): imageUrl 71JrSzgIomL._AC_SL1500_.jpg → 41ihO22jKPL._AC_SL1500_.jpg
+- ⏭ `B0BLTGHG8Y` (vase): audit pick == current imageUrl, no change
+- ✓ `B0BB2LB224` (vase, score 92): imageUrl 71Ms+27gxoL._AC_SL1500_.jpg → 41CqLNza39L._AC_SL1500_.jpg
+- ✓ `B0BYVGCYNL` (vase, score 92): imageUrl 91kgZ5RxjzL._AC_SL1500_.jpg → 41EKWFOINDL._AC_SL1500_.jpg
+- ✓ `B0CN8NMVW3` (vase, score 78): imageUrl 71KUmEfflOL._AC_SL1500_.jpg → 41Tw-KV567L._AC_SL1500_.jpg
+- ✓ `B0B9XCTY3K` (vase, score 92): imageUrl 61QgEw+XCEL._AC_SL1500_.jpg → 31+GmBFUNLL._AC_SL1500_.jpg
+- ✓ `B083NSV2LX` (vase, score 72): imageUrl 71aaO8-T-eL._AC_SL1500_.jpg → 41Du7gCrUKL._AC_SL1500_.jpg
+- ⏭ `B0BGBQDHXG` (vase): audit pick == current imageUrl, no change
+- ✓ `B0CMHQZ8JC` (vase, score 75): imageUrl 81oGp8nQENL._AC_SL1500_.jpg → 51H95m8KbsL._AC_SL1500_.jpg
+- ✓ `B01M2X53FT` (bar-stool, score 85): imageUrl 613hhSGeFEL._AC_SL1500_.jpg → 41P5n2zPflL._AC_SL1500_.jpg
+- ✓ `B0DPH5GNBQ` (bar-stool, score 78): imageUrl 816IbLHUe2L._AC_SL1500_.jpg → 41Ba4lRNFFL._AC_SL1500_.jpg
+- ✓ `B0CN17DYMS` (bar-stool, score 92): imageUrl 81GHRd1WwPL._AC_SL1500_.jpg → 41OcpQ-o2OL._AC_SL1500_.jpg
+- ✓ `B0CS345MYJ` (bar-stool, score 92): imageUrl 71tz8KO7snL._AC_SL1500_.jpg → 41QkD6kIQtL._AC_SL1500_.jpg
+- ✓ `B0DFW9RD2F` (bar-stool, score 85): imageUrl 81RJB4bbldL._AC_SL1500_.jpg → 410Q3nfastL._AC_SL1500_.jpg
+- ✓ `B0DMZN3TL1` (bar-stool, score 72): imageUrl 71gPmUd9NEL._AC_SL1500_.jpg → 51EtDtG-fuL._AC_SL1500_.jpg
+- ✓ `B08BNQG7N5` (bar-stool, score 85): imageUrl 71vO7VlzwVL._AC_SL1500_.jpg → 41TYOdg4Z8L._AC_SL1500_.jpg
+- ✓ `B0D6WBDYKB` (bar-stool, score 92): imageUrl 71LkeT58gEL._AC_SL1500_.jpg → 41yieItQiwL._AC_SL1500_.jpg
+- ✓ `B0G5Y5VY9N` (bar-stool, score 88): imageUrl 71xV2z9UmSL._AC_SL1500_.jpg → 4147HTqtDQL._AC_SL1500_.jpg
+- ✓ `B0FF41N4JL` (bar-stool, score 92): imageUrl 71A-vBuVovL._AC_SL1500_.jpg → 41b+QMid3CL._AC_SL1500_.jpg
+- ✓ `B0DV4R9V24` (bar-stool, score 92): imageUrl 81IfZ1g3-3L._AC_SL1500_.jpg → 41TUajXcK8L._AC_SL1500_.jpg
+- ⏭ `B001E4W9ZK` (dining-chair): audit pick == current imageUrl, no change
+- ✓ `B0F3CT6DDY` (dining-chair, score 92): imageUrl 814pvCzqf5L._AC_SL1500_.jpg → 41N0cKyqLoL._AC_SL1500_.jpg
+- ⏭ `B0BRY3CDWS` (dining-chair): audit pick == current imageUrl, no change
+- ⏭ `B0C1SZYCZC` (dining-chair): audit pick == current imageUrl, no change
+- ✓ `B0CHMDNNKK` (dining-chair, score 92): imageUrl 71vZ-BezufL._AC_SL1500_.jpg → 61ZUdxa8ZaL._AC_SL1500_.jpg
+- ✓ `B0CN6Q6FM7` (dining-chair, score 92): imageUrl 71que6vmoZL._AC_SL1500_.jpg → 417Irz8zbOL._AC_SL1500_.jpg
+- ✓ `B0CWNSK9XT` (dining-chair, score 92): imageUrl 6195gFNlCLL._AC_SL1500_.jpg → 21ZYAnZxe3L._AC_SL1500_.jpg
+- ⏭ `B0BV679372` (dining-chair): audit pick == current imageUrl, no change
+- ✓ `B09PMKXTND` (dining-chair, score 92): imageUrl 71MwKeIgveL._AC_SL1500_.jpg → 41pxRNeI+CL._AC_SL1500_.jpg
+- ✓ `B0CLVBBBMJ` (dining-chair, score 75): imageUrl 81X3jE7DK2L._AC_SL1500_.jpg → 41fu+1Zgd7L._AC_SL1500_.jpg
+- ✓ `B0F9P86J57` (sofa, score 88): imageUrl 91KRkm+o07L._AC_SL1500_.jpg → 31dbiaPtozL._AC_SL1500_.jpg
+- ✓ `B0CJCXS5M6` (sofa, score 88): imageUrl 71cfmw75skL._AC_SL1500_.jpg → 31qM26wLITL._AC_SL1500_.jpg
+- ⏭ `B0G2M4R2R6` (sofa): audit pick == current imageUrl, no change
+- ✓ `B0BT8C39X7` (accent-chair, score 92): imageUrl 71YMm8LjArL._AC_SL1500_.jpg → 21Su0zX4yhL._AC_SL1500_.jpg
+- ✓ `B0CZTTVB7J` (sofa, score 78): imageUrl 61IrRmLbNUL._AC_SL1500_.jpg → 41uVdMd4jTL._AC_SL1500_.jpg
+- ✓ `B091JC4CCK` (sofa, score 88): imageUrl 51+fg8yxK4S._AC_SL1500_.jpg → 21-cs6OzCKL._AC_SL1500_.jpg
+- ⏭ `B0DK13NL8Y` (sofa): audit pick == current imageUrl, no change
+- ✓ `B0DY4LND8W` (furniture-set, score 92): imageUrl 81+AJFnHG4L._AC_SL1500_.jpg → 31pxsgjxJWL._AC_SL1500_.jpg
+- ✓ `B0G1LWXT1V` (sofa, score 72): imageUrl 810pR9hQs5L._AC_SL1500_.jpg → 51d0sjd6ryL._AC_SL1500_.jpg
+- ✓ `B0DH85KD2B` (rug, score 78): imageUrl 910Oc-M4GuL._AC_SL1500_.jpg → 410DMthoPuL._AC_SL1500_.jpg
+- ✓ `B0G53GZNSR` (sofa, score 92): imageUrl 91lp+x+9ljL._AC_SL1500_.jpg → 31n-TY9NRaL._AC_SL1500_.jpg
+- ✓ `B0BM4BVGQ7` (accent-chair, score 88): imageUrl 71-ZdRBRftL._AC_SL1500_.jpg → 41gpP0HKj8L._AC_SL1500_.jpg
+- ✓ `B0DTSQ99GT` (accent-chair, score 92): imageUrl 91uzz8emmSL._AC_SL1500_.jpg → 414M33xifHL._AC_SL1500_.jpg
+- ✓ `B0C73GGMD4` (furniture-set, score 75): imageUrl 71+vOPRgb+L._AC_SL1500_.jpg → 41UbmJAYkjL._AC_SL1500_.jpg
+- ✓ `B0DM1DT6ZK` (dining-table, score 92): imageUrl 81aMzlPLnRL._AC_SL1500_.jpg → 41K2hbfl7TL._AC_SL1500_.jpg
+- ✓ `B0CSCN7SRM` (accent-chair, score 92): imageUrl 814ptBNNbHL._AC_SL1500_.jpg → 316Lx5x4y9L._AC_SL1500_.jpg
+- ✓ `B0D4B1KMDL` (accent-chair, score 86): imageUrl 81dEZnvZ1yL._AC_SL1500_.jpg → 41shHVhBFvL._AC_SL1500_.jpg
+- ✓ `B0FRFR22HL` (accent-chair, score 92): imageUrl 71mjXZ6N-5L._AC_SL1500_.jpg → 316rHWyjYXL._AC_SL1500_.jpg
+- ✓ `B0CW6JLFXC` (accent-chair, score 92): imageUrl 91pEhKrVBSL._AC_SL1500_.jpg → 41u2xd354AL._AC_SL1500_.jpg
+- ⏭ `B0F9JBQ7YC` (sofa): audit pick == current imageUrl, no change
+- ✓ `B0FH1XVHDM` (accent-chair, score 78): imageUrl 81PqMa32mhL._AC_SL1500_.jpg → 51EUqA8nRML._AC_SL1500_.jpg
+- ✓ `B0FMFCQB9Y` (accent-chair, score 92): imageUrl 81HUelzHK2L._AC_SL1500_.jpg → 31tcnIyvnUL._AC_SL1500_.jpg
+- ✓ `B0GTLL5J31` (accent-chair, score 72): imageUrl 81dzJ3B8KQL._AC_SL1500_.jpg → 418Zoaj3j5L._AC_SL1500_.jpg
+- ✓ `B0F7XVWQYL` (accent-chair, score 78): imageUrl 811M9lz3zML._AC_SL1500_.jpg → 41Nx6jafsIL._AC_SL1500_.jpg
+- ✓ `B0DR9Q9TV9` (accent-chair, score 92): imageUrl 51ET9GKQQ3L._AC_SL1500_.jpg → 41Xj4juqY+L._AC_SL1500_.jpg
+- ✓ `B0C6LRSP19` (accent-chair, score 92): imageUrl 81CB5qpiGoL._AC_SL1500_.jpg → 31HD7WsFyPL._AC_SL1500_.jpg
+- ✓ `B0F2N2FFT1` (accent-chair, score 92): imageUrl 81aWT7U0WRL._AC_SL1500_.jpg → 41ReXV7jyZL._AC_SL1500_.jpg
+- ✓ `B0FS6W8ZZG` (coffee-table, score 92): imageUrl 8110d9Tl-zL._AC_SL1500_.jpg → 410cPrjtyZL._AC_SL1500_.jpg
+- ✓ `B0GDWKN2Q8` (coffee-table, score 62): imageUrl 71WsIizbtpL._AC_SL1500_.jpg → 516ggiMTz3L._AC_SL1500_.jpg
+- ✓ `B0GBV3L7HQ` (coffee-table, score 85): imageUrl 71XywHOnxlL._AC_SL1500_.jpg → 41sZa+iW8sL._AC_SL1500_.jpg
+- ✓ `B0DXKYG19S` (coffee-table, score 92): imageUrl 81CoNaNE-BL._AC_SL1500_.jpg → 21RYn1HyU5L._AC_SL1500_.jpg
+- ✓ `B0GLYRCF8B` (coffee-table, score 78): imageUrl 91qcB8Mgz8L._AC_SL1500_.jpg → 31pdnvX6EpL._AC_SL1500_.jpg
+- ✓ `B0DCBPKMB5` (coffee-table, score 72): imageUrl 91Ir91AvMSL._AC_SL1500_.jpg → 51mQmeu62HL._AC_SL1500_.jpg
+- ✓ `B0FV8W34LD` (lamp, score 72): imageUrl 71NT6xKey7L._AC_SL1500_.jpg → 41vL+QwK7SL._AC_SL1500_.jpg
+- ✓ `B0F4CH2NB8` (accent-chair, score 92): imageUrl 51ttIAKKq-L._AC_SL1500_.jpg → 31I5scXj4ML._AC_SL1500_.jpg
+- ✓ `B0G3B28RJF` (coffee-table, score 92): imageUrl 81p10Iuq6NL._AC_SL1500_.jpg → 417zyh4eUZL._AC_SL1500_.jpg
+- ⏭ `B0C69ZF8WJ` (accent-chair): audit pick == current imageUrl, no change
+- ⏭ `B0DLWB9YDP` (coffee-table): audit pick == current imageUrl, no change
+- ✓ `B0CRL5KZC3` (rug, score 92): imageUrl 71xx-scY9qL._AC_SL1500_.jpg → 5104wlnMx0L._AC_SL1500_.jpg
+- ✓ `B00BLIQLLC` (rug, score 78): imageUrl 91naX9oI7jL._AC_SL1500_.jpg → 51zuInp9BiL._AC_SL1500_.jpg
+- ✓ `B0GJSJCQX8` (coffee-table, score 78): imageUrl 81MZiPGIXrL._AC_SL1500_.jpg → 511GS+YIM7L._AC_SL1500_.jpg
+- ✓ `B0GGZ47KS5` (sofa, score 78): imageUrl 51dLCeFPV2L._AC_SL1500_.jpg → 31roL-YU56L._AC_SL1500_.jpg
+- ✓ `B0BX93XRN1` (sofa, score 92): imageUrl 41wt1Zeoe2L._AC_SL1500_.jpg → 31yQK7vwQjL._AC_SL1500_.jpg
+- ⏭ `B0BZ7H7GXZ` (accent-chair): audit pick == current imageUrl, no change
+- ⏭ `B0DKNYN4Q9` (sofa): audit pick == current imageUrl, no change
+- ⏭ `B0F3JDBRC6` (sofa): audit pick == current imageUrl, no change
+- ⏭ `B0GRGT7SDY` (sofa): audit pick == current imageUrl, no change
+- ⏭ `B0GMFM1TLV` (sofa): audit pick == current imageUrl, no change
+- ✓ `B0GJZWXZFC` (sofa, score 82): imageUrl 71+CWkLxpdL._AC_SL1500_.jpg → 51cnVrOR9JL._AC_SL1500_.jpg
+- ✓ `B0FD8MLTRC` (accent-chair, score 92): imageUrl 610vPpuVLtL._AC_SL1500_.jpg → 51JAwIm-osL._AC_SL1500_.jpg
+- ✓ `B09C6TXFQ4` (side-table, score 92): imageUrl 81jva5DZVTL._AC_SL1500_.jpg → 31mL5r7hbaL._AC_SL1500_.jpg
+- ⏭ `B0C73NG4SN` (coffee-table): audit pick == current imageUrl, no change
+- ✓ `B076KJDT13` (floor-lamp, score 88): imageUrl 41+vk1U0V1L._AC_SL1500_.jpg → 51mVkKurMXL._AC_SL1500_.jpg
+- ⏭ `B0FPF38QBL` (side-table): audit pick == current imageUrl, no change
+- ✓ `B0FKLTD3L2` (coffee-table, score 85): imageUrl 818AYxUVemL._AC_SL1500_.jpg → 415Bvqf8nBL._AC_SL1500_.jpg
+- ✓ `B0GX6JZGKB` (dining-table, score 88): imageUrl 81tY8HT0C2L._AC_SL1500_.jpg → 31iwxGYqLPL._AC_SL1500_.jpg
+- ✓ `B09PHPT5MR` (accent-chair, score 92): imageUrl 71o+koR032L._AC_SL1500_.jpg → 51O7CrUOxnL._AC_SL1500_.jpg
+- ✓ `B0CGJDK8Z2` (accent-chair, score 85): imageUrl 51Gk4Bfz28L._AC_SL1500_.jpg → 21wXMVGXCNL._AC_SL1500_.jpg
+- ✓ `B0BXS7NR8X` (bed, score 78): imageUrl 91FePu+lLdL._AC_SL1500_.jpg → 51Yc55OD23L._AC_SL1500_.jpg
+- ✓ `B0FV852X2M` (pendant-light, score 72): imageUrl 81OAIBVnGoL._AC_SL1500_.jpg → 41GXR60oa6L._AC_SL1500_.jpg

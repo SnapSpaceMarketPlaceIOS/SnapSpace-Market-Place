@@ -1,0 +1,469 @@
+{
+  "summary": {
+    "timestamp": "2026-04-29T23:11:30.268Z",
+    "mode": "sample-10",
+    "totalProducts": 10,
+    "autoPicked": 8,
+    "needsManualPick": 2,
+    "heavyManualPick": 2,
+    "errors": 0,
+    "model": "claude-haiku-4-5-20251001"
+  },
+  "results": [
+    {
+      "id": "B0FGD5615L",
+      "name": "CAJCA Coffee Table, Mid Century Modern Glass Top & Wood, Walnut",
+      "category": "coffee-table",
+      "isHeavy": false,
+      "threshold": 60,
+      "chosenImage": "https://m.media-amazon.com/images/I/41ZGRunlOjL._AC_SL1500_.jpg",
+      "chosenScore": 92,
+      "chosenReason": "Clean studio shot with neutral beige background, product fully isolated and centered with even lighting and clear product specifications displayed.",
+      "needsManualPick": false,
+      "currentImageUrl": "https://m.media-amazon.com/images/I/81-a1cUJElL._AC_UL640_.jpg",
+      "allScores": [
+        {
+          "url": "https://m.media-amazon.com/images/I/81-a1cUJElL._AC_UL640_.jpg",
+          "score": 28,
+          "reason": "Full lifestyle image showing the coffee table styled within a complete room setting with sofa, pillows, plants, floor pattern, and decorative accessories throughout."
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/81-a1cUJElL._AC_SL1500_.jpg",
+          "score": 15,
+          "reason": "Full lifestyle image showing the coffee table styled within a complete interior scene with sofa, pillows, plants, patterned flooring, and decorative accessories."
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/51rAyrDJmbL._AC_SL1500_.jpg",
+          "score": 28,
+          "reason": "Full lifestyle image showing the coffee table styled within a complete living room scene with sofa, pillows, plants, rug pattern, and decorative accessories, designed to convey room aesthetic rather than isolate the product."
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/41ZGRunlOjL._AC_SL1500_.jpg",
+          "score": 92,
+          "reason": "Clean studio shot with neutral beige background, product fully isolated and centered with even lighting and clear product specifications displayed."
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/51AoznAQH8L._AC_SL1500_.jpg",
+          "score": 15,
+          "reason": "Full lifestyle image showing the coffee table in a completely styled living room with sofa, plants, shelving, windows, rug pattern, flowers, and fruit bowl that conveys overall room design rather than isolated product reference."
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/51hERnFMM3L._AC_SL1500_.jpg",
+          "score": 15,
+          "reason": "Full lifestyle image showing the coffee table styled in a complete living room with sofa, rug, plants, artwork, and a model seated at the table, designed to convey room ambiance rather than isolate the product."
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/51tp6Ho9jbL._AC_SL1500_.jpg",
+          "score": 32,
+          "reason": "Full lifestyle image showing the coffee table styled in a complete room setting with sofa, rug with pattern, decorative items, and coordinated decor that conveys room atmosphere rather than isolating the product."
+        }
+      ]
+    },
+    {
+      "id": "B0DJ54DT2G",
+      "name": "Honyee Morden Coffee Table, 42.5\" x 28.5\" Triangle Tempered Glass Top, Natural W",
+      "category": "coffee-table",
+      "isHeavy": false,
+      "threshold": 60,
+      "chosenImage": "https://m.media-amazon.com/images/I/318EsvxauEL._AC_SL1500_.jpg",
+      "chosenScore": 92,
+      "chosenReason": "Clean studio shot with neutral beige background, product fully isolated and centered with even lighting and no distracting elements.",
+      "needsManualPick": false,
+      "currentImageUrl": "https://m.media-amazon.com/images/I/51CLX01QPIL._AC_SL1500_.jpg",
+      "allScores": [
+        {
+          "url": "https://m.media-amazon.com/images/I/51CLX01QPIL._AC_SL1500_.jpg",
+          "score": 28,
+          "reason": "Full lifestyle image showing the coffee table styled within a complete living room scene with sofa, rug, decor items, and natural lighting from windows, designed to show aspirational room context rather than isolate the product."
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/41SfhdhPmnL._AC_SL1500_.jpg",
+          "score": 85,
+          "reason": "Clean studio-style shot with neutral beige background and product fully isolated, but subtle shadow beneath the table slightly reduces the perfect studio cleanliness."
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/51lITs+JYsL._AC_SL1500_.jpg",
+          "score": 28,
+          "reason": "Full lifestyle image showing the coffee table styled in a complete living room scene with sofa, pillows, rug, decor accessories, and wall paneling in background."
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/51OAQgQTK0L._AC_SL1500_.jpg",
+          "score": 28,
+          "reason": "Full lifestyle image showing the coffee table styled in a complete room setting with sofa, rug, decor items, and ambient lighting that conveys room design rather than isolating the product."
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/41f15-UPR0L._AC_SL1500_.jpg",
+          "score": 72,
+          "reason": "Clean product isolation with neutral background, but visible floor/rug surface and minimal room context slightly reduce studio purity."
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/318EsvxauEL._AC_SL1500_.jpg",
+          "score": 92,
+          "reason": "Clean studio shot with neutral beige background, product fully isolated and centered with even lighting and no distracting elements."
+        }
+      ]
+    },
+    {
+      "id": "B0F21JRJ43",
+      "name": "RUSTYER Oval Fluted Coffee Table, Farmhouse Boho Mid Century Modern, Walnut",
+      "category": "coffee-table",
+      "isHeavy": false,
+      "threshold": 60,
+      "chosenImage": "https://m.media-amazon.com/images/I/31-C87ucxnL._AC_SL1500_.jpg",
+      "chosenScore": 88,
+      "chosenReason": "Clean neutral background with product fully isolated and centered, but subtle floor shadow visible beneath the table base.",
+      "needsManualPick": false,
+      "currentImageUrl": "https://m.media-amazon.com/images/I/41TJfxE1z1L._AC_SL1500_.jpg",
+      "allScores": [
+        {
+          "url": "https://m.media-amazon.com/images/I/41TJfxE1z1L._AC_SL1500_.jpg",
+          "score": 28,
+          "reason": "Full lifestyle image showing the coffee table styled in a complete room with sofa, pillows, plants, books, laptop, and rug visible, conveying room atmosphere rather than isolated product reference."
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/31-C87ucxnL._AC_SL1500_.jpg",
+          "score": 88,
+          "reason": "Clean neutral background with product fully isolated and centered, but subtle floor shadow visible beneath the table base."
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/51+OeacAuiL._AC_SL1500_.jpg",
+          "score": 15,
+          "reason": "Full lifestyle image showing a styled living room with sofa, coffee table, plants, artwork, curtains, rugs, and complete interior design context rather than isolated product shots."
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/41BoyJVg5QL._AC_SL1500_.jpg",
+          "score": 28,
+          "reason": "Full lifestyle image showing the coffee table styled in a complete room setting with sofa, pillows, wall art, rug, and decorative accessories that convey room ambiance rather than isolating the product."
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/5139qbTMU0L._AC_SL1500_.jpg",
+          "score": 28,
+          "reason": "Full lifestyle image showing the coffee table styled in a complete living room with sofa, flowers, books, curtains, and decorative elements rather than isolated product photography."
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/513DVGbwZ7L._AC_SL1500_.jpg",
+          "score": 28,
+          "reason": "Full lifestyle image showing multiple furniture pieces, styled room with sofa, rug, plants, and decor that emphasizes room aesthetics rather than isolating the product itself."
+        }
+      ]
+    },
+    {
+      "id": "B0FFLPS4WJ",
+      "name": "Honyee Modern Oval Coffee Table, Oak Wood Top with Solid Legs, Natural",
+      "category": "coffee-table",
+      "isHeavy": false,
+      "threshold": 60,
+      "chosenImage": "https://m.media-amazon.com/images/I/31ya8vn-7lL._AC_SL1500_.jpg",
+      "chosenScore": 85,
+      "chosenReason": "Mostly clean studio shot with product fully isolated and centered, but subtle shadows and a neutral background gradient prevent a perfect score.",
+      "needsManualPick": false,
+      "currentImageUrl": "https://m.media-amazon.com/images/I/51GvDKhS8tL._AC_SL1500_.jpg",
+      "allScores": [
+        {
+          "url": "https://m.media-amazon.com/images/I/51GvDKhS8tL._AC_SL1500_.jpg",
+          "score": 28,
+          "reason": "Full lifestyle image showing the coffee table styled within a complete room scene with sofa, pillows, vase, books, windows, and coordinated decor, prioritizing room aesthetics over product isolation."
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/31ya8vn-7lL._AC_SL1500_.jpg",
+          "score": 85,
+          "reason": "Mostly clean studio shot with product fully isolated and centered, but subtle shadows and a neutral background gradient prevent a perfect score."
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/51bp2Y2kYvL._AC_SL1500_.jpg",
+          "score": 28,
+          "reason": "Full lifestyle image showing the coffee table styled in a complete living room scene with sofa, pillows, decor, flowers, and rug, designed to convey room ambiance rather than isolate the product."
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/51wV1zL0YKL._AC_SL1500_.jpg",
+          "score": 32,
+          "reason": "Multiple lifestyle elements visible (area rug, carpet texture, white furniture in background, natural lighting setup) that suggest a styled room rather than isolated product presentation."
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/51NywsZFYGL._AC_SL1500_.jpg",
+          "score": 15,
+          "reason": "Full lifestyle image showing a styled living room with multiple furniture pieces, decor, pet, toys, and accessories that convey room ambiance rather than isolating the product."
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/41dNgm27ZQL._AC_SL1500_.jpg",
+          "score": 85,
+          "reason": "Clean neutral background with product fully isolated and centered, though subtle floor shadow and assembly diagram presentation slightly reduce studio purity."
+        }
+      ]
+    },
+    {
+      "id": "B0CZNXN3NN",
+      "name": "Ivoros 42\" Round 3-Tier Tempered Glass Coffee Table with Storage, Wood",
+      "category": "coffee-table",
+      "isHeavy": false,
+      "threshold": 60,
+      "chosenImage": "https://m.media-amazon.com/images/I/41vmoUR1udL._AC_SL1500_.jpg",
+      "chosenScore": 92,
+      "chosenReason": "Clean studio shot with neutral light gray background, product fully isolated with clear technical dimensions, centered framing, and even lighting throughout.",
+      "needsManualPick": false,
+      "currentImageUrl": "https://m.media-amazon.com/images/I/518aIgqFXoL._AC_SL1500_.jpg",
+      "allScores": [
+        {
+          "url": "https://m.media-amazon.com/images/I/518aIgqFXoL._AC_SL1500_.jpg",
+          "score": 28,
+          "reason": "Full lifestyle image showing coffee tables styled in a complete room setting with sofa, rug, fruit bowl, book, and cup, designed to convey room aesthetic rather than isolate the products."
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/41vmoUR1udL._AC_SL1500_.jpg",
+          "score": 92,
+          "reason": "Clean studio shot with neutral light gray background, product fully isolated with clear technical dimensions, centered framing, and even lighting throughout."
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/513h4OSxl0L._AC_SL1500_.jpg",
+          "score": 28,
+          "reason": "Full lifestyle image showing the coffee table styled in a decorated room with visible flooring pattern, bowl of apples, coffee cup, couch, and art on walls."
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/511OPfZLV9L._AC_SL1500_.jpg",
+          "score": 32,
+          "reason": "Full lifestyle image showing the product in a styled room setting with multiple furniture pieces, rugs, fruit basket, coffee cup, and decorative items that emphasize room context over clean product isolation."
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/51UVjhhn8nL._AC_SL1500_.jpg",
+          "score": 18,
+          "reason": "Full lifestyle image showing the coffee table styled in a complete room setting with sofa, rug, decorative items, and plants, designed to convey room aesthetic rather than isolate the product."
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/51ktlomJ+iL._AC_SL1500_.jpg",
+          "score": 28,
+          "reason": "Full lifestyle image showing the coffee table styled in a complete room setting with sofa, rug, decorative items, and styled surfaces that emphasizes room context over product isolation."
+        }
+      ]
+    },
+    {
+      "id": "B0DDQ3273X",
+      "name": "YOPENG 82\" Modern Boucle 3-Seater Cloud Sofa, Green",
+      "category": "sofa",
+      "isHeavy": true,
+      "threshold": 75,
+      "chosenImage": "https://m.media-amazon.com/images/I/212lR0SGw5L._AC_SL1500_.jpg",
+      "chosenScore": 85,
+      "chosenReason": "Clean neutral background with product fully isolated and centered, but subtle floor shadow/surface visible at bottom slightly reduces studio purity.",
+      "needsManualPick": false,
+      "currentImageUrl": "https://m.media-amazon.com/images/I/41LXeu0rW9L._AC_SL1500_.jpg",
+      "allScores": [
+        {
+          "url": "https://m.media-amazon.com/images/I/41LXeu0rW9L._AC_SL1500_.jpg",
+          "score": 28,
+          "reason": "Full lifestyle image showing the sofa in a styled room with patterned rug, potted plant, wooden wall paneling, side table, and multiple contextual elements that emphasize room design over isolated product presentation."
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/212lR0SGw5L._AC_SL1500_.jpg",
+          "score": 85,
+          "reason": "Clean neutral background with product fully isolated and centered, but subtle floor shadow/surface visible at bottom slightly reduces studio purity."
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/51HcOUVQSAL._AC_SL1500_.jpg",
+          "score": 18,
+          "reason": "Full lifestyle image showing the sofa styled in a complete room with console table, wall art, plants, coffee table, rug, lamp, and decorative accessories."
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/51uimHUca5L._AC_SL1500_.jpg",
+          "score": 28,
+          "reason": "Full lifestyle image showing the sofa styled in a complete room with multiple context elements including console table, wall art, plants, lamp, coffee table, rug, and window treatments."
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/51h9GJCaX8L._AC_SL1500_.jpg",
+          "score": 18,
+          "reason": "Full lifestyle image showing the sofa in a completely styled room with console table, artwork, plants, floor, rug, coffee table, and window treatments that all compete for visual focus."
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/41ys39M8eiL._AC_SL1500_.jpg",
+          "score": 28,
+          "reason": "Full lifestyle image with multiple context elements including arc lamp, area rug, potted plant, wall art, window, and styled interior setting that conveys room atmosphere rather than isolating the product."
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/51p4HrEBLjL._AC_SL1500_.jpg",
+          "score": 72,
+          "reason": "Clean product focus with neutral background, but dark wood flooring and partial interior elements (curtain, wall, furniture edge) visible reduce isolation."
+        }
+      ]
+    },
+    {
+      "id": "B0CDWS3291",
+      "name": "Acanva Luxury Modern Curved Back Velvet Sofa, 3-Seater, Cream",
+      "category": "sofa",
+      "isHeavy": true,
+      "threshold": 75,
+      "chosenImage": "https://m.media-amazon.com/images/I/311PyizmGBL._AC_SL1500_.jpg",
+      "chosenScore": 92,
+      "chosenReason": "Studio shot with neutral light gray background, product fully isolated with clean centered framing and even lighting, only technical dimension annotations visible.",
+      "needsManualPick": false,
+      "currentImageUrl": "https://m.media-amazon.com/images/I/41d-z4PNZTL._AC_SL1500_.jpg",
+      "allScores": [
+        {
+          "url": "https://m.media-amazon.com/images/I/41d-z4PNZTL._AC_SL1500_.jpg",
+          "score": 72,
+          "reason": "Mostly clean studio setup with neutral background and centered product, but visible floor surface, area rug, and background shelving unit provide minor context distractions."
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/311PyizmGBL._AC_SL1500_.jpg",
+          "score": 92,
+          "reason": "Studio shot with neutral light gray background, product fully isolated with clean centered framing and even lighting, only technical dimension annotations visible."
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/51yEsRR3uvL._AC_SL1500_.jpg",
+          "score": 28,
+          "reason": "Full lifestyle image showing a styled room with sofa, coffee table, windows, curtains, throw blanket, pillows, ivy plant, and outdoor scenery - designed to convey room aesthetic rather than isolate the product."
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/51dcTFhjMjL._AC_SL1500_.jpg",
+          "score": 28,
+          "reason": "Full lifestyle image showing the sofa styled in a complete room setting with windows, curtains, coffee table, books, pillows, and outdoor scenery visible in background."
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/41eBp-qOOXL._AC_SL1500_.jpg",
+          "score": 15,
+          "reason": "Full lifestyle image showing the sofa in a completely styled interior scene with multiple furniture pieces, architectural elements, flooring, window, and room atmosphere rather than isolated product presentation."
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/51BZ5WrwkyL._AC_SL1500_.jpg",
+          "score": 15,
+          "reason": "Full lifestyle image showing the sofa in a complete styled room with windows, curtains, pillows, throw blanket, and outdoor scenery—designed to convey room ambiance rather than isolate the product."
+        }
+      ]
+    },
+    {
+      "id": "B0DYD79JC6",
+      "name": "KEIKI 103\" Boucle Half Moon Curved Sectional Sofa with 4 Throw Pillows, White",
+      "category": "sofa",
+      "isHeavy": true,
+      "threshold": 75,
+      "chosenImage": "https://m.media-amazon.com/images/I/41VsDxJCysL._AC_SL1500_.jpg",
+      "chosenScore": 92,
+      "chosenReason": "Clean studio shot with white background, product fully isolated and centered, clear technical specifications visible, even lighting with no distracting elements.",
+      "needsManualPick": false,
+      "currentImageUrl": "https://m.media-amazon.com/images/I/41inaNox5xL._AC_SL1500_.jpg",
+      "allScores": [
+        {
+          "url": "https://m.media-amazon.com/images/I/41inaNox5xL._AC_SL1500_.jpg",
+          "score": 28,
+          "reason": "Full lifestyle image showing the sofa in a styled interior with multiple context elements including flooring pattern, arc lamp, cactus, candles, coffee table, wall paneling, and window treatments."
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/41VsDxJCysL._AC_SL1500_.jpg",
+          "score": 92,
+          "reason": "Clean studio shot with white background, product fully isolated and centered, clear technical specifications visible, even lighting with no distracting elements."
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/51rWjZrUuRL._AC_SL1500_.jpg",
+          "score": 28,
+          "reason": "Full lifestyle image showing styled room with multiple context elements including patterned rug, coffee table, floor pattern, arc lamp, plants, and wall paneling that convey interior design rather than isolating the sofa product."
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/21Kt6jCc1gL._AC_SL1500_.jpg",
+          "score": 92,
+          "reason": "Studio shot with pure white background, product fully isolated and centered with clean lighting and no contextual elements visible."
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/31SIVXvXZKL._AC_SL1500_.jpg",
+          "score": 92,
+          "reason": "Pure studio shot with neutral white background, product fully isolated and centered with even lighting and clean edges."
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/21alx1EGmIL._AC_SL1500_.jpg",
+          "score": 92,
+          "reason": "Perfect studio shot with neutral white background, product fully isolated and centered with clean edges and even lighting."
+        }
+      ]
+    },
+    {
+      "id": "B09P83DPX4",
+      "name": "HIFIT 79\" Mid-Century Faux Leather Sofa with Deep Seat & Cloud Cushions, Brown",
+      "category": "sofa",
+      "isHeavy": true,
+      "threshold": 75,
+      "chosenImage": null,
+      "chosenScore": 72,
+      "chosenReason": "Mostly clean studio shot with product well-isolated, but light gray floor surface and subtle shadow visible beneath the couch slightly reduce the sterile studio quality.",
+      "needsManualPick": true,
+      "currentImageUrl": "https://m.media-amazon.com/images/I/518hjP4wuEL._AC_SL1500_.jpg",
+      "allScores": [
+        {
+          "url": "https://m.media-amazon.com/images/I/518hjP4wuEL._AC_SL1500_.jpg",
+          "score": 28,
+          "reason": "Full lifestyle image with styled room setting including windows, plants, fireplace, artwork, throw blanket, and rug that prioritizes room atmosphere over isolated product reference."
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/41mXifcpWLL._AC_SL1500_.jpg",
+          "score": 72,
+          "reason": "Mostly clean studio shot with product well-isolated, but light gray floor surface and subtle shadow visible beneath the couch slightly reduce the sterile studio quality."
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/51FdDFQHCaL._AC_SL1500_.jpg",
+          "score": 28,
+          "reason": "Full lifestyle image showing the sofa in a styled living room with fireplace, windows, coffee table, plant, rug, and decorative accessories, designed to convey room ambiance rather than isolate the product."
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/41PEvxttqnL._AC_SL1500_.jpg",
+          "score": 32,
+          "reason": "Multiple lifestyle elements visible including windows, walls, decor, and room styling that convey interior design context rather than isolating the product."
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/51yMOMf6IbL._AC_SL1500_.jpg",
+          "score": 15,
+          "reason": "Full lifestyle image showing three styled room scenes with multiple furniture pieces, decor, plants, and accessories that convey room design inspiration rather than isolated product reference."
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/51mxwEXYUkL._AC_SL1500_.jpg",
+          "score": 18,
+          "reason": "Full lifestyle image showing sofa in a completely styled living room with plants, fireplace, shelving, decor, and multiple context elements that emphasize room ambiance rather than product isolation."
+        }
+      ]
+    },
+    {
+      "id": "B0G7BT3HRC",
+      "name": "CHITA Curved Sectional Modular Cloud Chenille Sofa with Lumbar & Throw Pillows, ",
+      "category": "sofa",
+      "isHeavy": true,
+      "threshold": 75,
+      "chosenImage": null,
+      "chosenScore": 45,
+      "chosenReason": "Product is clearly shown but includes technical dimension overlays, package diagrams, and delivery information that add context beyond clean product isolation.",
+      "needsManualPick": true,
+      "currentImageUrl": "https://m.media-amazon.com/images/I/41NqnDE8BnL._AC_SL1500_.jpg",
+      "allScores": [
+        {
+          "url": "https://m.media-amazon.com/images/I/41NqnDE8BnL._AC_SL1500_.jpg",
+          "score": 28,
+          "reason": "Full lifestyle image with styled room context including windows, shelving, wall art, side table, lamp, plants, throw blanket, and decorative items that convey room atmosphere rather than isolating the product."
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/41NtIEUilRL._AC_SL1500_.jpg",
+          "score": 45,
+          "reason": "Product is clearly shown but includes technical dimension overlays, package diagrams, and delivery information that add context beyond clean product isolation."
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/41s1tXYKbvL._AC_SL1500_.jpg",
+          "score": 28,
+          "reason": "Full lifestyle image showing styled room with sofa, coffee table, windows, curtains, throw blanket, and natural lighting that emphasizes room ambiance rather than isolating the product."
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/41ZA-grjQZL._AC_SL1500_.jpg",
+          "score": 28,
+          "reason": "Full lifestyle image showing the sofa in a styled room with windows, plants, rug, coffee table, throws, and natural lighting that conveys room design rather than isolating the product."
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/41rSEapEzbL._AC_SL1500_.jpg",
+          "score": 15,
+          "reason": "Full lifestyle image showing the sofa in a complete, styled room with windows, flooring, rug, dresser, plants, throw blanket, and scenic outdoor views."
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/41GFI239ZpL._AC_SL1500_.jpg",
+          "score": 15,
+          "reason": "Full lifestyle image with styled room setting including windows, plants, floor, throw blanket, pillows, and outdoor scenery that conveys room atmosphere rather than isolating the product."
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/41j1ZmZk+yL._AC_SL1500_.jpg",
+          "score": 35,
+          "reason": "Lifestyle-leaning image with styled room context (visible floor, throw blanket, cushions) and product detail callouts that prioritize aesthetic presentation over isolated product documentation."
+        }
+      ]
+    }
+  ]
+}
