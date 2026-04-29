@@ -3,7 +3,18 @@ import { proxyFetch } from './apiProxy';
 const HAIKU_MODEL = 'claude-haiku-4-5-20251001';
 const MAX_TOKENS = 200;
 const EXPANSION_TIMEOUT_MS = 3000;
-const SKIP_IF_ALREADY_LONG_WORDS = 30;
+// Build 117: lowered from 30 → 18. All 16 style presets in stylePresets.js
+// are 19-25 words and were being passed to Haiku for cinematography
+// enrichment. Empirically, that compounded atmosphere-bleed on high-contrast
+// styles (Brutalist, Art Deco, Dark Luxe) — Haiku layered phrases like
+// "void shadows defining raw concrete" and "spotlight carving geometry"
+// on top of the preset's own atmosphere, producing prompts where flux
+// interpreted architecture as a sculptor's medium and repainted walls.
+// Curated presets already carry the right cinematography vocabulary; they
+// don't need further enrichment. Short user-typed prompts ("modern bedroom")
+// still get expanded because the value of texture/lighting words is highest
+// when the input is sparse.
+const SKIP_IF_ALREADY_LONG_WORDS = 18;
 const MIN_USABLE_EXPANSION_CHARS = 25;
 
 // Build 84 / Stage 6 — AI fidelity rewrite. The previous expansion prompt
@@ -47,6 +58,7 @@ ABSOLUTE RULES — violating these makes the downstream image-generation fail:
 - Lighting words like "lamplight", "lamp glow", "sconce light", "pendant glow" describe LIGHTING, not items, and are allowed. "Sunlight", "daylight", "firelight", "spotlight" are also allowed.
 - Materials and textures appear as adjectives describing atmosphere ("oak-toned warmth", "linen softness", "marble cool"), NOT as nouns describing pieces.
 - Color and palette descriptors apply to FURNITURE, LAMPLIGHT, and SOFT FURNISHINGS only. NEVER describe wall colors, paint colors, floor colors, or ceiling colors. Do NOT use phrases like "charcoal walls", "ivory walls", "painted walls", "dark walls", "wood floors", or anything that paints the room's surfaces. The user's existing room architecture stays as-is.
+- Build 117 directive — light is a TONE, not a sculptor. Forbidden phrasings that describe light shaping or revealing architecture: "shadows pooling beneath surfaces", "spotlight carving geometry", "light raking across planes", "shadows defining walls", "illumination sculpting forms", "shadows etching contours", "void shadows defining concrete", "shadows pooling against architecture". flux reads these as instructions to RECONSTRUCT the room's surfaces from light. Describe light as MOOD ("warm afternoon glow", "low-contrast hush", "golden lamplight", "diffused north light", "cinematic dim") — never as something that shapes, defines, carves, sculpts, rakes, etches, or reveals the room itself.
 - Do NOT substitute the input's vocabulary. If the input says "velvet", say "velvet" — not "luxe softness". If it says "rattan", say "rattan" — not "woven natural fibers". Vocabulary preservation is critical for product-matcher alignment.
 - Preserve the user's stated room type and style intent exactly. Do not change "bedroom" into "living room".
 - Do NOT add people, pets, or activity. Do NOT mention brands or designers.
