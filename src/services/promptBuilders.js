@@ -130,12 +130,24 @@ export function getQualityPrefix(userPrompt) {
 // New design: short, positive imperatives. The architecture-preservation
 // clause is owned by the wrapper (see buildPanelPrompt), so this constant
 // only carries the panel-fidelity anchor.
+//
+// Build 117 addition — per-cell isolation. TestFlight observation: when a
+// catalog product's hero is a LIFESTYLE shot (rug photographed in a styled
+// living room with sofa + art + plant visible), flux inherits the cell's
+// non-target context as additional reference. The user prompted "render this
+// rug" but flux saw "render this rug along with the white sectional and
+// arched bookshelf in the cell." The fidelity language now explicitly tells
+// flux that non-target items in a cell are photography artifacts of the
+// product listing, not directives for the rendered room. This pairs with
+// the catalog-side `panelImageUrl` curation (Build 117 audit) that picks
+// studio shots over lifestyle shots wherever they exist — but lifestyle
+// shots are unavoidable for some products, and this clause covers them.
 export const FIDELITY_DIRECTIVES =
-  'All 4 products must appear, matching their reference cells exactly. No substitutions, no omissions, no new decor.';
+  'All 4 products must appear, matching their reference cells exactly. Each cell shows only its named product — ignore any other furniture, walls, or decor visible in the cell, those are photography artifacts of the source listing, not directives for the room. No substitutions, no omissions, no new decor.';
 
 // Single-product variant — same simplification.
 export const FIDELITY_DIRECTIVES_SINGLE =
-  'The product must match the reference exactly. No substitutions, no new decor.';
+  'The product must match the reference exactly. Ignore any other items, walls, or decor visible in the reference image — render only the named product. No substitutions, no new decor.';
 
 // Cap total prompt words. Lowered 200 → 120: shorter prompts have
 // dramatically less token-attention dilution. flux weights early tokens
@@ -245,31 +257,44 @@ export function buildPanelPrompt(userPrompt, products) {
   // Strip trailing punctuation before re-adding our own terminator.
   const cleanedPrompt = (userPrompt || '').replace(/[.\s]+$/, '');
 
-  // Build 115: scope the user prompt as MOOD ONLY in one short clause.
-  // Previously this ran ~60 words with stacked "never to walls / never to
-  // floor / never to ceiling / etc." negations — flux read them all as
-  // attention weight on those exact surfaces. The new framing is a single
-  // positive scope: "Style mood: [user words]" tells flux these words
-  // describe ATMOSPHERE, not objects.
+  // Build 117: rescope the user-prompt mood with explicit fabric/lighting
+  // boundaries. Previously the clause was "Style mood (lighting and
+  // atmosphere only): [user prompt]" — flux still pulled atmospheric words
+  // like "deep void shadows defining concrete" into wall paint changes,
+  // because "atmosphere" is too abstract a category for a diffusion model
+  // to map to non-architectural surfaces. The new wording is concrete:
+  // "lighting tone and upholstery only" — fabric and lamps, never room
+  // surfaces. Pairs with the architecture lock moved to the end of the
+  // prompt (see comment on the return below).
   const styleIntent = cleanedPrompt
-    ? `Style mood (lighting and atmosphere only): ${cleanedPrompt}.`
+    ? `Atmosphere applies to lighting tone and upholstery only: ${cleanedPrompt}.`
     : '';
 
-  // Build 115 wrapper: 4 short sections, ~90 words total.
-  //   1. Quality framing
-  //   2. Architecture preserve (one short clause, no enumeration)
-  //   3. Panel reference + fidelity anchor
-  //   4. Style mood (user prompt scoped to atmosphere)
+  // Build 117 wrapper: 5 sections, restructured from Build 115's order.
+  // Token-position analysis from the TestFlight Brutalist/Art Deco renders
+  // showed flux was treating the architecture-preserve clause as middle-
+  // attention boilerplate while the user's mood prompt at the END got
+  // closing-position weight. Result: walls repainted, ceilings recolored.
+  // The new order puts ARCHITECTURE LOCK in the closing position so it
+  // owns flux's last-token attention budget. Style mood sits BEFORE the
+  // lock, giving the lock the chance to override any surface bleed the
+  // mood introduced.
   //
-  // Down from ~200 words; every token now lands in flux's high-attention
-  // region. Architecture preservation kept short — the model knows what
-  // "preserve image 1's room" means without 6 redundant clauses.
+  //   1. Quality framing (opening attention)
+  //   2. Panel reference + render directive (cell binding)
+  //   3. Fidelity anchor (per-cell isolation, all-4 anchor)
+  //   4. Style mood (scoped to fabric + lighting)
+  //   5. Architecture lock (closing attention — overrides any surface bleed)
+  //
+  // Total ~130 words — slightly above Build 115's 90 because of the
+  // per-cell isolation clause and the more explicit lock. Still well
+  // under flux's effective attention window.
   return [
     getQualityPrefix(cleanedPrompt),
-    'Scene edit: preserve image 1\'s walls, floor, ceiling, windows, lighting, and camera angle unchanged.',
     refLine,
     FIDELITY_DIRECTIVES,
     styleIntent,
+    'Architecture lock: image 1\'s walls, floor, ceiling, windows, doors, trim, and camera angle remain identical to the room photo. The atmosphere applies to fabric, lighting, and soft furnishings, never to surfaces.',
   ].filter(Boolean).join(' ');
 }
 
@@ -310,17 +335,19 @@ export function buildFlux2MaxPrompt(userPrompt, products) {
   // Strip trailing punctuation before re-adding our own terminator (matches
   // buildPanelPrompt's behavior — prevents "...prompt..." double-period).
   const cleanedUserPrompt = (userPrompt || '').replace(/[.\s]+$/, '');
+  // Build 117: same fabric/lighting scoping as buildPanelPrompt.
   const styleIntent = cleanedUserPrompt
-    ? `Style mood (lighting and atmosphere only): ${cleanedUserPrompt}.`
+    ? `Atmosphere applies to lighting tone and upholstery only: ${cleanedUserPrompt}.`
     : '';
 
-  // Same 4-section structure as buildPanelPrompt.
+  // Build 117: same 5-section structure as buildPanelPrompt — architecture
+  // lock owns the closing-token attention budget.
   return [
     getQualityPrefix(userPrompt),
-    'Scene edit: preserve image 1\'s walls, floor, ceiling, windows, lighting, and camera angle unchanged.',
     refLine,
     FIDELITY_DIRECTIVES,
     styleIntent,
+    'Architecture lock: image 1\'s walls, floor, ceiling, windows, doors, trim, and camera angle remain identical to the room photo. The atmosphere applies to fabric, lighting, and soft furnishings, never to surfaces.',
   ].filter(Boolean).join(' ');
 }
 
