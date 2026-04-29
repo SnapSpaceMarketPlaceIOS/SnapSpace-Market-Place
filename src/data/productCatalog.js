@@ -26526,6 +26526,58 @@ export const PRODUCT_CATALOG = [
     ],
   },
 
+  {
+    id: 'B0FKLTD3L2',
+    asin: 'B0FKLTD3L2',
+    name: 'koretech Japanese Tatami Low Floor Coffee Table, Paulownia Wood Folding Chabudai with Storage Shelf',
+    brand: 'koretech',
+    price: 45.99,
+    priceDisplay: '$45.99',
+    compareAtPrice: 45.99,
+    compareAtPriceDisplay: '$45.99',
+    imageUrl: 'https://m.media-amazon.com/images/I/818AYxUVemL._AC_SL1500_.jpg',
+    images: [
+      'https://m.media-amazon.com/images/I/818AYxUVemL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/51Q6eU-f7EL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/415Bvqf8nBL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/51CXFPtQMNL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/51WVgLXsLmL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/41grgt+cuEL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/51lbmF1uLrL._AC_SL1500_.jpg',
+    ],
+    category: 'coffee-table',
+    roomType: ['living-room', 'bedroom', 'office'],
+    styles: ['wabi-sabi', 'japandi', 'minimalist', 'scandinavian', 'mid-century', 'rustic', 'transitional', 'modern'],
+    materials: ['wood'],
+    tags: [
+      'coffee-table', 'low-floor-table', 'tatami-table', 'chabudai',
+      'japanese-table', 'meditation-table', 'altar-table', 'tea-table',
+      'folding-table', 'side-table', 'storage-shelf',
+      'paulownia-wood', 'solid-wood', 'natural-wood', 'wood-grain',
+      'wabi-sabi', 'japandi', 'minimalist', 'scandinavian', 'zen',
+      'mid-century', 'rustic', 'transitional', 'modern',
+      'meditation-room', 'tea-ceremony', 'tea-corner', 'mindful-living',
+      'living-room', 'bedroom', 'office', 'reading-nook',
+      'koretech', '22-inch', 'small-coffee-table', 'low-profile',
+      'natural', 'beige', 'wood-tone',
+    ],
+    source: 'amazon',
+    affiliateUrl: 'https://www.amazon.com/dp/B0FKLTD3L2?tag=' + TAG,
+    rating: 3.4,
+    reviewCount: 22,
+    description: 'koretech Japanese low floor coffee / tatami / chabudai table — 22" × 13.5" paulownia solid wood with a smooth finish, foldable for storage. Lower shelf holds meditation cushions, tea essentials, or books. The signature low-profile silhouette suits wabi-sabi, japandi, scandinavian, and minimalist rooms — meditation corners, tea ceremony nooks, low coffee setups, or as a quiet altar / journaling table.',
+    features: [
+      'Paulownia solid wood top with natural grain — warm, calming wabi-sabi material',
+      'Foldable design — stores flat when not in use',
+      'Lower shelf for meditation cushions, books, tea essentials, or decor',
+      'Low-profile chabudai silhouette suits tatami floors and zen interiors',
+      'Versatile — meditation table, altar, tea corner, journaling desk, or low coffee table',
+    ],
+    variants: [
+      { id: '1', label: 'Natural Paulownia', asin: 'B0FKLTD3L2', price: 45.99, swatchImage: 'https://m.media-amazon.com/images/I/51Q6eU-f7EL._AC_SL300_.jpg', mainImage: 'https://m.media-amazon.com/images/I/818AYxUVemL._AC_SL1500_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FKLTD3L2?tag=' + TAG },
+    ],
+  },
+
 ];
 
 // ─── Enrichment status helper ────────────────────────────────────────────────
