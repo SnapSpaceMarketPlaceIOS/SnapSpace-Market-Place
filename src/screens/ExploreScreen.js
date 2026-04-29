@@ -646,7 +646,10 @@ export default function ExploreScreen({ navigation, route }) {
   const { liked, toggleLiked } = useLiked();
   // onboarding hooks kept for potential future use
   const _onboarding = useOnboarding();
-  const [activeTab, setActiveTab] = useState('wishes'); // 'wishes' | 'products'
+  // Default tab — Products. User confirmed 2026-04-28 that the curated
+  // catalog is the more useful first-look surface than the community
+  // wishes feed when landing on Explore. Was 'wishes' previously.
+  const [activeTab, setActiveTab] = useState('products'); // 'wishes' | 'products'
   const [activeCategory, setActiveCategory] = useState(0);
   const [activeProdCat, setActiveProdCat] = useState(0);
   // Progressive render for Products grid — start small, load more in chunks
