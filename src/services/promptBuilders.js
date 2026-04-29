@@ -122,20 +122,25 @@ export function getQualityPrefix(userPrompt) {
 //   - All 4 products must appear in the final image (the new anchor — this
 //     directly targets the 2-3/4 hit rate by giving flux an explicit count
 //     constraint instead of leaving omission as an acceptable outcome)
+// Build 115 simplification: the prior FIDELITY_DIRECTIVES were ~80 words of
+// stacked negations and meta-instructions ("ignore words elsewhere"). flux is
+// a diffusion model, not an instruction-tuned LLM — meta-negation
+// paradoxically amplifies attention on the words you said to ignore.
+//
+// New design: short, positive imperatives. The architecture-preservation
+// clause is owned by the wrapper (see buildPanelPrompt), so this constant
+// only carries the panel-fidelity anchor.
 export const FIDELITY_DIRECTIVES =
-  'Preserve all architecture exactly. Do not introduce any new decor objects. Copy each piece of furniture from the reference panel exactly. All 4 products must appear in the final image; do not omit any. The reference panel is the ONLY source of truth for furniture — ignore any furniture descriptions, color words, or material words elsewhere in this prompt. Those words describe lighting and atmosphere only; they never override the panel.';
+  'All 4 products must appear, matching their reference cells exactly. No substitutions, no omissions, no new decor.';
 
-// Single-product variant for generateSingleProductInRoom (1 ref, not 4).
-// Same architecture/no-new-decor pins, but the all-4 anchor is replaced
-// with a single-product fidelity clause.
+// Single-product variant — same simplification.
 export const FIDELITY_DIRECTIVES_SINGLE =
-  'Preserve all architecture exactly. Do not introduce any new decor objects. The product in the final image must match the reference exactly. The reference image is the ONLY source of truth for the product — ignore any product descriptions, color words, or material words elsewhere in this prompt; they describe lighting and atmosphere only.';
+  'The product must match the reference exactly. No substitutions, no new decor.';
 
-// Cap total prompt words. Raised to 200: flux retains useful signal up to
-// ~200 words; beyond that the tokenizer starts dropping late tokens. The
-// smart budget in buildFinalPrompt trims user text first (least specific)
-// to keep high-priority product hints and color palette intact.
-const MAX_PROMPT_WORDS = 200;
+// Cap total prompt words. Lowered 200 → 120: shorter prompts have
+// dramatically less token-attention dilution. flux weights early tokens
+// most, and at 120 words every clause is in the high-attention region.
+const MAX_PROMPT_WORDS = 120;
 
 /**
  * Build the enriched design-intent prompt that is passed INTO the final
@@ -229,56 +234,39 @@ export function buildPanelPrompt(userPrompt, products) {
     return `Product ${i + 1} (${posLabels[i]}): ${safeDesc}`;
   });
 
+  // Build 115: tightened reference clause. Was ~50 words of layered
+  // imperatives + negations; now ~30 words of positive directives. flux
+  // doesn't need the "do not swap positions" anti-instruction because
+  // positional labels (top-left, etc.) already pin the cell binding.
   const refLine = entries.length > 0
-    ? `Image 2 is a 2×2 grid containing 4 reference products with white gutters between them. ${entries.join('. ')}. Each of these 4 products MUST appear in the final image. Do not swap their positions, do not substitute with similar-looking alternatives, do not omit any. Match each product's color, material, silhouette, finish, and proportions exactly.`
+    ? `Image 2 is a 2×2 reference grid: ${entries.join('; ')}. Render all 4 products in the room, matching each one's color, material, silhouette, and proportions to its panel cell.`
     : 'Replace furniture with pieces that complement the room style.';
 
-  // User text is included as SUPPLEMENTARY style intent, NOT as the primary
-  // content definition. Wrapping it in "While maintaining this intent:"
-  // tells flux to treat it as a hint rather than the canonical spec.
-  //
-  // Build 69: normalize trailing punctuation. HomeScreen's enrichment path
-  // appends sentences ending in `.` to a user prompt that may or may not
-  // already end with `.`, producing strings like "...throughout." — then this
-  // wrapper added another `.` giving "..throughout.." in live FAL logs.
-  // Strip trailing periods/whitespace before we add our own terminator.
+  // Strip trailing punctuation before re-adding our own terminator.
   const cleanedPrompt = (userPrompt || '').replace(/[.\s]+$/, '');
-  // Build 82 fix: scope the user prompt to AESTHETIC ONLY, not furniture.
-  // Haiku-expanded prompts often name specific items (e.g. "white-washed oak
-  // console, blue striped throw pillows") that compete with the panel and
-  // cause flux to render the prompt's items instead of the panel's items —
-  // especially noticeable on evocative styles like coastal, mid-century, etc.
-  // This rewrite tells flux: use this for vibe (lighting, palette, mood) but
-  // never for furniture, which comes exclusively from the panel.
-  // Build 94 architecture-bleed fix: scope the style guidance ONLY to the
-  // furniture upholstery, textile colors, lamp glow, and overall mood — NOT
-  // to the room's walls, floor, ceiling, or any architectural surface.
-  // Without this scoping, palette language like "deep charcoal palette" gets
-  // interpreted as a wall-paint directive (verified live: an Art Deco prompt
-  // turned a white-walled room charcoal in Build 93). Now palette descriptors
-  // bind to furniture and lighting tones, leaving the existing room surfaces
-  // identical.
+
+  // Build 115: scope the user prompt as MOOD ONLY in one short clause.
+  // Previously this ran ~60 words with stacked "never to walls / never to
+  // floor / never to ceiling / etc." negations — flux read them all as
+  // attention weight on those exact surfaces. The new framing is a single
+  // positive scope: "Style mood: [user words]" tells flux these words
+  // describe ATMOSPHERE, not objects.
   const styleIntent = cleanedPrompt
-    ? `Apply this style guidance ONLY to the upholstery and textile colors of the reference furniture, the lamp glow, and the overall mood — never to walls, wall paint, floor, ceiling, or any architectural surface. Color and palette words describe furniture and lighting tones, not room surfaces. Do not render any new furniture or decor described here; all furniture comes exclusively from the reference panel: ${cleanedPrompt}.`
+    ? `Style mood (lighting and atmosphere only): ${cleanedPrompt}.`
     : '';
 
-  // Order matters — flux weights EARLIER tokens more heavily AND truncates
-  // late tokens past ~200 words. Phase 1: FIDELITY_DIRECTIVES moved BEFORE
-  // styleIntent (the user's supplementary prompt). Two reasons:
-  //   1. The "all 4 products must appear" anchor must NEVER be truncated —
-  //      it's the central guard against the 2-3/4 hit-rate. Putting it
-  //      after the user prompt risked truncation when Haiku-expanded
-  //      prompts pushed total length past 200 words.
-  //   2. Earlier tokens get more attention weight, so the fidelity directive
-  //      gets a stronger pull on flux's output than when it was last.
-  // styleIntent stays last because it's intentionally supplementary — the
-  // wrapping comment "While maintaining this overall style intent" tells
-  // flux to treat it as a hint rather than the canonical spec, so losing
-  // its tail to truncation is acceptable.
+  // Build 115 wrapper: 4 short sections, ~90 words total.
+  //   1. Quality framing
+  //   2. Architecture preserve (one short clause, no enumeration)
+  //   3. Panel reference + fidelity anchor
+  //   4. Style mood (user prompt scoped to atmosphere)
+  //
+  // Down from ~200 words; every token now lands in flux's high-attention
+  // region. Architecture preservation kept short — the model knows what
+  // "preserve image 1's room" means without 6 redundant clauses.
   return [
     getQualityPrefix(cleanedPrompt),
-    'This is a precise scene edit, not a new generation.',
-    'Preserve image 1 exactly: keep the existing wall paint and color, floor surface and color, ceiling, windows, doorways, mouldings, mirrors and wall art positions, camera angle, perspective, and spatial layout. Do not repaint walls. Do not change the floor. Do not change wall color. Do not move or remove architectural elements. The room\'s existing surfaces stay identical.',
+    'Scene edit: preserve image 1\'s walls, floor, ceiling, windows, lighting, and camera angle unchanged.',
     refLine,
     FIDELITY_DIRECTIVES,
     styleIntent,
@@ -313,26 +301,23 @@ export function buildFlux2MaxPrompt(userPrompt, products) {
     return `Product ${i + 1} (image ${i + 2}) is a ${safeDesc}`;
   });
 
+  // Build 115: refs path mirrors the panel path — short positive imperatives,
+  // no anti-instructions, positional binding via image index.
   const refLine = entries.length > 0
-    ? `Place all 4 of these products into the room shown in image 1: ${entries.join('. ')}. Each of these 4 products MUST appear in the final image. Do not omit any, do not substitute with similar-looking alternatives. Match each product's color, material, silhouette, finish, and proportions exactly. Position each piece naturally where this type of furniture belongs in the room.`
+    ? `Place these 4 products into image 1's room: ${entries.join('; ')}. Match each product's color, material, silhouette, and proportions to its reference image.`
     : 'Replace furniture with pieces that complement the room style.';
 
-  // Build 82 fix: same aesthetic-only scoping as buildPanelPrompt — keeps
-  // flux from substituting prompt-described items for the actual reference
-  // products on evocative styles.
-  // Build 94 architecture-bleed fix: same scoping as buildPanelPrompt — palette
-  // language binds to furniture/lamps/textiles only, never wall paint or floor.
-  const styleIntent = userPrompt
-    ? `Apply this style guidance ONLY to the upholstery and textile colors of the reference furniture, the lamp glow, and the overall mood — never to walls, wall paint, floor, ceiling, or any architectural surface. Color and palette words describe furniture and lighting tones, not room surfaces. Do not render any new furniture or decor described here; all furniture comes exclusively from the reference images: ${userPrompt}.`
+  // Strip trailing punctuation before re-adding our own terminator (matches
+  // buildPanelPrompt's behavior — prevents "...prompt..." double-period).
+  const cleanedUserPrompt = (userPrompt || '').replace(/[.\s]+$/, '');
+  const styleIntent = cleanedUserPrompt
+    ? `Style mood (lighting and atmosphere only): ${cleanedUserPrompt}.`
     : '';
 
-  // Same order as buildPanelPrompt: FIDELITY_DIRECTIVES before styleIntent so
-  // the "all 4 products must appear" anchor stays in stable token position
-  // and never gets truncated when Haiku-expanded prompts run long.
+  // Same 4-section structure as buildPanelPrompt.
   return [
     getQualityPrefix(userPrompt),
-    'This is a precise scene edit, not a new generation.',
-    'Preserve image 1 exactly: keep the existing wall paint and color, floor surface and color, ceiling, windows, doorways, mouldings, mirrors and wall art positions, camera angle, perspective, and spatial layout. Do not repaint walls. Do not change the floor. Do not change wall color. Do not move or remove architectural elements. The room\'s existing surfaces stay identical.',
+    'Scene edit: preserve image 1\'s walls, floor, ceiling, windows, lighting, and camera angle unchanged.',
     refLine,
     FIDELITY_DIRECTIVES,
     styleIntent,
