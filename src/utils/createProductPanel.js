@@ -112,10 +112,40 @@ export async function createProductPanel(products, userId) {
   // is a one-time cost — and FAL only sees the final 1280×1280 panel JPEG,
   // so per-input billing is unchanged. Quality win: sharper product detail
   // in flux's attention map → 4/4 fidelity in the render.
+  //
+  // Source-image precedence for the panel composite:
+  //
+  //   1. Variant swap wins. If productMatcher.js (Build 71 Fix #2) swapped
+  //      the product to a specific variant, p.imageUrl already points at
+  //      that variant's mainImage — typically a clean studio shot of the
+  //      exact color the user asked for. We must NOT override that with
+  //      a catalog-level panelImageUrl, because the variant photo is the
+  //      whole point of the swap (it's both the most accurate panel
+  //      source AND what the user will actually see in their cart).
+  //
+  //   2. Catalog override. If the product carries an optional
+  //      `panelImageUrl` field, prefer that for the AI panel composite
+  //      ONLY. Used to override a default `imageUrl` that's a busy
+  //      lifestyle shot, a tightly-cropped detail, or otherwise gives
+  //      flux a poor silhouette to work with. The catalog UI keeps
+  //      showing `imageUrl` so the shopper-facing surface stays rich.
+  //
+  //   3. Default. Fall back to `imageUrl` — the current behavior for
+  //      every product that has no panelImageUrl set, which is the
+  //      whole catalog at the time this hook was added. Existing
+  //      products behave exactly as before.
+  const pickPanelSource = (p) => {
+    if (p._matchedVariant) return p.imageUrl;
+    if (typeof p.panelImageUrl === 'string' && p.panelImageUrl.startsWith('http')) {
+      return p.panelImageUrl;
+    }
+    return p.imageUrl;
+  };
   const productUrls = products
-    .filter(p => p.imageUrl && typeof p.imageUrl === 'string' && p.imageUrl.startsWith('http'))
+    .map(pickPanelSource)
+    .filter((url) => typeof url === 'string' && url.startsWith('http'))
     .slice(0, SEND_LIMIT)
-    .map(p => p.imageUrl
+    .map((url) => url
       .replace(/_AC_SL\d+_/g,  '_AC_SL1500_')
       .replace(/_AC_UL\d+_/g,  '_AC_SL1500_')
       .replace(/_SX\d+_/g,     '_AC_SL1500_')
