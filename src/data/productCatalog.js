@@ -26474,6 +26474,58 @@ export const PRODUCT_CATALOG = [
     ],
   },
 
+  {
+    id: 'B0FPF38QBL',
+    asin: 'B0FPF38QBL',
+    name: 'Suruim Geometric Dog Butler Accent Table with Detachable Metal Tray, Sculptural Animal Side Table',
+    brand: 'suruim',
+    price: 179.99,
+    priceDisplay: '$179.99',
+    compareAtPrice: 179.99,
+    compareAtPriceDisplay: '$179.99',
+    imageUrl: 'https://m.media-amazon.com/images/I/61z2ybmCR1L._AC_SL1500_.jpg',
+    images: [
+      'https://m.media-amazon.com/images/I/61z2ybmCR1L._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/31P+mpMTyzL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/41SADKKVqbL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/41yXs2TUgPL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/413QnfllKQL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/418i7Vdhl7L._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/41gkLGCVsFL._AC_SL1500_.jpg',
+    ],
+    category: 'side-table',
+    roomType: ['living-room', 'bedroom', 'office', 'entryway'],
+    styles: ['art-deco', 'industrial', 'maximalist', 'eclectic', 'modern', 'contemporary', 'glam', 'mid-century'],
+    materials: ['metal', 'concrete'],
+    tags: [
+      'side-table', 'accent-table', 'end-table', 'butler-table', 'butler-statue',
+      'serving-tray', 'detachable-tray', 'metal-tray',
+      'dog-sculpture', 'animal-table', 'animal-sculpture', 'figurine',
+      'geometric', 'sculptural', 'statement-piece', 'floor-sculpture',
+      'art-deco', 'industrial', 'maximalist', 'eclectic',
+      'modern', 'contemporary', 'glam', 'mid-century',
+      'resin', 'high-quality-resin', 'waterproof', 'corrosion-resistant',
+      'living-room', 'bedroom', 'office', 'entryway', 'foyer',
+      'pet-themed', 'novelty', 'gift-idea',
+      'suruim', 'black',
+    ],
+    source: 'amazon',
+    affiliateUrl: 'https://www.amazon.com/dp/B0FPF38QBL?tag=' + TAG,
+    rating: 5.0,
+    reviewCount: 7,
+    description: 'Suruim geometric dog butler accent side table — a sculptural resin statue holding a detachable metal serving tray with a safe curved edge. Functional and decorative: place drinks, books, remotes, keys, or use it as a sculptural floor decor piece. Geometric faceted dog silhouette is signature art-deco / maximalist statement. Waterproof, corrosion-resistant resin construction. Perfect for entryways, living rooms, and offices that lean modern, industrial, or eclectic.',
+    features: [
+      'Geometric faceted dog sculpture — sculptural art-deco statement piece',
+      'Detachable metal tray with safe curved edge — serves drinks, snacks, or stores keys',
+      'Resin construction — waterproof, corrosion-resistant, sturdy base',
+      'Doubles as floor sculpture, butler-statue, end table, or accent piece',
+      'Conversation-starter for entryways, living rooms, or home offices',
+    ],
+    variants: [
+      { id: '1', label: 'Black', asin: 'B0FPF38QBL', price: 179.99, swatchImage: 'https://m.media-amazon.com/images/I/31P+mpMTyzL._AC_SL300_.jpg', mainImage: 'https://m.media-amazon.com/images/I/61z2ybmCR1L._AC_SL1500_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0FPF38QBL?tag=' + TAG },
+    ],
+  },
+
 ];
 
 // ─── Enrichment status helper ────────────────────────────────────────────────
