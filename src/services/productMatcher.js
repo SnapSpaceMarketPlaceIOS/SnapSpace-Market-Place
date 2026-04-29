@@ -517,6 +517,29 @@ function scoreProduct(
   const styleScore = computeStyleScore(product.styles, styles);
   breakdown.style = styleScore * 25;
 
+  // ── Explicit-style bonus (+5 pts max, post-Build-105 fidelity pass) ──────
+  // computeStyleScore returns 1.0 for exact `styles[]` membership AND a high
+  // value for affinity-adjacent matches via STYLE_AFFINITY. So a "scandinavian"
+  // user query and a `styles: ['mid-century', 'minimalist']` product can both
+  // score near full 25. That makes color+material the real tiebreakers, and
+  // a non-scandinavian sofa with the right ivory color can outrank an actual
+  // scandinavian sofa.
+  //
+  // This bonus is a small thumb-on-the-scale (+5 pts max) for products whose
+  // `styles[]` contains an EXACT user-named style. Not enough to dominate
+  // color/material (each 20-25 pts), but enough to break ties toward the
+  // user's literal style ask. Fires only when `styles` is non-empty AND the
+  // product's styles[] contains at least one user-named style verbatim — so
+  // for vague prompts ("a cozy room") this is a no-op.
+  if (Array.isArray(styles) && styles.length > 0 && Array.isArray(product.styles)) {
+    for (const s of styles) {
+      if (product.styles.includes(s)) {
+        breakdown.style += 5;
+        break;
+      }
+    }
+  }
+
   // ── Color match (25 points — NEW in Phase 3) ─────────────────────────────
   // Only apply color scoring if the user explicitly specified a color for
   // this product's category (or unattached colors if no category binding).

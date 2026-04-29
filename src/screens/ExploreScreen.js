@@ -291,9 +291,12 @@ const PRODUCT_SORT_OPTIONS = [
   { key: 'newest',     label: 'Newest' },
 ];
 
+// Order matters — first option is the default. User direction 2026-04-28:
+// freshly-posted public wishes should land at position 1, not be buried
+// under whatever happens to have the most likes. Default = Newest.
 const WISH_SORT_OPTIONS = [
-  { key: 'most_popular', label: 'Most Popular' },
   { key: 'newest',       label: 'Newest' },
+  { key: 'most_popular', label: 'Most Popular' },
 ];
 
 // Room type chips for the filter sheet (Products tab)
@@ -691,7 +694,7 @@ export default function ExploreScreen({ navigation, route }) {
   const [filterMinRating, setFilterMinRating] = useState(0);
   const [productSort, setProductSort] = useState('best_match');
   // Wish-specific filters
-  const [wishSort, setWishSort] = useState('most_popular');
+  const [wishSort, setWishSort] = useState('newest');
   const [wishFilterStyles, setWishFilterStyles] = useState([]);
   const [wishFilterRoomTypes, setWishFilterRoomTypes] = useState([]);
   const [showSortPicker, setShowSortPicker] = useState(false);
@@ -785,7 +788,7 @@ export default function ExploreScreen({ navigation, route }) {
   }, []);
 
   const clearWishFilters = useCallback(() => {
-    setWishSort('most_popular');
+    setWishSort('newest');
     setWishFilterStyles([]);
     setWishFilterRoomTypes([]);
   }, []);
@@ -807,7 +810,7 @@ export default function ExploreScreen({ navigation, route }) {
   const activeWishFilterCount = [
     wishFilterStyles.length > 0,
     wishFilterRoomTypes.length > 0,
-    wishSort !== 'most_popular',
+    wishSort !== 'newest',
   ].filter(Boolean).length;
 
   const activeFilterCount = activeTab === 'products' ? activeProductFilterCount : activeWishFilterCount;
@@ -921,10 +924,14 @@ export default function ExploreScreen({ navigation, route }) {
     }
     // Sort
     if (wishSort === 'newest') {
-      // Reverse the default order — newest (highest id or most recently created) first
+      // Reverse the underlying searchAndFilter order so the most recently
+      // created wish lands at position 1. This is the default starting from
+      // 2026-04-28: a user posting publicly should see their wish at the
+      // top, not buried under whatever is most-liked.
       pool = [...pool].reverse();
     }
-    // 'most_popular' is already the default sort from searchAndFilter (by likes)
+    // 'most_popular' uses the underlying searchAndFilter order (sorted by
+    // likes) — the user can opt into it via the sort picker.
     return pool;
   }, [search, activeCategory, activeRoomFilter, activeStyleFilter, baseDesigns, wishFilterStyles, wishFilterRoomTypes, wishSort]);
 
@@ -1142,11 +1149,11 @@ export default function ExploreScreen({ navigation, route }) {
               <Text style={styles.sortLabel}>Sort by</Text>
               <Text style={[
                 styles.sortValue,
-                (activeTab === 'products' ? productSort !== 'best_match' : wishSort !== 'most_popular') && styles.sortValueActive,
+                (activeTab === 'products' ? productSort !== 'best_match' : wishSort !== 'newest') && styles.sortValueActive,
               ]}>
                 {activeTab === 'products'
                   ? (PRODUCT_SORT_OPTIONS.find(o => o.key === productSort)?.label ?? 'Best Match')
-                  : (WISH_SORT_OPTIONS.find(o => o.key === wishSort)?.label ?? 'Most Popular')
+                  : (WISH_SORT_OPTIONS.find(o => o.key === wishSort)?.label ?? 'Newest')
                 }
               </Text>
               <ChevDown size={10} color="#999" />

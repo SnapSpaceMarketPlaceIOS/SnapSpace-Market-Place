@@ -109,17 +109,24 @@ function extractTypeWord(name) {
  *
  * Unused slots are skipped. Resulting string is 2–5 words.
  *
- * Variant override (post-Build-105 fidelity pass): when the matcher swapped
- * the product to a specific variant via `_matchedVariant`, the variant's
- * label (e.g. "Sage Green", "Walnut Top-Grain Leather") is the most
- * authoritative signal for what the user will actually receive — it matches
- * the swapped imageUrl and the affiliateUrl. We parse the label for any
- * recognized color/shape tokens and prefer them over the base product's
- * tags. Without this, a "sage green" prompt could swap the variant image
- * correctly while the prompt descriptor still said "ivory" because the
- * base product's tags listed the default variant's color. Products without
- * a matched variant fall through to the unchanged base-tag path — no
- * regression for the no-variant case.
+ * Variant override: when the matcher swapped the product to a specific
+ * variant via `_matchedVariant`, the variant's label (e.g. "Sage Green",
+ * "Walnut Top-Grain Leather") is the authoritative signal for what the
+ * user will actually receive — it matches the swapped imageUrl and
+ * affiliateUrl. We parse the label for any recognized color/shape tokens
+ * and prefer them over the base product's tags. Without this, a "sage
+ * green" prompt could swap the variant image correctly while the prompt
+ * descriptor still said "ivory" because the base product's tags listed
+ * the default variant's color. Products without a matched variant fall
+ * through to the unchanged base-tag path — no regression for the
+ * no-variant case (verified in 5-scenario sandbox).
+ *
+ * History: this was originally part of commit ccf733e bundled with a
+ * separate FIDELITY_DIRECTIVES change. That bundle was reverted on
+ * device-test feedback because the FIDELITY change introduced a
+ * Streisand-effect regression. The variant override itself tested
+ * clean (regression scenarios A/C/E produce byte-identical output to
+ * pre-change behavior) and is now re-added as an isolated change.
  *
  * @param {object} p - product row from productCatalog
  * @returns {string}  short visual descriptor (may be empty string)
