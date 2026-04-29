@@ -26684,6 +26684,58 @@ export const PRODUCT_CATALOG = [
     ],
   },
 
+  {
+    id: 'B0CGJDK8Z2',
+    asin: 'B0CGJDK8Z2',
+    name: 'Home Square Velvet Barrel Swivel Accent Chair Set of 2 with Contrasting Cream Welt Detail',
+    brand: 'Home Square',
+    price: 1125.84,
+    priceDisplay: '$1,125.84',
+    compareAtPrice: 1125.84,
+    compareAtPriceDisplay: '$1,125.84',
+    imageUrl: 'https://m.media-amazon.com/images/I/51Gk4Bfz28L._AC_SL1500_.jpg',
+    images: [
+      'https://m.media-amazon.com/images/I/51Gk4Bfz28L._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/31YSAj75NHL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/51ZrnhAGOZL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/418Y-JN9h+L._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/41gSeS0Ux3L._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/31WBXjJEjaL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/21wXMVGXCNL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/31yriV-pphL._AC_SL1500_.jpg',
+    ],
+    category: 'accent-chair',
+    roomType: ['living-room', 'bedroom', 'office'],
+    styles: ['coastal', 'glam', 'art-deco', 'modern', 'contemporary', 'transitional', 'mid-century', 'eclectic'],
+    materials: ['velvet'],
+    tags: [
+      'accent-chair', 'barrel-chair', 'swivel-chair', 'set-of-2', 'club-chair',
+      'velvet', 'plush', 'contrasting-welt', 'piping-detail',
+      'coastal', 'beach-house', 'glam', 'art-deco', 'modern', 'contemporary',
+      'transitional', 'mid-century', 'eclectic',
+      'living-room', 'bedroom', 'office',
+      'home-square', '360-swivel', 'rounded-back',
+      'blue', 'navy', 'brown', 'cream', 'caramel', 'tan',
+    ],
+    source: 'amazon',
+    affiliateUrl: 'https://www.amazon.com/dp/B0CGJDK8Z2?tag=' + TAG,
+    rating: null,
+    reviewCount: null,
+    description: 'Home Square velvet barrel swivel accent chairs sold as a set of 2. Plush velvet upholstery with a contrasting cream welt that traces the rounded barrel silhouette — refined glam / coastal accent for living rooms, bedrooms, and home offices. Smooth 360° swivel. 30"H × 29.75"W × 30"D per chair. Available in 3 contrast pairings (Blue + Cream, Brown + Cream, Cream + Brown).',
+    features: [
+      'Set of 2 — paired velvet barrel swivel chairs at one price',
+      'Contrasting cream welt detailing accentuates the rounded barrel silhouette',
+      'Smooth 360° swivel — pivot effortlessly to face conversations or windows',
+      'Plush velvet upholstery in three sophisticated two-tone combinations',
+      '30"H × 29.75"W × 30"D — generous for both small and large living rooms',
+    ],
+    variants: [
+      { id: '1', label: 'Blue + Cream',  asin: 'B0CGJDK8Z2', price: 1125.84, swatchImage: 'https://m.media-amazon.com/images/I/31YSAj75NHL._AC_SL300_.jpg', mainImage: 'https://m.media-amazon.com/images/I/51Gk4Bfz28L._AC_SL1500_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CGJDK8Z2?tag=' + TAG },
+      { id: '2', label: 'Brown + Cream', asin: 'B0CGF42S2Q', price: 1125.84, swatchImage: 'https://m.media-amazon.com/images/I/31FHg+eWuOL._AC_SL300_.jpg', mainImage: 'https://m.media-amazon.com/images/I/51drb6zw-tL._AC_SL1500_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CGF42S2Q?tag=' + TAG },
+      { id: '3', label: 'Cream + Brown', asin: 'B0CGF433VQ', price: 1125.84, swatchImage: 'https://m.media-amazon.com/images/I/31Obz6B7oxL._AC_SL300_.jpg', mainImage: 'https://m.media-amazon.com/images/I/41n3RN8Ej2L._AC_SL1500_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B0CGF433VQ?tag=' + TAG },
+    ],
+  },
+
 ];
 
 // ─── Enrichment status helper ────────────────────────────────────────────────
