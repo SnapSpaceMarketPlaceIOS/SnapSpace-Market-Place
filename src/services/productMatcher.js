@@ -29,13 +29,18 @@ const MAX_PER_CATEGORY = 1;
 // there's a clear winner it still dominates while lower-scored but
 // still-relevant alternates occasionally come through.
 //
-// Raised 3 → 7 (Build 71 Fix #1): with RANDOM_POOL_SIZE=3 a single top
-// product (e.g. the MXSANYOO rug) was appearing in >40% of all generations.
-// At pool=7 with weighted draw the top product's expected win rate drops
-// from ~52% to ~28% while quality stays high (weakest of 7 still scored
-// above the style-filter floor). Reach simulation: 332/399 products are
-// now reachable vs 297/399 before.
-const RANDOM_POOL_SIZE = 7;
+// Build 115: lowered 7 → 4. With RANDOM_POOL_SIZE=7, the same prompt was
+// returning wildly different 4-packs across runs (verified: 5 different
+// sofas in 5 runs of "brutalist"). Pool=7 was tuned for variety; the new
+// priority is REPEATABILITY — the user's expectation is "I picked
+// brutalist, I expect brutalist-leaning products consistently."
+//
+// At pool=4 with weighted draw, the #1 scorer wins ~50-60% and the #2-#4
+// scorers each win 15-20% — strong selection while preventing the same
+// product from appearing every single time. Combined with the tiered
+// exact-style bonus (Workstream C3), the top scorer is now reliably the
+// best stylistic match instead of a near-tie that varies on noise.
+const RANDOM_POOL_SIZE = 4;
 
 // Top-N pool for the optional wildcard slot. One non-essential result slot
 // gets swapped for a uniform-random pick from these top-N overall scorers
@@ -43,11 +48,13 @@ const RANDOM_POOL_SIZE = 7;
 // has a fair shot — this is intentional discovery, not quality ranking.
 const WILDCARD_POOL_SIZE = 15;
 
-// 1-in-10 chance the last non-essential slot becomes a wildcard. At 10%,
-// a user generating 10 rooms will see ~1 surprise product. Keeping this
-// low preserves quality while breaking category "gravity" (same rug every
-// time). Set to 0 to disable; raise to 0.20 if users ask for more variety.
-const WILDCARD_PROBABILITY = 0.10;
+// Build 115: lowered 0.10 → 0.05. Wildcards introduce off-style products
+// (a coastal rug in a brutalist set). At 5%, a user gets ~1 surprise per
+// 20 generations — discovery is preserved, but it's no longer common
+// enough to feel like a quality regression on any single generation.
+// Combined with the tighter pool size, the user should perceive much
+// higher consistency between runs of the same prompt.
+const WILDCARD_PROBABILITY = 0.05;
 
 // Categories that are ONLY appropriate for specific room types.
 // If a product's category is in this map, it can only appear for those rooms.
@@ -517,24 +524,28 @@ function scoreProduct(
   const styleScore = computeStyleScore(product.styles, styles);
   breakdown.style = styleScore * 25;
 
-  // ── Explicit-style bonus (+5 pts max, post-Build-105 fidelity pass) ──────
-  // computeStyleScore returns 1.0 for exact `styles[]` membership AND a high
-  // value for affinity-adjacent matches via STYLE_AFFINITY. So a "scandinavian"
-  // user query and a `styles: ['mid-century', 'minimalist']` product can both
-  // score near full 25. That makes color+material the real tiebreakers, and
-  // a non-scandinavian sofa with the right ivory color can outrank an actual
-  // scandinavian sofa.
+  // ── Explicit-style bonus (tiered: +15 / +8 / +5 by parser rank) ─────────
+  // Build 115: amplified from flat +5 to a tiered bonus that respects parser
+  // ranking. The parser now returns top-3 styles ordered by score (Workstream
+  // C1), so the FIRST style is the user's strongest intent — that match
+  // deserves a much heavier thumb on the scale. Second and third matches
+  // still get a smaller bonus.
   //
-  // This bonus is a small thumb-on-the-scale (+5 pts max) for products whose
-  // `styles[]` contains an EXACT user-named style. Not enough to dominate
-  // color/material (each 20-25 pts), but enough to break ties toward the
-  // user's literal style ask. Fires only when `styles` is non-empty AND the
-  // product's styles[] contains at least one user-named style verbatim — so
-  // for vague prompts ("a cozy room") this is a no-op.
+  // Why this matters: in the brutalist test, the parser returns
+  // ['brutalist','industrial']. With the flat +5 bonus, an industrial-tagged
+  // product and a brutalist-tagged product scored the same +5. With the
+  // tiered bonus, brutalist-tagged products beat industrial-tagged ones by
+  // 10 points — strong enough to dominate selection without erasing the
+  // affinity routing for catalogs thin in the primary style.
+  //
+  // Bonus stops accumulating after the first match per product (we reward
+  // the BEST style match, not stack credit for products tagged with multiple
+  // of the user's styles).
   if (Array.isArray(styles) && styles.length > 0 && Array.isArray(product.styles)) {
-    for (const s of styles) {
-      if (product.styles.includes(s)) {
-        breakdown.style += 5;
+    for (let i = 0; i < styles.length; i++) {
+      if (product.styles.includes(styles[i])) {
+        const tierBonus = i === 0 ? 15 : (i === 1 ? 8 : 5);
+        breakdown.style += tierBonus;
         break;
       }
     }

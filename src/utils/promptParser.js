@@ -196,14 +196,46 @@ function detectAllRoomTypes(text) {
   return matches.map(m => m.room);
 }
 
+// Build 115: weighted, top-3-capped style detection.
+//
+// The prior implementation pushed EVERY style whose keyword list had any
+// match in the text, with no ranking. A single evocative paragraph
+// ("rustic living room … quiet … raw … warm …") would trigger 8+ styles
+// because short common words like "quiet" (japandi), "raw" (rustic),
+// "warm" (transitional) all pattern-matched. The matcher then weighted
+// those 8 styles equally and produced wildly inconsistent picks.
+//
+// New scoring:
+//   • Longer/multi-word keywords score higher (more specific intent)
+//   • The exact style name in the prompt scores 5× (explicit intent
+//     beats keyword spillover — "brutalist" written verbatim should
+//     dominate over "raw" matching rustic)
+//   • Top 3 styles by score are returned. Ties broken by score order.
+//
+// This converts the parser from "every-keyword-fires" to "top-3-by-fit",
+// dramatically reducing variance in matcher selection without changing
+// any downstream API.
 function detectStyles(text) {
-  const found = [];
+  const scored = [];
   for (const [style, keywords] of Object.entries(STYLE_KEYWORDS)) {
-    if (keywords.some((kw) => text.includes(kw))) {
-      found.push(style);
+    let score = 0;
+    for (const kw of keywords) {
+      if (text.includes(kw)) {
+        // Specificity weight: longer keywords are rarer and more intentional.
+        // 'wabi-sabi' (9 chars) outweighs 'raw' (3 chars).
+        const specificity = Math.max(1, kw.length / 3);
+        // Verbatim style-name match in prompt = explicit intent boost.
+        const verbatim = (kw === style) ? 5 : 1;
+        score += specificity * verbatim;
+      }
     }
+    if (score > 0) scored.push({ style, score });
   }
-  // If no styles found, infer from mood/material clues
+
+  scored.sort((a, b) => b.score - a.score);
+  const found = scored.slice(0, 3).map((s) => s.style);
+
+  // Mood/material-clue fallback for prompts with no style keyword hits.
   if (found.length === 0) {
     if (text.includes('wood') || text.includes('oak') || text.includes('warm')) found.push('transitional');
     else if (text.includes('white') || text.includes('clean')) found.push('minimalist');

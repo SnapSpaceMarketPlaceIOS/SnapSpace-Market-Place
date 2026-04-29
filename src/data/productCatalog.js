@@ -25086,7 +25086,7 @@ export const PRODUCT_CATALOG = [
     ],
     category: 'coffee-table',
     roomType: ['living-room', 'bedroom', 'office'],
-    styles: ['modern', 'contemporary', 'minimalist', 'japandi', 'wabi-sabi', 'mid-century', 'industrial', 'rustic', 'scandinavian'],
+    styles: ['brutalist', 'modern', 'contemporary', 'minimalist', 'japandi', 'wabi-sabi', 'mid-century', 'industrial', 'rustic', 'scandinavian'],
     materials: ['wood', 'concrete', 'metal'],
     tags: [
       'coffee-table', 'oval-coffee-table', 'square-coffee-table', 'round-coffee-table',
@@ -25153,7 +25153,7 @@ export const PRODUCT_CATALOG = [
     ],
     category: 'lamp',
     roomType: ['living-room', 'bedroom', 'office'],
-    styles: ['modern', 'contemporary', 'minimalist', 'mid-century', 'art-deco', 'glam', 'industrial', 'transitional'],
+    styles: ['brutalist', 'modern', 'contemporary', 'minimalist', 'mid-century', 'art-deco', 'glam', 'industrial', 'transitional'],
     materials: ['metal'],
     tags: [
       'floor-lamp', 'standing-lamp', 'globe-lamp', 'tiered-lamp', '2-tier',
@@ -25468,7 +25468,7 @@ export const PRODUCT_CATALOG = [
     ],
     category: 'coffee-table',
     roomType: ['living-room', 'dining-room', 'office'],
-    styles: ['industrial', 'mid-century', 'modern', 'contemporary', 'minimalist', 'transitional'],
+    styles: ['brutalist', 'industrial', 'mid-century', 'modern', 'contemporary', 'minimalist', 'transitional'],
     materials: ['metal'],
     tags: [
       'table-base', 'table-legs', 'coffee-table-base', 'dining-table-base',
@@ -26495,7 +26495,7 @@ export const PRODUCT_CATALOG = [
     ],
     category: 'side-table',
     roomType: ['living-room', 'bedroom', 'office', 'entryway'],
-    styles: ['art-deco', 'industrial', 'maximalist', 'eclectic', 'modern', 'contemporary', 'glam', 'mid-century'],
+    styles: ['brutalist', 'art-deco', 'industrial', 'maximalist', 'eclectic', 'modern', 'contemporary', 'glam', 'mid-century'],
     materials: ['metal', 'concrete'],
     tags: [
       'side-table', 'accent-table', 'end-table', 'butler-table', 'butler-statue',

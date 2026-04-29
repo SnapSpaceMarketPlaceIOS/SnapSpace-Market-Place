@@ -36,31 +36,46 @@ export const ROOM_FURNITURE = {
 
 // ─── Design Styles ─────────────────────────────────────────────────────────────
 export const DESIGN_STYLES = [
-  'minimalist', 'japandi', 'rustic', 'industrial', 'coastal', 'art-deco',
-  'mid-century', 'bohemian', 'scandi', 'dark-luxe', 'biophilic',
+  'minimalist', 'japandi', 'rustic', 'industrial', 'brutalist', 'coastal',
+  'art-deco', 'mid-century', 'bohemian', 'scandi', 'dark-luxe', 'biophilic',
   'transitional', 'contemporary', 'farmhouse', 'mediterranean',
   'wabi-sabi', 'maximalist', 'french-country', 'glam', 'luxury',
 ];
 
 // Keywords that indicate each style
 export const STYLE_KEYWORDS = {
+  // Build 115: keyword cleanup — removed bare-word triggers that caused
+  // cross-style pollution. Each removed token noted inline so it can be
+  // restored if testing shows under-matching.
   'minimalist':     ['minimalist', 'minimal', 'clean lines', 'simple', 'clutter-free', 'pared back', 'restrained'],
-  'japandi':        ['japandi', 'japanese', 'japan', 'zen', 'wabi', 'sabi', 'neutral palette', 'quiet'],
-  'rustic':         ['rustic', 'cabin', 'country', 'raw', 'weathered', 'distressed', 'reclaimed'],
-  'industrial':     ['industrial', 'loft', 'warehouse', 'factory', 'steel', 'iron', 'concrete', 'raw brick', 'exposed'],
+  // removed bare 'quiet' — too common, fired on rustic prompts ("gentle quiet")
+  'japandi':        ['japandi', 'japanese', 'japan', 'zen', 'wabi', 'sabi', 'neutral palette'],
+  // removed bare 'raw' — fired on brutalist prompts ("raw metal"). Multi-word
+  // forms preserve true rustic intent ("raw wood", "raw cotton").
+  'rustic':         ['rustic', 'cabin', 'country', 'raw wood', 'raw cotton', 'weathered', 'distressed', 'reclaimed'],
+  'industrial':     ['industrial', 'loft', 'warehouse', 'factory', 'steel', 'iron', 'raw brick', 'exposed'],
+  // NEW: brutalist as a first-class style. Specific multi-word keywords
+  // avoid trigger spillover. STYLE_AFFINITY maps brutalist → industrial
+  // (0.8) + dark-luxe (0.5) so the matcher routes it to existing inventory.
+  'brutalist':      ['brutalist', 'monolithic', 'concrete-toned', 'raw concrete', 'sculptural concrete', 'stark concrete', 'bauhaus'],
   'coastal':        ['coastal', 'beach', 'ocean', 'nautical', 'seaside', 'cerulean', 'whitewash', 'driftwood'],
   'art-deco':       ['art deco', 'deco', 'geometric', 'chevron', 'gatsby', 'glamour', 'gilded', 'jewel tones'],
   'mid-century':    ['mid century', 'midcentury', 'mid-century', 'retro', 'eames', 'atomic', 'teak', '1950', '1960'],
-  'bohemian':       ['bohemian', 'boho', 'eclectic', 'layered', 'free spirit', 'global', 'tribal', 'macrame'],
+  // removed bare 'layered' — fired on rustic ("layered earthy shadows")
+  'bohemian':       ['bohemian', 'boho', 'eclectic', 'free spirit', 'global', 'tribal', 'macrame'],
   'scandi':         ['scandi', 'scandinavian', 'nordic', 'hygge', 'danish', 'swedish', 'norwegian', 'finnish'],
-  'dark-luxe':      ['dark luxe', 'moody', 'dramatic', 'dark', 'navy', 'charcoal', 'black', 'deep tones'],
+  // removed bare 'dark' and 'black' — too common, fired on every dark-mood
+  // prompt regardless of style intent. Multi-word forms preserve dark-luxe
+  // intent without polluting brutalist/industrial parsing.
+  'dark-luxe':      ['dark luxe', 'moody', 'dramatic', 'navy', 'charcoal', 'deep tones', 'noir'],
   'biophilic':      ['biophilic', 'nature', 'plants', 'botanical', 'green wall', 'living wall', 'earthy', 'organic'],
   'transitional':   ['transitional', 'classic', 'timeless', 'neutral', 'balanced', 'refined'],
   'contemporary':   ['contemporary', 'modern', 'current', 'sleek', 'streamlined', 'urban'],
   'farmhouse':      ['farmhouse', 'shiplap', 'barn door', 'cotton', 'white wood', 'joanna', 'vintage'],
   'mediterranean':  ['mediterranean', 'tuscan', 'spanish', 'greek', 'terracotta', 'whitewashed', 'villa'],
   'wabi-sabi':      ['wabi sabi', 'wabi-sabi', 'imperfect', 'raw plaster', 'worn', 'textured', 'aged'],
-  'maximalist':     ['maximalist', 'bold', 'colorful', 'layered', 'more is more', 'saturated', 'vibrant'],
+  // removed bare 'layered' — fired on rustic ("layered earthy shadows")
+  'maximalist':     ['maximalist', 'bold', 'colorful', 'more is more', 'saturated', 'vibrant'],
   'french-country': ['french country', 'french', 'provençal', 'parisian', 'toile', 'ornate'],
   'glam':           ['glam', 'glamorous', 'luxe', 'gold', 'crystal', 'velvet', 'mirrored'],
   'luxury':         ['luxury', 'high end', 'premium', 'opulent', 'bespoke', 'estate', 'designer'],
@@ -135,7 +150,16 @@ export const STYLE_AFFINITY = {
   // Audit 2026-04-27: weakened industrial↔dark-luxe (0.5→0.2). Industrial is raw/exposed/metal;
   // dark-luxe is fabric/velvet/moody — visually opposite. Old 0.5 let dark-luxe products
   // surface in industrial sets at 50% credit and vice versa.
-  industrial:     { industrial: 1, 'mid-century': 0.4, 'dark-luxe': 0.2, contemporary: 0.4, modern: 0.5, 'art-deco': 0.3 },
+  // Build 115: added brutalist neighbor (0.8). Industrial-tagged products
+  // (concrete, steel, raw materials) are the closest catalog match for
+  // brutalist intent, so the affinity weight is high.
+  industrial:     { industrial: 1, brutalist: 0.8, 'mid-century': 0.4, 'dark-luxe': 0.2, contemporary: 0.4, modern: 0.5, 'art-deco': 0.3 },
+  // NEW: brutalist row. The catalog has zero brutalist-tagged products,
+  // so this row routes brutalist intent to its strongest visual neighbors:
+  // industrial (0.8 — concrete/steel/raw materials) and dark-luxe (0.5 —
+  // moody monolithic palette). Keeps brutalist prompts from dead-ending
+  // in the unfiltered fallback pool.
+  brutalist:      { brutalist: 1, industrial: 0.8, 'dark-luxe': 0.5, modern: 0.4, contemporary: 0.4, 'mid-century': 0.3 },
   coastal:        { coastal: 1, mediterranean: 0.6, bohemian: 0.4, transitional: 0.5, farmhouse: 0.4, scandi: 0.3, scandinavian: 0.3 },
   // 'luxury: 0.7' removed — dead target. Added dark-luxe / industrial / mid-century routes.
   'art-deco':     { 'art-deco': 1, glam: 0.8, maximalist: 0.5, 'dark-luxe': 0.5, industrial: 0.3, 'mid-century': 0.4 },
@@ -149,7 +173,7 @@ export const STYLE_AFFINITY = {
   // 'luxury: 0.8' removed — dead target. Added art-deco (strong) / mid-century routes.
   // Audit 2026-04-27: weakened dark-luxe↔industrial (0.4→0.2) — industrial is raw/exposed metal;
   // dark-luxe is moody fabric/velvet. Symmetric with the industrial-row tweak above.
-  'dark-luxe':    { 'dark-luxe': 1, glam: 0.6, industrial: 0.2, 'mid-century': 0.4, 'art-deco': 0.6, maximalist: 0.3 },
+  'dark-luxe':    { 'dark-luxe': 1, brutalist: 0.5, glam: 0.6, industrial: 0.2, 'mid-century': 0.4, 'art-deco': 0.6, maximalist: 0.3 },
   // Biophilic (8 products) — widened neighbor set so prompts don't dead-end.
   biophilic:      { biophilic: 1, bohemian: 0.5, rustic: 0.4, 'wabi-sabi': 0.6, scandi: 0.4, scandinavian: 0.4, minimalist: 0.4, japandi: 0.5, coastal: 0.3 },
   transitional:   { transitional: 1, contemporary: 0.7, modern: 0.6, minimalist: 0.5, scandi: 0.5, scandinavian: 0.5, 'mid-century': 0.4, farmhouse: 0.3 },
