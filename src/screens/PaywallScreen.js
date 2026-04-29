@@ -28,6 +28,9 @@ import { useSubscription, PAID_TIERS, WISH_PACKAGES } from '../context/Subscript
 import { useAuth } from '../context/AuthContext';
 import { getReferralCode, grantShareBonus } from '../services/subscriptionService';
 import { hapticTap, hapticSuccess, hapticError } from '../utils/haptics';
+import AnimatedTile from '../components/paywall/AnimatedTile';
+import AnimatedWishCounter from '../components/paywall/AnimatedWishCounter';
+import PurchaseCelebrationOverlay from '../components/paywall/PurchaseCelebrationOverlay';
 
 const { width: SCREEN_W, height: SCREEN_H } = Dimensions.get('window');
 
@@ -120,12 +123,16 @@ const CARD_W = (SCREEN_W - layout.screenPaddingH * 2 - CARD_GAP) / 2;
 
 // ── Wish Package Card ───────────────────────────────────────────────────────
 
-function WishCard({ pkg, selected, onSelect }) {
+function WishCard({ pkg, selected, onSelect, isPurchasing, registerRef }) {
   return (
-    <TouchableOpacity
-      activeOpacity={0.8}
-      onPress={() => onSelect(pkg.id)}
-      style={[styles.gridCard, selected && styles.gridCardSelected]}
+    <AnimatedTile
+      selected={selected}
+      isPurchasing={isPurchasing}
+      onSelect={() => onSelect(pkg.id)}
+      registerRef={registerRef}
+      cardWidth={CARD_W}
+      style={styles.gridCard}
+      selectedStyle={styles.gridCardSelected}
     >
       {/* Checkmark badge */}
       {selected && (
@@ -143,18 +150,22 @@ function WishCard({ pkg, selected, onSelect }) {
         <Text style={styles.cardPrice}>{pkg.price}</Text>
         <SmallGenieLamp />
       </View>
-    </TouchableOpacity>
+    </AnimatedTile>
   );
 }
 
 // ── Tier Card (Subscribe view) ──────────────────────────────────────────────
 
-function TierCard({ tier, selected, onSelect }) {
+function TierCard({ tier, selected, onSelect, isPurchasing, registerRef }) {
   return (
-    <TouchableOpacity
-      activeOpacity={0.8}
-      onPress={() => onSelect(tier.id)}
-      style={[styles.gridCard, selected && styles.gridCardSelected]}
+    <AnimatedTile
+      selected={selected}
+      isPurchasing={isPurchasing}
+      onSelect={() => onSelect(tier.id)}
+      registerRef={registerRef}
+      cardWidth={CARD_W}
+      style={styles.gridCard}
+      selectedStyle={styles.gridCardSelected}
     >
       {/* Checkmark badge */}
       {selected && (
@@ -174,7 +185,7 @@ function TierCard({ tier, selected, onSelect }) {
         <Text style={styles.cardPrice}>{tier.priceLabel}</Text>
         <SmallGenieLamp />
       </View>
-    </TouchableOpacity>
+    </AnimatedTile>
   );
 }
 
@@ -229,6 +240,16 @@ export default function PaywallScreen({ navigation }) {
   const [selectedWish, setSelectedWish] = useState('homegenie_wishes_4');
   const [purchasing, setPurchasing] = useState(false);
   const [restoring, setRestoring] = useState(false);
+
+  // ── Build 113: tile refs + burst origin for the celebration overlay ──
+  // Each grid card registers its underlying View ref via AnimatedTile's
+  // `registerRef` callback. When the user taps Buy, we measureInWindow
+  // on the selected tile to get its on-screen center, then hand that
+  // point to PurchaseCelebrationOverlay so the SparkleBurst radiates
+  // from the tile the user just bought from. measureInWindow gives us
+  // the live screen position (handles scroll, rotation, safe area).
+  const tileRefs = useRef({});
+  const [burstOrigin, setBurstOrigin] = useState(null);
 
   // ── Build 110: live-poll wish balance while paywall is open ──────────
   // Defense in depth for the wish-counter sync gap. Every 3 seconds while
@@ -372,6 +393,26 @@ export default function PaywallScreen({ navigation }) {
       navigation.navigate('Auth');
       return;
     }
+
+    // ── Build 113: capture the burst origin BEFORE awaiting StoreKit ──
+    // measureInWindow returns the tile's live screen position. We need
+    // this BEFORE the StoreKit sheet opens (which can shift focus) and
+    // BEFORE the listener fires (which is when the overlay reads it).
+    // Falls back gracefully to screen center if the ref isn't ready.
+    const tileId = activeTab === 'wishes'
+      ? selectedWish
+      : selectedSubTier?.productId;
+    const tileNode = tileId ? tileRefs.current[tileId] : null;
+    if (tileNode && typeof tileNode.measureInWindow === 'function') {
+      tileNode.measureInWindow((x, y, w, h) => {
+        if (typeof x === 'number' && typeof y === 'number') {
+          setBurstOrigin({ x: x + (w || 0) / 2, y: y + (h || 0) / 2 });
+        }
+      });
+    } else {
+      setBurstOrigin({ x: SCREEN_W / 2, y: SCREEN_H * 0.4 });
+    }
+
     setPurchasing(true);
     try {
       if (activeTab === 'wishes') {
@@ -624,7 +665,21 @@ export default function PaywallScreen({ navigation }) {
           <View style={styles.progressCard}>
             <View style={styles.progressLabelRow}>
               <Text style={styles.progressLabel}>{cardLabel}</Text>
-              <Text style={styles.progressCount}>{cardCount}</Text>
+              {/* Build 113: animated tick-up + scale punch on balance change.
+                  Falls back to plain text rendering when card-count is the
+                  non-numeric "Unlimited" string. The numeric value comes
+                  from the same render-time computation as before — the
+                  visible string is unchanged for all states except that
+                  the number now animates instead of jumping. */}
+              {isUnlimitedSub ? (
+                <Text style={styles.progressCount}>{cardCount}</Text>
+              ) : (
+                <AnimatedWishCounter
+                  value={isFree ? renewableRemaining + purchasedCount : renewableRemaining}
+                  suffix=" remaining"
+                  style={styles.progressCount}
+                />
+              )}
             </View>
             {showProgressBar && (
               <View style={styles.progressTrack}>
@@ -655,6 +710,8 @@ export default function PaywallScreen({ navigation }) {
                   pkg={pkg}
                   selected={selectedWish === pkg.id}
                   onSelect={setSelectedWish}
+                  isPurchasing={purchasing}
+                  registerRef={(node) => { tileRefs.current[pkg.id] = node; }}
                 />
               ))}
             </View>
@@ -667,6 +724,8 @@ export default function PaywallScreen({ navigation }) {
                     tier={tier}
                     selected={selectedTier === tier.id}
                     onSelect={setSelectedTier}
+                    isPurchasing={purchasing}
+                    registerRef={(node) => { tileRefs.current[tier.productId] = node; }}
                   />
                 ))}
               </View>
@@ -740,6 +799,15 @@ export default function PaywallScreen({ navigation }) {
           </TouchableOpacity>
         </View>
       </SafeAreaView>
+
+      {/* Build 113: celebration overlay sits above all content, full-screen,
+          pointerEvents="none" so taps still pass through to the SafeAreaView.
+          Watches SubscriptionContext for tokenBalance increases or tier
+          upgrades and fires a SparkleBurst at the previously-measured
+          burst origin. Reads context state but never writes — purchase
+          pipeline (validateReceipt → add_tokens → setTokenBalance) is
+          completely untouched. */}
+      <PurchaseCelebrationOverlay origin={burstOrigin} />
     </View>
   );
 }
