@@ -354,12 +354,43 @@ export default function PaywallScreen({ navigation }) {
     cardSubline = null;
   }
 
-  // Progress bar represents renewable-quota-remaining-share. Hidden for
-  // premium (no cap to graph). Bar starts full (100% = all wishes
-  // available) and depletes toward 0%.
-  const showProgressBar = !isUnlimitedSub && renewableTotal > 0;
-  const progressPct     = renewableTotal > 0
-    ? Math.min(1, renewableRemaining / renewableTotal)
+  // Progress bar represents wishes-remaining-share. Hidden for premium
+  // (no cap to graph). The bar reflects TOTAL wishes the user has —
+  // free + purchased + subscription remaining — not just the free quota.
+  //
+  // Build 113 fix: previously the denominator was just `renewableTotal`
+  // (5 for free users), so the bar only depleted as the 5 free wishes
+  // were used. After buying 8 wishes, balance went 5→13 but the bar
+  // stayed pinned to free-only progress, ignoring the purchase.
+  //
+  // New behavior: bar = totalAvailable / peakTotal. The peak ratchets
+  // UP on purchases / subscription renewals (never down) so the bar
+  // smoothly depletes as wishes are spent. When the user buys more,
+  // the peak grows and the bar refills proportionally.
+  //
+  // Examples:
+  //   • Fresh free user (5 free, 0 paid):  5/5 = 100%
+  //   • Used 2 free:                       3/5 = 60%
+  //   • After buying 4 with 0 free left:   4/4 = 100%   (peak resets to 4)
+  //   • Used 1 of those 4:                 3/4 = 75%
+  //   • Free=5, paid=8 (just bought):      13/13 = 100% (peak = 13)
+  //   • Used 1 from that pool:             12/13 = 92%
+  const showProgressBar = !isUnlimitedSub;
+  const totalAvailable  = renewableRemaining + purchasedCount;
+  // Baseline keeps the bar visible at 100% for a fresh free user with
+  // 0 purchased — `totalAvailable` would otherwise float without a
+  // reference. Subscribers use their weekly quota as the floor.
+  const baseline = isFree ? 5 : (isUnlimitedSub ? 0 : renewableTotal);
+  const peakTotalRef = useRef(Math.max(baseline, totalAvailable));
+  // Ratchet the peak upward on every render; never downward. Modifying
+  // a ref during render is safe here — value is read immediately below
+  // for progressPct, and the ref doesn't trigger re-renders.
+  const targetPeak = Math.max(baseline, totalAvailable);
+  if (targetPeak > peakTotalRef.current) {
+    peakTotalRef.current = targetPeak;
+  }
+  const progressPct = peakTotalRef.current > 0
+    ? Math.min(1, totalAvailable / peakTotalRef.current)
     : 0;
 
   // Legacy aliases retained for any downstream reference (keep blast radius small)
@@ -428,24 +459,36 @@ export default function PaywallScreen({ navigation }) {
           refreshTokenBalance?.();
           const pkg = WISH_PACKAGES.find(p => p.id === selectedWish);
           const wishCount = pkg?.wishes ?? 0;
-          Alert.alert(
-            '✨ Wishes added!',
-            wishCount > 0
-              ? `${wishCount} wish${wishCount === 1 ? '' : 'es'} added to your account. Tap a style on Home to start designing.`
-              : 'Your purchase was successful. Tap a style on Home to start designing.',
-            [{ text: 'Start Designing', onPress: () => navigation.goBack() }],
-          );
+          // Build 113 polish: defer the success Alert by 1500ms so the
+          // SparkleBurst (~1.0s) + counter tick-up get their full moment
+          // before the Alert covers them. 500ms of "settled" breathing
+          // room makes the celebration feel intentional rather than
+          // immediately interrupted.
+          setTimeout(() => {
+            Alert.alert(
+              '✨ Wishes added!',
+              wishCount > 0
+                ? `${wishCount} wish${wishCount === 1 ? '' : 'es'} added to your account. Tap a style on Home to start designing.`
+                : 'Your purchase was successful. Tap a style on Home to start designing.',
+              [{ text: 'Start Designing', onPress: () => navigation.goBack() }],
+            );
+          }, 1500);
         }
       } else {
         const result = await purchaseSubscription(selectedSubTier.productId);
         if (result?.success) {
           hapticSuccess();
           refreshTokenBalance?.();
-          Alert.alert(
-            '🎉 Subscription active',
-            `Welcome to ${selectedSubTier.name}! ${selectedSubTier.gens === -1 ? 'Unlimited' : selectedSubTier.gens} wishes per week. Renews automatically — manage anytime in your Apple ID settings.`,
-            [{ text: 'Start Designing', onPress: () => navigation.goBack() }],
-          );
+          // Build 113 polish: same 1500ms deferral as the wishes path so
+          // the burst + counter animation get to play uninterrupted before
+          // the Alert pops over them.
+          setTimeout(() => {
+            Alert.alert(
+              '🎉 Subscription active',
+              `Welcome to ${selectedSubTier.name}! ${selectedSubTier.gens === -1 ? 'Unlimited' : selectedSubTier.gens} wishes per week. Renews automatically — manage anytime in your Apple ID settings.`,
+              [{ text: 'Start Designing', onPress: () => navigation.goBack() }],
+            );
+          }, 1500);
         }
       }
     } catch (e) {
