@@ -61,6 +61,7 @@ import TabScreenFade from '../components/TabScreenFade';
 import ProductVisualizeModal from '../components/ProductVisualizeModal';
 import GenieLoader from '../components/GenieLoader';
 import { sendNotificationIfEnabled } from '../services/notifications';
+import { createShareableWishURL } from '../services/shareService';
 import { useOnboarding, ONBOARDING_STEPS } from '../context/OnboardingContext';
 import OnboardingOverlay, { OnboardingGlow } from '../components/OnboardingOverlay';
 import StyleCarousel from '../components/StyleCarousel';
@@ -1725,9 +1726,18 @@ export default function HomeScreen({ navigation, route }) {
     if (!resultData?.resultUri) return;
     const prompt = resultData.prompt || 'My AI wish';
     try {
+      // Build 113 polish: route through createShareableWishURL so
+      // recipients see a branded homegenie.app/wish/<id> landing page in
+      // iMessage instead of the raw Supabase storage URL. Falls back to
+      // the raw image URL if the RPC fails — share never breaks.
+      const shareUrl = await createShareableWishURL({
+        imageUrl: resultData.resultUri,
+        prompt,
+        roomType: resultData.roomType,
+      });
       await Share.share({
         message: `Check out my AI room wish on HomeGenie!\n\n"${prompt}"`,
-        url: resultData.resultUri,
+        url: shareUrl,
       });
     } catch (err) {
       console.log('[Share] Error:', err);

@@ -34,6 +34,7 @@ import PressableCard from '../components/PressableCard';
 import Skeleton from '../components/Skeleton';
 import { SellerName } from '../components/VerifiedBadge';
 import { getProductsForDesign, getProductsForPrompt } from '../services/affiliateProducts';
+import { createShareableWishURL } from '../services/shareService';
 import { parseDesignPrompt } from '../utils/promptParser';
 import TabScreenFade from '../components/TabScreenFade';
 import * as ImagePicker from 'expo-image-picker';
@@ -717,13 +718,21 @@ export default function ExploreScreen({ navigation, route }) {
       setOverrideProducts(null);
       setActiveCategory(0);
       setSearch('');
+      setFilterRoomTypes([]);
 
       if (params.featuredProductIds) {
         setActiveTab('products');
         setOverrideProducts(params.featuredProductIds);
         setFilterLabel(params.title || 'Featured');
       } else if (params.filterRoomType) {
+        // Set BOTH filter sources so Shop-by-Room from Home filters
+        // correctly regardless of which tab the user lands on:
+        //   • activeRoomFilter (string) → wishes pipeline
+        //   • filterRoomTypes  (array)  → products pipeline
+        // Without the second one, tapping a room from Home with the
+        // Products tab active was a silent no-op (showed all products).
         setActiveRoomFilter(params.filterRoomType);
+        setFilterRoomTypes([params.filterRoomType]);
         setFilterLabel(params.title || ROOM_LABEL_MAP[params.filterRoomType] || params.filterRoomType);
       } else if (params.filterStyle) {
         setActiveStyleFilter(params.filterStyle);
@@ -749,6 +758,9 @@ export default function ExploreScreen({ navigation, route }) {
     setFilterLabel(null);
     setActiveCategory(0);
     setSearch('');
+    // Also clear the products-side room filter so a clear from the
+    // Wishes tab also resets the products tab (and vice versa).
+    setFilterRoomTypes([]);
     // Reset route params so next navigation can apply fresh ones
     navigation.setParams({
       filterRoomType: undefined,
@@ -949,7 +961,15 @@ export default function ExploreScreen({ navigation, route }) {
       pool = pool.filter((p) => p.stock !== false);
     }
     if (filterRoomTypes.length > 0) {
-      pool = pool.filter((p) => filterRoomTypes.includes(p.roomType));
+      // Products store roomType as an array (e.g. ['living-room']); the
+      // older single-value form is kept as a fallback for resilience.
+      // The previous `filterRoomTypes.includes(p.roomType)` silently
+      // never matched array-shaped values, which broke Shop-by-Room
+      // navigation from Home for the Products tab.
+      pool = pool.filter((p) => {
+        const rts = Array.isArray(p.roomType) ? p.roomType : (p.roomType ? [p.roomType] : []);
+        return rts.some(rt => filterRoomTypes.includes(rt));
+      });
     }
     if (filterMinRating > 0) {
       pool = pool.filter((p) => (p.rating || 0) >= filterMinRating);
@@ -1282,7 +1302,15 @@ export default function ExploreScreen({ navigation, route }) {
                         const msg = design.prompt
                           ? `Check out this HomeGenie design: "${design.prompt}"`
                           : 'Check out this HomeGenie wish!';
-                        await Share.share({ message: msg, url: design.imageUrl || '' });
+                        // Build 113 polish: branded landing URL via shareService.
+                        const shareUrl = design.imageUrl
+                          ? await createShareableWishURL({
+                              imageUrl: design.imageUrl,
+                              prompt: design.prompt,
+                              roomType: design.roomType,
+                            })
+                          : '';
+                        await Share.share({ message: msg, url: shareUrl });
                       } catch {}
                     }}
                     onPress={() => {

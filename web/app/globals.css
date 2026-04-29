@@ -1,0 +1,36 @@
+/* Brand-only palette — matches src/constants/colors.js in the iOS app. */
+:root {
+  --hg-bg-start: #0D1E35;
+  --hg-bg-end: #1E5AB0;
+  --hg-blue-deep: #035DA8;
+  --hg-blue-primary: #0B6DC3;
+  --hg-blue-light: #67ACE9;
+  --hg-white: #FFFFFF;
+  --hg-text-soft: rgba(255, 255, 255, 0.72);
+  --hg-text-faint: rgba(255, 255, 255, 0.5);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  background: linear-gradient(180deg, var(--hg-bg-start) 0%, var(--hg-bg-end) 100%);
+  background-attachment: fixed;
+  min-height: 100vh;
+  color: var(--hg-white);
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}

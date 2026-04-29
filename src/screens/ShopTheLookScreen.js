@@ -31,6 +31,7 @@ import { useCart } from '../context/CartContext';
 import { useLiked } from '../context/LikedContext';
 import { useAuth } from '../context/AuthContext';
 import { getProductsForDesign, getRecommendedProducts } from '../services/affiliateProducts';
+import { createShareableWishURL } from '../services/shareService';
 import ModerationMenu from '../components/ModerationMenu';
 
 const { width } = Dimensions.get('window');
@@ -251,7 +252,15 @@ export default function ShopTheLookScreen({ route, navigation }) {
       const msg = design.prompt
         ? `Check out this HomeGenie wish: "${design.prompt}"`
         : 'Check out this HomeGenie wish!';
-      await Share.share({ message: msg, url: design.imageUrl || '' });
+      // Build 113 polish: branded landing URL via shareService.
+      const shareUrl = design.imageUrl
+        ? await createShareableWishURL({
+            imageUrl: design.imageUrl,
+            prompt: design.prompt,
+            roomType: design.roomType,
+          })
+        : '';
+      await Share.share({ message: msg, url: shareUrl });
     } catch {}
   };
 
