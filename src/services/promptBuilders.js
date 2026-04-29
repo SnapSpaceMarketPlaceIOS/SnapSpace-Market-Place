@@ -122,16 +122,8 @@ export function getQualityPrefix(userPrompt) {
 //   - All 4 products must appear in the final image (the new anchor — this
 //     directly targets the 2-3/4 hit rate by giving flux an explicit count
 //     constraint instead of leaving omission as an acceptable outcome)
-//   - Cell-background isolation (post-Build-105 fidelity pass): catalog
-//     product photos are often shot on styled lifestyle sets — a rug photo
-//     may include a couch in the background, a coffee table photo may show
-//     a sofa behind it. Without explicit guidance, flux conditions on the
-//     panel's full visual statistics and can leak that background into the
-//     rendered room (wrong product, duplicated furniture, drifted style).
-//     The added clauses tell flux to treat each cell as the named product
-//     ONLY and discard any background scenery inside that cell.
 export const FIDELITY_DIRECTIVES =
-  'Preserve all architecture exactly. Do not introduce any new decor objects. Copy each piece of furniture from the reference panel exactly. All 4 products must appear in the final image; do not omit any. The reference panel is the ONLY source of truth for furniture — ignore any furniture descriptions, color words, or material words elsewhere in this prompt. Those words describe lighting and atmosphere only; they never override the panel. Each product reference may also include background scenery — other furniture, decor, rugs, walls, or surfaces visible behind or around the named product — for context only. Render ONLY the named product from each reference; do not duplicate, infer, or place any background object from those references into the final room.';
+  'Preserve all architecture exactly. Do not introduce any new decor objects. Copy each piece of furniture from the reference panel exactly. All 4 products must appear in the final image; do not omit any. The reference panel is the ONLY source of truth for furniture — ignore any furniture descriptions, color words, or material words elsewhere in this prompt. Those words describe lighting and atmosphere only; they never override the panel.';
 
 // Single-product variant for generateSingleProductInRoom (1 ref, not 4).
 // Same architecture/no-new-decor pins, but the all-4 anchor is replaced
