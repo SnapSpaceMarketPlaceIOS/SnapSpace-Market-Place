@@ -109,6 +109,18 @@ function extractTypeWord(name) {
  *
  * Unused slots are skipped. Resulting string is 2–5 words.
  *
+ * Variant override (post-Build-105 fidelity pass): when the matcher swapped
+ * the product to a specific variant via `_matchedVariant`, the variant's
+ * label (e.g. "Sage Green", "Walnut Top-Grain Leather") is the most
+ * authoritative signal for what the user will actually receive — it matches
+ * the swapped imageUrl and the affiliateUrl. We parse the label for any
+ * recognized color/shape tokens and prefer them over the base product's
+ * tags. Without this, a "sage green" prompt could swap the variant image
+ * correctly while the prompt descriptor still said "ivory" because the
+ * base product's tags listed the default variant's color. Products without
+ * a matched variant fall through to the unchanged base-tag path — no
+ * regression for the no-variant case.
+ *
  * @param {object} p - product row from productCatalog
  * @returns {string}  short visual descriptor (may be empty string)
  */
@@ -117,16 +129,31 @@ export function describeProductForPrompt(p) {
   const category = (p.category || 'furniture').replace(/-/g, ' ');
 
   const tags = Array.isArray(p.tags) ? p.tags : [];
-  const colorWords  = tags.filter(t => COLOR_TAG_WORDS.has(t));
-  const shapeWords  = tags.filter(t => SHAPE_TAG_WORDS.has(t));
+  const baseColors  = tags.filter(t => COLOR_TAG_WORDS.has(t));
+  const baseShapes  = tags.filter(t => SHAPE_TAG_WORDS.has(t));
   const materials   = Array.isArray(p.materials) ? p.materials : [];
 
-  // Pick the most specific color — prefer longer/more-specific words
-  // "cognac" > "brown", "sage" > "green"
-  const sortedColors = [...colorWords].sort((a, b) => b.length - a.length);
-  const color    = sortedColors[0] || '';
+  // Variant-label tokens (if the matcher swapped to a specific variant).
+  // Tokenize on whitespace + common separators so labels like "Sage Green",
+  // "Walnut Top-Grain Leather", or "Cognac/Tan" all get parsed correctly.
+  const variantLabel =
+    p._matchedVariant && typeof p._matchedVariant.label === 'string'
+      ? p._matchedVariant.label.toLowerCase()
+      : '';
+  const variantTokens = variantLabel
+    ? variantLabel.split(/[\s\-_/,]+/).filter(Boolean)
+    : [];
+  const variantColor = variantTokens.find((t) => COLOR_TAG_WORDS.has(t)) || '';
+  const variantShape = variantTokens.find((t) => SHAPE_TAG_WORDS.has(t)) || '';
+
+  // Pick the most specific color. Variant override wins when present —
+  // it's the authoritative signal for the variant the user will receive.
+  // For base-only fallback, prefer longer tokens ("cognac" > "brown",
+  // "sage" > "green") to keep the prior behavior intact.
+  const sortedBaseColors = [...baseColors].sort((a, b) => b.length - a.length);
+  const color    = variantColor || sortedBaseColors[0] || '';
   const material = materials[0]    || '';
-  const shape    = shapeWords[0]   || '';
+  const shape    = variantShape || baseShapes[0]   || '';
   const typeWord = extractTypeWord(p.name || '');
 
   // Extract a visual feature for additional specificity
