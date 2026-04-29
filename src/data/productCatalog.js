@@ -26255,6 +26255,58 @@ export const PRODUCT_CATALOG = [
     ],
   },
 
+  {
+    id: 'B09C6TXFQ4',
+    asin: 'B09C6TXFQ4',
+    name: 'Powell Peabody Whale Driftwood Accent Side Table with Beveled Tempered Glass Top',
+    brand: 'Powell',
+    price: 149.32,
+    priceDisplay: '$149.32',
+    compareAtPrice: 149.32,
+    compareAtPriceDisplay: '$149.32',
+    imageUrl: 'https://m.media-amazon.com/images/I/81jva5DZVTL._AC_SL1500_.jpg',
+    images: [
+      'https://m.media-amazon.com/images/I/81jva5DZVTL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/31mL5r7hbaL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/41RVZgI2RPL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/41arCcKfb6L._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/31V+vHP7STL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/31fuhfITSEL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/31YYimw-AfL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/41oPUpi80wL._AC_SL1500_.jpg',
+    ],
+    category: 'side-table',
+    roomType: ['living-room', 'bedroom', 'office', 'entryway'],
+    styles: ['coastal', 'nautical', 'rustic', 'transitional', 'mediterranean', 'eclectic', 'farmhouse', 'bohemian'],
+    materials: ['wood', 'glass'],
+    tags: [
+      'side-table', 'end-table', 'accent-table', 'whale', 'driftwood',
+      'sculpted-base', 'hand-carved-look', 'animal-sculpture',
+      'glass-top', 'tempered-glass', 'beveled-glass', 'shatterproof',
+      'coastal', 'beach-house', 'nautical', 'seaside', 'ocean',
+      'rustic', 'farmhouse', 'transitional', 'mediterranean', 'eclectic', 'bohemian',
+      '21-inch-tall', '20-inch-diameter', 'small-table',
+      'living-room', 'bedroom', 'office', 'entryway', 'reading-nook',
+      'powell', 'peabody', 'easy-assembly',
+      'brown', 'natural-wood', 'driftwood-finish',
+    ],
+    source: 'amazon',
+    affiliateUrl: 'https://www.amazon.com/dp/B09C6TXFQ4?tag=' + TAG,
+    rating: 4.7,
+    reviewCount: 62,
+    description: 'Powell Peabody coastal accent side table — sculptural whale base in a rustic driftwood finish topped with a 20" beveled tempered glass surface. 21" tall, perfect as a side, end, or accent table beside a sofa or armchair. Each whale sculpture has its own hand-carved appearance, making every table unique. Signature coastal / beach-house statement piece. Easy assembly — just place the glass top.',
+    features: [
+      'Hand-carved-look whale sculpture in rustic driftwood finish — signature coastal silhouette',
+      'Beveled tempered glass top — shatterproof, heat-resistant, easy to clean',
+      '21" H × 20" diameter — perfect side, end, or reading-nook accent table',
+      'Each whale sculpture unique due to artisan-style detailing',
+      'Easy assembly — just position the glass top on the sculpted base',
+    ],
+    variants: [
+      { id: '1', label: 'Brown Driftwood', asin: 'B09C6TXFQ4', price: 149.32, swatchImage: 'https://m.media-amazon.com/images/I/31mL5r7hbaL._AC_SL300_.jpg', mainImage: 'https://m.media-amazon.com/images/I/81jva5DZVTL._AC_SL1500_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B09C6TXFQ4?tag=' + TAG },
+    ],
+  },
+
 ];
 
 // ─── Enrichment status helper ────────────────────────────────────────────────
