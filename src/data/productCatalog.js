@@ -26632,6 +26632,58 @@ export const PRODUCT_CATALOG = [
     ],
   },
 
+  {
+    id: 'B09PHPT5MR',
+    asin: 'B09PHPT5MR',
+    name: 'Pemberly Row Coastal Swivel Club Chair, Blue Seashell Fabric Pattern, Rubberwood Frame with 360° Swivel Plate',
+    brand: 'Pemberly Row',
+    price: 482.24,
+    priceDisplay: '$482.24',
+    compareAtPrice: 482.24,
+    compareAtPriceDisplay: '$482.24',
+    imageUrl: 'https://m.media-amazon.com/images/I/71o+koR032L._AC_SL1500_.jpg',
+    images: [
+      'https://m.media-amazon.com/images/I/71o+koR032L._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/51O7CrUOxnL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/51XYWdC5FgL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/51WK6yLseVL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/51Hpby652rL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/51AMVhh1xkL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/51SjWPyBDkL._AC_SL1500_.jpg',
+      'https://m.media-amazon.com/images/I/519ctoY-xFL._AC_SL1500_.jpg',
+    ],
+    category: 'accent-chair',
+    roomType: ['living-room', 'bedroom', 'office'],
+    styles: ['coastal', 'farmhouse', 'transitional', 'traditional', 'mediterranean', 'eclectic', 'bohemian'],
+    materials: ['linen', 'wood'],
+    tags: [
+      'accent-chair', 'club-chair', 'swivel-chair', 'arm-chair', 'reading-chair',
+      'coastal', 'nautical', 'beach-house', 'sunroom', 'beach-cottage',
+      'seashell-pattern', 'patterned-fabric', 'blue-pattern', 'shell-coral',
+      'farmhouse', 'transitional', 'traditional', 'mediterranean', 'eclectic', 'bohemian',
+      'rubberwood', 'wood-frame', 'metal-swivel-plate', '360-swivel',
+      'arched-back', 'roll-arms', 'removable-cushion', 'padded-seat',
+      'poly-microfiber', 'fade-proof', 'moisture-wicking', 'easy-clean',
+      'living-room', 'bedroom', 'office', 'sunroom', 'beach-house',
+      'pemberly-row', 'baltic-blue', 'navy', 'blue',
+    ],
+    source: 'amazon',
+    affiliateUrl: 'https://www.amazon.com/dp/B09PHPT5MR?tag=' + TAG,
+    rating: 4.1,
+    reviewCount: 6,
+    description: 'Pemberly Row coastal swivel club chair — Baltic blue background with an engaging shell-and-coral pattern brings nautical character to living rooms, sunrooms, bedrooms, and beach houses. 360° smooth swivel on a sturdy metal plate; arched back, rolled arms, and generously padded seat for superior comfort. Poly microfiber upholstery is fade-proof, moisture-wicking, and easy to clean. Rubberwood + plywood frame for long-term stability. Removable seat cushion.',
+    features: [
+      'Baltic blue background with seashell + coral pattern — signature coastal/nautical print',
+      '360° swivel on a sturdy metal plate — pivot from one side of the room to another',
+      'Arched back, rolled arms, generously padded seat — classic club chair comfort',
+      'Poly microfiber upholstery — fade-proof, moisture-wicking, easy to clean',
+      'Rubberwood + plywood frame; removable seat cushion for easy care',
+    ],
+    variants: [
+      { id: '1', label: 'Blue Seashell Pattern', asin: 'B09PHPT5MR', price: 482.24, swatchImage: 'https://m.media-amazon.com/images/I/51O7CrUOxnL._AC_SL300_.jpg', mainImage: 'https://m.media-amazon.com/images/I/71o+koR032L._AC_SL1500_.jpg', affiliateUrl: 'https://www.amazon.com/dp/B09PHPT5MR?tag=' + TAG },
+    ],
+  },
+
 ];
 
 // ─── Enrichment status helper ────────────────────────────────────────────────
