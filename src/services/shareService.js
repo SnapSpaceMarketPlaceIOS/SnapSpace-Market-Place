@@ -60,13 +60,26 @@ const HAS_APP_STORE_ID = /^\d+$/.test(APP_STORE_ID);
  *   2. Bake-in App Store listing (fallback — guarantees shares always work)
  *   3. Marketing web domain (only if for some reason both above fail validation)
  *
- * In practice option 1 or 2 always returns a real apps.apple.com URL, so
- * the recipient always gets a clickable App Store link. Tested as of
- * 2026-04-29 — Home Genie is live on the App Store at this ID.
+ * Build 124: appended `?platform=iphone` to all apps.apple.com URLs. Without
+ * this query parameter, Apple's iMessage link-preview service can decide
+ * which device family's screenshots to show based on what's uploaded to
+ * App Store Connect. With `supportsTablet: true` in app.json, Apple's
+ * preview was rendering the iPad format (4:3 screenshots) inside iMessage
+ * threads even when the recipient was on iPhone — which looked off-brand
+ * for an app that's positioned as iPhone-first. The `?platform=iphone`
+ * parameter is honored by Apple's link-preview service to force the
+ * iPhone-formatted preview regardless of what's uploaded to ASC.
  */
-export const SHARE_APP_URL = HAS_APP_STORE_ID
-  ? `https://apps.apple.com/app/id${APP_STORE_ID}`
-  : (WEB_DOMAIN ? `https://${WEB_DOMAIN}` : `https://apps.apple.com/app/id${APP_STORE_ID_FALLBACK}`);
+const ensureIphonePreview = (url) =>
+  url.includes('apps.apple.com') && !url.includes('platform=')
+    ? `${url}${url.includes('?') ? '&' : '?'}platform=iphone`
+    : url;
+
+export const SHARE_APP_URL = ensureIphonePreview(
+  HAS_APP_STORE_ID
+    ? `https://apps.apple.com/app/id${APP_STORE_ID}`
+    : (WEB_DOMAIN ? `https://${WEB_DOMAIN}` : `https://apps.apple.com/app/id${APP_STORE_ID_FALLBACK}`)
+);
 
 /**
  * Build the standard branded share-message body.

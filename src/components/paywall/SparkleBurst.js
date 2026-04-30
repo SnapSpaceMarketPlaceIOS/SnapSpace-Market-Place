@@ -298,8 +298,14 @@ export default function SparkleBurst({ x, y, size = 140, onComplete }) {
             width: size * 1.2,
             height: size * 1.2,
             borderRadius: (size * 1.2) / 2,
-            marginLeft: -(size * 1.2) / 2,
-            marginTop: -(size * 1.2) / 2,
+            // Build 124: swapped marginLeft/marginTop → left/top. With
+            // position:'absolute' on the parent's 0×0 + alignItems:center,
+            // Yoga's interpretation of negative margin is ambiguous — it
+            // resulted in rings rendering off-center from the particles
+            // (which use translate from origin and don't depend on margin).
+            // Explicit left/top is unambiguous in Yoga and CSS spec.
+            left: -(size * 1.2) / 2,
+            top: -(size * 1.2) / 2,
             transform: [{ scale: glowScale }],
             opacity: glowOpacity,
           },
@@ -314,8 +320,9 @@ export default function SparkleBurst({ x, y, size = 140, onComplete }) {
             width: size,
             height: size,
             borderRadius: size / 2,
-            marginLeft: -size / 2,
-            marginTop: -size / 2,
+            // Build 124: explicit left/top centering — see glow comment above.
+            left: -size / 2,
+            top: -size / 2,
             transform: [{ scale: ringOuterScale }],
             opacity: ringOuterOpacity,
           },
@@ -330,8 +337,9 @@ export default function SparkleBurst({ x, y, size = 140, onComplete }) {
             width: size,
             height: size,
             borderRadius: size / 2,
-            marginLeft: -size / 2,
-            marginTop: -size / 2,
+            // Build 124: explicit left/top centering — see glow comment above.
+            left: -size / 2,
+            top: -size / 2,
             transform: [{ scale: ringInnerScale }],
             opacity: ringInnerOpacity,
           },
@@ -397,8 +405,11 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    marginLeft: -18,
-    marginTop: -18,
+    // Build 124: swapped marginLeft/marginTop → left/top to match the
+    // glow + rings — see SparkleBurst component for full rationale on
+    // the Yoga ambiguity that motivated this swap.
+    left: -18,
+    top: -18,
     backgroundColor: COLOR_WHITE,
     shadowColor: COLOR_WHITE,
     shadowOffset: { width: 0, height: 0 },

@@ -37,6 +37,7 @@ import { useShared } from '../context/SharedContext';
 import { space, fontWeight, layout, typeScale, radius, shadow, fontSize } from '../constants/tokens';
 import { colors } from '../constants/colors';
 import { colors as C } from '../constants/theme';
+import { buildShareMessage } from '../services/shareService';
 
 const { width: SW, height: SH } = Dimensions.get('window');
 const H_PAD = layout.screenPaddingH; // 20
@@ -348,9 +349,31 @@ export default function ProductVisualizeModal({
   };
 
   const handleShare = async () => {
+    // Build 124 — bring single-product visualize share inline with the
+    // Build 122 full-room pattern:
+    //   1. Brand-first caption via buildShareMessage() — drops the
+    //      wall-of-text Amazon product name that was filling iMessage.
+    //   2. Download FAL render to local cache so the image persists in
+    //      the recipient's thread (FAL CDN URLs eventually expire).
+    //   3. Resilient fallback chain: if download fails, share the remote
+    //      URL with the same caption — better than nothing.
+    const msg = buildShareMessage();
     try {
-      const msg = `Check out how this ${productName} looks in my space — made with HomeGenie!`;
-      await Share.share({ message: msg, url: resultUri });
+      if (resultUri) {
+        try {
+          const fileUri = FileSystem.cacheDirectory + 'homegenie_visualize_' + Date.now() + '.jpg';
+          const { status } = await FileSystem.downloadAsync(resultUri, fileUri);
+          if (status === 200) {
+            await Share.share({ message: msg, url: fileUri });
+          } else {
+            throw new Error('Download status ' + status);
+          }
+        } catch {
+          await Share.share({ message: msg, url: resultUri });
+        }
+      } else {
+        await Share.share({ message: msg });
+      }
       if (designId) addShared(designId);
     } catch (e) {
       if (e.message !== 'User did not share') {

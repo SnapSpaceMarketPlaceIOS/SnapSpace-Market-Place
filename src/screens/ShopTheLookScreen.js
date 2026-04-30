@@ -31,7 +31,7 @@ import { useCart } from '../context/CartContext';
 import { useLiked } from '../context/LikedContext';
 import { useAuth } from '../context/AuthContext';
 import { getProductsForDesign, getRecommendedProducts } from '../services/affiliateProducts';
-import { createShareableWishURL } from '../services/shareService';
+import { createShareableWishURL, buildShareMessage } from '../services/shareService';
 import ModerationMenu from '../components/ModerationMenu';
 
 const { width } = Dimensions.get('window');
@@ -248,19 +248,36 @@ export default function ShopTheLookScreen({ route, navigation }) {
 
   const handleShare = async () => {
     setShareActive(true);
+    // Build 124 — same Build 122 share rewrite pattern as RoomResultScreen +
+    // ProductVisualizeModal: brand-first caption via buildShareMessage(),
+    // download the design image to local cache for permanence, fall back
+    // to a branded landing URL via createShareableWishURL only if the
+    // download fails. Drops the wall-of-text "Check out this HomeGenie
+    // wish: '<prompt>'" caption that was filling iMessage with AI-speak.
+    const msg = buildShareMessage();
+    const imageUrl = design?.imageUrl;
     try {
-      const msg = design.prompt
-        ? `Check out this HomeGenie wish: "${design.prompt}"`
-        : 'Check out this HomeGenie wish!';
-      // Build 113 polish: branded landing URL via shareService.
-      const shareUrl = design.imageUrl
-        ? await createShareableWishURL({
-            imageUrl: design.imageUrl,
+      if (imageUrl) {
+        try {
+          const fileUri = FileSystem.cacheDirectory + 'homegenie_share_' + Date.now() + '.jpg';
+          const { status } = await FileSystem.downloadAsync(imageUrl, fileUri);
+          if (status === 200) {
+            await Share.share({ message: msg, url: fileUri });
+          } else {
+            throw new Error('Download status ' + status);
+          }
+        } catch {
+          // Last-resort fallback — branded landing URL via shareService.
+          const shareUrl = await createShareableWishURL({
+            imageUrl,
             prompt: design.prompt,
             roomType: design.roomType,
-          })
-        : '';
-      await Share.share({ message: msg, url: shareUrl });
+          });
+          await Share.share({ message: msg, url: shareUrl || imageUrl });
+        }
+      } else {
+        await Share.share({ message: msg });
+      }
     } catch {}
   };
 
