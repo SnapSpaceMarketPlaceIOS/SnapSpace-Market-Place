@@ -39,6 +39,16 @@
  */
 export const STYLE_PRESETS = [
   {
+    id: 'contemporary',
+    label: 'Contemporary',
+    image: require('../assets/styles/Contemporary.jpg'),
+    prompts: [
+      'Contemporary living room, bright diffused daylight, balanced soft shadows, boucle and walnut textures with sculptural ceramic accents, warm-neutral palette, refined now-and-current calm.',
+      'Contemporary living room, soft late-morning light, low-contrast clarity, linen and oak softness with brass detail, oat and graphite palette, polished editorial restraint.',
+      'Contemporary living room, even daylight glow, gentle directional shadows, upholstered fabric and natural wood textures, ivory and warm-stone tones, sophisticated quiet sophistication.',
+    ],
+  },
+  {
     id: 'modern-minimal',
     label: 'Modern Minimal',
     image: require('../assets/styles/modern-minimal.jpg'),

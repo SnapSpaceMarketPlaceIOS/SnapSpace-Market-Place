@@ -365,7 +365,7 @@ export function buildPanelPrompt(userPrompt, products) {
     refLine,
     FIDELITY_DIRECTIVES,
     styleIntent,
-    'Architecture lock: image 1\'s walls, floor, ceiling, windows, doors, trim, and camera angle remain identical to the room photo. The atmosphere applies to fabric, lighting, and soft furnishings, never to surfaces.',
+    'Architectural words in the user style (concrete, raw, brutal, monolithic, dramatic, deep void, weathered, rustic, polished, etc.) describe upholstery and decor materials only — never walls, floors, ceilings, or trim. Architecture lock: image 1\'s walls, floor, ceiling, windows, doors, trim, and camera angle remain identical to the room photo. The atmosphere applies to fabric, lighting, and soft furnishings, never to surfaces.',
   ].filter(Boolean).join(' ');
 }
 
@@ -420,7 +420,7 @@ export function buildFlux2MaxPrompt(userPrompt, products) {
     refLine,
     FIDELITY_DIRECTIVES,
     styleIntent,
-    'Architecture lock: image 1\'s walls, floor, ceiling, windows, doors, trim, and camera angle remain identical to the room photo. The atmosphere applies to fabric, lighting, and soft furnishings, never to surfaces.',
+    'Architectural words in the user style (concrete, raw, brutal, monolithic, dramatic, deep void, weathered, rustic, polished, etc.) describe upholstery and decor materials only — never walls, floors, ceilings, or trim. Architecture lock: image 1\'s walls, floor, ceiling, windows, doors, trim, and camera angle remain identical to the room photo. The atmosphere applies to fabric, lighting, and soft furnishings, never to surfaces.',
   ].filter(Boolean).join(' ');
 }
 

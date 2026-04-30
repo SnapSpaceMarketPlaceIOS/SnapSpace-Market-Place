@@ -14,6 +14,7 @@ import {
   Pressable,
   Modal,
   FlatList,
+  ActivityIndicator,
 } from 'react-native';
 import CardImage from '../components/CardImage';
 import LensLoader from '../components/LensLoader';
@@ -243,9 +244,60 @@ function RevealImage({ before, after, borderRadius = 9 }) {
   const progress = useRef(new Animated.Value(0)).current;
   const hasPlayed = useRef(false);
 
+  // Build 126 — Item 2 fix: hero AFTER image robustness on revisit.
+  //
+  // Symptom: user generates → leaves screen → returns to view their post
+  // and the hero area is solid gray (#E5E7EB containerStyle background) for
+  // long stretches, sometimes never resolving. Required exit-and-retry to
+  // recover.
+  //
+  // Root cause is two-fold:
+  //   1. FAL's CDN URL caches at the edge with TTL ~24h. Cold revisits hit
+  //      the origin (slow on first request).
+  //   2. React Native's <Image> has no built-in retry on transient fetch
+  //      failure. One hiccup → permanently gray.
+  //
+  // Fix: track load state explicitly. Show ActivityIndicator while the
+  // image isn't yet rendered. On error, retry up to 3 times with linear
+  // backoff (1s, 2s, 3s) by bumping a remount key. After all retries
+  // exhaust, show a tap-to-retry button so the user has manual recovery
+  // (no more force-quit-the-screen).
+  const [afterLoaded, setAfterLoaded] = useState(false);
+  const [afterFailed, setAfterFailed] = useState(false);
+  const [afterRetryKey, setAfterRetryKey] = useState(0);
+  const afterRetryCountRef = useRef(0);
+  const handleAfterError = () => {
+    if (afterRetryCountRef.current < 3) {
+      const delayMs = 1000 * (afterRetryCountRef.current + 1);
+      afterRetryCountRef.current += 1;
+      setTimeout(() => setAfterRetryKey((k) => k + 1), delayMs);
+      return;
+    }
+    setAfterFailed(true);
+  };
+  const handleManualRetry = () => {
+    afterRetryCountRef.current = 0;
+    setAfterFailed(false);
+    setAfterLoaded(false);
+    setAfterRetryKey((k) => k + 1);
+  };
+  // Reset load state when AFTER URL changes (new generation, deep-link, etc.)
+  useEffect(() => {
+    setAfterLoaded(false);
+    setAfterFailed(false);
+    afterRetryCountRef.current = 0;
+    setAfterRetryKey(0);
+    // Pre-warm the CDN so the first <Image> mount usually hits warm cache.
+    if (after) Image.prefetch(after).catch(() => {});
+  }, [after]);
+
   // Re-encode BEFORE through ImageManipulator to bake EXIF rotation into pixels.
-  // No edits — empty actions array — just a re-save as JPEG. Cheap (<200ms on
-  // typical iPhone photos) and only runs once per component instance.
+  // Build 126 — Item 4 fix: explicit rotate(0) action instead of empty array.
+  // On iOS 26, empty-actions manipulateAsync was inconsistently stripping the
+  // EXIF orientation tag — landscape user photos still rendered rotated 90°
+  // in the BEFORE swipe page. An explicit rotate-by-zero forces the encoder
+  // to apply orientation pixel-bake reliably across all input shapes. Cheap
+  // (<200ms on typical iPhone photos) and only runs once per component instance.
   useEffect(() => {
     if (!before) {
       setNormalizedBefore(null);
@@ -256,7 +308,7 @@ function RevealImage({ before, after, borderRadius = 9 }) {
       try {
         const result = await ImageManipulator.manipulateAsync(
           before,
-          [],
+          [{ rotate: 0 }],
           { compress: 0.9, format: ImageManipulator.SaveFormat.JPEG },
         );
         if (!cancelled) setNormalizedBefore(result.uri);
@@ -324,12 +376,35 @@ function RevealImage({ before, after, borderRadius = 9 }) {
     backgroundColor: '#E5E7EB',
   };
 
-  // Fallback: no before image → render AFTER directly, no animation
+  // Fallback: no before image → render AFTER directly, no animation.
+  // Build 126 — Item 2: wraps the bare Image with retry + skeleton so a
+  // CDN cold-fetch doesn't leave the user staring at solid gray.
   if (!before) {
     return (
       <View style={containerStyle}>
-        {after && (
-          <Image source={{ uri: after }} style={StyleSheet.absoluteFill} resizeMode="cover" />
+        {after && !afterFailed && (
+          <Image
+            key={afterRetryKey}
+            source={{ uri: after }}
+            style={StyleSheet.absoluteFill}
+            resizeMode="cover"
+            onLoad={() => setAfterLoaded(true)}
+            onError={handleAfterError}
+          />
+        )}
+        {after && !afterLoaded && !afterFailed && (
+          <View style={[StyleSheet.absoluteFill, { alignItems: 'center', justifyContent: 'center' }]}>
+            <ActivityIndicator size="large" color="#0B6DC3" />
+          </View>
+        )}
+        {afterFailed && (
+          <TouchableOpacity
+            onPress={handleManualRetry}
+            style={[StyleSheet.absoluteFill, { alignItems: 'center', justifyContent: 'center' }]}
+            activeOpacity={0.7}
+          >
+            <Text style={{ fontSize: 14, fontWeight: '600', color: '#374151' }}>Tap to retry</Text>
+          </TouchableOpacity>
         )}
       </View>
     );
@@ -364,8 +439,35 @@ function RevealImage({ before, after, borderRadius = 9 }) {
 
   return (
     <View style={containerStyle}>
-      {/* AFTER — static bottom layer */}
-      <Image source={{ uri: after }} style={StyleSheet.absoluteFill} resizeMode="cover" />
+      {/* AFTER — static bottom layer.
+          Build 126 — Item 2: same retry/skeleton wrapping as the no-before
+          path above. The reveal animation overlays the BEFORE on top, but
+          if AFTER is still loading (or failed), the gray container would
+          show through during/after the slide. */}
+      {!afterFailed && (
+        <Image
+          key={afterRetryKey}
+          source={{ uri: after }}
+          style={StyleSheet.absoluteFill}
+          resizeMode="cover"
+          onLoad={() => setAfterLoaded(true)}
+          onError={handleAfterError}
+        />
+      )}
+      {!afterLoaded && !afterFailed && (
+        <View style={[StyleSheet.absoluteFill, { alignItems: 'center', justifyContent: 'center' }]}>
+          <ActivityIndicator size="large" color="#0B6DC3" />
+        </View>
+      )}
+      {afterFailed && (
+        <TouchableOpacity
+          onPress={handleManualRetry}
+          style={[StyleSheet.absoluteFill, { alignItems: 'center', justifyContent: 'center' }]}
+          activeOpacity={0.7}
+        >
+          <Text style={{ fontSize: 14, fontWeight: '600', color: '#374151' }}>Tap to retry</Text>
+        </TouchableOpacity>
+      )}
 
       {/* BEFORE — animated top layer, slides up off-screen */}
       <Animated.View
@@ -460,6 +562,13 @@ function BeforeCard({ before, afterDimensions, borderRadius = 9 }) {
   // rendered in this card showed up rotated 90° with black letterboxing.
   // ImageManipulator re-encodes with the rotation baked into pixels → a plain
   // upright JPEG that displays identically everywhere.
+  //
+  // Build 126 — Item 4 fix: explicit `rotate: 0` action instead of empty
+  // actions array. Empty actions on iOS 26 was inconsistently stripping
+  // the EXIF orientation tag for landscape inputs (verified Build 125
+  // TestFlight: a landscape user photo rendered sideways in the BEFORE
+  // swipe). Forcing a no-op rotation guarantees the encoder applies the
+  // pixel-bake reliably across all input shapes.
   useEffect(() => {
     if (!before) return;
     let cancelled = false;
@@ -467,7 +576,7 @@ function BeforeCard({ before, afterDimensions, borderRadius = 9 }) {
       try {
         const result = await ImageManipulator.manipulateAsync(
           before,
-          [],
+          [{ rotate: 0 }],
           { compress: 0.9, format: ImageManipulator.SaveFormat.JPEG },
         );
         if (!cancelled) setNormalizedUri(result.uri);

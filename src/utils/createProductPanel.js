@@ -153,10 +153,31 @@ export async function createProductPanel(products, userId) {
     'pendant-light', 'chandelier',
     'wall-art', 'mirror',
   ]);
+  // Build 126 — Item 1: don't let variant-swap leak lifestyle photos into
+  // the panel.
+  //
+  // Build 125 had a bug: when productMatcher swapped a product to a color
+  // variant (e.g. "sage green sofa" → variant id 3), it set p.imageUrl to
+  // that variant's mainImage. The pre-existing pickPanelSource then
+  // checked `_matchedVariant` first and returned p.imageUrl unconditionally
+  // — bypassing panelImageUrl entirely. Result: the 2×2 panel sent to FAL
+  // ended up with lifestyle scenes in 3 of 4 cells (verified in Build 125
+  // TestFlight: a sectional in a styled room, sofa with autumn window,
+  // chairs in a styled space). FAL inherited those scenes' architecture,
+  // bleeding into the rendered room despite our per-cell isolation
+  // directive.
+  //
+  // The two-track image model (Build 121) is unambiguous about who sees
+  // what: panelImageUrl = AI panel input (clean studio), imageUrl = user-
+  // facing display (lifestyle, color-correct for the chosen variant). For
+  // the variant case, we want FAL to see the studio shape reference; the
+  // variant's color is conveyed via the prompt descriptor + user style
+  // intent, and post-render variant re-rank reconciles any color drift.
+  //
+  // For LIFESTYLE_PREFERRED categories the lifestyle shot is intentional
+  // (rugs need a floor, pendants need a ceiling) and we keep that path.
   const pickPanelSource = (p) => {
-    if (p._matchedVariant) return p.imageUrl;
     if (p.category && LIFESTYLE_PREFERRED.has(p.category)) {
-      // Prefer the in-context shot. Falls back to panelImageUrl/imageUrl.
       return p.imageUrl || p.panelImageUrl;
     }
     if (typeof p.panelImageUrl === 'string' && p.panelImageUrl.startsWith('http')) {
