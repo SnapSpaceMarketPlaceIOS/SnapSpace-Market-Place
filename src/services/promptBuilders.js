@@ -149,6 +149,72 @@ export const FIDELITY_DIRECTIVES =
 export const FIDELITY_DIRECTIVES_SINGLE =
   'The product must match the reference exactly. Ignore any other items, walls, or decor visible in the reference image — render only the named product. No substitutions, no new decor.';
 
+// Build 125 (Lever B) — per-category fidelity hints.
+//
+// flux's vision-language head responds well to specific render directives —
+// "preserve silhouette" carries different weight than "preserve pattern" and
+// the category determines which signals matter most. Per-cell hints append
+// to the descriptor in buildPanelPrompt / buildFlux2MaxPrompt so the prompt
+// reads:
+//   "Product 3 (bottom-left): sage green wool area rug —
+//    preserve pattern and color blocking; lay flat on floor"
+//
+// Hints stay short (≤12 words) so they don't bloat the prompt past the
+// effective attention window. Categories with placement constraints
+// (rug → floor, pendant → ceiling, mirror → wall) include placement so
+// flux doesn't render a rug on a wall or a pendant on the floor.
+const PER_CELL_FIDELITY = {
+  // Hard goods — silhouette + finish
+  'sofa':           'preserve silhouette, upholstery color, and fabric texture',
+  'sectional':      'preserve silhouette, modular configuration, and upholstery color',
+  'accent-chair':   'preserve silhouette, leg style, and upholstery color',
+  'lounge-chair':   'preserve silhouette and upholstery color',
+  'recliner':       'preserve silhouette and upholstery color',
+  'coffee-table':   'preserve material finish, base style, and proportions',
+  'side-table':     'preserve material finish and proportions',
+  'console-table':  'preserve material finish and silhouette',
+  'dining-table':   'preserve top material, base style, and proportions',
+  'dining-chair':   'preserve silhouette, leg style, and upholstery',
+  'bar-stool':      'preserve silhouette and material finish',
+  'bed':            'preserve frame style, headboard shape, and finish',
+  'nightstand':     'preserve material finish and drawer layout',
+  'dresser':        'preserve material finish and drawer layout',
+  'wardrobe':       'preserve material finish and door layout',
+  'desk':           'preserve top material, leg style, and proportions',
+  'desk-chair':     'preserve silhouette and upholstery',
+  'office-chair':   'preserve silhouette and upholstery',
+  'bookshelf':      'preserve frame style, shelf count, and material finish',
+  'shelving':       'preserve frame style and material finish',
+  'tv-stand':       'preserve material finish and proportions',
+  'media-console':  'preserve material finish and proportions',
+  'storage':        'preserve material finish and silhouette',
+  'bench':          'preserve silhouette and material finish',
+  'ottoman':        'preserve silhouette and upholstery',
+  'pouf':           'preserve silhouette and texture',
+  // Lighting — fixture shape + mount placement
+  'floor-lamp':     'preserve fixture shape, finish, and shade style',
+  'table-lamp':     'preserve fixture shape, base finish, and shade style',
+  'pendant-light':  'preserve fixture shape and finish; mount from ceiling',
+  'chandelier':     'preserve fixture shape and finish; mount from ceiling',
+  'wall-light':     'preserve fixture shape; mount on wall',
+  // Soft goods — pattern + texture + placement
+  'rug':            'preserve pattern and color blocking; lay flat on floor',
+  'throw-pillow':   'preserve color and texture; place on seating',
+  'throw-blanket':  'preserve color and texture; drape over seating',
+  'curtains':       'preserve color and material; hang from window or rod',
+  // Wall items — frame + placement
+  'mirror':         'preserve frame finish and shape; mount on wall',
+  'wall-art':       'preserve frame, content, and proportions; mount on wall',
+  'wall-shelf':     'preserve material finish; mount on wall',
+  // Decor
+  'planter':        'preserve material and shape',
+  'vase':           'preserve material, color, and silhouette',
+};
+
+function fidelityHintForCategory(category) {
+  return PER_CELL_FIDELITY[category] || 'preserve silhouette, color, and material';
+}
+
 // Cap total prompt words. Lowered 200 → 120: shorter prompts have
 // dramatically less token-attention dilution. flux weights early tokens
 // most, and at 120 words every clause is in the high-attention region.
@@ -243,7 +309,12 @@ export function buildPanelPrompt(userPrompt, products) {
     const safeDesc = desc || 'the exact product shown in this cell of the reference panel';
     // Phase 1: ordinal tag pairs with positional label so flux tracks
     // 4 distinct items rather than treating them as a fungible list.
-    return `Product ${i + 1} (${posLabels[i]}): ${safeDesc}`;
+    // Build 125 (Lever B): per-category fidelity hint appended after the
+    // descriptor — gives flux specific render directives that vary by
+    // what the product actually is (silhouette for sofas, pattern for
+    // rugs, mount-on-ceiling for pendants, etc.).
+    const hint = fidelityHintForCategory(p?.category);
+    return `Product ${i + 1} (${posLabels[i]}): ${safeDesc} — ${hint}`;
   });
 
   // Build 115: tightened reference clause. Was ~50 words of layered
@@ -323,7 +394,9 @@ export function buildFlux2MaxPrompt(userPrompt, products) {
     const safeDesc = desc || `the exact product shown in image ${i + 2}`;
     // Phase 1: ordinal tag for tracking. Image 1 is the room, so products
     // start at image 2.
-    return `Product ${i + 1} (image ${i + 2}) is a ${safeDesc}`;
+    // Build 125 (Lever B): per-category fidelity hint, same as panel path.
+    const hint = fidelityHintForCategory(p?.category);
+    return `Product ${i + 1} (image ${i + 2}) is a ${safeDesc} — ${hint}`;
   });
 
   // Build 115: refs path mirrors the panel path — short positive imperatives,

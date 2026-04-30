@@ -1,6 +1,7 @@
 import { PRODUCT_CATALOG } from '../data/productCatalog';
 import { STYLE_AFFINITY } from '../data/styleMap';
 import { proxyFetch } from './apiProxy';
+import { detectColorFamilies, findMatchingColorVariant } from '../utils/colorMap';
 
 const ANTHROPIC_API_URL = 'https://api.anthropic.com/v1/messages';
 // Haiku is 12× cheaper than Sonnet ($0.001 vs $0.013 per call) and
@@ -392,10 +393,94 @@ export async function verifyGeneratedProducts(imageUrl, referenceProducts) {
     return (b._visionScore || 0) - (a._visionScore || 0);
   });
 
-  const verifiedCount = verified.filter(p => p.confidence === 'verified').length;
-  console.log(`[Verify] ${verifiedCount}/${verified.length} reference products verified in image`);
+  // Build 125 — post-render variant re-rank.
+  //
+  // The vision pass tells us the actual color FAL rendered for each item
+  // (via _visionMatch.color). If the catalog product has a variant whose
+  // label matches that color, swap to it — same imageUrl/affiliateUrl/asin
+  // rewrite as productMatcher's pre-render variant swap (Build 71 Fix #2),
+  // but driven by what FAL ACTUALLY drew rather than the prompt's intent.
+  //
+  // Why this matters: a "japandi living room" prompt might pull a CAJCA
+  // coffee table with default Brown/Walnut variant. FAL renders the room
+  // with a Black/Transparent table. Without re-rank, the strip shows the
+  // brown table photo next to a black-table room — visually mismatched.
+  // With re-rank, the strip swaps to the Black/Transparent variant photo
+  // before the user sees it.
+  //
+  // Conservative: only swaps if a clean color-family match exists. Falls
+  // back to whatever variant productMatcher already chose (or no variant)
+  // when vision color is ambiguous or no matching variant is in stock.
+  const reranked = verified.map(p => applyVisionColorVariantSwap(p));
 
-  return { products: verified, roomType, visionItems };
+  const verifiedCount = reranked.filter(p => p.confidence === 'verified').length;
+  const swappedCount = reranked.filter(p => p._visionVariantSwap).length;
+  console.log(`[Verify] ${verifiedCount}/${reranked.length} verified | ${swappedCount} variants swapped from vision color`);
+
+  return { products: reranked, roomType, visionItems };
+}
+
+/**
+ * Build 125 — post-render variant swap helper.
+ *
+ * If the product has a `_visionMatch.color`, map it to a canonical color
+ * family and look for a matching variant. If found, rewrite imageUrl,
+ * affiliateUrl, asin, and price to that variant — same shape as the
+ * pre-render swap in productMatcher.js so downstream UI renders the
+ * matched variant photo + correct ASIN/price in the strip.
+ *
+ * Idempotent: if a pre-render swap already chose a variant in the right
+ * color family, this is a no-op (the existing variant satisfies the
+ * vision color and we don't need to re-swap).
+ */
+function applyVisionColorVariantSwap(product) {
+  const visionColor = product?._visionMatch?.color;
+  if (!visionColor) return product;
+  if (!Array.isArray(product.variants) || product.variants.length === 0) return product;
+
+  const families = detectColorFamilies(visionColor);
+  if (families.length === 0) return product;
+
+  // If the current variant already matches one of the vision color families,
+  // no swap needed — the pre-render matcher got it right.
+  if (product._matchedVariant) {
+    const currentLabel = String(product._matchedVariant.label || '').toLowerCase();
+    if (families.some(f => detectColorFamilies(currentLabel).includes(f))) {
+      return product;
+    }
+  }
+
+  // Walk each detected family in priority order; first matching variant wins.
+  let matched = null;
+  let matchedFamily = null;
+  for (const family of families) {
+    matched = findMatchingColorVariant(product, family);
+    if (matched) {
+      matchedFamily = family;
+      break;
+    }
+  }
+  if (!matched) return product;
+
+  const next = {
+    ...product,
+    _matchedVariant: matched,
+    _visionVariantSwap: { from: product._matchedVariant?.label || null, to: matched.label, family: matchedFamily },
+  };
+  if (matched.mainImage || matched.swatchImage) {
+    next.imageUrl = matched.mainImage || matched.swatchImage;
+  }
+  if (matched.affiliateUrl) next.affiliateUrl = matched.affiliateUrl;
+  if (matched.asin) next.asin = matched.asin;
+  if (typeof matched.price === 'number' && matched.price > 0) {
+    next.price = matched.price;
+    next.priceDisplay = `$${matched.price.toFixed(2)}`;
+  }
+  console.log(
+    `[Verify] vision-color variant swap: "${(product.name || '').slice(0, 40)}" ` +
+    `→ "${matched.label}" (vision=${visionColor}, family=${matchedFamily})`
+  );
+  return next;
 }
 
 // Category relatedness for cross-checking vision items against products.

@@ -363,13 +363,17 @@ const HERO_FADE_MS  = 1200;  // 1.2 second smooth crossfade
 
 // ── Style category chips with preview image ────────────────────────────────────
 // Local assets for curated styles (permanent, no CDN expiry)
-const STYLE_IMG_JAPANDI      = require('../assets/styles/Japandi.jpg');
-const STYLE_IMG_SCANDI       = require('../assets/styles/Scandanavian.jpg');
-const STYLE_IMG_MINIMALIST   = require('../assets/styles/Minimalist.jpg');
-const STYLE_IMG_GLAM         = require('../assets/styles/glam.jpg');
-const STYLE_IMG_MODERN       = require('../assets/styles/Modern.jpg');
+const STYLE_IMG_JAPANDI       = require('../assets/styles/Japandi.jpg');
+const STYLE_IMG_SCANDI        = require('../assets/styles/Scandanavian.jpg');
+const STYLE_IMG_MINIMALIST    = require('../assets/styles/Minimalist.jpg');
+const STYLE_IMG_GLAM          = require('../assets/styles/glam.jpg');
+const STYLE_IMG_MODERN        = require('../assets/styles/Modern.jpg');
+const STYLE_IMG_CONTEMPORARY  = require('../assets/styles/Contemporary.jpg');
 
 const STYLE_CATEGORIES = [
+  { key: 'contemporary', label: 'Contemporary', sub: 'Now & Refined',
+    bg: '#FAFAFA', text: '#1F2937', accent: '#4B5563',
+    localImage: STYLE_IMG_CONTEMPORARY, nativeW: 1000, nativeH: 1250 },
   { key: 'japandi',     label: 'Japandi',     sub: 'Refined Calm',
     bg: '#F0FDF4', text: '#166534', accent: '#16A34A',
     localImage: STYLE_IMG_JAPANDI,    nativeW: 600,  nativeH: 750 },

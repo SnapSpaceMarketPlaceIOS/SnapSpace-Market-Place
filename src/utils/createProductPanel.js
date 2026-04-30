@@ -123,19 +123,42 @@ export async function createProductPanel(products, userId) {
   //      whole point of the swap (it's both the most accurate panel
   //      source AND what the user will actually see in their cart).
   //
-  //   2. Catalog override. If the product carries an optional
+  //   2. Build 125 — Lever A: lifestyle preference for context-dependent
+  //      categories. Studio shots work great for hard goods (sofa, table,
+  //      chair) — clean silhouette, isolated from environment. But they
+  //      hurt FAL fidelity for items that only "make sense" in context:
+  //        - Rugs: a flat top-down studio shot doesn't tell FAL how the
+  //          rug should drape on a real floor.
+  //        - Lighting fixtures: a fixture floating in a void doesn't tell
+  //          FAL how it mounts (ceiling/wall) or its scale.
+  //        - Wall art / mirrors: framing context informs how they hang.
+  //        - Soft goods (pillows/throws): need to be ON something.
+  //      For these categories, prefer the lifestyle imageUrl over
+  //      panelImageUrl. The FIDELITY_DIRECTIVES clause in promptBuilders
+  //      ("ignore any other furniture, walls, or decor visible in the
+  //      cell, those are photography artifacts") already protects against
+  //      lifestyle context-bleed for these cells.
+  //
+  //   3. Catalog override. If the product carries an optional
   //      `panelImageUrl` field, prefer that for the AI panel composite
   //      ONLY. Used to override a default `imageUrl` that's a busy
   //      lifestyle shot, a tightly-cropped detail, or otherwise gives
   //      flux a poor silhouette to work with. The catalog UI keeps
   //      showing `imageUrl` so the shopper-facing surface stays rich.
   //
-  //   3. Default. Fall back to `imageUrl` — the current behavior for
-  //      every product that has no panelImageUrl set, which is the
-  //      whole catalog at the time this hook was added. Existing
-  //      products behave exactly as before.
+  //   4. Default. Fall back to `imageUrl`.
+  const LIFESTYLE_PREFERRED = new Set([
+    'rug',
+    'throw-pillow', 'throw-blanket', 'curtains',
+    'pendant-light', 'chandelier',
+    'wall-art', 'mirror',
+  ]);
   const pickPanelSource = (p) => {
     if (p._matchedVariant) return p.imageUrl;
+    if (p.category && LIFESTYLE_PREFERRED.has(p.category)) {
+      // Prefer the in-context shot. Falls back to panelImageUrl/imageUrl.
+      return p.imageUrl || p.panelImageUrl;
+    }
     if (typeof p.panelImageUrl === 'string' && p.panelImageUrl.startsWith('http')) {
       return p.panelImageUrl;
     }

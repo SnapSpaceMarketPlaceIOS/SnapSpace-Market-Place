@@ -53,6 +53,15 @@ const APP_STORE_ID_FALLBACK = '6762400062';
 const APP_STORE_ID = process.env.EXPO_PUBLIC_APP_STORE_ID || APP_STORE_ID_FALLBACK;
 const HAS_APP_STORE_ID = /^\d+$/.test(APP_STORE_ID);
 
+// Build 125 — canonical App Store URL form. Apple's iMessage link-preview
+// renderer honors `?platform=iphone` reliably on the canonical URL form
+// (country + app slug + id), but inconsistently on the short redirect form
+// (`/app/id...`). With `supportsTablet: true` in app.json, the short form
+// was getting rendered as the iPad-style compact card. Switching to the
+// canonical form forces the iPhone-formatted preview every time.
+const APP_STORE_COUNTRY = 'us';
+const APP_STORE_SLUG = 'home-genie-ai-design-shop';
+
 /**
  * The download/CTA URL embedded in every share message. Resolves in this
  * priority order:
@@ -75,10 +84,13 @@ const ensureIphonePreview = (url) =>
     ? `${url}${url.includes('?') ? '&' : '?'}platform=iphone`
     : url;
 
+const buildCanonicalAppStoreUrl = (id) =>
+  `https://apps.apple.com/${APP_STORE_COUNTRY}/app/${APP_STORE_SLUG}/id${id}`;
+
 export const SHARE_APP_URL = ensureIphonePreview(
   HAS_APP_STORE_ID
-    ? `https://apps.apple.com/app/id${APP_STORE_ID}`
-    : (WEB_DOMAIN ? `https://${WEB_DOMAIN}` : `https://apps.apple.com/app/id${APP_STORE_ID_FALLBACK}`)
+    ? buildCanonicalAppStoreUrl(APP_STORE_ID)
+    : (WEB_DOMAIN ? `https://${WEB_DOMAIN}` : buildCanonicalAppStoreUrl(APP_STORE_ID_FALLBACK))
 );
 
 /**
