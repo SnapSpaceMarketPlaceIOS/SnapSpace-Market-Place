@@ -34,7 +34,7 @@ import PressableCard from '../components/PressableCard';
 import Skeleton from '../components/Skeleton';
 import { SellerName } from '../components/VerifiedBadge';
 import { getProductsForDesign, getProductsForPrompt } from '../services/affiliateProducts';
-import { createShareableWishURL } from '../services/shareService';
+import { createShareableWishURL, buildShareMessage } from '../services/shareService';
 import { parseDesignPrompt } from '../utils/promptParser';
 import TabScreenFade from '../components/TabScreenFade';
 import * as ImagePicker from 'expo-image-picker';
@@ -1305,11 +1305,13 @@ export default function ExploreScreen({ navigation, route }) {
                     isLiked={liked[design.id?.replace?.('user-', '')] || liked[design.id]}
                     onToggleLike={() => toggleLiked(design.id)}
                     onShare={async () => {
+                      // Build 122 — branded short caption (no prompt wall-of-text).
+                      // shareUrl resolves to the homegenie.app/wish/<id> landing
+                      // page when the web app is deployed (Direction 2 path),
+                      // otherwise falls back to the raw image URL. Caption is
+                      // brand-first via buildShareMessage().
                       try {
-                        const msg = design.prompt
-                          ? `Check out this HomeGenie design: "${design.prompt}"`
-                          : 'Check out this HomeGenie wish!';
-                        // Build 113 polish: branded landing URL via shareService.
+                        const msg = buildShareMessage();
                         const shareUrl = design.imageUrl
                           ? await createShareableWishURL({
                               imageUrl: design.imageUrl,

@@ -1,81 +1,181 @@
 /**
- * SparkleBurst.js — pure RN Animated celebration burst.
+ * SparkleBurst.js — multi-phase celebration burst (Build 122 redesign).
  *
- * Renders a one-shot particle explosion at a given (x, y) screen point.
- * Three layers stacked from back to front:
- *   1. Soft blue glow that scales up + fades (depth)
- *   2. Shockwave ring expanding outward (impact)
- *   3. ~28 sparkle particles fanning radially with stagger (magic)
+ * Renders a one-shot "you just bought something magical" explosion at a
+ * given (x, y) screen point. Designed to feel like ONE moment but with
+ * texture: a click → a wave → a settle.
  *
- * Pure native-driver: every animated property is transform/opacity, so
+ * Layers, back to front:
+ *
+ *   Phase 4 — Background radial glow         (0–900ms)  depth + aura
+ *   Phase 1 — Anticipation flash             (0–120ms)  the "click"
+ *   Phase 2 — Twin staggered shockwaves      (50–700ms) impact wave
+ *   Phase 3 — Tiered particle explosion      (150–1500ms) the magic
+ *               LARGE  10 hero sparkles    | size 10–14, dist 100–260
+ *               MEDIUM 22 filler particles | size 5–8,   dist 70–220
+ *               SMALL  24 dust particles   | size 2–4,   dist 50–320
+ *
+ * Total runtime ~1.5s. The dopamine spike sits at ~250–500ms when the
+ * shockwaves are at peak AND the large sparkles are mid-flight; small
+ * dust drifts on the back half so the moment "settles" rather than
+ * cutting off.
+ *
+ * Pure native driver: every animated property is transform/opacity, so
  * the entire burst runs on the UI thread and stays smooth even while
- * the JS thread is busy validating the StoreKit receipt.
+ * the JS thread is busy validating the StoreKit receipt downstream.
  *
  * No new dependencies — vanilla `Animated` from react-native.
  *
  * Brand palette only:
- *   - White (#FFFFFF) for sparkle cores
- *   - Light blue (#67ACE9) for accent particles + glow
- *   - Primary blue (#0B6DC3) implicit via shadows
+ *   - White (#FFFFFF) for sparkle cores + flash
+ *   - Light blue (#67ACE9) for accent particles + glow + outer ring
+ *   - Primary blue (#0B6DC3) for deep accents (subtle, ~15% of particles)
  *
- * Mount cost: ~30 Animated.Views, all destroyed when onComplete fires.
+ * Mount cost: ~60 Animated.Views during the burst, all destroyed when
+ * onComplete fires.
  */
 import React, { useEffect, useRef } from 'react';
 import { View, Animated, StyleSheet, Easing } from 'react-native';
 
-const PARTICLE_COUNT       = 28;
-const PARTICLE_DIST_MIN    = 70;
-const PARTICLE_DIST_MAX    = 170;
-const PARTICLE_DURATION    = 1000;
-const RING_DURATION        = 750;
-const GLOW_DURATION        = 650;
+// ── Phase timings ──────────────────────────────────────────────────────────
+const FLASH_DURATION       = 220;
+const RING_INNER_DURATION  = 650;
+const RING_OUTER_DURATION  = 850;
+const PARTICLE_DURATION    = 1350;
+const GLOW_DURATION        = 900;
+const TOTAL_DURATION       = 1500;  // outer envelope; what the parent waits for
 
-// Pre-compute a deterministic-but-jittered particle distribution. Even
-// angular spacing keeps the burst from clumping; the per-particle jitter
-// keeps it from looking robotic.
+// ── Particle tier configuration ────────────────────────────────────────────
+//
+// Three tiers give the burst a "core / filler / dust" feel instead of the
+// uniform halo of the old design. Distance ranges intentionally overlap so
+// the boundaries don't read as concentric rings.
+const TIERS = [
+  {
+    name:        'large',
+    count:       10,
+    sizeMin:     10,
+    sizeMax:     14,
+    distMin:     100,
+    distMax:     260,
+    delayMin:    0,
+    delayMax:    80,
+    accentRatio: 0.5,    // 50% blue accents — large particles get more color
+  },
+  {
+    name:        'medium',
+    count:       22,
+    sizeMin:     5,
+    sizeMax:     8,
+    distMin:     70,
+    distMax:     220,
+    delayMin:    80,
+    delayMax:    280,
+    accentRatio: 0.35,   // mostly white with some accent
+  },
+  {
+    name:        'small',
+    count:       24,
+    sizeMin:     2,
+    sizeMax:     4,
+    distMin:     50,
+    distMax:     320,
+    delayMin:    200,
+    delayMax:    500,
+    accentRatio: 0.25,   // mostly white dust
+  },
+];
+
+const COLOR_WHITE = '#FFFFFF';
+const COLOR_LIGHT_BLUE = '#67ACE9';
+const COLOR_PRIMARY_BLUE = '#0B6DC3';
+
+// Pick an accent color: most accent particles use light blue, a smaller
+// fraction use primary blue for depth. Keeps the burst grounded in brand
+// without ever introducing off-palette tints.
+function pickAccentColor() {
+  return Math.random() < 0.7 ? COLOR_LIGHT_BLUE : COLOR_PRIMARY_BLUE;
+}
+
+// Pre-compute deterministic-but-jittered particles for all tiers at mount.
+// Each particle carries its own angle, distance, size, color, delay, and
+// rotation direction — enough variation to never read as "robotic ring".
 function buildParticles() {
-  return Array.from({ length: PARTICLE_COUNT }, (_, i) => {
-    const baseAngle  = (i / PARTICLE_COUNT) * Math.PI * 2;
-    const jitter     = (Math.random() - 0.5) * 0.35;
-    const angle      = baseAngle + jitter;
-    const dist       = PARTICLE_DIST_MIN + Math.random() * (PARTICLE_DIST_MAX - PARTICLE_DIST_MIN);
-    const size       = 4 + Math.random() * 4;
-    const isAccent   = i % 3 === 0;
-    return {
-      angle,
-      dist,
-      size,
-      delay: i * 14,
-      // Mix white sparkles with brand-blue accents (~33%) so the burst
-      // has color depth without losing the pure-white "magic" reading.
-      color: isAccent ? '#67ACE9' : '#FFFFFF',
-    };
+  const particles = [];
+  TIERS.forEach((tier) => {
+    for (let i = 0; i < tier.count; i++) {
+      // Even angular distribution per tier with light jitter so neighbors
+      // don't pile on top of each other but the overall ring feels organic.
+      const baseAngle = (i / tier.count) * Math.PI * 2;
+      // Per-tier phase offset so the three tiers don't all land at the
+      // same compass directions — adds visual density.
+      const tierPhase = TIERS.indexOf(tier) * (Math.PI / 7);
+      const jitter    = (Math.random() - 0.5) * 0.4;
+      const angle     = baseAngle + tierPhase + jitter;
+
+      const dist  = tier.distMin + Math.random() * (tier.distMax - tier.distMin);
+      const size  = tier.sizeMin + Math.random() * (tier.sizeMax - tier.sizeMin);
+      const delay = tier.delayMin + Math.random() * (tier.delayMax - tier.delayMin);
+
+      const isAccent = Math.random() < tier.accentRatio;
+      const color    = isAccent ? pickAccentColor() : COLOR_WHITE;
+
+      // Rotation: small (-90 to +90 deg) random spin, randomized direction.
+      // Adds shimmer life without making the particle look like a propeller.
+      const rotateEnd = (Math.random() - 0.5) * 180;
+
+      particles.push({ angle, dist, size, delay, color, rotateEnd, tier: tier.name });
+    }
   });
+  return particles;
 }
 
 function Particle({ p, anim }) {
-  // translateX/Y go from origin (0,0) out to (cos·dist, sin·dist) at peak.
-  // The ease is overshoot-then-settle so particles "throw" outward fast,
-  // then drift to a stop instead of stopping abruptly.
+  // Per-particle progress curve: starts at p.delay/TOTAL, fully out by ~80%
+  // of remaining duration. This is what gives each tier its stagger.
+  const start = p.delay / TOTAL_DURATION;
+  const peak  = Math.min(start + 0.18, 0.85);   // when it reaches max distance
+  // Cap at 0.999 (not 1) so the inputRange tuples below never end with two
+  // identical 1.0 values when start is large (e.g. small-tier delay=500ms,
+  // start=0.333, end would clamp to 1.0 — making `[..., end, 1]` collapse
+  // to `[..., 1, 1]` which trips RN Animated's "monotonically increasing"
+  // warning. 1.5ms early finish is imperceptible.
+  const end   = Math.min(start + 0.85, 0.999);
+
+  // translateX/Y: 0 → cos·dist, sin·dist
   const tx = anim.interpolate({
-    inputRange:  [0, 1],
-    outputRange: [0, Math.cos(p.angle) * p.dist],
+    inputRange:  [0, start, end, 1],
+    outputRange: [0, 0, Math.cos(p.angle) * p.dist, Math.cos(p.angle) * p.dist],
+    extrapolate: 'clamp',
   });
   const ty = anim.interpolate({
-    inputRange:  [0, 1],
-    outputRange: [0, Math.sin(p.angle) * p.dist],
+    inputRange:  [0, start, end, 1],
+    outputRange: [0, 0, Math.sin(p.angle) * p.dist, Math.sin(p.angle) * p.dist],
+    extrapolate: 'clamp',
   });
-  // Scale: 0 → 1.3 (snap visible) → 0.5 (drift down so it feels like fading
-  // particle is shrinking too, more "sparkle" than "ball")
+
+  // Scale: 0 → 1.4 (overshoot pop) → 0.4 (drift down — feels like the
+  // sparkle is fading at the same rate as opacity, not just disappearing).
   const scale = anim.interpolate({
-    inputRange:  [0, 0.18, 0.7, 1],
-    outputRange: [0, 1.3,  0.85, 0.4],
+    inputRange:  [0, start, peak, end, 1],
+    outputRange: [0, 0,     1.4,  0.4, 0.4],
+    extrapolate: 'clamp',
   });
-  // Opacity: pop on at 0.1, hold to 0.65, fade to 0
+
+  // Opacity: 0 → 1 (snap on) → hold → fade to 0.
   const opacity = anim.interpolate({
-    inputRange:  [0, 0.08, 0.65, 1],
-    outputRange: [0, 1,    0.85, 0],
+    inputRange:  [0, start, start + 0.02, peak, end, 1],
+    outputRange: [0, 0,     1,            0.95, 0,   0],
+    extrapolate: 'clamp',
   });
+
+  // Rotation: smooth 0 → rotateEnd over the full particle lifetime.
+  const rotate = anim.interpolate({
+    inputRange:  [0, start, end, 1],
+    outputRange: ['0deg', '0deg', `${p.rotateEnd}deg`, `${p.rotateEnd}deg`],
+    extrapolate: 'clamp',
+  });
+
   return (
     <Animated.View
       style={[
@@ -85,7 +185,12 @@ function Particle({ p, anim }) {
           height: p.size,
           backgroundColor: p.color,
           shadowColor: p.color,
-          transform: [{ translateX: tx }, { translateY: ty }, { scale }],
+          transform: [
+            { translateX: tx },
+            { translateY: ty },
+            { rotate },
+            { scale },
+          ],
           opacity,
         },
       ]}
@@ -93,75 +198,148 @@ function Particle({ p, anim }) {
   );
 }
 
-export default function SparkleBurst({ x, y, size = 120, onComplete }) {
+export default function SparkleBurst({ x, y, size = 140, onComplete }) {
+  // Single timeline anim drives ALL phases. Each phase reads its own slice
+  // of [0,1] via interpolations. One animation, fully native driver,
+  // everything stays in sync.
+  const t = useRef(new Animated.Value(0)).current;
+
+  // Particles are built once at mount — same set throughout this burst's
+  // lifetime. Different bursts get different jitter naturally because
+  // useRef + buildParticles() re-runs per mount.
   const particlesRef = useRef(buildParticles()).current;
-  const particleAnim = useRef(new Animated.Value(0)).current;
-  const ringAnim     = useRef(new Animated.Value(0)).current;
-  const glowAnim     = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    Animated.parallel([
-      // Particles: smooth ease-out so they decelerate as they fly outward
-      Animated.timing(particleAnim, {
-        toValue: 1,
-        duration: PARTICLE_DURATION,
-        easing: Easing.bezier(0.22, 1, 0.36, 1),
-        useNativeDriver: true,
-      }),
-      // Ring: faster ease-out, classic shockwave
-      Animated.timing(ringAnim, {
-        toValue: 1,
-        duration: RING_DURATION,
-        easing: Easing.out(Easing.quad),
-        useNativeDriver: true,
-      }),
-      // Glow: slower bell so it has presence without dominating
-      Animated.timing(glowAnim, {
-        toValue: 1,
-        duration: GLOW_DURATION,
-        easing: Easing.out(Easing.cubic),
-        useNativeDriver: true,
-      }),
-    ]).start(() => onComplete?.());
+    Animated.timing(t, {
+      toValue: 1,
+      duration: TOTAL_DURATION,
+      easing: Easing.linear,    // master clock is linear; per-phase eases
+                                // come from the per-property interpolations
+      useNativeDriver: true,
+    }).start(() => onComplete?.());
   }, []);
 
-  const ringScale   = ringAnim.interpolate({ inputRange: [0, 1],          outputRange: [0.2, 3.4] });
-  const ringOpacity = ringAnim.interpolate({ inputRange: [0, 0.25, 1],    outputRange: [0, 0.7, 0] });
-  const glowScale   = glowAnim.interpolate({ inputRange: [0, 0.45, 1],    outputRange: [0.1, 1.0, 0.7] });
-  const glowOpacity = glowAnim.interpolate({ inputRange: [0, 0.4, 1],     outputRange: [0, 0.65, 0] });
+  // ── Phase 1: Anticipation flash ──────────────────────────────────────────
+  // White core that scales 0 → 1 → 0.6, full opacity peak then fades quickly.
+  // Sits dead-center and reads as the "click" of the purchase landing.
+  const flashEnd   = FLASH_DURATION / TOTAL_DURATION;       // ≈ 0.147
+  const flashScale = t.interpolate({
+    inputRange:  [0, flashEnd * 0.4, flashEnd, 1],
+    outputRange: [0, 1.0,            0.6,      0.6],
+    extrapolate: 'clamp',
+  });
+  const flashOpacity = t.interpolate({
+    inputRange:  [0, flashEnd * 0.3, flashEnd, 1],
+    outputRange: [0, 1,              0,        0],
+    extrapolate: 'clamp',
+  });
+
+  // ── Phase 2: Twin shockwaves ─────────────────────────────────────────────
+  // Inner: thicker, white, faster, smaller scale.
+  // Outer: thinner, light blue, slower, larger scale, slight delay.
+  const ringInnerEnd     = RING_INNER_DURATION / TOTAL_DURATION;        // ≈ 0.433
+  const ringInnerScale   = t.interpolate({
+    inputRange:  [0, ringInnerEnd, 1],
+    outputRange: [0.2, 2.8,        2.8],
+    extrapolate: 'clamp',
+  });
+  const ringInnerOpacity = t.interpolate({
+    inputRange:  [0, ringInnerEnd * 0.2, ringInnerEnd * 0.7, ringInnerEnd, 1],
+    outputRange: [0, 0.85,               0.4,                0,            0],
+    extrapolate: 'clamp',
+  });
+
+  const ringOuterStart   = 50 / TOTAL_DURATION;                          // ≈ 0.033
+  const ringOuterEnd     = (50 + RING_OUTER_DURATION) / TOTAL_DURATION; // ≈ 0.6
+  const ringOuterScale   = t.interpolate({
+    inputRange:  [0, ringOuterStart, ringOuterEnd, 1],
+    outputRange: [0.2, 0.2,           4.5,         4.5],
+    extrapolate: 'clamp',
+  });
+  const ringOuterOpacity = t.interpolate({
+    inputRange:  [0, ringOuterStart, ringOuterStart + 0.05, ringOuterEnd * 0.8, ringOuterEnd, 1],
+    outputRange: [0, 0,              0.6,                   0.2,                0,            0],
+    extrapolate: 'clamp',
+  });
+
+  // ── Phase 4: Background radial glow ──────────────────────────────────────
+  // Slow bell — peaks ~mid-burst, lingers as background warmth.
+  const glowEnd     = GLOW_DURATION / TOTAL_DURATION;                   // ≈ 0.6
+  const glowScale   = t.interpolate({
+    inputRange:  [0, glowEnd * 0.5, glowEnd, 1],
+    outputRange: [0.1, 1.2,         0.8,     0.8],
+    extrapolate: 'clamp',
+  });
+  const glowOpacity = t.interpolate({
+    inputRange:  [0, glowEnd * 0.3, glowEnd * 0.7, glowEnd, 1],
+    outputRange: [0, 0.55,          0.35,          0,       0],
+    extrapolate: 'clamp',
+  });
 
   return (
     <View pointerEvents="none" style={[styles.center, { left: x, top: y }]}>
+      {/* Phase 4: background glow (back-most) */}
       <Animated.View
         style={[
           styles.glow,
           {
-            width: size,
-            height: size,
-            borderRadius: size / 2,
-            marginLeft: -size / 2,
-            marginTop: -size / 2,
+            width: size * 1.2,
+            height: size * 1.2,
+            borderRadius: (size * 1.2) / 2,
+            marginLeft: -(size * 1.2) / 2,
+            marginTop: -(size * 1.2) / 2,
             transform: [{ scale: glowScale }],
             opacity: glowOpacity,
           },
         ]}
       />
+
+      {/* Phase 2: outer shockwave */}
       <Animated.View
         style={[
-          styles.ring,
+          styles.ringOuter,
           {
             width: size,
             height: size,
             borderRadius: size / 2,
             marginLeft: -size / 2,
             marginTop: -size / 2,
-            transform: [{ scale: ringScale }],
-            opacity: ringOpacity,
+            transform: [{ scale: ringOuterScale }],
+            opacity: ringOuterOpacity,
           },
         ]}
       />
+
+      {/* Phase 2: inner shockwave */}
+      <Animated.View
+        style={[
+          styles.ringInner,
+          {
+            width: size,
+            height: size,
+            borderRadius: size / 2,
+            marginLeft: -size / 2,
+            marginTop: -size / 2,
+            transform: [{ scale: ringInnerScale }],
+            opacity: ringInnerOpacity,
+          },
+        ]}
+      />
+
+      {/* Phase 1: anticipation flash */}
+      <Animated.View
+        style={[
+          styles.flash,
+          {
+            transform: [{ scale: flashScale }],
+            opacity: flashOpacity,
+          },
+        ]}
+      />
+
+      {/* Phase 3: tiered particles */}
       {particlesRef.map((p, i) => (
-        <Particle key={i} p={p} anim={particleAnim} />
+        <Particle key={i} p={p} anim={t} />
       ))}
     </View>
   );
@@ -180,17 +358,36 @@ const styles = StyleSheet.create({
   },
   glow: {
     position: 'absolute',
-    backgroundColor: '#67ACE9',
-    shadowColor: '#67ACE9',
+    backgroundColor: COLOR_LIGHT_BLUE,
+    shadowColor: COLOR_LIGHT_BLUE,
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.95,
-    shadowRadius: 35,
+    shadowRadius: 45,
   },
-  ring: {
+  ringOuter: {
     position: 'absolute',
-    borderWidth: 2,
-    borderColor: '#FFFFFF',
+    borderWidth: 1.5,
+    borderColor: COLOR_LIGHT_BLUE,
     backgroundColor: 'transparent',
+  },
+  ringInner: {
+    position: 'absolute',
+    borderWidth: 3,
+    borderColor: COLOR_WHITE,
+    backgroundColor: 'transparent',
+  },
+  flash: {
+    position: 'absolute',
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    marginLeft: -18,
+    marginTop: -18,
+    backgroundColor: COLOR_WHITE,
+    shadowColor: COLOR_WHITE,
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 1,
+    shadowRadius: 20,
   },
   particle: {
     position: 'absolute',

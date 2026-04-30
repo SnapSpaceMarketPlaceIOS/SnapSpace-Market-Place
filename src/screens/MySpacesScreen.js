@@ -31,6 +31,8 @@ import AutoImage from '../components/AutoImage';
 import LensLoader from '../components/LensLoader';
 import { useAuth } from '../context/AuthContext';
 import { getUserDesigns, deleteUserDesign } from '../services/supabase';
+import { buildShareMessage } from '../services/shareService';
+import * as FileSystem from 'expo-file-system/legacy';
 import { hapticTap } from '../utils/haptics';
 import { colors } from '../constants/colors';
 import { colors as C } from '../constants/theme';
@@ -119,8 +121,27 @@ function SpaceDetailModal({ design, visible, onClose, onDelete, navigation }) {
   const [deleting, setDeleting] = useState(false);
 
   const handleShare = async () => {
+    // Build 122 — share the actual design image with a branded caption.
+    // Previously this only shared text, no image. Now we download the
+    // saved design image to local cache and attach it to the share.
+    const msg = buildShareMessage();
+    const imageUrl = design?.image_url;
     try {
-      await Share.share({ message: `Check out my AI room wish on HomeGenie: "${design?.prompt}"` });
+      if (imageUrl) {
+        try {
+          const fileUri = FileSystem.cacheDirectory + 'homegenie_share_' + Date.now() + '.jpg';
+          const { status } = await FileSystem.downloadAsync(imageUrl, fileUri);
+          if (status === 200) {
+            await Share.share({ message: msg, url: fileUri });
+          } else {
+            throw new Error('Download status ' + status);
+          }
+        } catch {
+          await Share.share({ message: msg, url: imageUrl });
+        }
+      } else {
+        await Share.share({ message: msg });
+      }
     } catch (e) {}
   };
 

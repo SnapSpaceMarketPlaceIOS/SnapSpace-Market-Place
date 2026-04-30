@@ -37,6 +37,57 @@ import { supabase } from './supabase';
 // landing page is live, otherwise recipients tap a link that 404s.
 const WEB_DOMAIN = (process.env.EXPO_PUBLIC_WEB_DOMAIN || '').replace(/\/+$/, '');
 
+// Build 122 — share-message branding.
+//
+// EXPO_PUBLIC_APP_STORE_ID resolves to the numeric App Store ID for the
+// Apple-approved "Home Genie - AI Design & Shop" listing (6762400062).
+// Same convention used by storeReview.js, ProfileScreen.js, PaywallScreen.js.
+//
+// We hard-code the same ID as the BAKE-IN FALLBACK below. That way, if a
+// future build is somehow assembled without the .env present (e.g. fresh
+// worktree where .env wasn't copied), share messages still ship a real,
+// clickable App Store link instead of a dead-end URL. The env var still
+// wins when set — useful if the listing ID ever changes (e.g. regional
+// store, app rename) without needing a code release.
+const APP_STORE_ID_FALLBACK = '6762400062';
+const APP_STORE_ID = process.env.EXPO_PUBLIC_APP_STORE_ID || APP_STORE_ID_FALLBACK;
+const HAS_APP_STORE_ID = /^\d+$/.test(APP_STORE_ID);
+
+/**
+ * The download/CTA URL embedded in every share message. Resolves in this
+ * priority order:
+ *   1. Real App Store listing via env var (preferred — overridable via .env)
+ *   2. Bake-in App Store listing (fallback — guarantees shares always work)
+ *   3. Marketing web domain (only if for some reason both above fail validation)
+ *
+ * In practice option 1 or 2 always returns a real apps.apple.com URL, so
+ * the recipient always gets a clickable App Store link. Tested as of
+ * 2026-04-29 — Home Genie is live on the App Store at this ID.
+ */
+export const SHARE_APP_URL = HAS_APP_STORE_ID
+  ? `https://apps.apple.com/app/id${APP_STORE_ID}`
+  : (WEB_DOMAIN ? `https://${WEB_DOMAIN}` : `https://apps.apple.com/app/id${APP_STORE_ID_FALLBACK}`);
+
+/**
+ * Build the standard branded share-message body.
+ *
+ * Designed to look great as iMessage caption + as social caption. Two short
+ * lines, brand-first, action-second. Never includes the prompt text — that
+ * was Build 121's reported anti-pattern (caption became a wall of AI-speak).
+ *
+ * Output:
+ *   HomeGenie 🪄 Your dream room, one wish away.
+ *
+ *   Get the app → https://apps.apple.com/app/id...
+ *
+ * @returns {string} share-ready caption
+ */
+export function buildShareMessage() {
+  const tagline = 'HomeGenie 🪄 Your dream room, one wish away.';
+  if (!SHARE_APP_URL) return tagline;
+  return `${tagline}\n\nGet the app → ${SHARE_APP_URL}`;
+}
+
 /**
  * Create a shareable wish row + return a branded landing URL.
  *

@@ -1,6 +1,7 @@
 import React, { useRef, useCallback, useEffect } from 'react';
-import { View, Text, StyleSheet, Animated, Pressable, LogBox } from 'react-native';
+import { View, Text, StyleSheet, Animated, Pressable, LogBox, AppState } from 'react-native';
 import { lockPortrait } from './src/utils/orientation';
+import { supabase } from './src/services/supabase';
 import { hapticTap, hapticSelect } from './src/utils/haptics';
 import ErrorBoundary from './src/components/ErrorBoundary';
 import { useFonts } from 'expo-font';
@@ -528,6 +529,59 @@ export default function App() {
   // no-op and the app still boots. Once rebuilt, it activates automatically.
   useEffect(() => {
     lockPortrait();
+  }, []);
+
+  // Build 122 — Supabase auth-refresh AppState listener.
+  //
+  // Bug fixed: users reported "auth wall on every revisit, only force-quit
+  // works." Root cause was the missing AppState wiring documented in
+  // Supabase's official RN guide:
+  //   https://supabase.com/docs/reference/javascript/auth-startautorefresh
+  //
+  // Without this, the access token's auto-refresh interval timer is paused
+  // by iOS while the app is backgrounded. When the user returns:
+  //   - If the token expired during the background period, the next auth-
+  //     dependent call uses a stale token → either hangs on cold network or
+  //     fails with 401, which fires onAuthStateChange with a null session,
+  //     which sets user=null in AuthContext, which kicks the user to the
+  //     auth wall on the next gated-tab tap.
+  //   - Force-quit + relaunch resets the JS runtime and re-runs bootstrap
+  //     with a fresh getSession() that fetches a new token successfully —
+  //     hence the user's observation that "only relaunch fixes it."
+  //
+  // Fix: tell Supabase explicitly when to start/stop the refresh timer
+  // based on app foreground/background state. This is purely additive —
+  // it does NOT change the bootstrap flow, the token storage adapter, the
+  // lock disable, the `bootstrapSupersededRef` guard, or any user-facing
+  // auth behavior. The only thing that changes is that token refresh
+  // continues working reliably across foreground/background transitions.
+  //
+  // We also kick startAutoRefresh() once on mount so cold-launch benefits
+  // immediately (AppState 'change' events fire on TRANSITIONS, not on
+  // initial mount when state is already 'active').
+  useEffect(() => {
+    // Kick off immediately for cold launches
+    supabase.auth.startAutoRefresh();
+
+    const subscription = AppState.addEventListener('change', (state) => {
+      if (state === 'active') {
+        supabase.auth.startAutoRefresh();
+      } else if (state === 'background') {
+        // Only stop on actual 'background' (not 'inactive'). iOS fires
+        // 'inactive' for trivial events like Notification Center pulls,
+        // Control Center, incoming-call banners, multitasking peek —
+        // stopping/restarting the refresh timer for those is needless
+        // churn. Matches Supabase's official RN AppState recipe.
+        supabase.auth.stopAutoRefresh();
+      }
+    });
+
+    return () => {
+      subscription.remove();
+      // Stop the refresh timer on unmount (only fires on app teardown,
+      // since this useEffect lives on the root App component).
+      supabase.auth.stopAutoRefresh();
+    };
   }, []);
 
   // Build 89 / 🚩1: dropped the `if (!fontsLoaded) return loading-screen`

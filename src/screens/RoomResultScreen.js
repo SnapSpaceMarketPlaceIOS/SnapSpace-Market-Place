@@ -29,6 +29,7 @@ import { useSubscription } from '../context/SubscriptionContext';
 import { getProductsForPrompt, getRecommendedProducts } from '../services/affiliateProducts';
 import { parseDesignPrompt } from '../utils/promptParser';
 import { saveUserDesign, updateDesignVisibility, updateDesignProducts } from '../services/supabase';
+import { buildShareMessage } from '../services/shareService';
 import * as FileSystem from 'expo-file-system/legacy';
 import * as ImageManipulator from 'expo-image-manipulator';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -1019,9 +1020,35 @@ export default function RoomResultScreen({ route, navigation }) {
 
   const handleShare = async () => {
     setShareActive(true);
+    // Build 122 share rewrite — three goals:
+    //   1. Brand-first caption. Drop the wall-of-text prompt the recipient
+    //      never reads. Replace with HomeGenie name + tagline + App Store URL.
+    //   2. Download the AI render to local cache before sharing — FAL CDN
+    //      URLs are short-lived (TTL'd), so the recipient's iMessage thread
+    //      would lose the image days/weeks later. Local file → image lives
+    //      forever in the recipient's thread.
+    //   3. Resilient fallback chain: if download fails (transient network),
+    //      we still share the FAL URL with the new branded caption — better
+    //      than no share at all.
+    const msg = buildShareMessage();
     try {
-      const msg = `Check out my AI room wish on HomeGenie!\n\n"${prompt}"`;
-      await Share.share(resultUri ? { message: msg, url: resultUri } : { message: msg });
+      if (resultUri) {
+        try {
+          // Try to download to local cache first for permanence
+          const fileUri = FileSystem.cacheDirectory + 'homegenie_share_' + Date.now() + '.jpg';
+          const { status } = await FileSystem.downloadAsync(resultUri, fileUri);
+          if (status === 200) {
+            await Share.share({ message: msg, url: fileUri });
+          } else {
+            throw new Error('Download status ' + status);
+          }
+        } catch {
+          // Fallback: share the remote URL directly with the same caption
+          await Share.share({ message: msg, url: resultUri });
+        }
+      } else {
+        await Share.share({ message: msg });
+      }
     } catch {}
   };
 
