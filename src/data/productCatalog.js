@@ -15,8 +15,8 @@ export const PRODUCT_CATALOG = [
     price: 119.75, priceDisplay: '$119.75',
     salePrice: 101.79, salePriceDisplay: '$101.79',
     compareAtPrice: 119.75, compareAtPriceDisplay: '$119.75',
-    imageUrl: 'https://m.media-amazon.com/images/I/81-a1cUJElL._AC_UL640_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/41ZGRunlOjL._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/41ZGRunlOjL._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/81-a1cUJElL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41ZGRunlOjL._AC_SL1500_.jpg',
@@ -104,7 +104,7 @@ export const PRODUCT_CATALOG = [
     brand: 'Honyee',
     price: 139.99, priceDisplay: '$139.99',
     imageUrl: 'https://m.media-amazon.com/images/I/41f15-UPR0L._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/41SfhdhPmnL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/318EsvxauEL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/51CLX01QPIL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41SfhdhPmnL._AC_SL1500_.jpg',
@@ -151,8 +151,8 @@ export const PRODUCT_CATALOG = [
     name: 'RUSTYER Oval Fluted Coffee Table, Farmhouse Boho Mid Century Modern, Walnut',
     brand: 'RUSTYER',
     price: 129.99, priceDisplay: '$129.99',
-    imageUrl: 'https://m.media-amazon.com/images/I/41TJfxE1z1L._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/31-C87ucxnL._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/41BoyJVg5QL._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/41TJfxE1z1L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/31-C87ucxnL._AC_SL1500_.jpg',
@@ -224,8 +224,8 @@ export const PRODUCT_CATALOG = [
     price: 179.99, priceDisplay: '$179.99',
     salePrice: 152.00, salePriceDisplay: '$152.00',
     compareAtPrice: 179.99, compareAtPriceDisplay: '$179.99',
-    imageUrl: 'https://m.media-amazon.com/images/I/51GvDKhS8tL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/41dNgm27ZQL._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/41dNgm27ZQL._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/51GvDKhS8tL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41dNgm27ZQL._AC_SL1500_.jpg',
@@ -274,7 +274,7 @@ export const PRODUCT_CATALOG = [
     brand: 'Ivoros',
     price: 199.99, priceDisplay: '$199.99',
     imageUrl: 'https://m.media-amazon.com/images/I/513h4OSxl0L._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/41vmoUR1udL._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/518aIgqFXoL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41vmoUR1udL._AC_SL1500_.jpg',
@@ -336,7 +336,7 @@ export const PRODUCT_CATALOG = [
     brand: 'YOPENG',
     price: 879.00, priceDisplay: '$879.00',
     imageUrl: 'https://m.media-amazon.com/images/I/41LXeu0rW9L._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/212lR0SGw5L._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/41LXeu0rW9L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/212lR0SGw5L._AC_SL1500_.jpg',
@@ -424,7 +424,7 @@ export const PRODUCT_CATALOG = [
     salePrice: 1608.00, salePriceDisplay: '$1,608.00',
     compareAtPrice: 1797.00, compareAtPriceDisplay: '$1,797.00',
     imageUrl: 'https://m.media-amazon.com/images/I/41d-z4PNZTL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/311PyizmGBL._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/41d-z4PNZTL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/311PyizmGBL._AC_SL1500_.jpg',
@@ -490,8 +490,8 @@ export const PRODUCT_CATALOG = [
     name: 'KEIKI 103" Boucle Half Moon Curved Sectional Sofa with 4 Throw Pillows, White',
     brand: 'KEIKI',
     price: 1299.99, priceDisplay: '$1,299.99',
-    imageUrl: 'https://m.media-amazon.com/images/I/41inaNox5xL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/41VsDxJCysL._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/21Kt6jCc1gL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/21Kt6jCc1gL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/41inaNox5xL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41VsDxJCysL._AC_SL1500_.jpg',
@@ -586,7 +586,7 @@ export const PRODUCT_CATALOG = [
     salePrice: 265.00, salePriceDisplay: '$265.00',
     compareAtPrice: 278.99, compareAtPriceDisplay: '$278.99',
     imageUrl: 'https://m.media-amazon.com/images/I/518hjP4wuEL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/41mXifcpWLL._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/518hjP4wuEL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41mXifcpWLL._AC_SL1500_.jpg',
@@ -700,7 +700,7 @@ export const PRODUCT_CATALOG = [
     salePrice: 1009.00, salePriceDisplay: '$1,009.00',
     compareAtPrice: 1063.01, compareAtPriceDisplay: '$1,063.01',
     imageUrl: 'https://m.media-amazon.com/images/I/51-jdxnjraL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/31wC29JcACL._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/51-jdxnjraL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/31wC29JcACL._AC_SL1500_.jpg',
@@ -824,7 +824,7 @@ export const PRODUCT_CATALOG = [
     brand: 'JACH',
     price: 1389.99, priceDisplay: '$1,389.99',
     imageUrl: 'https://m.media-amazon.com/images/I/51nuMMn8CvL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/41w3HQvljOL._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/51nuMMn8CvL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41w3HQvljOL._AC_SL1500_.jpg',
@@ -911,8 +911,8 @@ export const PRODUCT_CATALOG = [
     name: 'YOPENG 135.4" Luxury Curved Boucle Sectional Sofa, Camel',
     brand: 'YOPENG',
     price: 1598.00, priceDisplay: '$1,598.00',
-    imageUrl: 'https://m.media-amazon.com/images/I/61B693xD2AL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/313fvgpQ8kL._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/51SQkE9VEYL._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/51SQkE9VEYL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/313fvgpQ8kL._AC_SL1500_.jpg',
@@ -998,8 +998,8 @@ export const PRODUCT_CATALOG = [
     name: 'KEIKI 126" Curved Oversized Boucle Sectional Sofa with Love Heart Design, White',
     brand: 'KEIKI',
     price: 1399.00, priceDisplay: '$1,399.00',
-    imageUrl: 'https://m.media-amazon.com/images/I/51DElNtqcML._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/41Hfpl9x0hL._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/51EHoUoawbL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51EEAg2EvQL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/51DElNtqcML._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41Hfpl9x0hL._AC_SL1500_.jpg',
@@ -1102,8 +1102,8 @@ export const PRODUCT_CATALOG = [
     price: 108.99, priceDisplay: '$108.99',
     salePrice: 94.04, salePriceDisplay: '$94.04',
     compareAtPrice: 108.99, compareAtPriceDisplay: '$108.99',
-    imageUrl: 'https://m.media-amazon.com/images/I/41atb-T6TkL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/51PXVccCKNL._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/41mez+UGarL._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/41atb-T6TkL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51PXVccCKNL._AC_SL1500_.jpg',
@@ -1212,7 +1212,7 @@ export const PRODUCT_CATALOG = [
     name: 'LUXE WEAVERS Geometric Swirl Cream 5x7 Area Rug, High Low Modern',
     brand: 'LUXE WEAVERS',
     price: 99.00, priceDisplay: '$99.00',
-    imageUrl: 'https://m.media-amazon.com/images/I/41gXxm7GjlL._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/41bg9HNZjXL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/41gXxm7GjlL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/4142jrtZE9L._AC_SL1500_.jpg',
@@ -1361,8 +1361,8 @@ export const PRODUCT_CATALOG = [
     price: 114.99, priceDisplay: '$114.99',
     salePrice: 109.00, salePriceDisplay: '$109.00',
     compareAtPrice: 114.99, compareAtPriceDisplay: '$114.99',
-    imageUrl: 'https://m.media-amazon.com/images/I/41JvugK4UfL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/51sGYm8zX7L._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/51V2RrjFySL._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/41JvugK4UfL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51sGYm8zX7L._AC_SL1500_.jpg',
@@ -1614,8 +1614,8 @@ export const PRODUCT_CATALOG = [
     name: 'CAMILSON Modern Swirl Luxury Micro Loop Area Rug 9x12, White',
     brand: 'CAMILSON',
     price: 259.00, priceDisplay: '$259.00',
-    imageUrl: 'https://m.media-amazon.com/images/I/51xLSYWerbL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/41AdW+l9MAL._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/51eHwqawVWL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51eHwqawVWL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/51xLSYWerbL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41AdW+l9MAL._AC_SL1500_.jpg',
@@ -1711,7 +1711,7 @@ export const PRODUCT_CATALOG = [
     salePrice: 105.00, salePriceDisplay: '$105.00',
     compareAtPrice: 129.99, compareAtPriceDisplay: '$129.99',
     imageUrl: 'https://m.media-amazon.com/images/I/51ly4BYo67L._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/51Xz53xP87L._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51ly4BYo67L._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/51ly4BYo67L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51Xz53xP87L._AC_SL1500_.jpg',
@@ -1808,7 +1808,7 @@ export const PRODUCT_CATALOG = [
     salePrice: 209.00, salePriceDisplay: '$209.00',
     compareAtPrice: 245.99, compareAtPriceDisplay: '$245.99',
     imageUrl: 'https://m.media-amazon.com/images/I/41zhqLpZl0L._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/51LyXaQ5z6L._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/41zhqLpZl0L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51LyXaQ5z6L._AC_SL1500_.jpg',
@@ -1955,8 +1955,8 @@ export const PRODUCT_CATALOG = [
     price: 149.99, priceDisplay: '$149.99',
     salePrice: 134.00, salePriceDisplay: '$134.00',
     compareAtPrice: 149.99, compareAtPriceDisplay: '$149.99',
-    imageUrl: 'https://m.media-amazon.com/images/I/41zw1duqxRL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/41ZTD1mwWzL._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/41vJKFbTyQL._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/41cV5cKSSkL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41ZTD1mwWzL._AC_SL1500_.jpg',
@@ -2519,7 +2519,7 @@ export const PRODUCT_CATALOG = [
     salePrice: 119.99, salePriceDisplay: '$119.99',
     compareAtPrice: 149.99, compareAtPriceDisplay: '$149.99',
     imageUrl: 'https://m.media-amazon.com/images/I/51FLK7pbW8L._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/41MalCsG7OL._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/51FLK7pbW8L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41MalCsG7OL._AC_SL1500_.jpg',
@@ -2626,7 +2626,7 @@ export const PRODUCT_CATALOG = [
     salePrice: 149.97, salePriceDisplay: '$149.97',
     compareAtPrice: 199.99, compareAtPriceDisplay: '$199.99',
     imageUrl: 'https://m.media-amazon.com/images/I/41EUfxYdFIL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/411pWbfRG3L._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/41EUfxYdFIL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/41EUfxYdFIL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/411pWbfRG3L._AC_SL1500_.jpg',
@@ -2717,7 +2717,7 @@ export const PRODUCT_CATALOG = [
     salePrice: 161.49, salePriceDisplay: '$161.49',
     compareAtPrice: 189.99, compareAtPriceDisplay: '$189.99',
     imageUrl: 'https://m.media-amazon.com/images/I/41UWIV++NuL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/41eYqqhEdwL._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/41UWIV++NuL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41eYqqhEdwL._AC_SL1500_.jpg',
@@ -2798,7 +2798,7 @@ export const PRODUCT_CATALOG = [
     salePrice: 93.49, salePriceDisplay: '$93.49',
     compareAtPrice: 109.99, compareAtPriceDisplay: '$109.99',
     imageUrl: 'https://m.media-amazon.com/images/I/414pHZUDnEL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/412WDgjz2vL._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/414pHZUDnEL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/412WDgjz2vL._AC_SL1500_.jpg',
@@ -2873,7 +2873,7 @@ export const PRODUCT_CATALOG = [
     salePrice: 288.98, salePriceDisplay: '$288.98',
     compareAtPrice: 339.98, compareAtPriceDisplay: '$339.98',
     imageUrl: 'https://m.media-amazon.com/images/I/51HigcT8dtL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/41KqPAoneqL._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/41idGumCZ4L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41KqPAoneqL._AC_SL1500_.jpg',
@@ -2961,8 +2961,8 @@ export const PRODUCT_CATALOG = [
     brand: 'Bonzy Home',
     price: 275.49,
     priceDisplay: '$275.49',
-    imageUrl: 'https://m.media-amazon.com/images/I/81rj2cvh3JL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/61wqYdLZ0yL._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/41uswN17yqL._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/81rj2cvh3JL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/61wqYdLZ0yL._AC_SL1500_.jpg',
@@ -3031,7 +3031,7 @@ export const PRODUCT_CATALOG = [
     salePriceDisplay: '$1,529.15',
     compareAtPrice: 1799.00,
     imageUrl: 'https://m.media-amazon.com/images/I/810YSn5zxHL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/41w-HnCA2hL._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/71hnJZJrrAL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41w-HnCA2hL._AC_SL1500_.jpg',
@@ -3098,8 +3098,8 @@ export const PRODUCT_CATALOG = [
     salePrice: 1063.24,
     salePriceDisplay: '$1,063.24',
     compareAtPrice: 1289.99,
-    imageUrl: 'https://m.media-amazon.com/images/I/81U6yUUsOXL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/41yA1CmUziL._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/21n2DY+ruEL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/21n2DY+ruEL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81U6yUUsOXL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41yA1CmUziL._AC_SL1500_.jpg',
@@ -3165,8 +3165,8 @@ export const PRODUCT_CATALOG = [
     salePrice: 725.87,
     salePriceDisplay: '$725.87',
     compareAtPrice: 897.96,
-    imageUrl: 'https://m.media-amazon.com/images/I/71HuA4RYrzL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/31WyBg8SJsL._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/41WtUupIIPL._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/71HuA4RYrzL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/31WyBg8SJsL._AC_SL1500_.jpg',
@@ -3228,7 +3228,7 @@ export const PRODUCT_CATALOG = [
     price: 755.98,
     priceDisplay: '$755.98',
     imageUrl: 'https://m.media-amazon.com/images/I/91ktb2Ru8SL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/412MQhkyTbL._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/91ktb2Ru8SL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/412MQhkyTbL._AC_SL1500_.jpg',
@@ -3291,8 +3291,8 @@ export const PRODUCT_CATALOG = [
     brand: 'KEIKI',
     price: 1964.82,
     priceDisplay: '$1,964.82',
-    imageUrl: 'https://m.media-amazon.com/images/I/81Jb-5oxMlL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/41gmt1jysFL._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/41bVgo1ImUL._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/81Jb-5oxMlL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41gmt1jysFL._AC_SL1500_.jpg',
@@ -3366,7 +3366,7 @@ export const PRODUCT_CATALOG = [
     reviewCount: 5,
     description: '102" curved bohemian sectional with artisan woven accents in primary color blocks on a serene beige base. Premium 35D high-density foam (vs standard 22D) for superior support. Boneless floor couch — no assembly, unbox and expand in 24–48 hrs. Includes 2 boho throw pillows.',
     tags: ['sofa', 'bohemian', 'curved', 'chenille', 'boneless', 'floor-couch', 'no-assembly', 'minimalist', '4-seater', 'beige', 'boho', 'living-room'],
-    imageUrl: 'https://m.media-amazon.com/images/I/91rxrE3ckmL._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/511OXpEjZEL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/91rxrE3ckmL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/511OXpEjZEL._AC_SL1500_.jpg',
@@ -3421,8 +3421,8 @@ export const PRODUCT_CATALOG = [
     reviewCount: 21,
     description: '126" oversized curved sectional with a signature love heart motif across the back and rolled arms. 5-seater with 25.19" deep seats, 2 decorative pillows included. Delivered in 2 pieces — no assembly required. Available in 7 colors and multiple sizes.',
     tags: ['sofa', 'sectional', 'curved', 'love-heart', 'boucle', 'glam', 'art-deco', 'maximalist', '5-seater', 'black', 'oversized', 'no-assembly'],
-    imageUrl: 'https://m.media-amazon.com/images/I/81DUI266dUL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/41Hfpl9x0hL._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/41-NE4TaVEL._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/81DUI266dUL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41Hfpl9x0hL._AC_SL1500_.jpg',
@@ -3615,7 +3615,7 @@ export const PRODUCT_CATALOG = [
     description: '3-piece boucle sofa set: 3-seater sofa + 2 armless chairs. Breathable, skin-friendly boucle fabric — more comfortable than sherpa for extended use. Wooden frame, high-resilience foam cushions, lumbar pillow included. Pet-friendly.',
     tags: ['sofa', 'sofa-set', 'boucle', '3-piece', 'pet-friendly', 'minimalist', 'modern', 'living-room', 'beige', 'armless-chairs', 'french-style'],
     imageUrl: 'https://m.media-amazon.com/images/I/41gpZaKn9yL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/51ud2p-K79L._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/814+gvO86dL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51ud2p-K79L._AC_SL1500_.jpg',
@@ -3711,7 +3711,7 @@ export const PRODUCT_CATALOG = [
     reviewCount: 2,
     description: '105.91" L-shaped modular cloud sofa with boneless foam structure and premium sherpa boucle upholstery. Zero assembly — unbox and allow 72 hrs to expand. Fully reconfigurable into loveseat, chaise, L-shape, or standalone seating.',
     tags: ['sofa', 'sectional', 'modular', 'boucle', 'sherpa', 'cloud-couch', 'boneless', 'l-shaped', 'no-assembly', 'white', 'curved', 'living-room'],
-    imageUrl: 'https://m.media-amazon.com/images/I/71OUIYUQByL._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/417oPsfht0L._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71OUIYUQByL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/417oPsfht0L._AC_SL1500_.jpg',
@@ -3807,7 +3807,7 @@ export const PRODUCT_CATALOG = [
     description: '82.7" minimalist curved sofa upholstered in soft boucle fabric with memory foam deep seat cushions. Sturdy metal legs and clean-line silhouette. Available in Beige, Green, and Warm Orange. Suits living rooms, bedrooms, and home offices.',
     tags: ['sofa', 'boucle', 'curved', 'minimalist', 'memory-foam', 'deep-seat', 'metal-legs', 'modern', '3-seater', 'beige', 'living-room'],
     imageUrl: 'https://m.media-amazon.com/images/I/71jaR-WfJYL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/212lR0SGw5L._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/71jaR-WfJYL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/212lR0SGw5L._AC_SL1500_.jpg',
@@ -3999,8 +3999,8 @@ export const PRODUCT_CATALOG = [
     reviewCount: 0,
     description: '5-seater corner sectional sofa in smooth faux leather with deep button-tufted backrests and slim metal legs. Modular design connects securely for flexible room arrangement. Wide seats and deep profile for maximum lounge comfort.',
     tags: ['sofa', 'sectional', 'faux-leather', 'mid-century', 'chesterfield', 'tufted', '5-seater', 'modular', 'metal-legs', 'living-room', 'camel'],
-    imageUrl: 'https://m.media-amazon.com/images/I/81yfP1rYPCL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/41aX3Y3BejL._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/51959lw-65L._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/81yfP1rYPCL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41aX3Y3BejL._AC_SL1500_.jpg',
@@ -4075,8 +4075,8 @@ export const PRODUCT_CATALOG = [
     reviewCount: 32,
     description: '80" genuine top-grain leather 3-seater sofa with intricate tufting and mid-century modern styling. Solid wood frame, sinuous spring system, and high-density foam + cotton cushions. Easy 20-minute setup.',
     tags: ['sofa', 'genuine-leather', 'mid-century', '3-seater', 'tufted', 'living-room', 'office', 'brown', 'wood-legs', 'couch'],
-    imageUrl: 'https://m.media-amazon.com/images/I/81CAfgZsDkL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/517O0cESZyL._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/41J5Ox7bRmL._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/81CAfgZsDkL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/517O0cESZyL._AC_SL1500_.jpg',
@@ -4297,8 +4297,8 @@ export const PRODUCT_CATALOG = [
     salePrice: 460.27,
     salePriceDisplay: '$460.27',
     compareAtPrice: 541.49,
-    imageUrl: 'https://m.media-amazon.com/images/I/81hTwFDlbnL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/71drSySNm-L._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/81kScgkBSXL._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/81hTwFDlbnL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/71drSySNm-L._AC_SL1500_.jpg',
@@ -4363,7 +4363,7 @@ export const PRODUCT_CATALOG = [
     salePrice: 1274.15,
     salePriceDisplay: '$1,274.15',
     compareAtPrice: 1499.00,
-    imageUrl: 'https://m.media-amazon.com/images/I/71XhFBHWGuL._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/41tSQL4wC9L._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71XhFBHWGuL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41tSQL4wC9L._AC_SL1500_.jpg',
@@ -4428,7 +4428,7 @@ export const PRODUCT_CATALOG = [
     salePriceDisplay: '$411.05',
     compareAtPrice: 483.59,
     imageUrl: 'https://m.media-amazon.com/images/I/61Ny2V6-iWL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/41cVqTWisEL._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/61Ny2V6-iWL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41cVqTWisEL._AC_SL1500_.jpg',
@@ -4493,7 +4493,7 @@ export const PRODUCT_CATALOG = [
     salePriceDisplay: '$152.99',
     compareAtPrice: 179.99,
     imageUrl: 'https://m.media-amazon.com/images/I/714xGcYJ3pL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/41WUCVT3C-L._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/714xGcYJ3pL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41WUCVT3C-L._AC_SL1500_.jpg',
@@ -4558,7 +4558,7 @@ export const PRODUCT_CATALOG = [
     salePriceDisplay: '$339.99',
     compareAtPrice: 399.99,
     imageUrl: 'https://m.media-amazon.com/images/I/51YTZ4JbUbL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/41-8iUiMakL._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/81xisi2mTrL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41-8iUiMakL._AC_SL1500_.jpg',
@@ -4622,7 +4622,7 @@ export const PRODUCT_CATALOG = [
     price: 999.99,
     priceDisplay: '$999.99',
     imageUrl: 'https://m.media-amazon.com/images/I/41Wz3+upqaL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/31iGgsxOz1L._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/91OzIjw5b7L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/31iGgsxOz1L._AC_SL1500_.jpg',
@@ -4685,7 +4685,7 @@ export const PRODUCT_CATALOG = [
     price: 214.99,
     priceDisplay: '$214.99',
     imageUrl: 'https://m.media-amazon.com/images/I/51UhqjeB7LL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/51MbaS13NJL._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/71ACVWqJ8xL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51MbaS13NJL._AC_SL1500_.jpg',
@@ -4811,7 +4811,7 @@ export const PRODUCT_CATALOG = [
     salePrice: 199.99,
     salePriceDisplay: '$199.99',
     compareAtPrice: 209.99,
-    imageUrl: 'https://m.media-amazon.com/images/I/7140EQfeqIL._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/513ac22sovL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/7140EQfeqIL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41coAF4-TAL._AC_SL1500_.jpg',
@@ -4938,8 +4938,8 @@ export const PRODUCT_CATALOG = [
     salePrice: 96.99,
     salePriceDisplay: '$96.99',
     compareAtPrice: 109.99,
-    imageUrl: 'https://m.media-amazon.com/images/I/71ielDQgBaL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/31yh4i1JEGL._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/31yh4i1JEGL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/21tPg2CQ8sL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71ielDQgBaL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/31yh4i1JEGL._AC_SL1500_.jpg',
@@ -5005,7 +5005,7 @@ export const PRODUCT_CATALOG = [
     salePriceDisplay: null,
     compareAtPrice: null,
     imageUrl: 'https://m.media-amazon.com/images/I/51O8-ld7XCL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/41f8aLN9WFL._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/51QBC4H3BSL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41f8aLN9WFL._AC_SL1500_.jpg',
@@ -5078,7 +5078,7 @@ export const PRODUCT_CATALOG = [
     reviewCount: 164,
     description: 'Rustic solid cedar wood coffee table with angled metal U-shaped legs. Natural wood grain character adds warmth to farmhouse and industrial living rooms. Holds up to 300 lbs. Assembles in under 8 minutes.',
     tags: ['coffee-table', 'rustic', 'solid-wood', 'industrial', 'farmhouse', 'metal-legs', 'rectangle', 'natural-wood', 'living-room', 'minimalist'],
-    imageUrl: 'https://m.media-amazon.com/images/I/81KyMXJRYbL._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/514kqMPdmdL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81KyMXJRYbL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51+8sEuPNtL._AC_SL1500_.jpg',
@@ -5153,8 +5153,8 @@ export const PRODUCT_CATALOG = [
     reviewCount: 32,
     description: 'Luxury 49.2" oval coffee table with scratch-resistant faux marble top and gray metal base. Elegant centerpiece for modern and glam living rooms. Compact enough for apartments and condos. Quick assembly.',
     tags: ['coffee-table', 'oval', 'faux-marble', 'metal-base', 'modern', 'luxury', 'glam', 'art-deco', 'scratch-resistant', 'living-room', 'contemporary'],
-    imageUrl: 'https://m.media-amazon.com/images/I/81QvRec-KUL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/31fX974M7QL._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/31fX974M7QL._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/81QvRec-KUL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/31fX974M7QL._AC_SL1500_.jpg',
@@ -5344,7 +5344,7 @@ export const PRODUCT_CATALOG = [
     reviewCount: 5,
     description: 'Premium fiberglass round coffee table with a realistic faux marble stone finish. Arrives fully assembled — no tools required. Waterproof and scratch-resistant surface. Non-slip foot pads and rounded edges for safety.',
     tags: ['coffee-table', 'round', 'faux-marble', 'minimalist', 'no-assembly', 'waterproof', 'scratch-resistant', 'living-room', 'bedroom', 'office', 'contemporary'],
-    imageUrl: 'https://m.media-amazon.com/images/I/51jjXwW-oJL._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/41yQz1xcpUL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71LGcJuZawL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51jjXwW-oJL._AC_SL1500_.jpg',
@@ -5514,8 +5514,8 @@ export const PRODUCT_CATALOG = [
     reviewCount: 0,
     description: '47.2" fully transparent tempered glass coffee table with sturdy metal legs. 0.4" thick tempered glass is scratch-resistant and durable. Anti-slip pads protect floors. Makes small rooms feel more open and refined.',
     tags: ['coffee-table', 'glass', 'tempered-glass', 'minimalist', 'metal-legs', 'transparent', 'modern', 'living-room', 'office', 'apartment', 'clear'],
-    imageUrl: 'https://m.media-amazon.com/images/I/A1RjNSmX8JL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/21ACdBRiSVL._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/51uQJa+goBL._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/A1RjNSmX8JL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/21ACdBRiSVL._AC_SL1500_.jpg',
@@ -5568,8 +5568,8 @@ export const PRODUCT_CATALOG = [
     reviewCount: 22,
     description: '46" round 2-tier coffee table with a striking U-shaped frame and warm oak finish. Upper tabletop for display, circular base for open storage. Dual-layer bracket for extra stability. Easy 5-panel assembly with all tools included.',
     tags: ['coffee-table', 'round', '2-tier', 'u-shaped', 'storage', 'oak', 'farmhouse', 'modern', 'living-room', 'low-profile', 'accent'],
-    imageUrl: 'https://m.media-amazon.com/images/I/91U3cro6wyL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/41ACbNNs76L._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/41ACbNNs76L._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/91U3cro6wyL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41ACbNNs76L._AC_SL1500_.jpg',
@@ -5754,7 +5754,7 @@ export const PRODUCT_CATALOG = [
     salePrice: null,
     salePriceDisplay: null,
     compareAtPrice: null,
-    imageUrl: 'https://m.media-amazon.com/images/I/51JUwXr17BL._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/51K1S-k-JdL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81z52pk+qtL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51JUwXr17BL._AC_SL1500_.jpg',
@@ -5823,7 +5823,7 @@ export const PRODUCT_CATALOG = [
     salePriceDisplay: null,
     compareAtPrice: null,
     imageUrl: 'https://m.media-amazon.com/images/I/81AS0o2ARVL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/51vbTPVz+XL._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/81AS0o2ARVL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51vbTPVz+XL._AC_SL1500_.jpg',
@@ -5894,7 +5894,7 @@ export const PRODUCT_CATALOG = [
     salePriceDisplay: '$110.49',
     compareAtPrice: 129.99,
     imageUrl: 'https://m.media-amazon.com/images/I/81EcY2MhHDL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/419EtEBBG9L._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/81EcY2MhHDL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/419EtEBBG9L._AC_SL1500_.jpg',
@@ -6098,8 +6098,8 @@ export const PRODUCT_CATALOG = [
     salePrice: 189.99,
     salePriceDisplay: '$189.99',
     compareAtPrice: 209.99,
-    imageUrl: 'https://m.media-amazon.com/images/I/81vsebgeLnL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/41v8CFG9lqL._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/51aLdqES4GL._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/81vsebgeLnL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41v8CFG9lqL._AC_SL1500_.jpg',
@@ -6163,7 +6163,7 @@ export const PRODUCT_CATALOG = [
     salePrice: null,
     salePriceDisplay: null,
     compareAtPrice: null,
-    imageUrl: 'https://m.media-amazon.com/images/I/61puFhk5zkL._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/41kC5ZeHdbL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/61puFhk5zkL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41IzVrgC+fL._AC_SL1500_.jpg',
@@ -6300,7 +6300,7 @@ export const PRODUCT_CATALOG = [
     salePrice: null,
     salePriceDisplay: null,
     compareAtPrice: null,
-    imageUrl: 'https://m.media-amazon.com/images/I/81v1iFhXr9L._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/512AhfNQ6ML._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81v1iFhXr9L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/512AhfNQ6ML._AC_SL1500_.jpg',
@@ -7518,7 +7518,7 @@ export const PRODUCT_CATALOG = [
     salePriceDisplay: '$76.49',
     compareAtPrice: 89.99,
     imageUrl: 'https://m.media-amazon.com/images/I/81tdBGaAIoL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/81tdBGaAIoL._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/81luCdOb67L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/81tdBGaAIoL._AC_SL1500_.jpg',
@@ -7673,7 +7673,7 @@ export const PRODUCT_CATALOG = [
     salePrice: null,
     salePriceDisplay: null,
     compareAtPrice: null,
-    imageUrl: 'https://m.media-amazon.com/images/I/91-0JmEjNWL._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/51R5vh2ErKL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/91-0JmEjNWL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/519+EmrpPIL._AC_SL1500_.jpg',
@@ -7740,7 +7740,7 @@ export const PRODUCT_CATALOG = [
     salePrice: 89.24,
     salePriceDisplay: '$89.24',
     compareAtPrice: 104.99,
-    imageUrl: 'https://m.media-amazon.com/images/I/51CYbEU6ADL._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/51ZDhpkpPuL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81oRDZPOfuL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/519k5NXpg0L._AC_SL1500_.jpg',
@@ -7947,7 +7947,7 @@ export const PRODUCT_CATALOG = [
     salePriceDisplay: '$350.99',
     compareAtPrice: 389.99,
     imageUrl: 'https://m.media-amazon.com/images/I/81cmOSWBzHL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/51H8cqO36gL._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/81cmOSWBzHL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51H8cqO36gL._AC_SL1500_.jpg',
@@ -8013,7 +8013,7 @@ export const PRODUCT_CATALOG = [
     salePriceDisplay: '$331.49',
     compareAtPrice: 389.99,
     imageUrl: 'https://m.media-amazon.com/images/I/71ffnxrvQbL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/51NF0bSGphL._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/71ffnxrvQbL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51NF0bSGphL._AC_SL1500_.jpg',
@@ -8081,7 +8081,7 @@ export const PRODUCT_CATALOG = [
     salePriceDisplay: null,
     compareAtPrice: null,
     imageUrl: 'https://m.media-amazon.com/images/I/81sCy-vfXuL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/41RdndGJogL._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/81sCy-vfXuL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41RdndGJogL._AC_SL1500_.jpg',
@@ -8144,7 +8144,7 @@ export const PRODUCT_CATALOG = [
     salePriceDisplay: '$322.99',
     compareAtPrice: 379.99,
     imageUrl: 'https://m.media-amazon.com/images/I/81w1oE9QQoL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/417BSFXr1LL._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/81w1oE9QQoL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/417BSFXr1LL._AC_SL1500_.jpg',
@@ -8211,7 +8211,7 @@ export const PRODUCT_CATALOG = [
     salePriceDisplay: '$269.99',
     compareAtPrice: 339.99,
     imageUrl: 'https://m.media-amazon.com/images/I/91dHCdKBm4L._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/519CpI23q1L._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/91dHCdKBm4L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/519CpI23q1L._AC_SL1500_.jpg',
@@ -8279,7 +8279,7 @@ export const PRODUCT_CATALOG = [
     salePriceDisplay: null,
     compareAtPrice: null,
     imageUrl: 'https://m.media-amazon.com/images/I/71FdmrK2+gL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/41LxMDTHkRL._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/71FdmrK2+gL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41LxMDTHkRL._AC_SL1500_.jpg',
@@ -8414,7 +8414,7 @@ export const PRODUCT_CATALOG = [
     salePriceDisplay: '$319.99',
     compareAtPrice: 339.99,
     imageUrl: 'https://m.media-amazon.com/images/I/81Mb07tGu5L._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/41rc96FfuVL._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/81Mb07tGu5L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41rc96FfuVL._AC_SL1500_.jpg',
@@ -8555,7 +8555,7 @@ export const PRODUCT_CATALOG = [
     salePrice: null,
     salePriceDisplay: null,
     compareAtPrice: null,
-    imageUrl: 'https://m.media-amazon.com/images/I/812HY0oOwDL._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/41iDQWADxjL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/812HY0oOwDL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51X3kyjld9L._AC_SL1500_.jpg',
@@ -8621,7 +8621,7 @@ export const PRODUCT_CATALOG = [
     salePriceDisplay: null,
     compareAtPrice: null,
     imageUrl: 'https://m.media-amazon.com/images/I/81F0+qm4+5L._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/51lzY1KBmfL._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/81F0+qm4+5L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51lzY1KBmfL._AC_SL1500_.jpg',
@@ -8692,7 +8692,7 @@ export const PRODUCT_CATALOG = [
     salePriceDisplay: '$1,429.99',
     compareAtPrice: 1599.99,
     imageUrl: 'https://m.media-amazon.com/images/I/615XyqiskqL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/41ByonuqvSL._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/615XyqiskqL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41ByonuqvSL._AC_SL1500_.jpg',
@@ -8757,8 +8757,8 @@ export const PRODUCT_CATALOG = [
     salePrice: null,
     salePriceDisplay: null,
     compareAtPrice: null,
-    imageUrl: 'https://m.media-amazon.com/images/I/91jeA7ek1aL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/51DoQLnVONL._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/51mZtizrbdL._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/91jeA7ek1aL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51DoQLnVONL._AC_SL1500_.jpg',
@@ -8827,7 +8827,7 @@ export const PRODUCT_CATALOG = [
     salePrice: null,
     salePriceDisplay: null,
     compareAtPrice: null,
-    imageUrl: 'https://m.media-amazon.com/images/I/61RA4CfPDZL._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/41Tu+I65ThL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/61RA4CfPDZL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41togjDVXPL._AC_SL1500_.jpg',
@@ -9023,8 +9023,8 @@ export const PRODUCT_CATALOG = [
     reviewCount: 145,
     description: 'Handcrafted ceramic table lamp fired at 1300°C for a unique translucent finish. Fully dimmable (0–100%) with included 4W E12 bulb. Minimalist 9.5"H × 5.6"W form fits any nightstand or side table.',
     tags: ['ceramic', 'table-lamp', 'dimmable', 'bedside', 'minimalist', 'modern', 'handmade', 'translucent', 'nightstand', 'ambient'],
-    imageUrl: 'https://m.media-amazon.com/images/I/71K5zrQ22KL._AC_SX679_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/41PCZmrdeLL._AC_SX679_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/41PCZmrdeLL._AC_SX679_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/71K5zrQ22KL._AC_SX679_.jpg',
       'https://m.media-amazon.com/images/I/41PCZmrdeLL._AC_SX679_.jpg',
@@ -9130,7 +9130,7 @@ export const PRODUCT_CATALOG = [
     reviewCount: 737,
     description: 'Mid-century standing lamp with dual E26 sockets and white drum shade. Each pull-chain controls one bulb independently. Includes two 9W LED bulbs with 3 color temps (3000K/4500K/6500K), foot switch, and memory function.',
     tags: ['floor-lamp', 'mid-century', 'standing-lamp', 'dimmable', 'fabric-shade', 'dual-bulb', '3-color-temperature', 'drum-shade', 'living-room', 'bedroom'],
-    imageUrl: 'https://m.media-amazon.com/images/I/81KF7CMufSL._AC_SX679_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/31XR5rowJiL._AC_SX679_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81KF7CMufSL._AC_SX679_.jpg',
       'https://m.media-amazon.com/images/I/41CzOXDDDkL._AC_SX679_.jpg',
@@ -9217,7 +9217,7 @@ export const PRODUCT_CATALOG = [
     reviewCount: 1528,
     description: 'Set of 2 ceramic table lamps at 23" tall. Scratch- and fade-resistant finish, 60W max E26 socket. Pairs beautifully on matching nightstands or end tables. Available in 12 colors.',
     tags: ['ceramic', 'table-lamp', 'set-of-2', 'bedside', 'farmhouse', 'minimalist', 'modern', 'nightstand', 'living-room', 'bedroom', 'pair'],
-    imageUrl: 'https://m.media-amazon.com/images/I/4123S1nMhKL._AC_SX679_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/710mJWK3xzL._AC_SX679_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/710mJWK3xzL._AC_SX679_.jpg',
       'https://m.media-amazon.com/images/I/51Ji9EDHVUL._AC_SX679_.jpg',
@@ -9479,7 +9479,7 @@ export const PRODUCT_CATALOG = [
     reviewCount: 26,
     description: '65" arc floor lamp with solid walnut wood base and linen shade. 1200lm LED bulb included (3000K). 3-level foot-switch dimming, 90° vertical and 350° horizontal lamp head adjustment.',
     tags: ['floor-lamp', 'arc', 'wood-base', 'walnut', 'mid-century', 'dimmable', 'linen-shade', 'adjustable', 'living-room', 'bedroom', 'led-included'],
-    imageUrl: 'https://m.media-amazon.com/images/I/61Qrh99aH2L._AC_SX679_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/41ROiWiiotL._AC_SX679_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/61Qrh99aH2L._AC_SX679_.jpg',
       'https://m.media-amazon.com/images/I/41ROiWiiotL._AC_SX679_.jpg',
@@ -9554,7 +9554,7 @@ export const PRODUCT_CATALOG = [
     reviewCount: 215,
     description: '24" vintage ceramic table lamp with natural textured finish and linen shade. 5ft cord, E26 socket, 60W max. Works as both ambient lighting and decorative accent. Available in 9 earthy colorways.',
     tags: ['ceramic', 'table-lamp', 'farmhouse', 'rustic', 'vintage', 'bedside', 'linen-shade', 'textured', 'nightstand', 'bedroom', 'boho'],
-    imageUrl: 'https://m.media-amazon.com/images/I/71BEOsgyNGL._AC_SX679_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/41TM+QZ+ucL._AC_SX679_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71BEOsgyNGL._AC_SX679_.jpg',
       'https://m.media-amazon.com/images/I/41Ka+nX7RoL._AC_SX679_.jpg',
@@ -9701,8 +9701,8 @@ export const PRODUCT_CATALOG = [
     reviewCount: 1,
     description: '26" transitional table lamp with a weathered grey resin base and playful wavy-edge wheat linen shade. E26 bulb included, UL-certified, with a rotary switch. Hand-finished for a high-end boutique look on any nightstand or side table.',
     tags: ['table-lamp', 'transitional', 'contemporary', 'grey', 'resin', 'linen-shade', 'wavy-shade', 'bedroom', 'living-room', 'nightstand', 'desk-lamp'],
-    imageUrl: 'https://m.media-amazon.com/images/I/81LBQkYpVKL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/31Ap0ABe7NL._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/31Ap0ABe7NL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/31t1PQU+btL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81LBQkYpVKL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/31Ap0ABe7NL._AC_SL1500_.jpg',
@@ -9759,7 +9759,7 @@ export const PRODUCT_CATALOG = [
     reviewCount: 2,
     description: '30" tall geometric mid-century modern table lamp with a white cast resin hourglass base and white fabric drum shade. UL listed, E26 socket (150W max), on-off socket switch. Designed exclusively by Lamps Plus for Possini Euro Design.',
     tags: ['table-lamp', 'mid-century', 'coastal', 'contemporary', 'white', 'geometric', 'resin', 'fabric-shade', 'bedroom', 'living-room', 'nightstand'],
-    imageUrl: 'https://m.media-amazon.com/images/I/71XTCRhncvL._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/21MSj+idP3L._AC_SL1500_.jpg',
     panelImageUrl: 'https://m.media-amazon.com/images/I/21MSj+idP3L._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71XTCRhncvL._AC_SL1500_.jpg',
@@ -9928,7 +9928,7 @@ export const PRODUCT_CATALOG = [
     reviewCount: 72,
     description: '22" modern farmhouse ceramic table lamp with oatmeal shade. Available in Terracotta, Matte Black, and White. E26 socket, 100W max, LED compatible. Versatile transitional design for bedrooms, living rooms, and entryways.',
     tags: ['table-lamp', 'ceramic', 'transitional', 'farmhouse', 'contemporary', 'bohemian', 'terracotta', 'oatmeal-shade', 'bedroom', 'living-room', 'nightstand'],
-    imageUrl: 'https://m.media-amazon.com/images/I/81rFb87loCL._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/21rS9M1j1BL._AC_SL1500_.jpg',
     panelImageUrl: 'https://m.media-amazon.com/images/I/21rS9M1j1BL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81rFb87loCL._AC_SL1500_.jpg',
@@ -10015,7 +10015,7 @@ export const PRODUCT_CATALOG = [
     reviewCount: 36,
     description: '18.3" dimmable modern table lamp with a smooth solid walnut wood base and beige linen shade. UL listed, compatible with standard E26 bulbs. Clean Japandi-inspired silhouette for bedrooms, nightstands, and office desks.',
     tags: ['table-lamp', 'modern', 'minimalist', 'japandi', 'contemporary', 'walnut', 'wood', 'linen-shade', 'dimmable', 'bedroom', 'nightstand', 'office'],
-    imageUrl: 'https://m.media-amazon.com/images/I/6130H4TJYzL._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/416R2fKFsiL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/6130H4TJYzL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/415zbMt9ieL._AC_SL1500_.jpg',
@@ -10071,8 +10071,8 @@ export const PRODUCT_CATALOG = [
     reviewCount: 13,
     description: 'Set of 2 Scandinavian bedside table lamps with antique gray matte concrete-effect resin bases and white linen shades. 18" tall, LED bulbs included, classic socket switch. Perfect matching pair for nightstands or a symmetrical living room setup.',
     tags: ['table-lamp', 'minimalist', 'scandinavian', 'contemporary', 'modern', 'concrete-effect', 'gray', 'linen-shade', 'set-of-2', 'bedroom', 'nightstand', 'bedside'],
-    imageUrl: 'https://m.media-amazon.com/images/I/31l1clYTvFL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/31l1clYTvFL._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/31dQMVHsWnL._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/81Wezpd7WUL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/31l1clYTvFL._AC_SL1500_.jpg',
@@ -10205,8 +10205,8 @@ export const PRODUCT_CATALOG = [
     reviewCount: 446,
     description: 'Chic 75" arc floor lamp with a 9" globe shade and genuine natural marble base. 360° adjustable head sits over sofas or reading chairs. Includes 9W 800-lumen 3000K warm LED bulb. Smart home compatible. Backed by a 3-year Brightech warranty.',
     tags: ['floor-lamp', 'arc', 'marble-base', 'globe-shade', 'boho', 'mid-century', 'art-deco', 'smart-compatible', 'led-included', 'living-room', 'reading-lamp'],
-    imageUrl: 'https://m.media-amazon.com/images/I/41he2BbctnL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/41he2BbctnL._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/41CKtYxhUVL._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/81gE2gWvK+L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41he2BbctnL._AC_SL1500_.jpg',
@@ -10282,7 +10282,7 @@ export const PRODUCT_CATALOG = [
     reviewCount: 16,
     description: 'Vintage-industrial floor lamp with a unique natural marble base and adjustable height (47"–55"). Built-in 12W LED (1050 lumens, 50,000hr lifespan) with 3 color temps (3000K/5000K/7000K) and inline dimmer switch. Adjustable lamp head angle for reading or ambient light.',
     tags: ['floor-lamp', 'led', 'dimmable', 'marble-base', 'industrial', 'vintage', 'adjustable-height', 'reading-lamp', 'bedroom', 'living-room', '3-color-temp'],
-    imageUrl: 'https://m.media-amazon.com/images/I/81GSfi9KHUL._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/416R5KaOPYL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81GSfi9KHUL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51PmpqIQM9L._AC_SL1500_.jpg',
@@ -10696,7 +10696,7 @@ export const PRODUCT_CATALOG = [
     description: '72" Japandi-style kitchen island with integrated LED ambient lighting, smooth-gliding drawers, wine rack, and deep cabinet storage. Engineered wood frame. Works as prep station, serving buffet, or extra counter space.',
     tags: ['kitchen-island', 'japandi', 'led-lighting', 'wine-rack', 'storage', 'minimalist', 'modern', 'kitchen', 'prep-station', 'countertop'],
     imageUrl: 'https://m.media-amazon.com/images/I/512+LYzor7L._AC_SX679_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/41gH+G+t3rL._AC_SX679_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/81Q7cYZLPVL._AC_SX679_.jpg',
       'https://m.media-amazon.com/images/I/41gH+G+t3rL._AC_SX679_.jpg',
@@ -10875,8 +10875,8 @@ export const PRODUCT_CATALOG = [
     reviewCount: 20,
     description: '50" Japandi kitchen island in sophisticated gray with integrated LED ambient lighting, built-in wine rack, smooth-glide drawers, and open shelving. The perfect compact modern prep station for contemporary kitchens.',
     tags: ['kitchen-island', 'japandi', 'minimalist', 'modern', 'led-lighting', 'wine-rack', 'gray', 'storage', 'compact'],
-    imageUrl: 'https://m.media-amazon.com/images/I/71pTboCEZBL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/41cFhv8kJML._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/41Kp1zcw5EL._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/71pTboCEZBL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41cFhv8kJML._AC_SL1500_.jpg',
@@ -10961,7 +10961,7 @@ export const PRODUCT_CATALOG = [
     description: 'Sleek gray kitchen island with a professional stainless steel countertop, 5 drawers, 2 cabinets, spice rack, and towel bar. Extended countertop overhang is perfect for casual bar-stool seating.',
     tags: ['kitchen-island', 'contemporary', 'modern', 'industrial', 'stainless-steel', 'gray', 'storage', 'drawers', 'seating'],
     imageUrl: 'https://m.media-amazon.com/images/I/71sBHKVeFOL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/41DvwqsY-6L._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/71sBHKVeFOL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71sBHKVeFOL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41DvwqsY-6L._AC_SL1500_.jpg',
@@ -11033,7 +11033,7 @@ export const PRODUCT_CATALOG = [
     description: 'Solid hardwood kitchen island with warm butcher block top and contrasting black frame. Generous prep surface and open shelving that bridges modern and rustic styles in any kitchen.',
     tags: ['kitchen-island', 'butcher-block', 'natural-wood', 'transitional', 'rustic', 'contemporary', 'black', 'hardwood'],
     imageUrl: 'https://m.media-amazon.com/images/I/819isHP6A4L._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/41x69-vO5dL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/819isHP6A4L._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/819isHP6A4L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41x69-vO5dL._AC_SL1500_.jpg',
@@ -11114,7 +11114,7 @@ export const PRODUCT_CATALOG = [
     description: 'Classic white kitchen island with solid butcher block top. Raised panel doors, deep push-through drawers accessible from both sides, and adjustable interior shelving — a versatile everyday kitchen workhorse.',
     tags: ['kitchen-island', 'butcher-block', 'white', 'transitional', 'farmhouse', 'contemporary', 'storage', 'drawers'],
     imageUrl: 'https://m.media-amazon.com/images/I/71ucL5CrIvL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/41bsKxHMwcL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/41rxkJsDcIL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71ucL5CrIvL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41bsKxHMwcL._AC_SL1500_.jpg',
@@ -11185,7 +11185,7 @@ export const PRODUCT_CATALOG = [
     description: 'Clean-lined modern kitchen island in natural wood finish. Uncluttered silhouette with a generous prep surface and open shelving — top-rated at 4.7 stars with 287+ verified reviews.',
     tags: ['kitchen-island', 'modern', 'minimalist', 'contemporary', 'natural-wood', 'storage', 'clean-lines'],
     imageUrl: 'https://m.media-amazon.com/images/I/41nhllUxsDL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/41kq3XZsCuL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/41nhllUxsDL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/41nhllUxsDL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41kq3XZsCuL._AC_SL1500_.jpg',
@@ -11255,7 +11255,7 @@ export const PRODUCT_CATALOG = [
     description: '72" modern kitchen island with 4 chairs included — stainless steel and laminate construction with 3 smooth-glide drawers and 5 open shelves. A complete all-in-one dining and prep solution for open-plan kitchens.',
     tags: ['kitchen-island', 'modern', 'contemporary', 'seating', 'chairs', 'stainless-steel', 'storage', 'drawers', 'dining'],
     imageUrl: 'https://m.media-amazon.com/images/I/71svg0hZGIL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/41kON+bUWUL._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/71svg0hZGIL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41kON+bUWUL._AC_SL1500_.jpg',
@@ -11311,7 +11311,7 @@ export const PRODUCT_CATALOG = [
     description: 'Bold 81"–106" extendable kitchen island in matte black with a sleek marble-pattern veneer top. Expands to fit any kitchen or entertaining setup — 3 drawers, 3 cabinet doors, and 5 open shelves.',
     tags: ['kitchen-island', 'modern', 'contemporary', 'minimalist', 'black', 'marble-effect', 'extendable', 'storage', 'bold'],
     imageUrl: 'https://m.media-amazon.com/images/I/51RKj64DdLL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/4187cFEfeJL._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/61k-uDGTwYL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/4187cFEfeJL._AC_SL1500_.jpg',
@@ -11366,7 +11366,7 @@ export const PRODUCT_CATALOG = [
     description: '50" compact modern kitchen island with an upscale marble-effect engineered wood top. Drawers, cabinet doors, and open shelves in a sleek white finish — ideal for apartments and contemporary kitchens.',
     tags: ['kitchen-island', 'modern', 'contemporary', 'minimalist', 'white', 'marble-effect', 'compact', 'storage', 'drawers'],
     imageUrl: 'https://m.media-amazon.com/images/I/41zbaroxI4L._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/3158vWBmEAL._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/71oMij2BFxL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/3158vWBmEAL._AC_SL1500_.jpg',
@@ -11420,8 +11420,8 @@ export const PRODUCT_CATALOG = [
     reviewCount: 0,
     description: '47" round farmhouse dining table with scratch-resistant walnut veneer MDF top and slim wood-strip base. Comes with 4 or 6 beige fabric upholstered chairs featuring ergonomic lumbar support and walnut-grain metal X-legs.',
     tags: ['dining-table', 'dining-set', 'round-table', 'farmhouse', 'walnut', 'upholstered', 'beige', 'set-of-6', 'dining-room', 'small-space'],
-    imageUrl: 'https://m.media-amazon.com/images/I/91f5pWUrIYL._AC_SX679_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/41lYr5fbb1L._AC_SX679_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/51iy+SF6hJL._AC_SX679_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/91f5pWUrIYL._AC_SX679_.jpg',
       'https://m.media-amazon.com/images/I/41lYr5fbb1L._AC_SX679_.jpg',
@@ -11498,7 +11498,7 @@ export const PRODUCT_CATALOG = [
     description: '7-piece dining set with 59" scratch-resistant engineered wood table and 6 PU leather cushioned chairs. Reinforced metal frame. Chairs tuck fully under the table for space-saving storage. Assembles in 20 minutes.',
     tags: ['dining-table', 'dining-set', 'rectangular-table', 'pu-leather', 'modern', 'set-of-6', 'space-saving', 'dining-room', 'office', 'conference'],
     imageUrl: 'https://m.media-amazon.com/images/I/81vN+moAdIL._AC_SX679_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/41s46v3tFXL._AC_SX679_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/81vN+moAdIL._AC_SX679_.jpg',
       'https://m.media-amazon.com/images/I/41s46v3tFXL._AC_SX679_.jpg',
@@ -11596,7 +11596,7 @@ export const PRODUCT_CATALOG = [
     description: 'Unique 5-piece farmhouse dining set with 47" round wood table, 2 loveseats, 1 corner connector, and 2 armchairs. Seats 4–6. Converts a breakfast nook into a stylish dining-lounge hybrid. Adjustable felt pads on all legs.',
     tags: ['dining-table', 'dining-set', 'round-table', 'loveseat', 'farmhouse', 'rustic', 'conversational', 'breakfast-nook', 'set-of-4', 'dining-room', 'small-space'],
     imageUrl: 'https://m.media-amazon.com/images/I/51ygss6XMgL._AC_SX679_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/41WkwdZfY3L._AC_SX679_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/91Y3EGktwiL._AC_SX679_.jpg',
       'https://m.media-amazon.com/images/I/41WkwdZfY3L._AC_SX679_.jpg',
@@ -11799,7 +11799,7 @@ export const PRODUCT_CATALOG = [
     description: '59" round dining table with eco-friendly plywood top in fine wood grain and faux leather-wrapped T-shaped base. Seats 4–8. Minimalist design integrates seamlessly into contemporary, Scandinavian, or traditional interiors. Table only.',
     tags: ['dining-table', 'round-table', 'faux-leather', 'wood-grain', 'modern', 'minimalist', 'scandinavian', 'dining-room', 'table-only', 'seats-6'],
     imageUrl: 'https://m.media-amazon.com/images/I/91ZA2Ys4NKL._AC_SX679_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/313x48GsuWL._AC_SX679_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/91ZA2Ys4NKL._AC_SX679_.jpg',
       'https://m.media-amazon.com/images/I/313x48GsuWL._AC_SX679_.jpg',
@@ -12185,7 +12185,7 @@ export const PRODUCT_CATALOG = [
     reviewCount: 84,
     description: '45" round dining table with a stable single-pedestal base. The clean circular top and sculptural base create a modern statement piece that seats 4–6. The pedestal design eliminates leg interference, allowing chairs to pull in freely on all sides.',
     tags: ['dining-table', 'round-table', 'pedestal-base', 'modern', 'minimalist', 'japandi', 'seats-6', 'dining-room', 'table-only', 'apartment'],
-    imageUrl: 'https://m.media-amazon.com/images/I/81dKD9N5zJL._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/31-Z0d30AiL._AC_SL1500_.jpg',
     panelImageUrl: 'https://m.media-amazon.com/images/I/31-Z0d30AiL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81dKD9N5zJL._AC_SL1500_.jpg',
@@ -12497,7 +12497,7 @@ export const PRODUCT_CATALOG = [
     description: 'Set of 4 barrel-shaped swivel dining chairs with 360° rotation and sculptural round pedestal base. 250 lb weight capacity. Available in Brown Faux Leather, Black Boucle, Khaki Velvet, and White Velvet. Armless design.',
     tags: ['dining-chair', 'swivel-chair', 'barrel-chair', 'mid-century', 'set-of-4', 'upholstered', 'round-base', 'dining-room', 'accent-chair', '360-swivel'],
     imageUrl: 'https://m.media-amazon.com/images/I/41s4g4dySQL._AC_SX679_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/413CoN1a5FL._AC_SX679_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/81dvuPJ1lkL._AC_SX679_.jpg',
       'https://m.media-amazon.com/images/I/413CoN1a5FL._AC_SX679_.jpg',
@@ -13065,7 +13065,7 @@ export const PRODUCT_CATALOG = [
     name: 'Yaheetech End Table, 3-Tier Industrial Side Table with Storage Shelves, X Design Metal Frame, Gray',
     brand: 'Yaheetech',
     price: 33.99, priceDisplay: '$33.99',
-    imageUrl: 'https://m.media-amazon.com/images/I/816a41CR8wL._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/81SIII5D9gL._AC_SL1500_.jpg',
     panelImageUrl: 'https://m.media-amazon.com/images/I/81SIII5D9gL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/816a41CR8wL._AC_SL1500_.jpg',
@@ -13107,7 +13107,7 @@ export const PRODUCT_CATALOG = [
     name: 'danpinera Small Round Side Table, White Wooden Tray with Gold Metal Legs, 15" D x 17.5" H',
     brand: 'danpinera',
     price: 25.49, priceDisplay: '$25.49',
-    imageUrl: 'https://m.media-amazon.com/images/I/816a41CR8wL._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/81MEgCcLo7L._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/816a41CR8wL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/81zGmEdxMoL._AC_SL1500_.jpg',
@@ -13591,7 +13591,7 @@ export const PRODUCT_CATALOG = [
     brand: 'Mobili Fiver',
     price: 75.25, priceDisplay: '$75.25',
     imageUrl: 'https://m.media-amazon.com/images/I/61sk+cbrFZL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/61ynn41l08L._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/61Qg-Mb+iyL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/61sk+cbrFZL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/61ynn41l08L._AC_SL1500_.jpg',
@@ -13736,7 +13736,7 @@ export const PRODUCT_CATALOG = [
     name: 'NANAGIFTREE Floating Nightstand, Solid Wood Wall-Mounted Bedside Shelf, Vintage Brown',
     brand: 'NANAGIFTREE',
     price: 27.99, priceDisplay: '$27.99',
-    imageUrl: 'https://m.media-amazon.com/images/I/71AAe+0xA5L._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/714ANzncJnL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/714ANzncJnL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/71AAe+0xA5L._AC_SL1500_.jpg',
@@ -13948,7 +13948,7 @@ export const PRODUCT_CATALOG = [
     brand: 'HOOBRO',
     price: 28.48, priceDisplay: '$28.48',
     imageUrl: 'https://m.media-amazon.com/images/I/61vYs1rvreL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/515z6504m8L._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/61pZ0+UpYYL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/61vYs1rvreL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/515z6504m8L._AC_SL1500_.jpg',
@@ -14248,8 +14248,8 @@ export const PRODUCT_CATALOG = [
     name: 'Sorbus 5-Drawer Kids Dresser — Wide Storage Chest, Steel Frame, Wood Top',
     brand: 'Sorbus',
     price: 69.99, priceDisplay: '$69.99',
-    imageUrl: 'https://m.media-amazon.com/images/I/81MkWU72iDL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/81P--mfwPYL._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/81ECZhLHYsL._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/81MkWU72iDL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/81P--mfwPYL._AC_SL1500_.jpg',
@@ -14374,7 +14374,7 @@ export const PRODUCT_CATALOG = [
     brand: 'LUMTOK',
     price: 89.99, priceDisplay: '$89.99',
     imageUrl: 'https://m.media-amazon.com/images/I/71MeBQ2NV5L._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/71d2NKgHcuL._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/71MeBQ2NV5L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/71d2NKgHcuL._AC_SL1500_.jpg',
@@ -14419,7 +14419,7 @@ export const PRODUCT_CATALOG = [
     brand: 'Lulive',
     price: 79.99, priceDisplay: '$79.99',
     imageUrl: 'https://m.media-amazon.com/images/I/91GTtpbrd+L._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/91VKZTJHUYL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/91GTtpbrd+L._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/91GTtpbrd+L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/91VKZTJHUYL._AC_SL1500_.jpg',
@@ -14457,7 +14457,7 @@ export const PRODUCT_CATALOG = [
     name: 'Tohomeor 7-Drawer Retro Floral Fabric Dresser — Wood Top, Iron Frame',
     brand: 'Tohomeor',
     price: 89.89, priceDisplay: '$89.89',
-    imageUrl: 'https://m.media-amazon.com/images/I/81392HFaKaL._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/81WtdVDynpL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81392HFaKaL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/714OFJ5gqeL._AC_SL1500_.jpg',
@@ -14539,7 +14539,7 @@ export const PRODUCT_CATALOG = [
     brand: 'EnHomee',
     price: 99.98, priceDisplay: '$99.98',
     imageUrl: 'https://m.media-amazon.com/images/I/91ggZ9MXT7L._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/917nkTdYZqL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/81qbfMD5RhL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/91ggZ9MXT7L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/917nkTdYZqL._AC_SL1500_.jpg',
@@ -14614,7 +14614,7 @@ export const PRODUCT_CATALOG = [
     name: 'EXOTICA 8-Drawer Tall Dresser — Van Gogh Floral Pattern, Steel Frame',
     brand: 'EXOTICA',
     price: 94.89, priceDisplay: '$94.89',
-    imageUrl: 'https://m.media-amazon.com/images/I/81logYKMn6L._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/91E8OMcPOiL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81logYKMn6L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/91sL2A5KHsL._AC_SL1500_.jpg',
@@ -14741,7 +14741,7 @@ export const PRODUCT_CATALOG = [
     name: 'Sorbus 5-Drawer Kids Dresser — Pink, Steel Frame, Fabric Bins, Wood Handle',
     brand: 'Sorbus',
     price: 56.99, priceDisplay: '$56.99',
-    imageUrl: 'https://m.media-amazon.com/images/I/81TNEJSupqL._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/81adUpta0OL._AC_SL1500_.jpg',
     panelImageUrl: 'https://m.media-amazon.com/images/I/81adUpta0OL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81TNEJSupqL._AC_SL1500_.jpg',
@@ -14880,7 +14880,7 @@ export const PRODUCT_CATALOG = [
     name: 'Teraves Reversible L Shaped Desk 69 Inch Corner Desk with Storage Shelves for Home Office Gaming',
     brand: 'Teraves',
     price: 169.98, priceDisplay: '$169.98',
-    imageUrl: 'https://m.media-amazon.com/images/I/71nXdjNlnqL._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/71qwwPHp-UL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/61vUw4VI+xL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/71v0weldFpL._AC_SL1500_.jpg',
@@ -14960,7 +14960,7 @@ export const PRODUCT_CATALOG = [
     name: 'Teraves Computer Desk 55.11" Sturdy Writing Workstation for Home Office, Beige + White Frame',
     brand: 'Teraves',
     price: 99.99, priceDisplay: '$99.99',
-    imageUrl: 'https://m.media-amazon.com/images/I/61wRXed1pQS._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/71ddzGD2-gL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/61wRXed1pQS._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/71ddzGD2-gL._AC_SL1500_.jpg',
@@ -14998,7 +14998,7 @@ export const PRODUCT_CATALOG = [
     brand: 'Cubiker',
     price: 64.99, priceDisplay: '$64.99',
     imageUrl: 'https://m.media-amazon.com/images/I/81pOPYngWBL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/713QHd457eL._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/81pOPYngWBL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/713QHd457eL._AC_SL1500_.jpg',
@@ -15130,7 +15130,7 @@ export const PRODUCT_CATALOG = [
     brand: 'FATORRI',
     price: 229.99, priceDisplay: '$229.99',
     imageUrl: 'https://m.media-amazon.com/images/I/61y-fwiAYsL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/612p3VAbfMS._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51XwnXBD-PL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/61y-fwiAYsL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/612p3VAbfMS._AC_SL1500_.jpg',
@@ -15296,7 +15296,7 @@ export const PRODUCT_CATALOG = [
     name: 'LVB Rustic Computer Desk, Metal Wood Industrial Study Executive Desk with Storage, 55 Inch Rustic Brown',
     brand: 'LVB',
     price: 127.46, priceDisplay: '$127.46',
-    imageUrl: 'https://m.media-amazon.com/images/I/71V6B4qXKcL._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/61m-KBGmEIL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71V6B4qXKcL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/715jlFDO2pL._AC_SL1500_.jpg',
@@ -15344,7 +15344,7 @@ export const PRODUCT_CATALOG = [
     name: 'TOPSKY Computer Desk 59 Inch Large Office Desk, Gaming Writing Desk, 1.88" Thickness Desktop, Rustic Brown',
     brand: 'TOPSKY',
     price: 139.89, priceDisplay: '$139.89',
-    imageUrl: 'https://m.media-amazon.com/images/I/71-RJHGtg5L._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/51T9R3HySBL._AC_SL1500_.jpg',
     panelImageUrl: 'https://m.media-amazon.com/images/I/51T9R3HySBL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71-RJHGtg5L._AC_SL1500_.jpg',
@@ -15379,7 +15379,7 @@ export const PRODUCT_CATALOG = [
     name: 'Pamray 32 Inch Computer Desk for Small Spaces with Storage Bag and Headphone Hook',
     brand: 'Pamray',
     price: 39.98, priceDisplay: '$39.98',
-    imageUrl: 'https://m.media-amazon.com/images/I/71cCobh2fkL._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/71dZdL8c1rL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71cCobh2fkL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/811xB7gXyjL._AC_SL1500_.jpg',
@@ -15423,7 +15423,7 @@ export const PRODUCT_CATALOG = [
     name: 'WOHOMO Folding Desk 31.5" for Small Spaces, Space Saving Foldable Computer Table, Oak',
     brand: 'WOHOMO',
     price: 49.99, priceDisplay: '$49.99',
-    imageUrl: 'https://m.media-amazon.com/images/I/71plY-qWJGL._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/71oznFKo4rL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71plY-qWJGL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/717-bhwLhRL._AC_SL1500_.jpg',
@@ -15473,7 +15473,7 @@ export const PRODUCT_CATALOG = [
     brand: 'MUXX.STIL',
     price: 119.98, priceDisplay: '$119.98',
     imageUrl: 'https://m.media-amazon.com/images/I/41dV0wQ6iPL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/418F+Ts-VGL._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/41dV0wQ6iPL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/418F+Ts-VGL._AC_SL1500_.jpg',
@@ -15600,7 +15600,7 @@ export const PRODUCT_CATALOG = [
     brand: 'GABRYLLY',
     price: 161, priceDisplay: '$161.00',
     imageUrl: 'https://m.media-amazon.com/images/I/81TIRoUQCIL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/71kZ0YBIIOL._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/81TIRoUQCIL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/71kZ0YBIIOL._AC_SL1500_.jpg',
@@ -15761,7 +15761,7 @@ export const PRODUCT_CATALOG = [
     brand: 'amseatec',
     price: 49.99, priceDisplay: '$49.99',
     imageUrl: 'https://m.media-amazon.com/images/I/81thssq+teL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/81R2IjnwnAL._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/71PcqF5ljdL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/81R2IjnwnAL._AC_SL1500_.jpg',
@@ -15803,8 +15803,8 @@ export const PRODUCT_CATALOG = [
     name: 'CYKOV Ergonomic Office Chair with Footrest, Adjustable Lumbar Support & Headrest, 90-160° Reclining Mesh Back, 350lbs Capacity',
     brand: 'CYKOV',
     price: 169, priceDisplay: '$169.00',
-    imageUrl: 'https://m.media-amazon.com/images/I/81iGibLxLxL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/71d5CDV2whL._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/71QTCj4hXuL._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/81iGibLxLxL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/71d5CDV2whL._AC_SL1500_.jpg',
@@ -15887,7 +15887,7 @@ export const PRODUCT_CATALOG = [
     brand: 'X XISHE',
     price: 122.39, priceDisplay: '$122.39',
     imageUrl: 'https://m.media-amazon.com/images/I/71a-ERBxUGL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/7105lhueJQL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/516Qe2bWC0L._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71a-ERBxUGL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/7105lhueJQL._AC_SL1500_.jpg',
@@ -15926,7 +15926,7 @@ export const PRODUCT_CATALOG = [
     brand: 'TRALT',
     price: 139.99, priceDisplay: '$139.99',
     imageUrl: 'https://m.media-amazon.com/images/I/71K-pGGUR3L._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/719LGRFdNrL._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/71K-pGGUR3L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/719LGRFdNrL._AC_SL1500_.jpg',
@@ -15966,7 +15966,7 @@ export const PRODUCT_CATALOG = [
     name: 'Fizzin Ergonomic Office Chair, 400 LBS, Adjustable Lumbar Support, Breathable Mesh with Thickened Cushion, Home Office Desk Chair',
     brand: 'Fizzin',
     price: 105.99, priceDisplay: '$105.99',
-    imageUrl: 'https://m.media-amazon.com/images/I/91z-41-ocaL._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/71bdZdnkVVL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81kXYU79wKL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/91s2qvKwbEL._AC_SL1500_.jpg',
@@ -16008,7 +16008,7 @@ export const PRODUCT_CATALOG = [
     name: 'Ergalithic Ergonomic Office Chair, X-Shaped Mesh PU Leather with Adjustable Lumbar Support, High Back Executive Desk Chair with Headrest',
     brand: 'Ergalithic',
     price: 119.99, priceDisplay: '$119.99',
-    imageUrl: 'https://m.media-amazon.com/images/I/71apPL11nML._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/71FFbO6+jpL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71apPL11nML._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/71FFbO6+jpL._AC_SL1500_.jpg',
@@ -16050,7 +16050,7 @@ export const PRODUCT_CATALOG = [
     brand: 'Soohow',
     price: 89.99, priceDisplay: '$89.99',
     imageUrl: 'https://m.media-amazon.com/images/I/61wqlB3rgkL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/61oCxRU30xL._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/61wqlB3rgkL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/61oCxRU30xL._AC_SL1500_.jpg',
@@ -16250,7 +16250,7 @@ export const PRODUCT_CATALOG = [
     brand: 'HOMISSUE',
     price: 119.99, priceDisplay: '$119.99',
     imageUrl: 'https://m.media-amazon.com/images/I/81cHAYc2ecL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/61FCKflvHhL._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/81cHAYc2ecL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/61FCKflvHhL._AC_SL1500_.jpg',
@@ -16331,7 +16331,7 @@ export const PRODUCT_CATALOG = [
     brand: 'FATORRI',
     price: 125.99, priceDisplay: '$125.99',
     imageUrl: 'https://m.media-amazon.com/images/I/71pytDzNCHL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/61a-hb21WdL._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/71pytDzNCHL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/61a-hb21WdL._AC_SL1500_.jpg',
@@ -16373,7 +16373,7 @@ export const PRODUCT_CATALOG = [
     brand: 'IDEALHOUSE',
     price: 69.99, priceDisplay: '$69.99',
     imageUrl: 'https://m.media-amazon.com/images/I/71RudUxkAXL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/61ig1TOYdHL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/41-pVPyUQ6L._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71RudUxkAXL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/61ig1TOYdHL._AC_SL1500_.jpg',
@@ -16414,8 +16414,8 @@ export const PRODUCT_CATALOG = [
     name: 'IRONCK Bookshelf Double Wide 55 in 3-Tier, Industrial Bookcases, Wood and Metal Bookshelves for Home Office Decor Display',
     brand: 'IRONCK',
     price: 139.99, priceDisplay: '$139.99',
-    imageUrl: 'https://m.media-amazon.com/images/I/919Gl+3FwVL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/81QWg0cBdjL._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/81QWg0cBdjL._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/919Gl+3FwVL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/81QWg0cBdjL._AC_SL1500_.jpg',
@@ -16454,7 +16454,7 @@ export const PRODUCT_CATALOG = [
     brand: 'IBF',
     price: 135.99, priceDisplay: '$135.99',
     imageUrl: 'https://m.media-amazon.com/images/I/81F83ofWnpL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/61mRJR2gTeL._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/81F83ofWnpL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/61mRJR2gTeL._AC_SL1500_.jpg',
@@ -16574,7 +16574,7 @@ export const PRODUCT_CATALOG = [
     brand: 'FOTOSOK',
     price: 119.99, priceDisplay: '$119.99',
     imageUrl: 'https://m.media-amazon.com/images/I/81fUuSuZkAL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/71Bxdkk2v+L._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/81fUuSuZkAL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/71Bxdkk2v+L._AC_SL1500_.jpg',
@@ -16734,8 +16734,8 @@ export const PRODUCT_CATALOG = [
     name: 'SGLfarmty Farmhouse Bar Pendant Light, Single Pendant with Wooden Finish',
     brand: 'SGLfarmty',
     price: 47.99, priceDisplay: '$47.99',
-    imageUrl: 'https://m.media-amazon.com/images/I/71k66ARV2oL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/71k66ARV2oL._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/71QmRfg5DfL._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/71QmRfg5DfL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/71k66ARV2oL._AC_SL1500_.jpg',
@@ -16815,7 +16815,7 @@ export const PRODUCT_CATALOG = [
     brand: 'DEWENWILS',
     price: 69.99, priceDisplay: '$69.99',
     imageUrl: 'https://m.media-amazon.com/images/I/71AT5AM67mL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/71gxEvV+UqL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/71AT5AM67mL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71ccJJMhCXL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/71gxEvV+UqL._AC_SL1500_.jpg',
@@ -16976,7 +16976,7 @@ export const PRODUCT_CATALOG = [
     brand: 'LOG BARN',
     price: 59.99, priceDisplay: '$59.99',
     imageUrl: 'https://m.media-amazon.com/images/I/71rPAgO-x5L._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/71P+VLmUmKL._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/71rPAgO-x5L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/71P+VLmUmKL._AC_SL1500_.jpg',
@@ -17056,7 +17056,7 @@ export const PRODUCT_CATALOG = [
     brand: 'SADUENFR',
     price: 46.74, priceDisplay: '$46.74',
     imageUrl: 'https://m.media-amazon.com/images/I/71+VYQ+fItL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/71l8tBsI5LL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/71+VYQ+fItL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71+VYQ+fItL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/71l8tBsI5LL._AC_SL1500_.jpg',
@@ -17136,7 +17136,7 @@ export const PRODUCT_CATALOG = [
     brand: 'DUHU',
     price: 43.29, priceDisplay: '$43.29',
     imageUrl: 'https://m.media-amazon.com/images/I/41zTg+zUIbL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/71DCcUChdOL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/41zTg+zUIbL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/41zTg+zUIbL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/71DCcUChdOL._AC_SL1500_.jpg',
@@ -17177,7 +17177,7 @@ export const PRODUCT_CATALOG = [
     brand: 'LMSOD',
     price: 41.00, priceDisplay: '$41.00',
     imageUrl: 'https://m.media-amazon.com/images/I/51hLd6gHRHL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/617mcHGk4BL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/41H8ysPMcHL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/51hLd6gHRHL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/617mcHGk4BL._AC_SL1500_.jpg',
@@ -17218,7 +17218,7 @@ export const PRODUCT_CATALOG = [
     brand: 'Murkluz',
     price: 49.99, priceDisplay: '$49.99',
     imageUrl: 'https://m.media-amazon.com/images/I/71hr4b8B73L._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/71t+9CW4ZDL._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/71hr4b8B73L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/71t+9CW4ZDL._AC_SL1500_.jpg',
@@ -17258,7 +17258,7 @@ export const PRODUCT_CATALOG = [
     brand: 'GOEBLESON',
     price: 79.99, priceDisplay: '$79.99',
     imageUrl: 'https://m.media-amazon.com/images/I/61jZPYKuzQL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/615Le6HRKrL._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/61jZPYKuzQL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/615Le6HRKrL._AC_SL1500_.jpg',
@@ -17378,7 +17378,7 @@ export const PRODUCT_CATALOG = [
     brand: 'Corlaceling',
     price: 179.99, priceDisplay: '$179.99',
     imageUrl: 'https://m.media-amazon.com/images/I/81jqkn84tFL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/51wmlAcBy1L._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/81jqkn84tFL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81jqkn84tFL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51wmlAcBy1L._AC_SL1500_.jpg',
@@ -17459,7 +17459,7 @@ export const PRODUCT_CATALOG = [
     brand: 'HMVPL',
     price: 119.99, priceDisplay: '$119.99',
     imageUrl: 'https://m.media-amazon.com/images/I/81ftrbGvVSL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/41PXUCclrZL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/81ftrbGvVSL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81ftrbGvVSL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41PXUCclrZL._AC_SL1500_.jpg',
@@ -17538,7 +17538,7 @@ export const PRODUCT_CATALOG = [
     brand: 'SANTOSTOCK',
     price: 79.99, priceDisplay: '$79.99',
     imageUrl: 'https://m.media-amazon.com/images/I/71EBo+zT42L._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/41XmsPPA2KL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/71EBo+zT42L._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71EBo+zT42L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41XmsPPA2KL._AC_SL1500_.jpg',
@@ -17657,7 +17657,7 @@ export const PRODUCT_CATALOG = [
     brand: 'CATINER',
     price: 99.99, priceDisplay: '$99.99',
     imageUrl: 'https://m.media-amazon.com/images/I/71dpXyvNY2L._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/51yaAaT567L._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/71dpXyvNY2L._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71dpXyvNY2L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51yaAaT567L._AC_SL1500_.jpg',
@@ -17856,7 +17856,7 @@ export const PRODUCT_CATALOG = [
     name: 'Topfinel Decorative Throw Pillow Covers Cushion Cases, Set of 4 Soft Velvet Modern Double-Sided Designs, Mix and Match for Boho Farmhouse Fall Home Decor (18x18 inch, Orange/Teal)',
     brand: 'Topfinel',
     price: 15.59, priceDisplay: '$15.59',
-    imageUrl: 'https://m.media-amazon.com/images/I/81Bu0nsrbHL._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/51kCfxop8EL._AC_SL1500_.jpg',
     panelImageUrl: 'https://m.media-amazon.com/images/I/51kCfxop8EL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81Bu0nsrbHL._AC_SL1500_.jpg',
@@ -17897,7 +17897,7 @@ export const PRODUCT_CATALOG = [
     name: 'Fancy Homi 4 Packs Neutral Decorative Throw Pillow Covers 18x18 Inch for Living Room Couch Bed Sofa, Rustic Farmhouse Boho Home Decor, Soft Plush Striped Corduroy Square Cushion Case 45x45 cm',
     brand: 'Fancy Homi',
     price: 15.97, priceDisplay: '$15.97',
-    imageUrl: 'https://m.media-amazon.com/images/I/51yVid+1rSL._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/51-rHRE2TDL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71YAboIsyAL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51ycdely66L._AC_SL1500_.jpg',
@@ -17937,7 +17937,7 @@ export const PRODUCT_CATALOG = [
     name: 'Fancy Homi 2 Packs Rust Boho Decorative Throw Pillow Covers 18x18 Inch for Couch Bed Sofa, Farmhouse Fall Home Decor, Soft Corss Corduroy Patchwork Textured Terracotta Accent Cushion Case 45x45 cm',
     brand: 'Fancy Homi',
     price: 9.98, priceDisplay: '$9.98',
-    imageUrl: 'https://m.media-amazon.com/images/I/81CqZf7jRvL._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/41SBCm-23IL._AC_SL1500_.jpg',
     panelImageUrl: 'https://m.media-amazon.com/images/I/51zDSY+7lKL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81CqZf7jRvL._AC_SL1500_.jpg',
@@ -18018,7 +18018,7 @@ export const PRODUCT_CATALOG = [
     brand: 'HPUK',
     price: 22.94, priceDisplay: '$22.94',
     imageUrl: 'https://m.media-amazon.com/images/I/91pX3XgEejL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/51Wz1PZYf8L._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/91pX3XgEejL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51Wz1PZYf8L._AC_SL1500_.jpg',
@@ -18057,7 +18057,7 @@ export const PRODUCT_CATALOG = [
     name: 'Aegero Pack of 2 Corduroy Decorative Throw Pillow Covers 18x18 Inch Soft Striped Pillow Covers Modern Farmhouse Home Decor for Sofa Living Room Couch Bed (Cream White)',
     brand: 'Aegero',
     price: 7.49, priceDisplay: '$7.49',
-    imageUrl: 'https://m.media-amazon.com/images/I/81XpsL1phCL._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/511pXkvGeAL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81XpsL1phCL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/511pXkvGeAL._AC_SL1500_.jpg',
@@ -18177,8 +18177,8 @@ export const PRODUCT_CATALOG = [
     name: 'LANANAS Neutral Couch Throw Pillow Covers 18x18 Inch Set of 4 Decorative Farmhouse Boho Throw Pillows for Living Room, Couch, Bed, Sofa Soft Corduroy Accent Home Decor (Neutral Brown, 18x18 Inch)',
     brand: 'LANANAS',
     price: 16.99, priceDisplay: '$16.99',
-    imageUrl: 'https://m.media-amazon.com/images/I/61ZfQOgagOL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/31641HoMo1L._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/31641HoMo1L._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/61ZfQOgagOL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/31641HoMo1L._AC_SL1500_.jpg',
@@ -18218,7 +18218,7 @@ export const PRODUCT_CATALOG = [
     name: 'Cozoomy Set of 4 Neutral Decorative Throw Pillow Covers 18x18 Inch Corduroy Pillow Covers for Bed Couch Sofa Living Room Soft Square Cushion Cases',
     brand: 'Cozoomy',
     price: 15.74, priceDisplay: '$15.74',
-    imageUrl: 'https://m.media-amazon.com/images/I/51sEYwB9VvL._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/51T1gRSQbDL._AC_SL1500_.jpg',
     panelImageUrl: 'https://m.media-amazon.com/images/I/61LFX2DYt4L._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/91KVnhHfYXL._AC_SL1500_.jpg',
@@ -18299,7 +18299,7 @@ export const PRODUCT_CATALOG = [
     brand: 'MIULEE',
     price: 28.99, priceDisplay: '$28.99',
     imageUrl: 'https://m.media-amazon.com/images/I/81Ez4LqQS2L._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/51bkrR8A01L._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/81Ez4LqQS2L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51bkrR8A01L._AC_SL1500_.jpg',
@@ -18378,7 +18378,7 @@ export const PRODUCT_CATALOG = [
     brand: 'Pallene',
     price: 9.99, priceDisplay: '$9.99',
     imageUrl: 'https://m.media-amazon.com/images/I/71NnhT0BU8L._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/31HiR3FomnL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/71NnhT0BU8L._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71NnhT0BU8L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/31HiR3FomnL._AC_SL1500_.jpg',
@@ -18417,8 +18417,8 @@ export const PRODUCT_CATALOG = [
     name: 'MIULEE Teal Orange Decorative Throw Pillow Covers 18x18 Inch Set of 4 Boho Corduroy Striped Cushion Cases Modern Farmhouse Patchwork Pillow Cases for Couch Sofa Bedroom Home Decor',
     brand: 'MIULEE',
     price: 16.98, priceDisplay: '$16.98',
-    imageUrl: 'https://m.media-amazon.com/images/I/51b6IbS6J8L._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/51b6IbS6J8L._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/51JhR1aoI1L._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/81yautWrxzL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81yautWrxzL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51b6IbS6J8L._AC_SL1500_.jpg',
@@ -18458,7 +18458,7 @@ export const PRODUCT_CATALOG = [
     brand: 'Foindtower',
     price: 19.41, priceDisplay: '$19.41',
     imageUrl: 'https://m.media-amazon.com/images/I/81bNyG1kWeL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/51iQE7qa-DL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/81bNyG1kWeL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81bNyG1kWeL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51iQE7qa-DL._AC_SL1500_.jpg',
@@ -18539,7 +18539,7 @@ export const PRODUCT_CATALOG = [
     brand: 'MIULEE',
     price: 15.99, priceDisplay: '$15.99',
     imageUrl: 'https://m.media-amazon.com/images/I/81HYZGdNrqL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/51cAbna9yYL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/61cBUsjywpL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81HYZGdNrqL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51cAbna9yYL._AC_SL1500_.jpg',
@@ -18619,7 +18619,7 @@ export const PRODUCT_CATALOG = [
     name: 'EXQ Home Fleece Throw Blanket for Couch or Bed - 3D Imitation Turtle Shell Jacquard Decorative Blankets - Cozy Soft Lightweight Fuzzy Flannel Blanket Suitable for All Seasons(50"×60",Beige)',
     brand: 'EXQ Home',
     price: 8.99, priceDisplay: '$8.99',
-    imageUrl: 'https://m.media-amazon.com/images/I/91brxXR1OYL._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/51GxhhUG-7L._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/91brxXR1OYL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51GxhhUG-7L._AC_SL1500_.jpg',
@@ -18800,7 +18800,7 @@ export const PRODUCT_CATALOG = [
     name: 'Linecooo Sage Green Fleece Throw Blanket 50"×60" for Couch Sofa Bed,Super Soft Cozy Plush Microfiber Flannel Blanket with Stripes Design Lightweight for Adults,Woman,Girls',
     brand: 'Linecooo',
     price: 9.99, priceDisplay: '$9.99',
-    imageUrl: 'https://m.media-amazon.com/images/I/81mdEx1mdQL._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/41ib9eRLCDL._AC_SL1500_.jpg',
     panelImageUrl: 'https://m.media-amazon.com/images/I/51KSLAADHgL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81mdEx1mdQL._AC_SL1500_.jpg',
@@ -18983,7 +18983,7 @@ export const PRODUCT_CATALOG = [
     name: "L'AGRATY Chunky Knit Blanket Throw,Soft Chenille Yarn Throw Blanket 50x60，Handmade Cable Knit Crochet Blanket,Large Knit Blankets Chunky Yarn,Rope Knot Throw Blanket for Couch Sofa Bed Home Decor",
     brand: "L'AGRATY",
     price: 36.99, priceDisplay: '$36.99',
-    imageUrl: 'https://m.media-amazon.com/images/I/81FqA9daRlL._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/51zFJaDG9FL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81FqA9daRlL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51zFJaDG9FL._AC_SL1500_.jpg',
@@ -19028,7 +19028,7 @@ export const PRODUCT_CATALOG = [
     name: 'Aganear Fleece Throw Blanket - Cozy Soft Lightweight Fuzzy Throw Blanket for Women Portable Throw Blankets for Couch, Warm Present for Birthday, Christmas, Halloween, Housewarming(50"x60", Khaki)',
     brand: 'Aganear',
     price: 13.98, priceDisplay: '$13.98',
-    imageUrl: 'https://m.media-amazon.com/images/I/91s3yj5-SFL._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/51WS+Sc2PyL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/91s3yj5-SFL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51WS+Sc2PyL._AC_SL1500_.jpg',
@@ -19385,7 +19385,7 @@ export const PRODUCT_CATALOG = [
     brand: 'HERDUK',
     price: 25.99, priceDisplay: '$25.99',
     imageUrl: 'https://m.media-amazon.com/images/I/719c2k+UI8L._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/41GCRaikRDL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/719c2k+UI8L._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/719c2k+UI8L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41GCRaikRDL._AC_SL1500_.jpg',
@@ -19429,8 +19429,8 @@ export const PRODUCT_CATALOG = [
     name: "D'vine Dev Set of 2 Stoneware Planter Pots, Ceramic Pot with Drainage Hole and Saucers, 4.5 Inch 5.8 Inch, Ivory",
     brand: "D'vine Dev",
     price: 26.99, priceDisplay: '$26.99',
-    imageUrl: 'https://m.media-amazon.com/images/I/51y0zh-4QzL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/41CCMy9oflS._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/41hQ-wbiLkL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/71zaTSAwufL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71zaTSAwufL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41CCMy9oflS._AC_SL1500_.jpg',
@@ -19515,7 +19515,7 @@ export const PRODUCT_CATALOG = [
     brand: 'G EPGardening',
     price: 36.99, priceDisplay: '$36.99',
     imageUrl: 'https://m.media-amazon.com/images/I/61vE5xuO3YL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/41YjWBSuDTL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/61vE5xuO3YL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/61vE5xuO3YL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41YjWBSuDTL._AC_SL1500_.jpg',
@@ -19715,8 +19715,8 @@ export const PRODUCT_CATALOG = [
     name: 'Shineloha 2 Pack Hanging Planters for Indoor Plants with 5.5" Pot + Ceiling Hook + Extender Chain — Hanging Plant Holder, Metal Minimalist Planter',
     brand: 'Shineloha',
     price: 34.99, priceDisplay: '$34.99',
-    imageUrl: 'https://m.media-amazon.com/images/I/61lx75XXxKL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/51NI1x-EsFL._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/41NgGmN9uML._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/61lx75XXxKL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51NI1x-EsFL._AC_SL1500_.jpg',
@@ -19796,7 +19796,7 @@ export const PRODUCT_CATALOG = [
     brand: 'LiyuanQ',
     price: 21.99, priceDisplay: '$21.99',
     imageUrl: 'https://m.media-amazon.com/images/I/51fjZwXfp2L._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/41wWNYxEQBL._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/71AAdMtXn8L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41wWNYxEQBL._AC_SL1500_.jpg',
@@ -19878,7 +19878,7 @@ export const PRODUCT_CATALOG = [
     brand: 'Mkono',
     price: 15.99, priceDisplay: '$15.99',
     imageUrl: 'https://m.media-amazon.com/images/I/712rVUIlwNL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/51+G4BUmEQL._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/712rVUIlwNL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51+G4BUmEQL._AC_SL1500_.jpg',
@@ -19923,7 +19923,7 @@ export const PRODUCT_CATALOG = [
     brand: 'QLOFEI',
     price: 19.99, priceDisplay: '$19.99',
     imageUrl: 'https://m.media-amazon.com/images/I/61Yri7GQ+6L._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/318Nae447BL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/61Yri7GQ+6L._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/61Yri7GQ+6L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/318Nae447BL._AC_SL1500_.jpg',
@@ -19964,7 +19964,7 @@ export const PRODUCT_CATALOG = [
     brand: 'QLOFEI',
     price: 29.99, priceDisplay: '$29.99',
     imageUrl: 'https://m.media-amazon.com/images/I/61KVbKSnozL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/41RWjBU-xtL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/412X2v+NkWL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/61KVbKSnozL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41RWjBU-xtL._AC_SL1500_.jpg',
@@ -20003,7 +20003,7 @@ export const PRODUCT_CATALOG = [
     brand: 'Kimdio',
     price: 29.99, priceDisplay: '$29.99',
     imageUrl: 'https://m.media-amazon.com/images/I/51kbZf5IkyL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/417BbVoT39L._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/71asisPMFBL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/417BbVoT39L._AC_SL1500_.jpg',
@@ -20044,7 +20044,7 @@ export const PRODUCT_CATALOG = [
     name: 'CwlwGO Ceramic Flower Vase Set of 3, Pottery Decorative Vases for Modern Farmhouse, Living Room Kitchen Table Centerpieces, Bookshelf Mantel and Entrance Decor — Multicolor',
     brand: 'CwlwGO',
     price: 30.99, priceDisplay: '$30.99',
-    imageUrl: 'https://m.media-amazon.com/images/I/71ayZnUjPTL._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/41iItwgOztL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71ayZnUjPTL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/419XyeWwtnL._AC_SL1500_.jpg',
@@ -20128,7 +20128,7 @@ export const PRODUCT_CATALOG = [
     name: 'CwlwGO Ceramic Vase Set of 3, Small Flower Vases for Home Decoration, Modern Farmhouse Decor, Living Room Kitchen Table Centerpieces, Shelf Mantel Fireplace Entrance Decorations',
     brand: 'CwlwGO',
     price: 29.99, priceDisplay: '$29.99',
-    imageUrl: 'https://m.media-amazon.com/images/I/71lGQtZnnWL._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/41ekHlKQpQL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71lGQtZnnWL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41wCYryG3JL._AC_SL1500_.jpg',
@@ -20253,7 +20253,7 @@ export const PRODUCT_CATALOG = [
     brand: 'COTYNI',
     price: 25.99, priceDisplay: '$25.99',
     imageUrl: 'https://m.media-amazon.com/images/I/71Ms+27gxoL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/41CqLNza39L._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/71Ms+27gxoL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41CqLNza39L._AC_SL1500_.jpg',
@@ -20335,8 +20335,8 @@ export const PRODUCT_CATALOG = [
     name: 'LUKA Ceramic Rustic Farmhouse Vase Set of 3, Terracotta Vases for Decor, Vases for Bedroom Office Living Room Fireplace Bookshelf, 10+7.5+5 Inch',
     brand: 'LUKA',
     price: 26.99, priceDisplay: '$26.99',
-    imageUrl: 'https://m.media-amazon.com/images/I/41EKWFOINDL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/41EKWFOINDL._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/51OvBIhlKML._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/91kgZ5RxjzL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41EKWFOINDL._AC_SL1500_.jpg',
@@ -20376,8 +20376,8 @@ export const PRODUCT_CATALOG = [
     name: 'SIDUCAL Ceramic Rustic Farmhouse Vase Set of 3, Whitewashed Terracotta Vase, Clay Decorative Vases for Home Decor Living Room Shelf Mantel Decoration',
     brand: 'SIDUCAL',
     price: 23.99, priceDisplay: '$23.99',
-    imageUrl: 'https://m.media-amazon.com/images/I/41+lE5hZpjL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/41Tw-KV567L._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/41oHhdpdewL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/41oHhdpdewL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71KUmEfflOL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41Tw-KV567L._AC_SL1500_.jpg',
@@ -20539,8 +20539,8 @@ export const PRODUCT_CATALOG = [
     name: 'QLOFEI 20 Pcs Amber Gold Glass Bud Vases Set — Amber Gold Small Vases for Flowers, Vintage Flower Cute Glass in Bulk for Centerpieces Rustic Decorative Wedding Table Home',
     brand: 'QLOFEI',
     price: 37.99, priceDisplay: '$37.99',
-    imageUrl: 'https://m.media-amazon.com/images/I/81oGp8nQENL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/51H95m8KbsL._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/51cC+Ssb1tL._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/81oGp8nQENL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51H95m8KbsL._AC_SL1500_.jpg',
@@ -20680,7 +20680,7 @@ export const PRODUCT_CATALOG = [
     brand: 'FIRAVOE',
     price: 89.99, priceDisplay: '$89.99',
     imageUrl: 'https://m.media-amazon.com/images/I/816IbLHUe2L._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/41Ba4lRNFFL._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/816IbLHUe2L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41Ba4lRNFFL._AC_SL1500_.jpg',
@@ -20772,8 +20772,8 @@ export const PRODUCT_CATALOG = [
     name: 'GrandNoor Natural Rattan Counter Height Stools Set of 2, 24" Cesca Style with Solid Wood Back',
     brand: 'GrandNoor',
     price: 169.99, priceDisplay: '$169.99',
-    imageUrl: 'https://m.media-amazon.com/images/I/71tz8KO7snL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/41QkD6kIQtL._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/41QkD6kIQtL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51tTeCMHRdL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71tz8KO7snL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41QkD6kIQtL._AC_SL1500_.jpg',
@@ -20816,7 +20816,7 @@ export const PRODUCT_CATALOG = [
     brand: 'Rejeke',
     price: 189.99, priceDisplay: '$189.99',
     imageUrl: 'https://m.media-amazon.com/images/I/81RJB4bbldL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/410Q3nfastL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/41KMA2aR24L._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81RJB4bbldL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/410Q3nfastL._AC_SL1500_.jpg',
@@ -20910,7 +20910,7 @@ export const PRODUCT_CATALOG = [
     brand: 'Rejeke',
     price: 199.90, priceDisplay: '$199.90',
     imageUrl: 'https://m.media-amazon.com/images/I/71gPmUd9NEL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/51EtDtG-fuL._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/71gPmUd9NEL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51EtDtG-fuL._AC_SL1500_.jpg',
@@ -20996,7 +20996,7 @@ export const PRODUCT_CATALOG = [
     brand: 'Aklaus',
     price: 149.99, priceDisplay: '$149.99',
     imageUrl: 'https://m.media-amazon.com/images/I/71vO7VlzwVL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/41TYOdg4Z8L._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/31P3gQYkhWL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71vO7VlzwVL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41TYOdg4Z8L._AC_SL1500_.jpg',
@@ -21039,7 +21039,7 @@ export const PRODUCT_CATALOG = [
     brand: 'DUOMAY',
     price: 219.99, priceDisplay: '$219.99',
     imageUrl: 'https://m.media-amazon.com/images/I/71LkeT58gEL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/41yieItQiwL._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/71LkeT58gEL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41yieItQiwL._AC_SL1500_.jpg',
@@ -21080,7 +21080,7 @@ export const PRODUCT_CATALOG = [
     brand: 'VATROS',
     price: 89.99, priceDisplay: '$89.99',
     imageUrl: 'https://m.media-amazon.com/images/I/41fkn-a9UiL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/4147HTqtDQL._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/71xV2z9UmSL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/4147HTqtDQL._AC_SL1500_.jpg',
@@ -21122,8 +21122,8 @@ export const PRODUCT_CATALOG = [
     name: 'KRAMZMING Swivel Velvet Bar Stools Set of 2, 26" Counter Height with Back & Footrest, 4 Colors',
     brand: 'KRAMZMING',
     price: 135.98, priceDisplay: '$135.98',
-    imageUrl: 'https://m.media-amazon.com/images/I/71A-vBuVovL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/41b+QMid3CL._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/412KvZApvkL._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/71A-vBuVovL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41b+QMid3CL._AC_SL1500_.jpg',
@@ -21165,8 +21165,8 @@ export const PRODUCT_CATALOG = [
     name: 'Rowill Swivel Adjustable Height Bar Stools Set of 2, White Faux Leather, Counter to Bar Height',
     brand: 'Rowill',
     price: 234.64, priceDisplay: '$234.64',
-    imageUrl: 'https://m.media-amazon.com/images/I/81IfZ1g3-3L._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/41TUajXcK8L._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/41xvwPbCBtL._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/81IfZ1g3-3L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41TUajXcK8L._AC_SL1500_.jpg',
@@ -21388,7 +21388,7 @@ export const PRODUCT_CATALOG = [
     price: 189.99,
     priceDisplay: '$189.99',
     imageUrl: 'https://m.media-amazon.com/images/I/814pvCzqf5L._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/41N0cKyqLoL._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/814pvCzqf5L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41N0cKyqLoL._AC_SL1500_.jpg',
@@ -21520,7 +21520,7 @@ export const PRODUCT_CATALOG = [
     price: 67.49,
     priceDisplay: '$67.49',
     imageUrl: 'https://m.media-amazon.com/images/I/71vZ-BezufL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/61ZUdxa8ZaL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/61BJWzeO14L._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71vZ-BezufL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/61ZUdxa8ZaL._AC_SL1500_.jpg',
@@ -21560,7 +21560,7 @@ export const PRODUCT_CATALOG = [
     price: 109.99,
     priceDisplay: '$109.99',
     imageUrl: 'https://m.media-amazon.com/images/I/417Irz8zbOL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/417Irz8zbOL._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/71que6vmoZL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/417Irz8zbOL._AC_SL1500_.jpg',
@@ -21607,7 +21607,7 @@ export const PRODUCT_CATALOG = [
     brand: 'RDUEEI',
     price: 161.40,
     priceDisplay: '$161.40',
-    imageUrl: 'https://m.media-amazon.com/images/I/6195gFNlCLL._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/21ZYAnZxe3L._AC_SL1500_.jpg',
     panelImageUrl: 'https://m.media-amazon.com/images/I/21ZYAnZxe3L._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/6195gFNlCLL._AC_SL1500_.jpg',
@@ -21726,7 +21726,7 @@ export const PRODUCT_CATALOG = [
     price: 253.99,
     priceDisplay: '$253.99',
     imageUrl: 'https://m.media-amazon.com/images/I/71MwKeIgveL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/41pxRNeI+CL._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/71MwKeIgveL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41pxRNeI+CL._AC_SL1500_.jpg',
@@ -21767,7 +21767,7 @@ export const PRODUCT_CATALOG = [
     price: 99.99,
     priceDisplay: '$99.99',
     imageUrl: 'https://m.media-amazon.com/images/I/81X3jE7DK2L._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/41fu+1Zgd7L._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/81X3jE7DK2L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41fu+1Zgd7L._AC_SL1500_.jpg',
@@ -22214,7 +22214,7 @@ export const PRODUCT_CATALOG = [
     brand: 'SIMPLIHOME',
     price: 3250.50, priceDisplay: '$3,250.50',
     imageUrl: 'https://m.media-amazon.com/images/I/61IrRmLbNUL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/41uVdMd4jTL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/31ws4Op2nuL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/31ws4Op2nuL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41uVdMd4jTL._AC_SL1500_.jpg',
@@ -22470,7 +22470,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 2299.99,
     compareAtPriceDisplay: '$2,299.99',
     imageUrl: 'https://m.media-amazon.com/images/I/51qf5IPRsVL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/31pxsgjxJWL._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/41Y39QVbnyL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/31pxsgjxJWL._AC_SL1500_.jpg',
@@ -22619,7 +22619,7 @@ export const PRODUCT_CATALOG = [
     priceDisplay: '$2,398.99',
     compareAtPrice: 2398.99,
     compareAtPriceDisplay: '$2,398.99',
-    imageUrl: 'https://m.media-amazon.com/images/I/810pR9hQs5L._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/41ub2ZlGexL._AC_SL1500_.jpg',
     panelImageUrl: 'https://m.media-amazon.com/images/I/51d0sjd6ryL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/41i6WhHaKQL._AC_SL1500_.jpg',
@@ -22680,7 +22680,7 @@ export const PRODUCT_CATALOG = [
     priceDisplay: '$946.00',
     compareAtPrice: 946.00,
     compareAtPriceDisplay: '$946.00',
-    imageUrl: 'https://m.media-amazon.com/images/I/51wb+XEO02L._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/51P67KNPZcL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/51u92sBOvBL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41gMfdC+85L._AC_SL1500_.jpg',
@@ -22950,7 +22950,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 82.07,
     compareAtPriceDisplay: '$82.07',
     imageUrl: 'https://m.media-amazon.com/images/I/910Oc-M4GuL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/410DMthoPuL._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/910Oc-M4GuL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/410DMthoPuL._AC_SL1500_.jpg',
@@ -23576,7 +23576,7 @@ export const PRODUCT_CATALOG = [
     priceDisplay: '$879.99',
     compareAtPrice: 879.99,
     compareAtPriceDisplay: '$879.99',
-    imageUrl: 'https://m.media-amazon.com/images/I/91lp+x+9ljL._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/31n-TY9NRaL._AC_SL1500_.jpg',
     panelImageUrl: 'https://m.media-amazon.com/images/I/31n-TY9NRaL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/91lp+x+9ljL._AC_SL1500_.jpg',
@@ -23696,7 +23696,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 184.99,
     compareAtPriceDisplay: '$184.99',
     imageUrl: 'https://m.media-amazon.com/images/I/518-AZjclLL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/414M33xifHL._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/91uzz8emmSL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/414M33xifHL._AC_SL1500_.jpg',
@@ -23754,7 +23754,7 @@ export const PRODUCT_CATALOG = [
     priceDisplay: '$299.99',
     compareAtPrice: 299.99,
     compareAtPriceDisplay: '$299.99',
-    imageUrl: 'https://m.media-amazon.com/images/I/51cHDXCbRQL._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/61QLhWOTCcL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/91mlLcMK2iL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51cHDXCbRQL._AC_SL1500_.jpg',
@@ -23959,8 +23959,8 @@ export const PRODUCT_CATALOG = [
     priceDisplay: '$679.99',
     compareAtPrice: 679.99,
     compareAtPriceDisplay: '$679.99',
-    imageUrl: 'https://m.media-amazon.com/images/I/71+vOPRgb+L._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/41UbmJAYkjL._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/51d+WVBtKgL._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/71+vOPRgb+L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41UbmJAYkjL._AC_SL1500_.jpg',
@@ -24071,7 +24071,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 181.99,
     compareAtPriceDisplay: '$181.99',
     imageUrl: 'https://m.media-amazon.com/images/I/81aMzlPLnRL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/41K2hbfl7TL._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/81aMzlPLnRL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41K2hbfl7TL._AC_SL1500_.jpg',
@@ -24149,7 +24149,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 499.99,
     compareAtPriceDisplay: '$499.99',
     imageUrl: 'https://m.media-amazon.com/images/I/814ptBNNbHL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/316Lx5x4y9L._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/41oti4lVptL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/814ptBNNbHL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/316Lx5x4y9L._AC_SL1500_.jpg',
@@ -24268,7 +24268,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 309.99,
     compareAtPriceDisplay: '$309.99',
     imageUrl: 'https://m.media-amazon.com/images/I/41shHVhBFvL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/41shHVhBFvL._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/81dEZnvZ1yL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41shHVhBFvL._AC_SL1500_.jpg',
@@ -24343,7 +24343,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 99.99,
     compareAtPriceDisplay: '$99.99',
     imageUrl: 'https://m.media-amazon.com/images/I/71mjXZ6N-5L._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/316rHWyjYXL._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/71mjXZ6N-5L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/316rHWyjYXL._AC_SL1500_.jpg',
@@ -24508,8 +24508,8 @@ export const PRODUCT_CATALOG = [
     priceDisplay: '$259.99',
     compareAtPrice: 259.99,
     compareAtPriceDisplay: '$259.99',
-    imageUrl: 'https://m.media-amazon.com/images/I/41yfH-K5HQL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/51EUqA8nRML._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/81PqMa32mhL._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/81PqMa32mhL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51EUqA8nRML._AC_SL1500_.jpg',
@@ -24566,8 +24566,8 @@ export const PRODUCT_CATALOG = [
     priceDisplay: '$263.99',
     compareAtPrice: 263.99,
     compareAtPriceDisplay: '$263.99',
-    imageUrl: 'https://m.media-amazon.com/images/I/41a7AO0vXpL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/31tcnIyvnUL._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/31tcnIyvnUL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/31ycMgt2s1L._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81HUelzHK2L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/31tcnIyvnUL._AC_SL1500_.jpg',
@@ -24623,8 +24623,8 @@ export const PRODUCT_CATALOG = [
     priceDisplay: '$139.99',
     compareAtPrice: 139.99,
     compareAtPriceDisplay: '$139.99',
-    imageUrl: 'https://m.media-amazon.com/images/I/81dzJ3B8KQL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/418Zoaj3j5L._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/41rlKEcaDML._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/81dzJ3B8KQL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/418Zoaj3j5L._AC_SL1500_.jpg',
@@ -24675,8 +24675,8 @@ export const PRODUCT_CATALOG = [
     priceDisplay: '$259.99',
     compareAtPrice: 259.99,
     compareAtPriceDisplay: '$259.99',
-    imageUrl: 'https://m.media-amazon.com/images/I/811M9lz3zML._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/41Nx6jafsIL._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/41SYDOr8t8L._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/811M9lz3zML._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41Nx6jafsIL._AC_SL1500_.jpg',
@@ -24727,7 +24727,7 @@ export const PRODUCT_CATALOG = [
     priceDisplay: '$289.99',
     compareAtPrice: 289.99,
     compareAtPriceDisplay: '$289.99',
-    imageUrl: 'https://m.media-amazon.com/images/I/81z8Shp3F4L._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/51TL+LfS2xL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81z8Shp3F4L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51n-ISxRohL._AC_SL1500_.jpg',
@@ -24779,7 +24779,7 @@ export const PRODUCT_CATALOG = [
     priceDisplay: '$107.99',
     compareAtPrice: 107.99,
     compareAtPriceDisplay: '$107.99',
-    imageUrl: 'https://m.media-amazon.com/images/I/51BPLr3fitL._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/91Qg4DGpK2L._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/91Qg4DGpK2L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51r6fcKEegL._AC_SL1500_.jpg',
@@ -24885,7 +24885,7 @@ export const PRODUCT_CATALOG = [
     priceDisplay: '$189.99',
     compareAtPrice: 189.99,
     compareAtPriceDisplay: '$189.99',
-    imageUrl: 'https://m.media-amazon.com/images/I/81CB5qpiGoL._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/31HD7WsFyPL._AC_SL1500_.jpg',
     panelImageUrl: 'https://m.media-amazon.com/images/I/31HD7WsFyPL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81CB5qpiGoL._AC_SL1500_.jpg',
@@ -24989,7 +24989,7 @@ export const PRODUCT_CATALOG = [
     priceDisplay: '$599.00',
     compareAtPrice: 599.00,
     compareAtPriceDisplay: '$599.00',
-    imageUrl: 'https://m.media-amazon.com/images/I/81aWT7U0WRL._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/416FCc0TvLL._AC_SL1500_.jpg',
     panelImageUrl: 'https://m.media-amazon.com/images/I/41ReXV7jyZL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81aWT7U0WRL._AC_SL1500_.jpg',
@@ -25041,7 +25041,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 482.99,
     compareAtPriceDisplay: '$482.99',
     imageUrl: 'https://m.media-amazon.com/images/I/410cPrjtyZL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/410cPrjtyZL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/41cesH1idHL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/8110d9Tl-zL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/410cPrjtyZL._AC_SL1500_.jpg',
@@ -25090,8 +25090,8 @@ export const PRODUCT_CATALOG = [
     priceDisplay: '$679.99',
     compareAtPrice: 679.99,
     compareAtPriceDisplay: '$679.99',
-    imageUrl: 'https://m.media-amazon.com/images/I/71WsIizbtpL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/516ggiMTz3L._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/516ggiMTz3L._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/71WsIizbtpL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/516ggiMTz3L._AC_SL1500_.jpg',
@@ -25191,7 +25191,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 685.00,
     compareAtPriceDisplay: '$685.00',
     imageUrl: 'https://m.media-amazon.com/images/I/21DQQAdc4EL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/21RYn1HyU5L._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/21DQQAdc4EL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81CoNaNE-BL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/21RYn1HyU5L._AC_SL1500_.jpg',
@@ -25291,8 +25291,8 @@ export const PRODUCT_CATALOG = [
     priceDisplay: '$546.00',
     compareAtPrice: 546.00,
     compareAtPriceDisplay: '$546.00',
-    imageUrl: 'https://m.media-amazon.com/images/I/91Ir91AvMSL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/51mQmeu62HL._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/51Cy994TBgL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51Cy994TBgL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/91Ir91AvMSL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51mQmeu62HL._AC_SL1500_.jpg',
@@ -25360,7 +25360,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 700.00,
     compareAtPriceDisplay: '$700.00',
     imageUrl: 'https://m.media-amazon.com/images/I/71NT6xKey7L._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/41vL+QwK7SL._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/71NT6xKey7L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41vL+QwK7SL._AC_SL1500_.jpg',
@@ -25412,7 +25412,7 @@ export const PRODUCT_CATALOG = [
     priceDisplay: '$1,859.99',
     compareAtPrice: 1859.99,
     compareAtPriceDisplay: '$1,859.99',
-    imageUrl: 'https://m.media-amazon.com/images/I/51UrX7mEmkL._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/41Lf0xKt9DL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/91hE2CRVsiL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51SFXiLujEL._AC_SL1500_.jpg',
@@ -25463,7 +25463,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 819.10,
     compareAtPriceDisplay: '$819.10',
     imageUrl: 'https://m.media-amazon.com/images/I/51ttIAKKq-L._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/31I5scXj4ML._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51ttIAKKq-L._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/51ttIAKKq-L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/31I5scXj4ML._AC_SL1500_.jpg',
@@ -25874,7 +25874,7 @@ export const PRODUCT_CATALOG = [
     priceDisplay: '$339.99',
     compareAtPrice: 339.99,
     compareAtPriceDisplay: '$339.99',
-    imageUrl: 'https://m.media-amazon.com/images/I/81BKoxCezhL._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/51ZDwYdeZGL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81BKoxCezhL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51371TEXjgL._AC_SL1500_.jpg',
@@ -25937,8 +25937,8 @@ export const PRODUCT_CATALOG = [
     priceDisplay: '$509.99',
     compareAtPrice: 509.99,
     compareAtPriceDisplay: '$509.99',
-    imageUrl: 'https://m.media-amazon.com/images/I/511GS+YIM7L._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/511GS+YIM7L._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/41bYIqI87DL._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/81MZiPGIXrL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/511GS+YIM7L._AC_SL1500_.jpg',
@@ -26374,7 +26374,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 1199.38,
     compareAtPriceDisplay: '$1,199.38',
     imageUrl: 'https://m.media-amazon.com/images/I/71+CWkLxpdL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/51cnVrOR9JL._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/71+CWkLxpdL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51cnVrOR9JL._AC_SL1500_.jpg',
@@ -26440,7 +26440,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 1003.70,
     compareAtPriceDisplay: '$1,003.70',
     imageUrl: 'https://m.media-amazon.com/images/I/610vPpuVLtL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/51JAwIm-osL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/610vPpuVLtL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/610vPpuVLtL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51JAwIm-osL._AC_SL1500_.jpg',
@@ -26659,7 +26659,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 139.99,
     compareAtPriceDisplay: '$139.99',
     imageUrl: 'https://m.media-amazon.com/images/I/41+vk1U0V1L._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/51mVkKurMXL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/41+vk1U0V1L._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/41+vk1U0V1L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51mVkKurMXL._AC_SL1500_.jpg',
@@ -26767,7 +26767,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 45.99,
     compareAtPriceDisplay: '$45.99',
     imageUrl: 'https://m.media-amazon.com/images/I/818AYxUVemL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/415Bvqf8nBL._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/818AYxUVemL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/415Bvqf8nBL._AC_SL1500_.jpg',
@@ -26981,7 +26981,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 582.61,
     compareAtPriceDisplay: '$582.61',
     imageUrl: 'https://m.media-amazon.com/images/I/91FePu+lLdL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/51Yc55OD23L._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/91FePu+lLdL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51Yc55OD23L._AC_SL1500_.jpg',
@@ -27055,7 +27055,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 303.59,
     compareAtPriceDisplay: '$303.59',
     imageUrl: 'https://m.media-amazon.com/images/I/41WIpTisJOL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/41GXR60oa6L._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/81OAIBVnGoL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41GXR60oa6L._AC_SL1500_.jpg',
