@@ -1,5 +1,5 @@
 /**
- * SparkleBurst.js — multi-phase celebration burst (Build 122 redesign).
+ * SparkleBurst.js — multi-phase celebration burst.
  *
  * Renders a one-shot "you just bought something magical" explosion at a
  * given (x, y) screen point. Designed to feel like ONE moment but with
@@ -9,7 +9,10 @@
  *
  *   Phase 4 — Background radial glow         (0–900ms)  depth + aura
  *   Phase 1 — Anticipation flash             (0–120ms)  the "click"
- *   Phase 2 — Twin staggered shockwaves      (50–700ms) impact wave
+ *   Phase 2 — Twin synchronized shockwaves   (0–850ms)  impact wave
+ *               (Build 123: rings now start at t=0 from scale 0,
+ *                inner max 2.2× borderWidth 1.5px white,
+ *                outer max 3.5× borderWidth 1px light-blue)
  *   Phase 3 — Tiered particle explosion      (150–1500ms) the magic
  *               LARGE  10 hero sparkles    | size 10–14, dist 100–260
  *               MEDIUM 22 filler particles | size 5–8,   dist 70–220
@@ -235,12 +238,22 @@ export default function SparkleBurst({ x, y, size = 140, onComplete }) {
   });
 
   // ── Phase 2: Twin shockwaves ─────────────────────────────────────────────
-  // Inner: thicker, white, faster, smaller scale.
-  // Outer: thinner, light blue, slower, larger scale, slight delay.
+  // Both rings now start synchronized at t=0 and emerge from scale 0
+  // (no pre-expansion "dot" visible at center) so they read as ONE
+  // coordinated shockwave pulse from the burst origin instead of two
+  // staggered arcs that the eye reads as off-center.
+  //
+  // Build 123 polish:
+  //   - Inner max scale 2.8× → 2.2×    (stays inside tile bounds longer)
+  //   - Outer max scale 4.5× → 3.5×    (doesn't extend so far past particle field)
+  //   - Initial scale 0.2 → 0          (rings emerge from nothing, like particles)
+  //   - Outer 50ms delay → 0           (rings start synchronized)
+  //   - Inner border 3px → 1.5px       (thinner, more elegant)
+  //   - Outer border 1.5px → 1px       (thinner, see styles.ringOuter below)
   const ringInnerEnd     = RING_INNER_DURATION / TOTAL_DURATION;        // ≈ 0.433
   const ringInnerScale   = t.interpolate({
     inputRange:  [0, ringInnerEnd, 1],
-    outputRange: [0.2, 2.8,        2.8],
+    outputRange: [0, 2.2,          2.2],
     extrapolate: 'clamp',
   });
   const ringInnerOpacity = t.interpolate({
@@ -249,16 +262,15 @@ export default function SparkleBurst({ x, y, size = 140, onComplete }) {
     extrapolate: 'clamp',
   });
 
-  const ringOuterStart   = 50 / TOTAL_DURATION;                          // ≈ 0.033
-  const ringOuterEnd     = (50 + RING_OUTER_DURATION) / TOTAL_DURATION; // ≈ 0.6
+  const ringOuterEnd     = RING_OUTER_DURATION / TOTAL_DURATION;        // ≈ 0.567
   const ringOuterScale   = t.interpolate({
-    inputRange:  [0, ringOuterStart, ringOuterEnd, 1],
-    outputRange: [0.2, 0.2,           4.5,         4.5],
+    inputRange:  [0, ringOuterEnd, 1],
+    outputRange: [0, 3.5,          3.5],
     extrapolate: 'clamp',
   });
   const ringOuterOpacity = t.interpolate({
-    inputRange:  [0, ringOuterStart, ringOuterStart + 0.05, ringOuterEnd * 0.8, ringOuterEnd, 1],
-    outputRange: [0, 0,              0.6,                   0.2,                0,            0],
+    inputRange:  [0, 0.05, ringOuterEnd * 0.8, ringOuterEnd, 1],
+    outputRange: [0, 0.6,  0.2,                0,            0],
     extrapolate: 'clamp',
   });
 
@@ -366,13 +378,17 @@ const styles = StyleSheet.create({
   },
   ringOuter: {
     position: 'absolute',
-    borderWidth: 1.5,
+    // Build 123: thinned from 1.5 → 1 for a more elegant shockwave reading
+    borderWidth: 1,
     borderColor: COLOR_LIGHT_BLUE,
     backgroundColor: 'transparent',
   },
   ringInner: {
     position: 'absolute',
-    borderWidth: 3,
+    // Build 123: thinned from 3 → 1.5 — pairs with the outer ring's new
+    // 1px border so the two together read as a single coordinated pulse
+    // rather than two distinct stripes.
+    borderWidth: 1.5,
     borderColor: COLOR_WHITE,
     backgroundColor: 'transparent',
   },
