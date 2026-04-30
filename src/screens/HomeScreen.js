@@ -1221,6 +1221,22 @@ export default function HomeScreen({ navigation, route }) {
   // the decode cost across the first 38 seconds rather than incurring all
   // of it in the first frame.
   const [mountedHeroSet, setMountedHeroSet] = useState(() => new Set([0]));
+  // Build 127 — gray-flash on first paint fix.
+  //
+  // Layer stack on Home: white #FFFFFF container → hero <Image> → 40% black
+  // tint (heroTint). On a cold first launch (new install / new account),
+  // iOS hasn't yet decoded the bundled cosmos-1.jpeg, so the <Image>
+  // renders nothing. The tint sits over the white container, which math
+  // resolves to a flat #999999 — exactly the gray flash users were seeing
+  // during onboarding. By the time onboarding ended, the image was decoded
+  // and cached, and revisits looked correct (which is why the bug appeared
+  // "tied to onboarding" rather than "tied to first paint").
+  //
+  // Fix: don't draw the tint until hero[0] reports onLoad. Image.prefetch
+  // would help only with remote URIs; bundled require()'d assets need to
+  // pass through iOS's image-decode pipeline regardless. The deferred
+  // tint is the reliable signal that the hero has actually drawn pixels.
+  const [hero0Loaded, setHero0Loaded] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -3318,12 +3334,17 @@ export default function HomeScreen({ navigation, route }) {
                 source={src}
                 style={{ width: '100%', height: '100%' }}
                 resizeMode="cover"
+                // Build 127: hero[0] gates the tint mount. See hero0Loaded
+                // comment above. Other indices don't need this — by the
+                // time the slideshow advances to them, hero[0] is already
+                // loaded and the tint is in place.
+                onLoad={i === 0 ? () => setHero0Loaded(true) : undefined}
               />
             )}
           </Animated.View>
         ))}
       </View>
-      <View style={styles.heroTint} pointerEvents="none" />
+      {hero0Loaded && <View style={styles.heroTint} pointerEvents="none" />}
 
       <ScrollView
         style={StyleSheet.absoluteFill}
