@@ -80,17 +80,53 @@ const WILDCARD_ALLOWED_CATEGORIES = new Set([
 // If a product's category is in this map, it can only appear for those rooms.
 // Categories NOT listed here (rug, mirror, wall-art, planter, vase, lamp, etc.)
 // are considered universal and can appear in any room.
+//
+// Build 131: dining-table and dining-chair unlocked for kitchen room. Many
+// modern kitchens have a breakfast-nook table+chair pair rather than (or in
+// addition to) an island+stool. The catalog already tags 11 dining-table
+// products and 14 dining-chair products with 'kitchen' in their roomType
+// array; the prior lock was blocking the matcher from surfacing them.
 const CATEGORY_ROOM_LOCK = {
   'bed':            ['bedroom'],
   'nightstand':     ['bedroom'],
   'dresser':        ['bedroom'],
-  'dining-table':   ['dining-room'],
-  'dining-chair':   ['dining-room'],
+  'dining-table':   ['dining-room', 'kitchen'],   // Build 131 — breakfast nook
+  'dining-chair':   ['dining-room', 'kitchen'],   // Build 131 — breakfast nook
   'chandelier':     ['dining-room', 'bedroom', 'entryway'],
   'bar-stool':      ['kitchen', 'dining-room'],
   'kitchen-island': ['kitchen'],
   'desk':           ['office'],
   'desk-chair':     ['office'],
+};
+
+// ── Build 131: Category pairing ────────────────────────────────────────────
+// When the matcher picks an "anchor" furniture piece (a dining-table or a
+// kitchen-island), the diversifier guarantees its functional pair (chair or
+// stool) is also surfaced. Without this, kitchen and dining-room renders
+// frequently came back with stools/chairs missing their counter/table —
+// a core "incomplete room" UX problem flagged by user testing 2026-05-01:
+// "the format of kitchen is almost always skipping generating a table...
+//  it's almost like you have to bind those two together."
+//
+// Anchor → pair mapping. Order matters: pair[0] is preferred (chair > stool
+// when both are available in the same room context).
+const CATEGORY_PAIRS = {
+  'dining-table':   'dining-chair',
+  'kitchen-island': 'bar-stool',
+};
+
+// Reverse: when matcher already picked the chair/stool, the anchor is the pair
+const CATEGORY_PAIR_ANCHORS = {
+  'dining-chair': 'dining-table',
+  'bar-stool':    'kitchen-island',
+};
+
+// When a pair is selected, allow MAX 2 of the chair/stool category in the
+// result set so the panel cell can show a true pair. This narrowly relaxes
+// the global MAX_PER_CATEGORY=1 rule only for these specific pairing cases.
+const PAIRED_MAX_PER_CATEGORY = {
+  'dining-chair': 2,
+  'bar-stool':    2,
 };
 
 // Material affinity: related materials that should score partial credit.
@@ -870,10 +906,16 @@ function computeStyleScore(productStyles, detectedStyles) {
 // Must-have categories per room — these get reserved slots before anything else.
 // A bedroom without a bed or a living room without a sofa looks wrong.
 // First 3 items are "essentials" that get priority; rest are standard priority.
+//
+// Build 131: kitchen now leads with kitchen-island so diversify() can pair it
+// with bar-stool via CATEGORY_PAIRS. If kitchen-island can't be picked (thin
+// pool), the matcher falls through to dining-table → which pairs with
+// dining-chair via the same mechanism. Either way kitchen renders are
+// guaranteed a complete seating cluster.
 const ROOM_ESSENTIALS = {
   'living-room': ['sofa', 'coffee-table', 'rug'],
   'bedroom':     ['bed', 'nightstand', 'rug'],
-  'kitchen':     ['bar-stool', 'pendant-light'],
+  'kitchen':     ['kitchen-island', 'bar-stool', 'pendant-light'],   // Build 131
   'dining-room': ['dining-table', 'dining-chair', 'rug'],
   'office':      ['desk', 'desk-chair', 'bookshelf'],
   'bathroom':    ['mirror', 'planter'],
@@ -939,8 +981,18 @@ function diversify(
   // weight drops as `gensAgo` shrinks, so users naturally rotate through
   // their style's catalog rather than seeing the same top scorer every gen.
   function pickFromCategory(cat) {
+    // Build 131: if this category is a paired chair/stool AND its anchor is
+    // already in the result, allow up to PAIRED_MAX_PER_CATEGORY (2) instead
+    // of the global MAX_PER_CATEGORY (1). This lets the panel cell render
+    // a true pair of dining chairs or bar stools when their table/island
+    // is also in the set.
+    const anchorCat = CATEGORY_PAIR_ANCHORS[cat];
+    const hasAnchor = anchorCat && categoryCounts[anchorCat] > 0;
+    const effectiveMax = hasAnchor && PAIRED_MAX_PER_CATEGORY[cat]
+      ? PAIRED_MAX_PER_CATEGORY[cat]
+      : MAX_PER_CATEGORY;
     let candidates = sorted.filter(
-      (p) => p.category === cat && !usedIds.has(p.id) && (categoryCounts[cat] || 0) < MAX_PER_CATEGORY
+      (p) => p.category === cat && !usedIds.has(p.id) && (categoryCounts[cat] || 0) < effectiveMax
     );
     if (candidates.length === 0) return null;
 
@@ -1045,6 +1097,58 @@ function diversify(
     }
   }
 
+  // ── Pass 1.5: Anchor pairing (Build 131) ──────────────────────────────────
+  // If the essentials pass picked an anchor (dining-table or kitchen-island),
+  // ensure its functional pair (dining-chair or bar-stool) is in the result.
+  // This is the "incomplete kitchen" fix — without pairing, a kitchen-island
+  // panel cell would float without stools, or a dining-table would be shown
+  // without chairs.
+  //
+  // Pairing also relaxes MAX_PER_CATEGORY for the chair/stool category from
+  // the global 1 to 2 (per PAIRED_MAX_PER_CATEGORY), so the matcher can
+  // surface a true pair of chairs/stools when the anchor is present.
+  for (const item of [...result]) {
+    if (result.length >= limit) break;
+    const pairCat = CATEGORY_PAIRS[item.category];
+    if (!pairCat) continue;
+    // Already have this pair?
+    if (categoryCounts[pairCat]) continue;
+    const pairPick = pickFromCategory(pairCat);
+    if (pairPick) {
+      result.push(pairPick);
+      usedIds.add(pairPick.id);
+      categoryCounts[pairCat] = (categoryCounts[pairCat] || 0) + 1;
+      if (MATCH_DEBUG) {
+        console.log(
+          `[match] pairing: ${item.category} (${(item.name || '').substring(0, 30)}) → ` +
+          `${pairCat} (${(pairPick.name || '').substring(0, 30)})`
+        );
+      }
+    }
+  }
+
+  // Reverse-pairing: if matcher picked a chair/stool but no anchor (because
+  // the chair was in essentials but the table wasn't picked yet), pull in
+  // the anchor so the chair has a functional pair to sit at.
+  for (const item of [...result]) {
+    if (result.length >= limit) break;
+    const anchorCat = CATEGORY_PAIR_ANCHORS[item.category];
+    if (!anchorCat) continue;
+    if (categoryCounts[anchorCat]) continue;
+    const anchorPick = pickFromCategory(anchorCat);
+    if (anchorPick) {
+      result.push(anchorPick);
+      usedIds.add(anchorPick.id);
+      categoryCounts[anchorCat] = (categoryCounts[anchorCat] || 0) + 1;
+      if (MATCH_DEBUG) {
+        console.log(
+          `[match] reverse-pairing: ${item.category} → anchor ${anchorCat} ` +
+          `(${(anchorPick.name || '').substring(0, 30)})`
+        );
+      }
+    }
+  }
+
   // Pass 2: Fill remaining room furniture categories (from ROOM_FURNITURE)
   const roomFurniture = ROOM_FURNITURE[roomType] || ROOM_FURNITURE['living-room'];
   for (const cat of roomFurniture) {
@@ -1071,13 +1175,21 @@ function diversify(
   }
 
   // Pass 4: If still short, take highest-scored remaining regardless of category
+  // (Build 131 — respects pairing relaxation: paired chair/stool can fill 2
+  // slots when their anchor is present.)
   if (result.length < limit) {
     for (const product of sorted) {
       if (result.length >= limit) break;
-      if (!usedIds.has(product.id) && (categoryCounts[product.category] || 0) < MAX_PER_CATEGORY) {
+      const cat = product.category;
+      const anchorCat = CATEGORY_PAIR_ANCHORS[cat];
+      const hasAnchor = anchorCat && categoryCounts[anchorCat] > 0;
+      const effectiveMax = hasAnchor && PAIRED_MAX_PER_CATEGORY[cat]
+        ? PAIRED_MAX_PER_CATEGORY[cat]
+        : MAX_PER_CATEGORY;
+      if (!usedIds.has(product.id) && (categoryCounts[cat] || 0) < effectiveMax) {
         result.push(product);
         usedIds.add(product.id);
-        categoryCounts[product.category] = (categoryCounts[product.category] || 0) + 1;
+        categoryCounts[cat] = (categoryCounts[cat] || 0) + 1;
       }
     }
   }

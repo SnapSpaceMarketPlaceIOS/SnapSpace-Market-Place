@@ -29,6 +29,7 @@ import { useLiked } from '../context/LikedContext';
 import { useSubscription } from '../context/SubscriptionContext';
 import { getProductsForPrompt, getRecommendedProducts } from '../services/affiliateProducts';
 import { parseDesignPrompt } from '../utils/promptParser';
+import { getVariantSwatchHex } from '../utils/colorMap';
 import { saveUserDesign, updateDesignVisibility, updateDesignProducts } from '../services/supabase';
 import { buildShareMessage } from '../services/shareService';
 import * as FileSystem from 'expo-file-system/legacy';
@@ -789,10 +790,26 @@ function ProductCard({ product, inCart, onAddToCart, onPress }) {
   // legal disclosure in the SHOP ROOM footer covers the whole section.
   const showSimilarBadge = product.confidence && product.confidence !== 'verified';
 
+  // Build 131 — variant swatch dot. When the matcher picked a specific
+  // variant (e.g. "Sage Green" of a chair), show a small color dot in the
+  // image's bottom-right corner so the user can tell at a glance which
+  // color this card represents. Closes the gap where the user couldn't
+  // tell why a "purple" chair appeared in their glam-prompt set without
+  // tapping into PDP and scrolling variants.
+  const variantSwatchHex = product._matchedVariant
+    ? getVariantSwatchHex(product._matchedVariant.label)
+    : null;
+
   return (
     <TouchableOpacity style={s.hCard} activeOpacity={0.7} onPress={onPress}>
       <View>
         <CardImage uri={product.imageUrl} style={s.hCardImg} resizeMode="cover" placeholderColor="#D0D7E3" compact />
+        {variantSwatchHex && (
+          <View
+            style={[s.hCardSwatchDot, { backgroundColor: variantSwatchHex }]}
+            accessibilityLabel={`Variant: ${product._matchedVariant.label}`}
+          />
+        )}
       </View>
       <View style={s.hCardBody}>
         <Text style={s.hCardName} numberOfLines={2}>{product.name}</Text>
@@ -1729,6 +1746,25 @@ const s = StyleSheet.create({
     width: '100%',
     height: 150,
     backgroundColor: C.surface2,
+  },
+  // Build 131 — variant swatch dot, anchored to bottom-right of the
+  // card image. Small white border keeps the dot visible against any
+  // background color (including dark variants like black/charcoal that
+  // would otherwise blend into shadowed product photos).
+  hCardSwatchDot: {
+    position: 'absolute',
+    bottom: 8,
+    right: 8,
+    width: 16,
+    height: 16,
+    borderRadius: 8,
+    borderWidth: 2,
+    borderColor: '#FFFFFF',
+    shadowColor: '#000',
+    shadowOpacity: 0.18,
+    shadowRadius: 3,
+    shadowOffset: { width: 0, height: 1 },
+    elevation: 3,
   },
   similarBadge: {
     position: 'absolute',

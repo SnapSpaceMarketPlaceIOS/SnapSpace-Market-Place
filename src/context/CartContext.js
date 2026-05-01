@@ -92,7 +92,22 @@ export function CartProvider({ children }) {
     // cart badge. Wired at the context level so every caller benefits.
     hapticMedium();
     setItems((prev) => {
-      const key = `${product.name}__${product.brand}`;
+      // Build 131 — variant-aware cart key. When the matcher picked a
+      // specific variant for this product (e.g. "Sage Green" of a chair
+      // available in 6 colors), the variant id/label is suffixed onto the
+      // key so adding two different variants of the same product creates
+      // two cart entries instead of merging into one. Backward-compatible:
+      // products without _matchedVariant get the legacy `name__brand` key,
+      // matching every cart entry from prior builds.
+      const variantTag = product._matchedVariant
+        ? (product._matchedVariant.id || product._matchedVariant.label || '')
+            .toString()
+            .toLowerCase()
+            .replace(/\s+/g, '-')
+        : null;
+      const key = variantTag
+        ? `${product.name}__${product.brand}__${variantTag}`
+        : `${product.name}__${product.brand}`;
       const existing = prev.find((item) => item.key === key);
       if (existing) {
         return prev.map((item) =>
@@ -118,6 +133,11 @@ export function CartProvider({ children }) {
           asin: product.asin || null,
           rating: product.rating || null,
           reviewCount: product.reviewCount || null,
+          // Build 131 — preserve variant info on cart items so the
+          // checkout/PDP flow can show the right color and the user
+          // doesn't have to re-pick a variant they already chose.
+          variantLabel: product._matchedVariant?.label || null,
+          variantId:    product._matchedVariant?.id || null,
           quantity: 1,
         },
       ];

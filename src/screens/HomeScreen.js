@@ -990,6 +990,13 @@ export default function HomeScreen({ navigation, route }) {
   // away from the preset's exact prompt — at that point the user's writing
   // their own thing and the badge no longer represents what'll generate.
   const [selectedStyle, setSelectedStyle] = useState(null);
+  // Build 131 — Room context chip selection. Default 'living room' matches
+  // the canonical pre-prompts in stylePresets.js. When user taps a chip
+  // (e.g. "Kitchen"), subsequent style-preset taps swap "living room" →
+  // "kitchen" in the picked prompt before populating the input. Closes the
+  // "wasted credit when user wants kitchen but pre-prompt is living-room"
+  // gap flagged in user testing 2026-05-01.
+  const [selectedRoom, setSelectedRoom] = useState('living room');
   // Counter that bumps every time the prompt is set programmatically (style
   // pick / × clear / post-generation cleanup / Auth-wall restore). The
   // TextInput uses this as its `key`, so each programmatic prompt change
@@ -2178,6 +2185,30 @@ export default function HomeScreen({ navigation, route }) {
         } else {
           log('preflight: all ' + matchedProducts.length + ' product URLs reachable');
         }
+      }
+
+      // ── Build 131: image prefetch (Move 3) ──────────────────────────────
+      // Variant rewrites in Build 130 changed imageUrl to variant-specific
+      // URLs that aren't in iOS' image cache. When RoomResult mounts after
+      // FAL completes, those URLs fetch fresh — producing the 3-5s
+      // gray-placeholder window the user described as "cheap and slow."
+      //
+      // Fix: prefetch matched product URLs NOW (during the FAL render wait
+      // window) so by the time RoomResult mounts, every Shop Room card
+      // image is already in cache and renders instantly. Fire-and-forget;
+      // we never block generation on prefetch outcome.
+      try {
+        const prefetchUrls = (matchedProducts || [])
+          .map(p => p.imageUrl)
+          .filter(u => typeof u === 'string' && u.startsWith('http'));
+        for (const url of prefetchUrls) {
+          // Image.prefetch returns a promise; we don't await any. iOS will
+          // batch and cache as bandwidth allows during the FAL wait window.
+          Image.prefetch(url).catch(() => { /* swallow — best-effort */ });
+        }
+        log('prefetched ' + prefetchUrls.length + ' Shop Room image URLs');
+      } catch (e) {
+        warn('image prefetch threw:', e?.message || e);
       }
 
       // ── Build 62: prompt enrichment for the AI call only ────────────────────
@@ -3680,6 +3711,63 @@ export default function HomeScreen({ navigation, route }) {
                 preset prompt and replaces the chip strip above with a
                 "selected style" pill. Hidden during generation so the
                 GenieLoader has the screen. */}
+            {/* Build 131 — Room context chips. Lets the user mark which
+                room they're designing BEFORE picking a style preset, so
+                the picked prompt swaps "living room" → "kitchen" /
+                "bedroom" / etc. without manual editing. Default = living
+                room (matches canonical preset prompts unmodified). */}
+            {!generating && (
+              <View style={styles.roomChipsRow}>
+                <ScrollView
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  contentContainerStyle={styles.roomChipsScroll}
+                >
+                  {[
+                    { key: 'living room', label: 'Living Room' },
+                    { key: 'bedroom',     label: 'Bedroom'    },
+                    { key: 'kitchen',     label: 'Kitchen'    },
+                    { key: 'dining room', label: 'Dining'     },
+                    { key: 'office',      label: 'Office'     },
+                    { key: 'bathroom',    label: 'Bathroom'   },
+                    { key: 'outdoor',     label: 'Outdoor'    },
+                    { key: 'nursery',     label: 'Nursery'    },
+                  ].map((r) => {
+                    const active = selectedRoom === r.key;
+                    return (
+                      <TouchableOpacity
+                        key={r.key}
+                        onPress={() => {
+                          setSelectedRoom(r.key);
+                          // If a style is currently selected, re-fire its
+                          // prompt swap with the new room so the input
+                          // updates immediately (don't make user re-tap
+                          // the style card). Skip if no style is selected.
+                          if (selectedStyle) {
+                            const orig = selectedStyle.prompt || '';
+                            const swapped = orig.replace(
+                              /(living room|bedroom|kitchen|dining room|office|bathroom|outdoor|nursery)/i,
+                              r.key
+                            );
+                            if (swapped !== orig) {
+                              setSelectedStyle({ ...selectedStyle, prompt: swapped });
+                              setPrompt(swapped);
+                              bumpInputKey();
+                            }
+                          }
+                        }}
+                        style={[styles.roomChip, active && styles.roomChipActive]}
+                        activeOpacity={0.75}
+                      >
+                        <Text style={[styles.roomChipLabel, active && styles.roomChipLabelActive]}>
+                          {r.label}
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </ScrollView>
+              </View>
+            )}
             {!generating && (
               <StyleCarousel
                 onSelect={(preset) => {
@@ -3691,12 +3779,20 @@ export default function HomeScreen({ navigation, route }) {
                   const lastIdx = lastPromptIdxRef.current[preset.id];
                   const { idx, prompt: pickedPrompt } = pickPromptVariation(preset, lastIdx);
                   lastPromptIdxRef.current[preset.id] = idx;
+                  // Build 131 — apply the selected room context. The canonical
+                  // preset prompts all start with "[Style] living room, ...".
+                  // If the user picked a different room chip, swap "living
+                  // room" → selectedRoom so the prompt context matches
+                  // the user's actual scene.
+                  const roomAdjusted = selectedRoom !== 'living room'
+                    ? pickedPrompt.replace(/\bliving room\b/i, selectedRoom)
+                    : pickedPrompt;
                   // Stash the picked prompt onto selectedStyle so the pill
                   // can render it as a preview AND the auto-clear useEffect
                   // (which compares prompt === selectedStyle.prompt) still
                   // works without modification.
-                  setSelectedStyle({ ...preset, prompt: pickedPrompt });
-                  setPrompt(pickedPrompt);
+                  setSelectedStyle({ ...preset, prompt: roomAdjusted });
+                  setPrompt(roomAdjusted);
                   bumpInputKey();
                 }}
               />
@@ -4213,6 +4309,39 @@ export default function HomeScreen({ navigation, route }) {
 // ─── Styles ───────────────────────────────────────────────────────────────────
 
 const styles = StyleSheet.create({
+  // ── Build 131 — Room context chips above the StyleCarousel ─────────────
+  roomChipsRow: {
+    width: '100%',
+    marginTop: 6,
+    marginBottom: 8,
+  },
+  roomChipsScroll: {
+    paddingHorizontal: 16,
+    gap: 8,
+  },
+  roomChip: {
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255,255,255,0.18)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.35)',
+    marginRight: 8,
+  },
+  roomChipActive: {
+    backgroundColor: '#FFFFFF',
+    borderColor: '#FFFFFF',
+  },
+  roomChipLabel: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: 'rgba(255,255,255,0.95)',
+    fontFamily: 'Geist_600SemiBold',
+    letterSpacing: 0.2,
+  },
+  roomChipLabelActive: {
+    color: '#0B6DC3',
+  },
   container: {
     flex: 1,
     overflow: 'hidden',

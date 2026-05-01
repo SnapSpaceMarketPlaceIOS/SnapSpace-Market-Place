@@ -149,6 +149,47 @@ export function productHasColorFamily(product, family) {
   return getProductColorFamilies(product).includes(family);
 }
 
+// ─── Build 131 — Representative hex per color family ─────────────────────
+// Used by RoomResultScreen's variant swatch dot to show a glanceable
+// indicator of which variant the matcher picked. These hex values are
+// MIDPOINT representatives of each family's visual range — not pixel-exact
+// to any specific product, but accurate enough that a "purple" dot reads
+// as purple, a "navy" dot reads as navy, etc.
+const COLOR_FAMILY_HEX = {
+  brown:    '#8B4A2A',
+  white:    '#F5F5F0',
+  beige:    '#D8C9A8',
+  black:    '#1A1A1A',
+  charcoal: '#3F3F3F',
+  gray:     '#9E9E9E',
+  navy:     '#1F3A5F',
+  blue:     '#3B7FBF',
+  teal:     '#1F7C7C',
+  green:    '#5C8C4A',
+  red:      '#A8392E',
+  rust:     '#A85B2E',
+  orange:   '#D6904E',
+  yellow:   '#D8B83C',
+  pink:     '#D88C9C',
+  purple:   '#7A4A8C',
+  gold:     '#C9A14A',
+  copper:   '#B0633A',
+};
+
+/**
+ * Build 131 — return a representative hex for a variant label string.
+ * "Sage Green" → '#5C8C4A', "Cognac Leather" → '#8B4A2A', "Ivory" → '#F5F5F0'.
+ * Returns null if no recognizable color family found in the label.
+ */
+export function getVariantSwatchHex(variantLabel) {
+  if (!variantLabel || typeof variantLabel !== 'string') return null;
+  const families = detectColorFamilies(variantLabel);
+  if (families.length === 0) return null;
+  // First detected family wins. "Sage Green" detects 'green' first; "Black/Brown"
+  // detects 'black' first — both reasonable defaults for a single-dot swatch.
+  return COLOR_FAMILY_HEX[families[0]] || null;
+}
+
 // ─── Opposite-color pairs ───────────────────────────────────────────────
 // When the user says "brown" and the product is clearly "white/charcoal/gray",
 // apply a penalty. Prevents wrong-color products from winning on other signals.
