@@ -3526,7 +3526,12 @@ export default function HomeScreen({ navigation, route }) {
                   {/* Build 133 — Nursery removed. Catalog has no true
                       crib/rocker/mobile imports; the chip oversold what
                       we could render. Will re-add when nursery-specific
-                      products are imported. */}
+                      products are imported.
+                      Build 134 — Dorms added. Routes to bedroom in the
+                      matcher (a dorm is architecturally a bedroom — bed,
+                      nightstand, dresser, rug all fit). styleMap.js's
+                      ROOM_KEYWORDS.bedroom includes 'dorm' / 'dorm room'
+                      so prompt parsing recognizes it. */}
                   {[
                     { key: 'living room', label: 'Living Room' },
                     { key: 'kitchen',     label: 'Kitchen'    },
@@ -3535,6 +3540,7 @@ export default function HomeScreen({ navigation, route }) {
                     { key: 'office',      label: 'Office'     },
                     { key: 'bathroom',    label: 'Bathroom'   },
                     { key: 'outdoor',     label: 'Outdoor'    },
+                    { key: 'dorm room',   label: 'Dorms'      },
                   ].map((r) => {
                     const active = selectedRoom === r.key;
                     return (
@@ -3549,7 +3555,7 @@ export default function HomeScreen({ navigation, route }) {
                           if (selectedStyle) {
                             const orig = selectedStyle.prompt || '';
                             const swapped = orig.replace(
-                              /(living room|bedroom|kitchen|dining room|office|bathroom|outdoor|nursery)/i,
+                              /(living room|bedroom|kitchen|dining room|office|bathroom|outdoor|nursery|dorm room)/i,
                               r.key
                             );
                             if (swapped !== orig) {
@@ -4333,10 +4339,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 6,
   },
+  // Build 134 — chip text refined per user direction:
+  //   • fontSize 16 → 14 (barely smaller, less visual dominance)
+  //   • fontWeight 600 → 500 (medium) for inactive state — softer
+  //     baseline so the bold active chip pops more by contrast.
+  // Active state stays 700 bold so the selection cue remains clear.
   roomChipAboveLabel: {
-    fontSize: 16,
-    fontWeight: '600',
-    fontFamily: 'Geist_600SemiBold',
+    fontSize: 14,
+    fontWeight: '500',
+    fontFamily: 'Geist_500Medium',
     color: 'rgba(255,255,255,0.92)',
     letterSpacing: 0.2,
   },

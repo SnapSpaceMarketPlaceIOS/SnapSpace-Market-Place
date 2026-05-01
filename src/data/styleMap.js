@@ -11,7 +11,11 @@ export const ROOM_TYPES = [
 // Keywords that indicate each room type
 export const ROOM_KEYWORDS = {
   'living-room': ['living', 'lounge', 'sitting', 'family room', 'great room', 'den', 'tv room', 'nook', 'reading nook', 'media room', 'sunroom', 'sun room', 'loft'],
-  'bedroom':     ['bedroom', 'master', 'sleeping', 'sleep', 'bed room', 'suite', 'boudoir', 'guest room', 'master bedroom', 'primary bedroom'],
+  // Build 134 — added 'dorm', 'dorm room', 'dormitory' so the Dorms
+  // chip in HomeScreen's room-chip strip routes to bedroom. A dorm is
+  // architecturally a bedroom (bed + nightstand + dresser + rug) and
+  // shares its essential category set, so no separate room type needed.
+  'bedroom':     ['bedroom', 'master', 'sleeping', 'sleep', 'bed room', 'suite', 'boudoir', 'guest room', 'master bedroom', 'primary bedroom', 'dorm', 'dorm room', 'dormitory'],
   'kitchen':     ['kitchen', 'cooking', 'culinary', 'chef', 'pantry', 'galley', 'breakfast area', 'kitchenette'],
   'dining-room': ['dining', 'dinner', 'eat', 'breakfast nook', 'banquet', 'eating area', 'dining area', 'breakfast room'],
   'office':      ['office', 'workspace', 'study', 'home office', 'work from home', 'wfh', 'desk', 'studio', 'library', 'craft room'],
