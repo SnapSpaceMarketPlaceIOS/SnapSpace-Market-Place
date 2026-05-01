@@ -2144,7 +2144,9 @@ export default function HomeScreen({ navigation, route }) {
         );
         matchedProducts = getProductsForPrompt(
           designPrompt,
-          6,
+          // Build 130: 6 → 4 to match 2×2 panel cell count. Every Shop Room
+          // product now has a panel cell + appears in the rendered room.
+          4,
           recentIdsSet,
           productHistoryRef.current,
           likedIdsSet,

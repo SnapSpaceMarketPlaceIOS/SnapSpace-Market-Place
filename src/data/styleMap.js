@@ -123,13 +123,63 @@ export const MATERIAL_KEYWORDS = {
 };
 
 // ─── Moods ─────────────────────────────────────────────────────────────────────
+//
+// Build 130 expansion (Theory 3 — descriptor vectors via existing moods array).
+// The Haiku prompt expander produces phrases like "champagne palette,"
+// "opulent restraint," "shimmering composure," "monolithic," "weathered" —
+// rich style signal that today collapses to a single style tag and is then
+// thrown away. By extending MOOD_KEYWORDS to capture these descriptors,
+// the matcher's existing `mood` scoring axis (raised to 12 pts in Build 130
+// — see productMatcher.js) picks up roughly 14 additional words per prompt.
+//
+// Five descriptor categories:
+//   • Finish    — surface treatment (matte, polished, weathered)
+//   • Form      — structural shape (sculptural, monolithic, geometric)
+//   • Tone      — emotional register (opulent, restrained, playful)
+//   • Palette   — color story (champagne, jewel, deep-void, warm-neutral)
+//   • Texture   — tactile quality (tactile, smooth, nubby, glossy)
+//
+// Existing 6 moods (warm/cool/moody/bright/earthy/bold) are preserved
+// verbatim — they remain the primary mood scoring axis. New descriptor moods
+// extend the array additively.
 export const MOOD_KEYWORDS = {
+  // ── Original 6 moods (unchanged) ──────────────────────────────────────
   warm:   ['warm', 'cozy', 'inviting', 'amber', 'honey', 'golden', 'sunset'],
   cool:   ['cool', 'airy', 'fresh', 'breezy', 'pale', 'icy', 'serene'],
   moody:  ['moody', 'dramatic', 'dark', 'atmospheric', 'intimate', 'cocooning'],
   bright: ['bright', 'light', 'airy', 'white', 'open', 'sun-filled', 'luminous'],
   earthy: ['earthy', 'natural', 'organic', 'grounded', 'terracotta', 'clay', 'sand'],
   bold:   ['bold', 'vibrant', 'saturated', 'colorful', 'vivid', 'striking'],
+
+  // ── Build 130 — Finish descriptors ────────────────────────────────────
+  matte:    ['matte', 'flat-finish', 'unfinished', 'raw-finish'],
+  polished: ['polished', 'glossy', 'sheen', 'lacquered', 'reflective'],
+  weathered:['weathered', 'aged', 'patina', 'distressed', 'reclaimed'],
+
+  // ── Build 130 — Form descriptors ──────────────────────────────────────
+  sculptural: ['sculptural', 'sculpted', 'artisanal', 'hand-formed'],
+  monolithic: ['monolithic', 'massive', 'imposing', 'block-form'],
+  curved:     ['curved', 'rounded', 'organic-shape', 'arched', 'flowing'],
+  geometric:  ['geometric', 'angular', 'linear', 'gridded', 'grid-like'],
+
+  // ── Build 130 — Tone descriptors ──────────────────────────────────────
+  opulent:    ['opulent', 'lavish', 'rich', 'sumptuous', 'shimmering', 'shimmer'],
+  restrained: ['restrained', 'understated', 'subdued', 'muted', 'quiet-confidence'],
+  playful:    ['playful', 'whimsical', 'cheerful', 'lighthearted'],
+  refined:    ['refined', 'sophisticated', 'elegant', 'polished-look'],
+
+  // ── Build 130 — Palette descriptors ───────────────────────────────────
+  // Captures palette phrases the prompt expander emits frequently. These
+  // overlap with COLOR_KEYWORDS but at a higher abstraction (a "champagne
+  // palette" implies cream + gold + blush, not literal champagne color).
+  champagne: ['champagne', 'pale-gold', 'creamy-gold', 'butter-yellow'],
+  jewel:     ['jewel', 'jewel-tone', 'jewel-tones', 'jewel-toned', 'sapphire', 'emerald-tone', 'ruby-tone'],
+  deepVoid:  ['deep-void', 'deep void', 'inky', 'pitch', 'noir-deep'],
+  earthy2:   ['ochre', 'umber', 'sienna', 'burnt-umber', 'rust-toned'],
+
+  // ── Build 130 — Texture descriptors ───────────────────────────────────
+  tactile:   ['tactile', 'textured', 'nubby', 'boucle', 'crinkled', 'ribbed'],
+  smooth:    ['smooth', 'silken', 'glassy', 'satin-finish'],
 };
 
 // ─── Style → Product Style Score ───────────────────────────────────────────────

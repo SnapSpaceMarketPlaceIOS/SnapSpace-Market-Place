@@ -948,7 +948,12 @@ export default function RoomResultScreen({ route, navigation }) {
     if (routeProducts && routeProducts.length > 0) {
       setProducts(routeProducts);
     } else {
-      const matched = getProductsForPrompt(prompt, 6);
+      // Build 130: Shop Room reduced 6 → 4 to match the 2×2 panel cell count.
+      // The previous 6 meant 2 products were never sent to FAL and never
+      // appeared in the rendered room — disconnect from "see this in your
+      // room → buy it" promise. Now every Shop Room product has a panel
+      // cell. (3×2 panel test deferred to Build 131+.)
+      const matched = getProductsForPrompt(prompt, 4);
       setProducts(matched);
     }
   }, [prompt, route.params]);
@@ -1309,10 +1314,21 @@ export default function RoomResultScreen({ route, navigation }) {
 
         {/* ── Actions row ──────────────────────────────────────────── */}
         <View style={s.actionsRow}>
-          <View style={s.actionsInfo}>
+          {/* Build 130 — long-press the title in __DEV__ to open the
+              DebugDiffScreen for the current generation's products. The
+              gesture is dead in production (no-op when __DEV__ is false). */}
+          <Pressable
+            style={s.actionsInfo}
+            onLongPress={() => {
+              if (typeof __DEV__ !== 'undefined' && __DEV__) {
+                navigation.navigate('DebugDiff', { products, prompt });
+              }
+            }}
+            delayLongPress={800}
+          >
             <Text style={s.actionsTitle}>Your Design</Text>
             <Text style={s.actionsSub}>Share or post to profile</Text>
-          </View>
+          </Pressable>
           <View style={s.actionBtns}>
             <AnimatedIconBtn
               onPress={handleDownload}

@@ -57,6 +57,9 @@ import CartScreen from './src/screens/CartScreen';
 import ProfileScreen from './src/screens/ProfileScreen';
 import RoomResultScreen from './src/screens/RoomResultScreen';
 import ProductDetailScreen from './src/screens/ProductDetailScreen';
+// Build 130 — internal-only diagnostic, reachable via long-press gesture
+// on RoomResult's "Your Design" header (only fires when __DEV__ is true).
+import DebugDiffScreen from './src/screens/DebugDiffScreen';
 import UserProfileScreen from './src/screens/UserProfileScreen';
 import LikedScreen from './src/screens/LikedScreen';
 import SharedScreen from './src/screens/SharedScreen';
@@ -507,6 +510,10 @@ function RootNavigator() {
           no animation = pop-in. 250ms fade reads as intentional. */}
       <Stack.Screen name="Paywall" component={PaywallScreen} options={{ presentation: 'transparentModal', headerShown: false, animation: 'fade', animationDuration: 250 }} />
       <Stack.Screen name="FollowList" component={FollowListScreen} />
+      {/* Build 130 — internal diagnostic. Route is registered always but the
+          gesture that navigates here only fires under __DEV__ in
+          RoomResultScreen, so production users can't reach it. */}
+      <Stack.Screen name="DebugDiff" component={DebugDiffScreen} options={{ animation: 'slide_from_bottom' }} />
     </Stack.Navigator>
   );
 }

@@ -8,6 +8,10 @@ import {
   getProductColorFamilies,
 } from '../utils/colorMap';
 import { computePreferenceBonus } from '../utils/userPreferences';
+import {
+  getVariantStyleBoost,
+  findBestStyleAffinityVariant,
+} from '../utils/colorStyleAffinity';
 
 // Phase 3: flip to true to see [match] diagnostic logs in Metro for each
 // generation. Leave false in production to keep logs tidy.
@@ -55,6 +59,22 @@ const WILDCARD_POOL_SIZE = 15;
 // Combined with the tighter pool size, the user should perceive much
 // higher consistency between runs of the same prompt.
 const WILDCARD_PROBABILITY = 0.05;
+
+// Build 130: wildcards are now restricted to TRULY ACCENT categories.
+// Previously a wildcard could swap an accent-chair, side-table, or other
+// secondary furniture and confuse the user (a blue chair appearing in a
+// glam render — Build 129 testing showed this in IMG_8816). Now wildcards
+// can ONLY fire on decor categories — lamps, vases, planters, soft goods,
+// wall items. This preserves discovery without breaking the visual story
+// of furniture pieces. Essentials (sofa/chair/table/bed/rug) are already
+// protected by the existing essential-slot guard.
+const WILDCARD_ALLOWED_CATEGORIES = new Set([
+  'floor-lamp', 'table-lamp', 'pendant-light', 'chandelier', 'wall-light',
+  'mirror', 'wall-art', 'wall-shelf',
+  'vase', 'planter', 'sculpture',
+  'throw-pillow', 'throw-blanket', 'curtains',
+  'side-table', 'console-table',
+]);
 
 // Categories that are ONLY appropriate for specific room types.
 // If a product's category is in this map, it can only appear for those rooms.
@@ -326,7 +346,7 @@ export function matchProducts(
     }
   }
 
-  // ── Variant swap (Build 71 Fix #2) ───────────────────────────────────────
+  // ── Variant swap (Build 71 Fix #2 + Build 130 panel sync) ────────────────
   // When the user asked for a specific color on a category AND the chosen
   // product has a matching variant, swap the display asset + affiliate link
   // to that variant. Without this, a "sage green" prompt could return a sofa
@@ -334,9 +354,15 @@ export function matchProducts(
   // the Shop Room strip — visually unmatched to the rendered AI room.
   //
   // We preserve the underlying product id (so Liked/Cart continue to work)
-  // but update imageUrl, affiliateUrl, asin, and price/priceDisplay to the
-  // matched variant. _matchedVariant is attached for downstream debugging
-  // and future UX (e.g. showing the variant swatch on the card).
+  // but update imageUrl, affiliateUrl, asin, price, AND panelImageUrl
+  // (Build 130 — fixes the "purple panel cell → green render" disconnect
+  // observed in Build 129 testing).
+  //
+  // Build 130 fallback: if no explicit color was extracted from the prompt
+  // for this category, but the prompt has strong style intent, pick the
+  // variant whose color amplifies that style. Example: a "glam" prompt
+  // matches a chair → if that chair has a purple variant, prefer purple
+  // over the default cream because purple ↔ glam in colorStyleAffinity.
   const finalResults = diversified.map((p) => {
     // Build 71 Fix #3: attach the derived color families as a first-class
     // field so downstream UI (cards, PDP, filter chips) can render swatches
@@ -345,7 +371,18 @@ export function matchProducts(
     const derivedColors = getProductColorFamilies(p);
 
     const desired = colorByCategory[p.category];
-    const matched = desired ? findMatchingColorVariant(p, desired) : null;
+    let matched = desired ? findMatchingColorVariant(p, desired) : null;
+
+    // Build 130: style-affinity variant fallback when no explicit color
+    if (!matched && (!desired) && Array.isArray(p.variants) && p.variants.length > 1) {
+      matched = findBestStyleAffinityVariant(p, styles);
+      if (matched && MATCH_DEBUG) {
+        console.log(
+          `[match] style-affinity variant: ${p.category} — ${(p.name || '').substring(0, 40)} ` +
+          `→ "${matched.label}" (no explicit color, picked from styles=[${styles.join(',')}])`
+        );
+      }
+    }
 
     if (!matched) {
       // No variant swap, but still surface colors for consumers.
@@ -360,6 +397,20 @@ export function matchProducts(
     if (matched.mainImage || matched.swatchImage) {
       next.imageUrl = matched.mainImage || matched.swatchImage;
     }
+    // Build 130 — variant-aware panelImageUrl. When a variant's mainImage
+    // exists (which it always does for catalog-imported variants), use it
+    // for the FAL panel cell so what the model sees == what the user sees
+    // == what the cart adds. The product-level panelImageUrl was the
+    // studio shot of the DEFAULT variant only — when matcher picks a
+    // different variant, that studio shot is the wrong color.
+    //
+    // Trade-off: a variant's mainImage may be lifestyle-styled rather than
+    // a clean studio cutout. We accept that here because cart-render
+    // consistency outweighs marginal panel cleanliness. Move 5 (panel
+    // re-audit) will refine variant-level panel quality later.
+    if (matched.mainImage) {
+      next.panelImageUrl = matched.mainImage;
+    }
     if (matched.affiliateUrl) next.affiliateUrl = matched.affiliateUrl;
     if (matched.asin) next.asin = matched.asin;
     if (typeof matched.price === 'number' && matched.price > 0) {
@@ -369,7 +420,7 @@ export function matchProducts(
     if (MATCH_DEBUG) {
       console.log(
         `[match] variant swap: ${p.category} — ${(p.name || '').substring(0, 40)} ` +
-        `→ "${matched.label}" (color=${desired})`
+        `→ "${matched.label}" (color=${desired || 'style-affinity'})`
       );
     }
     return next;
@@ -468,9 +519,26 @@ function productHasMaterial(product, material) {
   return false;
 }
 
-// Moods that suggest higher-end / premium items — boosts rating weight
-const LUXURY_MOODS = ['luxurious', 'elegant', 'opulent', 'rich', 'sophisticated', 'dark-luxe'];
-const COZY_MOODS   = ['cozy', 'warm', 'inviting', 'comfortable', 'relaxed'];
+// Moods that suggest higher-end / premium items — boosts rating weight.
+// Build 130: extended with the new descriptor moods (Theory 3) so the
+// matcher recognizes prompt-expander phrases like "champagne palette" or
+// "polished sheen" or "refined elegance" as luxury cues.
+const LUXURY_MOODS = [
+  'luxurious', 'elegant', 'opulent', 'rich', 'sophisticated', 'dark-luxe',
+  // Build 130 additions — descriptor moods that imply premium
+  'refined', 'jewel', 'champagne', 'polished', 'opulent',
+];
+const COZY_MOODS = [
+  'cozy', 'warm', 'inviting', 'comfortable', 'relaxed',
+  // Build 130 additions — tactile/weathered are inherently cozy signals
+  'tactile', 'weathered',
+];
+// Build 130: BOLD/EARTHY buckets are checked inline below; the mood-scoring
+// block now reads from MOOD_KEYWORDS directly via the parsed moods array,
+// so any new descriptor mood that lands in moods[] participates in scoring
+// when it overlaps the right material/rating signals.
+const BOLD_MOODS   = ['bold', 'vibrant', 'dramatic', 'striking', 'monolithic', 'sculptural', 'deepVoid', 'jewel'];
+const EARTHY_MOODS = ['earthy', 'natural', 'organic', 'grounded', 'weathered', 'matte', 'earthy2'];
 
 /**
  * Score a single product against the detected design intent.
@@ -510,6 +578,7 @@ function scoreProduct(
   const breakdown = {
     total: 0, style: 0, color: 0, material: 0, room: 0,
     tag: 0, name: 0, category: 0, mood: 0, rating: 0, description: 0, preference: 0,
+    variantAffinity: 0,
   };
 
   // ── Room type match (15 points) ───────────────────────────────────────────
@@ -704,12 +773,17 @@ function scoreProduct(
     }
   }
 
-  // ── Mood bonus (8 points — raised from 3) ─────────────────────────────────
+  // ── Mood bonus (8 points — Build 130 expanded coverage) ──────────────────
+  // Build 130: bucket lists now include the new descriptor moods so prompts
+  // like "opulent restraint, shimmering composure" or "monolithic concrete"
+  // reach a scoring trigger instead of falling through to the 1-pt floor.
+  // Scoring cap stays at 8 to avoid disrupting the overall point balance —
+  // we only widened the trigger surface, didn't inflate the cap.
   if (moods && moods.length > 0) {
     const isLuxury = moods.some((m) => LUXURY_MOODS.includes(m));
     const isCozy   = moods.some((m) => COZY_MOODS.includes(m));
-    const isBold   = moods.some((m) => ['bold', 'vibrant', 'dramatic', 'striking'].includes(m));
-    const isEarthy = moods.some((m) => ['earthy', 'natural', 'organic', 'grounded'].includes(m));
+    const isBold   = moods.some((m) => BOLD_MOODS.includes(m));
+    const isEarthy = moods.some((m) => EARTHY_MOODS.includes(m));
     if (isLuxury && product.rating && product.rating >= 4.5) breakdown.mood = 8;
     else if (isCozy && (product.materials || []).some((m) => ['velvet', 'linen', 'wool', 'cotton', 'rattan'].includes(m))) breakdown.mood = 8;
     else if (isBold && (product.materials || []).some((m) => ['velvet', 'marble', 'brass', 'glass'].includes(m))) breakdown.mood = 8;
@@ -722,6 +796,32 @@ function scoreProduct(
     breakdown.rating = ((product.rating - 3.5) / 1.5) * 5;
   }
 
+  // ── Variant-style affinity bonus (5 pts — Build 130) ─────────────────────
+  // If ANY variant of this product has a color that amplifies the prompt's
+  // styles (e.g. a purple variant for a "glam" prompt), give a small bonus.
+  // PURELY ADDITIVE — products without color-aligned variants score normally.
+  //
+  // Why this matters: the user's variant theory says "purple/green/blue
+  // chairs connect with glam/maximalist/eclectic." Today the matcher only
+  // uses parent.styles and ignores the implicit style information carried
+  // by variant colors. A neutral mid-century chair with a purple velvet
+  // variant should score slightly higher for "glam maximalist" prompts than
+  // an identical neutral mid-century chair without that variant — because
+  // the matcher will then ALSO pick the purple variant downstream.
+  //
+  // Capped at 5 to avoid swamping the explicit-style-bonus tier (15/8/5).
+  if (Array.isArray(product.variants) && product.variants.length > 0 && Array.isArray(styles) && styles.length > 0) {
+    let bestVariantBoost = 0;
+    for (const v of product.variants) {
+      const b = getVariantStyleBoost(v, styles);
+      if (b > bestVariantBoost) bestVariantBoost = b;
+      if (bestVariantBoost >= 1) break;
+    }
+    breakdown.variantAffinity = bestVariantBoost * 5;
+  } else {
+    breakdown.variantAffinity = 0;
+  }
+
   breakdown.total =
     breakdown.room +
     breakdown.style +
@@ -732,7 +832,8 @@ function scoreProduct(
     breakdown.category +
     breakdown.mood +
     breakdown.rating +
-    breakdown.description;
+    breakdown.description +
+    breakdown.variantAffinity;
 
   return breakdown;
 }
@@ -995,10 +1096,15 @@ function diversify(
   if (result.length >= 2 && Math.random() < WILDCARD_PROBABILITY) {
     const essentialCatSet = new Set(essentials);
 
-    // Find the last non-essential slot to replace — we protect essentials
+    // Build 130: find the last non-essential slot WHOSE CATEGORY is in the
+    // accent-only allow-list. This prevents wildcard from swapping an
+    // accent-chair (which is non-essential but core furniture) and
+    // confusing the rendered scene. Wildcard now lives in the lamp/vase/
+    // pillow/wall-art/etc. tier only.
     let replaceIdx = -1;
     for (let i = result.length - 1; i >= 0; i--) {
-      if (!essentialCatSet.has(result[i].category)) {
+      const cat = result[i].category;
+      if (!essentialCatSet.has(cat) && WILDCARD_ALLOWED_CATEGORIES.has(cat)) {
         replaceIdx = i;
         break;
       }
@@ -1013,12 +1119,14 @@ function diversify(
       }
 
       // Build wildcard pool: top scorers not already in result, not
-      // duplicating an existing category, respecting category-room lock.
+      // duplicating an existing category, respecting category-room lock,
+      // AND restricted to the accent-only allow-list (Build 130).
       // Build 83: same soft exclusion as pickFromCategory — prefer fresh
       // candidates, fall back to recently-shown only if no fresh exist.
       const wildcardPoolPre = sorted
         .filter(p => !usedIds.has(p.id))
         .filter(p => !otherSlotCats.has(p.category))
+        .filter(p => WILDCARD_ALLOWED_CATEGORIES.has(p.category)) // Build 130
         .filter(p => {
           const lock = CATEGORY_ROOM_LOCK[p.category];
           return !lock || lock.includes(roomType);
