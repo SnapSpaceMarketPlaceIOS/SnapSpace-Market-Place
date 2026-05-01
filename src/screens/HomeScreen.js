@@ -3523,6 +3523,10 @@ export default function HomeScreen({ navigation, route }) {
                   showsHorizontalScrollIndicator={false}
                   contentContainerStyle={styles.roomChipsAboveScroll}
                 >
+                  {/* Build 133 — Nursery removed. Catalog has no true
+                      crib/rocker/mobile imports; the chip oversold what
+                      we could render. Will re-add when nursery-specific
+                      products are imported. */}
                   {[
                     { key: 'living room', label: 'Living Room' },
                     { key: 'kitchen',     label: 'Kitchen'    },
@@ -3531,7 +3535,6 @@ export default function HomeScreen({ navigation, route }) {
                     { key: 'office',      label: 'Office'     },
                     { key: 'bathroom',    label: 'Bathroom'   },
                     { key: 'outdoor',     label: 'Outdoor'    },
-                    { key: 'nursery',     label: 'Nursery'    },
                   ].map((r) => {
                     const active = selectedRoom === r.key;
                     return (
@@ -3650,11 +3653,20 @@ export default function HomeScreen({ navigation, route }) {
                 iOS' UITextView hit-test claim cannot reach them. iOS
                 hit-test on heroBottom finds these icons (rendered later
                 in JSX → on top in z-order) before checking OnboardingGlow.
+
                 Top offset is computed dynamically:
-                  - 58pt if a style pill is shown above the inputBar
-                  - +4pt if the OnboardingGlow is in its padded onboarding
-                    state
-                  - +6pt to align with inputBar's paddingVertical */}
+                  - +44pt when the room chip strip is rendered above the
+                    input bar (Build 132 added the strip; chips are rendered
+                    whenever !generating)
+                  - +56pt if a style pill is shown above the input bar
+                  - +4pt if the OnboardingGlow is in its padded onboarding state
+                  - +6pt to align with inputBar's paddingVertical
+
+                Build 133 — chip-strip offset added. Without the +44pt
+                offset, icons sat at the TOP of heroBottom — overlapping
+                the chip strip and partially hiding the active room
+                chip behind the camera icon. Verified by user testing
+                2026-05-01. */}
             <View
               style={{
                 position: 'absolute',
@@ -3665,7 +3677,7 @@ export default function HomeScreen({ navigation, route }) {
                 // icons to the top of the inputBar. Otherwise the icons sat
                 // ~62pt below heroBottom's top — i.e. lower-middle of the
                 // grown bar — which the user reported as "icons moved down".
-                top: ((selectedStyle && !generating) ? 56 : 0) + ((isStepActive('chat_bar') && !generating) ? 4 : 0) + 6,
+                top: (!generating ? 44 : 0) + ((selectedStyle && !generating) ? 56 : 0) + ((isStepActive('chat_bar') && !generating) ? 4 : 0) + 6,
                 left: 8,
                 flexDirection: 'row',
                 alignItems: 'center',
@@ -4331,7 +4343,11 @@ const styles = StyleSheet.create({
   roomChipAboveLabelActive: {
     fontWeight: '700',
     fontFamily: 'Geist_700Bold',
-    color: '#0B6DC3',
+    // Build 133 — switched from #0B6DC3 (deep brand blue) to #67ACE9
+    // (lighter brand blue) per user direction. The lighter blue reads
+    // better against varied hero photos and matches the gradient end
+    // color used in the input bar's send button.
+    color: '#67ACE9',
   },
   container: {
     flex: 1,

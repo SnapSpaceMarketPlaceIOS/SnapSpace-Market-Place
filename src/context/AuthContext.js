@@ -176,7 +176,16 @@ export function AuthProvider({ children }) {
         // let it land so the auth wall clears.
         if (session && mounted && !bootstrapSupersededRef.current) {
           try {
-            const profile = await fetchProfile(session.user.id);
+            // Build 133 — added 5s timeout on bootstrap fetchProfile too
+            // (was unbounded). If it hangs, we still set the user from
+            // session data so the auth gate clears immediately and the
+            // user can use the app. Profile catches up via refreshUser
+            // when needed.
+            const profile = await withTimeout(
+              fetchProfile(session.user.id),
+              5000,
+              'bootstrap profile fetch timed out',
+            );
             if (mounted && !bootstrapSupersededRef.current) {
               setUser(buildUser(session, profile));
             }
@@ -205,7 +214,18 @@ export function AuthProvider({ children }) {
         if (!mounted) return;
         if (session) {
           try {
-            const profile = await fetchProfile(session.user.id);
+            // Build 133 — added 5s timeout. Previously this fetchProfile
+            // had NO timeout, so a slow profile RPC could hang the entire
+            // onAuthStateChange loop. The signIn() path already had a 5s
+            // timeout on fetchProfile (line 385); this brings the
+            // SIGNED_IN handler to parity. If profile fetch times out we
+            // proceed with session-only data — refreshUser() can pull
+            // the profile later without blocking the auth state machine.
+            const profile = await withTimeout(
+              fetchProfile(session.user.id),
+              5000,
+              'onAuthStateChange profile fetch timed out',
+            );
             const builtUser = buildUser(session, profile);
             setUser(builtUser);
             // Register push token on first sign-in — DEFERRED by 3 seconds.
@@ -455,6 +475,29 @@ export function AuthProvider({ children }) {
         }
       }),
     ]);
+
+    // Build 133 — Apple Guideline 5.1.1(v) compliance.
+    //
+    // Previously this flow stopped at deleting public-schema rows + storage,
+    // leaving the auth.users row (with the user's email) intact. Apple's
+    // "fully delete an account, including any associated personal data"
+    // requirement covers email — leaving it risked review rejection.
+    //
+    // Migration 032 introduces a SECURITY DEFINER RPC that nukes the
+    // auth.users row using the caller's auth.uid(). Cascade FKs from
+    // auth.users to public-schema tables clean up anything missed in
+    // the explicit DELETE statements above (defense in depth).
+    //
+    // Best-effort: if migration 032 hasn't been applied yet OR the RPC
+    // call fails (network blip), the user still sees a successful
+    // "account deleted" UX and their public-schema data + storage are
+    // already gone. The auth.users row is a 24-72-hour cleanup task at
+    // worst rather than a hard failure that traps the user mid-flow.
+    try {
+      await supabase.rpc('delete_my_account');
+    } catch (e) {
+      console.warn('[Auth] delete_my_account RPC failed (non-fatal):', e?.message);
+    }
 
     // Sign out and clear local state
     await supabase.auth.signOut();
