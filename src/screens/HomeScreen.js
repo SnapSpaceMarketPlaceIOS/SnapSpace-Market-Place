@@ -669,15 +669,6 @@ function AddAllToCartButton({ products, onAddAll, onViewCart }) {
 
 // ── AI generation helpers ─────────────────────────────────────────────────────
 
-const PROMPT_SUGGESTIONS = [
-  'Modern minimalist',
-  'Japandi',
-  'Dark luxe',
-  'Coastal',
-  'Boho eclectic',
-  'Scandi cozy',
-];
-
 const FURNITURE_LABELS = {
   'sofa': 'sofa', 'accent-chair': 'accent chair', 'coffee-table': 'coffee table',
   'rug': 'area rug', 'wall-art': 'wall art', 'mirror': 'floor mirror',
@@ -3517,6 +3508,68 @@ export default function HomeScreen({ navigation, route }) {
                 attached. A full-size thumbnail above the input bar is
                 redundant and pushes the hero content down. */}
 
+            {/* Build 132 — Room context chips. Moved ABOVE the input bar
+                (was below in Build 131). Restyled per design intent: bold
+                blue active, white inactive, NO pill background, NO border —
+                just clean text labels with horizontal scroll. Order leads
+                with Living Room then Kitchen (highest-traffic rooms),
+                followed by Bedroom / Dining / Office / Bathroom / Outdoor /
+                Nursery. Default = living room — matches the canonical
+                preset prompts in stylePresets.js unmodified. */}
+            {!generating && (
+              <View style={styles.roomChipsAbove}>
+                <ScrollView
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  contentContainerStyle={styles.roomChipsAboveScroll}
+                >
+                  {[
+                    { key: 'living room', label: 'Living Room' },
+                    { key: 'kitchen',     label: 'Kitchen'    },
+                    { key: 'bedroom',     label: 'Bedroom'    },
+                    { key: 'dining room', label: 'Dining'     },
+                    { key: 'office',      label: 'Office'     },
+                    { key: 'bathroom',    label: 'Bathroom'   },
+                    { key: 'outdoor',     label: 'Outdoor'    },
+                    { key: 'nursery',     label: 'Nursery'    },
+                  ].map((r) => {
+                    const active = selectedRoom === r.key;
+                    return (
+                      <TouchableOpacity
+                        key={r.key}
+                        onPress={() => {
+                          setSelectedRoom(r.key);
+                          // If a style is currently selected, re-fire its
+                          // prompt swap with the new room so the input
+                          // updates immediately (don't make user re-tap
+                          // the style card). Skip if no style is selected.
+                          if (selectedStyle) {
+                            const orig = selectedStyle.prompt || '';
+                            const swapped = orig.replace(
+                              /(living room|bedroom|kitchen|dining room|office|bathroom|outdoor|nursery)/i,
+                              r.key
+                            );
+                            if (swapped !== orig) {
+                              setSelectedStyle({ ...selectedStyle, prompt: swapped });
+                              setPrompt(swapped);
+                              bumpInputKey();
+                            }
+                          }
+                        }}
+                        style={styles.roomChipAbove}
+                        activeOpacity={0.6}
+                        hitSlop={{ top: 8, bottom: 8, left: 4, right: 4 }}
+                      >
+                        <Text style={[styles.roomChipAboveLabel, active && styles.roomChipAboveLabelActive]}>
+                          {r.label}
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </ScrollView>
+              </View>
+            )}
+
             <OnboardingGlow visible={isStepActive('chat_bar') && !generating} borderRadius={20} style={(isStepActive('chat_bar') && !generating) ? { padding: 4 } : undefined}>
             {/* Wrapper sits between OnboardingGlow and the inputBar so the
                 camera/gallery icons can be ABSOLUTE SIBLINGS of the inputBar
@@ -3706,68 +3759,10 @@ export default function HomeScreen({ navigation, route }) {
                 />
               </View>
             )}
-            {/* Style inspiration carousel — 4 visible cards, slow rightward
-                auto-drift, paused on touch. Tapping a card sets the matching
-                preset prompt and replaces the chip strip above with a
-                "selected style" pill. Hidden during generation so the
-                GenieLoader has the screen. */}
-            {/* Build 131 — Room context chips. Lets the user mark which
-                room they're designing BEFORE picking a style preset, so
-                the picked prompt swaps "living room" → "kitchen" /
-                "bedroom" / etc. without manual editing. Default = living
-                room (matches canonical preset prompts unmodified). */}
-            {!generating && (
-              <View style={styles.roomChipsRow}>
-                <ScrollView
-                  horizontal
-                  showsHorizontalScrollIndicator={false}
-                  contentContainerStyle={styles.roomChipsScroll}
-                >
-                  {[
-                    { key: 'living room', label: 'Living Room' },
-                    { key: 'bedroom',     label: 'Bedroom'    },
-                    { key: 'kitchen',     label: 'Kitchen'    },
-                    { key: 'dining room', label: 'Dining'     },
-                    { key: 'office',      label: 'Office'     },
-                    { key: 'bathroom',    label: 'Bathroom'   },
-                    { key: 'outdoor',     label: 'Outdoor'    },
-                    { key: 'nursery',     label: 'Nursery'    },
-                  ].map((r) => {
-                    const active = selectedRoom === r.key;
-                    return (
-                      <TouchableOpacity
-                        key={r.key}
-                        onPress={() => {
-                          setSelectedRoom(r.key);
-                          // If a style is currently selected, re-fire its
-                          // prompt swap with the new room so the input
-                          // updates immediately (don't make user re-tap
-                          // the style card). Skip if no style is selected.
-                          if (selectedStyle) {
-                            const orig = selectedStyle.prompt || '';
-                            const swapped = orig.replace(
-                              /(living room|bedroom|kitchen|dining room|office|bathroom|outdoor|nursery)/i,
-                              r.key
-                            );
-                            if (swapped !== orig) {
-                              setSelectedStyle({ ...selectedStyle, prompt: swapped });
-                              setPrompt(swapped);
-                              bumpInputKey();
-                            }
-                          }
-                        }}
-                        style={[styles.roomChip, active && styles.roomChipActive]}
-                        activeOpacity={0.75}
-                      >
-                        <Text style={[styles.roomChipLabel, active && styles.roomChipLabelActive]}>
-                          {r.label}
-                        </Text>
-                      </TouchableOpacity>
-                    );
-                  })}
-                </ScrollView>
-              </View>
-            )}
+            {/* Style inspiration carousel — 4 visible cards, manual swipe.
+                Tapping a card sets the matching preset prompt and replaces
+                the chip strip above with a "selected style" pill. Hidden
+                during generation so the GenieLoader has the screen. */}
             {!generating && (
               <StyleCarousel
                 onSelect={(preset) => {
@@ -4309,37 +4304,33 @@ export default function HomeScreen({ navigation, route }) {
 // ─── Styles ───────────────────────────────────────────────────────────────────
 
 const styles = StyleSheet.create({
-  // ── Build 131 — Room context chips above the StyleCarousel ─────────────
-  roomChipsRow: {
+  // ── Build 132 — Room context chips ABOVE the input bar ─────────────────
+  // Restyled per design intent (replacing Build 131's pill chips below the
+  // input bar): clean text-only labels, no pill background, no border.
+  // Active = bold brand blue (#0B6DC3). Inactive = white at high opacity
+  // (readable on both bright and dark hero photos).
+  roomChipsAbove: {
     width: '100%',
-    marginTop: 6,
-    marginBottom: 8,
+    marginBottom: 12,
   },
-  roomChipsScroll: {
-    paddingHorizontal: 16,
-    gap: 8,
+  roomChipsAboveScroll: {
+    paddingHorizontal: 24,
+    alignItems: 'center',
   },
-  roomChip: {
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 20,
-    backgroundColor: 'rgba(255,255,255,0.18)',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.35)',
-    marginRight: 8,
+  roomChipAbove: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
   },
-  roomChipActive: {
-    backgroundColor: '#FFFFFF',
-    borderColor: '#FFFFFF',
-  },
-  roomChipLabel: {
-    fontSize: 13,
+  roomChipAboveLabel: {
+    fontSize: 16,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.95)',
     fontFamily: 'Geist_600SemiBold',
+    color: 'rgba(255,255,255,0.92)',
     letterSpacing: 0.2,
   },
-  roomChipLabelActive: {
+  roomChipAboveLabelActive: {
+    fontWeight: '700',
+    fontFamily: 'Geist_700Bold',
     color: '#0B6DC3',
   },
   container: {
@@ -4371,9 +4362,14 @@ const styles = StyleSheet.create({
   },
 
   // ── Top bar ──────────────────────────────────────────────────────────────────
+  // Build 132: heading moved up from 36% → 28%. With the room chip strip
+  // moving to ABOVE the input bar (was below), the upper half of the screen
+  // gained visual weight. Centering the heading at ~28% keeps it visually
+  // balanced between the status bar and the new chip-strip + input-bar
+  // block, without crowding either.
   topBar: {
     position: 'absolute',
-    top: '36%',
+    top: '28%',
     left: 0,
     right: 0,
     flexDirection: 'column',

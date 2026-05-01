@@ -1410,10 +1410,16 @@ export default function RoomResultScreen({ route, navigation }) {
                 />
               ))}
             </ScrollView>
-            {/* Legal disclosure: the generated image is illustrative only. */}
+            {/* Build 132 — reframed copy. The previous wording ("AI-generated
+                for inspiration") seeded doubt about whether the render was
+                "real." New wording shifts framing toward the curated shopping
+                experience users actually came for. Same legal coverage —
+                "actual colors and finishes may vary" still preserves the
+                marketing-disclosure intent. */}
             <Text style={s.shopRoomDisclaimer}>
-              Room image is AI-generated for inspiration. Shown products are close matches —
-              actual colors, materials, and finishes may differ from the render.
+              We styled this room with products you can buy. Cart prices and
+              colors update live. Actual colors, materials, and finishes may
+              vary from the render.
             </Text>
           </View>
         )}

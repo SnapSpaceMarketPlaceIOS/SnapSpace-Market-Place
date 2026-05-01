@@ -1,0 +1,932 @@
+{
+  "threshold": 75,
+  "decisions": [
+    {
+      "id": "B0D1YLCN14",
+      "category": "pendant-light",
+      "name": "Sheetea 2-Pack Farmhouse Pendant Lights Kitchen Island, Black Metal Cage Design",
+      "newPanelUrl": null,
+      "bestScore": 22,
+      "urls": [
+        {
+          "url": "https://m.media-amazon.com/images/I/71harpKEZ5L._AC_SL1500_.jpg",
+          "score": 22,
+          "rejected": false,
+          "reason": "Fixture in fully styled kitchen lifestyle scene"
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/71tsz66ZDSL._AC_SL1500_.jpg",
+          "score": 15,
+          "rejected": false,
+          "reason": "Styled kitchen scene with multiple context elements"
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/71MwJnRbfvL._AC_SL1500_.jpg",
+          "score": 15,
+          "rejected": true,
+          "reason": "Styled lifestyle scene with furniture, room context, text ov"
+        }
+      ]
+    },
+    {
+      "id": "B09MK731BY",
+      "category": "pendant-light",
+      "name": "SGLfarmty Farmhouse Bar Pendant Light, Single Pendant with Wooden Finish",
+      "newPanelUrl": "https://m.media-amazon.com/images/I/71QmRfg5DfL._AC_SL1500_.jpg",
+      "bestScore": 92,
+      "urls": [
+        {
+          "url": "https://m.media-amazon.com/images/I/71QmRfg5DfL._AC_SL1500_.jpg",
+          "score": 92,
+          "rejected": false,
+          "reason": "Clean white background, minimal ceiling shadow visible"
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/71usFy2BR5L._AC_SL1500_.jpg",
+          "score": 22,
+          "rejected": false,
+          "reason": "Fixture in fully styled kitchen scene with context"
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/71SVTtiYGwL._AC_SL1500_.jpg",
+          "score": 22,
+          "rejected": false,
+          "reason": "Fixture in styled kitchen scene with visible ceiling, walls,"
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/71k66ARV2oL._AC_SL1500_.jpg",
+          "score": 15,
+          "rejected": true,
+          "reason": "Multi-thumbnail composite with instructional labels"
+        }
+      ]
+    },
+    {
+      "id": "B0968B7S51",
+      "category": "pendant-light",
+      "name": "KCO Lighting Large Gold Globe Pendant Light, Mid Century Glass Kitchen Island",
+      "newPanelUrl": "https://m.media-amazon.com/images/I/51qTGXgxQ0L._AC_SL1500_.jpg",
+      "bestScore": 97,
+      "urls": [
+        {
+          "url": "https://m.media-amazon.com/images/I/51qTGXgxQ0L._AC_SL1500_.jpg",
+          "score": 97,
+          "rejected": false,
+          "reason": "Isolated fixture, pure white seamless background"
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/71DEXZPRQAL._AC_SL1500_.jpg",
+          "score": 22,
+          "rejected": false,
+          "reason": "Fixture in fully styled dining room scene"
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/71qWNVQmBaL._AC_SL1500_.jpg",
+          "score": 22,
+          "rejected": false,
+          "reason": "Fixture in styled kitchen scene with visible architecture"
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/61MfoQ8WzUL._AC_SL1500_.jpg",
+          "score": 5,
+          "rejected": true,
+          "reason": "Instructional diagram with dimension callouts and multiple v"
+        }
+      ]
+    },
+    {
+      "id": "B08TC8KWJ9",
+      "category": "pendant-light",
+      "name": "DEWENWILS 2 Pack Farmhouse Pendant Light, Wooden Grain Metal, 48\" Adjustable",
+      "newPanelUrl": null,
+      "bestScore": 28,
+      "urls": [
+        {
+          "url": "https://m.media-amazon.com/images/I/71ccJJMhCXL._AC_SL1500_.jpg",
+          "score": 28,
+          "rejected": false,
+          "reason": "Visible ceiling, walls, wainscoting, doorway context"
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/81TdmpHLl3L._AC_SL1500_.jpg",
+          "score": 15,
+          "rejected": false,
+          "reason": "Fixture in fully styled kitchen and dining scenes"
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/71U6WZy6sTL._AC_SL1500_.jpg",
+          "score": 8,
+          "rejected": true,
+          "reason": "Instructional diagram with text overlays and angle callouts"
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/71gxEvV+UqL._AC_SL1500_.jpg",
+          "score": 5,
+          "rejected": true,
+          "reason": "Instructional diagram with dimension callouts and specs"
+        }
+      ]
+    },
+    {
+      "id": "B0BRV2M1QB",
+      "category": "pendant-light",
+      "name": "IHENGYANLT 2 Pack Black Spiral Cage Pendant Lights with Clear Glass Shade",
+      "newPanelUrl": "https://m.media-amazon.com/images/I/61+UJGSvoIL._AC_SL1500_.jpg",
+      "bestScore": 97,
+      "urls": [
+        {
+          "url": "https://m.media-amazon.com/images/I/61+UJGSvoIL._AC_SL1500_.jpg",
+          "score": 97,
+          "rejected": false,
+          "reason": "Pure white background, fixture isolated perfectly"
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/71Sf6cF4s8L._AC_SL1500_.jpg",
+          "score": 96,
+          "rejected": false,
+          "reason": "Fixture isolated on pure white seamless background"
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/712wz3t7sTL._AC_SL1500_.jpg",
+          "score": 22,
+          "rejected": false,
+          "reason": "Fixture in fully styled dining room scene with architectural"
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/71twidwZdHL._AC_SL1500_.jpg",
+          "score": 15,
+          "rejected": false,
+          "reason": "Lifestyle scene with people, kitchen, full context"
+        }
+      ]
+    },
+    {
+      "id": "B08JH56T5M",
+      "category": "pendant-light",
+      "name": "Trustwoods Hand Blown Glass Pendant Light — Grey Blue, Brushed Nickel",
+      "newPanelUrl": "https://m.media-amazon.com/images/I/81-kAgI-AHL._AC_SL1500_.jpg",
+      "bestScore": 96,
+      "urls": [
+        {
+          "url": "https://m.media-amazon.com/images/I/81-kAgI-AHL._AC_SL1500_.jpg",
+          "score": 96,
+          "rejected": false,
+          "reason": "Fixture isolated on pure white seamless background"
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/51PsBNwoOXS._AC_SL1500_.jpg",
+          "score": 25,
+          "rejected": false,
+          "reason": "Fixture in styled kitchen scene with visible ceiling, cabine"
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/91xMIjTy9pS._AC_SL1500_.jpg",
+          "score": 15,
+          "rejected": true,
+          "reason": "Text overlays and product diagram composite"
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/91wEG2BYsDS._AC_SL1500_.jpg",
+          "score": 0,
+          "rejected": true,
+          "reason": "Text overlay, marketing banner, composite image"
+        }
+      ]
+    },
+    {
+      "id": "B0C62DMSSF",
+      "category": "pendant-light",
+      "name": "ELYONA 2 Pack Hammered Pendant Lights, 10.2\" Vintage Metal + Solid Wood, Brushed Brass",
+      "newPanelUrl": null,
+      "bestScore": 32,
+      "urls": [
+        {
+          "url": "https://m.media-amazon.com/images/I/71zfSX2Yl9L._AC_SL1500_.jpg",
+          "score": 32,
+          "rejected": false,
+          "reason": "Fixture in styled dining scene with table, chairs, decor"
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/71vHfeG6R4S._AC_SL1500_.jpg",
+          "score": 22,
+          "rejected": false,
+          "reason": "Fixture in fully styled kitchen scene with context"
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/81H14QC1lXL._AC_SL1500_.jpg",
+          "score": 15,
+          "rejected": true,
+          "reason": "Lifestyle scene with text overlay and room context"
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/713jpN-z1hL._AC_SL1500_.jpg",
+          "score": 0,
+          "rejected": true,
+          "reason": "Technical specification diagram with dimension callouts"
+        }
+      ]
+    },
+    {
+      "id": "B0F7KBBQV8",
+      "category": "pendant-light",
+      "name": "LOG BARN Farmhouse Pendant Light, 16\" Orb Distressed Wood, Rustic Kitchen Island",
+      "newPanelUrl": "https://m.media-amazon.com/images/I/71rPAgO-x5L._AC_SL1500_.jpg",
+      "bestScore": 92,
+      "urls": [
+        {
+          "url": "https://m.media-amazon.com/images/I/71rPAgO-x5L._AC_SL1500_.jpg",
+          "score": 92,
+          "rejected": false,
+          "reason": "Clean white background, minimal ceiling visible at top"
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/71ipJEmCgAL._AC_SL1500_.jpg",
+          "score": 25,
+          "rejected": false,
+          "reason": "Fixture in styled kitchen scene with visible ceiling, cabine"
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/71P+VLmUmKL._AC_SL1500_.jpg",
+          "score": 5,
+          "rejected": true,
+          "reason": "Technical diagram with dimension callouts and UL badge"
+        }
+      ]
+    },
+    {
+      "id": "B089GGTMY5",
+      "category": "pendant-light",
+      "name": "Osimir 2 Pack Black Mini Pendant Light with Clear Glass, Industrial Farmhouse Cage",
+      "newPanelUrl": "https://m.media-amazon.com/images/I/613b9-rxOsL._AC_SL1500_.jpg",
+      "bestScore": 98,
+      "urls": [
+        {
+          "url": "https://m.media-amazon.com/images/I/613b9-rxOsL._AC_SL1500_.jpg",
+          "score": 98,
+          "rejected": false,
+          "reason": "Pure white background, fixture isolated, no context"
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/71VeilHxXdL._AC_SL1500_.jpg",
+          "score": 28,
+          "rejected": false,
+          "reason": "Styled kitchen scene with visible ceiling, walls, windows, c"
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/71qOcG2rj4L._AC_SL1500_.jpg",
+          "score": 15,
+          "rejected": true,
+          "reason": "Multi-panel composite with instructional diagram layout"
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/71S963KIMwL._AC_SL1500_.jpg",
+          "score": 5,
+          "rejected": true,
+          "reason": "Technical diagram with dimension callouts and specifications"
+        }
+      ]
+    },
+    {
+      "id": "B0D2LQR5MR",
+      "category": "pendant-light",
+      "name": "SADUENFR 1-Light Black Pendant Light with Hand-Blown Clear Glass, Farmhouse",
+      "newPanelUrl": null,
+      "bestScore": 28,
+      "urls": [
+        {
+          "url": "https://m.media-amazon.com/images/I/71+VYQ+fItL._AC_SL1500_.jpg",
+          "score": 28,
+          "rejected": false,
+          "reason": "Fixture in styled room with visible shelving, walls, décor"
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/71pgXYAcahL._AC_SL1500_.jpg",
+          "score": 22,
+          "rejected": false,
+          "reason": "Fixture in styled kitchen scene with visible ceiling, walls,"
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/71l8tBsI5LL._AC_SL1500_.jpg",
+          "score": 8,
+          "rejected": true,
+          "reason": "Multi-panel instructional diagram with text labels"
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/71mixDqpciL._AC_SL1500_.jpg",
+          "score": 0,
+          "rejected": true,
+          "reason": "Instructional diagram with dimension callouts and specificat"
+        }
+      ]
+    },
+    {
+      "id": "B0855Q471W",
+      "category": "pendant-light",
+      "name": "Doraimi 2 Pack Mini Metal Drum Pendant Light, Industrial Kitchen Island",
+      "newPanelUrl": "https://m.media-amazon.com/images/I/51jKO-xPcYL._AC_SL1500_.jpg",
+      "bestScore": 92,
+      "urls": [
+        {
+          "url": "https://m.media-amazon.com/images/I/51jKO-xPcYL._AC_SL1500_.jpg",
+          "score": 92,
+          "rejected": false,
+          "reason": "Clean white background, minimal ceiling plate visible"
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/71f8dUXaJoL._AC_SL1500_.jpg",
+          "score": 45,
+          "rejected": false,
+          "reason": "Fixture on visible white ceiling with subtle architectural c"
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/71Kwe-tHp-L._AC_SL1500_.jpg",
+          "score": 15,
+          "rejected": false,
+          "reason": "Fully styled kitchen scene with multiple context elements"
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/61-pA+6UrzL._AC_SL1500_.jpg",
+          "score": 0,
+          "rejected": true,
+          "reason": "http_429"
+        }
+      ]
+    },
+    {
+      "id": "B0CJPYVZ54",
+      "category": "pendant-light",
+      "name": "DUHU Black and Wood Pendant Light, Modern Industrial Kitchen Island, Height Adjustable",
+      "newPanelUrl": "https://m.media-amazon.com/images/I/71DCcUChdOL._AC_SL1500_.jpg",
+      "bestScore": 95,
+      "urls": [
+        {
+          "url": "https://m.media-amazon.com/images/I/71DCcUChdOL._AC_SL1500_.jpg",
+          "score": 95,
+          "rejected": false,
+          "reason": "Isolated fixture, clean white background, no ceiling context"
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/41zTg+zUIbL._AC_SL1500_.jpg",
+          "score": 94,
+          "rejected": false,
+          "reason": "Clean white background, minimal mounting hardware visible"
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/61LayvMTlPL._AC_SL1500_.jpg",
+          "score": 92,
+          "rejected": false,
+          "reason": "Isolated fixture, clean white background, minimal shadow"
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/51PZuMzallL._AC_SL1500_.jpg",
+          "score": 25,
+          "rejected": false,
+          "reason": "Fixture in styled bedroom scene with bed, headboard, nightst"
+        }
+      ]
+    },
+    {
+      "id": "B08PVKQ7JW",
+      "category": "pendant-light",
+      "name": "LMSOD Industrial Pendant Light, Single Black Mini Lantern Cage Farmhouse Kitchen Island",
+      "newPanelUrl": null,
+      "bestScore": 45,
+      "urls": [
+        {
+          "url": "https://m.media-amazon.com/images/I/51hLd6gHRHL._AC_SL1500_.jpg",
+          "score": 45,
+          "rejected": false,
+          "reason": "Fixture on visible white ceiling with architectural context"
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/61BpOo+mzfL._AC_SL1500_.jpg",
+          "score": 22,
+          "rejected": false,
+          "reason": "Styled dining scene with visible ceiling, walls, furniture"
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/619FuGm9BZL._AC_SL1500_.jpg",
+          "score": 20,
+          "rejected": false,
+          "reason": "Fixture in fully styled kitchen scene with architecture"
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/617mcHGk4BL._AC_SL1500_.jpg",
+          "score": 0,
+          "rejected": true,
+          "reason": "Instructional diagram with labeled callouts and annotations"
+        }
+      ]
+    },
+    {
+      "id": "B0DG64P38P",
+      "category": "pendant-light",
+      "name": "Murkluz 3 Pack Black Pendant Lights, Seeded Glass Hanging Light for Kitchen Island",
+      "newPanelUrl": null,
+      "bestScore": 52,
+      "urls": [
+        {
+          "url": "https://m.media-amazon.com/images/I/71hr4b8B73L._AC_SL1500_.jpg",
+          "score": 52,
+          "rejected": false,
+          "reason": "Fixture on visible white drywall ceiling, minor context"
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/71VTPwZgljL._AC_SL1500_.jpg",
+          "score": 20,
+          "rejected": false,
+          "reason": "Fixture in fully styled kitchen scene with architecture"
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/71t+9CW4ZDL._AC_SL1500_.jpg",
+          "score": 15,
+          "rejected": true,
+          "reason": "Instructional diagram with dimensions, multiple views, bulb "
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/618MBLSfP4L._AC_SL1500_.jpg",
+          "score": 8,
+          "rejected": true,
+          "reason": "Instructional diagram with labeled components and text overl"
+        }
+      ]
+    },
+    {
+      "id": "B0D14HVKNS",
+      "category": "pendant-light",
+      "name": "GOEBLESON 5-Light Linear Kitchen Island Pendant Lighting with Clear Glass Shades",
+      "newPanelUrl": null,
+      "bestScore": 28,
+      "urls": [
+        {
+          "url": "https://m.media-amazon.com/images/I/61jZPYKuzQL._AC_SL1500_.jpg",
+          "score": 28,
+          "rejected": false,
+          "reason": "Fixture in styled scene with visible ceiling, walls, furnitu"
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/71eb1w-GpuL._AC_SL1500_.jpg",
+          "score": 25,
+          "rejected": false,
+          "reason": "Fixture in styled kitchen scene with visible architecture"
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/71WUDo4jENL._AC_SL1500_.jpg",
+          "score": 15,
+          "rejected": true,
+          "reason": "Multi-image composite with text overlay and styled rooms"
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/615Le6HRKrL._AC_SL1500_.jpg",
+          "score": 5,
+          "rejected": true,
+          "reason": "Instructional diagram with extensive technical callouts"
+        }
+      ]
+    },
+    {
+      "id": "B0CJJ6JS44",
+      "category": "pendant-light",
+      "name": "JWLUYN Mason Jar Pendant Light, Farmhouse Kitchen Island Hanging Lamp",
+      "newPanelUrl": null,
+      "bestScore": 45,
+      "urls": [
+        {
+          "url": "https://m.media-amazon.com/images/I/61SOzn0c+4L._AC_SL1500_.jpg",
+          "score": 45,
+          "rejected": false,
+          "reason": "Visible ceiling, wainscoting, and room context present"
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/71uYqgZKoYL._AC_SL1500_.jpg",
+          "score": 15,
+          "rejected": false,
+          "reason": "Fixture in fully styled kitchen scene with extensive context"
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/71HsrZhVWnL._AC_SL1500_.jpg",
+          "score": 15,
+          "rejected": true,
+          "reason": "Multi-thumbnail composite with instructional diagram labels"
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/61UqDTqxCFL._AC_SL1500_.jpg",
+          "score": 5,
+          "rejected": true,
+          "reason": "Instructional diagram with dimension callouts and specs"
+        }
+      ]
+    },
+    {
+      "id": "B0D1TXPLRX",
+      "category": "chandelier",
+      "name": "36.2'' Kitchen Lighting, 5-Light Dining Room Light Fixture Chandelier Over Table, Black Modern Rustic Wood Ceiling Pendant Light Fixtures, with Clear Glass Shade, Farmhouse Chandelier",
+      "newPanelUrl": null,
+      "bestScore": 25,
+      "urls": [
+        {
+          "url": "https://m.media-amazon.com/images/I/411a7ZbBj7L._AC_SL1500_.jpg",
+          "score": 25,
+          "rejected": false,
+          "reason": "Fixture in styled dining room scene with visible ceiling, wa"
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/512SBgcXwgL._AC_SL1500_.jpg",
+          "score": 22,
+          "rejected": false,
+          "reason": "Fixture in fully styled dining room scene"
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/51G6Uo9CE1L._AC_SL1500_.jpg",
+          "score": 0,
+          "rejected": true,
+          "reason": "Instructional diagram with dimension callouts and labels"
+        }
+      ]
+    },
+    {
+      "id": "B0CJRD6111",
+      "category": "chandelier",
+      "name": "Farmhouse Chandelier, 19.8 inch 5-Light Black Dining Room Lighting Fixtures Rustic Adjustable Hanging Pendant Lighting for Kitchen Island Entryway Foyer Bedroom Hallway",
+      "newPanelUrl": "https://m.media-amazon.com/images/I/41MU7PhSdlL._AC_SL1500_.jpg",
+      "bestScore": 92,
+      "urls": [
+        {
+          "url": "https://m.media-amazon.com/images/I/41MU7PhSdlL._AC_SL1500_.jpg",
+          "score": 92,
+          "rejected": false,
+          "reason": "Clean white background, minimal ceiling context visible"
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/81jqkn84tFL._AC_SL1500_.jpg",
+          "score": 85,
+          "rejected": false,
+          "reason": "Clean background with subtle ceiling shadow visible"
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/51cHUuzcaDL._AC_SL1500_.jpg",
+          "score": 85,
+          "rejected": false,
+          "reason": "Clean background, faint ceiling visible at top"
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/51L5WZXTyfL._AC_SL1500_.jpg",
+          "score": 15,
+          "rejected": false,
+          "reason": "Fixture in fully styled kitchen scene with multiple competin"
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/51wmlAcBy1L._AC_SL1500_.jpg",
+          "score": 12,
+          "rejected": true,
+          "reason": "Multi-thumbnail composite with text labels and instructional"
+        }
+      ]
+    },
+    {
+      "id": "B0DKT3B4RX",
+      "category": "chandelier",
+      "name": "17.8\" Boho Rattan Chandelier Light Fixtures, 4-Light Rattan Pendant Light with 2-Tier Wicker Shade, Farmhouse Hanging Light Fixture Chandelier for Dining Room, Living Room, Kitchen Island, Bedroom",
+      "newPanelUrl": "https://m.media-amazon.com/images/I/51J6QzcaXgL._AC_SL1500_.jpg",
+      "bestScore": 88,
+      "urls": [
+        {
+          "url": "https://m.media-amazon.com/images/I/51J6QzcaXgL._AC_SL1500_.jpg",
+          "score": 88,
+          "rejected": false,
+          "reason": "Clean background, minimal ceiling visible, fixture isolated"
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/81HfWecZviL._AC_SL1500_.jpg",
+          "score": 82,
+          "rejected": false,
+          "reason": "Clean background, faint ceiling visible at top edge"
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/41HLeAlj5kL._AC_SL1500_.jpg",
+          "score": 22,
+          "rejected": false,
+          "reason": "Fixture in styled kitchen scene with visible architecture"
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/510OLMjsIPL._AC_SL1500_.jpg",
+          "score": 15,
+          "rejected": false,
+          "reason": "Fixture in fully styled lifestyle room scene"
+        }
+      ]
+    },
+    {
+      "id": "B0CJPNH4YR",
+      "category": "chandelier",
+      "name": "HMVPL Large Farmhouse Chandeliers for Dining Room, 5-Light Rattan Boho Chandelier Light Fixture with Wicker Lampshade, Coastal Hanging Pendant Lighting for Kitchen Island Bedroom Living Room Nursery",
+      "newPanelUrl": null,
+      "bestScore": 72,
+      "urls": [
+        {
+          "url": "https://m.media-amazon.com/images/I/81ftrbGvVSL._AC_SL1500_.jpg",
+          "score": 72,
+          "rejected": false,
+          "reason": "Fixture clear, but visible ceiling and room context present"
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/51vagXEzgxL._AC_SL1500_.jpg",
+          "score": 45,
+          "rejected": false,
+          "reason": "Fixture mounted to visible white drywall ceiling"
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/51UIk-CiqUL._AC_SL1500_.jpg",
+          "score": 15,
+          "rejected": false,
+          "reason": "Fully styled dining room scene, multiple competing elements"
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/41PXUCclrZL._AC_SL1500_.jpg",
+          "score": 15,
+          "rejected": true,
+          "reason": "Multi-thumbnail composite with instructional diagram layout"
+        }
+      ]
+    },
+    {
+      "id": "B0BCWMX2TQ",
+      "category": "chandelier",
+      "name": "Dining Room Light Fixture/Chandelier Over Table, 5-Light Kitchen Island Lighting Hanging for Farmhouse Linear Chandeliers Matte Black Rustic Wood Ceiling Pendant Light Fixtures with Clear Glass Shade",
+      "newPanelUrl": null,
+      "bestScore": 22,
+      "urls": [
+        {
+          "url": "https://m.media-amazon.com/images/I/71kfL+n4taL._AC_SL1500_.jpg",
+          "score": 22,
+          "rejected": false,
+          "reason": "Fixture in fully styled dining room scene with furniture, wi"
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/51D713Q6qrL._AC_SL1500_.jpg",
+          "score": 22,
+          "rejected": false,
+          "reason": "Styled lifestyle scene with dining room context visible"
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/410S4h0rxYL._AC_SL1500_.jpg",
+          "score": 15,
+          "rejected": true,
+          "reason": "Instructional diagram with dimension callouts and specs"
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/513Ugks4-FL._AC_SL1500_.jpg",
+          "score": 12,
+          "rejected": false,
+          "reason": "Fully styled lifestyle scene with multiple competing element"
+        }
+      ]
+    },
+    {
+      "id": "B0BZSXRG92",
+      "category": "chandelier",
+      "name": "SANTOSTOCK D19'' Farmhouse Chandelier, 4-Light Adjustable Dining Room Light Fixture Kitchen Island Lighting, Rustic Hanging Lights for Entryway Foyer Bedroom Living Room, Black & White Oak",
+      "newPanelUrl": null,
+      "bestScore": 72,
+      "urls": [
+        {
+          "url": "https://m.media-amazon.com/images/I/71EBo+zT42L._AC_SL1500_.jpg",
+          "score": 72,
+          "rejected": false,
+          "reason": "Fixture clear subject, visible ceiling and wall context"
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/512rP8rLl0L._AC_SL1500_.jpg",
+          "score": 72,
+          "rejected": false,
+          "reason": "Fixture clear, faint ceiling and wall context visible"
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/5168huKC8UL._AC_SL1500_.jpg",
+          "score": 22,
+          "rejected": false,
+          "reason": "Fixture in fully styled dining room scene with furniture"
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/41XmsPPA2KL._AC_SL1500_.jpg",
+          "score": 15,
+          "rejected": true,
+          "reason": "Instructional diagram with dimension callouts and specificat"
+        }
+      ]
+    },
+    {
+      "id": "B0G5292QM8",
+      "category": "chandelier",
+      "name": "Maxax 19.5'' Crystal Bronze Chandelier, 5-Light Large Vintage Farmhouse Ceiling Light Fixture, Drum Raindrop Metal Shade, French Empire, for Living Room Bedroom Dining Room Kitchen Entryway",
+      "newPanelUrl": null,
+      "bestScore": 52,
+      "urls": [
+        {
+          "url": "https://m.media-amazon.com/images/I/51G4tqkriTL._AC_SL1500_.jpg",
+          "score": 52,
+          "rejected": false,
+          "reason": "Fixture on visible white ceiling with corner walls visible"
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/814hI3+FiVL._AC_SL1500_.jpg",
+          "score": 45,
+          "rejected": false,
+          "reason": "Fixture on visible white drywall ceiling with context"
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/516RIbUkIiL._AC_SL1500_.jpg",
+          "score": 42,
+          "rejected": false,
+          "reason": "Fixture on visible white drywall ceiling with context"
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/51nxY6QCX0L._AC_SL1500_.jpg",
+          "score": 15,
+          "rejected": false,
+          "reason": "Fixture in fully styled lifestyle room scene"
+        }
+      ]
+    },
+    {
+      "id": "B0DFPC28JB",
+      "category": "chandelier",
+      "name": "24\" Coastal Capiz Shell Chandelier 5 Tiers Dining Room Chandeliers Large Light Fixture Boho Farmhouse Ceiling Lights Entryway for Bedroom Bathroom Kitchen",
+      "newPanelUrl": "https://m.media-amazon.com/images/I/31LPOe9aPbL._AC_SL1500_.jpg",
+      "bestScore": 92,
+      "urls": [
+        {
+          "url": "https://m.media-amazon.com/images/I/31LPOe9aPbL._AC_SL1500_.jpg",
+          "score": 92,
+          "rejected": false,
+          "reason": "Clean white background, minimal ceiling plate visible"
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/61THyknp7vL._AC_SL1500_.jpg",
+          "score": 22,
+          "rejected": false,
+          "reason": "Lifestyle scene with bathtub and person visible below"
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/313hD6-zzbL._AC_SL1500_.jpg",
+          "score": 22,
+          "rejected": false,
+          "reason": "Fixture in styled bathroom scene with bathtub below"
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/51uRCIxJgVL._AC_SL1500_.jpg",
+          "score": 15,
+          "rejected": false,
+          "reason": "Fixture in fully styled coastal interior scene"
+        }
+      ]
+    },
+    {
+      "id": "B0D9V7Y8QF",
+      "category": "chandelier",
+      "name": "CATINER Modern Black Crystal Pendant Light Fixture - Mini Chandelier for Kitchen Island, Dining Room, Living Room, Hallway, Porch, Bedroom Lighting",
+      "newPanelUrl": null,
+      "bestScore": 42,
+      "urls": [
+        {
+          "url": "https://m.media-amazon.com/images/I/41WU2xPD9ZL._AC_SL1500_.jpg",
+          "score": 42,
+          "rejected": false,
+          "reason": "Fixture mounted to visible white drywall ceiling"
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/71dpXyvNY2L._AC_SL1500_.jpg",
+          "score": 32,
+          "rejected": false,
+          "reason": "Fixture in styled room with visible walls, window, plant, bo"
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/51yaAaT567L._AC_SL1500_.jpg",
+          "score": 15,
+          "rejected": true,
+          "reason": "Multi-panel composite with text overlays and diagrams"
+        }
+      ]
+    },
+    {
+      "id": "B0D17C4S2Z",
+      "category": "chandelier",
+      "name": "HMVPL Black Rattan Chandelier for Dining Room, 3-Light Boho Light Fixture with Woven Lampshade, Wicker Pendant Light Ceiling Hanging, Farmhouse Kitchen Chandelier for Bedroom Living Room Entryway",
+      "newPanelUrl": null,
+      "bestScore": 52,
+      "urls": [
+        {
+          "url": "https://m.media-amazon.com/images/I/710CygpSC4L._AC_SL1500_.jpg",
+          "score": 52,
+          "rejected": false,
+          "reason": "Fixture on visible white drywall ceiling with room context"
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/51wYZAOaV1L._AC_SL1500_.jpg",
+          "score": 42,
+          "rejected": false,
+          "reason": "Fixture on visible white drywall ceiling, window context"
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/41SxHJJt61L._AC_SL1500_.jpg",
+          "score": 22,
+          "rejected": false,
+          "reason": "Fixture in fully styled kitchen scene with context"
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/51Pj4RK62zL._AC_SL1500_.jpg",
+          "score": 15,
+          "rejected": true,
+          "reason": "Multi-image composite, text banner, instructional diagram"
+        }
+      ]
+    },
+    {
+      "id": "B0B93SNYQ8",
+      "category": "chandelier",
+      "name": "28-Inch Wagon Wheel Chandelier, 6-Light Farmhouse Dining Room Light Fixture Over Table, Round Matte Black Rustic Wood Ceiling Hanging Pendant Light with Clear Glass Shade",
+      "newPanelUrl": null,
+      "bestScore": 72,
+      "urls": [
+        {
+          "url": "https://m.media-amazon.com/images/I/61z1ut1bF0L._AC_SL1500_.jpg",
+          "score": 72,
+          "rejected": false,
+          "reason": "Fixture clear but subtle ceiling/wall context visible"
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/41Cs0jzRmZL._AC_SL1500_.jpg",
+          "score": 72,
+          "rejected": false,
+          "reason": "Fixture clear but blurred ceiling/room context visible"
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/412GdBh8fkL._AC_SL1500_.jpg",
+          "score": 25,
+          "rejected": false,
+          "reason": "Styled scene with visible ceiling, walls, furniture, plants"
+        }
+      ]
+    },
+    {
+      "id": "B093CSBWH4",
+      "category": "chandelier",
+      "name": "JKLX Mid-Century Sputnik Chandeliers 18-Lights, Modern Semi Flush Mount Ceiling Light Fixture Industrial Retro Hanging Lamps for Kitchen Living Room Dining Bedroom Corridor, Gold",
+      "newPanelUrl": "https://m.media-amazon.com/images/I/71YJiNh+pXS._AC_SL1500_.jpg",
+      "bestScore": 98,
+      "urls": [
+        {
+          "url": "https://m.media-amazon.com/images/I/71YJiNh+pXS._AC_SL1500_.jpg",
+          "score": 98,
+          "rejected": false,
+          "reason": "Pure white background, fixture isolated perfectly"
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/41psWeGqo3S._AC_SL1500_.jpg",
+          "score": 96,
+          "rejected": false,
+          "reason": "Isolated fixture, pure white seamless background"
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/41WWGnXXndS._AC_SL1500_.jpg",
+          "score": 22,
+          "rejected": false,
+          "reason": "Fixture in fully styled interior scene with visible ceiling,"
+        }
+      ]
+    },
+    {
+      "id": "B0FV852X2M",
+      "category": "pendant-light",
+      "name": "JAYMP Wabi-Sabi Pendant Light, Hand-Molded Sculptural Conch Shape, E26 Hanging Chandelier",
+      "newPanelUrl": null,
+      "bestScore": 25,
+      "urls": [
+        {
+          "url": "https://m.media-amazon.com/images/I/41WIpTisJOL._AC_SL1500_.jpg",
+          "score": 25,
+          "rejected": false,
+          "reason": "Styled scene with visible ceiling, walls, furniture, plants"
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/81OAIBVnGoL._AC_SL1500_.jpg",
+          "score": 25,
+          "rejected": false,
+          "reason": "Fixture in fully styled dining room scene"
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/41Y5n0dUsEL._AC_SL1500_.jpg",
+          "score": 22,
+          "rejected": false,
+          "reason": "Fixture in styled dining room scene with furniture, walls, p"
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/41GXR60oa6L._AC_SL1500_.jpg",
+          "score": 15,
+          "rejected": true,
+          "reason": "Instructional diagram with dimension callouts and specificat"
+        }
+      ]
+    }
+  ]
+}

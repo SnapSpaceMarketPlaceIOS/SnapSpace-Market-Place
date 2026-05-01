@@ -16735,7 +16735,7 @@ export const PRODUCT_CATALOG = [
     brand: 'SGLfarmty',
     price: 47.99, priceDisplay: '$47.99',
     imageUrl: 'https://m.media-amazon.com/images/I/71usFy2BR5L._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/71QmRfg5DfL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71QmRfg5DfL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/71k66ARV2oL._AC_SL1500_.jpg',
@@ -16856,6 +16856,7 @@ export const PRODUCT_CATALOG = [
     brand: 'IHENGYANLT',
     price: 33.65, priceDisplay: '$33.65',
     imageUrl: 'https://m.media-amazon.com/images/I/712wz3t7sTL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/61+UJGSvoIL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/61+UJGSvoIL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/71twidwZdHL._AC_SL1500_.jpg',
@@ -16896,6 +16897,7 @@ export const PRODUCT_CATALOG = [
     brand: 'Trustwoods',
     price: 69.98, priceDisplay: '$69.98',
     imageUrl: 'https://m.media-amazon.com/images/I/51PsBNwoOXS._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/81-kAgI-AHL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81-kAgI-AHL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/91wEG2BYsDS._AC_SL1500_.jpg',
@@ -17136,7 +17138,7 @@ export const PRODUCT_CATALOG = [
     brand: 'DUHU',
     price: 43.29, priceDisplay: '$43.29',
     imageUrl: 'https://m.media-amazon.com/images/I/51PZuMzallL._AC_SL1500_.jpg',
-    panelImageUrl: 'https://m.media-amazon.com/images/I/41zTg+zUIbL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/71DCcUChdOL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/41zTg+zUIbL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/71DCcUChdOL._AC_SL1500_.jpg',
@@ -17299,6 +17301,7 @@ export const PRODUCT_CATALOG = [
     brand: 'JWLUYN',
     price: 29.99, priceDisplay: '$29.99',
     imageUrl: 'https://m.media-amazon.com/images/I/71uYqgZKoYL._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/61SOzn0c+4L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/61UqDTqxCFL._AC_SL1500_.jpg',
@@ -17697,6 +17700,7 @@ export const PRODUCT_CATALOG = [
     brand: 'HMVPL',
     price: 56.99, priceDisplay: '$56.99',
     imageUrl: 'https://m.media-amazon.com/images/I/41SxHJJt61L._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/710CygpSC4L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51wYZAOaV1L._AC_SL1500_.jpg',
@@ -17737,6 +17741,7 @@ export const PRODUCT_CATALOG = [
     brand: 'NSRCE',
     price: 204.99, priceDisplay: '$204.99',
     imageUrl: 'https://m.media-amazon.com/images/I/412GdBh8fkL._AC_SL1500_.jpg',
+    panelImageUrl: null,
     images: [
       'https://m.media-amazon.com/images/I/61z1ut1bF0L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41Cs0jzRmZL._AC_SL1500_.jpg',
@@ -17817,7 +17822,7 @@ export const PRODUCT_CATALOG = [
     brand: 'MIULEE',
     price: 7.48, priceDisplay: '$7.48',
     imageUrl: 'https://m.media-amazon.com/images/I/51OS--GJghL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/71YJiNh+pXS._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81RwIClSl0L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/514oLvzF9vL._AC_SL1500_.jpg',
