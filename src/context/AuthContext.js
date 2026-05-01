@@ -349,7 +349,17 @@ export function AuthProvider({ children }) {
 
     // If Supabase requires email confirmation, session will be null here.
     // The user must verify their email before they can sign in.
-    return { needsEmailVerification: !data.session };
+    //
+    // Build 135 — return userId so the AuthScreen's promo/referral code
+    // redemption flow can actually find the new user. Previously this
+    // returned ONLY needsEmailVerification, leaving userId undefined in
+    // AuthScreen — which meant the redeemSignupCode call was silently
+    // skipped. Result: users typing valid promo codes (e.g. HG-77M3D7RYV)
+    // never got their bonus wishes credited. Caught in 2026-05-01 testing.
+    return {
+      needsEmailVerification: !data.session,
+      userId: data?.user?.id || null,
+    };
   };
 
   /**

@@ -3390,7 +3390,16 @@ export default function HomeScreen({ navigation, route }) {
               screen so the GenieLoader's orbiting particles (80px radius
               around the lamp at ~34% from top) don't visually overlap the
               "HomeGenie" wordmark or tagline. */}
-          <View style={[styles.topBar, generating && styles.topBarGenerating]}>
+          {/* Build 135 — shift content UP while the chat_bar onboarding
+              tooltip is visible. Without this, the "Describe Your Dream
+              Room" popup partially covers the StyleCarousel cards + their
+              labels. When the user dismisses or skips onboarding, the
+              layout returns to the normal 28% top position. */}
+          <View style={[
+            styles.topBar,
+            generating && styles.topBarGenerating,
+            isStepActive('chat_bar') && !generating && styles.topBarOnboarding,
+          ]}>
             <View style={styles.logoRow}>
               {/* Build 90 fix: numberOfLines + adjustsFontSizeToFit defends
                   against the wordmark clipping when Geist_700Bold hasn't
@@ -3448,8 +3457,15 @@ export default function HomeScreen({ navigation, route }) {
             </View>
           )}
 
-          {/* Input bar — centered in hero, drops below loader during generation */}
-          <View style={[styles.heroBottom, generating && styles.heroBottomGenerating]}>
+          {/* Input bar — centered in hero, drops below loader during generation.
+              Build 135 — also shifts UP during the chat_bar onboarding
+              step so the StyleCarousel cards remain fully visible below
+              the "Describe Your Dream Room" tooltip. */}
+          <View style={[
+            styles.heroBottom,
+            generating && styles.heroBottomGenerating,
+            isStepActive('chat_bar') && !generating && styles.heroBottomOnboarding,
+          ]}>
             {/* Above-input zone:
                 - Default: empty. The legacy "recommended prompt" chip strip
                   was retired once the StyleCarousel below the input bar
@@ -4331,8 +4347,17 @@ const styles = StyleSheet.create({
     width: '100%',
     marginBottom: 12,
   },
+  // Build 135 — left-aligned with the input bar's left edge.
+  // Previously paddingHorizontal: 24 pushed the first chip ~40px from
+  // the screen edge (heroBottom's 16px + ScrollView's 24px), drifting
+  // visibly right of the input bar's rounded left edge. Now: paddingLeft
+  // 0 lets the first chip's internal 12px padding handle breathing
+  // room, so "Living Room" lines up flush with the input bar's left
+  // visual edge. paddingRight kept generous so the last chips don't
+  // run off-screen abruptly when scrolled.
   roomChipsAboveScroll: {
-    paddingHorizontal: 24,
+    paddingLeft: 0,
+    paddingRight: 24,
     alignItems: 'center',
   },
   roomChipAbove: {
@@ -4409,6 +4434,13 @@ const styles = StyleSheet.create({
   // orbit radius ≈ 80px) don't collide with the heading or tagline.
   topBarGenerating: {
     top: '14%',
+  },
+  // Build 135 — heading position during the chat_bar onboarding step.
+  // Pairs with heroBottomOnboarding (below) which lifts the chip
+  // strip + input bar + StyleCarousel together so the "Describe Your
+  // Dream Room" popup doesn't clip the carousel cards.
+  topBarOnboarding: {
+    top: '10%',
   },
   wishTagline: {
     fontSize: 21,
@@ -4594,6 +4626,16 @@ const styles = StyleSheet.create({
   },
   heroBottomGenerating: {
     top: '78%',
+    transform: [{ translateY: 0 }],
+  },
+  // Build 135 — chip strip + input bar + carousel position during
+  // chat_bar onboarding. Lifted from 58% → 40% so the "Describe Your
+  // Dream Room" tooltip (anchored below the input bar) leaves enough
+  // vertical room for the StyleCarousel cards and their labels to
+  // remain fully visible. Reverts to 58% the moment the user taps
+  // "Got it" or "Skip".
+  heroBottomOnboarding: {
+    top: '40%',
     transform: [{ translateY: 0 }],
   },
   inputBar: {
