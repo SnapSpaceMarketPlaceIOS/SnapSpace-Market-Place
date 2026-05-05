@@ -5,7 +5,7 @@ import {
   MOOD_KEYWORDS,
   ROOM_FURNITURE,
 } from '../data/styleMap';
-import { detectColorFamilies } from './colorMap';
+import { detectColorFamilies, COLOR_KEYWORDS } from './colorMap';
 
 // Category aliases: catalog category → user-vocabulary words for that category.
 // Used to attach a detected color to a specific category (e.g. "brown couch"
@@ -82,6 +82,28 @@ export function parseDesignPrompt(promptText) {
   // "white rug with brown couch" → { sofa: 'brown', rug: 'white' }
   const colorByCategory = attachAttributeToCategory(text, colors, (c, t) => t.includes(c));
   const materialByCategory = attachAttributeToCategory(text, materials, (m, t) => t.includes(m));
+
+  // Build 136 — orphan color/material pair → room-default centerpiece.
+  //
+  // Closes the gap where a user writes "brown leather and black metal
+  // accents" without naming the actual furniture piece. attachAttribute-
+  // ToCategory above only attaches when a category word is in proximity,
+  // so neither "brown" nor "leather" got pinned to sofa, and the matcher
+  // picked a default-color (white) variant. Result: AI rendered a white
+  // couch when user clearly wanted brown.
+  //
+  // Heuristic: scan word pairs for <orphan_color> immediately followed by
+  // <orphan_soft_material>. If found, attach both to the room's default
+  // centerpiece (sofa for living-room, bed for bedroom, etc.). Soft
+  // materials = upholstery (leather/velvet/linen/etc.) — those are
+  // unambiguously sofa/chair/bed cues. Hard materials (wood/metal/glass)
+  // are deliberately excluded because they could refer to the table,
+  // lamp, frame, or anything else.
+  //
+  // Strictly EXPANDS the existing colorByCategory mapping — never
+  // overwrites a value attachAttributeToCategory already set.
+  applyOrphanCenterpieceDefault(text, roomType, colors, materials,
+    colorByCategory, materialByCategory);
 
   // Tokenize the raw prompt into clean lowercase words for tag matching.
   // This lets the product matcher compare tags against the user's exact wording.
@@ -171,6 +193,98 @@ function attachAttributeToCategory(text, attributes, containsCheck) {
   }
 
   return result;
+}
+
+// ── Build 136 — orphan color/material centerpiece defaulting ────────────────
+//
+// When a user writes a prompt like "brown leather and black metal accents"
+// without naming the furniture piece, both colors land in the flat
+// `colors[]` list but neither gets attached to a specific category by
+// attachAttributeToCategory (no category word is nearby). The matcher
+// then has no color preference for the room's centerpiece sofa and ends
+// up showing a default-color variant — typically white/beige — which
+// rendered as the wrong color in the AI panel.
+//
+// This helper does ONE narrow thing: look for a word pair where an
+// orphan color is immediately followed by an orphan soft (upholstery)
+// material. Soft materials are reliable sofa/chair/bed cues. If we find
+// such a pair, attach both attributes to the room type's default
+// centerpiece category. This addresses the user-reported "brown leather"
+// → white-couch failure without affecting any prompt that already had a
+// category specified or that uses hard materials (wood/metal/glass —
+// those are ambiguous because they could refer to a table, lamp, or
+// frame).
+//
+// SAFETY: this function NEVER overwrites a value attachAttributeToCategory
+// already set. It only fills empty centerpiece slots. Any prompt that
+// works correctly today continues to work — the only behavioral change
+// is for prompts that previously dropped their orphan attributes.
+const SOFT_UPHOLSTERY_MATERIALS = new Set([
+  'leather', 'velvet', 'linen', 'cotton', 'wool', 'suede', 'fabric', 'chenille',
+]);
+
+const ROOM_DEFAULT_CENTERPIECE = {
+  'living-room':  'sofa',
+  'bedroom':      'bed',
+  'dining-room':  'dining-chair',
+  'office':       'desk-chair',
+  'kitchen':      'dining-chair',  // kitchens with seating typically have chairs
+  'outdoor':      'sofa',           // patio sofa / outdoor sectional
+  'nursery':      'bed',            // crib falls under bed category
+};
+
+// Reverse lookup: literal color word → canonical family name.
+// "cream" → "white", "cognac" → "brown", "navy" → "blue", etc.
+// Built once at module load. Mirrors WORD_TO_COLOR_FAMILY in colorMap.js
+// but redeclared here to keep the dependency surface narrow (we only
+// import COLOR_KEYWORDS, not the private map).
+const _WORD_TO_FAMILY = (() => {
+  const m = new Map();
+  for (const [family, words] of Object.entries(COLOR_KEYWORDS)) {
+    for (const w of words) {
+      if (!m.has(w)) m.set(w, family);
+    }
+  }
+  return m;
+})();
+
+function applyOrphanCenterpieceDefault(
+  text, roomType, colors, materials, colorByCategory, materialByCategory,
+) {
+  const target = ROOM_DEFAULT_CENTERPIECE[roomType];
+  if (!target) return;
+  if (colorByCategory[target]) return; // already set — don't overwrite
+
+  const usedColors = new Set(Object.values(colorByCategory));
+  const usedMats   = new Set(Object.values(materialByCategory));
+
+  // Walk word pairs left-to-right looking for color → soft-material adjacency.
+  // We require an EXACT word match (not substring) to avoid false positives
+  // like "brownie" matching "brown" or "leathered" matching "leather".
+  //
+  // For colors: resolve the literal source word ("cream", "cognac") to its
+  // canonical family ("white", "brown") so the result aligns with the rest
+  // of the pipeline (matcher's findMatchingColorVariant operates on family
+  // names).
+  const words = text.split(/\s+/).map(w => w.replace(/[^a-z]/g, ''));
+  for (let i = 0; i < words.length - 1; i++) {
+    const wColor = words[i];
+    const wMat   = words[i + 1];
+    const colorFamily = _WORD_TO_FAMILY.get(wColor);
+    if (!colorFamily) continue;
+    if (!SOFT_UPHOLSTERY_MATERIALS.has(wMat)) continue;
+    if (!materials.includes(wMat)) continue;
+    if (!colors.includes(colorFamily)) continue; // sanity: family should be in detected colors
+    if (usedColors.has(colorFamily)) continue;   // family already assigned elsewhere
+    if (usedMats.has(wMat))          continue;   // material already assigned elsewhere
+
+    // Found an orphan color + soft-material pair. Pin to centerpiece using
+    // the canonical family name (so downstream matcher/variant logic
+    // keys on the same string the rest of the pipeline uses).
+    colorByCategory[target]    = colorFamily;
+    materialByCategory[target] = wMat;
+    return; // first match wins; don't keep scanning
+  }
 }
 
 /**

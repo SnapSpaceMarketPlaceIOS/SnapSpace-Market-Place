@@ -306,10 +306,52 @@ export function matchProducts(
   // (Phase C2) handles the case where the smaller style pool can't fill 6
   // diverse category slots.
   const MIN_POOL = limit;
-  const candidates = styleFiltered.length >= MIN_POOL ? styleFiltered
+  let candidates = styleFiltered.length >= MIN_POOL ? styleFiltered
     : attrFiltered.length >= MIN_POOL ? attrFiltered
     : categoryFiltered.length >= MIN_POOL ? categoryFiltered
     : roomFiltered;
+
+  // Build 136 — essential-category guarantee.
+  //
+  // Closes the gap where a tightly-filtered candidate pool (e.g. dark-luxe
+  // mid-century industrial) excludes the room's essential categories
+  // entirely — diversify() then has nothing to pick from for sofa/bed/rug
+  // and silently moves on, leaving the slot empty. User-reported symptom:
+  // a living-room generation with 2 chairs + coffee table + rug but no
+  // sofa, even though the AI rendered a (white) couch in the panel.
+  //
+  // Fix: union into the candidates pool the top-K products of each
+  // missing essential category from the broader roomFiltered tier. The
+  // category guarantee runs BEFORE scoring, so injected products go
+  // through the full score+diversify pipeline. Style/material scoring
+  // still ranks them — we just guarantee they're in the running.
+  //
+  // Why pull from roomFiltered (not the full catalog): roomFiltered is
+  // already locked to the prompt's room type (CATEGORY_ROOM_LOCK), so a
+  // bedroom prompt can't accidentally inject a kitchen-island. We're only
+  // expanding the pool within the room scope.
+  //
+  // K=3 per missing essential keeps the pool injection bounded — at
+  // most 3 essentials × 3 products = 9 extra candidates added to a pool
+  // that's typically 50-300 products. Negligible scoring cost, big
+  // coverage win. Strictly EXPANDS the pool — no existing product is
+  // removed.
+  const ESSENTIAL_GUARANTEE_TOPK = 3;
+  const _essentialsForGuarantee = ROOM_ESSENTIALS[roomType] || [];
+  for (const essCat of _essentialsForGuarantee) {
+    const alreadyInCandidates = candidates.some(p => p.category === essCat);
+    if (alreadyInCandidates) continue;
+    const supplements = roomFiltered.filter(p => p.category === essCat).slice(0, ESSENTIAL_GUARANTEE_TOPK);
+    if (supplements.length > 0) {
+      candidates = [...candidates, ...supplements];
+      if (MATCH_DEBUG) {
+        console.log(
+          `[match] essential-guarantee: ${essCat} missing from filtered pool ` +
+          `→ injected ${supplements.length} from roomFiltered`
+        );
+      }
+    }
+  }
 
   if (MATCH_DEBUG) {
     console.log(
