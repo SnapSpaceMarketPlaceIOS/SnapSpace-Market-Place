@@ -65,10 +65,11 @@ const PAD_H       = layout.screenPaddingH;        // 20
 const SECTION_GAP = layout.sectionGap;             // 32
 const IMAGE_W     = SW - (PAD_H * 2);             // image width with side padding
 const IMAGE_H     = Math.round(IMAGE_W * 1.1);    // taller than square for breathing room
-// Hero image corner radius. radius.sm (8pt) per user direction
-// 2026-04-28 — they wanted 8–10px, less aggressive than the prior
-// radius.xl (20pt) which read as too soft for the product shape.
-const IMAGE_R     = radius.sm;
+// Hero image corner radius. radius.md (12pt) per user direction
+// 2026-05-03 (Build 136) — bumped from 8pt to 12pt to match the
+// design-system standard card radius. Subtle bend, still reads as a
+// product photo, less sharp than the prior 8pt corners.
+const IMAGE_R     = radius.md;
 const CARD_LIFT   = 0;                             // no overlap — bar sits between hero and card
 const FEAT_BG     = uiColors.accentBg;              // feature icon circle bg
 const DIVIDER_COLOR = 'rgba(0,0,0,0.06)';
