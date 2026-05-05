@@ -778,8 +778,16 @@ function AnimatedIconBtn({ onPress, style, children, disabled, accessibilityLabe
 }
 
 // ── Product Card (identical to ShopTheLookScreen) ────────────────────────────
+// Build 136 — wrapped in React.memo. ProductCard renders 4-8 instances per
+// RoomResult mount, plus the "You Might Also Like" tier. Without memo, every
+// parent re-render (cart updates, scroll-induced layout shifts, navigation
+// focus events) re-renders all instances unconditionally. Memo skips those
+// re-renders when product / inCart / handler refs haven't changed.
+//
+// SAFETY: pure render component — no side effects, no refs, no internal
+// state. The memo's default shallow-prop comparison is correct here.
 
-function ProductCard({ product, inCart, onAddToCart, onPress }) {
+function ProductCardImpl({ product, inCart, onAddToCart, onPress }) {
   const priceVal = product.priceValue ?? product.price;
   const priceStr = typeof priceVal === 'number'
     ? `$${priceVal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
@@ -800,8 +808,13 @@ function ProductCard({ product, inCart, onAddToCart, onPress }) {
     ? getVariantSwatchHex(product._matchedVariant.label)
     : null;
 
+  // Build 136 — call onPress with the product as arg. Lets the parent
+  // pass a single useCallback'd handler to all cards instead of an
+  // inline arrow per card (which would defeat React.memo).
+  const handleCardPress = () => onPress(product);
+
   return (
-    <TouchableOpacity style={s.hCard} activeOpacity={0.7} onPress={onPress}>
+    <TouchableOpacity style={s.hCard} activeOpacity={0.7} onPress={handleCardPress}>
       <View>
         {/* Build 136 — resizeMode flipped from "cover" to "contain" so the
             full product is visible inside the card. "cover" was cropping
@@ -847,6 +860,12 @@ function ProductCard({ product, inCart, onAddToCart, onPress }) {
     </TouchableOpacity>
   );
 }
+
+// Memoized export. Default shallow-prop comparison is correct because
+// the component is pure (no internal state, no side effects, no refs).
+// Build 136 — measurable benefit on cart-update and back-navigation
+// flows where parent state changes don't actually affect the cards.
+const ProductCard = React.memo(ProductCardImpl);
 
 // ── Main Screen ──────────────────────────────────────────────────────────────
 
@@ -1040,21 +1059,36 @@ export default function RoomResultScreen({ route, navigation }) {
   }, [resultUri, user?.id, products, prompt]);
 
   // ── Computed ──
-  const isInCart = (product) => {
+  // Build 136 — useCallback for memoized ProductCard's prop refs.
+  // isInCart and handleAddToCart need stable refs (when their deps don't
+  // change) so the memoized ProductCard can short-circuit on shallow
+  // comparison instead of re-rendering on every parent re-render.
+  const isInCart = useCallback((product) => {
     const key = `${product.name}__${product.brand}`;
     return addedKeys[key] || items.some(item => item.key === key);
-  };
+  }, [addedKeys, items]);
 
   const allInCart = products.length > 0 && products.every(p => isInCart(p));
 
   const styleTags = [...new Set(products.flatMap(p => p.styles || []).filter(Boolean))];
 
   // ── Handlers ──
-  const handleAddToCart = (product) => {
+  const handleAddToCart = useCallback((product) => {
     const key = `${product.name}__${product.brand}`;
     addToCart({ ...product, price: product.priceValue ?? product.price });
     setAddedKeys(prev => ({ ...prev, [key]: true }));
-  };
+  }, [addToCart]);
+
+  // Build 136 — stable navigate-to-PDP handler. The previous inline arrow
+  // `onPress={() => navigation.navigate('ProductDetail', { product })}` at
+  // each ProductCard render site allocated a fresh function ref every
+  // parent render, defeating React.memo's shallow comparison. This
+  // useCallback gives every card the same handler ref; ProductCard
+  // internally calls onPress(product) so each card still navigates to
+  // its own product.
+  const handleProductPress = useCallback((product) => {
+    navigation.navigate('ProductDetail', { product });
+  }, [navigation]);
 
   const handleAddAll = () => {
     let added = 0;
@@ -1412,7 +1446,7 @@ export default function RoomResultScreen({ route, navigation }) {
                   product={product}
                   inCart={isInCart(product)}
                   onAddToCart={handleAddToCart}
-                  onPress={() => navigation.navigate('ProductDetail', { product })}
+                  onPress={handleProductPress}
                 />
               ))}
             </ScrollView>
@@ -1446,7 +1480,7 @@ export default function RoomResultScreen({ route, navigation }) {
                   product={product}
                   inCart={isInCart(product)}
                   onAddToCart={handleAddToCart}
-                  onPress={() => navigation.navigate('ProductDetail', { product })}
+                  onPress={handleProductPress}
                 />
               ))}
             </ScrollView>
