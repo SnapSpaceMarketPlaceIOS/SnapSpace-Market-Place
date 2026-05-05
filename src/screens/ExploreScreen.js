@@ -701,6 +701,21 @@ export default function ExploreScreen({ navigation, route }) {
   const [aiImageLoading, setAiImageLoading] = useState(false);
   const [aiImageProducts, setAiImageProducts] = useState(null);
 
+  // Build 136 — "All" category shuffle nonce.
+  // Every time the user focuses the Explore tab, this nonce bumps. The
+  // filteredProducts useMemo reads it and re-shuffles the "All" pool so
+  // visitors see fresh ordering on every visit instead of the same
+  // catalog-order top results every time. Only triggers when the user is
+  // in the default browse state (All category, default sort, no filters,
+  // no search) — searches and filters always preserve their natural order
+  // because users expect predictable results when they're looking for
+  // something specific.
+  //
+  // Nonce-based: shuffle is computed once per nonce value inside the
+  // useMemo, so re-renders within a single focus (scroll, tap, etc.) do
+  // NOT re-shuffle — the order stays stable while the user browses.
+  const [allShuffleNonce, setAllShuffleNonce] = useState(0);
+
   // No tab-switch animation — previously used opacity fade + deferred render,
   // but the opacity-to-0 + setTimeout + re-render + fade-in chain added ~500ms
   // of "invisible content" that looked like lag. Instant swap is snappier.
@@ -842,6 +857,18 @@ export default function ExploreScreen({ navigation, route }) {
       setAiImageLoading(false);
     }
   }, []);
+
+  // Build 136 — bump shuffle nonce on every Explore tab focus so the
+  // "All" pool re-shuffles for the visitor. Cheap state update; the
+  // actual shuffle work happens inside filteredProducts useMemo only
+  // when conditions match (All category + no filters/search). Empty
+  // dep array keeps the callback stable; useFocusEffect runs it on
+  // every focus regardless.
+  useFocusEffect(
+    useCallback(() => {
+      setAllShuffleNonce(n => n + 1);
+    }, []),
+  );
 
   // Fetch community (user-posted) designs on screen focus (with 5-min cache)
   const lastCommunityFetch = useRef(0);
@@ -1001,8 +1028,46 @@ export default function ExploreScreen({ navigation, route }) {
       default: // best_match — keep current order
         break;
     }
+
+    // Build 136 — shuffle the "All" pool on every Explore tab focus so
+    // visitors see a fresh ordering instead of the same catalog-order
+    // top results. Strictly gated to the default browse state: All
+    // category, default sort, no overrides, no filters, no search.
+    // Any filter or search returns predictable results.
+    //
+    // The nonce changes on focus → useMemo invalidates → Fisher-Yates
+    // shuffle runs once. Re-renders within the same focus reuse the
+    // memoized result (no jumpy reshuffle while the user scrolls).
+    const isDefaultBrowse =
+      !overrideProducts &&
+      activeProdCat === 0 &&
+      productSort === 'best_match' &&
+      !search.trim() &&
+      priceMin === PRICE_ABSOLUTE_MIN &&
+      priceMax === PRICE_ABSOLUTE_MAX &&
+      filterStyles.length === 0 &&
+      !filterInStockOnly &&
+      filterRoomTypes.length === 0 &&
+      filterMinRating === 0;
+
+    if (isDefaultBrowse) {
+      // Reference the nonce so React knows this memo depends on it.
+      // The actual randomness comes from Math.random; the nonce is just
+      // a "re-run trigger" — every focus bump invalidates this memo and
+      // re-shuffles. (No-op statement: keeps the dep visible to readers.)
+      void allShuffleNonce;
+      pool = [...pool];
+      // Fisher-Yates — O(n), in-place after the copy above.
+      for (let i = pool.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        const tmp = pool[i];
+        pool[i] = pool[j];
+        pool[j] = tmp;
+      }
+    }
+
     return pool;
-  }, [overrideProducts, activeProdCat, search, priceMin, priceMax, filterStyles, filterInStockOnly, filterRoomTypes, filterMinRating, productSort]);
+  }, [overrideProducts, activeProdCat, search, priceMin, priceMax, filterStyles, filterInStockOnly, filterRoomTypes, filterMinRating, productSort, allShuffleNonce]);
 
   // Progressively reveal more products after initial paint (chunks of 30)
   // Keeps the Products tab opening fast — first 24 render instantly,

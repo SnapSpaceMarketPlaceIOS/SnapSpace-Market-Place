@@ -803,7 +803,13 @@ function ProductCard({ product, inCart, onAddToCart, onPress }) {
   return (
     <TouchableOpacity style={s.hCard} activeOpacity={0.7} onPress={onPress}>
       <View>
-        <CardImage uri={product.imageUrl} style={s.hCardImg} resizeMode="cover" placeholderColor="#D0D7E3" compact />
+        {/* Build 136 — resizeMode flipped from "cover" to "contain" so the
+            full product is visible inside the card. "cover" was cropping
+            tightly to the middle of the photo, hiding ends of couches /
+            tops of lamps / sides of rugs. "contain" lets each product
+            sit within its own bounds with subtle background padding —
+            matches how products read on Explore page PDP. */}
+        <CardImage uri={product.imageUrl} style={s.hCardImg} resizeMode="contain" placeholderColor="#D0D7E3" compact />
         {variantSwatchHex && (
           <View
             style={[s.hCardSwatchDot, { backgroundColor: variantSwatchHex }]}
