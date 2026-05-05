@@ -390,7 +390,43 @@ function TabNavigator() {
 
 // ─── Root Navigator ──────────────────────────────────────────────
 function RootNavigator() {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
+
+  // Build 136 — restored cold-start GenieLoader splash.
+  //
+  // CONTEXT: Build 89 dropped this gate to render Home immediately and
+  // skip the 200-1500ms bootstrap wait. That trade was: faster perceived
+  // boot, at the cost of a stark white window where the app looked dead
+  // until React mounted the tab tree. User feedback in the live builds
+  // 130-135 cycle was that the white screen feels broken.
+  //
+  // RESTORED BEHAVIOR: while AuthContext.loading is true (bootstrap in
+  // flight — Supabase getSession + fetchProfile + AsyncStorage warm-up),
+  // render the same GenieLoader animation users see during AI generation.
+  // Familiar visual language; the brand reads as "working" instead of
+  // "frozen."
+  //
+  // SAFETY (why this is now safer than the Build 89 removal context):
+  //   1. AuthContext bootstrap has a hard 5s timeout (Build 133) that
+  //      always releases `loading`, so the splash can't hang the app.
+  //   2. AuthContext only sets `loading=true` once on mount and never
+  //      flips it back to true — sign-in/out don't re-trigger this.
+  //      So users only see the splash on cold-launch, not on every
+  //      auth action mid-session.
+  //   3. The GenieLoader is the same animation used elsewhere in the
+  //      app (HomeScreen mid-generation), so it's already battle-tested
+  //      and self-cleans on unmount.
+  //
+  // For users with no persisted session, the splash typically shows
+  // for ~200-400ms. For users with a persisted session that needs a
+  // profile fetch, ~600-1500ms. Worst case (network blip): 5s timeout.
+  if (authLoading) {
+    return (
+      <View style={styles.loadingScreen}>
+        <GenieLoader animating={true} size={200} />
+      </View>
+    );
+  }
 
   // Build 89 / L1: dropped the `loading` gate.
   //
