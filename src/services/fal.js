@@ -347,6 +347,25 @@ export async function generateWithProductPanel(roomPhotoUrl, userPrompt, product
     // image at higher tolerances — 1 keeps edits conservative so the output
     // actually contains the matched products rather than style-similar substitutes.
     safety_tolerance: 1,
+    // Build 141 — the missing preservation lever that's been deferred since
+    // Build 136 ("Bug B"). FAL's flux-2-pro/edit defaults to ~0.85 strength,
+    // which means flux preserves only ~15% of the input image and regenerates
+    // the rest. Combined with the prompt's "Editorial / Architectural Digest
+    // style" framing, that default tells flux to render a magazine-quality
+    // room rather than placing products into the user's actual room — which
+    // is exactly the user-reported failure mode (real dining nook with
+    // ceiling fan + dog rendered as formal dining room with brass chandelier
+    // + herringbone floor).
+    //
+    // 0.4 = preserve ~60% of input pixels, edit ~40%. This is the canonical
+    // ballpark for "keep my room geometry, swap furniture in" use cases.
+    // Walls / floors / ceilings / windows / doors / camera angle hold; only
+    // the product surfaces and lighting tone change.
+    //
+    // Recoverable: removing this single line returns to Build 140 behavior
+    // (FAL default ~0.85). If 0.4 over-preserves and products don't render,
+    // bump to 0.5; if it under-preserves, drop to 0.3. One-line tuning.
+    strength:         0.4,
   });
 }
 
@@ -389,6 +408,7 @@ export async function generateWithProductRefs(roomPhotoUrl, userPrompt, products
     image_size:       imageSize,
     output_format:    'jpeg',     // FAL flux-2-pro/edit only accepts jpeg|png (no webp)
     safety_tolerance: 1,          // Build 69: see generateWithProductPanel for rationale
+    strength:         0.4,        // Build 141: same room-preservation lever as panel path
   });
 
   return result.url;
@@ -458,6 +478,7 @@ export async function generateSingleProductInRoom(roomPhotoUrl, product, aspectR
     image_size:       imageSize,
     output_format:    'jpeg',     // FAL flux-2-pro/edit only accepts jpeg|png (no webp)
     safety_tolerance: 1,          // Build 69: see generateWithProductPanel for rationale
+    strength:         0.4,        // Build 141: same room-preservation lever as panel path
   });
 
   return result.url;
