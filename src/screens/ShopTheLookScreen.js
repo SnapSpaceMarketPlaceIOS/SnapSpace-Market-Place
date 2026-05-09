@@ -383,7 +383,11 @@ export default function ShopTheLookScreen({ route, navigation }) {
         <TouchableOpacity
           style={s.userRow}
           activeOpacity={0.75}
-          onPress={() => navigation?.navigate('UserProfile', { username: displayUser })}
+          // Build 142 — pass userId (UUID) when available so UserProfile can
+          // do a stable user_id lookup instead of relying on the username
+          // string (which is often a display-name fallback that misses).
+          // Falls back to username for designs without user_id (legacy/seed).
+          onPress={() => navigation?.navigate('UserProfile', { username: displayUser, userId: design.user_id })}
         >
           <View style={s.avatar}>
             <Text style={s.avatarText}>{displayInitial}</Text>

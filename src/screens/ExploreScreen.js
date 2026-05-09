@@ -901,6 +901,11 @@ export default function ExploreScreen({ navigation, route }) {
             id: `user-${d.id}`,
             title: d.prompt || 'AI Generated Design',
             user: d.author?.username || d.author?.full_name || 'HomeGenie User',
+            // Build 142 — preserve the author's UUID so navigation to
+            // UserProfile can use stable user_id instead of the often-stub
+            // user display string. Falls back to user_id from the design row
+            // itself if the author join didn't materialize.
+            user_id: d.author?.id || d.user_id || null,
             initial: (d.author?.full_name || 'U')[0],
             verified: d.author?.is_verified_supplier || false,
             imageUrl: d.image_url,
@@ -1492,7 +1497,8 @@ export default function ExploreScreen({ navigation, route }) {
                   activeOpacity={0.75}
                   onPress={() => {
                     setSelectedCard(null);
-                    navigation?.navigate('UserProfile', { username: selectedCard.user });
+                    // Build 142 — pass userId for stable lookup, see ShopTheLookScreen.
+                    navigation?.navigate('UserProfile', { username: selectedCard.user, userId: selectedCard.user_id });
                   }}
                 >
                   <View style={[styles.modalAvatar, selectedCard.verified && styles.modalAvatarVerified]}>

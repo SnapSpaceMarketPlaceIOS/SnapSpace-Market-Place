@@ -1182,6 +1182,41 @@ export async function getUserProfileData(username) {
   return data; // { id, full_name, username, bio, avatar_url, is_verified_supplier, follower_count, following_count, design_count }
 }
 
+/**
+ * Look up a profile by user_id (UUID) instead of username string.
+ *
+ * Fixes the navigation gap where tapping the author header on a wish/post
+ * would land on a blank "Test" profile because design.user often stores a
+ * display string (full_name fallback) rather than a real username — and
+ * get_user_profile_data lookup-by-username then misses.
+ *
+ * Direct profiles-table read with .eq('id', userId) — no RPC needed.
+ * Returns the same shape as getUserProfileData, plus null follower/following
+ * counts (callers don't always need them; FollowList screen has its own
+ * count source).
+ */
+export async function getUserProfileDataById(userId) {
+  if (!userId) return null;
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('id, full_name, username, bio, avatar_url, is_verified_supplier')
+    .eq('id', userId)
+    .maybeSingle();
+  if (error) throw error;
+  if (!data) return null;
+  // Hydrate counts via the same RPC the username-path uses, since profiles
+  // row alone doesn't have follower/following/design counts. If the username
+  // path also fails (very rare), we still return the basic profile so the
+  // screen can render meaningfully.
+  if (data.username) {
+    try {
+      const fullData = await getUserProfileData(data.username);
+      if (fullData) return fullData;
+    } catch { /* fall through to basic profile */ }
+  }
+  return { ...data, follower_count: 0, following_count: 0, design_count: 0 };
+}
+
 export async function getMyStats(userId) {
   const { data, error } = await supabase.rpc('get_my_stats', {
     p_user_id: userId,

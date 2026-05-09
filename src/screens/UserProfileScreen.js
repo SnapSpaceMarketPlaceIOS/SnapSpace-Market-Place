@@ -21,6 +21,7 @@ import { useAuth } from '../context/AuthContext';
 // Like functionality is on ShopTheLookScreen (when user taps into a post)
 import {
   getUserProfileData,
+  getUserProfileDataById,
   getUserPublicDesigns,
   checkIsFollowing,
   followUser,
@@ -67,6 +68,12 @@ function formatCount(n) {
 
 export default function UserProfileScreen({ navigation, route }) {
   const rawUsername = route?.params?.username ?? '';
+  // Build 142 — accept userId (UUID) as alternative param. Callers should
+  // pass userId whenever available because design.user is often a display-
+  // name fallback that doesn't match any profile.username column. Without
+  // userId, this screen rendered as a blank "Test" placeholder for any
+  // wish whose author had no username set.
+  const rawUserId = route?.params?.userId ?? '';
   const { user: currentUser } = useAuth();
 
   const [profile, setProfile] = useState(null);
@@ -76,11 +83,16 @@ export default function UserProfileScreen({ navigation, route }) {
   const [isFollowing, setIsFollowing] = useState(false);
   const [followLoading, setFollowLoading] = useState(false);
 
-  // Load profile + follow state
+  // Load profile + follow state. Prefer userId-based lookup when available
+  // (UUID is stable, never null, never a display-name fallback). Falls back
+  // to username for legacy callers that only pass username.
   useEffect(() => {
-    if (!rawUsername) return;
+    if (!rawUsername && !rawUserId) return;
     setProfileLoading(true);
-    getUserProfileData(rawUsername)
+    const lookup = rawUserId
+      ? getUserProfileDataById(rawUserId)
+      : getUserProfileData(rawUsername);
+    lookup
       .then(data => {
         setProfile(data);
         if (currentUser?.id && data?.id && currentUser.id !== data.id) {
@@ -89,7 +101,7 @@ export default function UserProfileScreen({ navigation, route }) {
       })
       .catch(err => console.warn('[UserProfile] load failed:', err.message))
       .finally(() => setProfileLoading(false));
-  }, [rawUsername, currentUser?.id]);
+  }, [rawUsername, rawUserId, currentUser?.id]);
 
   // Load public designs
   useEffect(() => {
@@ -108,6 +120,11 @@ export default function UserProfileScreen({ navigation, route }) {
           styles: d.style_tags || [],
           tags: (d.style_tags || []).map(s => `#${s}`),
           isUserDesign: true,
+          // Build 142 — keep author identity on the design so if a viewer taps
+          // into the post (ShopTheLook) and then taps the author header,
+          // navigation lands back on the same creator's profile.
+          user: profile.username || profile.full_name,
+          user_id: profile.id,
         })));
       })
       .catch(err => console.warn('[UserProfile] designs failed:', err.message))

@@ -406,6 +406,11 @@ export default function ProfileScreen({ navigation }) {
             _rawId: d.id,
             title: d.prompt || 'Liked Design',
             user: d.profiles?.username || d.profiles?.full_name || 'Creator',
+            // Build 142 — preserve creator's UUID so when user taps into a
+            // liked design and then taps the author header on ShopTheLook,
+            // navigation lands on the real creator's profile (not a blank
+            // "Creator" stub).
+            user_id: d.profiles?.id || d.user_id || null,
             initial: (d.profiles?.full_name || 'C')[0],
             verified: d.profiles?.is_verified_supplier || false,
             imageUrl: d.image_url,
