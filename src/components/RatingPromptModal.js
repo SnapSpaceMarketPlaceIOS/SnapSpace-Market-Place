@@ -8,6 +8,7 @@ import {
   Animated,
   Easing,
   Pressable,
+  Image,
 } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -16,26 +17,36 @@ import { colors } from '../constants/colors';
 /**
  * RatingPromptModal — post-second-generation App Store review prompt.
  *
- * Pure presentational. Shown by RatingPromptHost in App.js when
- * SubscriptionContext.shouldShowRatingPrompt flips true.
+ * Compact card overlay shown on RoomResultScreen after the user's 2nd
+ * successful generation. Layout per spec:
  *
- * UX intent (per user direction): no incentive, no carrot. Just a
- * polite ask after the user has seen TWO room generations and has
- * therefore had a real taste of what the app does. The thinking is
- * that engagement after two real uses is a more honest signal than
- * a review-for-wishes trade.
+ *   ┌─────────────────────────┐
+ *   │       [app icon]        │
+ *   │   Enjoying Home Genie?  │
+ *   │      Leave a review!    │
+ *   ├─────────────────────────┤
+ *   │   ☆   ☆   ☆   ☆   ☆    │
+ *   ├─────────────────────────┤
+ *   │         Not Now         │
+ *   └─────────────────────────┘
  *
- * Important: do NOT add wish bonuses, free wishes, or any other
- * compensation tied to tapping "Leave a Review." Apple guideline
- * 4.5.4 explicitly prohibits offering rewards in exchange for App
- * Store ratings/reviews; coupling the two is a likely review-time
+ * Behavior — tapping ANY star fires the native iOS rating sheet via
+ * SKStoreReviewController (through expo-store-review), with a fallback
+ * to the App Store write-review URL. "Not Now" dismisses without
+ * triggering any prompt. Both actions persist a one-shot flag so the
+ * prompt never auto-fires again on this account.
+ *
+ * Apple guideline 4.5.4 — NO incentive is tied to this prompt. Do not
+ * add wish bonuses, free wishes, or any other compensation for tapping
+ * a star. Coupling rewards to an App Store rating is a likely review
  * rejection.
  *
  * Props:
- *   visible       — boolean, drives the Modal
- *   onLeaveReview — () => void, parent triggers the native review
- *                   sheet AND logs engagement
- *   onMaybeLater  — () => void, parent dismisses + logs decline
+ *   visible        — boolean, drives the Modal
+ *   onLeaveReview  — () => void; fires on any star tap (parent triggers
+ *                    the native review path AND logs engagement)
+ *   onMaybeLater   — () => void; fires on "Not Now" (parent dismisses +
+ *                    logs decline)
  */
 export default function RatingPromptModal({ visible, onLeaveReview, onMaybeLater }) {
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -69,59 +80,75 @@ export default function RatingPromptModal({ visible, onLeaveReview, onMaybeLater
     <Modal transparent visible={visible} animationType="none" statusBarTranslucent>
       <Animated.View style={[styles.overlay, { opacity: fadeAnim }]}>
         <Animated.View style={[styles.card, { transform: [{ scale: scaleAnim }] }]}>
-          {/* Five-star illustration in the gradient hero — visually
-              communicates "review" without needing a label. */}
-          <View style={styles.heroWrap}>
-            <LinearGradient
-              colors={[colors.blueLight, colors.bluePrimary]}
-              locations={[0.32, 0.86]}
-              style={styles.hero}
-            >
-              <FiveStarsIcon />
-            </LinearGradient>
-          </View>
 
-          <Text style={styles.title}>Enjoying HomeGenie?</Text>
-          <Text style={styles.body}>
-            If the app&apos;s helped you wish up a space you love,{'\n'}
-            we&apos;d be grateful for a quick review.
-          </Text>
-
-          <Pressable
-            onPress={onLeaveReview}
-            accessibilityRole="button"
-            accessibilityLabel="Leave a review on the App Store"
-            style={styles.primaryWrap}
+          <LinearGradient
+            colors={['#E6F2FB', '#C6DFF3']}
+            locations={[0, 1]}
+            style={styles.cardBg}
           >
-            <LinearGradient
-              colors={[colors.blueLight, colors.bluePrimary]}
-              locations={[0.32, 0.86]}
-              style={styles.primary}
-            >
-              <Text style={styles.primaryLabel}>Leave a Review</Text>
-            </LinearGradient>
-          </Pressable>
+            {/* App icon */}
+            <View style={styles.logoWrap}>
+              <Image
+                source={require('../../assets/icon.png')}
+                style={styles.logo}
+                resizeMode="cover"
+              />
+            </View>
 
-          <TouchableOpacity
-            onPress={onMaybeLater}
-            accessibilityRole="button"
-            accessibilityLabel="Maybe later"
-            style={styles.secondary}
-            hitSlop={{ top: 8, bottom: 8, left: 16, right: 16 }}
-          >
-            <Text style={styles.secondaryLabel}>Maybe Later</Text>
-          </TouchableOpacity>
+            {/* Heading + subtitle */}
+            <Text style={styles.title}>Enjoying Home Genie?</Text>
+            <Text style={styles.subtitle}>Leave a review!</Text>
+
+            {/* Divider, stars, divider */}
+            <View style={styles.divider} />
+
+            <View style={styles.starsRow}>
+              {[1, 2, 3, 4, 5].map((i) => (
+                <Pressable
+                  key={i}
+                  onPress={onLeaveReview}
+                  style={({ pressed }) => [styles.starBtn, pressed && styles.starBtnPressed]}
+                  accessibilityRole="button"
+                  accessibilityLabel={`Rate ${i} star${i > 1 ? 's' : ''}`}
+                  hitSlop={{ top: 8, bottom: 8, left: 4, right: 4 }}
+                >
+                  <StarOutlineIcon />
+                </Pressable>
+              ))}
+            </View>
+
+            <View style={styles.divider} />
+
+            {/* Not Now */}
+            <TouchableOpacity
+              onPress={onMaybeLater}
+              activeOpacity={0.6}
+              accessibilityRole="button"
+              accessibilityLabel="Not now"
+              style={styles.notNowBtn}
+              hitSlop={{ top: 8, bottom: 8, left: 16, right: 16 }}
+            >
+              <Text style={styles.notNowLabel}>Not Now</Text>
+            </TouchableOpacity>
+
+          </LinearGradient>
+
         </Animated.View>
       </Animated.View>
     </Modal>
   );
 }
 
-function FiveStarsIcon() {
-  // Single five-pointed solid white star — visual shorthand for "rate."
+function StarOutlineIcon() {
   return (
-    <Svg width={28} height={28} viewBox="0 0 24 24" fill="#FFFFFF">
-      <Path d="M12 2.5l2.95 5.98 6.6.96-4.78 4.66 1.13 6.57L12 17.6l-5.9 3.07 1.13-6.57L2.45 9.44l6.6-.96L12 2.5z" />
+    <Svg width={32} height={32} viewBox="0 0 24 24" fill="none">
+      <Path
+        d="M12 2.5l2.95 5.98 6.6.96-4.78 4.66 1.13 6.57L12 17.6l-5.9 3.07 1.13-6.57L2.45 9.44l6.6-.96L12 2.5z"
+        stroke={colors.bluePrimary}
+        strokeWidth={1.4}
+        strokeLinejoin="round"
+        fill="none"
+      />
     </Svg>
   );
 }
@@ -129,78 +156,81 @@ function FiveStarsIcon() {
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.55)',
-    justifyContent: 'center',
+    backgroundColor: 'rgba(0,0,0,0.4)',
     alignItems: 'center',
-    paddingHorizontal: 24,
+    justifyContent: 'center',
+    paddingHorizontal: 32,
   },
   card: {
-    backgroundColor: '#FFFFFF',
+    width: 300,
     borderRadius: 20,
-    width: '100%',
-    paddingHorizontal: 24,
-    paddingTop: 28,
-    paddingBottom: 20,
-    alignItems: 'center',
+    overflow: 'hidden',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 12 },
+    shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.18,
-    shadowRadius: 32,
-    elevation: 10,
+    shadowRadius: 24,
+    elevation: 12,
   },
-
-  heroWrap: { marginBottom: 18 },
-  hero: {
+  cardBg: {
+    paddingHorizontal: 24,
+    paddingTop: 24,
+    paddingBottom: 0,
+    alignItems: 'center',
+  },
+  logoWrap: {
     width: 64,
     height: 64,
-    borderRadius: 32,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-
-  title: {
-    fontSize: 22,
-    fontWeight: '700',
-    fontFamily: 'Geist_700Bold',
-    color: '#111',
-    textAlign: 'center',
-    letterSpacing: -0.3,
-    marginBottom: 8,
-  },
-  body: {
-    fontSize: 14,
-    fontWeight: '400',
-    fontFamily: 'Geist_400Regular',
-    color: '#555',
-    textAlign: 'center',
-    lineHeight: 20,
-    marginBottom: 22,
-  },
-
-  primaryWrap: {
-    width: '100%',
     borderRadius: 14,
     overflow: 'hidden',
-    marginBottom: 4,
+    marginBottom: 14,
+    backgroundColor: '#FFFFFF',
   },
-  primary: {
-    paddingVertical: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
+  logo: {
+    width: '100%',
+    height: '100%',
   },
-  primaryLabel: {
-    fontSize: 15,
+  title: {
+    fontSize: 18,
     fontWeight: '700',
-    fontFamily: 'Geist_700Bold',
-    color: '#FFFFFF',
-    letterSpacing: 0.2,
+    color: colors.bluePrimary,
+    textAlign: 'center',
   },
-
-  secondary: { paddingVertical: 12, paddingHorizontal: 8 },
-  secondaryLabel: {
+  subtitle: {
     fontSize: 14,
-    fontWeight: '600',
-    fontFamily: 'Geist_600SemiBold',
-    color: '#888',
+    fontWeight: '500',
+    color: colors.bluePrimary,
+    textAlign: 'center',
+    marginTop: 2,
+    marginBottom: 18,
+  },
+  divider: {
+    height: StyleSheet.hairlineWidth,
+    backgroundColor: 'rgba(11,109,195,0.22)',
+    width: '100%',
+  },
+  starsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    width: '100%',
+    paddingVertical: 14,
+    paddingHorizontal: 4,
+  },
+  starBtn: {
+    padding: 4,
+  },
+  starBtnPressed: {
+    opacity: 0.45,
+  },
+  notNowBtn: {
+    paddingVertical: 14,
+    width: '100%',
+    alignItems: 'center',
+  },
+  notNowLabel: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: colors.bluePrimary,
+    textAlign: 'center',
   },
 });
