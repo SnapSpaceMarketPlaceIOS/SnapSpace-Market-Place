@@ -2142,9 +2142,23 @@ export default function HomeScreen({ navigation, route }) {
         );
         matchedProducts = getProductsForPrompt(
           designPrompt,
-          // Build 130: 6 → 4 to match 2×2 panel cell count. Every Shop Room
-          // product now has a panel cell + appears in the rendered room.
-          4,
+          // Build 140 — RESTORED to 6 (was 4 in Build 130). The Build 130
+          // reduction "to match 2×2 panel cell count" silently regressed
+          // panel reliability: composite-products is designed to accept up
+          // to 6 URLs as a backup pool, picking the first 4 that decode
+          // cleanly. With only 4 candidates, ANY single failure (URL with
+          // a literal `+` that S3 misinterprets, transient 404, content-type
+          // mismatch, JPEG decode error, 15s fetch timeout) forces a
+          // fall-through to Ring 2 (generateWithProductRefs) which sends
+          // all 4 images individually to FAL — 5 image_urls instead of 2,
+          // ~$0.10 per generation instead of ~$0.06.
+          //
+          // Restoring 6 gives the edge fn a 2-product safety margin. Shop
+          // Room still shows exactly 4 — the panelCompositedIndices return
+          // value tells the client which 4 actually made it into the panel,
+          // and reachableProducts gets filtered down accordingly (see the
+          // "phantom-product fix" block below).
+          6,
           recentIdsSet,
           productHistoryRef.current,
           likedIdsSet,
