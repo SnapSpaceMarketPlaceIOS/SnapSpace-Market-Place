@@ -86,7 +86,10 @@ function ProductCard({ product, onPress }) {
 
   return (
     <TouchableOpacity style={s.hCard} activeOpacity={0.7} onPress={onPress}>
-      <CardImage uri={product.imageUrl} style={s.hCardImg} resizeMode="cover" />
+      {/* Build 139 — resizeMode unified to "contain" (was "cover") so saved
+          designs render product photos with the same uncropped framing as
+          the live RoomResultScreen Shop Room. */}
+      <CardImage uri={product.imageUrl} style={s.hCardImg} resizeMode="contain" />
       <View style={s.hCardBody}>
         <Text style={s.hCardName} numberOfLines={2}>{product.name}</Text>
         <Text style={s.hCardBrand} numberOfLines={1}>{product.brand}</Text>

@@ -180,7 +180,12 @@ function ProductCard({ product, inCart, onAddToCart, onPress }) {
 
   return (
     <TouchableOpacity style={s.hCard} activeOpacity={0.7} onPress={onPress}>
-      <CardImage uri={product.imageUrl} style={s.hCardImg} resizeMode="cover" placeholderColor="#D0D7E3" compact />
+      {/* Build 139 — resizeMode flipped from "cover" to "contain" for
+          consistency with RoomResultScreen. cover was zooming wide product
+          images (e.g. couch shots at 2.26:1 aspect) into the middle of the
+          card, hiding the product's full silhouette. contain shows the
+          whole product with light letterboxing on the matching surface2 bg. */}
+      <CardImage uri={product.imageUrl} style={s.hCardImg} resizeMode="contain" placeholderColor="#D0D7E3" compact />
       <View style={s.hCardBody}>
         <Text style={s.hCardName} numberOfLines={2}>{product.name}</Text>
         <Text style={s.hCardBrand} numberOfLines={1}>{product.brand}</Text>

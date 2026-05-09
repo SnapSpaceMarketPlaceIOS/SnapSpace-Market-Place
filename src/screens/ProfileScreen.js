@@ -659,7 +659,9 @@ export default function ProfileScreen({ navigation }) {
                     >
                       <View style={[styles.cardImg, { borderRadius: cardRadius }]}>
                         <View style={styles.cardImgBg} />
-                        <CardImage uri={product.imageUrl} style={styles.cardImgPhoto} resizeMode="cover" />
+                        {/* Build 139 — contain so wide product photos
+                            (couches/sectionals) aren't middle-cropped. */}
+                        <CardImage uri={product.imageUrl} style={styles.cardImgPhoto} resizeMode="contain" />
                       </View>
                     </PressableCard>
                   </View>

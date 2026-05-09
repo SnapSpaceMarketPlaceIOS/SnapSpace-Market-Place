@@ -961,7 +961,15 @@ const ROOM_ESSENTIALS = {
   'dining-room': ['dining-table', 'dining-chair', 'rug'],
   'office':      ['desk', 'desk-chair', 'bookshelf'],
   'bathroom':    ['mirror', 'planter'],
-  'outdoor':     ['planter'],
+  // Build 139 — outdoor essentials expanded from ['planter'] to surface
+  // sectional / lounge-chair / fire-pit FIRST. The Shop Room only shows the
+  // top 4 results, so single-option categories like sofa/rug/throw — which
+  // outdoor only has 1 of each — were dominating the visible slots and
+  // creating identical results across every outdoor prompt regardless of
+  // style. Putting variety-rich outdoor categories in essentials promotes
+  // them to the first 4 slots; the 24+ unsurfaced outdoor sectionals,
+  // furniture-sets, fire-pits, and lounge-chairs become reachable.
+  'outdoor':     ['sectional', 'lounge-chair', 'fire-pit', 'planter'],
   'nursery':     ['rug', 'bookshelf'],
   'entryway':    ['mirror', 'side-table'],
 };
@@ -969,12 +977,20 @@ const ROOM_ESSENTIALS = {
 // Fallback priority when essentials are filled or room type unknown.
 // Only includes universal categories that work in any room — room-locked
 // categories (bed, dining-table, etc.) are handled by ROOM_ESSENTIALS.
+//
+// Build 139 — added: sectional, furniture-set, lounge-chair, fire-pit.
+// Catalog has 24+ outdoor products in those 4 categories that were
+// completely unreachable before because the matcher's fallback list
+// didn't know they existed. Now they're scoreable for any room (with
+// CATEGORY_ROOM_LOCK still gating to room-compatible products).
 const CATEGORY_FALLBACK = [
-  'sofa', 'accent-chair',
+  'sofa', 'sectional', 'furniture-set',
+  'accent-chair', 'lounge-chair',
   'coffee-table', 'side-table',
   'floor-lamp', 'table-lamp', 'pendant-light',
   'rug', 'throw-pillow', 'throw-blanket',
   'mirror', 'wall-art', 'planter', 'vase',
+  'fire-pit',
   'bookshelf', 'tv-stand',
 ];
 
