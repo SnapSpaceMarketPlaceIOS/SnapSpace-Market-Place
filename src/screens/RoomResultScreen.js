@@ -929,45 +929,22 @@ export default function RoomResultScreen({ route, navigation }) {
   // wish — like the post-second-generation rating prompt below.
   const isFreshGeneration = !!styleId;
 
-  // ── Rating prompt arming (post-second-generation) ──────────────────────
-  // Fires AFTER the user leaves the screen following their N-th generation
+  // ── Rating prompt (post-second-generation) ────────────────────────────
+  // Fires while the user is ON RoomResult after their N-th generation
   // (currently N=2, configurable via RATING_PROMPT_TRIGGER_GENERATION).
-  // The modal itself is rendered globally by RatingPromptHost in App.js
-  // so it appears on top of whichever screen the user lands on. We just
-  // arm the trigger here, then schedule it via a navigation 'blur'
-  // listener.
+  // The modal itself is rendered globally by RatingPromptHost in App.js,
+  // so it appears as a card overlay on top of the result screen — the
+  // user has just experienced a real generation, the moment is right.
   //
-  // Why blur (not unmount): React Navigation keeps the previous screen
-  // mounted under the new one, so component-level unmount only fires when
-  // the screen is fully removed from the stack. Blur is the cleaner
-  // signal for "user has navigated away."
-  const ratingPromptArmedRef = useRef(false);
+  // The 1500ms delay gives the result a beat to settle before the modal
+  // animates in, so it doesn't crash the celebratory moment.
   useEffect(() => {
-    if (
-      !ratingPromptShown &&
-      isFreshGeneration &&
-      subscription?.generationsUsed === RATING_PROMPT_TRIGGER_GENERATION
-    ) {
-      ratingPromptArmedRef.current = true;
+    if (!ratingPromptShown && isFreshGeneration &&
+        subscription?.generationsUsed === RATING_PROMPT_TRIGGER_GENERATION) {
+      const timer = setTimeout(() => triggerRatingPrompt(), 1500);
+      return () => clearTimeout(timer);
     }
-  }, [
-    ratingPromptShown,
-    isFreshGeneration,
-    subscription?.generationsUsed,
-    RATING_PROMPT_TRIGGER_GENERATION,
-  ]);
-
-  useEffect(() => {
-    const unsubscribe = navigation.addListener('blur', () => {
-      if (!ratingPromptArmedRef.current) return;
-      ratingPromptArmedRef.current = false; // one-shot per arming
-      // Small delay so the navigation transition completes before the
-      // modal pops — feels like a beat of breath rather than an
-      // immediate interruption.
-      setTimeout(() => triggerRatingPrompt(), 1500);
-    });
-    return unsubscribe;
-  }, [navigation, triggerRatingPrompt]);
+  }, [ratingPromptShown, isFreshGeneration, subscription?.generationsUsed, RATING_PROMPT_TRIGGER_GENERATION, triggerRatingPrompt]);
 
   // Post-to-Profile modal image aspect — fetched from the actual image so the
   // preview container fits landscape OR portrait output without black letterbox.

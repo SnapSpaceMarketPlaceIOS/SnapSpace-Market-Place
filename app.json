@@ -14,7 +14,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.anthonyrivera.snapspace",
-      "buildNumber": "141",
+      "buildNumber": "142",
       "usesAppleSignIn": true,
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
@@ -166,7 +166,8 @@
           }
         }
       ],
-      "expo-sharing"
+      "expo-sharing",
+      "expo-web-browser"
     ],
     "extra": {
       "eas": {

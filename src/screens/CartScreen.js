@@ -20,6 +20,7 @@ import { useOrderHistory } from '../context/OrderHistoryContext';
 import { supabase } from '../services/supabase';
 import { trackAffiliateClickAndTagUrl } from '../services/purchaseTracking';
 import { safeOpenURL } from '../utils/safeOpenURL';
+import * as WebBrowser from 'expo-web-browser';
 import { hapticTap, hapticMedium } from '../utils/haptics';
 import { PRODUCT_CATALOG } from '../data/productCatalog';
 import TabScreenFade from '../components/TabScreenFade';
@@ -391,13 +392,19 @@ export default function CartScreen({ navigation }) {
         try {
           tagged = await trackAffiliateClickAndTagUrl({ userId, url, product });
         } catch { tagged = url; }
-        // Build 69 Commit I: affiliate URLs go through safeOpenURL (https-only).
-        // The tracked/tagged URL is always an https affiliate host; if it somehow
-        // fails the scheme check we fall back to the original product URL which
-        // goes through the same check. Both failing = silently no-op (user sees
-        // the "redirecting..." affordance already shown before this handler).
-        const ok = await safeOpenURL(tagged);
-        if (!ok) await safeOpenURL(url);
+        // Build 142: open the tagged affiliate URL in an in-app SFSafariViewController
+        // (expo-web-browser) instead of via Linking. Reason: the Amazon iOS app installs
+        // a Universal Link handler for /gp/aws/cart/add.html that intercepts the URL,
+        // swallows the cart payload, and lands the user on a generic "Cart" screen
+        // (CS11 / "We're sorry — this cart wasn't found"). SFSafariViewController bypasses
+        // the Universal Link layer entirely and renders the page in-app, so the cart
+        // pre-population works as designed. Fallback path stays on safeOpenURL → Linking
+        // (it carries the un-tagged product URL, no cart endpoint involved).
+        try {
+          await WebBrowser.openBrowserAsync(tagged, { dismissButtonStyle: 'close' });
+        } catch {
+          await safeOpenURL(url);
+        }
       };
 
       if (itemsWithAsin.length > 0) {
