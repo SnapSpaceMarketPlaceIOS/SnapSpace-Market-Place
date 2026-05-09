@@ -14,6 +14,7 @@ import {
   Share,
   Linking,
   Animated,
+  Image,
 } from 'react-native';
 import CardImage from '../components/CardImage';
 import LensLoader from '../components/LensLoader';
@@ -324,6 +325,16 @@ export default function ProfileScreen({ navigation }) {
   const [gridCols, setGridCols] = useState(2);
   const cycleGrid = () => setGridCols(c => c === 3 ? 1 : c + 1);
 
+  // Build 142 — progressive grid render. Default 12 cards on first paint;
+  // grow on scroll-near-bottom. Without this, all wishes render at once
+  // and fire ~30 concurrent Amazon CDN fetches that iOS throttles, leaving
+  // the last 20 cards as gray placeholders for several seconds. Slicing
+  // matches the existing pattern used by ExploreScreen's products tab
+  // (productsVisibleCount). Reset to 12 when the user changes tab/filter
+  // so a fresh tab visit always starts with a fast initial paint.
+  const [wishesVisibleCount, setWishesVisibleCount] = useState(12);
+  React.useEffect(() => { setWishesVisibleCount(12); }, [activeTab, likedFilter]);
+
   // Reset pill filter to Wishes whenever user leaves the Liked tab
   React.useEffect(() => {
     if (activeTab !== 1) setLikedFilter(0);
@@ -435,6 +446,23 @@ export default function ProfileScreen({ navigation }) {
           };
         });
         setMyDesigns(normalizedDesigns);
+
+        // Build 142 — image prefetch for the first dozen wish thumbnails of
+        // each tab. Fire-and-forget; failures are silent. Without this, when
+        // the user navigates to Profile, all visible cards START fetching
+        // their images at React-mount time, which on a fresh tab visit
+        // produces the gray-overlay-then-fade-in effect users described as
+        // "the app feels slow." Prefetching here gives iOS' image cache a
+        // ~100-300ms head start, so by the time the cards mount the images
+        // are already warm.
+        const prefetchCount = 12;
+        const urlsToWarm = [
+          ...normalizedDesigns.slice(0, prefetchCount).map(d => d.imageUrl),
+          ...normalizedLiked.slice(0, prefetchCount).map(d => d.imageUrl),
+        ].filter(Boolean);
+        urlsToWarm.forEach(url => {
+          Image.prefetch(url).catch(() => { /* silent — best effort */ });
+        });
       }).finally(() => {
         clearTimeout(fetchTimeoutId);
         if (!cancelled) setDesignsLoading(false);
@@ -500,7 +528,23 @@ export default function ProfileScreen({ navigation }) {
 
   return (
     <TabScreenFade style={styles.container}>
-      <ScrollView showsVerticalScrollIndicator={false} bounces={true}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        bounces={true}
+        scrollEventThrottle={400}
+        onScroll={({ nativeEvent }) => {
+          // Build 142 — grow visible-card count when user scrolls near bottom.
+          // 800px threshold = approximately one screen-height of buffer so
+          // images for the next batch start fetching BEFORE they're on screen.
+          // Throttled to 400ms so this doesn't fire on every scroll frame.
+          const { contentOffset, contentSize, layoutMeasurement } = nativeEvent;
+          const distanceFromBottom =
+            contentSize.height - (contentOffset.y + layoutMeasurement.height);
+          if (distanceFromBottom < 800) {
+            setWishesVisibleCount((c) => c + 12);
+          }
+        }}
+      >
 
         {/* ── Banner ── */}
         <View style={styles.banner}>
@@ -671,13 +715,18 @@ export default function ProfileScreen({ navigation }) {
           }
 
           // Wishes / designs grid
-          const filtered = (activeTab === 0
+          const filteredAll = (activeTab === 0
             ? myDesigns
             : activeTab === 1
               ? [...myDesigns.filter(d => liked[d.id]), ...serverLikedDesigns]
               : myDesigns.filter(d => shared[d.id])
           ).filter(d => !!d.imageUrl);
-          if (filtered.length === 0) {
+          // Build 142 — slice to first wishesVisibleCount for progressive render
+          const filtered = filteredAll.slice(0, wishesVisibleCount);
+          // Empty-state check uses the FULL list, not the sliced one — otherwise
+          // a totally-empty array would never trigger the empty state because
+          // slice(0, 12) returns [] either way.
+          if (filteredAll.length === 0) {
             return (
               <View style={styles.emptyGrid}>
                 <Text style={styles.emptyGridTitle}>
@@ -1404,7 +1453,10 @@ const styles = StyleSheet.create({
   },
   cardImgBg: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: '#E8EDF2',
+    // Build 142 — warmed from #E8EDF2 (cool blue-gray) to #F0EDE6
+    // (warm linen). Same compositional weight, but loading reads as
+    // "intentional / styled" instead of "broken / missing."
+    backgroundColor: '#F0EDE6',
   },
   cardImgPhoto: {
     ...StyleSheet.absoluteFillObject,

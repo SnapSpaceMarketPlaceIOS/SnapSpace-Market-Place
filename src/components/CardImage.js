@@ -8,14 +8,15 @@ import { View, Image } from 'react-native';
  * Props:
  *   uri              string|null  — image URL
  *   style            style        — applied to both Image and fallback View
- *   placeholderColor string       — background color when image fails (default #D0D7E3)
+ *   placeholderColor string       — background color when image fails (default #F0EDE6)
  *   resizeMode       string       — passed through to Image (default 'cover')
  *   compact          boolean      — when true, downscale Amazon URLs to _SL400_
  *                                   for grid/thumbnail use. PDP and other full-bleed
  *                                   contexts should leave this false (default).
  *
- * Note: placeholderColor #D0D7E3 is a design system placeholder color with no
- * corresponding token — intentionally kept as a hardcoded default.
+ * Build 142 — placeholder default warmed from #D0D7E3 (cool gray, read as
+ * "broken / missing") to #F0EDE6 (warm linen-neutral, reads as "loading
+ * intentionally"). Same compositional weight, no negative connotation.
  */
 
 // React Native's iOS Image loader runs URIs through NSURLComponents, which
@@ -49,7 +50,7 @@ function compactify(uri) {
     .replace(/_AC_UL\d+_/g, '_AC_SL400_');
 }
 
-export default function CardImage({ uri, style, placeholderColor = '#D0D7E3', resizeMode = 'cover', compact = false }) {
+export default function CardImage({ uri, style, placeholderColor = '#F0EDE6', resizeMode = 'cover', compact = false }) {
   const [err, setErr] = useState(false);
   // Tracks how many times we've already retried this URI. Bounded retry so
   // we don't loop forever on a genuinely 404'd asset.

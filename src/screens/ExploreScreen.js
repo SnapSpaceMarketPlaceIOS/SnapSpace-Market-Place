@@ -15,6 +15,7 @@ import {
   Share,
   Switch,
   PanResponder,
+  Image,
 } from 'react-native';
 import CardImage from '../components/CardImage';
 import AutoImage from '../components/AutoImage';
@@ -658,6 +659,11 @@ export default function ExploreScreen({ navigation, route }) {
   const [activeProdCat, setActiveProdCat] = useState(0);
   // Progressive render for Products grid — start small, load more in chunks
   const [productsVisibleCount, setProductsVisibleCount] = useState(24);
+  // Build 142 — same progressive-render pattern for the designs (Wishes) grid.
+  // Was: render all filteredDesigns at once → 30+ concurrent CDN fetches that
+  // iOS throttles, leaving the back half of the grid as gray placeholders for
+  // seconds on a fresh tab visit. Now: paint first 12, grow on scroll.
+  const [designsVisibleCount, setDesignsVisibleCount] = useState(12);
   const [search, setSearch] = useState('');
   const [selectedCard, setSelectedCard] = useState(null);
   const [showPostModal, setShowPostModal] = useState(false);
@@ -911,7 +917,21 @@ export default function ExploreScreen({ navigation, route }) {
         }).filter(d => !!d.imageUrl);
         console.log('[Explore] Loaded', normalized.length, 'community designs');
         // Fallback to local seed designs if Supabase returned nothing
-        setCommunityDesigns(normalized.length > 0 ? normalized : LOCAL_DESIGNS);
+        const finalDesigns = normalized.length > 0 ? normalized : LOCAL_DESIGNS;
+        setCommunityDesigns(finalDesigns);
+
+        // Build 142 — image prefetch for the first dozen wish thumbnails.
+        // Without this, all visible cards START fetching at React-mount time,
+        // producing the gray-overlay loading effect users described as "the
+        // app feels slow." Prefetching gives iOS' image cache a head start
+        // so by the time the cards mount the images are already warm.
+        // Fire-and-forget — failures are silent.
+        const prefetchCount = 12;
+        finalDesigns.slice(0, prefetchCount).forEach(d => {
+          if (d.imageUrl) {
+            Image.prefetch(d.imageUrl).catch(() => { /* silent */ });
+          }
+        });
       }).catch(err => {
         clearTimeout(fetchTimeoutId);
         console.warn('[Explore] Failed to load community designs:', err.message);
@@ -966,6 +986,11 @@ export default function ExploreScreen({ navigation, route }) {
   useEffect(() => {
     setProductsVisibleCount(24);
   }, [activeTab, activeProdCat, search, productSort, filterRoomTypes, filterMinRating]);
+
+  // Build 142 — same reset for the designs (Wishes) grid
+  useEffect(() => {
+    setDesignsVisibleCount(12);
+  }, [activeTab, activeCategory, activeRoomFilter, activeStyleFilter, search, wishSort, wishFilterStyles, wishFilterRoomTypes]);
 
   const filteredProducts = useMemo(() => {
     let pool;
@@ -1103,6 +1128,25 @@ export default function ExploreScreen({ navigation, route }) {
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.scrollContent}
           onScrollBeginDrag={() => showSortPicker && setShowSortPicker(false)}
+          scrollEventThrottle={400}
+          onScroll={({ nativeEvent }) => {
+            // Build 142 — grow visible-card count when user scrolls near
+            // bottom. 800px threshold so next batch starts fetching BEFORE
+            // it scrolls into view. Throttled to 400ms so this doesn't fire
+            // on every scroll frame. Single handler covers both grids;
+            // products tab uses productsVisibleCount, designs tab uses
+            // designsVisibleCount.
+            const { contentOffset, contentSize, layoutMeasurement } = nativeEvent;
+            const distanceFromBottom =
+              contentSize.height - (contentOffset.y + layoutMeasurement.height);
+            if (distanceFromBottom < 800) {
+              if (activeTab === 'products') {
+                setProductsVisibleCount((c) => c + 24);
+              } else {
+                setDesignsVisibleCount((c) => c + 12);
+              }
+            }
+          }}
         >
           {/* ── Header ── */}
           <Text style={styles.title}>{filterLabel && hasActiveFilter ? filterLabel : 'Explore'}</Text>
@@ -1361,7 +1405,7 @@ export default function ExploreScreen({ navigation, route }) {
             </View>
           ) : (
             <View style={[styles.grid, gridCols === 1 && { paddingHorizontal: space.lg }]}>
-              {filteredDesigns.map((design) => (
+              {filteredDesigns.slice(0, designsVisibleCount).map((design) => (
                 <View key={design.id} style={{ width: colWidthPct(gridCols), padding: gridCols === 1 ? 0 : 1, marginBottom: gridCols === 1 ? space.lg : 0 }}>
                   <GridCard
                     design={design}

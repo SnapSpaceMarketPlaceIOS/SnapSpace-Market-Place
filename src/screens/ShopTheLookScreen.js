@@ -773,7 +773,8 @@ const s = StyleSheet.create({
   hCardImg: {
     width: '100%',
     height: 150,
-    backgroundColor: '#F3F4F6',
+    // Build 142 — warmed loading background (was #F3F4F6 cool gray)
+    backgroundColor: '#F0EDE6',
   },
   hCardBody: {
     padding: 10,

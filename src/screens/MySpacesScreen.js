@@ -277,7 +277,20 @@ export default function MySpacesScreen({ navigation }) {
       (async () => {
         try {
           const data = await getUserDesigns(user.id);
-          if (!cancelled) setDesigns(data.filter(d => !!d.image_url));
+          if (!cancelled) {
+            const filtered = data.filter(d => !!d.image_url);
+            setDesigns(filtered);
+
+            // Build 142 — image prefetch for the first dozen design thumbnails.
+            // Same head-start pattern as ProfileScreen + ExploreScreen.
+            // Fire-and-forget; failures silent.
+            const prefetchCount = 12;
+            filtered.slice(0, prefetchCount).forEach(d => {
+              if (d.image_url) {
+                Image.prefetch(d.image_url).catch(() => { /* silent */ });
+              }
+            });
+          }
         } catch (e) {
           console.warn('MySpaces load failed:', e.message);
         } finally {
@@ -568,7 +581,8 @@ const s = StyleSheet.create({
   hCardImg: {
     width: '100%',
     height: 150,
-    backgroundColor: '#F3F4F6',
+    // Build 142 — warmed loading background (was #F3F4F6 cool gray)
+    backgroundColor: '#F0EDE6',
   },
   hCardBody: {
     padding: 10,
