@@ -9,6 +9,9 @@ import { registerForPushNotifications } from '../services/notifications';
 // preference signals. See fullAccountReset() below.
 import { clearStyleProfile } from '../services/styleDnaService';
 import { clearUserPreferences } from '../utils/userPreferences';
+// Build 143 — analytics instrumentation. No-op when PostHog client isn't
+// registered (e.g. dev build with missing .env), so always safe to call.
+import { trackEvent, identifyUser, resetUser, EVENTS } from '../services/analytics';
 
 // AsyncStorage keys that are NOT yet scoped to a specific user.
 // Cleared on sign-out so the next account on this device can't inherit
@@ -356,6 +359,18 @@ export function AuthProvider({ children }) {
     // AuthScreen — which meant the redeemSignupCode call was silently
     // skipped. Result: users typing valid promo codes (e.g. HG-77M3D7RYV)
     // never got their bonus wishes credited. Caught in 2026-05-01 testing.
+    // Build 143 — instrument signup. Fires regardless of whether email
+    // verification is required so we can measure both flows.
+    trackEvent(EVENTS.SIGNUP_COMPLETED, {
+      needs_email_verification: !data.session,
+      provider: 'email',
+    });
+    // Identify the user so subsequent anonymous events get merged under
+    // their real user_id once the verification handshake completes.
+    if (data?.user?.id) {
+      identifyUser(data.user.id, { email: email.trim().toLowerCase() });
+    }
+
     return {
       needsEmailVerification: !data.session,
       userId: data?.user?.id || null,
@@ -423,6 +438,11 @@ export function AuthProvider({ children }) {
         // onAuthStateChange will retry in the background.
         setUser(buildUser(data.session, null));
       }
+      // Build 143 — analytics: tie subsequent events to this user.
+      identifyUser(data.session.user.id, {
+        email: email.trim().toLowerCase(),
+      });
+      trackEvent(EVENTS.SIGNIN_COMPLETED, { provider: 'email' });
     }
   };
 
@@ -456,6 +476,12 @@ export function AuthProvider({ children }) {
       // and userPreferences JS module vars populated, which would bleed into
       // the next account to sign in on this device.
       await fullAccountReset();
+      // Build 143 — analytics: log the sign-out, then disassociate the
+      // current user from this device. Order matters — the signout event
+      // must capture under the user's distinct_id BEFORE reset() flips
+      // the SDK back to an anonymous id.
+      trackEvent(EVENTS.SIGNOUT);
+      resetUser();
     }
   };
 
@@ -543,11 +569,21 @@ export function AuthProvider({ children }) {
         AppleAuthentication.AppleAuthenticationScope.EMAIL,
       ],
     });
-    const { error } = await supabase.auth.signInWithIdToken({
+    const { data, error } = await supabase.auth.signInWithIdToken({
       provider: 'apple',
       token: credential.identityToken,
     });
     if (error) throw new Error(error.message);
+    // Build 143 — analytics: identify + log a sign-in via the Apple
+    // provider. onAuthStateChange handles user-state hydration, but we
+    // want the event to capture against the resolved user id NOT the
+    // pre-existing anonymous id, hence calling identify here too.
+    if (data?.session?.user?.id) {
+      identifyUser(data.session.user.id, {
+        email: data.session.user.email || null,
+      });
+    }
+    trackEvent(EVENTS.SIGNIN_COMPLETED, { provider: 'apple' });
     // onAuthStateChange above handles setting user state
   };
 

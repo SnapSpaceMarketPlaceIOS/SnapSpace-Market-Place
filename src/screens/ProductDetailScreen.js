@@ -44,6 +44,9 @@ import { useLiked } from '../context/LikedContext';
 import CardImage from '../components/CardImage';
 import { SellerName } from '../components/VerifiedBadge';
 import { handleShopNow } from '../services/productTapHandler';
+// Build 143 — analytics for product_viewed + affiliate_clicked. Safe no-op
+// when PostHog client isn't registered.
+import { trackEvent, EVENTS } from '../services/analytics';
 import { useOnboarding, ONBOARDING_STEPS } from '../context/OnboardingContext';
 import OnboardingOverlay, { OnboardingGlow } from '../components/OnboardingOverlay';
 import {
@@ -1384,6 +1387,22 @@ export default function ProductDetailScreen({ route, navigation }) {
       return () => clearTimeout(timer);
     }
   }, [isStepActive('genie_lamp')]);
+
+  // Build 143 — fire product_viewed once per mount. The `product?.asin || name`
+  // dep means revisiting the same PDP within one session doesn't double-fire
+  // (good for funnel hygiene); navigating to a DIFFERENT product correctly
+  // fires a new event.
+  useEffect(() => {
+    if (!product) return;
+    trackEvent(EVENTS.PRODUCT_VIEWED, {
+      product_name: product.name || null,
+      brand: product.brand || null,
+      price: typeof product.price === 'number' ? product.price : null,
+      source: product.source || 'amazon',
+      asin: product.asin || null,
+      category: product.category || null,
+    });
+  }, [product?.asin || product?.name]);
 
   // ── Product data (from route, with fallbacks) ─────────────────────────────
   const name         = product?.name         ?? 'Vento Sofa, Italian Leather';

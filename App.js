@@ -25,10 +25,19 @@ import {
   Geist_700Bold,
 } from '@expo-google-fonts/geist';
 
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, createNavigationContainerRef } from '@react-navigation/native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { PostHogProvider, usePostHog } from 'posthog-react-native';
-import { registerClient as registerAnalyticsClient } from './src/services/analytics';
+import { registerClient as registerAnalyticsClient, trackEvent as analyticsTrackEvent, EVENTS } from './src/services/analytics';
+
+// Build 143 — module-level NavigationContainer ref shared with PostHog's
+// autocapture hook. Without this ref, the auto $screen events never fire:
+// posthog-react-native's useNavigationTracker tries to call useNavigationState()
+// inside PostHogProvider, which sits ABOVE NavigationContainer in our tree, so
+// the hook silently errors and no screen events get emitted. Passing the ref
+// gives the tracker a direct handle into the navigation state regardless of
+// component tree position.
+const navigationRef = createNavigationContainerRef();
 
 // PostHog config — public client token (phc_) is safe to embed in app
 // bundles by PostHog's design. Read from .env so it can be rotated without
@@ -655,7 +664,7 @@ export default function App() {
                     Sits inside the providers so retry preserves auth/cart
                     state — only the navigation stack remounts. */}
                 <ErrorBoundary>
-                  <NavigationContainer>
+                  <NavigationContainer ref={navigationRef}>
                     <RootNavigator />
                     <ConsentModal />
                     {/* Global host for the post-second-generation App
@@ -696,6 +705,14 @@ export default function App() {
             captureTouches: false, // disable global touch capture — we'll
                                    // use explicit trackEvent() calls so
                                    // the data is curated, not noisy
+            // Build 143 — wire React Navigation into autocapture. Without
+            // navigationRef the tracker can't read the route state from
+            // outside the NavigationContainer, so $screen events never fire.
+            navigationRef,
+            navigation: {
+              routeToName: (name) => name,
+              routeToProperties: (_name, params) => (params || {}),
+            },
           }}
         >
           <PostHogClientRegistrar />
@@ -718,7 +735,18 @@ export default function App() {
 function PostHogClientRegistrar() {
   const client = usePostHog();
   useEffect(() => {
-    if (client) registerAnalyticsClient(client);
+    if (client) {
+      registerAnalyticsClient(client);
+      // Build 143 — fires once per cold launch as soon as the SDK is alive.
+      // Lets us verify on PostHog Live within ~5s of opening the app that
+      // the integration is reaching the server. If this event is missing,
+      // no other custom events will ever arrive either — diagnostic value
+      // is roughly "is PostHog alive on this device at all?"
+      analyticsTrackEvent('app_ready', {
+        provider: 'posthog-react-native',
+        build_number: '143',
+      });
+    }
   }, [client]);
   return null;
 }

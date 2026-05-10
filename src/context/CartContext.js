@@ -3,6 +3,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { PRODUCT_CATALOG } from '../data/productCatalog';
 import { useAuth } from './AuthContext';
 import { hapticMedium } from '../utils/haptics';
+// Build 143 — analytics instrumentation. Safe no-op when PostHog isn't
+// registered (dev build with no API key).
+import { trackEvent, EVENTS } from '../services/analytics';
 
 const CartContext = createContext();
 const STORAGE_KEY = '@snapspace_cart';
@@ -91,6 +94,18 @@ export function CartProvider({ children }) {
     // confirmation "thump" trust the action landed without watching the
     // cart badge. Wired at the context level so every caller benefits.
     hapticMedium();
+    // Build 143 — fire BEFORE setItems so a render-time error inside the
+    // updater can't suppress the analytics event. cart_add captures even
+    // if the product was already in the cart (we still treat the tap as
+    // an "intent to buy" signal — quantity bump is implicit in our funnel).
+    trackEvent(EVENTS.CART_ADD, {
+      product_name: product.name,
+      brand: product.brand || null,
+      price: parsePrice(product.price),
+      source: product.source || 'amazon',
+      asin: product.asin || null,
+      variant: product._matchedVariant?.label || null,
+    });
     setItems((prev) => {
       // Build 131 — variant-aware cart key. When the matcher picked a
       // specific variant for this product (e.g. "Sage Green" of a chair
@@ -145,7 +160,19 @@ export function CartProvider({ children }) {
   };
 
   const removeFromCart = (key) => {
-    setItems((prev) => prev.filter((item) => item.key !== key));
+    // Build 143 — find the item BEFORE filtering so we can capture its
+    // name/brand/price in the event payload. If the key isn't in the cart
+    // (defensive), we still no-op silently — no event, no setState churn.
+    const item = items.find((i) => i.key === key);
+    if (!item) return;
+    trackEvent(EVENTS.CART_REMOVE, {
+      product_name: item.name,
+      brand: item.brand || null,
+      price: item.price,
+      source: item.source || 'amazon',
+      asin: item.asin || null,
+    });
+    setItems((prev) => prev.filter((i) => i.key !== key));
   };
 
   const updateQuantity = (key, delta) => {

@@ -21,6 +21,9 @@ import { supabase } from '../services/supabase';
 import { trackAffiliateClickAndTagUrl } from '../services/purchaseTracking';
 import { safeOpenURL } from '../utils/safeOpenURL';
 import * as WebBrowser from 'expo-web-browser';
+// Build 143 — affiliate_clicked analytics. Safe no-op when PostHog isn't
+// registered.
+import { trackEvent, EVENTS } from '../services/analytics';
 import { hapticTap, hapticMedium } from '../utils/haptics';
 import { PRODUCT_CATALOG } from '../data/productCatalog';
 import TabScreenFade from '../components/TabScreenFade';
@@ -392,6 +395,21 @@ export default function CartScreen({ navigation }) {
         try {
           tagged = await trackAffiliateClickAndTagUrl({ userId, url, product });
         } catch { tagged = url; }
+        // Build 143 — fire affiliate_clicked BEFORE opening so a hung
+        // WebBrowser open or network glitch can't suppress the event.
+        // This is the single highest-value funnel event in the app — every
+        // conversion downstream depends on it firing.
+        try {
+          trackEvent(EVENTS.AFFILIATE_CLICKED, {
+            product_name: product?.name || null,
+            brand: product?.brand || null,
+            price: typeof product?.price === 'number' ? product.price : null,
+            source: product?.source || 'amazon',
+            asin: product?.asin || null,
+            cart_item_count: amazonItems.length,
+            via: itemsWithAsin.length > 0 ? 'multi_cart' : 'single_url',
+          });
+        } catch { /* never let analytics block revenue */ }
         // Build 142: open the tagged affiliate URL in an in-app SFSafariViewController
         // (expo-web-browser) instead of via Linking. Reason: the Amazon iOS app installs
         // a Universal Link handler for /gp/aws/cart/add.html that intercepts the URL,

@@ -51,6 +51,9 @@ import { createProductPanel } from '../utils/createProductPanel';
 import { withTimeout } from '../utils/withTimeout';
 import { readFileExifOrientation, readFileExif, getLastFileExifError } from '../utils/imageOptimizer';
 import { verifyGeneratedProducts } from '../services/visionMatcher';
+// Build 143 — analytics for wish_generated / wish_failed. Safe no-op when
+// PostHog client isn't registered (e.g. dev build with missing .env).
+import { trackEvent, EVENTS } from '../services/analytics';
 import { PRODUCT_CATALOG } from '../data/productCatalog';
 import { saveUserDesign, updateDesignVisibility, uploadRoomPhoto, recordGenerationError } from '../services/supabase';
 import { safeOpenURL } from '../utils/safeOpenURL';
@@ -3252,6 +3255,18 @@ export default function HomeScreen({ navigation, route }) {
       // behavior remixes get. Capped at 3 by appendStyleHistory.
       recentStyleIdsRef.current = appendStyleHistory(recentStyleIdsRef.current, savedStyleId, 3);
 
+      // Build 143 — instrument successful wish generation. Fires here (after
+      // verify, before climax burst) rather than in handleClimaxComplete so a
+      // user who backgrounds the app mid-climax still has the event captured.
+      try {
+        trackEvent(EVENTS.WISH_GENERATED, {
+          style_id: savedStyleId || null,
+          photo_source: savedPhotoSource || null,
+          duration_ms: durationMs || null,
+          product_count: Array.isArray(finalMatchedProducts) ? finalMatchedProducts.length : 0,
+        });
+      } catch { /* never let analytics throw user-visible */ }
+
       // Stash the RoomResult navigation params in the ref. handleClimaxComplete
       // reads + clears it after the burst.
       pendingNavRef.current = {
@@ -3314,6 +3329,15 @@ export default function HomeScreen({ navigation, route }) {
       stopLoadingBar(false);
       setGenerating(false);
       setGenStatus('');
+      // Build 143 — instrument failed wish generation. The error message
+      // is included so PostHog dashboards can group failures by cause
+      // (timeout, vision verify reject, network, etc).
+      try {
+        trackEvent(EVENTS.WISH_FAILED, {
+          error_message: err?.message ? String(err.message).slice(0, 200) : 'unknown',
+          stage: 'post_generation_finalize',
+        });
+      } catch { /* analytics never escalates */ }
       // Structured telemetry — outermost error boundary. This catches things
       // like vision verification throws, setResultData failures, or anything
       // between pipeline success and navigation.navigate. genMeta is NOT in
