@@ -306,7 +306,9 @@ function TabNavigator() {
       }
       if (!user) {
         e.preventDefault();
-        tabNav.getParent()?.navigate('Auth');
+        // Build 145 — route to Onboarding page 5 (the new auth surface)
+        // instead of the legacy AuthScreen modal.
+        tabNav.getParent()?.navigate('Onboarding', { initialPage: 5 });
       }
     },
   });
@@ -406,42 +408,57 @@ function RootNavigator() {
 
   // Build 145 — pre-auth onboarding gate.
   //
-  // intro_status is a 3-valued state machine:
-  //   'checking' — async read of AsyncStorage flag in flight; render splash
-  //   'show'     — flag absent AND no signed-in user; render OnboardingScreen
-  //                as the initial route
-  //   'skip'     — flag present OR user already signed in; render Main as
-  //                the initial route (existing behavior)
+  // introStatus is a 4-valued state machine:
+  //   'checking'   — async read of AsyncStorage flag in flight; render splash
+  //   'first-time' — flag absent AND no signed-in user; render Onboarding from page 1
+  //   'returning'  — flag present AND no signed-in user; render Onboarding from page 5
+  //                  (the auth screen) — they've seen the marketing already
+  //   'signed-in'  — user already signed in (any auth method, any flag state);
+  //                  render Main as the initial route
   //
-  // The check runs once on cold launch. After that, the state never
-  // transitions BACK to 'show' — even if the user signs out, the flag
-  // stays set. The intro is a one-time-per-device introduction; subsequent
-  // signed-out sessions land directly on the soft-wall'd Home tab.
+  // The check runs once on cold launch to set the INITIAL route. Mid-session
+  // signout is handled by the useEffect below (imperative reset to Onboarding
+  // page 5) rather than re-running this check, because Stack.Navigator's
+  // initialRouteName only applies on first mount.
   const [introStatus, setIntroStatus] = React.useState('checking');
   React.useEffect(() => {
-    // Wait for auth bootstrap to settle so we can pass the right signed-in
-    // signal to ensureIntroFlagForExistingUser. Once authLoading flips
-    // false, we read the flag exactly once.
     if (authLoading) return;
     let cancelled = false;
     (async () => {
-      // Migration: if the user is already signed in (i.e. they're an
-      // existing tester updating from <=Build 144), set the flag so they
-      // don't see the intro on this update. No-op if the flag is already
-      // present.
       await ensureIntroFlagForExistingUser(!!user);
       const completed = await isIntroCompleted();
-      if (!cancelled) {
-        setIntroStatus(completed || user ? 'skip' : 'show');
-      }
+      if (cancelled) return;
+      if (user) setIntroStatus('signed-in');
+      else if (completed) setIntroStatus('returning');
+      else setIntroStatus('first-time');
     })();
     return () => { cancelled = true; };
-    // Intentionally only re-runs when authLoading transitions, NOT when
-    // user identity changes mid-session. Sign-in mid-flow is handled by
-    // OnboardingScreen's own auth listener (advance to page 6); sign-out
-    // mid-session is irrelevant because we already passed the gate.
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authLoading]);
+
+  // Build 145 — mid-session signout watcher.
+  //
+  // When the user signs out from inside the app (Settings → Sign Out), `user`
+  // flips from truthy → null. The Stack.Navigator is already mounted, so the
+  // initialRouteName logic doesn't re-fire. We have to imperatively reset the
+  // navigation stack to Onboarding page 5 (the new auth re-entry surface)
+  // so the user lands directly on the auth form instead of staying on Main
+  // and waiting for a soft-wall modal to pop up.
+  const prevUserRef = React.useRef(user);
+  React.useEffect(() => {
+    const wasSignedIn = !!prevUserRef.current;
+    const isSignedIn = !!user;
+    prevUserRef.current = user;
+    // Only act on the truthy → null transition. Mounting with user=null
+    // and the user staying null is the fresh-install case — already
+    // handled by initialRouteName.
+    if (wasSignedIn && !isSignedIn && navigationRef.isReady()) {
+      navigationRef.reset({
+        index: 0,
+        routes: [{ name: 'Onboarding', params: { initialPage: 5 } }],
+      });
+    }
+  }, [user]);
 
   // Build 136 — restored cold-start GenieLoader splash.
   //
@@ -479,11 +496,14 @@ function RootNavigator() {
     );
   }
 
-  // Build 145 — onboarding initial route selection. Once intro is shown,
-  // OnboardingScreen handles its own internal navigation through the 6
-  // pages, then calls navigation.reset({ name: 'Main' }) on completion —
-  // dropping the user into the app and unmounting the onboarding stack.
-  const initialRouteName = introStatus === 'show' ? 'Onboarding' : 'Main';
+  // Build 145 — initial route + onboarding entry-point selection.
+  //   'first-time' → Onboarding starts at page 1 (full intro)
+  //   'returning'  → Onboarding starts at page 5 (auth only)
+  //   'signed-in'  → Main (app home)
+  const initialRouteName =
+    introStatus === 'signed-in' ? 'Main' : 'Onboarding';
+  const onboardingInitialParams =
+    introStatus === 'returning' ? { initialPage: 5 } : undefined;
 
   // Build 89 / L1: dropped the `loading` gate.
   //
@@ -554,13 +574,17 @@ function RootNavigator() {
         contentStyle: { backgroundColor: '#FFFFFF' },
       }}
     >
-      {/* Build 145 — pre-auth onboarding. initialRouteName controls whether
-          a fresh launch shows Onboarding or jumps straight to Main; either
-          way, both screens are registered so they're reachable. After the
-          user completes onboarding (page 6 → "Continue For FREE"), the
-          screen calls navigation.reset to Main and the Onboarding instance
-          unmounts. No animation override → uses the default slide. */}
-      <Stack.Screen name="Onboarding" component={OnboardingScreen} options={{ gestureEnabled: false }} />
+      {/* Build 145 — pre-auth onboarding. initialRouteName controls the
+          initial route; initialParams seed the route param so 'returning'
+          users land on page 5 (auth) rather than page 1. Both screens are
+          registered either way. Mid-session signout uses navigationRef.reset
+          (see useEffect above) to jump back to Onboarding page 5. */}
+      <Stack.Screen
+        name="Onboarding"
+        component={OnboardingScreen}
+        initialParams={onboardingInitialParams}
+        options={{ gestureEnabled: false }}
+      />
       <Stack.Screen name="Main" component={TabNavigator} />
       {/* Build 69 Commit G: Auth screens always mounted so soft-wall
           gates can navigate here from anywhere. Presented as a modal so

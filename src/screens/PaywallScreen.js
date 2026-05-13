@@ -421,7 +421,9 @@ export default function PaywallScreen({ navigation }) {
     // Supabase RPC write (record purchase + grant entitlement) will silently
     // fail — user ends up charged with nothing to show for it.
     if (!user?.id) {
-      navigation.navigate('Auth');
+      // Build 145 — route to Onboarding page 5 (new auth surface) instead
+      // of the legacy AuthScreen modal.
+      navigation.navigate('Onboarding', { initialPage: 5 });
       return;
     }
 
@@ -538,7 +540,9 @@ export default function PaywallScreen({ navigation }) {
 
   const handleShareReferral = async () => {
     if (!user?.id) {
-      navigation.navigate('Auth');
+      // Build 145 — route to Onboarding page 5 (new auth surface) instead
+      // of the legacy AuthScreen modal.
+      navigation.navigate('Onboarding', { initialPage: 5 });
       return;
     }
     try {

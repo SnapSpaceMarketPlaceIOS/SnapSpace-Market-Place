@@ -3158,7 +3158,8 @@ export default function HomeScreen({ navigation, route }) {
         } catch (e) {
           // Best-effort — never block the Auth navigation on storage
         }
-        navigation.navigate('Auth');
+        // Build 145 — route to Onboarding page 5 (new auth surface).
+        navigation.navigate('Onboarding', { initialPage: 5 });
         return;
       }
 

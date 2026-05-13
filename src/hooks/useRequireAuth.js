@@ -62,10 +62,13 @@ export function useRequireAuth() {
       if (loading) {
         return false;
       }
-      // Not signed in and bootstrap settled — route to Auth. The
-      // AuthScreen is registered at the root stack level (see App.js),
-      // so this navigate call works from any depth.
-      navigation.navigate('Auth');
+      // Not signed in and bootstrap settled — route to the auth surface.
+      // Build 145: the legacy AuthScreen modal is replaced by Onboarding's
+      // page 5 (the new auth design). Pages 1-4 are skipped via the
+      // initialPage param — returning signed-out users land directly on
+      // the auth form, same UX shape as the old modal but with the new
+      // visuals and inline form fields.
+      navigation.navigate('Onboarding', { initialPage: 5 });
       return false;
     },
     [user, loading, navigation],

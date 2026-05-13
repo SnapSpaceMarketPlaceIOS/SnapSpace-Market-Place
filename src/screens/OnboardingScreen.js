@@ -49,9 +49,8 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
-import * as AppleAuthentication from 'expo-apple-authentication';
-
 import OnboardingArt from '../components/onboarding/OnboardingArt';
+import OnboardingAuthPage from '../components/onboarding/OnboardingAuthPage';
 import { useAuth } from '../context/AuthContext';
 import { markIntroCompleted } from '../utils/intro';
 import { colors } from '../constants/colors';
@@ -107,19 +106,29 @@ const PAGE_6_INDEX = 5;
 const BLUE_LIGHT = colors.blueLight;    // #67ACE9 — matches mockup CTA gradient base
 const BLUE_PRIMARY = colors.bluePrimary; // #0B6DC3
 
-export default function OnboardingScreen({ navigation }) {
+export default function OnboardingScreen({ navigation, route }) {
   const insets = useSafeAreaInsets();
-  const { user, signInWithApple } = useAuth();
+  const { user } = useAuth();
+
+  // Build 145 — route param entry point. `initialPage` is 1-indexed to
+  // match how the design refers to pages (page 1 = marketing intro,
+  // page 5 = auth, page 6 = gift). Defaults to page 1 for fresh-install
+  // first-time flow. Post-signout / soft-wall navigations pass
+  // `initialPage: 5` to jump straight to the auth page so returning
+  // users don't have to re-watch pages 1-4.
+  const requestedPage = route?.params?.initialPage ?? 1;
+  const initialPage = Math.max(0, Math.min(PAGES.length - 1, requestedPage - 1));
 
   // FlatList ref for programmatic page advance + skip.
   const listRef = useRef(null);
-  const [pageIndex, setPageIndex] = useState(0);
+  const [pageIndex, setPageIndex] = useState(initialPage);
 
   // Track whether the user has reached page 5 yet. The auth completion
   // listener (below) advances them to page 6 once they sign in — but we
   // only want to do that if they explicitly reached page 5, not if they
   // happen to be on some other page when their auth state flips.
-  const reachedAuthPageRef = useRef(false);
+  // Pre-seed to true if we entered at page 5 (returning-user re-auth flow).
+  const reachedAuthPageRef = useRef(initialPage >= 4);
 
   // ─── Page advance / skip ──────────────────────────────────────────────
   const goToPage = useCallback((idx) => {
@@ -146,37 +155,14 @@ export default function OnboardingScreen({ navigation }) {
     goToPage(PAGE_5_INDEX);
   }, [goToPage]);
 
-  // ─── Auth handlers (page 5) ───────────────────────────────────────────
-  const handleEmailSignIn = useCallback(() => {
-    // Re-uses the existing AuthScreen for email/password/signup so we
-    // don't fork the auth UX. The `fromOnboarding: true` param flips
-    // AuthScreen's post-success behavior from "reset to Main" to
-    // "goBack" — so when the user finishes auth, they return here to
-    // Onboarding page 5, and the useEffect below auto-advances them
-    // to page 6 (the gift).
-    navigation.navigate('Auth', { fromOnboarding: true });
-  }, [navigation]);
-
-  const handleAppleSignIn = useCallback(async () => {
-    try {
-      await signInWithApple();
-      // useEffect below will see user become truthy and advance.
-    } catch (e) {
-      // User cancelling Apple sheet throws — treat as no-op, not an error.
-      const cancelled = e?.code === 'ERR_REQUEST_CANCELED' || /cancel/i.test(e?.message || '');
-      if (!cancelled && __DEV__) {
-        console.warn('[onboarding] Apple sign-in failed:', e?.message);
-      }
-    }
-  }, [signInWithApple]);
-
   // Watch for auth completion. The instant user becomes truthy AND the
   // user has scrolled to page 5 (the auth gate), advance to page 6.
+  // Build 145: page 5 is now the inline auth page (OnboardingAuthPage),
+  // so the keyboard may still be up when auth completes. The setTimeout
+  // gives the keyboard time to dismiss before the page-6 slide-in.
   useEffect(() => {
     if (user && reachedAuthPageRef.current && pageIndex === PAGE_5_INDEX) {
-      // Tiny delay so the auth modal's close animation and the page-6
-      // slide-in don't fight each other.
-      const t = setTimeout(() => goToPage(PAGE_6_INDEX), 250);
+      const t = setTimeout(() => goToPage(PAGE_6_INDEX), 350);
       return () => clearTimeout(t);
     }
   }, [user, pageIndex, goToPage]);
@@ -195,16 +181,24 @@ export default function OnboardingScreen({ navigation }) {
   // auth page" weird state. FlatList scrollEnabled toggles this.
   const scrollEnabled = pageIndex < PAGE_6_INDEX;
 
-  // ─── Apple button availability ────────────────────────────────────────
-  const [appleAvailable, setAppleAvailable] = useState(false);
-  useEffect(() => {
-    AppleAuthentication.isAvailableAsync().then(setAppleAvailable).catch(() => {});
-  }, []);
-
   // ─── Render ───────────────────────────────────────────────────────────
   const renderPage = useCallback(({ item, index }) => {
     const isAuthPage = index === PAGE_5_INDEX;
     const isGiftPage = index === PAGE_6_INDEX;
+
+    // Build 145 — page 5 is its own self-contained component that owns the
+    // inline auth form (email/password, Apple, signup toggle, Forgot
+    // password, promo codes, ToS/Privacy disclosure). Lifted out so this
+    // file stays focused on the swipe scaffolding.
+    if (isAuthPage) {
+      return (
+        <OnboardingAuthPage
+          navigation={navigation}
+          screenWidth={SCREEN_W}
+          progressDots={<ProgressDots count={TOTAL_PAGES} active={index} />}
+        />
+      );
+    }
 
     return (
       <View style={[styles.page, { width: SCREEN_W }]}>
@@ -222,83 +216,44 @@ export default function OnboardingScreen({ navigation }) {
             <OnboardingArt step={item.step} />
           </View>
 
-          {/* CTA block — auth page (5) has two buttons; all others have one
-              Continue button. Skip link only appears on pages 1-4. */}
-          {isAuthPage ? (
-            <View style={styles.authButtons}>
-              <TouchableOpacity
-                style={styles.primaryButton}
-                onPress={handleEmailSignIn}
-                activeOpacity={0.85}
-                accessibilityRole="button"
-                accessibilityLabel="Sign in or create an account"
-              >
-                <Text style={styles.primaryButtonText}>Sign in</Text>
-              </TouchableOpacity>
+          <View style={styles.singleButtonWrap}>
+            <TouchableOpacity
+              style={styles.primaryButton}
+              onPress={handleContinue}
+              activeOpacity={0.85}
+              accessibilityRole="button"
+              accessibilityLabel={isGiftPage ? 'Continue for free' : 'Continue to next page'}
+            >
+              <Text style={styles.primaryButtonText}>{item.cta}</Text>
+              <ArrowRightIcon style={{ marginLeft: 10 }} />
+            </TouchableOpacity>
 
-              <Text style={styles.orDivider}>or</Text>
-
-              {appleAvailable && (
+            {/* Bottom row — progress dots + skip link (skip only on pages 1-4) */}
+            <View style={styles.bottomRow}>
+              {!isGiftPage && index < PAGE_5_INDEX ? (
                 <TouchableOpacity
-                  style={styles.appleButton}
-                  onPress={handleAppleSignIn}
-                  activeOpacity={0.85}
+                  onPress={handleSkip}
+                  activeOpacity={0.7}
+                  hitSlop={{ top: 12, left: 12, bottom: 12, right: 12 }}
                   accessibilityRole="button"
-                  accessibilityLabel="Sign in with Apple"
+                  accessibilityLabel="Skip introduction"
                 >
-                  <AppleLogoIcon />
-                  <Text style={styles.appleButtonText}>Sign in with Apple</Text>
+                  <Text style={styles.skipText}>Skip</Text>
                 </TouchableOpacity>
-              )}
-            </View>
-          ) : (
-            <View style={styles.singleButtonWrap}>
-              <TouchableOpacity
-                style={styles.primaryButton}
-                onPress={handleContinue}
-                activeOpacity={0.85}
-                accessibilityRole="button"
-                accessibilityLabel={isGiftPage ? 'Continue for free' : 'Continue to next page'}
-              >
-                <Text style={styles.primaryButtonText}>{item.cta}</Text>
-                <ArrowRightIcon style={{ marginLeft: 10 }} />
-              </TouchableOpacity>
-
-              {/* Bottom row — progress dots + skip link (skip only on pages 1-4) */}
-              <View style={styles.bottomRow}>
-                {!isGiftPage && index < PAGE_5_INDEX ? (
-                  <TouchableOpacity
-                    onPress={handleSkip}
-                    activeOpacity={0.7}
-                    hitSlop={{ top: 12, left: 12, bottom: 12, right: 12 }}
-                    accessibilityRole="button"
-                    accessibilityLabel="Skip introduction"
-                  >
-                    <Text style={styles.skipText}>Skip</Text>
-                  </TouchableOpacity>
-                ) : (
-                  <View style={{ width: 40 }} />
-                )}
-
-                <ProgressDots count={TOTAL_PAGES} active={index} />
-
-                {/* Mirror placeholder so dots stay perfectly centered */}
+              ) : (
                 <View style={{ width: 40 }} />
-              </View>
-            </View>
-          )}
+              )}
 
-          {/* Auth page: footer copy (no Skip; no progress dots needed
-              because we're already at the gate) */}
-          {isAuthPage && (
-            <View style={styles.authFooter}>
               <ProgressDots count={TOTAL_PAGES} active={index} />
+
+              {/* Mirror placeholder so dots stay perfectly centered */}
+              <View style={{ width: 40 }} />
             </View>
-          )}
+          </View>
         </View>
       </View>
     );
-  }, [insets, appleAvailable, handleContinue, handleEmailSignIn, handleAppleSignIn, handleSkip]);
+  }, [insets, handleContinue, handleSkip, navigation]);
 
   return (
     <View style={styles.root}>
@@ -315,6 +270,8 @@ export default function OnboardingScreen({ navigation }) {
         scrollEventThrottle={16}
         scrollEnabled={scrollEnabled}
         bounces={false}
+        getItemLayout={(_, idx) => ({ length: SCREEN_W, offset: SCREEN_W * idx, index: idx })}
+        initialScrollIndex={initialPage}
       />
     </View>
   );
@@ -352,13 +309,7 @@ function ArrowRightIcon({ style }) {
   );
 }
 
-function AppleLogoIcon() {
-  return (
-    <Svg width={20} height={20} viewBox="0 0 24 24" fill="#FFFFFF">
-      <Path d="M17.05 12.04c-.03-3.04 2.49-4.51 2.6-4.58-1.42-2.07-3.62-2.35-4.4-2.38-1.86-.19-3.66 1.1-4.61 1.1-.97 0-2.42-1.08-3.99-1.05-2.03.03-3.93 1.21-4.97 3.05-2.14 3.7-.55 9.18 1.54 12.18.99 1.46 2.18 3.11 3.74 3.05 1.51-.06 2.08-.97 3.91-.97 1.82 0 2.34.97 3.95.94 1.63-.03 2.66-1.49 3.66-2.96 1.15-1.7 1.62-3.34 1.65-3.43-.04-.02-3.17-1.22-3.2-4.83zM13.99 3.13c.83-1 1.39-2.39 1.23-3.77-1.19.05-2.64.79-3.49 1.79-.76.88-1.43 2.29-1.25 3.65 1.33.1 2.68-.67 3.51-1.67z" />
-    </Svg>
-  );
-}
+// AppleLogoIcon moved into OnboardingAuthPage where the Apple button now lives.
 
 // ─── Styles ──────────────────────────────────────────────────────────────
 

@@ -93,7 +93,8 @@ export default function RestorePurchaseScreen({ navigation }) {
 
   const handleRestore = async () => {
     if (!user) {
-      navigation.navigate('Auth');
+      // Build 145 — route to Onboarding page 5 (new auth surface).
+      navigation.navigate('Onboarding', { initialPage: 5 });
       return;
     }
     setRestoring(true);
