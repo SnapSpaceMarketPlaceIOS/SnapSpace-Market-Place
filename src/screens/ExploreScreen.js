@@ -29,7 +29,7 @@ import { useAuth } from '../context/AuthContext';
 import { useOnboarding, ONBOARDING_STEPS } from '../context/OnboardingContext';
 import OnboardingOverlay from '../components/OnboardingOverlay';
 import { PRODUCT_CATALOG } from '../data/productCatalog';
-import { getPublicDesigns } from '../services/supabase';
+import { getPublicDesigns, getThumbnailUrl } from '../services/supabase';
 import { DESIGNS as LOCAL_DESIGNS } from '../data/designs';
 import PressableCard from '../components/PressableCard';
 import Skeleton from '../components/Skeleton';
@@ -572,7 +572,7 @@ const GridCard = React.memo(function GridCard({ design, onPress, cardRadius, isL
       >
         <View style={[styles.cardImg, { borderRadius: r }]}>
           <View style={styles.cardImgBg} />
-          <CardImage uri={design.imageUrl} style={styles.cardImgPhoto} resizeMode="cover" />
+          <CardImage uri={design.thumbnailUrl || design.imageUrl} style={styles.cardImgPhoto} resizeMode="cover" />
         </View>
       </PressableCard>
     );
@@ -591,7 +591,7 @@ const GridCard = React.memo(function GridCard({ design, onPress, cardRadius, isL
       >
         <View style={[styles.cardImg, { borderTopLeftRadius: r, borderTopRightRadius: r, borderBottomLeftRadius: 0, borderBottomRightRadius: 0 }]}>
           <View style={styles.cardImgBg} />
-          <CardImage uri={design.imageUrl} style={styles.cardImgPhoto} resizeMode="cover" />
+          <CardImage uri={design.thumbnailUrl || design.imageUrl} style={styles.cardImgPhoto} resizeMode="cover" />
         </View>
       </PressableCard>
       <View style={styles.feedUserRow}>
@@ -908,7 +908,11 @@ export default function ExploreScreen({ navigation, route }) {
             user_id: d.author?.id || d.user_id || null,
             initial: (d.author?.full_name || 'U')[0],
             verified: d.author?.is_verified_supplier || false,
+            // Full-res for ShopTheLook hero; 400px thumbnail for the
+            // Explore grid (Build 144). Grid bindings read thumbnailUrl
+            // with a fallback to imageUrl for non-Supabase sources.
             imageUrl: d.image_url,
+            thumbnailUrl: getThumbnailUrl(d.image_url, 400),
             description: d.prompt,
             prompt: d.prompt,
             roomType: parsed.roomType || 'living-room',
@@ -933,8 +937,11 @@ export default function ExploreScreen({ navigation, route }) {
         // Fire-and-forget — failures are silent.
         const prefetchCount = 12;
         finalDesigns.slice(0, prefetchCount).forEach(d => {
-          if (d.imageUrl) {
-            Image.prefetch(d.imageUrl).catch(() => { /* silent */ });
+          // Build 144 — warm the thumbnail URL (what the grid renders),
+          // not the full-res.
+          const warmUrl = d.thumbnailUrl || d.imageUrl;
+          if (warmUrl) {
+            Image.prefetch(warmUrl).catch(() => { /* silent */ });
           }
         });
       }).catch(err => {

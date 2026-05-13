@@ -777,8 +777,9 @@ const s = StyleSheet.create({
   hCardImg: {
     width: '100%',
     height: 150,
-    // Build 142 — warmed loading background (was #F3F4F6 cool gray)
-    backgroundColor: '#F0EDE6',
+    // Build 144 — reverted to brand-aligned cool gray; warm cream from
+    // Build 142 read as off-brand against the rest of the UI.
+    backgroundColor: '#F3F4F6',
   },
   hCardBody: {
     padding: 10,

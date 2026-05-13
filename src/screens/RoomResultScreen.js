@@ -1768,12 +1768,10 @@ const s = StyleSheet.create({
   hCardImg: {
     width: '100%',
     height: 150,
-    // Build 142 — warmed loading background. Was C.surface2 (#F3F4F6 cool
-    // gray) which read as "broken/missing" while images fetched. Now warm
-    // linen so the loading state looks intentionally styled. Hardcoded
-    // here rather than via a new token because this is a card-image-only
-    // background, not a general surface tone.
-    backgroundColor: '#F0EDE6',
+    // Build 144 — reverted to brand-aligned cool gray (matches uiColors.
+    // surface2). The Build-142 warm cream read as off-brand against the
+    // rest of the cool-blue UI.
+    backgroundColor: '#F3F4F6',
   },
   // Build 131 — variant swatch dot, anchored to bottom-right of the
   // card image. Small white border keeps the dot visible against any

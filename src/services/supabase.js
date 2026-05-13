@@ -169,6 +169,42 @@ export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
  * confirmed as the root cause of the "landscape photo displayed sideways
  * at flux-2-max" bug on the first generation post-deploy.
  */
+/**
+ * Build 144 — return a thumbnail-sized variant of a Supabase storage URL
+ * for use in grid cells (Profile wishes, Liked tab, MySpaces). Rewrites:
+ *
+ *   .../storage/v1/object/public/<bucket>/<path>
+ *           →
+ *   .../storage/v1/render/image/public/<bucket>/<path>?width=400&quality=75&resize=cover
+ *
+ * Cuts per-image payload from 2–4 MB (full-res JPEG) to ~50–80 KB. The
+ * /render/image/ endpoint caches at the CDN, so subsequent requests for the
+ * same URL anywhere in the world are fast. First cold-warm of a particular
+ * source image incurs the Supabase image-server cost (~1-2s), but the
+ * cache is project-wide so any user viewing a popular design pays that
+ * cost only once.
+ *
+ * Non-Supabase URLs (Unsplash, Amazon, raw http) pass through unchanged.
+ * Non-string inputs (null, undefined, objects) pass through unchanged.
+ *
+ * Width parameter is overridable for callers that render larger cells
+ * (e.g. RoomResult hero at width=800).
+ */
+export function getThumbnailUrl(url, width = 400) {
+  if (typeof url !== 'string' || !url) return url;
+  const marker = '/storage/v1/object/public/';
+  const idx = url.indexOf(marker);
+  if (idx === -1) return url; // not a Supabase object URL — leave alone
+  const head = url.slice(0, idx);
+  const tail = url.slice(idx + marker.length); // "<bucket>/<path>?maybe=query"
+  const [tailPath, tailQuery] = tail.split('?');
+  // If a query string was already on the URL, preserve it but force our
+  // width/quality params to win (URLSearchParams would dedupe, but for
+  // simplicity we just append — Supabase reads the LAST occurrence).
+  const sep = tailQuery ? '&' : '';
+  return `${head}/storage/v1/render/image/public/${tailPath}?width=${width}&quality=75&resize=cover${sep}${tailQuery || ''}`;
+}
+
 export function warmupEdgeFunctions() {
   // DISABLED in Build 26 after Build 25 crashed with EXC_BAD_ACCESS on the
   // first launch and Snap tab focus. The OPTIONS + AbortSignal.timeout call

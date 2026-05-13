@@ -30,7 +30,7 @@ import CardImage from '../components/CardImage';
 import AutoImage from '../components/AutoImage';
 import LensLoader from '../components/LensLoader';
 import { useAuth } from '../context/AuthContext';
-import { getUserDesigns, deleteUserDesign } from '../services/supabase';
+import { getUserDesigns, deleteUserDesign, getThumbnailUrl } from '../services/supabase';
 import { buildShareMessage } from '../services/shareService';
 import * as FileSystem from 'expo-file-system/legacy';
 import { hapticTap } from '../utils/haptics';
@@ -278,7 +278,13 @@ export default function MySpacesScreen({ navigation }) {
         try {
           const data = await getUserDesigns(user.id);
           if (!cancelled) {
-            const filtered = data.filter(d => !!d.image_url);
+            // Build 144 — keep full-res image_url intact (it's used by
+            // share, save-to-camera-roll, and the detail modal). Add a
+            // separate thumbnail_url field for the grid render so cells
+            // load in ~50-80KB instead of 2-4MB.
+            const filtered = data
+              .filter(d => !!d.image_url)
+              .map(d => ({ ...d, thumbnail_url: getThumbnailUrl(d.image_url, 400) }));
             setDesigns(filtered);
 
             // Build 142 — image prefetch for the first dozen design thumbnails.
@@ -286,8 +292,11 @@ export default function MySpacesScreen({ navigation }) {
             // Fire-and-forget; failures silent.
             const prefetchCount = 12;
             filtered.slice(0, prefetchCount).forEach(d => {
-              if (d.image_url) {
-                Image.prefetch(d.image_url).catch(() => { /* silent */ });
+              // Build 144 — warm the THUMBNAIL URL (what the grid renders),
+              // not the full-res, otherwise the prefetch is for nothing.
+              const warmUrl = d.thumbnail_url || d.image_url;
+              if (warmUrl) {
+                Image.prefetch(warmUrl).catch(() => { /* silent */ });
               }
             });
           }
@@ -364,8 +373,13 @@ export default function MySpacesScreen({ navigation }) {
               onPress={() => setSelected(item)}
             >
               <View style={s.thumbImgContainer}>
+                {/* Build 144 — grid renders the 400px thumbnail; full-res
+                    image_url stays available on the design for share /
+                    save-to-camera-roll / detail-modal use cases. Falls
+                    back to image_url for non-Supabase URLs (which pass
+                    through getThumbnailUrl unchanged). */}
                 <CardImage
-                  uri={item.image_url}
+                  uri={item.thumbnail_url || item.image_url}
                   style={s.thumbImg}
                   resizeMode="cover"
                 />
@@ -581,8 +595,9 @@ const s = StyleSheet.create({
   hCardImg: {
     width: '100%',
     height: 150,
-    // Build 142 — warmed loading background (was #F3F4F6 cool gray)
-    backgroundColor: '#F0EDE6',
+    // Build 144 — reverted to brand-aligned cool gray; warm cream from
+    // Build 142 read as off-brand against the rest of the UI.
+    backgroundColor: '#F3F4F6',
   },
   hCardBody: {
     padding: 10,

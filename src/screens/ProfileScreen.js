@@ -27,7 +27,7 @@ import { useLiked } from '../context/LikedContext';
 import { useShared } from '../context/SharedContext';
 import { useAuth } from '../context/AuthContext';
 import { useFocusEffect } from '@react-navigation/native';
-import { updateProfile, uploadAvatar, getUserDesigns, getMyStats, deleteExpiredDesigns, getUserLikedDesigns } from '../services/supabase';
+import { updateProfile, uploadAvatar, getUserDesigns, getMyStats, deleteExpiredDesigns, getUserLikedDesigns, getThumbnailUrl } from '../services/supabase';
 import { parseDesignPrompt } from '../utils/promptParser';
 // DESIGNS import removed — profile only shows real user designs from Supabase
 import Skeleton from '../components/Skeleton';
@@ -413,7 +413,15 @@ export default function ProfileScreen({ navigation }) {
             user_id: d.profiles?.id || d.user_id || null,
             initial: (d.profiles?.full_name || 'C')[0],
             verified: d.profiles?.is_verified_supplier || false,
+            // Full-res URL for ShopTheLook hero + downstream screens.
             imageUrl: d.image_url,
+            // Build 144 — 400px thumbnail variant for grid cells only.
+            // Cuts payload from 2-4MB per wish to ~50-80KB, eliminating
+            // the multi-second grey-overlay on Profile open. The grid
+            // render reads thumbnailUrl with a fallback to imageUrl so
+            // non-Supabase URLs (which getThumbnailUrl passes through
+            // unchanged) still work.
+            thumbnailUrl: getThumbnailUrl(d.image_url, 400),
             description: d.prompt,
             prompt: d.prompt,
             roomType: parsed.roomType || 'living-room',
@@ -437,7 +445,10 @@ export default function ProfileScreen({ navigation }) {
             user: user.username || user.name || 'Me',
             initial: (user.name || 'M')[0],
             verified: false,
+            // Full-res URL for the detail view; 400px thumbnail for the
+            // grid (see comment on the liked-designs normalization above).
             imageUrl: d.image_url,
+            thumbnailUrl: getThumbnailUrl(d.image_url, 400),
             description: d.prompt,
             prompt: d.prompt,
             roomType: parsed.roomType || 'living-room',
@@ -461,9 +472,11 @@ export default function ProfileScreen({ navigation }) {
         // ~100-300ms head start, so by the time the cards mount the images
         // are already warm.
         const prefetchCount = 12;
+        // Build 144 — prefetch the thumbnail URLs (what the grid actually
+        // renders), not the full-res. Warming the wrong URL helps nothing.
         const urlsToWarm = [
-          ...normalizedDesigns.slice(0, prefetchCount).map(d => d.imageUrl),
-          ...normalizedLiked.slice(0, prefetchCount).map(d => d.imageUrl),
+          ...normalizedDesigns.slice(0, prefetchCount).map(d => d.thumbnailUrl || d.imageUrl),
+          ...normalizedLiked.slice(0, prefetchCount).map(d => d.thumbnailUrl || d.imageUrl),
         ].filter(Boolean);
         urlsToWarm.forEach(url => {
           Image.prefetch(url).catch(() => { /* silent — best effort */ });
@@ -756,7 +769,12 @@ export default function ProfileScreen({ navigation }) {
                   >
                     <View style={[styles.cardImg, { borderRadius: cardRadius }]}>
                       <View style={styles.cardImgBg} />
-                      <CardImage uri={design.imageUrl} style={styles.cardImgPhoto} resizeMode="cover" />
+                      {/* Build 144 — grid renders the 400px thumbnail
+                          variant; the full-res imageUrl is still on the
+                          design object and gets passed to ShopTheLook on
+                          tap. Falls back to imageUrl for any design whose
+                          source isn't a Supabase URL. */}
+                      <CardImage uri={design.thumbnailUrl || design.imageUrl} style={styles.cardImgPhoto} resizeMode="cover" />
                     </View>
                   </PressableCard>
                 </View>
@@ -1458,10 +1476,11 @@ const styles = StyleSheet.create({
   },
   cardImgBg: {
     ...StyleSheet.absoluteFillObject,
-    // Build 142 — warmed from #E8EDF2 (cool blue-gray) to #F0EDE6
-    // (warm linen). Same compositional weight, but loading reads as
-    // "intentional / styled" instead of "broken / missing."
-    backgroundColor: '#F0EDE6',
+    // Build 144 — neutral cool gray placeholder that matches the rest of
+    // the app's brand palette (uiColors.surface2). The earlier #F0EDE6
+    // (warm linen) read as off-brand cream against the cool-blue UI; this
+    // restores visual continuity with the rest of the surfaces.
+    backgroundColor: '#F3F4F6',
   },
   cardImgPhoto: {
     ...StyleSheet.absoluteFillObject,
