@@ -84,6 +84,9 @@ import LanguageScreen from './src/screens/LanguageScreen';
 import TermsOfUseScreen from './src/screens/TermsOfUseScreen';
 import PrivacyPolicyScreen from './src/screens/PrivacyPolicyScreen';
 import AuthScreen from './src/screens/AuthScreen';
+import OnboardingScreen from './src/screens/OnboardingScreen';
+// Build 145 — pre-auth onboarding flow gating
+import { isIntroCompleted, ensureIntroFlagForExistingUser } from './src/utils/intro';
 import VerifyEmailSentScreen from './src/screens/VerifyEmailSentScreen';
 import SupplierApplicationScreen from './src/screens/SupplierApplicationScreen';
 import SupplierApplicationStatusScreen from './src/screens/SupplierApplicationStatusScreen';
@@ -401,6 +404,45 @@ function TabNavigator() {
 function RootNavigator() {
   const { user, loading: authLoading } = useAuth();
 
+  // Build 145 — pre-auth onboarding gate.
+  //
+  // intro_status is a 3-valued state machine:
+  //   'checking' — async read of AsyncStorage flag in flight; render splash
+  //   'show'     — flag absent AND no signed-in user; render OnboardingScreen
+  //                as the initial route
+  //   'skip'     — flag present OR user already signed in; render Main as
+  //                the initial route (existing behavior)
+  //
+  // The check runs once on cold launch. After that, the state never
+  // transitions BACK to 'show' — even if the user signs out, the flag
+  // stays set. The intro is a one-time-per-device introduction; subsequent
+  // signed-out sessions land directly on the soft-wall'd Home tab.
+  const [introStatus, setIntroStatus] = React.useState('checking');
+  React.useEffect(() => {
+    // Wait for auth bootstrap to settle so we can pass the right signed-in
+    // signal to ensureIntroFlagForExistingUser. Once authLoading flips
+    // false, we read the flag exactly once.
+    if (authLoading) return;
+    let cancelled = false;
+    (async () => {
+      // Migration: if the user is already signed in (i.e. they're an
+      // existing tester updating from <=Build 144), set the flag so they
+      // don't see the intro on this update. No-op if the flag is already
+      // present.
+      await ensureIntroFlagForExistingUser(!!user);
+      const completed = await isIntroCompleted();
+      if (!cancelled) {
+        setIntroStatus(completed || user ? 'skip' : 'show');
+      }
+    })();
+    return () => { cancelled = true; };
+    // Intentionally only re-runs when authLoading transitions, NOT when
+    // user identity changes mid-session. Sign-in mid-flow is handled by
+    // OnboardingScreen's own auth listener (advance to page 6); sign-out
+    // mid-session is irrelevant because we already passed the gate.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [authLoading]);
+
   // Build 136 — restored cold-start GenieLoader splash.
   //
   // CONTEXT: Build 89 dropped this gate to render Home immediately and
@@ -429,13 +471,19 @@ function RootNavigator() {
   // For users with no persisted session, the splash typically shows
   // for ~200-400ms. For users with a persisted session that needs a
   // profile fetch, ~600-1500ms. Worst case (network blip): 5s timeout.
-  if (authLoading) {
+  if (authLoading || introStatus === 'checking') {
     return (
       <View style={styles.loadingScreen}>
         <GenieLoader animating={true} size={200} />
       </View>
     );
   }
+
+  // Build 145 — onboarding initial route selection. Once intro is shown,
+  // OnboardingScreen handles its own internal navigation through the 6
+  // pages, then calls navigation.reset({ name: 'Main' }) on completion —
+  // dropping the user into the app and unmounting the onboarding stack.
+  const initialRouteName = introStatus === 'show' ? 'Onboarding' : 'Main';
 
   // Build 89 / L1: dropped the `loading` gate.
   //
@@ -485,6 +533,7 @@ function RootNavigator() {
 
   return (
     <Stack.Navigator
+      initialRouteName={initialRouteName}
       screenOptions={{
         headerShown: false,
         // Build 89: explicitly set the default push animation. Previously
@@ -505,6 +554,13 @@ function RootNavigator() {
         contentStyle: { backgroundColor: '#FFFFFF' },
       }}
     >
+      {/* Build 145 — pre-auth onboarding. initialRouteName controls whether
+          a fresh launch shows Onboarding or jumps straight to Main; either
+          way, both screens are registered so they're reachable. After the
+          user completes onboarding (page 6 → "Continue For FREE"), the
+          screen calls navigation.reset to Main and the Onboarding instance
+          unmounts. No animation override → uses the default slide. */}
+      <Stack.Screen name="Onboarding" component={OnboardingScreen} options={{ gestureEnabled: false }} />
       <Stack.Screen name="Main" component={TabNavigator} />
       {/* Build 69 Commit G: Auth screens always mounted so soft-wall
           gates can navigate here from anywhere. Presented as a modal so

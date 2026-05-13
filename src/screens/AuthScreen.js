@@ -294,7 +294,19 @@ const marqueeStyles = StyleSheet.create({
 
 // ── Screen ────────────────────────────────────────────────────────────────────
 
-export default function AuthScreen({ navigation }) {
+export default function AuthScreen({ navigation, route }) {
+  // Build 145 — when AuthScreen is opened from the onboarding flow, the
+  // post-success navigation should return to OnboardingScreen (which then
+  // advances to page 6 — the gift). The default behavior is to reset to
+  // Main because the soft-wall flow has no surrounding stack to go back to.
+  const fromOnboarding = !!route?.params?.fromOnboarding;
+  const finishAuth = () => {
+    if (fromOnboarding && navigation.canGoBack?.()) {
+      navigation.goBack();
+    } else {
+      try { navigation.reset({ index: 0, routes: [{ name: 'Main' }] }); } catch (_e) { /* RootNavigator re-renders */ }
+    }
+  };
   const { signUp, signIn, signInWithApple, resetPassword } = useAuth();
   const { enableOnboarding } = useOnboarding();
 
@@ -408,14 +420,13 @@ export default function AuthScreen({ navigation }) {
         if (result.needsEmailVerification) {
           navigation.replace('VerifyEmailSent', { email });
         } else {
-          // Hard-wall auth: RootNavigator re-renders when user state changes.
-          // navigation.reset is a no-op here but kept for safety in case
-          // AuthScreen is ever used in a full-stack context.
-          try { navigation.reset({ index: 0, routes: [{ name: 'Main' }] }); } catch (_e) { /* handled by RootNavigator re-render */ }
+          // Build 145 — finishAuth routes to Onboarding (for gift page)
+          // or Main, depending on fromOnboarding route param.
+          finishAuth();
         }
       } else {
         await signIn(email, password);
-        try { navigation.reset({ index: 0, routes: [{ name: 'Main' }] }); } catch (_e) { /* handled by RootNavigator re-render */ }
+        finishAuth();
       }
     } catch (err) {
       Alert.alert(
@@ -608,7 +619,8 @@ export default function AuthScreen({ navigation }) {
                   safeSetLoading(true);
                   try {
                     await signInWithApple();
-                    try { navigation.reset({ index: 0, routes: [{ name: 'Main' }] }); } catch (_e) { /* handled by RootNavigator re-render */ }
+                    // Build 145 — finishAuth honors the fromOnboarding param.
+                    finishAuth();
                   } catch (err) {
                     if (err.code !== 'ERR_REQUEST_CANCELED') {
                       Alert.alert('Apple Sign-In Failed', err.message);
