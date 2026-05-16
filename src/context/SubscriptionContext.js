@@ -30,15 +30,24 @@ const ratingPromptShownKey    = (uid) => (uid ? `${RATING_PROMPT_SHOWN_KEY}_${ui
 // hunting through the codebase.
 export const RATING_PROMPT_TRIGGER_GENERATION = 2;
 
-// ── Tier definitions (weekly billing, 10% discount on Pro + Premium) ─────────
+// ── Tier definitions (weekly billing) ────────────────────────────────────────
+// As of Build 145, the paywall surfaces only two paid tiers:
+//   • basic (renamed "PRO" in UI)   — 25 wishes / wk @ $4.99/wk
+//   • premium (renamed "UNLIMITED") — unlimited / wk @ $19.99/wk
+// The middle 50-wishes-per-week tier (TIERS.pro) is kept in the TIERS map
+// so existing subscribers stay grandfathered, but it's excluded from
+// PAID_TIERS so the paywall no longer offers it as a new purchase.
 export const TIERS = {
-  free:    { id: 'free',    name: 'Free',    price: 0,    priceLabel: 'Free',       gens: 5,  displayLabel: '5',         weekly: false },
-  basic:   { id: 'basic',   name: 'Basic',   price: 4.99,  priceLabel: '$4.99/wk',   gens: 25, displayLabel: '25',        weekly: true, productId: 'homegenie_basic_weekly' },
-  pro:     { id: 'pro',     name: 'Pro',     price: 9.99,  priceLabel: '$9.99/wk',   gens: 50, displayLabel: '50',        weekly: true, productId: 'homegenie_pro_weekly',   popular: true },
-  premium: { id: 'premium', name: 'Premium', price: 19.99, priceLabel: '$19.99/wk',  gens: -1, displayLabel: 'Unlimited', weekly: true, productId: 'homegenie_premium_weekly' },
+  free:    { id: 'free',    name: 'Free',      price: 0,    priceLabel: 'Free',       gens: 5,  displayLabel: '5',         weekly: false },
+  basic:   { id: 'basic',   name: 'PRO',       price: 4.99,  priceLabel: '$4.99/wk',   gens: 25, displayLabel: '25',        weekly: true, productId: 'homegenie_basic_weekly' },
+  pro:     { id: 'pro',     name: 'Pro',       price: 9.99,  priceLabel: '$9.99/wk',   gens: 50, displayLabel: '50',        weekly: true, productId: 'homegenie_pro_weekly',   popular: true },
+  premium: { id: 'premium', name: 'UNLIMITED', price: 19.99, priceLabel: '$19.99/wk',  gens: -1, displayLabel: 'Unlimited', weekly: true, productId: 'homegenie_premium_weekly' },
 };
 
-export const PAID_TIERS = [TIERS.basic, TIERS.pro, TIERS.premium];
+// Build 145: dropped TIERS.pro (50 wishes/wk) from the paywall offering.
+// The product ID stays valid in StoreKit so existing 50/wk subscribers keep
+// their entitlement; new sign-ups choose between PRO (25/wk) and UNLIMITED.
+export const PAID_TIERS = [TIERS.basic, TIERS.premium];
 
 const ALL_PRODUCT_IDS = PAID_TIERS.map(t => t.productId);
 

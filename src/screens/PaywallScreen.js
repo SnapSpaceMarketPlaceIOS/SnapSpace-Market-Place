@@ -115,7 +115,10 @@ const WISH_CARD_ORDER = [
 ];
 
 // ── Subscribe card order (cheapest first) ───────────────────────────────────
-const TIER_CARD_ORDER = ['basic', 'pro', 'premium'];
+// Build 145: paywall offers only two tiers — PRO (25/wk) and UNLIMITED (∞/wk).
+// The middle 50-wishes-per-week tier (TIERS.pro) is excluded; existing
+// subscribers on that legacy product remain grandfathered in StoreKit.
+const TIER_CARD_ORDER = ['basic', 'premium'];
 
 // ── Card dimensions (2-column grid) ─────────────────────────────────────────
 const CARD_GAP = 12;
@@ -235,8 +238,10 @@ export default function PaywallScreen({ navigation }) {
     tokenBalance, purchaseTokens, refreshTokenBalance,
   } = useSubscription();
 
-  const [activeTab, setActiveTab] = useState('wishes');
-  const [selectedTier, setSelectedTier] = useState('premium');
+  // Build 145: default to Subscribe tab with the PRO tier highlighted.
+  // Mock spec: paywall opens on Subscribe (was Wishes), PRO recommended.
+  const [activeTab, setActiveTab] = useState('subscribe');
+  const [selectedTier, setSelectedTier] = useState('basic');
   const [selectedWish, setSelectedWish] = useState('homegenie_wishes_4');
   const [purchasing, setPurchasing] = useState(false);
   const [restoring, setRestoring] = useState(false);
