@@ -375,35 +375,39 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
   },
 
-  // Build 147 v5: vertical-center wrapper for the title/body/buttons
-  // group. flex:1 absorbs all space above the ProgressBars so the
-  // content visually floats in the middle of the content area.
+  // Build 147 v5: wrapper for the title/body/buttons group.
+  // Build 147 v9: justifyContent center → flex-end. Push the group
+  // toward the bottom of the content area so buttons sit close to
+  // the progress bars (user wants buttons closer to bottom of phone).
   contentMiddle: {
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: 'flex-end',
+    paddingBottom: 8,
   },
 
   // Title block — sits high in the content area, just under the divider.
   titleBlock: {
     alignItems: 'center',
   },
+  // Build 147 v9: fontSize 34 → 38 + lineHeight 40 → 44 (heading larger
+  // per user spec).
   title: {
-    fontSize: 34,
+    fontSize: 38,
     fontWeight: '700',
     color: '#000000',
     textAlign: 'center',
-    lineHeight: 40,
+    lineHeight: 44,
     letterSpacing: -0.5,
   },
-  // Build 147 v2: marginTop 16 → 10 (tighter body-to-title spacing,
-  // matches the mockup's compact heading block).
+  // Build 147 v9: fontSize 16 → 18 (subheading larger) + color
+  // BLUE_PRIMARY → BLUE_LIGHT (lighter, friendlier blue per user).
   body: {
     marginTop: 10,
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: '400',
-    color: BLUE_PRIMARY,
+    color: BLUE_LIGHT,
     textAlign: 'center',
-    lineHeight: 22,
+    lineHeight: 24,
   },
 
   // Slide 1 dual-button row (Log In + Sign Up).
@@ -425,8 +429,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: 16,
   },
+  // Build 147 v9: added 1pt black border to both buttons per mockup spec.
   btnFilled: {
     backgroundColor: BLUE_LIGHT,
+    borderWidth: 1,
+    borderColor: '#000000',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.08,
@@ -438,10 +445,13 @@ const styles = StyleSheet.create({
     fontSize: 17,
     fontWeight: '700',
   },
+  // Build 147 v9: borderWidth 1.5 → 1, borderColor BLUE_LIGHT → black
+  // for the thin black outline per user spec. Inner button text stays
+  // BLUE_LIGHT so the outline frames a blue label on white fill.
   btnOutline: {
     backgroundColor: '#FFFFFF',
-    borderWidth: 1.5,
-    borderColor: BLUE_LIGHT,
+    borderWidth: 1,
+    borderColor: '#000000',
   },
   btnOutlineText: {
     color: BLUE_LIGHT,
@@ -486,10 +496,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 4,
   },
+  // Build 147 v9: height 3 → 2 + borderRadius 1.5 → 1. Thinner bars
+  // per user — same length, smaller height so they read as delicate
+  // strokes rather than chunky stripes.
   progressBar: {
     flex: 1,
-    height: 3,
-    borderRadius: 1.5,
+    height: 2,
+    borderRadius: 1,
     backgroundColor: '#D7E3F0',
   },
   progressBarActive: {
