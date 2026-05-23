@@ -182,9 +182,12 @@ export default function OnboardingAuthPage({ navigation, screenWidth, progressDo
 // ── Styles ────────────────────────────────────────────────────────────────
 
 const styles = StyleSheet.create({
+  // Build 147 v15: page bg #FFFFFF → #F8F8F8 (super-light gray).
+  // The button card flips to #FFFFFF below — gives the buttons a
+  // clean "elevated" feel against the slightly darker page surface.
   page: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#F8F8F8',
   },
 
   // Upper portion: title + subtitle + button card.
@@ -212,10 +215,12 @@ const styles = StyleSheet.create({
     lineHeight: 24,
   },
 
-  // Card wrapping the two sign-in CTAs. Light gray bg gives subtle
-  // depth without competing with the buttons themselves.
+  // Card wrapping the two sign-in CTAs.
+  // Build 147 v15: bg #F8F8F8 → #FFFFFF. Swapped with the page bg so
+  // the card now reads as a brighter elevated surface against the
+  // soft-gray page background.
   buttonCard: {
-    backgroundColor: '#F8F8F8',
+    backgroundColor: '#FFFFFF',
     borderRadius: 20,
     paddingHorizontal: 16,
     paddingTop: 16,
@@ -281,9 +286,11 @@ const styles = StyleSheet.create({
   },
 
   // Progress bars row at the very bottom of the screen.
+  // Build 147 v15: bg #FFFFFF → #F8F8F8 to match the new page bg so
+  // there's no visible seam between the video bottom and the dots row.
   dotsWrap: {
     paddingHorizontal: 28,
     paddingTop: 8,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#F8F8F8',
   },
 });
