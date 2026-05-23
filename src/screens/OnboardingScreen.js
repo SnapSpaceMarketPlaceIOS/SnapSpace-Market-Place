@@ -202,7 +202,7 @@ export default function OnboardingScreen({ navigation, route }) {
             → 0.6 makes the video block bigger per user direction.
             ─────────────────────────────────────────────────────────────── */}
         <View style={[styles.videoBlock, { paddingTop: insets.top }]}>
-          <OnboardingArt step={item.step} fullBleed contentFit="cover" />
+          <OnboardingArt step={item.step} fullBleed contentFit="contain" />
         </View>
 
         {/* ── 1pt black divider between video and content ─────────────── */}
