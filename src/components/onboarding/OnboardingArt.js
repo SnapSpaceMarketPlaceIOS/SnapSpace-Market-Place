@@ -27,7 +27,7 @@
  *   step 6 → slide-7.mp4 (A gift to get you started)
  */
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { VideoView, useVideoPlayer } from 'expo-video';
 
@@ -40,14 +40,36 @@ const VIDEO_SOURCES = {
   6: require('../../assets/onboarding/videos/slide-7.mp4'),
 };
 
-export default function OnboardingArt({ step, style, fullBleed = false, contentFit = 'contain' }) {
+export default function OnboardingArt({ step, style, fullBleed = false, contentFit = 'contain', isActive = true }) {
   const source = VIDEO_SOURCES[step] || VIDEO_SOURCES[1];
 
+  // Build 147 v12: player no longer auto-plays in the init callback.
+  // The useEffect below drives play/pause based on the isActive prop
+  // so videos only run when their slide is the active one. Prevents
+  // all 6 videos from playing simultaneously when FlatList mounts
+  // every page on first render — user's feedback was "the animations
+  // are already all playing even though the user hasn't visited the
+  // 2nd/3rd/4th slide."
   const player = useVideoPlayer(source, (p) => {
     p.loop = true;
     p.muted = true;
-    p.play();
+    // Removed p.play() — handled by useEffect.
   });
+
+  // Build 147 v12: play when slide becomes active, pause otherwise.
+  // Pausing inactive videos saves GPU/decode resources. When user
+  // navigates back to a previously-played slide, the video resumes
+  // from wherever the player paused (or restarts the loop naturally
+  // since loop:true). isActive defaults to true so the existing
+  // OnboardingAuthPage usage (no isActive prop) keeps auto-playing.
+  useEffect(() => {
+    if (!player) return;
+    if (isActive) {
+      player.play();
+    } else {
+      player.pause();
+    }
+  }, [isActive, player]);
 
   const wrapperStyle = fullBleed ? styles.fullBleed : styles.square;
 

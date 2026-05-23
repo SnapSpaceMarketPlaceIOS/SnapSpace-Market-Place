@@ -204,7 +204,16 @@ export default function OnboardingScreen({ navigation, route }) {
             no separate safe-area band exists to create a seam.
             ─────────────────────────────────────────────────────────────── */}
         <View style={styles.videoBlock}>
-          <OnboardingArt step={item.step} fullBleed contentFit="cover" />
+          {/* Build 147 v12: isActive only true for the currently-visible
+              slide so non-visible slides' videos stay paused (was: all
+              6 videos auto-playing simultaneously since FlatList mounts
+              every page on render). */}
+          <OnboardingArt
+            step={item.step}
+            fullBleed
+            contentFit="cover"
+            isActive={index === pageIndex}
+          />
         </View>
 
         {/* ── 1pt black divider between video and content ─────────────
@@ -272,7 +281,7 @@ export default function OnboardingScreen({ navigation, route }) {
         </View>
       </View>
     );
-  }, [insets, handleContinue, navigation]);
+  }, [insets, handleContinue, navigation, pageIndex]);
 
   return (
     <View style={styles.root}>
@@ -301,6 +310,9 @@ export default function OnboardingScreen({ navigation, route }) {
 // Build 147: segmented horizontal bars replacing the previous round dots.
 // Active bar fills blue; inactive bars are a quiet light-blue/gray. Each
 // bar gets equal flex so 6 bars span the screen evenly with small gaps.
+// Build 147 v12: cumulative-fill behavior. All segments at index <= active
+// render in the active color. Visualizes progress through the flow rather
+// than just highlighting the current step.
 function ProgressBars({ count, active }) {
   return (
     <View style={styles.progressBarsRow}>
@@ -309,7 +321,7 @@ function ProgressBars({ count, active }) {
           key={i}
           style={[
             styles.progressBar,
-            i === active && styles.progressBarActive,
+            i <= active && styles.progressBarActive,
           ]}
         />
       ))}
