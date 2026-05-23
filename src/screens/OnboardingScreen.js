@@ -207,10 +207,12 @@ export default function OnboardingScreen({ navigation, route }) {
           <OnboardingArt step={item.step} fullBleed contentFit="contain" />
         </View>
 
-        {/* Build 147 v5: 1pt black divider REMOVED — user feedback that
-            the hard line read as a "weird gray line." Transition between
-            video block (#FAFAFA) and content block (#FFFFFF) is now a
-            soft color step that reads as a natural section boundary. */}
+        {/* ── 1pt black divider between video and content ─────────────
+            Build 147 v6: divider restored. v5 removed it based on a
+            misread of feedback — the user wanted the SOFT color step
+            killed and the HARD line kept. Hard 1pt black line is the
+            clean defined section separator. */}
+        <View style={styles.divider} />
 
         {/* ── Content block — title, body, CTA, progress bars ───────────
             Build 147 v5: contentMiddle now centers title + body + buttons
@@ -343,18 +345,26 @@ const styles = StyleSheet.create({
   // Top hero — video fills horizontally edge-to-edge.
   // Build 147 v2: flex 0.55 → 0.6 (bigger video per user direction).
   // Build 147 v5: backgroundColor #F5F7FA → #FAFAFA per user spec.
+  // Build 147 v6: keeping #FAFAFA as placeholder pending user's new
+  // color spec — will update when they provide the exact value.
   videoBlock: {
     flex: 0.6,
     width: '100%',
     backgroundColor: '#FAFAFA',
   },
 
+  // 1pt black divider between video block and content block.
+  // Build 147 v6: restored after being mistakenly removed in v5.
+  divider: {
+    height: 1,
+    backgroundColor: '#000000',
+    width: '100%',
+  },
+
   // Bottom content — title, body, CTA, progress.
-  // Build 147 v5: divider removed (was 1pt black line, read as "weird
-  // gray line" per user). Layout restructured so contentMiddle takes
-  // flex:1 with justifyContent:center — visually centers title + body
-  // + buttons in the available vertical space. ProgressBars hangs off
-  // the bottom as the last child with no special positioning.
+  // contentMiddle takes flex:1 with justifyContent:center — visually
+  // centers title + body + buttons in the available vertical space.
+  // ProgressBars hangs off the bottom as the last child.
   contentBlock: {
     flex: 0.4,
     paddingHorizontal: 28,
