@@ -51,11 +51,24 @@ export default function OnboardingArt({ step, style, fullBleed = false, contentF
 
   const wrapperStyle = fullBleed ? styles.fullBleed : styles.square;
 
+  // Build 147 v8: scale transform to crop the Higgsfield videos' baked-in
+  // white margins. The renders have ~10-15% of horizontal width as white
+  // padding on each side of the actual composition (lamp/person/rooms).
+  // Even with contentFit:cover filling the box, those white margins are
+  // PART of the video content and remain visible. Scaling 1.18× pushes
+  // them off-screen so the composition fills edge-to-edge. The wrapper
+  // is overflow:hidden so the scaled-up overflow gets clipped cleanly.
+  // Only applied when fullBleed (the onboarding hero use case); the
+  // shrunk-art use in OnboardingAuthPage skips the zoom.
+  const videoStyle = fullBleed
+    ? [styles.video, { transform: [{ scale: 1.18 }] }]
+    : styles.video;
+
   return (
-    <View style={[wrapperStyle, style]} pointerEvents="none">
+    <View style={[wrapperStyle, style, fullBleed && styles.clip]} pointerEvents="none">
       <VideoView
         player={player}
-        style={styles.video}
+        style={videoStyle}
         contentFit={contentFit}
         nativeControls={false}
       />
@@ -73,6 +86,11 @@ const styles = StyleSheet.create({
   fullBleed: {
     width: '100%',
     height: '100%',
+  },
+  // Build 147 v8: clip overflow so the scaled-up video doesn't bleed
+  // into adjacent areas (status bar, divider, content block).
+  clip: {
+    overflow: 'hidden',
   },
   video: {
     width: '100%',
