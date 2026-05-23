@@ -197,11 +197,13 @@ export default function OnboardingScreen({ navigation, route }) {
       <View style={[styles.page, { width: SCREEN_W }]}>
         {/* ── Video block — edge-to-edge top ─────────────────────────────
             Build 147 v2: backgroundColor #FFFFFF → #F5F7FA to blend
-            with the Higgsfield-rendered videos' off-white bg, removing
-            the visible seam at the video/container boundary. flex 0.55
-            → 0.6 makes the video block bigger per user direction.
+            with the Higgsfield-rendered videos' off-white bg.
+            Build 147 v4: paddingTop:insets.top removed — video now
+            extends ALL the way to the top of the screen (under the
+            status bar / Dynamic Island). True corner-to-corner means
+            no separate safe-area band exists to create a seam.
             ─────────────────────────────────────────────────────────────── */}
-        <View style={[styles.videoBlock, { paddingTop: insets.top }]}>
+        <View style={styles.videoBlock}>
           <OnboardingArt step={item.step} fullBleed contentFit="contain" />
         </View>
 
