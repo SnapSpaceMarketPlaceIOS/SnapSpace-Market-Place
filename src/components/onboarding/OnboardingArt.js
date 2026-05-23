@@ -54,13 +54,18 @@ const VIDEO_SOURCES = {
 // Per-step scale lets each video render at the right zoom. New videos
 // get 1.0 (no zoom); older margined videos keep 1.18. When other
 // slides get re-rendered without margins, drop their entry to 1.0.
+// Build 147 v18: zoomed out across all slides per user feedback
+// ("still too zoomed in. needs to be more spread out. yes, slides 2-6 too").
+// Each video now renders at 90% of native scale, leaving ~5% margin on
+// each side filled by the videoBlock bg (#F8F8F8). The composition reads
+// more relaxed with visible breathing room instead of edge-to-edge fill.
 const VIDEO_SCALE_BY_STEP = {
-  1: 1.0,   // new render — no white margins to crop
-  2: 1.18,
-  3: 1.18,
-  4: 1.18,
-  5: 1.18,
-  6: 1.18,
+  1: 0.9,
+  2: 0.9,
+  3: 0.9,
+  4: 0.9,
+  5: 0.9,
+  6: 0.9,
 };
 
 export default function OnboardingArt({ step, style, fullBleed = false, contentFit = 'contain', isActive = true }) {
