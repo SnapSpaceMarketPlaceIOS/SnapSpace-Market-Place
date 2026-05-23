@@ -196,10 +196,10 @@ export default function OnboardingScreen({ navigation, route }) {
     return (
       <View style={[styles.page, { width: SCREEN_W }]}>
         {/* ── Video block — edge-to-edge top ─────────────────────────────
-            paddingTop: insets.top draws a white band over the safe-area
-            top so the status bar / Dynamic Island stays legible against a
-            consistent background; the video starts immediately below the
-            status bar and fills the rest of this flex block.
+            Build 147 v2: backgroundColor #FFFFFF → #F5F7FA to blend
+            with the Higgsfield-rendered videos' off-white bg, removing
+            the visible seam at the video/container boundary. flex 0.55
+            → 0.6 makes the video block bigger per user direction.
             ─────────────────────────────────────────────────────────────── */}
         <View style={[styles.videoBlock, { paddingTop: insets.top }]}>
           <OnboardingArt step={item.step} fullBleed contentFit="cover" />
@@ -208,14 +208,20 @@ export default function OnboardingScreen({ navigation, route }) {
         {/* ── 1pt black divider between video and content ─────────────── */}
         <View style={styles.divider} />
 
-        {/* ── Content block — title, body, CTA, progress bars ─────────── */}
+        {/* ── Content block — title, body, CTA, progress bars ───────────
+            Build 147 v2: restructured. contentTop groups title + body +
+            buttons into one TIGHT stack (was previously spread by
+            justify-content:space-between which created huge empty space
+            between body and CTA). Progress bars now pinned to the bottom
+            via justify-content:space-between on the outer contentBlock.
+            ─────────────────────────────────────────────────────────────── */}
         <View style={[styles.contentBlock, { paddingBottom: insets.bottom + 16 }]}>
-          <View style={styles.titleBlock}>
-            <Text style={styles.title}>{item.title}</Text>
-            <Text style={styles.body}>{item.body}</Text>
-          </View>
+          <View style={styles.contentTop}>
+            <View style={styles.titleBlock}>
+              <Text style={styles.title}>{item.title}</Text>
+              <Text style={styles.body}>{item.body}</Text>
+            </View>
 
-          <View style={styles.ctaBlock}>
             {isSlide1 ? (
               // Build 147: dual-button row on slide 1 only. Both Log In
               // and Sign Up just advance to slide 2 — actual auth lives
@@ -252,10 +258,10 @@ export default function OnboardingScreen({ navigation, route }) {
                 <ArrowRightIcon style={{ marginLeft: 10 }} />
               </TouchableOpacity>
             )}
-
-            {/* Progress bars at very bottom of content area */}
-            <ProgressBars count={TOTAL_PAGES} active={index} />
           </View>
+
+          {/* Progress bars pinned to bottom via parent space-between */}
+          <ProgressBars count={TOTAL_PAGES} active={index} />
         </View>
       </View>
     );
@@ -330,14 +336,14 @@ const styles = StyleSheet.create({
   },
 
   // Top hero — video fills horizontally edge-to-edge.
-  // flex: 0.55 gives the video block ~55% of the screen height; the
-  // remaining 45% goes to the content block. The video itself uses
-  // contentFit:cover (configured at the OnboardingArt level) so it
-  // fills the available space without letterboxing.
+  // Build 147 v2: flex 0.55 → 0.6 (bigger video per user direction).
+  // backgroundColor #FFFFFF → #F5F7FA to blend with the Higgsfield
+  // videos' subtle off-white background. Pure white was leaving a
+  // visible seam at the edges where the video frame met the container.
   videoBlock: {
-    flex: 0.55,
+    flex: 0.6,
     width: '100%',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#F5F7FA',
   },
 
   // 1pt black hard divider between video and content blocks.
@@ -348,13 +354,23 @@ const styles = StyleSheet.create({
   },
 
   // Bottom content — title, body, CTA, progress.
-  // flex: 0.45 with justify-between pushes the progress row to the
-  // bottom edge while the title stays close to the divider above.
+  // Build 147 v2: flex 0.45 → 0.4 (tighter content area, more video).
+  // justify-between still applies, but now the children are:
+  //   1. contentTop — title + body + buttons grouped tight at the top
+  //   2. ProgressBars — pinned to the bottom edge
+  // This kills the previous huge empty space between body and CTA.
   contentBlock: {
-    flex: 0.45,
+    flex: 0.4,
     paddingHorizontal: 28,
     paddingTop: 24,
     justifyContent: 'space-between',
+  },
+
+  // Title + body + CTA grouped together at the top of the content area.
+  // No special styles — children stack naturally with tight margins
+  // defined on body and on the button containers.
+  contentTop: {
+    // intentionally empty — flex column default; children control gaps
   },
 
   // Title block — sits high in the content area, just under the divider.
@@ -369,8 +385,10 @@ const styles = StyleSheet.create({
     lineHeight: 40,
     letterSpacing: -0.5,
   },
+  // Build 147 v2: marginTop 16 → 10 (tighter body-to-title spacing,
+  // matches the mockup's compact heading block).
   body: {
-    marginTop: 16,
+    marginTop: 10,
     fontSize: 16,
     fontWeight: '400',
     color: BLUE_PRIMARY,
@@ -378,17 +396,16 @@ const styles = StyleSheet.create({
     lineHeight: 22,
   },
 
-  // CTA block wraps the buttons + progress bars at the bottom of content.
-  ctaBlock: {
-    paddingBottom: 8,
-  },
-
   // Slide 1 dual-button row (Log In + Sign Up).
   // flex:1 on each button + gap:12 between them gives equal-width
   // buttons spanning the content padding box.
+  // Build 147 v2: marginTop:24 pulls the buttons close to the body
+  // text above (was previously floating with huge gap from the
+  // justify-content:space-between layout).
   dualButtonRow: {
     flexDirection: 'row',
     gap: 12,
+    marginTop: 24,
   },
   btnHalf: {
     flex: 1,
@@ -423,6 +440,8 @@ const styles = StyleSheet.create({
   },
 
   // Continue button — single CTA on slides 2-4 + 6.
+  // Build 147 v2: marginTop:24 matches dualButtonRow for visual
+  // consistency across slides — buttons sit close to the body text.
   primaryButton: {
     backgroundColor: BLUE_LIGHT,
     borderRadius: 34,
@@ -431,6 +450,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 24,
+    marginTop: 24,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.08,
@@ -443,19 +463,23 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
 
-  // Build 147 — segmented bars at the bottom of each slide. Equal-width
-  // bars with small gaps. Active bar in primary blue, inactive in a
-  // quiet desaturated blue.
+  // Build 147 — segmented bars at the bottom of each slide.
+  // Build 147 v2: thinner + tighter per mockup feedback.
+  //   height 4 → 3 (thinner)
+  //   borderRadius 2 → 1.5 (matches thinner bar)
+  //   gap 6 → 4 (closer together)
+  //   marginTop:18 removed — bars are now pinned to bottom via parent
+  //   contentBlock's justify-content:space-between, so they sit at the
+  //   bottom edge of the content area naturally.
   progressBarsRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
-    marginTop: 18,
+    gap: 4,
   },
   progressBar: {
     flex: 1,
-    height: 4,
-    borderRadius: 2,
+    height: 3,
+    borderRadius: 1.5,
     backgroundColor: '#D7E3F0',
   },
   progressBarActive: {
