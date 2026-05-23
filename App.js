@@ -744,7 +744,29 @@ export default function App() {
                     Sits inside the providers so retry preserves auth/cart
                     state — only the navigation stack remounts. */}
                 <ErrorBoundary>
-                  <NavigationContainer ref={navigationRef}>
+                  <NavigationContainer
+                    ref={navigationRef}
+                    onStateChange={() => {
+                      // Build 147 v13: manual screen tracking. Replaces
+                      // posthog-react-native's broken autocapture
+                      // (which called useNavigationState() outside the
+                      // NavigationContainer and crashed). This callback
+                      // runs INSIDE the container's tree so it has full
+                      // route info. Fires a $screen PostHog event with
+                      // the route name + params on every navigation.
+                      try {
+                        if (!navigationRef.isReady()) return;
+                        const route = navigationRef.getCurrentRoute();
+                        if (!route) return;
+                        analyticsTrackEvent('$screen', {
+                          $screen_name: route.name,
+                          ...(route.params || {}),
+                        });
+                      } catch (_e) {
+                        // never let analytics break navigation
+                      }
+                    }}
+                  >
                     <RootNavigator />
                     <ConsentModal />
                     {/* Global host for the post-second-generation App
@@ -791,19 +813,22 @@ export default function App() {
             enableSessionReplay: false,
           }}
           autocapture={{
-            captureScreens: true,
+            // Build 147 v13: captureScreens true → false. posthog-react-
+            // native's screen autocapture calls useNavigationState() from
+            // a hook that lives INSIDE PostHogProvider — which sits ABOVE
+            // NavigationContainer in our tree. The hook errors on every
+            // render with 'Couldn't get the navigation state. Is your
+            // component inside a navigator?' and dev-mode shows a red
+            // banner that blocks the lower half of every screen. Even
+            // with navigationRef passed in the config, the hook is still
+            // called first and errors before the ref is consulted.
+            // Manual screen tracking now happens via NavigationContainer's
+            // onStateChange callback below — same data, no error.
+            captureScreens: false,
             captureLifecycleEvents: true,
             captureTouches: false, // disable global touch capture — we'll
                                    // use explicit trackEvent() calls so
                                    // the data is curated, not noisy
-            // Build 143 — wire React Navigation into autocapture. Without
-            // navigationRef the tracker can't read the route state from
-            // outside the NavigationContainer, so $screen events never fire.
-            navigationRef,
-            navigation: {
-              routeToName: (name) => name,
-              routeToProperties: (_name, params) => (params || {}),
-            },
           }}
         >
           <PostHogClientRegistrar />
