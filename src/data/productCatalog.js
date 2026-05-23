@@ -16,7 +16,7 @@ export const PRODUCT_CATALOG = [
     salePrice: 101.79, salePriceDisplay: '$101.79',
     compareAtPrice: 119.75, compareAtPriceDisplay: '$119.75',
     imageUrl: 'https://m.media-amazon.com/images/I/81-a1cUJElL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51tp6Ho9jbL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81-a1cUJElL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41ZGRunlOjL._AC_SL1500_.jpg',
@@ -152,7 +152,7 @@ export const PRODUCT_CATALOG = [
     brand: 'RUSTYER',
     price: 129.99, priceDisplay: '$129.99',
     imageUrl: 'https://m.media-amazon.com/images/I/51+OeacAuiL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/41TJfxE1z1L._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/41TJfxE1z1L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/31-C87ucxnL._AC_SL1500_.jpg',
@@ -225,7 +225,7 @@ export const PRODUCT_CATALOG = [
     salePrice: 152.00, salePriceDisplay: '$152.00',
     compareAtPrice: 179.99, compareAtPriceDisplay: '$179.99',
     imageUrl: 'https://m.media-amazon.com/images/I/51GvDKhS8tL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51NywsZFYGL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/51GvDKhS8tL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41dNgm27ZQL._AC_SL1500_.jpg',
@@ -274,7 +274,7 @@ export const PRODUCT_CATALOG = [
     brand: 'Ivoros',
     price: 199.99, priceDisplay: '$199.99',
     imageUrl: 'https://m.media-amazon.com/images/I/518aIgqFXoL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51ktlomJ+iL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/518aIgqFXoL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41vmoUR1udL._AC_SL1500_.jpg',
@@ -336,7 +336,7 @@ export const PRODUCT_CATALOG = [
     brand: 'YOPENG',
     price: 879.00, priceDisplay: '$879.00',
     imageUrl: 'https://m.media-amazon.com/images/I/51h9GJCaX8L._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/41LXeu0rW9L._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/41LXeu0rW9L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/212lR0SGw5L._AC_SL1500_.jpg',
@@ -424,7 +424,7 @@ export const PRODUCT_CATALOG = [
     salePrice: 1608.00, salePriceDisplay: '$1,608.00',
     compareAtPrice: 1797.00, compareAtPriceDisplay: '$1,797.00',
     imageUrl: 'https://m.media-amazon.com/images/I/51yEsRR3uvL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/41d-z4PNZTL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/41d-z4PNZTL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/311PyizmGBL._AC_SL1500_.jpg',
@@ -586,7 +586,7 @@ export const PRODUCT_CATALOG = [
     salePrice: 265.00, salePriceDisplay: '$265.00',
     compareAtPrice: 278.99, compareAtPriceDisplay: '$278.99',
     imageUrl: 'https://m.media-amazon.com/images/I/518hjP4wuEL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51mxwEXYUkL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/518hjP4wuEL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41mXifcpWLL._AC_SL1500_.jpg',
@@ -635,6 +635,7 @@ export const PRODUCT_CATALOG = [
     brand: 'CHITA',
     price: 599.99, priceDisplay: '$599.99',
     imageUrl: 'https://m.media-amazon.com/images/I/41NqnDE8BnL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/41j1ZmZk+yL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/41NqnDE8BnL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41NtIEUilRL._AC_SL1500_.jpg',
@@ -700,7 +701,7 @@ export const PRODUCT_CATALOG = [
     salePrice: 1009.00, salePriceDisplay: '$1,009.00',
     compareAtPrice: 1063.01, compareAtPriceDisplay: '$1,063.01',
     imageUrl: 'https://m.media-amazon.com/images/I/51-jdxnjraL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/41dUnqLTtNL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/51-jdxnjraL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/31wC29JcACL._AC_SL1500_.jpg',
@@ -749,6 +750,7 @@ export const PRODUCT_CATALOG = [
     brand: 'Christopher Knight Home',
     price: 723.99, priceDisplay: '$723.99',
     imageUrl: 'https://m.media-amazon.com/images/I/51hzxbwRQIL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/41b9pDMZJrL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/51hzxbwRQIL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/31nbqme5cnL._AC_SL1500_.jpg',
@@ -824,7 +826,7 @@ export const PRODUCT_CATALOG = [
     brand: 'JACH',
     price: 1389.99, priceDisplay: '$1,389.99',
     imageUrl: 'https://m.media-amazon.com/images/I/51nuMMn8CvL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/41hWO2DxpkL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/51nuMMn8CvL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41w3HQvljOL._AC_SL1500_.jpg',
@@ -912,7 +914,7 @@ export const PRODUCT_CATALOG = [
     brand: 'YOPENG',
     price: 1598.00, priceDisplay: '$1,598.00',
     imageUrl: 'https://m.media-amazon.com/images/I/61B693xD2AL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51SQkE9VEYL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/51SQkE9VEYL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/313fvgpQ8kL._AC_SL1500_.jpg',
@@ -999,7 +1001,7 @@ export const PRODUCT_CATALOG = [
     brand: 'KEIKI',
     price: 1399.00, priceDisplay: '$1,399.00',
     imageUrl: 'https://m.media-amazon.com/images/I/51DElNtqcML._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51EEAg2EvQL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/51DElNtqcML._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41Hfpl9x0hL._AC_SL1500_.jpg',
@@ -2519,7 +2521,7 @@ export const PRODUCT_CATALOG = [
     salePrice: 119.99, salePriceDisplay: '$119.99',
     compareAtPrice: 149.99, compareAtPriceDisplay: '$149.99',
     imageUrl: 'https://m.media-amazon.com/images/I/51yaDlWvrBL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51FLK7pbW8L._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/51FLK7pbW8L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41MalCsG7OL._AC_SL1500_.jpg',
@@ -2626,7 +2628,7 @@ export const PRODUCT_CATALOG = [
     salePrice: 149.97, salePriceDisplay: '$149.97',
     compareAtPrice: 199.99, compareAtPriceDisplay: '$199.99',
     imageUrl: 'https://m.media-amazon.com/images/I/41EUfxYdFIL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51L2VNnrufL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/41EUfxYdFIL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/411pWbfRG3L._AC_SL1500_.jpg',
@@ -2717,7 +2719,7 @@ export const PRODUCT_CATALOG = [
     salePrice: 161.49, salePriceDisplay: '$161.49',
     compareAtPrice: 189.99, compareAtPriceDisplay: '$189.99',
     imageUrl: 'https://m.media-amazon.com/images/I/41UWIV++NuL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/412tuJMSBnL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/41UWIV++NuL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41eYqqhEdwL._AC_SL1500_.jpg',
@@ -2798,7 +2800,7 @@ export const PRODUCT_CATALOG = [
     salePrice: 93.49, salePriceDisplay: '$93.49',
     compareAtPrice: 109.99, compareAtPriceDisplay: '$109.99',
     imageUrl: 'https://m.media-amazon.com/images/I/51Xcm-n0uCL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/414pHZUDnEL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/414pHZUDnEL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/412WDgjz2vL._AC_SL1500_.jpg',
@@ -2873,7 +2875,7 @@ export const PRODUCT_CATALOG = [
     salePrice: 288.98, salePriceDisplay: '$288.98',
     compareAtPrice: 339.98, compareAtPriceDisplay: '$339.98',
     imageUrl: 'https://m.media-amazon.com/images/I/41idGumCZ4L._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/41Ka-r-9jGL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/41idGumCZ4L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41KqPAoneqL._AC_SL1500_.jpg',
@@ -2962,7 +2964,7 @@ export const PRODUCT_CATALOG = [
     price: 275.49,
     priceDisplay: '$275.49',
     imageUrl: 'https://m.media-amazon.com/images/I/714JnI0Ou4L._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/81rj2cvh3JL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81rj2cvh3JL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/61wqYdLZ0yL._AC_SL1500_.jpg',
@@ -3031,7 +3033,7 @@ export const PRODUCT_CATALOG = [
     salePriceDisplay: '$1,529.15',
     compareAtPrice: 1799.00,
     imageUrl: 'https://m.media-amazon.com/images/I/810YSn5zxHL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/71hnJZJrrAL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71hnJZJrrAL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41w-HnCA2hL._AC_SL1500_.jpg',
@@ -3166,7 +3168,7 @@ export const PRODUCT_CATALOG = [
     salePriceDisplay: '$725.87',
     compareAtPrice: 897.96,
     imageUrl: 'https://m.media-amazon.com/images/I/71HuA4RYrzL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/41WtUupIIPL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71HuA4RYrzL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/31WyBg8SJsL._AC_SL1500_.jpg',
@@ -3228,7 +3230,7 @@ export const PRODUCT_CATALOG = [
     price: 755.98,
     priceDisplay: '$755.98',
     imageUrl: 'https://m.media-amazon.com/images/I/91ktb2Ru8SL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/41O-mSFSnDL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/91ktb2Ru8SL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/412MQhkyTbL._AC_SL1500_.jpg',
@@ -3292,7 +3294,7 @@ export const PRODUCT_CATALOG = [
     price: 1964.82,
     priceDisplay: '$1,964.82',
     imageUrl: 'https://m.media-amazon.com/images/I/81Jb-5oxMlL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/41tmDaeS3VL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81Jb-5oxMlL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41gmt1jysFL._AC_SL1500_.jpg',
@@ -3367,6 +3369,7 @@ export const PRODUCT_CATALOG = [
     description: '102" curved bohemian sectional with artisan woven accents in primary color blocks on a serene beige base. Premium 35D high-density foam (vs standard 22D) for superior support. Boneless floor couch — no assembly, unbox and expand in 24–48 hrs. Includes 2 boho throw pillows.',
     tags: ['sofa', 'bohemian', 'curved', 'chenille', 'boneless', 'floor-couch', 'no-assembly', 'minimalist', '4-seater', 'beige', 'boho', 'living-room'],
     imageUrl: 'https://m.media-amazon.com/images/I/51zzHRVCzBL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/91rxrE3ckmL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/91rxrE3ckmL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/511OXpEjZEL._AC_SL1500_.jpg',
@@ -3422,7 +3425,7 @@ export const PRODUCT_CATALOG = [
     description: '126" oversized curved sectional with a signature love heart motif across the back and rolled arms. 5-seater with 25.19" deep seats, 2 decorative pillows included. Delivered in 2 pieces — no assembly required. Available in 7 colors and multiple sizes.',
     tags: ['sofa', 'sectional', 'curved', 'love-heart', 'boucle', 'glam', 'art-deco', 'maximalist', '5-seater', 'black', 'oversized', 'no-assembly'],
     imageUrl: 'https://m.media-amazon.com/images/I/41-NE4TaVEL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/81DUI266dUL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81DUI266dUL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41Hfpl9x0hL._AC_SL1500_.jpg',
@@ -3520,6 +3523,7 @@ export const PRODUCT_CATALOG = [
     description: '128" oversized power sofa bed with wireless RF remote that converts to a full sleeper bed with one touch. Each motor extends independently. Scratch-resistant, breathable velvet fabric. Deep seat design. Assembles in 10 minutes. Includes 5 throw pillows.',
     tags: ['sofa', 'sofa-bed', 'convertible', 'power', 'remote-control', 'sleeper', 'velvet', 'oversized', 'dark-green', 'living-room', 'pull-out'],
     imageUrl: 'https://m.media-amazon.com/images/I/81K-Pw7n61L._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51C9hcBG76L._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81K-Pw7n61L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41rTugs346L._AC_SL1500_.jpg',
@@ -3615,7 +3619,7 @@ export const PRODUCT_CATALOG = [
     description: '3-piece boucle sofa set: 3-seater sofa + 2 armless chairs. Breathable, skin-friendly boucle fabric — more comfortable than sherpa for extended use. Wooden frame, high-resilience foam cushions, lumbar pillow included. Pet-friendly.',
     tags: ['sofa', 'sofa-set', 'boucle', '3-piece', 'pet-friendly', 'minimalist', 'modern', 'living-room', 'beige', 'armless-chairs', 'french-style'],
     imageUrl: 'https://m.media-amazon.com/images/I/814+gvO86dL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/41gpZaKn9yL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/814+gvO86dL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51ud2p-K79L._AC_SL1500_.jpg',
@@ -3712,6 +3716,7 @@ export const PRODUCT_CATALOG = [
     description: '105.91" L-shaped modular cloud sofa with boneless foam structure and premium sherpa boucle upholstery. Zero assembly — unbox and allow 72 hrs to expand. Fully reconfigurable into loveseat, chaise, L-shape, or standalone seating.',
     tags: ['sofa', 'sectional', 'modular', 'boucle', 'sherpa', 'cloud-couch', 'boneless', 'l-shaped', 'no-assembly', 'white', 'curved', 'living-room'],
     imageUrl: 'https://m.media-amazon.com/images/I/71OUIYUQByL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/415COoozUTL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71OUIYUQByL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/417oPsfht0L._AC_SL1500_.jpg',
@@ -3807,7 +3812,7 @@ export const PRODUCT_CATALOG = [
     description: '82.7" minimalist curved sofa upholstered in soft boucle fabric with memory foam deep seat cushions. Sturdy metal legs and clean-line silhouette. Available in Beige, Green, and Warm Orange. Suits living rooms, bedrooms, and home offices.',
     tags: ['sofa', 'boucle', 'curved', 'minimalist', 'memory-foam', 'deep-seat', 'metal-legs', 'modern', '3-seater', 'beige', 'living-room'],
     imageUrl: 'https://m.media-amazon.com/images/I/51LJ7wJsDqL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/71jaR-WfJYL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71jaR-WfJYL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/212lR0SGw5L._AC_SL1500_.jpg',
@@ -4000,7 +4005,7 @@ export const PRODUCT_CATALOG = [
     description: '5-seater corner sectional sofa in smooth faux leather with deep button-tufted backrests and slim metal legs. Modular design connects securely for flexible room arrangement. Wide seats and deep profile for maximum lounge comfort.',
     tags: ['sofa', 'sectional', 'faux-leather', 'mid-century', 'chesterfield', 'tufted', '5-seater', 'modular', 'metal-legs', 'living-room', 'camel'],
     imageUrl: 'https://m.media-amazon.com/images/I/81yfP1rYPCL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51959lw-65L._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81yfP1rYPCL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41aX3Y3BejL._AC_SL1500_.jpg',
@@ -4076,7 +4081,7 @@ export const PRODUCT_CATALOG = [
     description: '80" genuine top-grain leather 3-seater sofa with intricate tufting and mid-century modern styling. Solid wood frame, sinuous spring system, and high-density foam + cotton cushions. Easy 20-minute setup.',
     tags: ['sofa', 'genuine-leather', 'mid-century', '3-seater', 'tufted', 'living-room', 'office', 'brown', 'wood-legs', 'couch'],
     imageUrl: 'https://m.media-amazon.com/images/I/81CAfgZsDkL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/41fS2CZuTaL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81CAfgZsDkL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/517O0cESZyL._AC_SL1500_.jpg',
@@ -4233,6 +4238,7 @@ export const PRODUCT_CATALOG = [
     salePriceDisplay: '$225.24',
     compareAtPrice: 264.99,
     imageUrl: 'https://m.media-amazon.com/images/I/81djEzriMQL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/81uAmDDyxQL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81uAmDDyxQL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/81djEzriMQL._AC_SL1500_.jpg',
@@ -4298,7 +4304,7 @@ export const PRODUCT_CATALOG = [
     salePriceDisplay: '$460.27',
     compareAtPrice: 541.49,
     imageUrl: 'https://m.media-amazon.com/images/I/81kScgkBSXL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/81hTwFDlbnL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81hTwFDlbnL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/71drSySNm-L._AC_SL1500_.jpg',
@@ -4364,6 +4370,7 @@ export const PRODUCT_CATALOG = [
     salePriceDisplay: '$1,274.15',
     compareAtPrice: 1499.00,
     imageUrl: 'https://m.media-amazon.com/images/I/71XhFBHWGuL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/41snqJPyD2L._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71XhFBHWGuL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41tSQL4wC9L._AC_SL1500_.jpg',
@@ -4428,7 +4435,7 @@ export const PRODUCT_CATALOG = [
     salePriceDisplay: '$411.05',
     compareAtPrice: 483.59,
     imageUrl: 'https://m.media-amazon.com/images/I/61Ny2V6-iWL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/412QKZNbEfL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/61Ny2V6-iWL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41cVqTWisEL._AC_SL1500_.jpg',
@@ -4493,7 +4500,7 @@ export const PRODUCT_CATALOG = [
     salePriceDisplay: '$152.99',
     compareAtPrice: 179.99,
     imageUrl: 'https://m.media-amazon.com/images/I/41rRUhHrR9L._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/714xGcYJ3pL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/714xGcYJ3pL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41WUCVT3C-L._AC_SL1500_.jpg',
@@ -4558,7 +4565,7 @@ export const PRODUCT_CATALOG = [
     salePriceDisplay: '$339.99',
     compareAtPrice: 399.99,
     imageUrl: 'https://m.media-amazon.com/images/I/81xisi2mTrL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/41QlNiq3x1L._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81xisi2mTrL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41-8iUiMakL._AC_SL1500_.jpg',
@@ -4622,7 +4629,7 @@ export const PRODUCT_CATALOG = [
     price: 999.99,
     priceDisplay: '$999.99',
     imageUrl: 'https://m.media-amazon.com/images/I/91OzIjw5b7L._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/41l3L7AaG9L._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/91OzIjw5b7L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/31iGgsxOz1L._AC_SL1500_.jpg',
@@ -4685,7 +4692,7 @@ export const PRODUCT_CATALOG = [
     price: 214.99,
     priceDisplay: '$214.99',
     imageUrl: 'https://m.media-amazon.com/images/I/71ACVWqJ8xL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/416IgqLBI+L._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71ACVWqJ8xL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51MbaS13NJL._AC_SL1500_.jpg',
@@ -4748,6 +4755,7 @@ export const PRODUCT_CATALOG = [
     price: 199.99,
     priceDisplay: '$199.99',
     imageUrl: 'https://m.media-amazon.com/images/I/51GR0gBFsWL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/71iINUEWvDL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71iINUEWvDL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41Nsx3qMsoL._AC_SL1500_.jpg',
@@ -4812,6 +4820,7 @@ export const PRODUCT_CATALOG = [
     salePriceDisplay: '$199.99',
     compareAtPrice: 209.99,
     imageUrl: 'https://m.media-amazon.com/images/I/7140EQfeqIL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/41sWsjSqDHL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/7140EQfeqIL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41coAF4-TAL._AC_SL1500_.jpg',
@@ -4876,6 +4885,7 @@ export const PRODUCT_CATALOG = [
     salePriceDisplay: '$199.20',
     compareAtPrice: 249.00,
     imageUrl: 'https://m.media-amazon.com/images/I/91YmkGqzXzL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51qOYK6b6NL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/91YmkGqzXzL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51WAyba7TJL._AC_SL1500_.jpg',
@@ -5005,7 +5015,7 @@ export const PRODUCT_CATALOG = [
     salePriceDisplay: null,
     compareAtPrice: null,
     imageUrl: 'https://m.media-amazon.com/images/I/51QBC4H3BSL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51O8-ld7XCL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/51QBC4H3BSL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41f8aLN9WFL._AC_SL1500_.jpg',
@@ -5079,6 +5089,7 @@ export const PRODUCT_CATALOG = [
     description: 'Rustic solid cedar wood coffee table with angled metal U-shaped legs. Natural wood grain character adds warmth to farmhouse and industrial living rooms. Holds up to 300 lbs. Assembles in under 8 minutes.',
     tags: ['coffee-table', 'rustic', 'solid-wood', 'industrial', 'farmhouse', 'metal-legs', 'rectangle', 'natural-wood', 'living-room', 'minimalist'],
     imageUrl: 'https://m.media-amazon.com/images/I/81KyMXJRYbL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/514kqMPdmdL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81KyMXJRYbL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51+8sEuPNtL._AC_SL1500_.jpg',
@@ -5154,7 +5165,7 @@ export const PRODUCT_CATALOG = [
     description: 'Luxury 49.2" oval coffee table with scratch-resistant faux marble top and gray metal base. Elegant centerpiece for modern and glam living rooms. Compact enough for apartments and condos. Quick assembly.',
     tags: ['coffee-table', 'oval', 'faux-marble', 'metal-base', 'modern', 'luxury', 'glam', 'art-deco', 'scratch-resistant', 'living-room', 'contemporary'],
     imageUrl: 'https://m.media-amazon.com/images/I/81QvRec-KUL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/41BUKKa-41L._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81QvRec-KUL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/31fX974M7QL._AC_SL1500_.jpg',
@@ -5250,6 +5261,7 @@ export const PRODUCT_CATALOG = [
     description: 'Mid-century modern 31" round coffee table with a distinctive mushroom-shaped fluted pedestal base. MDF construction with walnut veneer. Ample surface for decor display. Suits living rooms, bedrooms, and offices.',
     tags: ['coffee-table', 'round', 'mid-century', 'fluted', 'pedestal', 'walnut', 'minimalist', 'living-room', 'circle', 'compact', 'apartment'],
     imageUrl: 'https://m.media-amazon.com/images/I/81cXFI3IhdL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51Hnaych7+L._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81cXFI3IhdL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41htzikHbLL._AC_SL1500_.jpg',
@@ -5345,6 +5357,7 @@ export const PRODUCT_CATALOG = [
     description: 'Premium fiberglass round coffee table with a realistic faux marble stone finish. Arrives fully assembled — no tools required. Waterproof and scratch-resistant surface. Non-slip foot pads and rounded edges for safety.',
     tags: ['coffee-table', 'round', 'faux-marble', 'minimalist', 'no-assembly', 'waterproof', 'scratch-resistant', 'living-room', 'bedroom', 'office', 'contemporary'],
     imageUrl: 'https://m.media-amazon.com/images/I/71LGcJuZawL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51EYmUEfI+L._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71LGcJuZawL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51jjXwW-oJL._AC_SL1500_.jpg',
@@ -5440,6 +5453,7 @@ export const PRODUCT_CATALOG = [
     description: 'Compact 31.5" round coffee table with a sculptural fluted drum base and warm rustic brown finish. 300 lb weight capacity, scratch-resistant surface. Versatile farmhouse-meets-mid-century style works in modern, boho, and Japandi interiors.',
     tags: ['coffee-table', 'round', 'farmhouse', 'mid-century', 'boho', 'fluted', 'drum-base', 'compact', 'apartment', 'living-room', 'japandi'],
     imageUrl: 'https://m.media-amazon.com/images/I/91GNG9cxVTL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51TTtucfk8L._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/91GNG9cxVTL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51QiRTlFGYL._AC_SL1500_.jpg',
@@ -5515,7 +5529,7 @@ export const PRODUCT_CATALOG = [
     description: '47.2" fully transparent tempered glass coffee table with sturdy metal legs. 0.4" thick tempered glass is scratch-resistant and durable. Anti-slip pads protect floors. Makes small rooms feel more open and refined.',
     tags: ['coffee-table', 'glass', 'tempered-glass', 'minimalist', 'metal-legs', 'transparent', 'modern', 'living-room', 'office', 'apartment', 'clear'],
     imageUrl: 'https://m.media-amazon.com/images/I/A1RjNSmX8JL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51mJY4zOGGL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/A1RjNSmX8JL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/21ACdBRiSVL._AC_SL1500_.jpg',
@@ -5569,7 +5583,7 @@ export const PRODUCT_CATALOG = [
     description: '46" round 2-tier coffee table with a striking U-shaped frame and warm oak finish. Upper tabletop for display, circular base for open storage. Dual-layer bracket for extra stability. Easy 5-panel assembly with all tools included.',
     tags: ['coffee-table', 'round', '2-tier', 'u-shaped', 'storage', 'oak', 'farmhouse', 'modern', 'living-room', 'low-profile', 'accent'],
     imageUrl: 'https://m.media-amazon.com/images/I/51-xYpgjP6L._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/91U3cro6wyL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/91U3cro6wyL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41ACbNNs76L._AC_SL1500_.jpg',
@@ -5894,7 +5908,7 @@ export const PRODUCT_CATALOG = [
     salePriceDisplay: '$110.49',
     compareAtPrice: 129.99,
     imageUrl: 'https://m.media-amazon.com/images/I/51-iJ4+RrqL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/81EcY2MhHDL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81EcY2MhHDL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/419EtEBBG9L._AC_SL1500_.jpg',
@@ -5967,6 +5981,7 @@ export const PRODUCT_CATALOG = [
     salePriceDisplay: '$169.43',
     compareAtPrice: 188.88,
     imageUrl: 'https://m.media-amazon.com/images/I/51jcV3hyniL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/71jrzAq2G2L._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71jrzAq2G2L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51eoizGQsUL._AC_SL1500_.jpg',
@@ -6032,6 +6047,7 @@ export const PRODUCT_CATALOG = [
     salePriceDisplay: null,
     compareAtPrice: null,
     imageUrl: 'https://m.media-amazon.com/images/I/71pvLZsDwdL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/4161sg2zJKL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71pvLZsDwdL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51lrO-LGQJL._AC_SL1500_.jpg',
@@ -6099,7 +6115,7 @@ export const PRODUCT_CATALOG = [
     salePriceDisplay: '$189.99',
     compareAtPrice: 209.99,
     imageUrl: 'https://m.media-amazon.com/images/I/81vsebgeLnL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51KEMUlVTaL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81vsebgeLnL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41v8CFG9lqL._AC_SL1500_.jpg',
@@ -6164,6 +6180,7 @@ export const PRODUCT_CATALOG = [
     salePriceDisplay: null,
     compareAtPrice: null,
     imageUrl: 'https://m.media-amazon.com/images/I/61puFhk5zkL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/41Y5GTs4I-L._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/61puFhk5zkL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41IzVrgC+fL._AC_SL1500_.jpg',
@@ -6230,6 +6247,7 @@ export const PRODUCT_CATALOG = [
     salePriceDisplay: '$104.30',
     compareAtPrice: 125.99,
     imageUrl: 'https://m.media-amazon.com/images/I/51lEYDLJvSL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/81Ivz+nqaXL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81Ivz+nqaXL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/519qPgpQ7CL._AC_SL1500_.jpg',
@@ -6301,6 +6319,7 @@ export const PRODUCT_CATALOG = [
     salePriceDisplay: null,
     compareAtPrice: null,
     imageUrl: 'https://m.media-amazon.com/images/I/512AhfNQ6ML._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/81v1iFhXr9L._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81v1iFhXr9L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/512AhfNQ6ML._AC_SL1500_.jpg',
@@ -7883,6 +7902,7 @@ export const PRODUCT_CATALOG = [
     salePriceDisplay: null,
     compareAtPrice: null,
     imageUrl: 'https://m.media-amazon.com/images/I/81WTj4Y-kbL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/41SwQiauHbL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81WTj4Y-kbL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41jQeOrC9qL._AC_SL1500_.jpg',
@@ -7947,7 +7967,7 @@ export const PRODUCT_CATALOG = [
     salePriceDisplay: '$350.99',
     compareAtPrice: 389.99,
     imageUrl: 'https://m.media-amazon.com/images/I/81cmOSWBzHL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/41UZzwdtdpL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81cmOSWBzHL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51H8cqO36gL._AC_SL1500_.jpg',
@@ -8013,7 +8033,7 @@ export const PRODUCT_CATALOG = [
     salePriceDisplay: '$331.49',
     compareAtPrice: 389.99,
     imageUrl: 'https://m.media-amazon.com/images/I/71ffnxrvQbL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51DSHDCjXXL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71ffnxrvQbL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51NF0bSGphL._AC_SL1500_.jpg',
@@ -8081,7 +8101,7 @@ export const PRODUCT_CATALOG = [
     salePriceDisplay: null,
     compareAtPrice: null,
     imageUrl: 'https://m.media-amazon.com/images/I/51KGhtxE95L._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/81sCy-vfXuL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81sCy-vfXuL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41RdndGJogL._AC_SL1500_.jpg',
@@ -8144,7 +8164,7 @@ export const PRODUCT_CATALOG = [
     salePriceDisplay: '$322.99',
     compareAtPrice: 379.99,
     imageUrl: 'https://m.media-amazon.com/images/I/81w1oE9QQoL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/41WRlMN45cL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81w1oE9QQoL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/417BSFXr1LL._AC_SL1500_.jpg',
@@ -8211,7 +8231,7 @@ export const PRODUCT_CATALOG = [
     salePriceDisplay: '$269.99',
     compareAtPrice: 339.99,
     imageUrl: 'https://m.media-amazon.com/images/I/91dHCdKBm4L._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/41RKz631huL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/91dHCdKBm4L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/519CpI23q1L._AC_SL1500_.jpg',
@@ -8279,7 +8299,7 @@ export const PRODUCT_CATALOG = [
     salePriceDisplay: null,
     compareAtPrice: null,
     imageUrl: 'https://m.media-amazon.com/images/I/71FdmrK2+gL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/41vpFRdpr-L._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71FdmrK2+gL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41LxMDTHkRL._AC_SL1500_.jpg',
@@ -8349,6 +8369,7 @@ export const PRODUCT_CATALOG = [
     salePriceDisplay: null,
     compareAtPrice: null,
     imageUrl: 'https://m.media-amazon.com/images/I/81ZKXPsaEbL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/41Bja+42JIL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81ZKXPsaEbL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41gyutT4riL._AC_SL1500_.jpg',
@@ -8414,7 +8435,7 @@ export const PRODUCT_CATALOG = [
     salePriceDisplay: '$319.99',
     compareAtPrice: 339.99,
     imageUrl: 'https://m.media-amazon.com/images/I/81Mb07tGu5L._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/41ReWMVRlaL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81Mb07tGu5L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41rc96FfuVL._AC_SL1500_.jpg',
@@ -8556,6 +8577,7 @@ export const PRODUCT_CATALOG = [
     salePriceDisplay: null,
     compareAtPrice: null,
     imageUrl: 'https://m.media-amazon.com/images/I/812HY0oOwDL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51yW88HSYsL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/812HY0oOwDL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51X3kyjld9L._AC_SL1500_.jpg',
@@ -8621,7 +8643,7 @@ export const PRODUCT_CATALOG = [
     salePriceDisplay: null,
     compareAtPrice: null,
     imageUrl: 'https://m.media-amazon.com/images/I/81F0+qm4+5L._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51T1BASwqGL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81F0+qm4+5L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51lzY1KBmfL._AC_SL1500_.jpg',
@@ -8692,7 +8714,7 @@ export const PRODUCT_CATALOG = [
     salePriceDisplay: '$1,429.99',
     compareAtPrice: 1599.99,
     imageUrl: 'https://m.media-amazon.com/images/I/615XyqiskqL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/41JKI7n4dGL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/615XyqiskqL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41ByonuqvSL._AC_SL1500_.jpg',
@@ -8758,7 +8780,7 @@ export const PRODUCT_CATALOG = [
     salePriceDisplay: null,
     compareAtPrice: null,
     imageUrl: 'https://m.media-amazon.com/images/I/91jeA7ek1aL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51T0wB6aBoL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/91jeA7ek1aL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51DoQLnVONL._AC_SL1500_.jpg',
@@ -8828,6 +8850,7 @@ export const PRODUCT_CATALOG = [
     salePriceDisplay: null,
     compareAtPrice: null,
     imageUrl: 'https://m.media-amazon.com/images/I/41kX3jZwFgL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/61RA4CfPDZL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/61RA4CfPDZL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41togjDVXPL._AC_SL1500_.jpg',
@@ -8889,6 +8912,7 @@ export const PRODUCT_CATALOG = [
     salePriceDisplay: null,
     compareAtPrice: null,
     imageUrl: 'https://m.media-amazon.com/images/I/61e0AXpN-QL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/31WqLa+JZTL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/61e0AXpN-QL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/31xBv070tEL._AC_SL1500_.jpg',
@@ -8949,6 +8973,7 @@ export const PRODUCT_CATALOG = [
     salePriceDisplay: null,
     compareAtPrice: null,
     imageUrl: 'https://m.media-amazon.com/images/I/41B-BcpZGwL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/71-NW3rLzNL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71-NW3rLzNL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41jCY+9uKSL._AC_SL1500_.jpg',
@@ -9024,7 +9049,7 @@ export const PRODUCT_CATALOG = [
     description: 'Handcrafted ceramic table lamp fired at 1300°C for a unique translucent finish. Fully dimmable (0–100%) with included 4W E12 bulb. Minimalist 9.5"H × 5.6"W form fits any nightstand or side table.',
     tags: ['ceramic', 'table-lamp', 'dimmable', 'bedside', 'minimalist', 'modern', 'handmade', 'translucent', 'nightstand', 'ambient'],
     imageUrl: 'https://m.media-amazon.com/images/I/71K5zrQ22KL._AC_SX679_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/412CO7pLczL._AC_SX679_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71K5zrQ22KL._AC_SX679_.jpg',
       'https://m.media-amazon.com/images/I/41PCZmrdeLL._AC_SX679_.jpg',
@@ -9131,6 +9156,7 @@ export const PRODUCT_CATALOG = [
     description: 'Mid-century standing lamp with dual E26 sockets and white drum shade. Each pull-chain controls one bulb independently. Includes two 9W LED bulbs with 3 color temps (3000K/4500K/6500K), foot switch, and memory function.',
     tags: ['floor-lamp', 'mid-century', 'standing-lamp', 'dimmable', 'fabric-shade', 'dual-bulb', '3-color-temperature', 'drum-shade', 'living-room', 'bedroom'],
     imageUrl: 'https://m.media-amazon.com/images/I/41CzOXDDDkL._AC_SX679_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/81KF7CMufSL._AC_SX679_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81KF7CMufSL._AC_SX679_.jpg',
       'https://m.media-amazon.com/images/I/41CzOXDDDkL._AC_SX679_.jpg',
@@ -9218,6 +9244,7 @@ export const PRODUCT_CATALOG = [
     description: 'Set of 2 ceramic table lamps at 23" tall. Scratch- and fade-resistant finish, 60W max E26 socket. Pairs beautifully on matching nightstands or end tables. Available in 12 colors.',
     tags: ['ceramic', 'table-lamp', 'set-of-2', 'bedside', 'farmhouse', 'minimalist', 'modern', 'nightstand', 'living-room', 'bedroom', 'pair'],
     imageUrl: 'https://m.media-amazon.com/images/I/51wxAGBQaPL._AC_SX679_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/710mJWK3xzL._AC_SX679_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/710mJWK3xzL._AC_SX679_.jpg',
       'https://m.media-amazon.com/images/I/51Ji9EDHVUL._AC_SX679_.jpg',
@@ -9394,6 +9421,7 @@ export const PRODUCT_CATALOG = [
     description: 'Arc floor lamp with heavy marble base and polished metal body. 360° rotatable arm and 180° tiltable head. Height adjusts 67"–77". Hollow lampshade casts dramatic ceiling light patterns. Foot switch on cord.',
     tags: ['floor-lamp', 'arc', 'marble-base', 'adjustable-height', 'rotatable', 'industrial', 'reading-lamp', 'living-room', 'bedroom', 'hollow-shade'],
     imageUrl: 'https://m.media-amazon.com/images/I/81lWLX9tUPL._AC_SX679_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51-FMhNJOcL._AC_SX679_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81lWLX9tUPL._AC_SX679_.jpg',
       'https://m.media-amazon.com/images/I/41oEyWMKOeL._AC_SX679_.jpg',
@@ -9480,6 +9508,7 @@ export const PRODUCT_CATALOG = [
     description: '65" arc floor lamp with solid walnut wood base and linen shade. 1200lm LED bulb included (3000K). 3-level foot-switch dimming, 90° vertical and 350° horizontal lamp head adjustment.',
     tags: ['floor-lamp', 'arc', 'wood-base', 'walnut', 'mid-century', 'dimmable', 'linen-shade', 'adjustable', 'living-room', 'bedroom', 'led-included'],
     imageUrl: 'https://m.media-amazon.com/images/I/61Qrh99aH2L._AC_SX679_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/41m5vPexliL._AC_SX679_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/61Qrh99aH2L._AC_SX679_.jpg',
       'https://m.media-amazon.com/images/I/41ROiWiiotL._AC_SX679_.jpg',
@@ -9555,6 +9584,7 @@ export const PRODUCT_CATALOG = [
     description: '24" vintage ceramic table lamp with natural textured finish and linen shade. 5ft cord, E26 socket, 60W max. Works as both ambient lighting and decorative accent. Available in 9 earthy colorways.',
     tags: ['ceramic', 'table-lamp', 'farmhouse', 'rustic', 'vintage', 'bedside', 'linen-shade', 'textured', 'nightstand', 'bedroom', 'boho'],
     imageUrl: 'https://m.media-amazon.com/images/I/71BEOsgyNGL._AC_SX679_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/41t09picB+L._AC_SX679_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71BEOsgyNGL._AC_SX679_.jpg',
       'https://m.media-amazon.com/images/I/41Ka+nX7RoL._AC_SX679_.jpg',
@@ -9875,6 +9905,7 @@ export const PRODUCT_CATALOG = [
     description: '24.5" mid-century modern table lamp with a warm brown espresso bronze metal base and tan fabric cylinder shade. E26 socket, compatible with standard and LED bulbs. Designed exclusively by Lamps Plus for 360 Lighting.',
     tags: ['table-lamp', 'mid-century', 'contemporary', 'transitional', 'bronze', 'espresso', 'metal', 'tan', 'cylinder-shade', 'bedroom', 'living-room', 'nightstand'],
     imageUrl: 'https://m.media-amazon.com/images/I/51AfIGjtCyL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/61vF-iPdYGL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/61vF-iPdYGL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/315mjT9IL6L._AC_SL1500_.jpg',
@@ -10016,6 +10047,7 @@ export const PRODUCT_CATALOG = [
     description: '18.3" dimmable modern table lamp with a smooth solid walnut wood base and beige linen shade. UL listed, compatible with standard E26 bulbs. Clean Japandi-inspired silhouette for bedrooms, nightstands, and office desks.',
     tags: ['table-lamp', 'modern', 'minimalist', 'japandi', 'contemporary', 'walnut', 'wood', 'linen-shade', 'dimmable', 'bedroom', 'nightstand', 'office'],
     imageUrl: 'https://m.media-amazon.com/images/I/6130H4TJYzL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/41mtKRi2tRL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/6130H4TJYzL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/415zbMt9ieL._AC_SL1500_.jpg',
@@ -10129,6 +10161,7 @@ export const PRODUCT_CATALOG = [
     description: 'Three-light floor lamp with natural wood base, satin steel accents, and crinkle paper shade. Foot switch cycles through 1, 2, or all 3 bulbs for flexible dimming. Smart outlet compatible. 60" cord.',
     tags: ['floor-lamp', 'three-light', 'wood-base', 'transitional', 'dimmable', 'paper-shade', 'smart-outlet', 'living-room', 'corner-lamp', 'reading-lamp'],
     imageUrl: 'https://m.media-amazon.com/images/I/71-5SAueIbL._AC_SX679_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51HQVotoSbL._AC_SX679_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71-5SAueIbL._AC_SX679_.jpg',
       'https://m.media-amazon.com/images/I/3148dBjqqCL._AC_SX679_.jpg',
@@ -10206,7 +10239,7 @@ export const PRODUCT_CATALOG = [
     description: 'Chic 75" arc floor lamp with a 9" globe shade and genuine natural marble base. 360° adjustable head sits over sofas or reading chairs. Includes 9W 800-lumen 3000K warm LED bulb. Smart home compatible. Backed by a 3-year Brightech warranty.',
     tags: ['floor-lamp', 'arc', 'marble-base', 'globe-shade', 'boho', 'mid-century', 'art-deco', 'smart-compatible', 'led-included', 'living-room', 'reading-lamp'],
     imageUrl: 'https://m.media-amazon.com/images/I/81gE2gWvK+L._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/41CKtYxhUVL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81gE2gWvK+L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41he2BbctnL._AC_SL1500_.jpg',
@@ -10283,6 +10316,7 @@ export const PRODUCT_CATALOG = [
     description: 'Vintage-industrial floor lamp with a unique natural marble base and adjustable height (47"–55"). Built-in 12W LED (1050 lumens, 50,000hr lifespan) with 3 color temps (3000K/5000K/7000K) and inline dimmer switch. Adjustable lamp head angle for reading or ambient light.',
     tags: ['floor-lamp', 'led', 'dimmable', 'marble-base', 'industrial', 'vintage', 'adjustable-height', 'reading-lamp', 'bedroom', 'living-room', '3-color-temp'],
     imageUrl: 'https://m.media-amazon.com/images/I/81GSfi9KHUL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/41MWfEfIQaL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81GSfi9KHUL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51PmpqIQM9L._AC_SL1500_.jpg',
@@ -10363,6 +10397,7 @@ export const PRODUCT_CATALOG = [
     description: '47" round dining table with two-part MDF + engineered wood strip base in walnut finish. Includes 4 barrel-shaped upholstered chairs with curved backrest, armrests, and high-density foam seats. Water-resistant sealed top.',
     tags: ['dining-table', 'dining-set', 'round-table', 'barrel-chairs', 'walnut', 'rustic', 'mid-century', 'upholstered', 'set-of-4', 'dining-room'],
     imageUrl: 'https://m.media-amazon.com/images/I/91KK0DW3SoL._AC_SX679_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51Hu8iaWLUL._AC_SX679_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/91KK0DW3SoL._AC_SX679_.jpg',
       'https://m.media-amazon.com/images/I/51t8vUo-wyL._AC_SX679_.jpg',
@@ -10439,6 +10474,7 @@ export const PRODUCT_CATALOG = [
     description: '47" round dining table with 1.38" thick engineered wood top and sculptural fan-shaped base. Seats 4. Includes 4 boucle-upholstered chairs with high-density foam. Available in Brown, Natural, and Grey table finishes with multiple chair fabric options.',
     tags: ['dining-table', 'dining-set', 'round-table', 'boucle', 'fanned-base', 'farmhouse', 'mid-century', 'upholstered', 'set-of-4', 'dining-room'],
     imageUrl: 'https://m.media-amazon.com/images/I/81W59x-P3QL._AC_SX679_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51p9AjH6QmL._AC_SX679_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81W59x-P3QL._AC_SX679_.jpg',
       'https://m.media-amazon.com/images/I/51H1n3Vq5CL._AC_SX679_.jpg',
@@ -10576,6 +10612,7 @@ export const PRODUCT_CATALOG = [
     description: '43.3" round dining table with built-in 2-tier storage shelf, seats 4–6. Scratch-resistant waterproof top. Includes 4 PU leather upholstered chairs — spill-resistant and easy to clean. Ideal for apartments and small dining rooms.',
     tags: ['dining-table', 'dining-set', 'round-table', 'small-space', 'storage-shelf', 'pu-leather', 'farmhouse', 'mid-century', 'set-of-4', 'apartment', 'dining-room'],
     imageUrl: 'https://m.media-amazon.com/images/I/810k5DLdgaL._AC_SX679_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51cW80IHTSL._AC_SX679_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/810k5DLdgaL._AC_SX679_.jpg',
       'https://m.media-amazon.com/images/I/513knnaHxYL._AC_SX679_.jpg',
@@ -10696,7 +10733,7 @@ export const PRODUCT_CATALOG = [
     description: '72" Japandi-style kitchen island with integrated LED ambient lighting, smooth-gliding drawers, wine rack, and deep cabinet storage. Engineered wood frame. Works as prep station, serving buffet, or extra counter space.',
     tags: ['kitchen-island', 'japandi', 'led-lighting', 'wine-rack', 'storage', 'minimalist', 'modern', 'kitchen', 'prep-station', 'countertop'],
     imageUrl: 'https://m.media-amazon.com/images/I/81Q7cYZLPVL._AC_SX679_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51hRLhMJ5dL._AC_SX679_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81Q7cYZLPVL._AC_SX679_.jpg',
       'https://m.media-amazon.com/images/I/41gH+G+t3rL._AC_SX679_.jpg',
@@ -10782,6 +10819,7 @@ export const PRODUCT_CATALOG = [
     description: '71" modern kitchen island with premium sintered stone countertop — scratch, heat, and stain resistant with 10+ year durability. Features 3 drawers, 3 cabinet doors, and 5 open shelves in a sleek white finish.',
     tags: ['kitchen-island', 'modern', 'minimalist', 'sintered-stone', 'white', 'storage', 'drawers', 'contemporary'],
     imageUrl: 'https://m.media-amazon.com/images/I/7105EtMd1dL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/41jJxDFIskL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/7105EtMd1dL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41GUtZi4lBL._AC_SL1500_.jpg',
@@ -10876,7 +10914,7 @@ export const PRODUCT_CATALOG = [
     description: '50" Japandi kitchen island in sophisticated gray with integrated LED ambient lighting, built-in wine rack, smooth-glide drawers, and open shelving. The perfect compact modern prep station for contemporary kitchens.',
     tags: ['kitchen-island', 'japandi', 'minimalist', 'modern', 'led-lighting', 'wine-rack', 'gray', 'storage', 'compact'],
     imageUrl: 'https://m.media-amazon.com/images/I/71pTboCEZBL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/41HmHF79XnL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71pTboCEZBL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41cFhv8kJML._AC_SL1500_.jpg',
@@ -11033,7 +11071,7 @@ export const PRODUCT_CATALOG = [
     description: 'Solid hardwood kitchen island with warm butcher block top and contrasting black frame. Generous prep surface and open shelving that bridges modern and rustic styles in any kitchen.',
     tags: ['kitchen-island', 'butcher-block', 'natural-wood', 'transitional', 'rustic', 'contemporary', 'black', 'hardwood'],
     imageUrl: 'https://m.media-amazon.com/images/I/51mcll1LnIL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/819isHP6A4L._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/819isHP6A4L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41x69-vO5dL._AC_SL1500_.jpg',
@@ -11255,7 +11293,7 @@ export const PRODUCT_CATALOG = [
     description: '72" modern kitchen island with 4 chairs included — stainless steel and laminate construction with 3 smooth-glide drawers and 5 open shelves. A complete all-in-one dining and prep solution for open-plan kitchens.',
     tags: ['kitchen-island', 'modern', 'contemporary', 'seating', 'chairs', 'stainless-steel', 'storage', 'drawers', 'dining'],
     imageUrl: 'https://m.media-amazon.com/images/I/71svg0hZGIL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/417T0A+paqL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71svg0hZGIL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41kON+bUWUL._AC_SL1500_.jpg',
@@ -11311,7 +11349,7 @@ export const PRODUCT_CATALOG = [
     description: 'Bold 81"–106" extendable kitchen island in matte black with a sleek marble-pattern veneer top. Expands to fit any kitchen or entertaining setup — 3 drawers, 3 cabinet doors, and 5 open shelves.',
     tags: ['kitchen-island', 'modern', 'contemporary', 'minimalist', 'black', 'marble-effect', 'extendable', 'storage', 'bold'],
     imageUrl: 'https://m.media-amazon.com/images/I/61k-uDGTwYL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/514XtV00AXL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/61k-uDGTwYL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/4187cFEfeJL._AC_SL1500_.jpg',
@@ -11366,7 +11404,7 @@ export const PRODUCT_CATALOG = [
     description: '50" compact modern kitchen island with an upscale marble-effect engineered wood top. Drawers, cabinet doors, and open shelves in a sleek white finish — ideal for apartments and contemporary kitchens.',
     tags: ['kitchen-island', 'modern', 'contemporary', 'minimalist', 'white', 'marble-effect', 'compact', 'storage', 'drawers'],
     imageUrl: 'https://m.media-amazon.com/images/I/71oMij2BFxL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/415QU6fDqmL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71oMij2BFxL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/3158vWBmEAL._AC_SL1500_.jpg',
@@ -11421,7 +11459,7 @@ export const PRODUCT_CATALOG = [
     description: '47" round farmhouse dining table with scratch-resistant walnut veneer MDF top and slim wood-strip base. Comes with 4 or 6 beige fabric upholstered chairs featuring ergonomic lumbar support and walnut-grain metal X-legs.',
     tags: ['dining-table', 'dining-set', 'round-table', 'farmhouse', 'walnut', 'upholstered', 'beige', 'set-of-6', 'dining-room', 'small-space'],
     imageUrl: 'https://m.media-amazon.com/images/I/91f5pWUrIYL._AC_SX679_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51iy+SF6hJL._AC_SX679_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/91f5pWUrIYL._AC_SX679_.jpg',
       'https://m.media-amazon.com/images/I/41lYr5fbb1L._AC_SX679_.jpg',
@@ -11498,7 +11536,7 @@ export const PRODUCT_CATALOG = [
     description: '7-piece dining set with 59" scratch-resistant engineered wood table and 6 PU leather cushioned chairs. Reinforced metal frame. Chairs tuck fully under the table for space-saving storage. Assembles in 20 minutes.',
     tags: ['dining-table', 'dining-set', 'rectangular-table', 'pu-leather', 'modern', 'set-of-6', 'space-saving', 'dining-room', 'office', 'conference'],
     imageUrl: 'https://m.media-amazon.com/images/I/81vN+moAdIL._AC_SX679_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51Vjd-ISuWL._AC_SX679_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81vN+moAdIL._AC_SX679_.jpg',
       'https://m.media-amazon.com/images/I/41s46v3tFXL._AC_SX679_.jpg',
@@ -11596,7 +11634,7 @@ export const PRODUCT_CATALOG = [
     description: 'Unique 5-piece farmhouse dining set with 47" round wood table, 2 loveseats, 1 corner connector, and 2 armchairs. Seats 4–6. Converts a breakfast nook into a stylish dining-lounge hybrid. Adjustable felt pads on all legs.',
     tags: ['dining-table', 'dining-set', 'round-table', 'loveseat', 'farmhouse', 'rustic', 'conversational', 'breakfast-nook', 'set-of-4', 'dining-room', 'small-space'],
     imageUrl: 'https://m.media-amazon.com/images/I/91Y3EGktwiL._AC_SX679_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51CaTGP5cvL._AC_SX679_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/91Y3EGktwiL._AC_SX679_.jpg',
       'https://m.media-amazon.com/images/I/41WkwdZfY3L._AC_SX679_.jpg',
@@ -11683,6 +11721,7 @@ export const PRODUCT_CATALOG = [
     description: '63" rectangular farmhouse dining table with 1.8" thick crack-resistant MDF top and U-shaped base. Includes 6 upholstered chairs with high-density foam. Available in fabric suede, linen, and PU leather chair options across two table styles.',
     tags: ['dining-table', 'dining-set', 'rectangular-table', 'farmhouse', 'mid-century', 'upholstered', 'set-of-6', 'u-shape', 'dining-room', 'suede', 'linen'],
     imageUrl: 'https://m.media-amazon.com/images/I/71i9VXH61rL._AC_SX679_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51sUXylaQAL._AC_SX679_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71i9VXH61rL._AC_SX679_.jpg',
       'https://m.media-amazon.com/images/I/51R42T0xckL._AC_SX679_.jpg',
@@ -11799,7 +11838,7 @@ export const PRODUCT_CATALOG = [
     description: '59" round dining table with eco-friendly plywood top in fine wood grain and faux leather-wrapped T-shaped base. Seats 4–8. Minimalist design integrates seamlessly into contemporary, Scandinavian, or traditional interiors. Table only.',
     tags: ['dining-table', 'round-table', 'faux-leather', 'wood-grain', 'modern', 'minimalist', 'scandinavian', 'dining-room', 'table-only', 'seats-6'],
     imageUrl: 'https://m.media-amazon.com/images/I/91ZA2Ys4NKL._AC_SX679_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51rFVVF32OL._AC_SX679_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/91ZA2Ys4NKL._AC_SX679_.jpg',
       'https://m.media-amazon.com/images/I/313x48GsuWL._AC_SX679_.jpg',
@@ -11868,6 +11907,7 @@ export const PRODUCT_CATALOG = [
     description: 'Industrial-style acacia wood dining table with a teak finish and rustic metal frame. The natural acacia grain pairs with dark iron legs for a raw, workshop aesthetic. Compact footprint suits apartments and small dining spaces.',
     tags: ['dining-table', 'industrial', 'rustic', 'acacia', 'teak', 'metal-legs', 'table-only', 'dining-room', 'small-space'],
     imageUrl: 'https://m.media-amazon.com/images/I/81vA-p3tCQL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/71BLNgp30YL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71BLNgp30YL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/81vA-p3tCQL._AC_SL1500_.jpg',
@@ -11938,6 +11978,7 @@ export const PRODUCT_CATALOG = [
     description: '55" rectangular dining table with an MDF wood-grain top and sleek metal legs. Seats 4–6 comfortably. The clean-lined silhouette suits modern apartments, dining rooms, and living spaces. Budget-friendly with premium aesthetics.',
     tags: ['dining-table', 'modern', 'minimalist', 'mdf', 'metal-legs', 'rectangular', 'seats-6', 'dining-room', 'table-only', 'budget'],
     imageUrl: 'https://m.media-amazon.com/images/I/919xWWsO09L._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/81I+TtnU2ZL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81I+TtnU2ZL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/91fO95aPFXL._AC_SL1500_.jpg',
@@ -12020,6 +12061,7 @@ export const PRODUCT_CATALOG = [
     description: '55" solid wood dining table with angled metal legs in a refined industrial style. Features a thick wood top with a smooth finish and a sturdy welded steel frame. Seats 4–6 people. Multiple finish options available.',
     tags: ['dining-table', 'modern', 'industrial', 'solid-wood', 'metal-legs', 'rectangular', 'seats-6', 'dining-room', 'table-only'],
     imageUrl: 'https://m.media-amazon.com/images/I/51sIMgT5k1L._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/81aSWe0UGzL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81aSWe0UGzL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51sIMgT5k1L._AC_SL1500_.jpg',
@@ -12102,6 +12144,7 @@ export const PRODUCT_CATALOG = [
     description: '42" round dining table with a built-in lower storage shelf. The circular top seats 4 comfortably and the shelf keeps dining essentials organized. Metal legs with a powder-coat finish and a rustic wood-grain top make it perfect for farmhouse or industrial interiors.',
     tags: ['dining-table', 'round-table', 'storage-shelf', 'farmhouse', 'rustic', 'industrial', 'seats-4', 'dining-room', 'table-only', 'budget'],
     imageUrl: 'https://m.media-amazon.com/images/I/91cBVDAdPAL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/5125wDbXh7L._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/91cBVDAdPAL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51mFI7j9Q+L._AC_SL1500_.jpg',
@@ -12269,6 +12312,7 @@ export const PRODUCT_CATALOG = [
     description: '63" rectangular dining table with a 10mm tempered glass top and sculptural black MDF trapezoid legs. The transparent surface keeps rooms feeling open and airy while the bold angular base creates visual drama. Seats 4–6.',
     tags: ['dining-table', 'glass-top', 'modern', 'minimalist', 'art-deco', 'tempered-glass', 'rectangular', 'seats-6', 'dining-room', 'table-only'],
     imageUrl: 'https://m.media-amazon.com/images/I/81MzYHZEmKL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/41CcWOF0Q8L._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81MzYHZEmKL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51bRNcn+9QL._AC_SL1500_.jpg',
@@ -12341,6 +12385,7 @@ export const PRODUCT_CATALOG = [
     description: '63" rectangular dining table with a polished PDLB sintered stone marble-look top and a matte black OC design base. The luxurious veined surface pairs with the geometric base to create a bold, gallery-worthy statement for 4–6 diners.',
     tags: ['dining-table', 'marble-top', 'glam', 'art-deco', 'modern', 'luxury', 'rectangular', 'seats-6', 'dining-room', 'table-only', 'sintered-stone'],
     imageUrl: 'https://m.media-amazon.com/images/I/51X6d40jxQL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/71M4nyEvobL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71M4nyEvobL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51X6d40jxQL._AC_SL1500_.jpg',
@@ -12423,6 +12468,7 @@ export const PRODUCT_CATALOG = [
     description: 'Round extendable dining table set including 4 matching chairs in a warm natural wood wash. The extension leaf adds seating capacity for guests. Scandinavian-inspired tapered legs and a clean silhouette make this a versatile centerpiece for any dining room.',
     tags: ['dining-table', 'dining-set', 'round-table', 'extendable', 'scandinavian', 'japandi', 'natural-wood', 'set-of-4', 'chairs-included', 'dining-room'],
     imageUrl: 'https://m.media-amazon.com/images/I/81sqpZaT7AL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51s35vEMH5L._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81sqpZaT7AL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51rrwmWV0yL._AC_SL1500_.jpg',
@@ -12497,7 +12543,7 @@ export const PRODUCT_CATALOG = [
     description: 'Set of 4 barrel-shaped swivel dining chairs with 360° rotation and sculptural round pedestal base. 250 lb weight capacity. Available in Brown Faux Leather, Black Boucle, Khaki Velvet, and White Velvet. Armless design.',
     tags: ['dining-chair', 'swivel-chair', 'barrel-chair', 'mid-century', 'set-of-4', 'upholstered', 'round-base', 'dining-room', 'accent-chair', '360-swivel'],
     imageUrl: 'https://m.media-amazon.com/images/I/81dvuPJ1lkL._AC_SX679_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/41s4g4dySQL._AC_SX679_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81dvuPJ1lkL._AC_SX679_.jpg',
       'https://m.media-amazon.com/images/I/413CoN1a5FL._AC_SX679_.jpg',
@@ -12594,6 +12640,7 @@ export const PRODUCT_CATALOG = [
     description: 'Set of 6 armless wingback dining chairs with soft linen upholstery and high-density foam cushion. Solid wood legs with brushed retro finish. Ergonomic slightly-tilted backrest supports lumbar. 250 lb capacity. Floor-protecting leg pads.',
     tags: ['dining-chair', 'wingback', 'linen', 'farmhouse', 'mid-century', 'set-of-6', 'solid-wood', 'armless', 'dining-room', 'upholstered'],
     imageUrl: 'https://m.media-amazon.com/images/I/71zA1wc-MPL._AC_SX679_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51QWeKcCjmL._AC_SX679_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71zA1wc-MPL._AC_SX679_.jpg',
       'https://m.media-amazon.com/images/I/41e1KELR4+L._AC_SX679_.jpg',
@@ -12669,7 +12716,7 @@ export const PRODUCT_CATALOG = [
     brand: 'VASAGLE',
     price: 31.99, priceDisplay: '$31.99',
     imageUrl: 'https://m.media-amazon.com/images/I/71MbBfkBDNL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/71A-+JRUMfL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71A-+JRUMfL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/71s4Mv7aQRL._AC_SL1500_.jpg',
@@ -12713,6 +12760,7 @@ export const PRODUCT_CATALOG = [
     brand: 'VASAGLE',
     price: 33.99, priceDisplay: '$33.99',
     imageUrl: 'https://m.media-amazon.com/images/I/71MbBfkBDNL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/71A-+JRUMfL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71A-+JRUMfL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/71MbBfkBDNL._AC_SL1500_.jpg',
@@ -12760,6 +12808,7 @@ export const PRODUCT_CATALOG = [
     brand: 'Leick Home',
     price: 129.31, priceDisplay: '$129.31',
     imageUrl: 'https://m.media-amazon.com/images/I/81lQpxJ8x3L._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/61Sg2HumliL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81lQpxJ8x3L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/611PMgMcVYL._AC_SL1500_.jpg',
@@ -12799,6 +12848,7 @@ export const PRODUCT_CATALOG = [
     brand: 'Signature Design by Ashley',
     price: 119.99, priceDisplay: '$119.99',
     imageUrl: 'https://m.media-amazon.com/images/I/61GNlyH4NIL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/71TJGcVCffL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/61GNlyH4NIL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/71TJGcVCffL._AC_SL1500_.jpg',
@@ -12837,6 +12887,7 @@ export const PRODUCT_CATALOG = [
     brand: 'Signature Design by Ashley',
     price: 167.14, priceDisplay: '$167.14',
     imageUrl: 'https://m.media-amazon.com/images/I/71a9pepOkbL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/710KorWG5ZL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71a9pepOkbL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/619AEkOzUVL._AC_SL1500_.jpg',
@@ -12876,6 +12927,7 @@ export const PRODUCT_CATALOG = [
     brand: 'Convenience Concepts',
     price: 43.40, priceDisplay: '$43.40',
     imageUrl: 'https://m.media-amazon.com/images/I/41tH566RvQL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/41UKKKa1Z4L._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/41tH566RvQL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41UKKKa1Z4L._AC_SL1500_.jpg',
@@ -12913,6 +12965,7 @@ export const PRODUCT_CATALOG = [
     brand: 'Tribesigns',
     price: 75.99, priceDisplay: '$75.99',
     imageUrl: 'https://m.media-amazon.com/images/I/8119H4R9yCL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/81ut1Qt8JXL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81ut1Qt8JXL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/8119H4R9yCL._AC_SL1500_.jpg',
@@ -12962,6 +13015,7 @@ export const PRODUCT_CATALOG = [
     brand: 'Bme',
     price: 118.00, priceDisplay: '$118.00',
     imageUrl: 'https://m.media-amazon.com/images/I/8119H4R9yCL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/81ut1Qt8JXL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81ut1Qt8JXL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/8119H4R9yCL._AC_SL1500_.jpg',
@@ -13017,6 +13071,7 @@ export const PRODUCT_CATALOG = [
     brand: 'Artmaze',
     price: 179.99, priceDisplay: '$179.99',
     imageUrl: 'https://m.media-amazon.com/images/I/81bGkrF0WdL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/61b5jWE5kfL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/61b5jWE5kfL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/71YgXFV53gL._AC_SL1500_.jpg',
@@ -13066,7 +13121,7 @@ export const PRODUCT_CATALOG = [
     brand: 'Yaheetech',
     price: 33.99, priceDisplay: '$33.99',
     imageUrl: 'https://m.media-amazon.com/images/I/816a41CR8wL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/81MEgCcLo7L._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/816a41CR8wL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/81SIII5D9gL._AC_SL1500_.jpg',
@@ -13108,6 +13163,7 @@ export const PRODUCT_CATALOG = [
     brand: 'danpinera',
     price: 25.49, priceDisplay: '$25.49',
     imageUrl: 'https://m.media-amazon.com/images/I/816a41CR8wL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/81SIII5D9gL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/816a41CR8wL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/81zGmEdxMoL._AC_SL1500_.jpg',
@@ -13149,6 +13205,7 @@ export const PRODUCT_CATALOG = [
     brand: 'Trggivs',
     price: 169.99, priceDisplay: '$169.99',
     imageUrl: 'https://m.media-amazon.com/images/I/919ldqEh9TL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/81trJvuWM2L._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/919ldqEh9TL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/91tznXX44lL._AC_SL1500_.jpg',
@@ -13368,6 +13425,7 @@ export const PRODUCT_CATALOG = [
     brand: 'Sorbus',
     price: 44.99, priceDisplay: '$44.99',
     imageUrl: 'https://m.media-amazon.com/images/I/81MBYvMAUpL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/81fPxOj8O3L._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81fPxOj8O3L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/81MBYvMAUpL._AC_SL1500_.jpg',
@@ -13423,6 +13481,7 @@ export const PRODUCT_CATALOG = [
     brand: 'Signature Design by Ashley',
     price: 191.49, priceDisplay: '$191.49',
     imageUrl: 'https://m.media-amazon.com/images/I/71sDhys5JRL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/818Gg4b0OaL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71sDhys5JRL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/71Gl2QdQQvL._AC_SL1500_.jpg',
@@ -13463,6 +13522,7 @@ export const PRODUCT_CATALOG = [
     brand: 'SICOTAS',
     price: 134.49, priceDisplay: '$134.49',
     imageUrl: 'https://m.media-amazon.com/images/I/71sDhys5JRL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/818Gg4b0OaL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71sDhys5JRL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/71Gl2QdQQvL._AC_SL1500_.jpg',
@@ -13505,6 +13565,7 @@ export const PRODUCT_CATALOG = [
     brand: 'VASAGLE',
     price: 59.49, priceDisplay: '$59.49',
     imageUrl: 'https://m.media-amazon.com/images/I/714epnyxPFL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/81n9TWAzhcL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/714epnyxPFL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/81WkhUGSqQL._AC_SL1500_.jpg',
@@ -13591,7 +13652,7 @@ export const PRODUCT_CATALOG = [
     brand: 'Mobili Fiver',
     price: 75.25, priceDisplay: '$75.25',
     imageUrl: 'https://m.media-amazon.com/images/I/61sk+cbrFZL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/61IRD9Qp9wL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/61sk+cbrFZL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/61ynn41l08L._AC_SL1500_.jpg',
@@ -13695,6 +13756,7 @@ export const PRODUCT_CATALOG = [
     brand: 'HOSEOKA',
     price: 84.05, priceDisplay: '$84.05',
     imageUrl: 'https://m.media-amazon.com/images/I/71ioavLyBYL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/71LeYOGTcnL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71ioavLyBYL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/71cr9IcS6lL._AC_SL1500_.jpg',
@@ -13737,6 +13799,7 @@ export const PRODUCT_CATALOG = [
     brand: 'NANAGIFTREE',
     price: 27.99, priceDisplay: '$27.99',
     imageUrl: 'https://m.media-amazon.com/images/I/714ANzncJnL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/718W5Sgk9WL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/714ANzncJnL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/71AAe+0xA5L._AC_SL1500_.jpg',
@@ -13783,6 +13846,7 @@ export const PRODUCT_CATALOG = [
     brand: 'South Shore',
     price: 59.99, priceDisplay: '$59.99',
     imageUrl: 'https://m.media-amazon.com/images/I/615Nvq9fBjL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/514MR2G0YmL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/514MR2G0YmL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/61gm8XJjcUL._AC_SL1500_.jpg',
@@ -13861,7 +13925,7 @@ export const PRODUCT_CATALOG = [
     brand: 'AWASEN',
     price: 35.99, priceDisplay: '$35.99',
     imageUrl: 'https://m.media-amazon.com/images/I/61Ac6NSilRL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/71HP52a5J6L._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/61Ac6NSilRL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/615PHGI0zRL._AC_SL1500_.jpg',
@@ -14003,6 +14067,7 @@ export const PRODUCT_CATALOG = [
     brand: 'Furinno',
     price: 21.99, priceDisplay: '$21.99',
     imageUrl: 'https://m.media-amazon.com/images/I/81Fr2Q1725L._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/61w7vsoNkbL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/61w7vsoNkbL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/81Ftu7DcIFL._AC_SL1500_.jpg',
@@ -14057,6 +14122,7 @@ export const PRODUCT_CATALOG = [
     brand: 'T4TREAM',
     price: 139.99, priceDisplay: '$139.99',
     imageUrl: 'https://m.media-amazon.com/images/I/91wqXMH+8wL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/71FwjsprUtL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71FwjsprUtL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/91pJZEgqL8L._AC_SL1500_.jpg',
@@ -14249,7 +14315,7 @@ export const PRODUCT_CATALOG = [
     brand: 'Sorbus',
     price: 69.99, priceDisplay: '$69.99',
     imageUrl: 'https://m.media-amazon.com/images/I/81MkWU72iDL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/81emZ1HWdBL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81MkWU72iDL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/81P--mfwPYL._AC_SL1500_.jpg',
@@ -14295,6 +14361,7 @@ export const PRODUCT_CATALOG = [
     brand: 'Furnulem',
     price: 69.99, priceDisplay: '$69.99',
     imageUrl: 'https://m.media-amazon.com/images/I/81OyzY2IaeL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/71shwH2CWCL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71shwH2CWCL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/81OyzY2IaeL._AC_SL1500_.jpg',
@@ -14335,6 +14402,7 @@ export const PRODUCT_CATALOG = [
     brand: 'Furnulem',
     price: 48.48, priceDisplay: '$48.48',
     imageUrl: 'https://m.media-amazon.com/images/I/71shwH2CWCL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/61Wlo8EwdIL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71shwH2CWCL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/81OyzY2IaeL._AC_SL1500_.jpg',
@@ -14374,7 +14442,7 @@ export const PRODUCT_CATALOG = [
     brand: 'LUMTOK',
     price: 89.99, priceDisplay: '$89.99',
     imageUrl: 'https://m.media-amazon.com/images/I/71MeBQ2NV5L._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/71VuThxvWCL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71MeBQ2NV5L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/71d2NKgHcuL._AC_SL1500_.jpg',
@@ -14419,7 +14487,7 @@ export const PRODUCT_CATALOG = [
     brand: 'Lulive',
     price: 79.99, priceDisplay: '$79.99',
     imageUrl: 'https://m.media-amazon.com/images/I/71slxO00MRL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/91GTtpbrd+L._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/91GTtpbrd+L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/91VKZTJHUYL._AC_SL1500_.jpg',
@@ -14458,6 +14526,7 @@ export const PRODUCT_CATALOG = [
     brand: 'Tohomeor',
     price: 89.89, priceDisplay: '$89.89',
     imageUrl: 'https://m.media-amazon.com/images/I/81392HFaKaL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/8145qbVIg3L._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81392HFaKaL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/714OFJ5gqeL._AC_SL1500_.jpg',
@@ -14501,6 +14570,7 @@ export const PRODUCT_CATALOG = [
     brand: 'Lulive',
     price: 67.99, priceDisplay: '$67.99',
     imageUrl: 'https://m.media-amazon.com/images/I/71slxO00MRL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/91GTtpbrd+L._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71slxO00MRL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/91VKZTJHUYL._AC_SL1500_.jpg',
@@ -14539,7 +14609,7 @@ export const PRODUCT_CATALOG = [
     brand: 'EnHomee',
     price: 99.98, priceDisplay: '$99.98',
     imageUrl: 'https://m.media-amazon.com/images/I/91ggZ9MXT7L._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/915HOWSEiDL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/91ggZ9MXT7L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/917nkTdYZqL._AC_SL1500_.jpg',
@@ -14579,6 +14649,7 @@ export const PRODUCT_CATALOG = [
     brand: 'VASICAR',
     price: 89.99, priceDisplay: '$89.99',
     imageUrl: 'https://m.media-amazon.com/images/I/81MWZOkspYL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/71by4tl5JjL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71by4tl5JjL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/81MWZOkspYL._AC_SL1500_.jpg',
@@ -14615,6 +14686,7 @@ export const PRODUCT_CATALOG = [
     brand: 'EXOTICA',
     price: 94.89, priceDisplay: '$94.89',
     imageUrl: 'https://m.media-amazon.com/images/I/91E8OMcPOiL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/81logYKMn6L._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81logYKMn6L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/91sL2A5KHsL._AC_SL1500_.jpg',
@@ -14795,6 +14867,7 @@ export const PRODUCT_CATALOG = [
     brand: 'GreenForest',
     price: 69.99, priceDisplay: '$69.99',
     imageUrl: 'https://m.media-amazon.com/images/I/71DSMfpNbCL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/7172EyV2fNL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71DSMfpNbCL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/61xD-1dkvoL._AC_SL1500_.jpg',
@@ -14838,6 +14911,7 @@ export const PRODUCT_CATALOG = [
     brand: 'Need',
     price: 59.99, priceDisplay: '$59.99',
     imageUrl: 'https://m.media-amazon.com/images/I/71tCFjJiogL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/611zeTspTsL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/611zeTspTsL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/61SowBK-H1L._AC_SL1500_.jpg',
@@ -14881,6 +14955,7 @@ export const PRODUCT_CATALOG = [
     brand: 'Teraves',
     price: 169.98, priceDisplay: '$169.98',
     imageUrl: 'https://m.media-amazon.com/images/I/71nXdjNlnqL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/61vUw4VI+xL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/61vUw4VI+xL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/71v0weldFpL._AC_SL1500_.jpg',
@@ -14961,6 +15036,7 @@ export const PRODUCT_CATALOG = [
     brand: 'Teraves',
     price: 99.99, priceDisplay: '$99.99',
     imageUrl: 'https://m.media-amazon.com/images/I/71ddzGD2-gL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/61wRXed1pQS._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/61wRXed1pQS._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/71ddzGD2-gL._AC_SL1500_.jpg',
@@ -14998,7 +15074,7 @@ export const PRODUCT_CATALOG = [
     brand: 'Cubiker',
     price: 64.99, priceDisplay: '$64.99',
     imageUrl: 'https://m.media-amazon.com/images/I/91vHzMdE4sL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/81pOPYngWBL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81pOPYngWBL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/713QHd457eL._AC_SL1500_.jpg',
@@ -15038,6 +15114,7 @@ export const PRODUCT_CATALOG = [
     brand: 'Bestier',
     price: 119.90, priceDisplay: '$119.90',
     imageUrl: 'https://m.media-amazon.com/images/I/71MPnDa6BQL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/71DBpUmp5nL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71DBpUmp5nL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/81TKvTBg0pL._AC_SL1500_.jpg',
@@ -15083,6 +15160,7 @@ export const PRODUCT_CATALOG = [
     brand: 'Aquzee',
     price: 179.00, priceDisplay: '$179.00',
     imageUrl: 'https://m.media-amazon.com/images/I/81hx4QDRsSL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/71gCPD2ftcL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71gCPD2ftcL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/71Hxkp6W2TL._AC_SL1500_.jpg',
@@ -15130,7 +15208,7 @@ export const PRODUCT_CATALOG = [
     brand: 'FATORRI',
     price: 229.99, priceDisplay: '$229.99',
     imageUrl: 'https://m.media-amazon.com/images/I/71pZZDCdsLL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/61y-fwiAYsL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/61y-fwiAYsL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/612p3VAbfMS._AC_SL1500_.jpg',
@@ -15171,6 +15249,7 @@ export const PRODUCT_CATALOG = [
     brand: 'BON AUGURE',
     price: 189.82, priceDisplay: '$189.82',
     imageUrl: 'https://m.media-amazon.com/images/I/71IcU78CsGL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/71NMpTMoHoL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71IcU78CsGL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/71+P2Rq7ArL._AC_SL1500_.jpg',
@@ -15213,6 +15292,7 @@ export const PRODUCT_CATALOG = [
     brand: 'EUREKA ERGONOMIC',
     price: 199.00, priceDisplay: '$199.00',
     imageUrl: 'https://m.media-amazon.com/images/I/61yCiY6tUuL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/71aO5ctYsfL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71aO5ctYsfL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/61yCiY6tUuL._AC_SL1500_.jpg',
@@ -15249,6 +15329,7 @@ export const PRODUCT_CATALOG = [
     brand: 'FOLUBAN',
     price: 132.81, priceDisplay: '$132.81',
     imageUrl: 'https://m.media-amazon.com/images/I/71ODLCrhLCL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/71u-z2YhZuL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71ODLCrhLCL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/71hgLdKmk0L._AC_SL1500_.jpg',
@@ -15297,6 +15378,7 @@ export const PRODUCT_CATALOG = [
     brand: 'LVB',
     price: 127.46, priceDisplay: '$127.46',
     imageUrl: 'https://m.media-amazon.com/images/I/715y4dWBYLL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/71V6B4qXKcL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71V6B4qXKcL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/715jlFDO2pL._AC_SL1500_.jpg',
@@ -15380,6 +15462,7 @@ export const PRODUCT_CATALOG = [
     brand: 'Pamray',
     price: 39.98, priceDisplay: '$39.98',
     imageUrl: 'https://m.media-amazon.com/images/I/717dhKgC85L._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/71cCobh2fkL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71cCobh2fkL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/811xB7gXyjL._AC_SL1500_.jpg',
@@ -15424,6 +15507,7 @@ export const PRODUCT_CATALOG = [
     brand: 'WOHOMO',
     price: 49.99, priceDisplay: '$49.99',
     imageUrl: 'https://m.media-amazon.com/images/I/71plY-qWJGL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/61PZ6bkmQXL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71plY-qWJGL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/717-bhwLhRL._AC_SL1500_.jpg',
@@ -15515,6 +15599,7 @@ export const PRODUCT_CATALOG = [
     brand: 'ELABEST',
     price: 203.98, priceDisplay: '$203.98',
     imageUrl: 'https://m.media-amazon.com/images/I/916OGdlsGCL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/71+fcWd65nL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71+fcWd65nL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/916OGdlsGCL._AC_SL1500_.jpg',
@@ -15559,6 +15644,7 @@ export const PRODUCT_CATALOG = [
     brand: 'ELABEST',
     price: 295.98, priceDisplay: '$295.98',
     imageUrl: 'https://m.media-amazon.com/images/I/81vXeRdDeNL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/71pjCOXcRtL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81vXeRdDeNL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/71aAllf2fwL._AC_SL1500_.jpg',
@@ -15600,7 +15686,7 @@ export const PRODUCT_CATALOG = [
     brand: 'GABRYLLY',
     price: 161, priceDisplay: '$161.00',
     imageUrl: 'https://m.media-amazon.com/images/I/81TIRoUQCIL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/91rFG-WfXtL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81TIRoUQCIL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/71kZ0YBIIOL._AC_SL1500_.jpg',
@@ -15640,6 +15726,7 @@ export const PRODUCT_CATALOG = [
     brand: 'GABRYLLY',
     price: 191.5, priceDisplay: '$191.50',
     imageUrl: 'https://m.media-amazon.com/images/I/81AUY5N8ZfL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/91XzCPhL2XL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/91XzCPhL2XL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/91p-6MEe34L._AC_SL1500_.jpg',
@@ -15679,6 +15766,7 @@ export const PRODUCT_CATALOG = [
     brand: 'SIHOO',
     price: 189.99, priceDisplay: '$189.99',
     imageUrl: 'https://m.media-amazon.com/images/I/71iwfBYkZWL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/71qbmxtE21L._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71iwfBYkZWL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/61MTtUeaTJL._AC_SL1500_.jpg',
@@ -15719,6 +15807,7 @@ export const PRODUCT_CATALOG = [
     brand: 'Modway',
     price: 123.94, priceDisplay: '$123.94',
     imageUrl: 'https://m.media-amazon.com/images/I/81fkLWNducL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/71VXyLuHyIL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71VXyLuHyIL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/81fkLWNducL._AC_SL1500_.jpg',
@@ -15761,7 +15850,7 @@ export const PRODUCT_CATALOG = [
     brand: 'amseatec',
     price: 49.99, priceDisplay: '$49.99',
     imageUrl: 'https://m.media-amazon.com/images/I/81thssq+teL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/71PcqF5ljdL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71PcqF5ljdL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/81R2IjnwnAL._AC_SL1500_.jpg',
@@ -15804,7 +15893,7 @@ export const PRODUCT_CATALOG = [
     brand: 'CYKOV',
     price: 169, priceDisplay: '$169.00',
     imageUrl: 'https://m.media-amazon.com/images/I/81iGibLxLxL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/71QTCj4hXuL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81iGibLxLxL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/71d5CDV2whL._AC_SL1500_.jpg',
@@ -15845,6 +15934,7 @@ export const PRODUCT_CATALOG = [
     brand: 'CASASIO',
     price: 97.74, priceDisplay: '$97.74',
     imageUrl: 'https://m.media-amazon.com/images/I/71r6fcbYFcL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/71N9vxENGdL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71r6fcbYFcL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/81lSqUMXabL._AC_SL1500_.jpg',
@@ -15926,7 +16016,7 @@ export const PRODUCT_CATALOG = [
     brand: 'TRALT',
     price: 139.99, priceDisplay: '$139.99',
     imageUrl: 'https://m.media-amazon.com/images/I/71K-pGGUR3L._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/71H8pX7LRUL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71K-pGGUR3L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/719LGRFdNrL._AC_SL1500_.jpg',
@@ -15967,6 +16057,7 @@ export const PRODUCT_CATALOG = [
     brand: 'Fizzin',
     price: 105.99, priceDisplay: '$105.99',
     imageUrl: 'https://m.media-amazon.com/images/I/91z-41-ocaL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/81kXYU79wKL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81kXYU79wKL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/91s2qvKwbEL._AC_SL1500_.jpg',
@@ -16009,6 +16100,7 @@ export const PRODUCT_CATALOG = [
     brand: 'Ergalithic',
     price: 119.99, priceDisplay: '$119.99',
     imageUrl: 'https://m.media-amazon.com/images/I/71FFbO6+jpL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/71apPL11nML._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71apPL11nML._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/71FFbO6+jpL._AC_SL1500_.jpg',
@@ -16050,7 +16142,7 @@ export const PRODUCT_CATALOG = [
     brand: 'Soohow',
     price: 89.99, priceDisplay: '$89.99',
     imageUrl: 'https://m.media-amazon.com/images/I/61TEn73eQaL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/61wqlB3rgkL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/61wqlB3rgkL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/61oCxRU30xL._AC_SL1500_.jpg',
@@ -16135,6 +16227,7 @@ export const PRODUCT_CATALOG = [
     brand: 'IRONCK',
     price: 79.99, priceDisplay: '$79.99',
     imageUrl: 'https://m.media-amazon.com/images/I/81thipGv+RL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/71abiqKPyQL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71abiqKPyQL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/813YbWS1wsL._AC_SL1500_.jpg',
@@ -16174,6 +16267,7 @@ export const PRODUCT_CATALOG = [
     brand: 'IRONCK',
     price: 144.49, priceDisplay: '$144.49',
     imageUrl: 'https://m.media-amazon.com/images/I/81rOUAAYsDL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/81ViSNPymwL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81ViSNPymwL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/81rOUAAYsDL._AC_SL1500_.jpg',
@@ -16212,6 +16306,7 @@ export const PRODUCT_CATALOG = [
     brand: 'IRONCK',
     price: 109.99, priceDisplay: '$109.99',
     imageUrl: 'https://m.media-amazon.com/images/I/91ihfjZDTzS._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/81-bhMITI3S._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81-bhMITI3S._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/91wroATMw3S._AC_SL1500_.jpg',
@@ -16250,7 +16345,7 @@ export const PRODUCT_CATALOG = [
     brand: 'HOMISSUE',
     price: 119.99, priceDisplay: '$119.99',
     imageUrl: 'https://m.media-amazon.com/images/I/81cHAYc2ecL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/81cm8aXhW0L._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81cHAYc2ecL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/61FCKflvHhL._AC_SL1500_.jpg',
@@ -16292,6 +16387,7 @@ export const PRODUCT_CATALOG = [
     brand: '4NM',
     price: 139.99, priceDisplay: '$139.99',
     imageUrl: 'https://m.media-amazon.com/images/I/81i667q+B0L._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/81uMgPViCoL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81i667q+B0L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/81u3pWBgoqL._AC_SL1500_.jpg',
@@ -16331,7 +16427,7 @@ export const PRODUCT_CATALOG = [
     brand: 'FATORRI',
     price: 125.99, priceDisplay: '$125.99',
     imageUrl: 'https://m.media-amazon.com/images/I/714M60riOYL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/71pytDzNCHL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71pytDzNCHL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/61a-hb21WdL._AC_SL1500_.jpg',
@@ -16373,7 +16469,7 @@ export const PRODUCT_CATALOG = [
     brand: 'IDEALHOUSE',
     price: 69.99, priceDisplay: '$69.99',
     imageUrl: 'https://m.media-amazon.com/images/I/71RudUxkAXL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/71-5VGz3D+L._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71RudUxkAXL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/61ig1TOYdHL._AC_SL1500_.jpg',
@@ -16415,7 +16511,7 @@ export const PRODUCT_CATALOG = [
     brand: 'IRONCK',
     price: 139.99, priceDisplay: '$139.99',
     imageUrl: 'https://m.media-amazon.com/images/I/91Uszr+g8ML._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/919Gl+3FwVL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/919Gl+3FwVL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/81QWg0cBdjL._AC_SL1500_.jpg',
@@ -16454,7 +16550,7 @@ export const PRODUCT_CATALOG = [
     brand: 'IBF',
     price: 135.99, priceDisplay: '$135.99',
     imageUrl: 'https://m.media-amazon.com/images/I/81-Yl7pPQfL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/81F83ofWnpL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81F83ofWnpL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/61mRJR2gTeL._AC_SL1500_.jpg',
@@ -16495,6 +16591,7 @@ export const PRODUCT_CATALOG = [
     brand: 'NUMENN',
     price: 149.99, priceDisplay: '$149.99',
     imageUrl: 'https://m.media-amazon.com/images/I/71ECNOPC-mL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/61JkLEj43+L._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71ECNOPC-mL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/71Kj75hr5QL._AC_SL1500_.jpg',
@@ -16533,6 +16630,7 @@ export const PRODUCT_CATALOG = [
     brand: 'CAPHAUS',
     price: 59.99, priceDisplay: '$59.99',
     imageUrl: 'https://m.media-amazon.com/images/I/81I-FFvwKpL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/613F8uCItbL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/613F8uCItbL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/81I-FFvwKpL._AC_SL1500_.jpg',
@@ -16574,7 +16672,7 @@ export const PRODUCT_CATALOG = [
     brand: 'FOTOSOK',
     price: 119.99, priceDisplay: '$119.99',
     imageUrl: 'https://m.media-amazon.com/images/I/81e-6PeH7HL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/81fUuSuZkAL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81fUuSuZkAL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/71Bxdkk2v+L._AC_SL1500_.jpg',
@@ -16613,6 +16711,7 @@ export const PRODUCT_CATALOG = [
     brand: 'VECELO',
     price: 94.99, priceDisplay: '$94.99',
     imageUrl: 'https://m.media-amazon.com/images/I/81ysakqNt2L._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/71UO8l0WQWL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71UO8l0WQWL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/81YGQNUAHML._AC_SL1500_.jpg',
@@ -16652,6 +16751,7 @@ export const PRODUCT_CATALOG = [
     brand: 'IRONCK',
     price: 75.98, priceDisplay: '$75.98',
     imageUrl: 'https://m.media-amazon.com/images/I/81BKjQ7Q6mL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/710+fhspHRL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/710+fhspHRL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/71moYY6NPcL._AC_SL1500_.jpg',
@@ -19268,6 +19368,7 @@ export const PRODUCT_CATALOG = [
     brand: "D'vine Dev",
     price: 15.29, priceDisplay: '$15.29',
     imageUrl: 'https://m.media-amazon.com/images/I/51nPjgH+QtL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/71iEv6cuCYL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71iEv6cuCYL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41bpoyMS54L._AC_SL1500_.jpg',
@@ -19351,6 +19452,7 @@ export const PRODUCT_CATALOG = [
     brand: 'Selamica',
     price: 29.99, priceDisplay: '$29.99',
     imageUrl: 'https://m.media-amazon.com/images/I/71EPjNQwwuL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51xPW2rnWQL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71EPjNQwwuL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41afcs8DSgL._AC_SL1500_.jpg',
@@ -19435,7 +19537,7 @@ export const PRODUCT_CATALOG = [
     brand: "D'vine Dev",
     price: 26.99, priceDisplay: '$26.99',
     imageUrl: 'https://m.media-amazon.com/images/I/51y0zh-4QzL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/71zaTSAwufL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71zaTSAwufL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41CCMy9oflS._AC_SL1500_.jpg',
@@ -19476,6 +19578,7 @@ export const PRODUCT_CATALOG = [
     brand: "D'vine Dev",
     price: 61.19, priceDisplay: '$61.19',
     imageUrl: 'https://m.media-amazon.com/images/I/41Z7MWdfWcL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/61zyC+AVVJL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/61zyC+AVVJL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/31t3agMPoeL._AC_SL1500_.jpg',
@@ -19560,7 +19663,7 @@ export const PRODUCT_CATALOG = [
     brand: 'Willowy',
     price: 55.00, priceDisplay: '$55.00',
     imageUrl: 'https://m.media-amazon.com/images/I/51eyPuGyUEL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/71YTI68bBPL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71YTI68bBPL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41r64Z0Bl9L._AC_SL1500_.jpg',
@@ -19602,6 +19705,7 @@ export const PRODUCT_CATALOG = [
     brand: "D'vine Dev",
     price: 89.99, priceDisplay: '$89.99',
     imageUrl: 'https://m.media-amazon.com/images/I/41LeCgDs1bL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/71fa2CelMkL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71fa2CelMkL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41mz2zmUsnL._AC_SL1500_.jpg',
@@ -19640,6 +19744,7 @@ export const PRODUCT_CATALOG = [
     brand: "D'vine Dev",
     price: 99.99, priceDisplay: '$99.99',
     imageUrl: 'https://m.media-amazon.com/images/I/51CETqBEvkL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/81Fmitn8YYL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81Fmitn8YYL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41D2EhBeoaL._AC_SL1500_.jpg',
@@ -19679,6 +19784,7 @@ export const PRODUCT_CATALOG = [
     brand: 'FaithLand',
     price: 29.99, priceDisplay: '$29.99',
     imageUrl: 'https://m.media-amazon.com/images/I/51q8Boc1KML._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/81gcKs3X3QL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81gcKs3X3QL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/419Eg2thYXL._AC_SL1500_.jpg',
@@ -19721,7 +19827,7 @@ export const PRODUCT_CATALOG = [
     brand: 'Shineloha',
     price: 34.99, priceDisplay: '$34.99',
     imageUrl: 'https://m.media-amazon.com/images/I/41OUM3DxmrL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/61lx75XXxKL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/61lx75XXxKL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51NI1x-EsFL._AC_SL1500_.jpg',
@@ -19763,6 +19869,7 @@ export const PRODUCT_CATALOG = [
     brand: 'Mkono',
     price: 8.99, priceDisplay: '$8.99',
     imageUrl: 'https://m.media-amazon.com/images/I/41X4L9EzxOS._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51N0oxFJLHS._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/51N0oxFJLHS._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/31wgxCz3QyS._AC_SL1500_.jpg',
@@ -19801,7 +19908,7 @@ export const PRODUCT_CATALOG = [
     brand: 'LiyuanQ',
     price: 21.99, priceDisplay: '$21.99',
     imageUrl: 'https://m.media-amazon.com/images/I/51xLM87+-gL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/71AAdMtXn8L._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71AAdMtXn8L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41wWNYxEQBL._AC_SL1500_.jpg',
@@ -19842,6 +19949,7 @@ export const PRODUCT_CATALOG = [
     brand: 'Mkono',
     price: 7.99, priceDisplay: '$7.99',
     imageUrl: 'https://m.media-amazon.com/images/I/41QSGMwDDAL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/61dWZkgeJ0L._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/61dWZkgeJ0L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/31KzGJEZG-L._AC_SL1500_.jpg',
@@ -19883,7 +19991,7 @@ export const PRODUCT_CATALOG = [
     brand: 'Mkono',
     price: 15.99, priceDisplay: '$15.99',
     imageUrl: 'https://m.media-amazon.com/images/I/51A7Sa6PskL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/712rVUIlwNL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/712rVUIlwNL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51+G4BUmEQL._AC_SL1500_.jpg',
@@ -19969,7 +20077,7 @@ export const PRODUCT_CATALOG = [
     brand: 'QLOFEI',
     price: 29.99, priceDisplay: '$29.99',
     imageUrl: 'https://m.media-amazon.com/images/I/61KVbKSnozL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51n-yx5Nc-L._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/61KVbKSnozL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41RWjBU-xtL._AC_SL1500_.jpg',
@@ -20008,7 +20116,7 @@ export const PRODUCT_CATALOG = [
     brand: 'Kimdio',
     price: 29.99, priceDisplay: '$29.99',
     imageUrl: 'https://m.media-amazon.com/images/I/51kbZf5IkyL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/71asisPMFBL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71asisPMFBL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/417BbVoT39L._AC_SL1500_.jpg',
@@ -20050,6 +20158,7 @@ export const PRODUCT_CATALOG = [
     brand: 'CwlwGO',
     price: 30.99, priceDisplay: '$30.99',
     imageUrl: 'https://m.media-amazon.com/images/I/51oFyNhf3LL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/71ayZnUjPTL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71ayZnUjPTL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/419XyeWwtnL._AC_SL1500_.jpg',
@@ -20134,6 +20243,7 @@ export const PRODUCT_CATALOG = [
     brand: 'CwlwGO',
     price: 29.99, priceDisplay: '$29.99',
     imageUrl: 'https://m.media-amazon.com/images/I/41ekHlKQpQL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/71lGQtZnnWL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71lGQtZnnWL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41wCYryG3JL._AC_SL1500_.jpg',
@@ -20180,7 +20290,7 @@ export const PRODUCT_CATALOG = [
     brand: "Carrot's Den",
     price: 36.90, priceDisplay: '$36.90',
     imageUrl: 'https://m.media-amazon.com/images/I/41Mt2aiLgkL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/71JrSzgIomL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71JrSzgIomL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41ihO22jKPL._AC_SL1500_.jpg',
@@ -20220,6 +20330,7 @@ export const PRODUCT_CATALOG = [
     brand: 'Home Habitat',
     price: 33.99, priceDisplay: '$33.99',
     imageUrl: 'https://m.media-amazon.com/images/I/51fjIrIYIoL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/81b+WTkmukL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81b+WTkmukL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41go82Pra-L._AC_SL1500_.jpg',
@@ -20258,7 +20369,7 @@ export const PRODUCT_CATALOG = [
     brand: 'COTYNI',
     price: 25.99, priceDisplay: '$25.99',
     imageUrl: 'https://m.media-amazon.com/images/I/71Ms+27gxoL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51lxO5RlF4L._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71Ms+27gxoL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41CqLNza39L._AC_SL1500_.jpg',
@@ -20300,6 +20411,7 @@ export const PRODUCT_CATALOG = [
     brand: 'Zormon',
     price: 26.99, priceDisplay: '$26.99',
     imageUrl: 'https://m.media-amazon.com/images/I/71Gqd2SBR6L._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/41XVDBwShmL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71Gqd2SBR6L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41cA+RL3NAL._AC_SL1500_.jpg',
@@ -20341,7 +20453,7 @@ export const PRODUCT_CATALOG = [
     brand: 'LUKA',
     price: 26.99, priceDisplay: '$26.99',
     imageUrl: 'https://m.media-amazon.com/images/I/91kgZ5RxjzL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51OvBIhlKML._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/91kgZ5RxjzL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41EKWFOINDL._AC_SL1500_.jpg',
@@ -20504,6 +20616,7 @@ export const PRODUCT_CATALOG = [
     brand: 'XMGZQ',
     price: 16.49, priceDisplay: '$16.49',
     imageUrl: 'https://m.media-amazon.com/images/I/51ei5N76GAL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/61SjEJg2RmL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/61SjEJg2RmL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41kABxMxV1L._AC_SL1500_.jpg',
@@ -20545,7 +20658,7 @@ export const PRODUCT_CATALOG = [
     brand: 'QLOFEI',
     price: 37.99, priceDisplay: '$37.99',
     imageUrl: 'https://m.media-amazon.com/images/I/81oGp8nQENL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51cC+Ssb1tL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81oGp8nQENL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51H95m8KbsL._AC_SL1500_.jpg',
@@ -20643,6 +20756,7 @@ export const PRODUCT_CATALOG = [
     brand: 'Raynesys',
     price: 84.99, priceDisplay: '$84.99',
     imageUrl: 'https://m.media-amazon.com/images/I/41F-AX8kRBL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/71zFCac+XTL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71zFCac+XTL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41F-AX8kRBL._AC_SL1500_.jpg',
@@ -20685,7 +20799,7 @@ export const PRODUCT_CATALOG = [
     brand: 'FIRAVOE',
     price: 89.99, priceDisplay: '$89.99',
     imageUrl: 'https://m.media-amazon.com/images/I/51ExGf7wINL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/816IbLHUe2L._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/816IbLHUe2L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41Ba4lRNFFL._AC_SL1500_.jpg',
@@ -20728,7 +20842,7 @@ export const PRODUCT_CATALOG = [
     brand: 'gopop',
     price: 189.99, priceDisplay: '$189.99',
     imageUrl: 'https://m.media-amazon.com/images/I/51lT+ba5PFL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/81GHRd1WwPL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81GHRd1WwPL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41OcpQ-o2OL._AC_SL1500_.jpg',
@@ -20778,7 +20892,7 @@ export const PRODUCT_CATALOG = [
     brand: 'GrandNoor',
     price: 169.99, priceDisplay: '$169.99',
     imageUrl: 'https://m.media-amazon.com/images/I/71tz8KO7snL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51tTeCMHRdL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71tz8KO7snL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41QkD6kIQtL._AC_SL1500_.jpg',
@@ -20868,6 +20982,7 @@ export const PRODUCT_CATALOG = [
     brand: 'Zesthouse',
     price: 179.99, priceDisplay: '$179.99',
     imageUrl: 'https://m.media-amazon.com/images/I/71Hz5hNx7xL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/514VhlrqyKL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71Hz5hNx7xL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/418viPUqCQL._AC_SL1500_.jpg',
@@ -20915,7 +21030,7 @@ export const PRODUCT_CATALOG = [
     brand: 'Rejeke',
     price: 199.90, priceDisplay: '$199.90',
     imageUrl: 'https://m.media-amazon.com/images/I/51MYn-RhiDL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/71gPmUd9NEL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71gPmUd9NEL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51EtDtG-fuL._AC_SL1500_.jpg',
@@ -20960,6 +21075,7 @@ export const PRODUCT_CATALOG = [
     brand: 'STOOLINK',
     price: 89.99, priceDisplay: '$89.99',
     imageUrl: 'https://m.media-amazon.com/images/I/81ckdLc9zUL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/418VGVmf8iL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81ckdLc9zUL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51lWmjGwVfL._AC_SL1500_.jpg',
@@ -21044,7 +21160,7 @@ export const PRODUCT_CATALOG = [
     brand: 'DUOMAY',
     price: 219.99, priceDisplay: '$219.99',
     imageUrl: 'https://m.media-amazon.com/images/I/71LkeT58gEL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/41N8dKdPDuL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71LkeT58gEL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41yieItQiwL._AC_SL1500_.jpg',
@@ -21085,7 +21201,7 @@ export const PRODUCT_CATALOG = [
     brand: 'VATROS',
     price: 89.99, priceDisplay: '$89.99',
     imageUrl: 'https://m.media-amazon.com/images/I/71xV2z9UmSL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51U+n1oPp7L._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71xV2z9UmSL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/4147HTqtDQL._AC_SL1500_.jpg',
@@ -21128,7 +21244,7 @@ export const PRODUCT_CATALOG = [
     brand: 'KRAMZMING',
     price: 135.98, priceDisplay: '$135.98',
     imageUrl: 'https://m.media-amazon.com/images/I/71A-vBuVovL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/412KvZApvkL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71A-vBuVovL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41b+QMid3CL._AC_SL1500_.jpg',
@@ -21171,7 +21287,7 @@ export const PRODUCT_CATALOG = [
     brand: 'Rowill',
     price: 234.64, priceDisplay: '$234.64',
     imageUrl: 'https://m.media-amazon.com/images/I/81IfZ1g3-3L._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/41wqyjF7q-L._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81IfZ1g3-3L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41TUajXcK8L._AC_SL1500_.jpg',
@@ -21215,6 +21331,7 @@ export const PRODUCT_CATALOG = [
     brand: 'Cozyman',
     price: 149.99, priceDisplay: '$149.99',
     imageUrl: 'https://m.media-amazon.com/images/I/81dhBvCyr1L._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51vjhBwCK1L._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81dhBvCyr1L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51AjBNLqUQL._AC_SL1500_.jpg',
@@ -21256,6 +21373,7 @@ export const PRODUCT_CATALOG = [
     brand: 'Sophia & William',
     price: 175.99, priceDisplay: '$175.99',
     imageUrl: 'https://m.media-amazon.com/images/I/71AdiAKDq-L._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/414MB4eaprL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71AdiAKDq-L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41xzQzvKLPL._AC_SL1500_.jpg',
@@ -21303,6 +21421,7 @@ export const PRODUCT_CATALOG = [
     price: 182.23,
     priceDisplay: '$182.23',
     imageUrl: 'https://m.media-amazon.com/images/I/71n8897EHAL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/31Qgw-nf8-L._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71n8897EHAL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41LXQsTrhcL._AC_SL1500_.jpg',
@@ -21342,6 +21461,7 @@ export const PRODUCT_CATALOG = [
     price: 257.77,
     priceDisplay: '$257.77',
     imageUrl: 'https://m.media-amazon.com/images/I/51Hm2Hi0xRL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/81FoDmiD-3L._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81FoDmiD-3L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51gj4zVsXRL._AC_SL1500_.jpg',
@@ -21393,7 +21513,7 @@ export const PRODUCT_CATALOG = [
     price: 189.99,
     priceDisplay: '$189.99',
     imageUrl: 'https://m.media-amazon.com/images/I/51dIiDPbyBL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/814pvCzqf5L._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/814pvCzqf5L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41N0cKyqLoL._AC_SL1500_.jpg',
@@ -21443,6 +21563,7 @@ export const PRODUCT_CATALOG = [
     price: 195.99,
     priceDisplay: '$195.99',
     imageUrl: 'https://m.media-amazon.com/images/I/71wVhIg7hfL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/41AjMxEgS9L._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71wVhIg7hfL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41AjMxEgS9L._AC_SL1500_.jpg',
@@ -21485,6 +21606,7 @@ export const PRODUCT_CATALOG = [
     price: 129.99,
     priceDisplay: '$129.99',
     imageUrl: 'https://m.media-amazon.com/images/I/81dWPwHQnOL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/314mmyjBvkL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81dWPwHQnOL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/314mmyjBvkL._AC_SL1500_.jpg',
@@ -21656,6 +21778,7 @@ export const PRODUCT_CATALOG = [
     price: 159.99,
     priceDisplay: '$159.99',
     imageUrl: 'https://m.media-amazon.com/images/I/716MGkPepML._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/414Iy1UCDpL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/716MGkPepML._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/414Iy1UCDpL._AC_SL1500_.jpg',
@@ -21772,7 +21895,7 @@ export const PRODUCT_CATALOG = [
     price: 99.99,
     priceDisplay: '$99.99',
     imageUrl: 'https://m.media-amazon.com/images/I/81X3jE7DK2L._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/41fu+1Zgd7L._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81X3jE7DK2L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41fu+1Zgd7L._AC_SL1500_.jpg',
@@ -21814,6 +21937,7 @@ export const PRODUCT_CATALOG = [
     price: 149.99,
     priceDisplay: '$149.99',
     imageUrl: 'https://m.media-amazon.com/images/I/81rP7AV8UmL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/41f368h6PTL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81rP7AV8UmL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41f368h6PTL._AC_SL1500_.jpg',
@@ -21854,6 +21978,7 @@ export const PRODUCT_CATALOG = [
     price: 89.98,
     priceDisplay: '$89.98',
     imageUrl: 'https://m.media-amazon.com/images/I/81G8M8bNtML._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/41Ess1KyKkL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81G8M8bNtML._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41Ess1KyKkL._AC_SL1500_.jpg',
@@ -22040,6 +22165,7 @@ export const PRODUCT_CATALOG = [
     brand: 'POLY & BARK',
     price: 1992.00, priceDisplay: '$1,992.00',
     imageUrl: 'https://m.media-amazon.com/images/I/71OKBplKgOL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/31sbWuxv9iL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/31sbWuxv9iL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41Zv8yS6aoL._AC_SL1500_.jpg',
@@ -22092,6 +22218,7 @@ export const PRODUCT_CATALOG = [
     brand: 'Signature Design by Ashley',
     price: 2934.17, priceDisplay: '$2,934.17',
     imageUrl: 'https://m.media-amazon.com/images/I/41cnOcMzmvL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/31EqP3vQ0GL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/31EqP3vQ0GL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41cnOcMzmvL._AC_SL1500_.jpg',
@@ -22273,6 +22400,7 @@ export const PRODUCT_CATALOG = [
     brand: 'KEIKI',
     price: 1882.99, priceDisplay: '$1,882.99',
     imageUrl: 'https://m.media-amazon.com/images/I/81fbgzc+gpL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/41nDZ8YbcUL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/41nDZ8YbcUL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41OiapyBkFL._AC_SL1500_.jpg',
@@ -22400,6 +22528,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 1695.65,
     compareAtPriceDisplay: '$1,695.65',
     imageUrl: 'https://m.media-amazon.com/images/I/41bsQHNaHJL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/31vBzyqrzML._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/31vBzyqrzML._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41bsQHNaHJL._AC_SL1500_.jpg',
@@ -22475,7 +22604,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 2299.99,
     compareAtPriceDisplay: '$2,299.99',
     imageUrl: 'https://m.media-amazon.com/images/I/41Y39QVbnyL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/412l9oTB7bL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/41Y39QVbnyL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/31pxsgjxJWL._AC_SL1500_.jpg',
@@ -22555,6 +22684,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 1897.00,
     compareAtPriceDisplay: '$1,897.00',
     imageUrl: 'https://m.media-amazon.com/images/I/41PZNMW+x3L._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/514KYsM7VpL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/41PZNMW+x3L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41VTCGqvryL._AC_SL1500_.jpg',
@@ -22625,7 +22755,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 2398.99,
     compareAtPriceDisplay: '$2,398.99',
     imageUrl: 'https://m.media-amazon.com/images/I/810pR9hQs5L._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/41i6WhHaKQL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/41i6WhHaKQL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51d0sjd6ryL._AC_SL1500_.jpg',
@@ -22686,6 +22816,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 946.00,
     compareAtPriceDisplay: '$946.00',
     imageUrl: 'https://m.media-amazon.com/images/I/51u92sBOvBL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51wb+XEO02L._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/51u92sBOvBL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41gMfdC+85L._AC_SL1500_.jpg',
@@ -22807,6 +22938,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 1359.00,
     compareAtPriceDisplay: '$1,359.00',
     imageUrl: 'https://m.media-amazon.com/images/I/81c167vs1-L._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/41D0s+OSMsL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/41D0s+OSMsL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/31s6v5QvuDL._AC_SL1500_.jpg',
@@ -22875,6 +23007,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 479.99,
     compareAtPriceDisplay: '$479.99',
     imageUrl: 'https://m.media-amazon.com/images/I/41a1e9lS5cL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/918bEZB+QML._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/918bEZB+QML._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51XBeM1Hq3L._AC_SL1500_.jpg',
@@ -23304,6 +23437,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 1099.99,
     compareAtPriceDisplay: '$1,099.99',
     imageUrl: 'https://m.media-amazon.com/images/I/51JMK-wJI6L._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/81-ULFHpuUL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81-ULFHpuUL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41K95GBM7xL._AC_SL1500_.jpg',
@@ -23380,6 +23514,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 799.99,
     compareAtPriceDisplay: '$799.99',
     imageUrl: 'https://m.media-amazon.com/images/I/917q4zFmvXL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51swfwL-kqL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/917q4zFmvXL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51XjkMEao-L._AC_SL1500_.jpg',
@@ -23448,6 +23583,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 1749.00,
     compareAtPriceDisplay: '$1,749.00',
     imageUrl: 'https://m.media-amazon.com/images/I/81lW-OMoRuL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51MYBT7TV2L._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81lW-OMoRuL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41X66bKJ4uL._AC_SL1500_.jpg',
@@ -23524,6 +23660,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 669.99,
     compareAtPriceDisplay: '$669.99',
     imageUrl: 'https://m.media-amazon.com/images/I/81HELbUKS0L._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/41hV7WtMJVL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81HELbUKS0L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41vqfu1q-qL._AC_SL1500_.jpg',
@@ -23701,7 +23838,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 184.99,
     compareAtPriceDisplay: '$184.99',
     imageUrl: 'https://m.media-amazon.com/images/I/91uzz8emmSL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51m0Tzh+4uL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/91uzz8emmSL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/414M33xifHL._AC_SL1500_.jpg',
@@ -23760,6 +23897,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 299.99,
     compareAtPriceDisplay: '$299.99',
     imageUrl: 'https://m.media-amazon.com/images/I/514rpx9UyaL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/91mlLcMK2iL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/91mlLcMK2iL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51cHDXCbRQL._AC_SL1500_.jpg',
@@ -23845,6 +23983,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 549.99,
     compareAtPriceDisplay: '$549.99',
     imageUrl: 'https://m.media-amazon.com/images/I/51KbyYF878L._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/81tsaaU+z2L._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81tsaaU+z2L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51BktrhYUcL._AC_SL1500_.jpg',
@@ -23965,7 +24104,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 679.99,
     compareAtPriceDisplay: '$679.99',
     imageUrl: 'https://m.media-amazon.com/images/I/71+vOPRgb+L._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51SUWaWJKnL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71+vOPRgb+L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41UbmJAYkjL._AC_SL1500_.jpg',
@@ -24076,7 +24215,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 181.99,
     compareAtPriceDisplay: '$181.99',
     imageUrl: 'https://m.media-amazon.com/images/I/81aMzlPLnRL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51atUdxiCzL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81aMzlPLnRL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41K2hbfl7TL._AC_SL1500_.jpg',
@@ -24273,7 +24412,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 309.99,
     compareAtPriceDisplay: '$309.99',
     imageUrl: 'https://m.media-amazon.com/images/I/81dEZnvZ1yL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51H6sxQWpVL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81dEZnvZ1yL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41shHVhBFvL._AC_SL1500_.jpg',
@@ -24348,7 +24487,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 99.99,
     compareAtPriceDisplay: '$99.99',
     imageUrl: 'https://m.media-amazon.com/images/I/51XEBSJZl1L._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/71mjXZ6N-5L._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71mjXZ6N-5L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/316rHWyjYXL._AC_SL1500_.jpg',
@@ -24463,6 +24602,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 929.99,
     compareAtPriceDisplay: '$929.99',
     imageUrl: 'https://m.media-amazon.com/images/I/4169DeHRLlL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/41lBhShEPHL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/41lBhShEPHL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/21vgEAfp8cL._AC_SL1500_.jpg',
@@ -24514,7 +24654,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 259.99,
     compareAtPriceDisplay: '$259.99',
     imageUrl: 'https://m.media-amazon.com/images/I/81PqMa32mhL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/41xRdCm0X4L._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81PqMa32mhL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51EUqA8nRML._AC_SL1500_.jpg',
@@ -24629,7 +24769,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 139.99,
     compareAtPriceDisplay: '$139.99',
     imageUrl: 'https://m.media-amazon.com/images/I/81dzJ3B8KQL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/41rlKEcaDML._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81dzJ3B8KQL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/418Zoaj3j5L._AC_SL1500_.jpg',
@@ -24681,7 +24821,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 259.99,
     compareAtPriceDisplay: '$259.99',
     imageUrl: 'https://m.media-amazon.com/images/I/811M9lz3zML._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/41MqP8EHMxL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/811M9lz3zML._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41Nx6jafsIL._AC_SL1500_.jpg',
@@ -24733,6 +24873,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 289.99,
     compareAtPriceDisplay: '$289.99',
     imageUrl: 'https://m.media-amazon.com/images/I/81z8Shp3F4L._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51rxzOv9vDL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81z8Shp3F4L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51n-ISxRohL._AC_SL1500_.jpg',
@@ -24785,6 +24926,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 107.99,
     compareAtPriceDisplay: '$107.99',
     imageUrl: 'https://m.media-amazon.com/images/I/91Qg4DGpK2L._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51DVuNCK8VL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/91Qg4DGpK2L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51r6fcKEegL._AC_SL1500_.jpg',
@@ -24943,6 +25085,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 199.98,
     compareAtPriceDisplay: '$199.98',
     imageUrl: 'https://m.media-amazon.com/images/I/71mZUDP7oIL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51RRBknsq5L._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71mZUDP7oIL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41iY6HAu0wL._AC_SL1500_.jpg',
@@ -25046,7 +25189,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 482.99,
     compareAtPriceDisplay: '$482.99',
     imageUrl: 'https://m.media-amazon.com/images/I/8110d9Tl-zL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/41fJScvHviL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/8110d9Tl-zL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/410cPrjtyZL._AC_SL1500_.jpg',
@@ -25096,7 +25239,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 679.99,
     compareAtPriceDisplay: '$679.99',
     imageUrl: 'https://m.media-amazon.com/images/I/71WsIizbtpL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51DeMogxB2L._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71WsIizbtpL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/516ggiMTz3L._AC_SL1500_.jpg',
@@ -25145,7 +25288,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 698.99,
     compareAtPriceDisplay: '$698.99',
     imageUrl: 'https://m.media-amazon.com/images/I/518InL9StYL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/71XywHOnxlL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71XywHOnxlL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41sZa+iW8sL._AC_SL1500_.jpg',
@@ -25196,7 +25339,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 685.00,
     compareAtPriceDisplay: '$685.00',
     imageUrl: 'https://m.media-amazon.com/images/I/21DQQAdc4EL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/81CoNaNE-BL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81CoNaNE-BL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/21RYn1HyU5L._AC_SL1500_.jpg',
@@ -25246,7 +25389,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 289.99,
     compareAtPriceDisplay: '$289.99',
     imageUrl: 'https://m.media-amazon.com/images/I/91qcB8Mgz8L._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/41nWYwHACRL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/91qcB8Mgz8L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/31pdnvX6EpL._AC_SL1500_.jpg',
@@ -25297,7 +25440,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 546.00,
     compareAtPriceDisplay: '$546.00',
     imageUrl: 'https://m.media-amazon.com/images/I/91Ir91AvMSL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51zgt7zAVnL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/91Ir91AvMSL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51mQmeu62HL._AC_SL1500_.jpg',
@@ -25365,7 +25508,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 700.00,
     compareAtPriceDisplay: '$700.00',
     imageUrl: 'https://m.media-amazon.com/images/I/71NT6xKey7L._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51dHtgTKQyL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71NT6xKey7L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41vL+QwK7SL._AC_SL1500_.jpg',
@@ -25418,6 +25561,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 1859.99,
     compareAtPriceDisplay: '$1,859.99',
     imageUrl: 'https://m.media-amazon.com/images/I/51UrX7mEmkL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/91hE2CRVsiL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/91hE2CRVsiL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51SFXiLujEL._AC_SL1500_.jpg',
@@ -25468,7 +25612,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 819.10,
     compareAtPriceDisplay: '$819.10',
     imageUrl: 'https://m.media-amazon.com/images/I/51ttIAKKq-L._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51-X16jKolL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/51ttIAKKq-L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/31I5scXj4ML._AC_SL1500_.jpg',
@@ -25528,7 +25672,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 299.99,
     compareAtPriceDisplay: '$299.99',
     imageUrl: 'https://m.media-amazon.com/images/I/417zyh4eUZL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/81p10Iuq6NL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81p10Iuq6NL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/417zyh4eUZL._AC_SL1500_.jpg',
@@ -25581,6 +25725,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 1199.99,
     compareAtPriceDisplay: '$1,199.99',
     imageUrl: 'https://m.media-amazon.com/images/I/41K7HMqdp6L._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/41EcaytjREL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/41K7HMqdp6L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/31m0TrDw3gL._AC_SL1500_.jpg',
@@ -25635,6 +25780,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 1420.00,
     compareAtPriceDisplay: '$1,420.00',
     imageUrl: 'https://m.media-amazon.com/images/I/51+eUsLwxQL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/21-eKSp4t2L._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/51+eUsLwxQL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/31gehOsfnoL._AC_SL1500_.jpg',
@@ -25684,6 +25830,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 159.99,
     compareAtPriceDisplay: '$159.99',
     imageUrl: 'https://m.media-amazon.com/images/I/513xGghwrqL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/31AUPvTbsaL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/513xGghwrqL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/31xtmU8Ku2L._AC_SL1500_.jpg',
@@ -25943,7 +26090,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 509.99,
     compareAtPriceDisplay: '$509.99',
     imageUrl: 'https://m.media-amazon.com/images/I/511GS+YIM7L._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/81MZiPGIXrL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81MZiPGIXrL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/511GS+YIM7L._AC_SL1500_.jpg',
@@ -25999,7 +26146,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 1099.99,
     compareAtPriceDisplay: '$1,099.99',
     imageUrl: 'https://m.media-amazon.com/images/I/51dLCeFPV2L._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51uUi3-+LUL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/51dLCeFPV2L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/31roL-YU56L._AC_SL1500_.jpg',
@@ -26050,7 +26197,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 699.95,
     compareAtPriceDisplay: '$699.95',
     imageUrl: 'https://m.media-amazon.com/images/I/41wt1Zeoe2L._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/61PedmvX6FL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/41wt1Zeoe2L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/31yQK7vwQjL._AC_SL1500_.jpg',
@@ -26102,6 +26249,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 688.90,
     compareAtPriceDisplay: '$688.90',
     imageUrl: 'https://m.media-amazon.com/images/I/613ghMZA2TL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/41LAdSMU0PL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/613ghMZA2TL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/31aPoByMsSL._AC_SL1500_.jpg',
@@ -26154,6 +26302,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 1699.96,
     compareAtPriceDisplay: '$1,699.96',
     imageUrl: 'https://m.media-amazon.com/images/I/51eU6PpZ8TL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/41tqA5M-sLL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/51eU6PpZ8TL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/31ARQoQXbCL._AC_SL1500_.jpg',
@@ -26212,6 +26361,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 1859.99,
     compareAtPriceDisplay: '$1,859.99',
     imageUrl: 'https://m.media-amazon.com/images/I/61wJe0ioRYL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51vz0fZa3BL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/61wJe0ioRYL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/31VAuGgcf0L._AC_SL1500_.jpg',
@@ -26270,6 +26420,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 1882.99,
     compareAtPriceDisplay: '$1,882.99',
     imageUrl: 'https://m.media-amazon.com/images/I/4195YvuJkXL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/41KEghQVULL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/4195YvuJkXL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/316raWP+u-L._AC_SL1500_.jpg',
@@ -26324,6 +26475,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 499.90,
     compareAtPriceDisplay: '$499.90',
     imageUrl: 'https://m.media-amazon.com/images/I/51QO0ZpsgVL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/516+35j2ndL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/51QO0ZpsgVL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/31HOlirsJ1L._AC_SL1500_.jpg',
@@ -26379,7 +26531,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 1199.38,
     compareAtPriceDisplay: '$1,199.38',
     imageUrl: 'https://m.media-amazon.com/images/I/71+CWkLxpdL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/41lGHm+y9wL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71+CWkLxpdL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51cnVrOR9JL._AC_SL1500_.jpg',
@@ -26445,7 +26597,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 1003.70,
     compareAtPriceDisplay: '$1,003.70',
     imageUrl: 'https://m.media-amazon.com/images/I/610vPpuVLtL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51eGK7SRo1L._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/610vPpuVLtL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51JAwIm-osL._AC_SL1500_.jpg',
@@ -26499,7 +26651,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 149.32,
     compareAtPriceDisplay: '$149.32',
     imageUrl: 'https://m.media-amazon.com/images/I/81jva5DZVTL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/41oPUpi80wL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81jva5DZVTL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/31mL5r7hbaL._AC_SL1500_.jpg',
@@ -26552,6 +26704,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 626.00,
     compareAtPriceDisplay: '$626.00',
     imageUrl: 'https://m.media-amazon.com/images/I/71suQLl8pgL._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51W0mhzSgiL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71suQLl8pgL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41rvza1Ds4L._AC_SL1500_.jpg',
@@ -26604,6 +26757,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 1399.99,
     compareAtPriceDisplay: '$1,399.99',
     imageUrl: 'https://m.media-amazon.com/images/I/51iisdVLe3L._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51P-9zI0T+L._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/51iisdVLe3L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/31YRGa7LHgL._AC_SL1500_.jpg',
@@ -26664,7 +26818,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 139.99,
     compareAtPriceDisplay: '$139.99',
     imageUrl: 'https://m.media-amazon.com/images/I/41+vk1U0V1L._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51cp0HaWwDL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/41+vk1U0V1L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51mVkKurMXL._AC_SL1500_.jpg',
@@ -26720,6 +26874,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 179.99,
     compareAtPriceDisplay: '$179.99',
     imageUrl: 'https://m.media-amazon.com/images/I/61z2ybmCR1L._AC_SL1500_.jpg',
+    panelImageUrl: 'https://m.media-amazon.com/images/I/41gkLGCVsFL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/61z2ybmCR1L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/31P+mpMTyzL._AC_SL1500_.jpg',
@@ -26772,7 +26927,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 45.99,
     compareAtPriceDisplay: '$45.99',
     imageUrl: 'https://m.media-amazon.com/images/I/818AYxUVemL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51lbmF1uLrL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/818AYxUVemL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/415Bvqf8nBL._AC_SL1500_.jpg',
@@ -26825,7 +26980,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 1135.99,
     compareAtPriceDisplay: '$1,135.99',
     imageUrl: 'https://m.media-amazon.com/images/I/81tY8HT0C2L._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/41+qRvmGXGL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81tY8HT0C2L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/31iwxGYqLPL._AC_SL1500_.jpg',
@@ -26880,7 +27035,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 482.24,
     compareAtPriceDisplay: '$482.24',
     imageUrl: 'https://m.media-amazon.com/images/I/71o+koR032L._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/519ctoY-xFL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71o+koR032L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51O7CrUOxnL._AC_SL1500_.jpg',
@@ -26933,7 +27088,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 1125.84,
     compareAtPriceDisplay: '$1,125.84',
     imageUrl: 'https://m.media-amazon.com/images/I/51Gk4Bfz28L._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/31yriV-pphL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/51Gk4Bfz28L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/21wXMVGXCNL._AC_SL1500_.jpg',
@@ -26986,7 +27141,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 582.61,
     compareAtPriceDisplay: '$582.61',
     imageUrl: 'https://m.media-amazon.com/images/I/91FePu+lLdL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/41flSL6eRhL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/91FePu+lLdL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51Yc55OD23L._AC_SL1500_.jpg',
@@ -27129,7 +27284,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 1648.80,
     compareAtPriceDisplay: '$1,648.80',
     imageUrl: 'https://m.media-amazon.com/images/I/71RNxdkoMLL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/511YZPE5lYL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71RNxdkoMLL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51SoicVlP8L._AC_SL1500_.jpg',
@@ -27213,7 +27368,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 1972.13,
     compareAtPriceDisplay: '$1,972.13',
     imageUrl: 'https://m.media-amazon.com/images/I/71QV5c-WFsL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/41Wkiy+JN3L._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71QV5c-WFsL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/515XwoDCXHL._AC_SL1500_.jpg',
@@ -27312,7 +27467,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 459.99,
     compareAtPriceDisplay: '$459.99',
     imageUrl: 'https://m.media-amazon.com/images/I/91hwUQ-9MLL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/619cJaQqFcL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/91hwUQ-9MLL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51vuQ9aByzL._AC_SL1500_.jpg',
@@ -27423,7 +27578,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 899.99,
     compareAtPriceDisplay: '$899.99',
     imageUrl: 'https://m.media-amazon.com/images/I/81ANWGIaWfL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51cDnh5Yn7L._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81ANWGIaWfL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51vyvX4WaaL._AC_SL1500_.jpg',
@@ -27560,7 +27715,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 2012.59,
     compareAtPriceDisplay: '$2,012.59',
     imageUrl: 'https://m.media-amazon.com/images/I/7153Jfe9aZL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/31ZIeKNP2SL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/7153Jfe9aZL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41Ygdj8PkJL._AC_SL1500_.jpg',
@@ -27645,7 +27800,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 981.88,
     compareAtPriceDisplay: '$981.88',
     imageUrl: 'https://m.media-amazon.com/images/I/71tLYPEL-zL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/31hHg7Wwj6L._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71tLYPEL-zL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/411GlzVAPmL._AC_SL1500_.jpg',
@@ -27746,7 +27901,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 751.00,
     compareAtPriceDisplay: '$751.00',
     imageUrl: 'https://m.media-amazon.com/images/I/91Coyu0iTdL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51AgwA3WYIL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/91Coyu0iTdL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51oUbqYqI+L._AC_SL1500_.jpg',
@@ -27836,7 +27991,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 2031.30,
     compareAtPriceDisplay: '$2,031.30',
     imageUrl: 'https://m.media-amazon.com/images/I/81zC8wxVBSL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/31vfvR55NwL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81zC8wxVBSL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/416u4YYYV1L._AC_SL1500_.jpg',
@@ -27927,7 +28082,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 189.99,
     compareAtPriceDisplay: '$189.99',
     imageUrl: 'https://m.media-amazon.com/images/I/61RFEPQ8MCL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/41m3-i3vz-L._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/61RFEPQ8MCL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41iitOOglnL._AC_SL1500_.jpg',
@@ -28035,7 +28190,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 1549.93,
     compareAtPriceDisplay: '$1,549.93',
     imageUrl: 'https://m.media-amazon.com/images/I/91tBGFUPK7L._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/315x52ZhUtL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/91tBGFUPK7L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51w87qiRx6L._AC_SL1500_.jpg',
@@ -28129,7 +28284,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 239.99,
     compareAtPriceDisplay: '$239.99',
     imageUrl: 'https://m.media-amazon.com/images/I/71OT45UjUUL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/41FI0SpRYuL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71OT45UjUUL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41-DY4gs3jL._AC_SL1500_.jpg',
@@ -28241,7 +28396,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 659.99,
     compareAtPriceDisplay: '$659.99',
     imageUrl: 'https://m.media-amazon.com/images/I/51tnfajzNWL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51MAa66S8ZL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/51tnfajzNWL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/31JvaaHKGkL._AC_SL1500_.jpg',
@@ -28331,7 +28486,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 599.00,
     compareAtPriceDisplay: '$599.00',
     imageUrl: 'https://m.media-amazon.com/images/I/712bqyICqjL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/410+6E+8wiL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/712bqyICqjL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41Z8uJAqTiL._AC_SL1500_.jpg',
@@ -28442,7 +28597,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 142.89,
     compareAtPriceDisplay: '$142.89',
     imageUrl: 'https://m.media-amazon.com/images/I/81OpEqAWZLL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51iewvAz4zL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81OpEqAWZLL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41VetGCYZfL._AC_SL1500_.jpg',
@@ -28545,7 +28700,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 111.59,
     compareAtPriceDisplay: '$111.59',
     imageUrl: 'https://m.media-amazon.com/images/I/81oR39uFXSL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/41EcVfsFSzL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81oR39uFXSL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41LFg8Hs3SL._AC_SL1500_.jpg',
@@ -28629,7 +28784,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 109.99,
     compareAtPriceDisplay: '$109.99',
     imageUrl: 'https://m.media-amazon.com/images/I/91trM5YYxgL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/61xk-bQlWjL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/91trM5YYxgL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41Hf8duCKKL._AC_SL1500_.jpg',
@@ -28727,7 +28882,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 119.99,
     compareAtPriceDisplay: '$119.99',
     imageUrl: 'https://m.media-amazon.com/images/I/61pT8HusDvL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51jwOAONJPL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/61pT8HusDvL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41d1rc-B6JL._AC_SL1500_.jpg',
@@ -28830,7 +28985,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 159.99,
     compareAtPriceDisplay: '$159.99',
     imageUrl: 'https://m.media-amazon.com/images/I/61z6slICmsL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51E-Wd61HeL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/61z6slICmsL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/31KpV802oEL._AC_SL1500_.jpg',
@@ -28935,7 +29090,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 76.49,
     compareAtPriceDisplay: '$76.49',
     imageUrl: 'https://m.media-amazon.com/images/I/711bHwntafL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51xqcw5T6oL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/711bHwntafL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41ZsLS0uKgL._AC_SL1500_.jpg',
@@ -29118,7 +29273,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 549.64,
     compareAtPriceDisplay: '$549.64',
     imageUrl: 'https://m.media-amazon.com/images/I/91rwiDiCe0L._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/31M3CnaXn6L._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/91rwiDiCe0L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51EqNJ3NkdL._AC_SL1500_.jpg',
@@ -29227,7 +29382,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 179.99,
     compareAtPriceDisplay: '$179.99',
     imageUrl: 'https://m.media-amazon.com/images/I/81OOU+N0FDL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/41BkWJZvkfL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81OOU+N0FDL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41e5-yHZ0PL._AC_SL1500_.jpg',
@@ -29355,7 +29510,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 545.19,
     compareAtPriceDisplay: '$545.19',
     imageUrl: 'https://m.media-amazon.com/images/I/81lOaoS0LUL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/41piyokGoTL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81lOaoS0LUL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41J+8ErJRuL._AC_SL1500_.jpg',
@@ -29490,7 +29645,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 269.99,
     compareAtPriceDisplay: '$269.99',
     imageUrl: 'https://m.media-amazon.com/images/I/619eSxBStgL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/41N9BFywyoL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/619eSxBStgL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41WNRCw2p9L._AC_SL1500_.jpg',
@@ -29597,7 +29752,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 189.99,
     compareAtPriceDisplay: '$189.99',
     imageUrl: 'https://m.media-amazon.com/images/I/71rcZq0f5uL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51s-AtukNBL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71rcZq0f5uL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41sVLMI7vcL._AC_SL1500_.jpg',
@@ -29707,7 +29862,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 132.99,
     compareAtPriceDisplay: '$132.99',
     imageUrl: 'https://m.media-amazon.com/images/I/613wFyxU66S._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/31bMx1Q5kSS._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/613wFyxU66S._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/31v6riyRwYS._AC_SL1500_.jpg',
@@ -29794,7 +29949,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 1295.61,
     compareAtPriceDisplay: '$1,295.61',
     imageUrl: 'https://m.media-amazon.com/images/I/715G580qyXL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51X8AoqYGDL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/715G580qyXL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41-M3DMsYfL._AC_SL1500_.jpg',
@@ -29893,7 +30048,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 2146.99,
     compareAtPriceDisplay: '$2,146.99',
     imageUrl: 'https://m.media-amazon.com/images/I/814c1HvixHL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/41FYSyo6ftL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/814c1HvixHL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41N0IgFg6oL._AC_SL1500_.jpg',
@@ -29993,7 +30148,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 994.46,
     compareAtPriceDisplay: '$994.46',
     imageUrl: 'https://m.media-amazon.com/images/I/61l+QdqHN4L._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/41vWZu+BNaL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/61l+QdqHN4L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/31JrG-eHYGL._AC_SL1500_.jpg',
@@ -30087,7 +30242,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 604.89,
     compareAtPriceDisplay: '$604.89',
     imageUrl: 'https://m.media-amazon.com/images/I/71J3qvWYBbL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/4159BGQQVdL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71J3qvWYBbL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/416zZ4x54nL._AC_SL1500_.jpg',
@@ -30194,7 +30349,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 885.47,
     compareAtPriceDisplay: '$885.47',
     imageUrl: 'https://m.media-amazon.com/images/I/616XCHye-aL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/31NrcrkJYRL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/616XCHye-aL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/31L1MBOsyuL._AC_SL1500_.jpg',
@@ -30325,7 +30480,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 1029.99,
     compareAtPriceDisplay: '$1,029.99',
     imageUrl: 'https://m.media-amazon.com/images/I/91ZDgEZUa6L._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/417fymrnY7L._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/91ZDgEZUa6L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/514qWQaRU0L._AC_SL1500_.jpg',
@@ -30415,7 +30570,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 389.99,
     compareAtPriceDisplay: '$389.99',
     imageUrl: 'https://m.media-amazon.com/images/I/71LtclNEPAL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51Fb16URT+L._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71LtclNEPAL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41vGZvfsXSL._AC_SL1500_.jpg',
@@ -30508,7 +30663,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 719.94,
     compareAtPriceDisplay: '$719.94',
     imageUrl: 'https://m.media-amazon.com/images/I/71Jq-xa1t2L._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/515WCiAWwhL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71Jq-xa1t2L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41NLhHmooeL._AC_SL1500_.jpg',
@@ -30617,7 +30772,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 437.25,
     compareAtPriceDisplay: '$437.25',
     imageUrl: 'https://m.media-amazon.com/images/I/810SlSffqpL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/41POpuK6SDL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/810SlSffqpL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41HU3m+jThL._AC_SL1500_.jpg',
@@ -30724,7 +30879,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 699.99,
     compareAtPriceDisplay: '$699.99',
     imageUrl: 'https://m.media-amazon.com/images/I/918h31F3jeL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51+mV9jSelL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/918h31F3jeL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51T4jHzrTvL._AC_SL1500_.jpg',
@@ -30808,7 +30963,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 1699.99,
     compareAtPriceDisplay: '$1,699.99',
     imageUrl: 'https://m.media-amazon.com/images/I/81ne4lWaKwL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51Bfo-SnQ3L._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81ne4lWaKwL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51L+AM0gDsL._AC_SL1500_.jpg',
@@ -30908,7 +31063,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 175.99,
     compareAtPriceDisplay: '$175.99',
     imageUrl: 'https://m.media-amazon.com/images/I/81gXJM-DaiL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51a+M-Po1pL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81gXJM-DaiL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/412iP4B6P3L._AC_SL1500_.jpg',
@@ -30995,7 +31150,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 239.99,
     compareAtPriceDisplay: '$239.99',
     imageUrl: 'https://m.media-amazon.com/images/I/81IwciNAAwL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/41hfn9J3BmL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81IwciNAAwL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41NzCadGsKL._AC_SL1500_.jpg',
@@ -31101,7 +31256,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 2498.79,
     compareAtPriceDisplay: '$2,498.79',
     imageUrl: 'https://m.media-amazon.com/images/I/71vPTzfwDtL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/414H5LHq6XL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71vPTzfwDtL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41Nt-hSaa9L._AC_SL1500_.jpg',
@@ -31193,7 +31348,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 1159.99,
     compareAtPriceDisplay: '$1,159.99',
     imageUrl: 'https://m.media-amazon.com/images/I/71MUjGjXl+L._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51F94l-6TTL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71MUjGjXl+L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41+GYAnLE4L._AC_SL1500_.jpg',
@@ -31278,7 +31433,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 2989.79,
     compareAtPriceDisplay: '$2,989.79',
     imageUrl: 'https://m.media-amazon.com/images/I/91kZfRDBneL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/41NDzsPdO6L._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/91kZfRDBneL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51-jaBbmi2L._AC_SL1500_.jpg',
@@ -31368,7 +31523,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 1761.61,
     compareAtPriceDisplay: '$1,761.61',
     imageUrl: 'https://m.media-amazon.com/images/I/51dIEHmUtuL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/31F9gL+AOUL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/51dIEHmUtuL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/31Xp7DrssUL._AC_SL1500_.jpg',
@@ -31454,7 +31609,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 3397.79,
     compareAtPriceDisplay: '$3,397.79',
     imageUrl: 'https://m.media-amazon.com/images/I/71SI5LKMM3L._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51bH9IvVhlL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71SI5LKMM3L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41rId1oxYYL._AC_SL1500_.jpg',
@@ -31559,7 +31714,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 145.99,
     compareAtPriceDisplay: '$145.99',
     imageUrl: 'https://m.media-amazon.com/images/I/81e0Wl80QbL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/41rfhAbLemL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81e0Wl80QbL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51y7+fvTaVL._AC_SL1500_.jpg',
@@ -31660,7 +31815,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 96.98,
     compareAtPriceDisplay: '$96.98',
     imageUrl: 'https://m.media-amazon.com/images/I/61Xfd8w+uwL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51A0omkC3ZL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/61Xfd8w+uwL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/31H4gj+GkqL._AC_SL1500_.jpg',
@@ -31757,7 +31912,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 219.99,
     compareAtPriceDisplay: '$219.99',
     imageUrl: 'https://m.media-amazon.com/images/I/91OtIp39IuL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51LY8y+lZqL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/91OtIp39IuL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51SORqjOW1L._AC_SL1500_.jpg',
@@ -31841,7 +31996,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 315.22,
     compareAtPriceDisplay: '$315.22',
     imageUrl: 'https://m.media-amazon.com/images/I/71KoGe-QtvL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51ia4ShUvNL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71KoGe-QtvL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51vcx1fKIbL._AC_SL1500_.jpg',
@@ -31926,7 +32081,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 499.99,
     compareAtPriceDisplay: '$499.99',
     imageUrl: 'https://m.media-amazon.com/images/I/91kZfRDBneL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/516Z29CkFNL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/516Z29CkFNL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41c5gGkizcL._AC_SL1500_.jpg',
@@ -32010,7 +32165,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 419.99,
     compareAtPriceDisplay: '$419.99',
     imageUrl: 'https://m.media-amazon.com/images/I/91udJG5MHaL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/31VnOUB5ZKL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/91udJG5MHaL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51q4afBMfcL._AC_SL1500_.jpg',
@@ -32095,7 +32250,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 108.48,
     compareAtPriceDisplay: '$108.48',
     imageUrl: 'https://m.media-amazon.com/images/I/81bV2FirtGL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51Hood3W-CL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81bV2FirtGL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51y-L2VMbRL._AC_SL1500_.jpg',
@@ -32200,7 +32355,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 399.99,
     compareAtPriceDisplay: '$399.99',
     imageUrl: 'https://m.media-amazon.com/images/I/91Coyu0iTdL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/413cXe8E7SL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/413cXe8E7SL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/417BHwSV2iL._AC_SL1500_.jpg',
@@ -32297,7 +32452,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 458.21,
     compareAtPriceDisplay: '$458.21',
     imageUrl: 'https://m.media-amazon.com/images/I/91b-8WVOILL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/41Avp7PWCRL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/91b-8WVOILL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41AkVc8cHVL._AC_SL1500_.jpg',
@@ -32383,7 +32538,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 229.99,
     compareAtPriceDisplay: '$229.99',
     imageUrl: 'https://m.media-amazon.com/images/I/71JAG0aruLL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/41sxfCCYu6L._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71JAG0aruLL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41YnXAGt6aL._AC_SL1500_.jpg',
@@ -32475,7 +32630,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 154.00,
     compareAtPriceDisplay: '$154.00',
     imageUrl: 'https://m.media-amazon.com/images/I/413kdhO27XL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51SCW4jlBqL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/413kdhO27XL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51wTK7X2JuL._AC_SL1500_.jpg',
@@ -32560,7 +32715,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 159.99,
     compareAtPriceDisplay: '$159.99',
     imageUrl: 'https://m.media-amazon.com/images/I/61aECRMt-CL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51JjVr1MywL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/61aECRMt-CL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/31f6dTs8ICL._AC_SL1500_.jpg',
@@ -32646,7 +32801,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 129.99,
     compareAtPriceDisplay: '$129.99',
     imageUrl: 'https://m.media-amazon.com/images/I/81niTmYOJ3L._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/41jEaxSpIpL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81niTmYOJ3L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41TUg8InddL._AC_SL1500_.jpg',
@@ -32728,7 +32883,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 209.99,
     compareAtPriceDisplay: '$209.99',
     imageUrl: 'https://m.media-amazon.com/images/I/816WD6ruTyL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51yekpSuDDL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/816WD6ruTyL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41jB52Y47OL._AC_SL1500_.jpg',
@@ -32824,7 +32979,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 139.99,
     compareAtPriceDisplay: '$139.99',
     imageUrl: 'https://m.media-amazon.com/images/I/81V0yiq3GoL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51K2h+iHGFL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81V0yiq3GoL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41goS1akJYL._AC_SL1500_.jpg',
@@ -32922,7 +33077,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 99.99,
     compareAtPriceDisplay: '$99.99',
     imageUrl: 'https://m.media-amazon.com/images/I/81fE8IcoE9L._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51ISMmgaqkL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81fE8IcoE9L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41n1fP15ThL._AC_SL1500_.jpg',
@@ -33008,7 +33163,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 89.99,
     compareAtPriceDisplay: '$89.99',
     imageUrl: 'https://m.media-amazon.com/images/I/71PvXyBQGeL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/41uRN93KTYL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71PvXyBQGeL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/517dEzw0DzL._AC_SL1500_.jpg',
@@ -33110,7 +33265,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 45.99,
     compareAtPriceDisplay: '$45.99',
     imageUrl: 'https://m.media-amazon.com/images/I/41wdkHzHvWL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/41E+Pl7EvEL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/41wdkHzHvWL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41H1K5qsXZL._AC_SL1500_.jpg',
@@ -33205,7 +33360,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 44.98,
     compareAtPriceDisplay: '$44.98',
     imageUrl: 'https://m.media-amazon.com/images/I/71hKetB78tL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/41N23ucM7JL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71hKetB78tL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41fBO8Hx2DL._AC_SL1500_.jpg',
@@ -33315,7 +33470,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 69.99,
     compareAtPriceDisplay: '$69.99',
     imageUrl: 'https://m.media-amazon.com/images/I/71WztriDcYL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51oDmooynwL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71WztriDcYL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51l4Fx4W32L._AC_SL1500_.jpg',
@@ -33407,7 +33562,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 79.99,
     compareAtPriceDisplay: '$79.99',
     imageUrl: 'https://m.media-amazon.com/images/I/81-KKdQ+0nL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51Nurjl4HvL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81-KKdQ+0nL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51fP6aIzu1L._AC_SL1500_.jpg',
@@ -33496,7 +33651,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 59.98,
     compareAtPriceDisplay: '$59.98',
     imageUrl: 'https://m.media-amazon.com/images/I/71Uz0iUAkcL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51xlTFddyIL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71Uz0iUAkcL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51DTCLXb-NL._AC_SL1500_.jpg',
@@ -33590,7 +33745,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 52.99,
     compareAtPriceDisplay: '$52.99',
     imageUrl: 'https://m.media-amazon.com/images/I/71PjdLlrnrL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/514o4fDqJTL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71PjdLlrnrL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41ikntGsNtL._AC_SL1500_.jpg',
@@ -33685,7 +33840,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 69.99,
     compareAtPriceDisplay: '$69.99',
     imageUrl: 'https://m.media-amazon.com/images/I/41NfKN5-4jL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/41SmlUvqP4L._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/41NfKN5-4jL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41BIqG+2gFL._AC_SL1500_.jpg',
@@ -33800,7 +33955,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 59.99,
     compareAtPriceDisplay: '$59.99',
     imageUrl: 'https://m.media-amazon.com/images/I/81YjaA6Mb9L._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/41i+qiMxuJL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81YjaA6Mb9L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/31L8CWrD1EL._AC_SL1500_.jpg',
@@ -33893,7 +34048,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 79.99,
     compareAtPriceDisplay: '$79.99',
     imageUrl: 'https://m.media-amazon.com/images/I/71x1F6G4YyL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/41bfP6ckqWL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/71x1F6G4YyL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41xidqScveL._AC_SL1500_.jpg',
@@ -33983,7 +34138,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 299.99,
     compareAtPriceDisplay: '$299.99',
     imageUrl: 'https://m.media-amazon.com/images/I/81jgoKmnGnL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/514LhQnlT1L._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/81jgoKmnGnL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/414u4zp6wdL._AC_SL1500_.jpg',
@@ -34080,7 +34235,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 319.99,
     compareAtPriceDisplay: '$319.99',
     imageUrl: 'https://m.media-amazon.com/images/I/41-gnpVmOKL._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/511s5G7hQeL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/41-gnpVmOKL._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/51UgtEVt3yL._AC_SL1500_.jpg',
@@ -34170,7 +34325,7 @@ export const PRODUCT_CATALOG = [
     compareAtPrice: 288.89,
     compareAtPriceDisplay: '$288.89',
     imageUrl: 'https://m.media-amazon.com/images/I/41wo6RqQP+L._AC_SL1500_.jpg',
-    panelImageUrl: null,
+    panelImageUrl: 'https://m.media-amazon.com/images/I/51S3xfPZ0bL._AC_SL1500_.jpg',
     images: [
       'https://m.media-amazon.com/images/I/41wo6RqQP+L._AC_SL1500_.jpg',
       'https://m.media-amazon.com/images/I/41xKgTDLDvL._AC_SL1500_.jpg',

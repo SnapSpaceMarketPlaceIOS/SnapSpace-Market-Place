@@ -149,6 +149,21 @@ export const FIDELITY_DIRECTIVES =
 export const FIDELITY_DIRECTIVES_SINGLE =
   'The product must match the reference exactly. Ignore any other items, walls, or decor visible in the reference image — render only the named product. No substitutions, no new decor.';
 
+// Build 146 (Gap 6) — closing architecture lock for the single-product path.
+//
+// The panel/refs paths put an architecture lock in the closing position to
+// own flux's last-token attention budget (see buildPanelPrompt's section 5
+// comment). The single-product path was missing this and could drift on
+// products whose descriptor carried atmospheric vocabulary (e.g. a
+// "rustic farmhouse linen sofa" — the descriptor's "rustic farmhouse" was
+// landing on walls instead of just the upholstery).
+//
+// This variant is scoped to the PRODUCT descriptor (not a user style prompt)
+// since the single-product flow has no user atmospheric input. Same closing-
+// position philosophy: it sits last so flux gives it peak attention weight.
+export const ARCHITECTURE_LOCK_SINGLE =
+  'Architectural words in the product descriptor (concrete, raw, brutal, monolithic, dramatic, weathered, rustic, polished, etc.) describe the product\'s upholstery and finish only — never walls, floors, ceilings, or trim. Architecture lock: image 1\'s walls, floor, ceiling, windows, doors, trim, and camera angle remain identical to the room photo.';
+
 // Build 125 (Lever B) — per-category fidelity hints.
 //
 // flux's vision-language head responds well to specific render directives —
@@ -191,6 +206,12 @@ const PER_CELL_FIDELITY = {
   'bench':          'preserve silhouette and material finish',
   'ottoman':        'preserve silhouette and upholstery',
   'pouf':           'preserve silhouette and texture',
+  // Build 146 (Gap 5) — furniture-set covers multi-piece outdoor/dining
+  // bundles (15 products in catalog). Default fallback was "preserve
+  // silhouette, color, and material" which loses the multi-piece signal —
+  // flux would sometimes drop or substitute components of the set. The
+  // explicit directive tells flux the cell shows a coordinated bundle.
+  'furniture-set':  'preserve every piece in the set, their configuration, materials, and proportions',
   // Lighting — fixture shape + mount placement
   'floor-lamp':     'preserve fixture shape, finish, and shade style',
   'table-lamp':     'preserve fixture shape, base finish, and shade style',

@@ -106,9 +106,15 @@ const BORDER_B = 220;
 // The audit flagged this as HIGH — not data-leak bad, but a real DoS
 // and cost-abuse vector.
 //
-// Whitelisted hosts cover the three legitimate sources of product
-// imagery HomeGenie uses today. New sources require a migration here
-// + a security review.
+// Build 146 (Gap 4): pruned Wayfair (wfcdn.com) and Houzz (hzcdn.com)
+// entries. Those integrations were removed in Build 107; the catalog is
+// Amazon-only. Leaving stale CDN hosts in the allowlist widens the SSRF
+// surface for no legitimate purpose. If multi-vendor returns, restore
+// these here as part of that work.
+//
+// Whitelisted hosts cover the legitimate sources of product imagery
+// HomeGenie uses today. New sources require a migration here + a
+// security review.
 const ALLOWED_HOSTS = new Set([
   // Supabase Storage (own uploads, own CDN transforms)
   "lqjfnpibbjymhzupqtda.supabase.co",
@@ -116,11 +122,6 @@ const ALLOWED_HOSTS = new Set([
   "m.media-amazon.com",
   "images-na.ssl-images-amazon.com",
   "images-amazon.com",
-  // Wayfair CJ affiliate image CDN
-  "secure.img1-fg.wfcdn.com",
-  "secure.img2-fg.wfcdn.com",
-  // Houzz affiliate image CDN
-  "st.hzcdn.com",
   // Unsplash — used by seed catalog designs
   "images.unsplash.com",
 ]);

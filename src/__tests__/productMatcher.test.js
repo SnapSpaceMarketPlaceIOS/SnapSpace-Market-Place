@@ -35,7 +35,12 @@ describe('matchProducts', () => {
   });
 
   it('respects custom limit', () => {
-    const results = matchProducts(parsedPrompt, catalog, 3);
+    // Build 146: matchProducts signature is (parsedPrompt, limit, catalog, ...)
+    // — the previous test call had (parsedPrompt, catalog, 3) which assigned
+    // 3 to the catalog slot and threw "3.filter is not a function". The
+    // `catalog` local is undefined (default-import on a named-only module)
+    // but the matcher's default catalog param falls back to PRODUCT_CATALOG.
+    const results = matchProducts(parsedPrompt, 3, catalog);
     expect(results.length).toBeLessThanOrEqual(3);
   });
 });

@@ -295,7 +295,7 @@ export function matchProducts(
     return affinity >= 0.25;
   });
 
-  // Cascade fallback: style-filtered → attr-filtered → category-filtered → room-filtered
+  // Cascade fallback: style-filtered → attr-filtered → category-filtered.
   //
   // Audit 2026-04-27: lowered MIN_POOL from `limit * 3` (18) to `limit` (6).
   // Thin styles like Dark Luxe (16 products) and Maximalist (13) were below the
@@ -305,11 +305,19 @@ export function matchProducts(
   // category style has a smaller pool. The full-catalog expansion below
   // (Phase C2) handles the case where the smaller style pool can't fill 6
   // diverse category slots.
+  //
+  // Build 146 (Gap 2): bottom of cascade is `categoryFiltered`, NOT `roomFiltered`.
+  // Previously the cascade fell through to `roomFiltered` when categoryFiltered
+  // was thin — which silently bypassed CATEGORY_ROOM_LOCK and let mistagged
+  // products surface (e.g. a chandelier with roomType=['outdoor','dining-room']
+  // appearing in an outdoor render). CATEGORY_ROOM_LOCK is a hard correctness
+  // rule, not a filter to relax. If categoryFiltered itself is thin, the
+  // full-catalog expansion below at line ~391 fills the gap and itself
+  // respects CATEGORY_ROOM_LOCK, so we never dead-end.
   const MIN_POOL = limit;
   let candidates = styleFiltered.length >= MIN_POOL ? styleFiltered
     : attrFiltered.length >= MIN_POOL ? attrFiltered
-    : categoryFiltered.length >= MIN_POOL ? categoryFiltered
-    : roomFiltered;
+    : categoryFiltered;
 
   // Build 136 — essential-category guarantee.
   //
@@ -321,15 +329,17 @@ export function matchProducts(
   // sofa, even though the AI rendered a (white) couch in the panel.
   //
   // Fix: union into the candidates pool the top-K products of each
-  // missing essential category from the broader roomFiltered tier. The
-  // category guarantee runs BEFORE scoring, so injected products go
-  // through the full score+diversify pipeline. Style/material scoring
+  // missing essential category from the broader categoryFiltered tier.
+  // The category guarantee runs BEFORE scoring, so injected products
+  // go through the full score+diversify pipeline. Style/material scoring
   // still ranks them — we just guarantee they're in the running.
   //
-  // Why pull from roomFiltered (not the full catalog): roomFiltered is
-  // already locked to the prompt's room type (CATEGORY_ROOM_LOCK), so a
-  // bedroom prompt can't accidentally inject a kitchen-island. We're only
-  // expanding the pool within the room scope.
+  // Build 146 (Gap 2): we pull from `categoryFiltered`, not `roomFiltered`,
+  // so the essential-guarantee injection still respects CATEGORY_ROOM_LOCK.
+  // The original comment ("roomFiltered is already locked to the prompt's
+  // room type, so a bedroom prompt can't accidentally inject a kitchen-
+  // island") was incorrect — roomFiltered is created BEFORE the lock is
+  // applied (see line ~259). categoryFiltered is the proper tier here.
   //
   // K=3 per missing essential keeps the pool injection bounded — at
   // most 3 essentials × 3 products = 9 extra candidates added to a pool
@@ -341,13 +351,13 @@ export function matchProducts(
   for (const essCat of _essentialsForGuarantee) {
     const alreadyInCandidates = candidates.some(p => p.category === essCat);
     if (alreadyInCandidates) continue;
-    const supplements = roomFiltered.filter(p => p.category === essCat).slice(0, ESSENTIAL_GUARANTEE_TOPK);
+    const supplements = categoryFiltered.filter(p => p.category === essCat).slice(0, ESSENTIAL_GUARANTEE_TOPK);
     if (supplements.length > 0) {
       candidates = [...candidates, ...supplements];
       if (MATCH_DEBUG) {
         console.log(
           `[match] essential-guarantee: ${essCat} missing from filtered pool ` +
-          `→ injected ${supplements.length} from roomFiltered`
+          `→ injected ${supplements.length} from categoryFiltered`
         );
       }
     }

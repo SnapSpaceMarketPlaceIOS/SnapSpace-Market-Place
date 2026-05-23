@@ -39,7 +39,7 @@ import { proxyFetch } from './apiProxy';
 // fal.js has zero runtime dependency on replicate.js. replicate.js is now
 // orphaned (no import graph edge into it) and can be deleted in a future
 // cleanup. Keeping it around for the moment in case a rollback is needed.
-import { buildPanelPrompt, buildFlux2MaxPrompt, getQualityPrefix, FIDELITY_DIRECTIVES_SINGLE } from './promptBuilders';
+import { buildPanelPrompt, buildFlux2MaxPrompt, getQualityPrefix, FIDELITY_DIRECTIVES_SINGLE, ARCHITECTURE_LOCK_SINGLE } from './promptBuilders';
 
 const FAL_QUEUE_URL = 'https://queue.fal.run/fal-ai/flux-2-pro/edit';
 const POLL_INTERVAL_MS = 3000;
@@ -456,11 +456,18 @@ export async function generateSingleProductInRoom(roomPhotoUrl, product, aspectR
   // Build 115: same structural cleanup as buildPanelPrompt — short
   // positive imperatives, no anti-instructions. Single-product flow has
   // no user style prompt, so the wrapper is even shorter (~50 words).
+  //
+  // Build 146 (Gap 6): added ARCHITECTURE_LOCK_SINGLE in closing position
+  // to mirror the panel/refs paths. Without it, products whose descriptor
+  // carries atmospheric vocabulary ("rustic farmhouse linen sofa") could
+  // bleed onto walls/floors/ceilings. The lock owns the closing-token
+  // attention budget — same philosophy as buildPanelPrompt's section 5.
   const prompt = [
     getQualityPrefix(),
     'Scene edit: preserve image 1\'s walls, floor, ceiling, windows, lighting, and camera angle unchanged.',
     `Place the product from image 2 into the room: a ${descriptor}. Match its color, material, silhouette, and proportions to the reference exactly.`,
     FIDELITY_DIRECTIVES_SINGLE,
+    ARCHITECTURE_LOCK_SINGLE,
   ].join(' ');
 
   const imageSize = resolveImageSize(aspectRatio);

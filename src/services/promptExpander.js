@@ -1,4 +1,6 @@
 import { proxyFetch } from './apiProxy';
+import { COLOR_KEYWORDS } from '../utils/colorMap';
+import { STYLE_KEYWORDS, MATERIAL_KEYWORDS } from '../data/styleMap';
 
 const HAIKU_MODEL = 'claude-haiku-4-5-20251001';
 const MAX_TOKENS = 200;
@@ -77,6 +79,59 @@ function timeoutPromise(ms) {
   );
 }
 
+// Build 146 (Gap 3) — vocabulary preservation check.
+//
+// The system prompt instructs Haiku not to substitute the user's vocabulary
+// (Build 95 directive: "If the input says 'velvet', say 'velvet' — not 'luxe
+// softness'"). But that's a rule, not enforcement — a non-compliant Haiku
+// response silently degrades matcher alignment because the matcher scores
+// against the same color/material/style keywords the user wrote.
+//
+// This guard runs AFTER a successful expansion: if the raw prompt carried
+// meaningful color/material/style vocabulary AND Haiku stripped most of it,
+// fall back to the raw prompt. Better to lose cinematography enrichment
+// than to lose matcher fidelity. Threshold is 50% preservation — preserves
+// most expansions while catching gross substitutions.
+//
+// Only fires when raw has ≥2 vocab tokens — short prompts like
+// "modern bedroom" pass through unchecked. This avoids over-triggering on
+// inputs Haiku can't substitute much anyway.
+const _VOCAB_TOKENS = (() => {
+  const tokens = new Set();
+  // Specific color words (cognac, walnut, ivory, etc.) — most are 4+ chars
+  for (const words of Object.values(COLOR_KEYWORDS)) {
+    for (const w of words) tokens.add(w.toLowerCase());
+  }
+  // Materials (velvet, rattan, leather, oak, etc.)
+  for (const words of Object.values(MATERIAL_KEYWORDS)) {
+    for (const w of words) tokens.add(w.toLowerCase());
+  }
+  // Style keywords (brutalist, japandi, mid-century, etc.)
+  for (const words of Object.values(STYLE_KEYWORDS)) {
+    for (const w of words) tokens.add(w.toLowerCase());
+  }
+  // Filter to length-4+ — single-letter / short words like 'oak' get false
+  // positives ("yoak" contains "oak"). Word-boundary matching below also
+  // helps. Net effect: we focus on the substantive vocabulary tokens that
+  // most matter for matcher alignment.
+  return [...tokens].filter(t => t.length >= 4);
+})();
+
+function _escapeRe(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+
+function extractVocabulary(text) {
+  if (!text || typeof text !== 'string') return new Set();
+  const lower = text.toLowerCase();
+  const found = new Set();
+  for (const tok of _VOCAB_TOKENS) {
+    if (new RegExp(`\\b${_escapeRe(tok)}\\b`).test(lower)) found.add(tok);
+  }
+  return found;
+}
+
+const VOCAB_MIN_THRESHOLD = 2;        // only enforce when raw has 2+ vocab tokens
+const VOCAB_PRESERVATION_RATIO = 0.5; // require 50%+ preservation
+
 export async function expandPrompt(userText) {
   const raw = (userText || '').trim();
   if (raw.length === 0) return raw;
@@ -113,6 +168,30 @@ export async function expandPrompt(userText) {
     if (!expanded || expanded.length < MIN_USABLE_EXPANSION_CHARS) {
       if (__DEV__) console.warn(`[promptExpander] empty/short response — using raw prompt`);
       return raw;
+    }
+
+    // Build 146 (Gap 3) — vocabulary preservation check. Reject expansions
+    // that strip color/material/style words the user actually wrote. The
+    // matcher scores against these tokens; losing them produces
+    // style-misaligned product picks.
+    const rawVocab = extractVocabulary(raw);
+    if (rawVocab.size >= VOCAB_MIN_THRESHOLD) {
+      const expandedVocab = extractVocabulary(expanded);
+      let preserved = 0;
+      for (const tok of rawVocab) {
+        if (expandedVocab.has(tok)) preserved++;
+      }
+      const ratio = preserved / rawVocab.size;
+      if (ratio < VOCAB_PRESERVATION_RATIO) {
+        if (__DEV__) {
+          const dropped = [...rawVocab].filter(t => !expandedVocab.has(t));
+          console.warn(
+            `[promptExpander] vocabulary preservation ${preserved}/${rawVocab.size} = ${ratio.toFixed(2)} ` +
+            `(< ${VOCAB_PRESERVATION_RATIO}) — falling back to raw. dropped=[${dropped.join(',')}]`
+          );
+        }
+        return raw;
+      }
     }
 
     if (__DEV__) {
