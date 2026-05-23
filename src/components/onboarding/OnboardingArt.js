@@ -54,18 +54,27 @@ const VIDEO_SOURCES = {
 // Per-step scale lets each video render at the right zoom. New videos
 // get 1.0 (no zoom); older margined videos keep 1.18. When other
 // slides get re-rendered without margins, drop their entry to 1.0.
-// Build 147 v18: zoomed out across all slides per user feedback
-// ("still too zoomed in. needs to be more spread out. yes, slides 2-6 too").
-// Each video now renders at 90% of native scale, leaving ~5% margin on
-// each side filled by the videoBlock bg (#F8F8F8). The composition reads
-// more relaxed with visible breathing room instead of edge-to-edge fill.
+// Build 147 v20: scale tuned to 1.05 across all slides.
+//
+// Iteration history:
+//   v8  — universal 1.18 (cropped white margins from legacy renders)
+//   v17 — slide-1 dropped to 1.0 (new render had no margins to crop)
+//   v18 — all → 0.9 (user: 'too zoomed in')
+//   v19 — videoBlock bg #F8F8F8 → #FFFFFF (kill the gray seam)
+//   v20 — all → 1.05 (user: 0.9 left too much white silhouette
+//         around the composition; bump to fill the box with a tiny
+//         margin crop on the video's own internal white edges)
+//
+// 1.05 fills the videoBlock cleanly (no box bg visible) AND trims the
+// faint white margin that's inside the video frame. Slight zoom in
+// vs 1.0 but well short of the 1.18 'too zoomed' threshold.
 const VIDEO_SCALE_BY_STEP = {
-  1: 0.9,
-  2: 0.9,
-  3: 0.9,
-  4: 0.9,
-  5: 0.9,
-  6: 0.9,
+  1: 1.05,
+  2: 1.05,
+  3: 1.05,
+  4: 1.05,
+  5: 1.05,
+  6: 1.05,
 };
 
 export default function OnboardingArt({ step, style, fullBleed = false, contentFit = 'contain', isActive = true }) {
