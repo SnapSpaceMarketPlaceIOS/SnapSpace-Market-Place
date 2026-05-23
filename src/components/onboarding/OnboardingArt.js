@@ -1,49 +1,36 @@
 /**
  * OnboardingArt — renders the illustration for an onboarding page.
  *
- * Build 145 (original): static PNG illustration (onboarding-N-art.png)
- *   extracted from the source SVG mockups, rendered with <Image>.
+ * Build 145 (original): static PNG illustration rendered with <Image>.
+ * Build 147 (video swap): looping silent MP4 via expo-video.
+ * Build 147 (layout restructure): added fullBleed + contentFit props so
+ *   the same component can serve both:
+ *     • OnboardingScreen's new top-hero layout (fullBleed + contentFit:cover)
+ *     • OnboardingAuthPage's shrunk-art block (default square + contain)
  *
- * Build 147: replaced static images with 10-second looping silent MP4
- *   videos (Higgsfield-rendered animations). Same `step` prop contract
- *   so OnboardingScreen.js + OnboardingAuthPage.js don't change —
- *   they still pass step={1..6} and we pick the right asset.
+ * Props:
+ *   step          int 1-6  — picks the video source
+ *   style         style    — additional style merged onto the wrapper
+ *   fullBleed     bool     — true: wrapper fills its parent (parent
+ *                            controls size, video covers the box).
+ *                            false (default): wrapper is square 1:1.
+ *   contentFit    string   — VideoView resize mode. 'contain' (default)
+ *                            preserves the full frame with letterboxing.
+ *                            'cover' fills the box and crops as needed.
  *
- *   Video config:
- *     • shouldPlay      true   — autoplay on mount
- *     • loop            true   — restart silently at end of 10s clip
- *     • muted           true   — silent autoplay is allowed on iOS;
- *                                 anything with audio would require a
- *                                 user-gesture tap to begin
- *     • nativeControls  false  — no play/pause/scrubber overlay; the
- *                                 video is decorative, the user advances
- *                                 with Continue / swipe / Skip
- *     • contentFit      contain — full content visible inside the 1:1
- *                                  wrapper, letterboxed if source isn't
- *                                  square. User explicitly asked for the
- *                                  full video to be visible (not cropped).
- *
- *   Aspect ratio:
- *     Wrapper stays at aspectRatio:1 (matches original Image render).
- *
- *   Slide → asset map:
- *     step 1 → slide-1.mp4 (Picture the possibilities)
- *     step 2 → slide-2.mp4 (Wish it. See it.)
- *     step 3 → slide-3.mp4 (Shop every piece)
- *     step 4 → slide-4.mp4 (Just what you need)
- *     step 5 → slide-5.mp4 (HomeGenie auth wall)
- *     step 6 → slide-7.mp4 (A gift to get you started — user's mental
- *                            model has the paywall as "slide 6", so the
- *                            gift reward is "slide 7" in their numbering;
- *                            our internal step:6 is the gift reward.)
+ * Slide → asset map:
+ *   step 1 → slide-1.mp4 (Picture the possibilities)
+ *   step 2 → slide-2.mp4 (Wish it. See it.)
+ *   step 3 → slide-3.mp4 (Shop every piece)
+ *   step 4 → slide-4.mp4 (Just what you need)
+ *   step 5 → slide-5.mp4 (HomeGenie auth wall)
+ *   step 6 → slide-7.mp4 (A gift to get you started)
  */
 
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { VideoView, useVideoPlayer } from 'expo-video';
 
-// Static require() of each MP4 so Metro bundles them with the app at
-// build time. Resolved once at module load.
 const VIDEO_SOURCES = {
   1: require('../../assets/onboarding/videos/slide-1.mp4'),
   2: require('../../assets/onboarding/videos/slide-2.mp4'),
@@ -53,25 +40,23 @@ const VIDEO_SOURCES = {
   6: require('../../assets/onboarding/videos/slide-7.mp4'),
 };
 
-export default function OnboardingArt({ step, style }) {
+export default function OnboardingArt({ step, style, fullBleed = false, contentFit = 'contain' }) {
   const source = VIDEO_SOURCES[step] || VIDEO_SOURCES[1];
 
-  // useVideoPlayer's setup callback configures the player ONCE when the
-  // component mounts. Each OnboardingArt instance gets its own player —
-  // FlatList only mounts nearby pages so we don't hold 6 simultaneous
-  // AVPlayer instances except briefly during swipes.
   const player = useVideoPlayer(source, (p) => {
     p.loop = true;
     p.muted = true;
     p.play();
   });
 
+  const wrapperStyle = fullBleed ? styles.fullBleed : styles.square;
+
   return (
-    <View style={[styles.square, style]} pointerEvents="none">
+    <View style={[wrapperStyle, style]} pointerEvents="none">
       <VideoView
         player={player}
         style={styles.video}
-        contentFit="contain"
+        contentFit={contentFit}
         nativeControls={false}
       />
     </View>
@@ -84,6 +69,10 @@ const styles = StyleSheet.create({
     width: '100%',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  fullBleed: {
+    width: '100%',
+    height: '100%',
   },
   video: {
     width: '100%',

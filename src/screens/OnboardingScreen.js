@@ -6,35 +6,32 @@
  * screen again on this device.
  *
  * Page order:
- *   1. Picture the possibilities     — camera + room infographic
- *   2. Wish it. See it.              — room generation infographic
- *   3. Shop every piece              — tagged products in room
- *   4. Just what you need            — single product placement
+ *   1. Picture the possibilities     — Log In + Sign Up (both → page 2)
+ *   2. Wish it. See it.              — Continue → page 3
+ *   3. Shop every piece              — Continue → page 4
+ *   4. Just what you need            — Continue → page 5
  *   5. HomeGenie (AUTH)              — Sign in / Sign in with Apple
- *   6. A gift to get you started     — 5 free wishes celebration
+ *                                       (handled by OnboardingAuthPage,
+ *                                        existing layout untouched)
+ *   6. A gift to get you started     — Continue For FREE → completes
+ *                                       onboarding, drops into Main
  *
- * Navigation:
- *   - Pages 1-4: Continue → next page. Skip (bottom-left) → jump to page 5.
- *   - Page 5: NO Continue/Skip. Tapping Sign in opens existing AuthScreen
- *             modal. Apple button does Apple auth inline. When the user
- *             becomes authed (we observe via useAuth().user changing from
- *             null → non-null), we auto-advance to page 6.
- *   - Page 6: "Continue For FREE" → markIntroCompleted() then navigate to
- *             Main (drops the user into the Home tab).
+ * Build 147 layout restructure:
+ *   • Video block at top, edge-to-edge (covers from safe-area top down
+ *     to roughly the vertical midpoint of the screen).
+ *   • 1pt black divider under the video.
+ *   • Content block below (title, body, CTA, progress bars).
+ *   • Skip removed entirely (was previously available on pages 1-4).
+ *   • Back arrow removed entirely.
+ *   • Dots progress indicator → segmented horizontal bars.
  *
- * Layout:
- *   The 6 SVG mockups in src/assets/onboarding/ are 440×1006 full-frame
- *   designs (artwork + title + buttons baked in). We extract just the
- *   ILLUSTRATION portion via OnboardingArt (viewBox crop) and render
- *   title / subtitle / buttons / skip / dots with native React components
- *   so text wraps correctly and buttons are tappable.
- *
- * Parallax / interactivity (bonus):
- *   FlatList scroll position drives a tiny scale + translate on each
- *   illustration so the artwork feels alive while swiping. Reanimated-
- *   driven for native-thread smoothness, no JS thread interpolation.
- *
- * Build 145.
+ * Build 147 slide-1 CTA change:
+ *   • Replaces the single "Continue" with a dual-button row: "Log In"
+ *     (filled blue) and "Sign Up" (outlined blue). BOTH buttons simply
+ *     advance to slide 2 — actual auth still happens on slide 5.
+ *     User decision: visual differentiation only at this point in the
+ *     funnel; the real account creation/login flow lives on the auth
+ *     page where it belongs.
  */
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
@@ -59,13 +56,14 @@ const { width: SCREEN_W } = Dimensions.get('window');
 
 // ── Page copy ─────────────────────────────────────────────────────────────
 // Centralized so the screen body stays compact. Titles and subtitles match
-// the source mockups exactly.
+// the source mockups exactly. cta:null = slide has custom buttons handled
+// inline in renderPage (slide 1 dual-button, slide 5 auth page).
 const PAGES = [
   {
     step: 1,
     title: 'Picture the\npossibilities',
     body: 'Point your camera at any room,\nempty or fully lived-in.',
-    cta: 'Continue',
+    cta: null, // slide 1 = Log In + Sign Up dual buttons
   },
   {
     step: 2,
@@ -89,7 +87,7 @@ const PAGES = [
     step: 5,
     title: 'HomeGenie',
     body: 'Shop and Design your room with AI',
-    cta: null, // page 5 has its own auth CTAs, not a generic Continue
+    cta: null, // handled by OnboardingAuthPage
   },
   {
     step: 6,
@@ -119,7 +117,7 @@ export default function OnboardingScreen({ navigation, route }) {
   const requestedPage = route?.params?.initialPage ?? 1;
   const initialPage = Math.max(0, Math.min(PAGES.length - 1, requestedPage - 1));
 
-  // FlatList ref for programmatic page advance + skip.
+  // FlatList ref for programmatic page advance.
   const listRef = useRef(null);
   const [pageIndex, setPageIndex] = useState(initialPage);
 
@@ -130,7 +128,7 @@ export default function OnboardingScreen({ navigation, route }) {
   // Pre-seed to true if we entered at page 5 (returning-user re-auth flow).
   const reachedAuthPageRef = useRef(initialPage >= 4);
 
-  // ─── Page advance / skip ──────────────────────────────────────────────
+  // ─── Page advance ─────────────────────────────────────────────────────
   const goToPage = useCallback((idx) => {
     if (!listRef.current) return;
     listRef.current.scrollToOffset({ offset: idx * SCREEN_W, animated: true });
@@ -148,12 +146,6 @@ export default function OnboardingScreen({ navigation, route }) {
       });
     }
   }, [pageIndex, goToPage, navigation]);
-
-  const handleSkip = useCallback(() => {
-    // Skip only available on pages 1-4. Jumps to page 5 (auth) — they
-    // still have to authenticate to actually enter the app.
-    goToPage(PAGE_5_INDEX);
-  }, [goToPage]);
 
   // Watch for auth completion. The instant user becomes truthy AND the
   // user has scrolled to page 5 (the auth gate), advance to page 6.
@@ -184,76 +176,90 @@ export default function OnboardingScreen({ navigation, route }) {
   // ─── Render ───────────────────────────────────────────────────────────
   const renderPage = useCallback(({ item, index }) => {
     const isAuthPage = index === PAGE_5_INDEX;
-    const isGiftPage = index === PAGE_6_INDEX;
+    const isSlide1 = index === 0;
 
     // Build 145 — page 5 is its own self-contained component that owns the
     // inline auth form (email/password, Apple, signup toggle, Forgot
-    // password, promo codes, ToS/Privacy disclosure). Lifted out so this
-    // file stays focused on the swipe scaffolding.
+    // password, promo codes, ToS/Privacy disclosure). Build 147: progress
+    // indicator changes to bars but the existing prop name 'progressDots'
+    // is kept for back-compat — content is now bars.
     if (isAuthPage) {
       return (
         <OnboardingAuthPage
           navigation={navigation}
           screenWidth={SCREEN_W}
-          progressDots={<ProgressDots count={TOTAL_PAGES} active={index} />}
+          progressDots={<ProgressBars count={TOTAL_PAGES} active={index} />}
         />
       );
     }
 
     return (
       <View style={[styles.page, { width: SCREEN_W }]}>
-        <View style={[styles.pageInner, { paddingTop: insets.top + 24, paddingBottom: insets.bottom + 24 }]}>
-          {/* Title block — kept high on the page so it stays visible above
-              the artwork even on smaller phones (SE-class) */}
+        {/* ── Video block — edge-to-edge top ─────────────────────────────
+            paddingTop: insets.top draws a white band over the safe-area
+            top so the status bar / Dynamic Island stays legible against a
+            consistent background; the video starts immediately below the
+            status bar and fills the rest of this flex block.
+            ─────────────────────────────────────────────────────────────── */}
+        <View style={[styles.videoBlock, { paddingTop: insets.top }]}>
+          <OnboardingArt step={item.step} fullBleed contentFit="cover" />
+        </View>
+
+        {/* ── 1pt black divider between video and content ─────────────── */}
+        <View style={styles.divider} />
+
+        {/* ── Content block — title, body, CTA, progress bars ─────────── */}
+        <View style={[styles.contentBlock, { paddingBottom: insets.bottom + 16 }]}>
           <View style={styles.titleBlock}>
             <Text style={styles.title}>{item.title}</Text>
             <Text style={styles.body}>{item.body}</Text>
           </View>
 
-          {/* Illustration. Equal padding above + below keeps the artwork
-              visually centered in the gap between title and CTA. */}
-          <View style={styles.artSlot}>
-            <OnboardingArt step={item.step} />
-          </View>
-
-          <View style={styles.singleButtonWrap}>
-            <TouchableOpacity
-              style={styles.primaryButton}
-              onPress={handleContinue}
-              activeOpacity={0.85}
-              accessibilityRole="button"
-              accessibilityLabel={isGiftPage ? 'Continue for free' : 'Continue to next page'}
-            >
-              <Text style={styles.primaryButtonText}>{item.cta}</Text>
-              <ArrowRightIcon style={{ marginLeft: 10 }} />
-            </TouchableOpacity>
-
-            {/* Bottom row — progress dots + skip link (skip only on pages 1-4) */}
-            <View style={styles.bottomRow}>
-              {!isGiftPage && index < PAGE_5_INDEX ? (
+          <View style={styles.ctaBlock}>
+            {isSlide1 ? (
+              // Build 147: dual-button row on slide 1 only. Both Log In
+              // and Sign Up just advance to slide 2 — actual auth lives
+              // on slide 5. Visual differentiation only at this stage.
+              <View style={styles.dualButtonRow}>
                 <TouchableOpacity
-                  onPress={handleSkip}
-                  activeOpacity={0.7}
-                  hitSlop={{ top: 12, left: 12, bottom: 12, right: 12 }}
+                  style={[styles.btnHalf, styles.btnFilled]}
+                  onPress={handleContinue}
+                  activeOpacity={0.85}
                   accessibilityRole="button"
-                  accessibilityLabel="Skip introduction"
+                  accessibilityLabel="Log In"
                 >
-                  <Text style={styles.skipText}>Skip</Text>
+                  <Text style={styles.btnFilledText}>Log In</Text>
                 </TouchableOpacity>
-              ) : (
-                <View style={{ width: 40 }} />
-              )}
+                <TouchableOpacity
+                  style={[styles.btnHalf, styles.btnOutline]}
+                  onPress={handleContinue}
+                  activeOpacity={0.85}
+                  accessibilityRole="button"
+                  accessibilityLabel="Sign Up"
+                >
+                  <Text style={styles.btnOutlineText}>Sign Up</Text>
+                </TouchableOpacity>
+              </View>
+            ) : (
+              <TouchableOpacity
+                style={styles.primaryButton}
+                onPress={handleContinue}
+                activeOpacity={0.85}
+                accessibilityRole="button"
+                accessibilityLabel={item.cta}
+              >
+                <Text style={styles.primaryButtonText}>{item.cta}</Text>
+                <ArrowRightIcon style={{ marginLeft: 10 }} />
+              </TouchableOpacity>
+            )}
 
-              <ProgressDots count={TOTAL_PAGES} active={index} />
-
-              {/* Mirror placeholder so dots stay perfectly centered */}
-              <View style={{ width: 40 }} />
-            </View>
+            {/* Progress bars at very bottom of content area */}
+            <ProgressBars count={TOTAL_PAGES} active={index} />
           </View>
         </View>
       </View>
     );
-  }, [insets, handleContinue, handleSkip, navigation]);
+  }, [insets, handleContinue, navigation]);
 
   return (
     <View style={styles.root}>
@@ -279,15 +285,18 @@ export default function OnboardingScreen({ navigation, route }) {
 
 // ─── Subcomponents ──────────────────────────────────────────────────────
 
-function ProgressDots({ count, active }) {
+// Build 147: segmented horizontal bars replacing the previous round dots.
+// Active bar fills blue; inactive bars are a quiet light-blue/gray. Each
+// bar gets equal flex so 6 bars span the screen evenly with small gaps.
+function ProgressBars({ count, active }) {
   return (
-    <View style={styles.dotsRow}>
+    <View style={styles.progressBarsRow}>
       {Array.from({ length: count }).map((_, i) => (
         <View
           key={i}
           style={[
-            styles.dot,
-            i === active && styles.dotActive,
+            styles.progressBar,
+            i === active && styles.progressBarActive,
           ]}
         />
       ))}
@@ -309,8 +318,6 @@ function ArrowRightIcon({ style }) {
   );
 }
 
-// AppleLogoIcon moved into OnboardingAuthPage where the Apple button now lives.
-
 // ─── Styles ──────────────────────────────────────────────────────────────
 
 const styles = StyleSheet.create({
@@ -321,16 +328,38 @@ const styles = StyleSheet.create({
   page: {
     flex: 1,
   },
-  pageInner: {
-    flex: 1,
+
+  // Top hero — video fills horizontally edge-to-edge.
+  // flex: 0.55 gives the video block ~55% of the screen height; the
+  // remaining 45% goes to the content block. The video itself uses
+  // contentFit:cover (configured at the OnboardingArt level) so it
+  // fills the available space without letterboxing.
+  videoBlock: {
+    flex: 0.55,
+    width: '100%',
+    backgroundColor: '#FFFFFF',
+  },
+
+  // 1pt black hard divider between video and content blocks.
+  divider: {
+    height: 1,
+    backgroundColor: '#000000',
+    width: '100%',
+  },
+
+  // Bottom content — title, body, CTA, progress.
+  // flex: 0.45 with justify-between pushes the progress row to the
+  // bottom edge while the title stays close to the divider above.
+  contentBlock: {
+    flex: 0.45,
     paddingHorizontal: 28,
+    paddingTop: 24,
     justifyContent: 'space-between',
   },
 
-  // Title block
+  // Title block — sits high in the content area, just under the divider.
   titleBlock: {
     alignItems: 'center',
-    paddingTop: 8,
   },
   title: {
     fontSize: 34,
@@ -349,18 +378,51 @@ const styles = StyleSheet.create({
     lineHeight: 22,
   },
 
-  // Illustration slot — flex so it absorbs the space between title + CTA
-  artSlot: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingVertical: 16,
-  },
-
-  // CTA stack
-  singleButtonWrap: {
+  // CTA block wraps the buttons + progress bars at the bottom of content.
+  ctaBlock: {
     paddingBottom: 8,
   },
+
+  // Slide 1 dual-button row (Log In + Sign Up).
+  // flex:1 on each button + gap:12 between them gives equal-width
+  // buttons spanning the content padding box.
+  dualButtonRow: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  btnHalf: {
+    flex: 1,
+    height: 56,
+    borderRadius: 34,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 16,
+  },
+  btnFilled: {
+    backgroundColor: BLUE_LIGHT,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 6,
+    elevation: 2,
+  },
+  btnFilledText: {
+    color: '#FFFFFF',
+    fontSize: 17,
+    fontWeight: '700',
+  },
+  btnOutline: {
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1.5,
+    borderColor: BLUE_LIGHT,
+  },
+  btnOutlineText: {
+    color: BLUE_LIGHT,
+    fontSize: 17,
+    fontWeight: '700',
+  },
+
+  // Continue button — single CTA on slides 2-4 + 6.
   primaryButton: {
     backgroundColor: BLUE_LIGHT,
     borderRadius: 34,
@@ -369,7 +431,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 24,
-    // Subtle shadow so the button reads as a primary CTA, not flat
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.08,
@@ -382,64 +443,22 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
 
-  // Auth page CTAs
-  authButtons: {
-    paddingBottom: 8,
-  },
-  orDivider: {
-    textAlign: 'center',
-    color: BLUE_PRIMARY,
-    fontSize: 14,
-    fontWeight: '500',
-    marginVertical: 14,
-  },
-  appleButton: {
-    backgroundColor: '#000000',
-    borderRadius: 34,
-    height: 56,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 24,
-  },
-  appleButtonText: {
-    color: '#FFFFFF',
-    fontSize: 17,
-    fontWeight: '600',
-    marginLeft: 8,
-  },
-  authFooter: {
-    alignItems: 'center',
-    marginTop: 12,
-  },
-
-  // Bottom row — Skip + dots
-  bottomRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginTop: 18,
-  },
-  skipText: {
-    color: '#9CA3AF', // theme.textTertiary — quiet
-    fontSize: 15,
-    fontWeight: '500',
-  },
-
-  // Dots
-  dotsRow: {
+  // Build 147 — segmented bars at the bottom of each slide. Equal-width
+  // bars with small gaps. Active bar in primary blue, inactive in a
+  // quiet desaturated blue.
+  progressBarsRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
+    marginTop: 18,
   },
-  dot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
+  progressBar: {
+    flex: 1,
+    height: 4,
+    borderRadius: 2,
     backgroundColor: '#D7E3F0',
   },
-  dotActive: {
+  progressBarActive: {
     backgroundColor: BLUE_PRIMARY,
-    width: 18,
   },
 });
