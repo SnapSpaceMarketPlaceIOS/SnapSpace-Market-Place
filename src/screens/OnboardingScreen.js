@@ -387,9 +387,16 @@ const styles = StyleSheet.create({
     paddingBottom: 8,
   },
 
-  // Title block — sits high in the content area, just under the divider.
+  // Title block — sits in the upper-middle of the content area.
+  // Build 147 v11: added paddingTop:40. v10 had title pinned at the
+  // very top (felt too high), v9 had it pinned at the bottom near
+  // buttons (felt too low). v11 splits the difference by giving the
+  // title a top breathing margin so it floats into the upper third
+  // of the content area while buttons stay at the bottom via the
+  // contentMiddle's justify-content:space-between.
   titleBlock: {
     alignItems: 'center',
+    paddingTop: 40,
   },
   // Build 147 v9: fontSize 34 → 38 + lineHeight 40 → 44 (heading larger
   // per user spec).
@@ -494,10 +501,11 @@ const styles = StyleSheet.create({
   //   marginTop:18 removed — bars are now pinned to bottom via parent
   //   contentBlock's justify-content:space-between, so they sit at the
   //   bottom edge of the content area naturally.
+  // Build 147 v11: gap 4 → 2. Tighter spacing between segments.
   progressBarsRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
+    gap: 2,
   },
   // Build 147 v9: height 3 → 2 + borderRadius 1.5 → 1. Thinner bars
   // per user — same length, smaller height so they read as delicate
