@@ -376,12 +376,14 @@ const styles = StyleSheet.create({
   },
 
   // Build 147 v5: wrapper for the title/body/buttons group.
-  // Build 147 v9: justifyContent center → flex-end. Push the group
-  // toward the bottom of the content area so buttons sit close to
-  // the progress bars (user wants buttons closer to bottom of phone).
+  // Build 147 v10: justifyContent space-between. Title+body float at
+  // the TOP of the content area, buttons stay anchored at the BOTTOM
+  // just above the progress bars. v9 had everything stuck at the
+  // bottom — user wanted title+body higher (centered in upper half)
+  // while buttons stayed near progress bars.
   contentMiddle: {
     flex: 1,
-    justifyContent: 'flex-end',
+    justifyContent: 'space-between',
     paddingBottom: 8,
   },
 
@@ -421,10 +423,11 @@ const styles = StyleSheet.create({
     gap: 12,
     marginTop: 24,
   },
+  // Build 147 v10: height 56 → 50 (shorter buttons per user spec).
   btnHalf: {
     flex: 1,
-    height: 56,
-    borderRadius: 34,
+    height: 50,
+    borderRadius: 30,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 16,
@@ -460,12 +463,12 @@ const styles = StyleSheet.create({
   },
 
   // Continue button — single CTA on slides 2-4 + 6.
-  // Build 147 v2: marginTop:24 matches dualButtonRow for visual
-  // consistency across slides — buttons sit close to the body text.
+  // Build 147 v10: height 56 → 50, borderRadius 34 → 30 (shorter
+  // buttons per user spec, matching btnHalf).
   primaryButton: {
     backgroundColor: BLUE_LIGHT,
-    borderRadius: 34,
-    height: 56,
+    borderRadius: 30,
+    height: 50,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -505,7 +508,10 @@ const styles = StyleSheet.create({
     borderRadius: 1,
     backgroundColor: '#D7E3F0',
   },
+  // Build 147 v10: active bar BLUE_PRIMARY → BLUE_LIGHT per user.
+  // Active progress segment now matches the lighter, friendlier blue
+  // family used elsewhere (subheading, button fill).
   progressBarActive: {
-    backgroundColor: BLUE_PRIMARY,
+    backgroundColor: BLUE_LIGHT,
   },
 });
