@@ -774,7 +774,7 @@ export default function ProfileScreen({ navigation }) {
                           design object and gets passed to ShopTheLook on
                           tap. Falls back to imageUrl for any design whose
                           source isn't a Supabase URL. */}
-                      <CardImage uri={design.thumbnailUrl || design.imageUrl} style={styles.cardImgPhoto} resizeMode="cover" />
+                      <CardImage uri={design.thumbnailUrl || design.imageUrl} style={styles.cardImgPhoto} resizeMode="contain" />
                     </View>
                   </PressableCard>
                 </View>

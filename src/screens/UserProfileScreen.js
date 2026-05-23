@@ -300,7 +300,7 @@ export default function UserProfileScreen({ navigation, route }) {
                   onPress={() => navigation?.navigate('ShopTheLook', { design: post })}
                 >
                   <View style={styles.cardImg}>
-                    <CardImage uri={post.imageUrl} style={styles.cardImgPhoto} resizeMode="cover" />
+                    <CardImage uri={post.imageUrl} style={styles.cardImgPhoto} resizeMode="contain" />
                   </View>
                 </PressableCard>
               </View>

@@ -572,7 +572,7 @@ const GridCard = React.memo(function GridCard({ design, onPress, cardRadius, isL
       >
         <View style={[styles.cardImg, { borderRadius: r }]}>
           <View style={styles.cardImgBg} />
-          <CardImage uri={design.thumbnailUrl || design.imageUrl} style={styles.cardImgPhoto} resizeMode="cover" />
+          <CardImage uri={design.thumbnailUrl || design.imageUrl} style={styles.cardImgPhoto} resizeMode="contain" />
         </View>
       </PressableCard>
     );
@@ -591,7 +591,7 @@ const GridCard = React.memo(function GridCard({ design, onPress, cardRadius, isL
       >
         <View style={[styles.cardImg, { borderTopLeftRadius: r, borderTopRightRadius: r, borderBottomLeftRadius: 0, borderBottomRightRadius: 0 }]}>
           <View style={styles.cardImgBg} />
-          <CardImage uri={design.thumbnailUrl || design.imageUrl} style={styles.cardImgPhoto} resizeMode="cover" />
+          <CardImage uri={design.thumbnailUrl || design.imageUrl} style={styles.cardImgPhoto} resizeMode="contain" />
         </View>
       </PressableCard>
       <View style={styles.feedUserRow}>

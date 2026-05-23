@@ -377,11 +377,17 @@ export default function MySpacesScreen({ navigation }) {
                     image_url stays available on the design for share /
                     save-to-camera-roll / detail-modal use cases. Falls
                     back to image_url for non-Supabase URLs (which pass
-                    through getThumbnailUrl unchanged). */}
+                    through getThumbnailUrl unchanged).
+                    Build 147 — resizeMode cover → contain. Generated
+                    rooms (especially Snap-mode photo inputs with non-
+                    square camera aspect) were getting cropped to the
+                    middle vertical/horizontal slice, hiding the full
+                    composition. contain letterboxes instead so the
+                    whole room is visible in the square tile. */}
                 <CardImage
                   uri={item.thumbnail_url || item.image_url}
                   style={s.thumbImg}
-                  resizeMode="cover"
+                  resizeMode="contain"
                 />
               </View>
               <View style={s.thumbPromptBox}>

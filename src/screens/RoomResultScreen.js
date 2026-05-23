@@ -821,8 +821,16 @@ function ProductCardImpl({ product, inCart, onAddToCart, onPress }) {
             tightly to the middle of the photo, hiding ends of couches /
             tops of lamps / sides of rugs. "contain" lets each product
             sit within its own bounds with subtle background padding —
-            matches how products read on Explore page PDP. */}
-        <CardImage uri={product.imageUrl} style={s.hCardImg} resizeMode="contain" placeholderColor="#D0D7E3" compact />
+            matches how products read on Explore page PDP.
+            Build 147 — switched the source from imageUrl (lifestyle
+            photo) to panelImageUrl when available. The two-track image
+            model (Build 121) reserves panelImageUrl for clean studio
+            shots that the AI panel uses; the Shop Room strip is the
+            ideal surface for those same studio shots since cards are
+            small and lifestyle photos read as "messy crops" at thumb
+            size. Falls back to imageUrl when panelImageUrl is missing
+            (still ~18% of the catalog as of Build 146 backfill). */}
+        <CardImage uri={product.panelImageUrl || product.imageUrl} style={s.hCardImg} resizeMode="contain" placeholderColor="#D0D7E3" compact />
         {variantSwatchHex && (
           <View
             style={[s.hCardSwatchDot, { backgroundColor: variantSwatchHex }]}
