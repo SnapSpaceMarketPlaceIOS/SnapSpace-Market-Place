@@ -1370,7 +1370,16 @@ export default function ProductDetailScreen({ route, navigation }) {
 
   // ── Local state ──────────────────────────────────────────────────────────
   const [qty,         setQty]        = useState(1);
-  const [selectedVar, setSelectedVar]= useState(product?.variants?.[0]?.id ?? '1');
+  // Build 147 #7 — when the user navigates into PDP from the Shop Room
+  // strip on RoomResultScreen, the matcher attached a _matchedVariant
+  // to the product (e.g. "Sage Green" was the color in the generated
+  // room). Pre-select that variant so the user doesn't have to scroll
+  // the variant strip and manually re-pick the same color the AI
+  // already chose. Falls back to variants[0].id when no variant was
+  // matched (legacy seed-design products, search results, etc.).
+  const [selectedVar, setSelectedVar]= useState(
+    product?._matchedVariant?.id ?? product?.variants?.[0]?.id ?? '1'
+  );
 
   const scrollY           = useRef(new Animated.Value(0)).current;
   const cartLabelOpacity  = useRef(new Animated.Value(1)).current;

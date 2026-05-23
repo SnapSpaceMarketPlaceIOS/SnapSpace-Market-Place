@@ -788,7 +788,21 @@ function AnimatedIconBtn({ onPress, style, children, disabled, accessibilityLabe
 // state. The memo's default shallow-prop comparison is correct here.
 
 function ProductCardImpl({ product, inCart, onAddToCart, onPress }) {
-  const priceVal = product.priceValue ?? product.price;
+  // Build 147 #7 — when the matcher picked a specific variant for this
+  // product, the card surface itself (image + price) should represent
+  // that variant, not the catalog default. Before this fix, a sage-green
+  // chair matched into a Japandi prompt rendered the default-color
+  // (ivory) photo with only a small color dot in the corner — users
+  // couldn't tell which color was selected and had to drill into PDP,
+  // scroll the variant strip, manually re-pick the same color the AI
+  // already chose, then add to cart. Now the card image swaps to the
+  // variant's mainImage and the price swaps to the variant's price.
+  // Falls through cleanly when no variant is matched.
+  const variant = product._matchedVariant;
+  const effectiveImage = variant?.mainImage || product.panelImageUrl || product.imageUrl;
+  const effectivePrice = variant?.price ?? product.priceValue ?? product.price;
+
+  const priceVal = effectivePrice;
   const priceStr = typeof priceVal === 'number'
     ? `$${priceVal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
     : product.priceLabel || String(priceVal).replace(/^\$+/, '$');
@@ -804,8 +818,12 @@ function ProductCardImpl({ product, inCart, onAddToCart, onPress }) {
   // color this card represents. Closes the gap where the user couldn't
   // tell why a "purple" chair appeared in their glam-prompt set without
   // tapping into PDP and scrolling variants.
-  const variantSwatchHex = product._matchedVariant
-    ? getVariantSwatchHex(product._matchedVariant.label)
+  // Build 147 #7 — kept the swatch dot even though the card image now
+  // swaps to the variant. The dot remains a useful at-a-glance signal
+  // for "this is a variant pick" (e.g. when the variant image is very
+  // similar to the default at thumbnail size, the dot disambiguates).
+  const variantSwatchHex = variant
+    ? getVariantSwatchHex(variant.label)
     : null;
 
   // Build 136 — call onPress with the product as arg. Lets the parent
@@ -829,12 +847,15 @@ function ProductCardImpl({ product, inCart, onAddToCart, onPress }) {
             ideal surface for those same studio shots since cards are
             small and lifestyle photos read as "messy crops" at thumb
             size. Falls back to imageUrl when panelImageUrl is missing
-            (still ~18% of the catalog as of Build 146 backfill). */}
-        <CardImage uri={product.panelImageUrl || product.imageUrl} style={s.hCardImg} resizeMode="contain" placeholderColor="#D0D7E3" compact />
+            (still ~18% of the catalog as of Build 146 backfill).
+            Build 147 #7 — effectiveImage further prefers the matched
+            variant's mainImage when one was selected by the matcher.
+            Chain: variant.mainImage → product.panelImageUrl → imageUrl. */}
+        <CardImage uri={effectiveImage} style={s.hCardImg} resizeMode="contain" placeholderColor="#D0D7E3" compact />
         {variantSwatchHex && (
           <View
             style={[s.hCardSwatchDot, { backgroundColor: variantSwatchHex }]}
-            accessibilityLabel={`Variant: ${product._matchedVariant.label}`}
+            accessibilityLabel={`Variant: ${variant.label}`}
           />
         )}
       </View>
@@ -1060,7 +1081,24 @@ export default function RoomResultScreen({ route, navigation }) {
   // ── Handlers ──
   const handleAddToCart = useCallback((product) => {
     const key = `${product.name}__${product.brand}`;
-    addToCart({ ...product, price: product.priceValue ?? product.price });
+    // Build 147 #7 — when the product carries a _matchedVariant, use the
+    // variant's price (and override the imageUrl + asin + affiliateUrl
+    // so the cart line item represents the matched variant end-to-end).
+    // CartContext already keys items by `${name}__${brand}__${variantId}`
+    // and stores variant label/id metadata when _matchedVariant is
+    // present, so price/image were the only missing pieces from the
+    // user-facing cart row.
+    const variant = product._matchedVariant;
+    const cartPayload = variant
+      ? {
+          ...product,
+          price:        variant.price ?? product.priceValue ?? product.price,
+          imageUrl:     variant.mainImage || product.imageUrl,
+          asin:         variant.asin     || product.asin,
+          affiliateUrl: variant.affiliateUrl || product.affiliateUrl,
+        }
+      : { ...product, price: product.priceValue ?? product.price };
+    addToCart(cartPayload);
     setAddedKeys(prev => ({ ...prev, [key]: true }));
   }, [addToCart]);
 
