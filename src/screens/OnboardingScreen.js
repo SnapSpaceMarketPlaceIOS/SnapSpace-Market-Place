@@ -204,7 +204,7 @@ export default function OnboardingScreen({ navigation, route }) {
             no separate safe-area band exists to create a seam.
             ─────────────────────────────────────────────────────────────── */}
         <View style={styles.videoBlock}>
-          <OnboardingArt step={item.step} fullBleed contentFit="contain" />
+          <OnboardingArt step={item.step} fullBleed contentFit="cover" />
         </View>
 
         {/* ── 1pt black divider between video and content ─────────────
@@ -344,13 +344,16 @@ const styles = StyleSheet.create({
 
   // Top hero — video fills horizontally edge-to-edge.
   // Build 147 v2: flex 0.55 → 0.6 (bigger video per user direction).
-  // Build 147 v5: backgroundColor #F5F7FA → #FAFAFA per user spec.
-  // Build 147 v6: keeping #FAFAFA as placeholder pending user's new
-  // color spec — will update when they provide the exact value.
+  // Build 147 v7: backgroundColor #FAFAFA → #F8F8F8 per user spec.
+  // contentFit was contain (showed full video frame with top/bottom
+  // letterbox bars in this bg color); now switched back to cover so
+  // the video fills the box top to bottom — the "weird gray rectangle
+  // above the divider" was the bottom letterbox bar. With cover the
+  // bg is rarely visible (only during video load/buffer).
   videoBlock: {
     flex: 0.6,
     width: '100%',
-    backgroundColor: '#FAFAFA',
+    backgroundColor: '#F8F8F8',
   },
 
   // 1pt black divider between video block and content block.
