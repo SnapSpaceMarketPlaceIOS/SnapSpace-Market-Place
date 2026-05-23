@@ -357,13 +357,12 @@ const styles = StyleSheet.create({
   // Top hero — video fills horizontally edge-to-edge.
   // Build 147 v2: flex 0.55 → 0.6 (bigger video per user direction).
   // Build 147 v7: backgroundColor #FAFAFA → #F8F8F8 per user spec.
-  // contentFit was contain (showed full video frame with top/bottom
-  // letterbox bars in this bg color); now switched back to cover so
-  // the video fills the box top to bottom — the "weird gray rectangle
-  // above the divider" was the bottom letterbox bar. With cover the
-  // bg is rarely visible (only during video load/buffer).
+  // Build 147 v16: flex 0.6 → 0.65. User: 'the black line, can you
+  // lower it? It's a little bit too close to the bottom of the video.'
+  // Bigger videoBlock pushes the divider lower on the screen and gives
+  // the video more vertical breathing room before the section break.
   videoBlock: {
-    flex: 0.6,
+    flex: 0.65,
     width: '100%',
     backgroundColor: '#F8F8F8',
   },
@@ -380,8 +379,11 @@ const styles = StyleSheet.create({
   // contentMiddle takes flex:1 with justifyContent:center — visually
   // centers title + body + buttons in the available vertical space.
   // ProgressBars hangs off the bottom as the last child.
+  // Build 147 v16: flex 0.4 → 0.35 to match the videoBlock bump above
+  // (videoBlock 0.6 → 0.65). Net: divider line sits lower on the
+  // screen, content area is slightly more compact.
   contentBlock: {
-    flex: 0.4,
+    flex: 0.35,
     paddingHorizontal: 28,
     paddingTop: 8,
     backgroundColor: '#FFFFFF',
