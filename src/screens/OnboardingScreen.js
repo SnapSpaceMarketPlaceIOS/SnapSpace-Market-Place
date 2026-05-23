@@ -207,18 +207,21 @@ export default function OnboardingScreen({ navigation, route }) {
           <OnboardingArt step={item.step} fullBleed contentFit="contain" />
         </View>
 
-        {/* ── 1pt black divider between video and content ─────────────── */}
-        <View style={styles.divider} />
+        {/* Build 147 v5: 1pt black divider REMOVED — user feedback that
+            the hard line read as a "weird gray line." Transition between
+            video block (#FAFAFA) and content block (#FFFFFF) is now a
+            soft color step that reads as a natural section boundary. */}
 
         {/* ── Content block — title, body, CTA, progress bars ───────────
-            Build 147 v2: restructured. contentTop groups title + body +
-            buttons into one TIGHT stack (was previously spread by
-            justify-content:space-between which created huge empty space
-            between body and CTA). Progress bars now pinned to the bottom
-            via justify-content:space-between on the outer contentBlock.
+            Build 147 v5: contentMiddle now centers title + body + buttons
+            VERTICALLY in the available space (flex:1 + justify-center).
+            Previously they were pinned to the top via space-between which
+            stacked everything at the top of contentBlock with the
+            ProgressBars at the bottom. Now the group floats centered;
+            ProgressBars stays at the bottom.
             ─────────────────────────────────────────────────────────────── */}
         <View style={[styles.contentBlock, { paddingBottom: insets.bottom + 16 }]}>
-          <View style={styles.contentTop}>
+          <View style={styles.contentMiddle}>
             <View style={styles.titleBlock}>
               <Text style={styles.title}>{item.title}</Text>
               <Text style={styles.body}>{item.body}</Text>
@@ -339,40 +342,32 @@ const styles = StyleSheet.create({
 
   // Top hero — video fills horizontally edge-to-edge.
   // Build 147 v2: flex 0.55 → 0.6 (bigger video per user direction).
-  // backgroundColor #FFFFFF → #F5F7FA to blend with the Higgsfield
-  // videos' subtle off-white background. Pure white was leaving a
-  // visible seam at the edges where the video frame met the container.
+  // Build 147 v5: backgroundColor #F5F7FA → #FAFAFA per user spec.
   videoBlock: {
     flex: 0.6,
     width: '100%',
-    backgroundColor: '#F5F7FA',
-  },
-
-  // 1pt black hard divider between video and content blocks.
-  divider: {
-    height: 1,
-    backgroundColor: '#000000',
-    width: '100%',
+    backgroundColor: '#FAFAFA',
   },
 
   // Bottom content — title, body, CTA, progress.
-  // Build 147 v2: flex 0.45 → 0.4 (tighter content area, more video).
-  // justify-between still applies, but now the children are:
-  //   1. contentTop — title + body + buttons grouped tight at the top
-  //   2. ProgressBars — pinned to the bottom edge
-  // This kills the previous huge empty space between body and CTA.
+  // Build 147 v5: divider removed (was 1pt black line, read as "weird
+  // gray line" per user). Layout restructured so contentMiddle takes
+  // flex:1 with justifyContent:center — visually centers title + body
+  // + buttons in the available vertical space. ProgressBars hangs off
+  // the bottom as the last child with no special positioning.
   contentBlock: {
     flex: 0.4,
     paddingHorizontal: 28,
-    paddingTop: 24,
-    justifyContent: 'space-between',
+    paddingTop: 8,
+    backgroundColor: '#FFFFFF',
   },
 
-  // Title + body + CTA grouped together at the top of the content area.
-  // No special styles — children stack naturally with tight margins
-  // defined on body and on the button containers.
-  contentTop: {
-    // intentionally empty — flex column default; children control gaps
+  // Build 147 v5: vertical-center wrapper for the title/body/buttons
+  // group. flex:1 absorbs all space above the ProgressBars so the
+  // content visually floats in the middle of the content area.
+  contentMiddle: {
+    flex: 1,
+    justifyContent: 'center',
   },
 
   // Title block — sits high in the content area, just under the divider.
