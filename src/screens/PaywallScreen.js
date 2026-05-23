@@ -623,6 +623,27 @@ export default function PaywallScreen({ navigation }) {
     ? subscription.tier.charAt(0).toUpperCase() + subscription.tier.slice(1)
     : 'Free';
 
+  // Build 147: animated wishes-remaining progress tracker.
+  // Shows a blue line under "Only N wishes left" that visually depletes
+  // as wishes get consumed and refills on purchase/renewal. Free users
+  // track X/5 (free quota), basic-sub tracks X/25 (weekly quota), and
+  // unlimited subscribers hide the bar (renderless when isUnlimitedSub).
+  // useNativeDriver:false because width-% interpolation runs on the JS
+  // thread — acceptable here since this is a one-off transition, not a
+  // 60fps loop. ~600ms cubic-out matches the in-app "settle" feel.
+  const wishProgressRatio = isUnlimitedSub
+    ? 0
+    : Math.max(0, Math.min(1, renewableRemaining / Math.max(renewableTotal, 1)));
+  const wishProgressAnim = useRef(new Animated.Value(wishProgressRatio)).current;
+  useEffect(() => {
+    Animated.timing(wishProgressAnim, {
+      toValue: wishProgressRatio,
+      duration: 600,
+      easing: Easing.out(Easing.cubic),
+      useNativeDriver: false,
+    }).start();
+  }, [wishProgressRatio, wishProgressAnim]);
+
   // Card content — labels + counts + optional subline
   let cardLabel, cardCount, cardSubline;
   if (isUnlimitedSub) {
@@ -1058,7 +1079,28 @@ export default function PaywallScreen({ navigation }) {
                     </Text>
                   )}
                 </View>
-                <View style={styles.wishCounterDivider} />
+                {/* Build 147: divider replaced with an animated blue progress
+                    track that depletes as wishes are consumed. Unlimited
+                    subscribers still see the static thin divider — there's
+                    no meaningful ratio to animate. */}
+                {isUnlimitedSub ? (
+                  <View style={styles.wishCounterDivider} />
+                ) : (
+                  <View style={styles.wishProgressTrack}>
+                    <Animated.View
+                      style={[
+                        styles.wishProgressFill,
+                        {
+                          width: wishProgressAnim.interpolate({
+                            inputRange: [0, 1],
+                            outputRange: ['0%', '100%'],
+                            extrapolate: 'clamp',
+                          }),
+                        },
+                      ]}
+                    />
+                  </View>
+                )}
                 {cardSubline && (
                   <Text style={styles.wishCounterSubline}>{cardSubline}</Text>
                 )}
@@ -1289,8 +1331,11 @@ const styles = StyleSheet.create({
     // Build 145 v5.46: top 18 → 30 — v5.45 was still too high (X visually
     // touching the battery icon on iPhone 16e). 30pt clears the status
     // bar comfortably on notched devices.
+    // Build 147: top 30 → 38 — physical-device feedback that X felt
+    // too cramped against the Dynamic Island. Extra 8pt gives a clearer
+    // visual exit affordance without dropping into the content area.
     position: 'absolute',
-    top: 30,
+    top: 38,
     right: space.lg,            // 20pt in from the right edge
     width: 40,
     height: 40,
@@ -1753,13 +1798,19 @@ const styles = StyleSheet.create({
   // paddingTop 18 → 30) so the tabs sit slightly lower on the page,
   // matching the new close-X top of 30pt. Now there's a clean 30pt gap
   // below the safe-area top before any content begins.
+  // Build 147: tightened so the page reads more centered on physical
+  // iPhone (paddingTop 30 → 8, minHeight 60 → 32). Saves ~50pt of
+  // empty whitespace at top. The X-close lives at top:38 (height:40
+  // → bottom at 78), which now visually sits BESIDE the tabs row on
+  // the right margin — they don't horizontally collide because tab
+  // labels are centered in flex:1 halves while the X stays at right:20.
   topBar: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: layout.screenPaddingH,
-    paddingTop: 30,
+    paddingTop: 8,
     paddingBottom: 0,
-    minHeight: 60,
+    minHeight: 32,
   },
   logoPill: {
     width: 110,
@@ -1869,6 +1920,23 @@ const styles = StyleSheet.create({
     height: 1,
     backgroundColor: C.border,
     marginBottom: 4,
+  },
+  // Build 147: animated progress track replacing the static divider for
+  // non-unlimited users. 3pt height matches the visual weight of the
+  // original 1pt divider with a touch more presence so the fill is
+  // legible. overflow:hidden so the 100%-width Animated.View child
+  // honors the parent's border-radius corners.
+  wishProgressTrack: {
+    height: 3,
+    borderRadius: 2,
+    backgroundColor: C.border,
+    marginBottom: 4,
+    overflow: 'hidden',
+  },
+  wishProgressFill: {
+    height: '100%',
+    borderRadius: 2,
+    backgroundColor: colors.blueLight,
   },
   wishCounterSubline: {
     fontSize: 11,
