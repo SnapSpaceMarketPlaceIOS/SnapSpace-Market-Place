@@ -40,6 +40,29 @@ const VIDEO_SOURCES = {
   6: require('../../assets/onboarding/videos/slide-7.mp4'),
 };
 
+// Build 147 v17: per-step scale transform.
+//
+// Original Higgsfield renders (slides 2-6) baked in ~15% horizontal
+// white margin on each side of the actual composition. v8 applied a
+// universal 1.18× scale to crop those margins so the composition
+// reached edge-to-edge.
+//
+// The new slide-1 render (v16) was authored without that white margin
+// — the scene fills the video frame natively. Applying 1.18× to it
+// crops actual content (the user sees only a zoomed central portion).
+//
+// Per-step scale lets each video render at the right zoom. New videos
+// get 1.0 (no zoom); older margined videos keep 1.18. When other
+// slides get re-rendered without margins, drop their entry to 1.0.
+const VIDEO_SCALE_BY_STEP = {
+  1: 1.0,   // new render — no white margins to crop
+  2: 1.18,
+  3: 1.18,
+  4: 1.18,
+  5: 1.18,
+  6: 1.18,
+};
+
 export default function OnboardingArt({ step, style, fullBleed = false, contentFit = 'contain', isActive = true }) {
   const source = VIDEO_SOURCES[step] || VIDEO_SOURCES[1];
 
@@ -73,17 +96,14 @@ export default function OnboardingArt({ step, style, fullBleed = false, contentF
 
   const wrapperStyle = fullBleed ? styles.fullBleed : styles.square;
 
-  // Build 147 v8: scale transform to crop the Higgsfield videos' baked-in
-  // white margins. The renders have ~10-15% of horizontal width as white
-  // padding on each side of the actual composition (lamp/person/rooms).
-  // Even with contentFit:cover filling the box, those white margins are
-  // PART of the video content and remain visible. Scaling 1.18× pushes
-  // them off-screen so the composition fills edge-to-edge. The wrapper
-  // is overflow:hidden so the scaled-up overflow gets clipped cleanly.
-  // Only applied when fullBleed (the onboarding hero use case); the
-  // shrunk-art use in OnboardingAuthPage skips the zoom.
-  const videoStyle = fullBleed
-    ? [styles.video, { transform: [{ scale: 1.18 }] }]
+  // Build 147 v8: scale transform to crop Higgsfield videos' baked-in
+  // white margins (see VIDEO_SCALE_BY_STEP comment above).
+  // Build 147 v17: scale value is now per-step. New renders (no white
+  // margins) get 1.0 so we don't crop their actual composition;
+  // legacy renders keep 1.18 to push their margins off-screen.
+  const stepScale = VIDEO_SCALE_BY_STEP[step] ?? 1.18;
+  const videoStyle = fullBleed && stepScale !== 1
+    ? [styles.video, { transform: [{ scale: stepScale }] }]
     : styles.video;
 
   return (
