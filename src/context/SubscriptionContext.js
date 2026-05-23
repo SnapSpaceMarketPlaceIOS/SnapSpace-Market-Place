@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useCallback, useEffect, useRef } from 'react';
-import { Alert, InteractionManager } from 'react-native';
+import { Alert, AppState, InteractionManager } from 'react-native';
 import {
   initConnection,
   endConnection,
@@ -14,6 +14,7 @@ import {
 import { useAuth } from './AuthContext';
 import { validateReceipt, fetchQuota, fetchTokenBalance } from '../services/subscriptionService';
 import { supabase } from '../services/supabase';
+import { trackEvent, EVENTS } from '../services/analytics';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // ── Rating prompt (post-second-generation, no incentive) ────────────────────
@@ -49,7 +50,18 @@ export const TIERS = {
 // their entitlement; new sign-ups choose between PRO (25/wk) and UNLIMITED.
 export const PAID_TIERS = [TIERS.basic, TIERS.premium];
 
-const ALL_PRODUCT_IDS = PAID_TIERS.map(t => t.productId);
+// Build 145 v5.63 (audit-fix #1): Restore-allow-list includes the
+// grandfathered 'homegenie_pro_weekly' (TIERS.pro) — even though it's
+// hidden from the visible paywall offering, legacy 50/wk subscribers
+// must still be able to recover their entitlement via "Restore Purchase".
+// Without this, restorePurchases() would silently filter the legacy SKU
+// out (since it's not in PAID_TIERS) and the user would think their sub
+// disappeared. Webhook-driven renewals still work either way — this
+// only affects the user-initiated Restore path.
+const ALL_PRODUCT_IDS = [
+  ...PAID_TIERS.map(t => t.productId),
+  TIERS.pro.productId, // grandfathered — keep restorable, not purchasable
+];
 
 // ── Wish packages (consumable IAP — "wishes" = design credits) ──────────
 export const WISH_PACKAGES = [
@@ -103,6 +115,14 @@ export function SubscriptionProvider({ children }) {
   const [products, setProducts] = useState([]);
   const [tokenBalance, setTokenBalance] = useState(0);
   const [tokenProducts, setTokenProducts] = useState([]);
+
+  // Build 145 v5.63 (audit-fix #3): mirror tokenBalance into a ref so
+  // useCallback closures (like purchaseTokens) can read the current
+  // balance without listing tokenBalance in their deps (which would
+  // cause unnecessary callback rebuilds on every credit). Used by the
+  // 30s purchase-timeout snapshot guard.
+  const tokenBalanceRef = useRef(0);
+  useEffect(() => { tokenBalanceRef.current = tokenBalance; }, [tokenBalance]);
 
   // Post-second-generation rating prompt (no incentive). Persisted flag
   // = "this account has already seen the prompt"; in-memory flag =
@@ -420,6 +440,21 @@ export function SubscriptionProvider({ children }) {
             }
           }
 
+          // Build 145 v5.63 (audit-fix #4): conversion analytics for wish-pack
+          // purchases. Captured AFTER local state has been updated so the
+          // event represents a successfully-fulfilled purchase, not a charged
+          // -but-not-yet-credited one. Wrapped in trackEvent's own try/catch
+          // (in analytics.js) so analytics failures never break the purchase
+          // path. Properties chosen for funnel analysis: productId for SKU
+          // attribution, wishes for quantity, newBalance for post-purchase
+          // user state.
+          trackEvent(EVENTS.WISH_PURCHASED, {
+            product_id:   purchase.productId,
+            wishes:       result.tokensAdded,
+            new_balance:  result.newBalance,
+            from_timeout: false,
+          });
+
           // Build 110: belt-and-suspenders force-refresh. Even if the listener
           // got the right value above, fetch the authoritative server balance
           // ~250ms later as a self-healing measure. If the server is the
@@ -448,6 +483,17 @@ export function SubscriptionProvider({ children }) {
             subscriptionExpiresAt: result.subscriptionExpiresAt,
           }));
           console.log('[Subscription] subscription activated:', result.tier, result.quotaLimit);
+
+          // Build 145 v5.63 (audit-fix #4): conversion analytics for
+          // subscription starts. Fires after local state has been updated
+          // so we know the entitlement is live. Tier is captured for
+          // tier-mix analysis (basic/PRO vs premium/UNLIMITED).
+          trackEvent(EVENTS.SUBSCRIPTION_STARTED, {
+            product_id: purchase.productId,
+            tier:       result.tier,
+            quota_limit: result.quotaLimit,
+            expires_at: result.subscriptionExpiresAt,
+          });
         }
       } catch (mergeErr) {
         console.warn('[Subscription] state merge after purchase failed:', mergeErr?.message);
@@ -669,6 +715,16 @@ export function SubscriptionProvider({ children }) {
       }
     }
 
+    // Build 145 v5.63 (audit-fix #3): snapshot the pre-purchase balance so
+    // the timeout fallback can verify the balance ACTUALLY GREW before
+    // claiming success. Without this snapshot, the timeout fallback would
+    // resolve "success" any time the server returned a positive number —
+    // including the case where the listener silently failed but a prior
+    // purchase had already credited the user. Reading from the ref means
+    // we always see the latest balance (the ref is mirrored to state via
+    // useEffect) without needing to add tokenBalance to useCallback deps.
+    const snapshotBalance = tokenBalanceRef.current;
+
     // Build 108: wait for the listener to actually credit the wish before
     // resolving. Previously this returned immediately on requestPurchase,
     // which made the call-site "Wishes added!" Alert fire before any
@@ -690,12 +746,30 @@ export function SubscriptionProvider({ children }) {
             const fresh = await fetchTokenBalance(user.id);
             if (typeof fresh?.balance === 'number') {
               setTokenBalance(fresh.balance);
-              // Caller can decide whether the new balance reflects this
-              // purchase by comparing to a snapshot. We resolve as success
-              // here so the user sees an affirmative Alert with the
-              // post-purchase server-side count.
-              resolve({ success: true, type: 'tokens', newBalance: fresh.balance, fromTimeout: true });
-              return;
+              // Build 145 v5.63 (audit-fix #3): only claim success if the
+              // server balance actually grew vs. the pre-purchase snapshot.
+              // If fresh <= snapshot, the listener never credited — surface
+              // PURCHASE_TIMEOUT to the caller so the user sees the correct
+              // "still processing" message instead of a false "Wishes
+              // added!" alert with a stale balance.
+              if (fresh.balance > snapshotBalance) {
+                // Build 145 v5.63 (audit-fix #4): track timeout-recovered
+                // purchases separately so we can monitor listener-drop rate.
+                trackEvent(EVENTS.WISH_PURCHASED, {
+                  product_id:   productId,
+                  wishes:       fresh.balance - snapshotBalance,
+                  new_balance:  fresh.balance,
+                  from_timeout: true,
+                });
+                resolve({
+                  success: true,
+                  type: 'tokens',
+                  newBalance: fresh.balance,
+                  fromTimeout: true,
+                  delta: fresh.balance - snapshotBalance,
+                });
+                return;
+              }
             }
           }
         } catch (e) {
@@ -835,6 +909,16 @@ export function SubscriptionProvider({ children }) {
     try {
       const result = await validateReceipt(latestJws, user.id);
       setSubscription(prev => ({ ...prev, ...result }));
+
+      // Build 145 v5.63 (audit-fix #4): restore analytics. Helps us monitor
+      // restore-flow health (volume + product-mix) — high restore traffic
+      // can signal session-stickiness or device-switch issues worth
+      // investigating.
+      trackEvent(EVENTS.SUBSCRIPTION_RESTORED, {
+        product_id: latest.productId,
+        tier:       result.tier,
+      });
+
       return { success: true, restored: 1 };
     } catch (e) {
       console.warn('[Subscription] restore failed:', e.message);
@@ -920,6 +1004,29 @@ export function SubscriptionProvider({ children }) {
       setSubscription(DEFAULT_SUBSCRIPTION);
       setTokenBalance(0);
     }
+  }, [user?.id, refreshQuota, refreshTokenBalance]);
+
+  // Build 145 v5.63 (audit-fix #2): refresh subscription quota + token
+  // balance whenever the app returns to the foreground from background.
+  // Previously the AppState listener in App.js only kicked Supabase auth
+  // refresh — meaning if a user's weekly sub renewed via DID_RENEW
+  // webhook while the app was backgrounded, subscriptionExpiresAt would
+  // stay stale until they tapped into the paywall (which has its own 3s
+  // poll) or triggered some other refresh path. Users sitting on Home
+  // could see "Plan expired" flicker incorrectly. This listener closes
+  // that gap by force-refreshing on every active transition.
+  //
+  // Skipped in __DEV__ (mirrors the cold-launch behavior above — dev
+  // builds use the local-only quota track to avoid DB churn).
+  useEffect(() => {
+    if (!user?.id || __DEV__) return;
+    const sub = AppState.addEventListener('change', (state) => {
+      if (state === 'active') {
+        refreshQuota();
+        refreshTokenBalance();
+      }
+    });
+    return () => sub.remove();
   }, [user?.id, refreshQuota, refreshTokenBalance]);
 
   return (

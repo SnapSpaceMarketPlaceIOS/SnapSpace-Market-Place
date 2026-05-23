@@ -1,3 +1,6 @@
+// Build 145 v3 cleanup: trimmed RN imports to actual usage.
+// Removed: Animated, Platform, UIManager (animations were ripped out
+// when the hero slideshow + progress bar were removed).
 import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
@@ -10,99 +13,190 @@ import {
   Share,
   Image,
   Animated,
-  Platform,
-  UIManager,
+  Easing,
 } from 'react-native';
-
-// Enable LayoutAnimation on Android
-if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
-  UIManager.setLayoutAnimationEnabledExperimental(true);
-}
 import { SafeAreaView } from 'react-native-safe-area-context';
-import Svg, { Line, Circle, Polyline, Path, Rect, Defs, LinearGradient as SvgLinearGradient, Stop } from 'react-native-svg';
 import { LinearGradient } from 'expo-linear-gradient';
+import Svg, { Line, Path, Circle } from 'react-native-svg';
 import { colors } from '../constants/colors';
 import { colors as C } from '../constants/theme';
-import { space, radius, fontWeight, fontSize, typeScale, layout, uiColors } from '../constants/tokens';
+import { space, radius, fontWeight, fontSize, typeScale, layout } from '../constants/tokens';
 import { useSubscription, PAID_TIERS, WISH_PACKAGES } from '../context/SubscriptionContext';
 import { useAuth } from '../context/AuthContext';
 import { getReferralCode, grantShareBonus } from '../services/subscriptionService';
-import { hapticTap, hapticSuccess, hapticError } from '../utils/haptics';
+import { hapticSuccess, hapticError } from '../utils/haptics';
 import AnimatedTile from '../components/paywall/AnimatedTile';
-import AnimatedWishCounter from '../components/paywall/AnimatedWishCounter';
 import PurchaseCelebrationOverlay from '../components/paywall/PurchaseCelebrationOverlay';
+
+// Build 145 v5: hero image bundled via Metro's asset registry (numeric
+// handle, 4 bytes across the bridge). Module-level const so React doesn't
+// allocate a new source object on every render — that was forcing RCTImageView
+// to re-trip the loader. Pre-mounted in HomeScreen too (warms the UIImage
+// cache before user ever navigates here), so paywall mount paints instantly.
+const HERO_SOURCE = require('../../assets/paywall-hero.jpg');
 
 const { width: SCREEN_W, height: SCREEN_H } = Dimensions.get('window');
 
-// ── Hero slideshow images ────────────────────────────────────────────────────
-const HERO_IMAGES = [
-  require('../../assets/hero-slideshow-1.jpg'),
-  require('../../assets/hero-slideshow-9.jpg'),
-  require('../../assets/hero-slideshow-6.jpg'),
-  require('../../assets/hero-slideshow-3.jpg'),
-  require('../../assets/hero-slideshow-5.jpg'),
-  require('../../assets/hero-slideshow-2.jpg'),
-];
-const HERO_INTERVAL = 5500;
-const HERO_FADE_MS  = 1200;
+// Build 145: hero slideshow removed — paywall is now a clean white-card design.
 
 // ── Icons ────────────────────────────────────────────────────────────────────
 
 function CloseIcon() {
+  // Build 145: dark X on white background
   return (
-    <Svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke={C.white} strokeWidth={2.4} strokeLinecap="round">
+    <Svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke={C.textPrimary} strokeWidth={2.4} strokeLinecap="round">
       <Line x1={18} y1={6} x2={6} y2={18} />
       <Line x1={6} y1={6} x2={18} y2={18} />
     </Svg>
   );
 }
 
-function CheckIcon({ size = 14, color = C.white }) {
+// Build 145 v3 cleanup: CheckIcon + ShareIcon removed (dead code from prior
+// design — feature bullets are now empty circles; share button has no arrow).
+
+// Build 145 v5.27: precise SVG infinity icon for the UNLIMITED tier card.
+// Replaces the text "∞" character which had inconsistent baseline / weight
+// against neighboring "Wishes" label. SVG gives pixel-precise sizing +
+// vertical-center alignment matching the digit-based "25" on the PRO card.
+function InfinityIcon({ color = C.textPrimary, size = 52 }) {
+  // Lucide-style stroke infinity — pixel-precise, weight-matched to semibold
+  // digits on the PRO card. Sized + positioned to baseline-align with "Wishes".
   return (
-    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={3} strokeLinecap="round" strokeLinejoin="round">
-      <Polyline points="20 6 9 17 4 12" />
+    <Svg
+      width={size * 1.1}
+      height={size * 0.55}
+      viewBox="0 0 24 12"
+      fill="none"
+      stroke={color}
+      strokeWidth={2.4}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <Path d="M12 6c-2-2.67-4-4-6-4a4 4 0 1 0 0 8c2 0 4-1.33 6-4Zm0 0c2 2.67 4 4 6 4a4 4 0 0 0 0-8c-2 0-4 1.33-6 4" />
     </Svg>
   );
 }
 
-function ShareIcon({ color = colors.blueLight, size = 20 }) {
-  return (
-    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={1.4} strokeLinecap="round" strokeLinejoin="round">
-      <Circle cx={12} cy={12} r={10} />
-      <Polyline points="15 11 12 8 9 11" />
-      <Line x1={12} y1={8} x2={12} y2={16} />
-    </Svg>
-  );
-}
+// ── Feature lists per selection (Build 145 v3 polish) ──────────────────────
+// Each tier and each wish pack has its own set of value props so the user
+// feels the specific upside of what they're about to buy. The first bullet
+// always echoes the selection ("25 wishes per week", "10 wishes for $2.49")
+// so the user sees their choice reinforced in the feature list.
 
-// ── Feature lists per tier ────────────────────────────────────────────────────
-
-const TIER_FEATURES = {
+// Build 145 v5.29: copy expanded 4 → 6 bullets per option to give each
+// purchase decision more surface area for psychological selling. Bullets
+// are ordered to match the FEATURE_ICONS rotation:
+//   0 lamp     — usage / wishes available
+//   1 share    — social proof / inspire others
+//   2 cart     — shop products from designs
+//   3 sparkle  — style variety / premium polish
+//   4 clock    — speed / time-value / no-expiry
+//   5 shield   — trust / risk-free / pay-once
+// Levers applied: specificity (concrete numbers), loss aversion (cancel /
+// never expire), social proof (followers / community), status (creator
+// identity), anchoring (per-day, per-design pricing), permanence,
+// priority/exclusivity for UNLIMITED.
+const FEATURES_BY_TIER = {
   basic: [
-    '25 wishes per week',
-    'Shop curated furniture matched to your style',
-    'Save, share & post your wishes',
-    'Access to all room types & design styles',
-    'New AI models as they release',
-  ],
-  pro: [
-    '50 wishes per week',
-    'Shop curated furniture matched to your style',
-    'Save, share & post your wishes',
-    'Priority generation — skip the line',
-    'Access to all room types & design styles',
-    'New AI models as they release',
+    'Generate *25 stunning room designs* every week',
+    'Save & *share designs* to inspire your followers',
+    'Tap any product in your design to *shop it instantly*',
+    'Unlock *every style* — from Japandi to Dark Luxe',
+    '*45-second AI renders* — faster than ordering coffee',
+    '*Cancel anytime* — keep every design you’ve made',
   ],
   premium: [
-    'Unlimited wishes',
-    'Shop curated furniture matched to your style',
-    'Save, share & post your wishes',
-    'Priority generation — fastest results',
-    'Early access to new AI models & features',
-    'Access to all room types & design styles',
-    'Premium support',
+    '*Unlimited wishes* — design without limits, all week',
+    'Save & share designs to grow your *personal style*',
+    'Tap any product in your design to *shop it instantly*',
+    '*First access* to every new AI style we ship',
+    '*Priority generation queue* — your designs render first',
+    '*Cancel anytime* — your library stays yours forever',
   ],
 };
+
+// Wish packs share 5 bullets (positions 1–5); position 0 carries the
+// pack-specific hook with size + value framing.
+const FEATURES_BY_WISH_PACKAGE = {
+  homegenie_wishes_4: [
+    '*4 fresh redesigns* to transform any space',
+    'Save & *share* every design you create',
+    'Every product is *one tap to shop*',
+    'Mix every style and every room — *no limits*',
+    '*Wishes never expire* — use them whenever inspiration hits',
+    '*Pay once* — no subscription, no surprise charges',
+  ],
+  homegenie_wishes_10: [
+    '*10 redesigns* — just *$0.25 per stunning room*',
+    'Save & *share* every design you create',
+    'Every product is *one tap to shop*',
+    'Mix every style and every room — *no limits*',
+    '*Wishes never expire* — use them whenever inspiration hits',
+    '*Pay once* — no subscription, no surprise charges',
+  ],
+  homegenie_wishes_20: [
+    '*20 redesigns* — best value for casual designers',
+    'Save & *share* every design you create',
+    'Every product is *one tap to shop*',
+    'Mix every style and every room — *no limits*',
+    '*Wishes never expire* — use them whenever inspiration hits',
+    '*Pay once* — no subscription, no surprise charges',
+  ],
+  homegenie_wishes_40: [
+    '*40 redesigns* — perfect for a full-home refresh',
+    'Save & *share* every design you create',
+    'Every product is *one tap to shop*',
+    'Mix every style and every room — *no limits*',
+    '*Wishes never expire* — use them whenever inspiration hits',
+    '*Pay once* — no subscription, no surprise charges',
+  ],
+  homegenie_wishes_100: [
+    '*100 redesigns* — power-user volume at *$0.25 each*',
+    'Save & *share* every design you create',
+    'Every product is *one tap to shop*',
+    'Mix every style and every room — *no limits*',
+    '*Wishes never expire* — use them whenever inspiration hits',
+    '*Pay once* — no subscription, no surprise charges',
+  ],
+  homegenie_wishes_200: [
+    '*200 redesigns* — go all-in on your dream home',
+    'Save & *share* every design you create',
+    'Every product is *one tap to shop*',
+    'Mix every style and every room — *no limits*',
+    '*Wishes never expire* — use them whenever inspiration hits',
+    '*Pay once* — no subscription, no surprise charges',
+  ],
+};
+
+// Fallback so the feature list never renders empty (6 bullets to match
+// the new icon rotation).
+const FEATURES_FALLBACK = [
+  'Generate *stunning AI room designs* in seconds',
+  'Save & *share* every design you create',
+  'Every product is *one tap to shop*',
+  'Try *every style* and every room',
+  '*45-second renders* — faster than ordering coffee',
+  '*Risk-free* — cancel or use anytime',
+];
+
+// Build 145 v5.31: parse `*highlight*` markers in feature bullet copy.
+// Wrapping a phrase in single asterisks (e.g., '*Cancel anytime* — ...')
+// causes that span to render bold + blueLight inside the otherwise grey
+// featureText. Splitting on '*' yields [plain, highlight, plain, ...]
+// because asterisks come in pairs — odd-indexed segments are the highlight
+// spans, even-indexed are plain text. Returned array is inlined into a
+// parent <Text> via nested <Text> children, which RN renders as a
+// single flowing line with mixed styles.
+function renderFeatureText(feature) {
+  const parts = feature.split('*');
+  return parts.map((part, idx) =>
+    idx % 2 === 1 ? (
+      <Text key={idx} style={styles.featureTextHighlight}>{part}</Text>
+    ) : (
+      part
+    )
+  );
+}
 
 // ── Wish card order (cheapest first, most expensive at bottom) ──────────────
 const WISH_CARD_ORDER = [
@@ -120,39 +214,129 @@ const WISH_CARD_ORDER = [
 // subscribers on that legacy product remain grandfathered in StoreKit.
 const TIER_CARD_ORDER = ['basic', 'premium'];
 
-// ── Card dimensions (2-column grid) ─────────────────────────────────────────
+// ── Card dimensions ─────────────────────────────────────────────────────────
+// Tier cards (Subscribe tab) use a 2-column grid since there are exactly
+// two tiers (PRO + UNLIMITED) and each gets a fuller, more prominent card.
+// Wish cards (Wishes tab) use a 3-up horizontal carousel — fits 3 cards
+// in the visible viewport, with horizontal scroll revealing the rest of
+// the 6-pack lineup. Narrower cards = better browsing, more "shelf" feel.
 const CARD_GAP = 12;
 const CARD_W = (SCREEN_W - layout.screenPaddingH * 2 - CARD_GAP) / 2;
+const WISH_CARD_W = (SCREEN_W - layout.screenPaddingH * 2 - CARD_GAP * 2) / 3;
 
 // ── Wish Package Card ───────────────────────────────────────────────────────
 
 function WishCard({ pkg, selected, onSelect, isPurchasing, registerRef }) {
+  // Build 145 v5.47: parity polish with TierCard — badge + per-wish anchor +
+  // trust line + shake animation.
+  // Build 145 v5.50: badge moved from 40-pack → 4-pack and relabeled
+  // "BEST DEAL" per user. The 4-pack is now the recommended entry point
+  // (lowest commitment, easiest first-purchase decision) and "BEST DEAL"
+  // is honest framing for a $0.99 trial-style price point.
+  const isPopular = pkg.id === 'homegenie_wishes_4';
+
+  // Per-wish unit price — derived live from pkg.priceNum / pkg.wishes.
+  // Two decimals, no trailing zeros, $-prefixed.
+  const perWish = (pkg.priceNum / pkg.wishes).toFixed(2);
+
+  // Shake animation (same pattern as TierCard for visual consistency).
+  const shakeX = useRef(new Animated.Value(0)).current;
+  const runShake = React.useCallback(() => {
+    shakeX.setValue(0);
+    Animated.sequence([
+      Animated.timing(shakeX, { toValue: -4, duration: 50, useNativeDriver: true }),
+      Animated.timing(shakeX, { toValue: 4,  duration: 60, useNativeDriver: true }),
+      Animated.timing(shakeX, { toValue: -3, duration: 60, useNativeDriver: true }),
+      Animated.timing(shakeX, { toValue: 3,  duration: 60, useNativeDriver: true }),
+      Animated.timing(shakeX, { toValue: 0,  duration: 60, useNativeDriver: true }),
+    ]).start();
+  }, [shakeX]);
+
+  useEffect(() => {
+    if (!isPopular) return;
+    const t = setTimeout(runShake, 350);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (!isPopular) return;
+    if (!selected) return;
+    runShake();
+  }, [selected, isPopular, runShake]);
+
   return (
     <AnimatedTile
       selected={selected}
       isPurchasing={isPurchasing}
       onSelect={() => onSelect(pkg.id)}
       registerRef={registerRef}
-      cardWidth={CARD_W}
-      style={styles.gridCard}
+      cardWidth={WISH_CARD_W}
+      style={[styles.gridCard, styles.gridCardWish]}
       selectedStyle={styles.gridCardSelected}
     >
-      {/* Checkmark badge */}
-      {selected && (
-        <View style={styles.checkBadge}>
-          <CheckIcon size={10} color="#FFFFFF" />
+      {/* BEST DEAL badge — sits on the top edge of the 4-pack only. Same
+          behavior + animation as the TierCard's MOST POPULAR badge. */}
+      {isPopular && (
+        <View style={styles.popularBadge}>
+          <Animated.View style={{ transform: [{ translateX: shakeX }] }}>
+            <View style={[styles.popularBadgePill, !selected && styles.popularBadgePillUnselected]}>
+              <Text style={styles.popularBadgeText}>BEST DEAL</Text>
+              <Svg width={9} height={9} viewBox="0 0 24 24" fill={C.white} style={styles.popularBadgeStar}>
+                <Path d="M12 1 L14 10 L23 12 L14 14 L12 23 L10 14 L1 12 L10 10 Z" />
+              </Svg>
+            </View>
+          </Animated.View>
         </View>
       )}
-
-      <Text style={styles.cardBrandLabel}>HomeGenie Designs</Text>
-      <View style={styles.cardCountRow}>
-        <Text style={styles.cardBigNumber}>{pkg.wishes}</Text>
-        <Text style={styles.cardWishesLabel}>Wishes</Text>
+      {/* Build 145 v5.57: wish-card count row stacks vertically (column)
+          with both number and "Wishes" label horizontally centered, so
+          the 3-up cards have a tight, symmetric header instead of a
+          side-by-side row that drifts off-center on three-digit values. */}
+      <View style={[styles.cardCountRow, styles.cardCountRowWish]}>
+        <Text
+          style={[
+            styles.cardBigNumber,
+            styles.cardBigNumberWish,
+            selected && styles.cardBigNumberSelected,
+          ]}
+          numberOfLines={1}
+          adjustsFontSizeToFit
+          minimumFontScale={0.55}
+        >
+          {pkg.wishes}
+        </Text>
+        <Text style={[
+          styles.cardWishesLabel,
+          styles.cardWishesLabelWish,
+          styles.cardWishesLabelWishStacked,
+          selected && styles.cardWishesLabelSelected,
+        ]}>
+          Wishes
+        </Text>
       </View>
+      <View style={[
+        styles.cardPriceDivider,
+        styles.cardPriceDividerWish,
+        selected && styles.cardPriceDividerSelected,
+      ]} />
       <View style={styles.cardPriceRow}>
-        <Text style={styles.cardPrice}>{pkg.price}</Text>
-        <SmallGenieLamp />
+        <Text
+          style={[styles.cardPrice, styles.cardPriceWish, selected && styles.cardPriceSelected]}
+          numberOfLines={1}
+          adjustsFontSizeToFit
+          minimumFontScale={0.7}
+        >
+          {pkg.price}
+        </Text>
       </View>
+      {/* Unit-economics anchor — parallels the per-day price on TierCards. */}
+      <Text style={[styles.cardPerDay, styles.cardPerDayWish, selected && styles.cardPerDaySelected]}>
+        ${perWish}/wish
+      </Text>
+      {/* Trust microcopy — "Pay once" is the Wishes-side equivalent of
+          "Cancel anytime" on TierCards. */}
+      <Text style={[styles.cardTrustLine, styles.cardTrustLineWish]}>Pay once</Text>
     </AnimatedTile>
   );
 }
@@ -160,6 +344,40 @@ function WishCard({ pkg, selected, onSelect, isPurchasing, registerRef }) {
 // ── Tier Card (Subscribe view) ──────────────────────────────────────────────
 
 function TierCard({ tier, selected, onSelect, isPurchasing, registerRef }) {
+  // Build 145 v5.38: subtle shake animation on the MOST POPULAR badge.
+  // Fires (a) on first mount so the user notices the badge when the
+  // paywall opens, and (b) every time the PRO tier becomes selected
+  // (each tap on this card) — a small "kick" that draws attention back
+  // to the social-proof cue. Only runs on the basic/PRO card since
+  // that's the only card with the badge.
+  const shakeX = useRef(new Animated.Value(0)).current;
+  const runShake = React.useCallback(() => {
+    shakeX.setValue(0);
+    Animated.sequence([
+      Animated.timing(shakeX, { toValue: -4, duration: 50, useNativeDriver: true }),
+      Animated.timing(shakeX, { toValue: 4,  duration: 60, useNativeDriver: true }),
+      Animated.timing(shakeX, { toValue: -3, duration: 60, useNativeDriver: true }),
+      Animated.timing(shakeX, { toValue: 3,  duration: 60, useNativeDriver: true }),
+      Animated.timing(shakeX, { toValue: 0,  duration: 60, useNativeDriver: true }),
+    ]).start();
+  }, [shakeX]);
+
+  // First-mount shake (paywall open) — delay 350ms so the card finishes
+  // its slide-in / fade before the badge wiggles.
+  useEffect(() => {
+    if (tier.id !== 'basic') return;
+    const t = setTimeout(runShake, 350);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Re-shake every time the PRO card becomes selected.
+  useEffect(() => {
+    if (tier.id !== 'basic') return;
+    if (!selected) return;
+    runShake();
+  }, [selected, tier.id, runShake]);
+
   return (
     <AnimatedTile
       selected={selected}
@@ -170,64 +388,165 @@ function TierCard({ tier, selected, onSelect, isPurchasing, registerRef }) {
       style={styles.gridCard}
       selectedStyle={styles.gridCardSelected}
     >
-      {/* Checkmark badge */}
-      {selected && (
-        <View style={styles.checkBadge}>
-          <CheckIcon size={10} color="#FFFFFF" />
+      {/* Build 145: TierCard layout per mock \u2014 "HomeGenie Designs \u2500\u2500\u2500 PRO"
+          header with thin connector dash, big blue number when selected,
+          thin divider, price (no lamp icon on tier cards per mock). */}
+      {/* Build 145 v5.19: conversion-optimized \u2014 "MOST POPULAR" badge on the
+          recommended (basic/PRO) tier, per-day pricing math under price, and
+          a trust-line microcopy reducing commitment fear. */}
+      {tier.id === 'basic' && (
+        <View style={styles.popularBadge}>
+          {/* Build 145 v5.38: Animated.View wrapper around the pill so the
+              shakeX value (running translation, ~290ms total) drives a
+              subtle attention-grabbing wiggle on first sight and on every
+              re-selection of the PRO card. */}
+          <Animated.View style={{ transform: [{ translateX: shakeX }] }}>
+            {/* Build 145 v5.33: badge pill background reacts to selection.
+                Selected → bluePrimary (deep navy, draws the eye to the
+                actively-chosen tier). Not selected → blueLight (baby blue,
+                softer presence so it doesn't compete with whichever tier
+                the user has currently selected). */}
+            <View style={[styles.popularBadgePill, !selected && styles.popularBadgePillUnselected]}>
+              <Text style={styles.popularBadgeText}>MOST POPULAR</Text>
+              <Svg width={9} height={9} viewBox="0 0 24 24" fill={C.white} style={styles.popularBadgeStar}>
+                <Path d="M12 1 L14 10 L23 12 L14 14 L12 23 L10 14 L1 12 L10 10 Z" />
+              </Svg>
+            </View>
+          </Animated.View>
         </View>
       )}
-
-      <Text style={styles.cardBrandLabel}>{tier.name}</Text>
       <View style={styles.cardCountRow}>
-        <Text style={styles.cardBigNumber}>
-          {tier.gens === -1 ? '\u221E' : tier.gens}
+        {tier.gens === -1 ? (
+          <View style={styles.cardInfinityWrap}>
+            <InfinityIcon
+              color={selected ? colors.blueLight : C.textPrimary}
+              size={72}
+            />
+          </View>
+        ) : (
+          <Text style={[styles.cardBigNumber, selected && styles.cardBigNumberSelected]}>
+            {tier.gens}
+          </Text>
+        )}
+        <Text style={[styles.cardWishesLabel, selected && styles.cardWishesLabelSelected]}>
+          Wishes
         </Text>
-        <Text style={styles.cardWishesLabel}>Wishes</Text>
       </View>
+      <View style={[styles.cardPriceDivider, selected && styles.cardPriceDividerSelected]} />
+      {/* Build 145 v5.36: price hierarchy swap. Per-day price is the BIG
+          headline (psychologically lighter — $0.71/day reads cheaper than
+          $4.99/wk), and the weekly price becomes the smaller supporting
+          line below it. This anchors the user on the lowest-friction
+          number while still showing the actual billing cadence. */}
       <View style={styles.cardPriceRow}>
-        <Text style={styles.cardPrice}>{tier.priceLabel}</Text>
-        <SmallGenieLamp />
+        <Text style={[styles.cardPrice, selected && styles.cardPriceSelected]}>
+          {tier.id === 'basic' ? '$0.71/day' : tier.id === 'premium' ? '$2.85/day' : ''}
+        </Text>
       </View>
+      <Text style={[styles.cardPerDay, selected && styles.cardPerDaySelected]}>
+        {tier.priceLabel}
+      </Text>
+      {/* Trust microcopy — reduces commitment fear */}
+      <Text style={styles.cardTrustLine}>Cancel anytime</Text>
     </AnimatedTile>
   );
 }
 
 // Small white genie lamp — displayed next to "Wishes" on each card
 const GENIE_LAMP_D = 'M326.155 194.661C306.203 193.551 286.596 223.576 265.287 232.582C259.954 218.661 247.863 208.794 233.603 206.723C231.53 206.386 230.008 204.515 230.02 202.32V201.347C230.044 200.249 230.428 199.189 231.123 198.353C233.699 195.023 234.837 190.732 234.262 186.491C233.675 182.25 231.945 180 228 180C223.945 180 221.632 183.609 221.596 188.674C221.56 192.191 222.71 195.622 224.819 198.353C225.49 199.201 225.862 200.262 225.886 201.347V202.32C225.934 204.441 224.52 206.287 222.53 206.723C206.748 209.006 193.77 220.794 189.432 236.748C178 232.457 167.143 226.669 157.138 219.497C130.008 200.91 117.852 197.824 106.271 197.234C106.271 197.234 104.761 197.234 101.739 199.004L97.5928 201.372V201.385C96.2007 201.953 95.6735 205.674 96.2008 206.672C96.7161 207.67 99.1384 208.944 100.229 209.031C114.118 209.518 127.527 211.489 138.924 219.771C164.952 237.721 180.062 295.913 228.116 295.913C275.031 295.913 295.993 209.304 326.155 209.304C346.886 209.304 342.714 254.499 330.898 264.778C319.082 275.069 307.291 264.503 296.637 264.503C283.719 264.503 284.33 277.476 291.281 278.287C292.862 278.524 294.468 278.05 295.69 276.99C296.925 275.93 297.668 274.37 297.74 272.711C304.33 277.464 312.024 280.283 320.029 280.845C338.699 280.845 354 250.642 354 228.464C353.964 218.248 349.175 195.896 326.155 194.661ZM262.64 247.836C251.579 251.878 239.943 253.936 228.21 253.923C216.502 253.923 204.878 251.877 193.818 247.873C190.93 246.888 189.324 243.67 190.235 240.639C202.326 245.591 215.196 248.123 228.186 248.11C241.176 248.098 254.058 245.566 266.161 240.639C266.593 242.111 266.449 243.682 265.754 245.042C265.059 246.389 263.885 247.399 262.471 247.836H262.64ZM272.322 318.425V318.961C258.158 324.387 243.154 327.106 228.054 326.994C212.955 327.144 197.964 324.462 183.774 319.061V318.524C184.302 316.204 185.704 314.196 187.669 312.973C189.634 311.751 191.995 311.414 194.212 312.038C201.378 314.532 209.275 312.088 213.972 305.925C215.099 304.341 215.974 302.582 216.561 300.711C220.3 301.522 224.098 301.921 227.921 301.921C231.732 301.909 235.519 301.397 239.198 300.374C240.552 305.152 243.763 309.119 248.053 311.339C252.343 313.547 257.316 313.809 261.798 312.038C264.003 311.414 266.364 311.763 268.317 312.986C270.282 314.208 271.673 316.204 272.2 318.524L272.322 318.425Z';
-function SmallGenieLamp() {
+function SmallGenieLamp({ color = colors.bluePrimary, size = 14 }) {
+  // Build 145: accepts color + size props so the lamp can render inline
+  // in tier card prices AND inside feature-bullet circles.
   return (
-    <Svg width={14} height={14} viewBox="92 176 266 155" fill="none">
-      <Path d={GENIE_LAMP_D} fill="rgba(255,255,255,0.6)" />
+    <Svg width={size} height={size} viewBox="92 176 266 155" fill="none">
+      <Path d={GENIE_LAMP_D} fill={color} />
     </Svg>
   );
 }
 
-// ── Toggle Pill ─────────────────────────────────────────────────────────────
+// ── Build 145 v5.14: feature bullet icons (lamp / share / cart / sparkle) ─
+function FeatureLampIcon({ color, size = 12 }) {
+  return <SmallGenieLamp color={color} size={size} />;
+}
 
-function TogglePill({ activeTab, onTabChange }) {
+function FeatureShareIcon({ color, size = 12 }) {
+  // Build 145 v5.15: brand share icon ported from HomeScreen.js (line 586).
+  // Smile-arc + up-arrow stack — matches the rest of the app's share UX.
   return (
-    <View style={styles.toggleContainer}>
-      <TouchableOpacity
-        activeOpacity={0.7}
-        onPress={() => onTabChange('subscribe')}
-        style={[styles.toggleTab, activeTab === 'subscribe' && styles.toggleTabActive]}
-      >
-        <Text style={[styles.toggleText, activeTab === 'subscribe' && styles.toggleTextActive]}>
-          Subscribe
-        </Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        activeOpacity={0.7}
-        onPress={() => onTabChange('wishes')}
-        style={[styles.toggleTab, activeTab === 'wishes' && styles.toggleTabActive]}
-      >
-        <Text style={[styles.toggleText, activeTab === 'wishes' && styles.toggleTextActive]}>
-          Wishes
-        </Text>
-      </TouchableOpacity>
-    </View>
+    <Svg width={size} height={size} viewBox="0 0 30 30" fill="none">
+      <Path
+        d="M6.54815 18.5147C7.04668 20.3752 8.1452 22.0193 9.67334 23.1918C11.2015 24.3644 13.0738 25 15 25C16.9262 25 18.7985 24.3644 20.3267 23.1918C21.8548 22.0193 22.9533 20.3752 23.4519 18.5147"
+        stroke={color} strokeWidth={1.6} strokeLinecap="round"
+      />
+      <Path
+        d="M15 5L14.6877 4.60957L15 4.35969L15.3123 4.60957L15 5ZM15.5 16.25C15.5 16.5261 15.2761 16.75 15 16.75C14.7239 16.75 14.5 16.5261 14.5 16.25L15 16.25L15.5 16.25ZM8.75 10L8.43765 9.60957L14.6877 4.60957L15 5L15.3123 5.39043L9.06235 10.3904L8.75 10ZM15 5L15.3123 4.60957L21.5623 9.60957L21.25 10L20.9377 10.3904L14.6877 5.39043L15 5ZM15 5L15.5 5L15.5 16.25L15 16.25L14.5 16.25L14.5 5L15 5Z"
+        fill={color}
+      />
+    </Svg>
   );
 }
+
+function FeatureCartIcon({ color, size = 12 }) {
+  // Build 145 v5.15: brand shopping-bag icon ported from ProfileScreen.js
+  // CartActionIcon (line 131). Bag silhouette with handle curve.
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round">
+      <Path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+      <Line x1={3} y1={6} x2={21} y2={6} />
+      <Path d="M16 10a4 4 0 0 1-8 0" />
+    </Svg>
+  );
+}
+
+function FeatureSparkleIcon({ color, size = 12 }) {
+  // 4-point sparkle/star — "surprise me" for the 4th feature bullet
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill={color}>
+      <Path d="M12 1 L14 10 L23 12 L14 14 L12 23 L10 14 L1 12 L10 10 Z" />
+    </Svg>
+  );
+}
+
+// Build 145 v5.29: clock icon — speed / value-of-time bullet (60s renders,
+// wishes-never-expire). Lucide-style stroke to match share/cart family.
+function FeatureClockIcon({ color, size = 12 }) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+      <Circle cx={12} cy={12} r={10} />
+      <Path d="M12 6v6l4 2" />
+    </Svg>
+  );
+}
+
+// Build 145 v5.29: shield icon — trust / risk-free / cancel-anytime bullet.
+// Lucide-style stroke for visual consistency with the rest of the icon set.
+function FeatureShieldIcon({ color, size = 12 }) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+      <Path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+      <Path d="M9 12l2 2 4-4" />
+    </Svg>
+  );
+}
+
+// Build 145 v5.29: 6-icon rotation for 6-bullet feature lists.
+// 0 → lamp (wishes/usage), 1 → share, 2 → cart (shop),
+// 3 → sparkle (style variety / premium), 4 → clock (speed / no-expiry),
+// 5 → shield (trust / risk-free / pay-once)
+const FEATURE_ICONS = [
+  FeatureLampIcon,
+  FeatureShareIcon,
+  FeatureCartIcon,
+  FeatureSparkleIcon,
+  FeatureClockIcon,
+  FeatureShieldIcon,
+];
+
+// Build 145 v5.27: duplicate InfinityIcon declaration removed — the
+// canonical definition lives at top of file (Lucide-style stroked).
+
+// Build 145 v3 cleanup: TogglePill component removed (tabs are now rendered
+// inline as underlined Text in the main render — see tabsRow JSX below).
 
 // ── Screen ────────────────────────────────────────────────────────────────────
 
@@ -284,36 +603,7 @@ export default function PaywallScreen({ navigation }) {
     console.log('[Paywall] tokenBalance render value:', tokenBalance);
   }, [tokenBalance]);
 
-  // ── Hero slideshow animation ───────────────────────────────────────────
-  const heroOpacities = useRef(HERO_IMAGES.map((_, i) => new Animated.Value(i === 0 ? 1 : 0))).current;
-  const heroCurrentIdx = useRef(0);
-  const heroTimerRef = useRef(null);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    const scheduleNext = () => {
-      heroTimerRef.current = setTimeout(() => {
-        if (cancelled) return;
-        const currentIdx = heroCurrentIdx.current;
-        const nextIdx = (currentIdx + 1) % HERO_IMAGES.length;
-
-        Animated.timing(heroOpacities[nextIdx], {
-          toValue: 1,
-          duration: HERO_FADE_MS,
-          useNativeDriver: true,
-        }).start(() => {
-          if (cancelled) return;
-          heroOpacities[currentIdx].setValue(0);
-          heroCurrentIdx.current = nextIdx;
-          scheduleNext();
-        });
-      }, HERO_INTERVAL);
-    };
-
-    scheduleNext();
-    return () => { cancelled = true; clearTimeout(heroTimerRef.current); };
-  }, []);
+  // Build 145: hero slideshow animation removed (clean white-card design).
 
   // ── Unified wishes counter (Build 84 follow-up) ──────────────────────────
   // Build 84 user feedback: the prior card showed a static "Free Wishes:
@@ -403,16 +693,9 @@ export default function PaywallScreen({ navigation }) {
   const totalFree = isFree ? 5 : renewableTotal;
   const usedCount = subscription.generationsUsed;
 
-  // Entrance animation — bar fills from 0 to actual value once on mount
-  const progressAnim = useRef(new Animated.Value(0)).current;
-  useEffect(() => {
-    Animated.timing(progressAnim, {
-      toValue: progressPct,
-      duration: 800,
-      delay: 400,
-      useNativeDriver: false,
-    }).start();
-  }, [progressPct]);
+  // Build 145 v4: hero is inlined as base64 in the JS bundle — no Metro
+  // HTTP fetch, no prefetch needed, renders synchronously with the Image
+  // component. Eliminates the 8-10s dev-mode reload delay entirely.
 
   // Selected items
   const selectedSubTier = PAID_TIERS.find(t => t.id === selectedTier);
@@ -594,25 +877,57 @@ export default function PaywallScreen({ navigation }) {
 
   // ── CTA label ──────────────────────────────────────────────────────────
 
-  // Build 84 / Bug C4 fix: replace the muddled "HomeGenie Wishes" label
-  // with explicit "Buy N wishes" copy. App Review 3.1.2(a) calls for
-  // unambiguous pricing copy on IAP CTAs; the prior brand-only label was
-  // borderline non-compliant and gave no value-prop signal.
+  // Build 145 v5.17: single "Continue" CTA across both tabs per user spec.
+  // The selected card already communicates the choice + price, so the CTA
+  // just needs to drive the next-step action. Apple Review precedent:
+  // "Continue" is allowed because the StoreKit sheet immediately shows
+  // the explicit product, price, and renewal terms after tap.
   const selectedWishCount = WISH_PACKAGES.find(p => p.id === selectedWish)?.wishes ?? 0;
+  // Build 145 v5.52: context-aware loading microcopy — "Loading wishes…"
+  // for the consumables tab, "Preparing subscription…" for the recurring
+  // tab. Tells the user something is happening between tap and the
+  // StoreKit sheet appearing, so the brief gap doesn't feel like a freeze.
+  // Falls back to "Continue" in idle state.
   const ctaLabel = purchasing
-    ? 'Processing...'
-    : activeTab === 'wishes'
-      ? selectedWishCount > 0
-        ? `Buy ${selectedWishCount} Wish${selectedWishCount === 1 ? '' : 'es'}`
-        : 'Buy Wishes'
-      : 'Subscribe Weekly';
+    ? (activeTab === 'wishes' ? 'Loading wishes…' : 'Preparing subscription…')
+    : 'Continue';
 
-  const ctaPrice = activeTab === 'wishes'
-    ? selectedWishPkg?.price ?? '$0.99'
-    : selectedSubTier?.priceLabel ?? '$1.99/wk';
+  // Build 145 v5.54: shine-sweep animation across the Continue CTA.
+  // A diagonal white-translucent band translates from off-left to off-
+  // right, paused between sweeps so it reads as polish (not a strobe).
+  // Loop disables itself when the user is in the middle of a purchase
+  // (pause sheen → no competing motion with the StoreKit dialog about
+  // to appear).
+  const ctaShineX = useRef(new Animated.Value(-160)).current;
+  const [ctaWidth, setCtaWidth] = useState(SCREEN_W);
+  useEffect(() => {
+    if (purchasing) return;
+    let cancelled = false;
+    const runOnce = () => {
+      if (cancelled) return;
+      ctaShineX.setValue(-160);
+      Animated.timing(ctaShineX, {
+        toValue: ctaWidth + 80,
+        duration: 1100,
+        easing: Easing.inOut(Easing.cubic),
+        useNativeDriver: true,
+      }).start(({ finished }) => {
+        if (!finished || cancelled) return;
+        // Pause between sweeps — premium polish reads as occasional shine,
+        // not a constant strobe. 3.5s gap is the sweet spot from real
+        // top-app A/B observation (Cash App, Notion, Linear all use ~3s).
+        setTimeout(runOnce, 3500);
+      });
+    };
+    runOnce();
+    return () => { cancelled = true; };
+  }, [purchasing, ctaWidth, ctaShineX]);
 
-  // ── Features for selected tier ─────────────────────────────────────────
-  const features = TIER_FEATURES[selectedTier] || TIER_FEATURES.basic;
+  // Build 145 v3: context-aware features per selected tier / wish pack.
+  // Highlights the SPECIFIC value of what the user is about to buy.
+  const features = activeTab === 'wishes'
+    ? (FEATURES_BY_WISH_PACKAGE[selectedWish] || FEATURES_FALLBACK)
+    : (FEATURES_BY_TIER[selectedTier] || FEATURES_FALLBACK);
 
   // Ordered packages for the grid
   const orderedWishes = WISH_CARD_ORDER
@@ -625,27 +940,8 @@ export default function PaywallScreen({ navigation }) {
 
   return (
     <View style={styles.root}>
-      {/* ── Background hero slideshow ─────────────────────────────── */}
-      <View style={StyleSheet.absoluteFill}>
-        {HERO_IMAGES.map((src, i) => (
-          <Animated.View key={i} style={[StyleSheet.absoluteFill, { opacity: heroOpacities[i] }]}>
-            <Image
-              source={src}
-              style={{ width: '100%', height: '100%' }}
-              resizeMode="cover"
-            />
-          </Animated.View>
-        ))}
-      </View>
-
-      {/* ── Gradient overlay ──────────────────────────────────────── */}
-      <LinearGradient
-        colors={['rgba(11,109,195,0.65)', 'rgba(0,0,0,0.80)']}
-        locations={[0.17, 0.75]}
-        style={StyleSheet.absoluteFill}
-        pointerEvents="none"
-      />
-
+      {/* Build 145: clean white-card paywall — hero slideshow + dark gradient
+          overlay removed. Background is plain white via styles.root. */}
       <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
         {/* Close (X) button — OUTSIDE the ScrollView so it stays fixed at
             the top of the safe area and doesn't scroll away. Positioned
@@ -668,94 +964,131 @@ export default function PaywallScreen({ navigation }) {
           alwaysBounceVertical={false}
           overScrollMode="never"
         >
-          <View style={styles.header}>
-            <View style={styles.wordmarkRow}>
-              <Text style={styles.wordmark}>HomeGenie</Text>
-              <Svg width={38} height={38} viewBox="0 0 450 450" style={{ marginLeft: 8 }}>
-                <Defs>
-                  <SvgLinearGradient id="pwBgGrad" x1="225" y1="0" x2="225" y2="450" gradientUnits="userSpaceOnUse">
-                    <Stop offset="0.144" stopColor="#67ACE9" />
-                    <Stop offset="0.769" stopColor="#0B6DC3" />
-                  </SvgLinearGradient>
-                  <SvgLinearGradient id="pwGenieGrad" x1="225.6" y1="176" x2="225.6" y2="327" gradientUnits="userSpaceOnUse">
-                    <Stop offset="0.317" stopColor="#67ACE9" />
-                    <Stop offset="0.861" stopColor="#0B6DC3" />
-                  </SvgLinearGradient>
-                </Defs>
-                <Rect width="450" height="450" rx="100" fill="url(#pwBgGrad)" />
-                <Path fillRule="evenodd" clipRule="evenodd" d="M197 74.5482L79.8429 154.709C69.2396 160.878 64 168.427 64 177.444V356.814C64 374.007 86.7806 388.057 114.655 388.057H334.344C362.219 388.057 385 374.007 385 356.814V177.444C385 168.427 379.74 160.878 369.136 154.709L256.5 74.5483C227.631 57.7131 224.313 57.9218 197 74.5482Z" fill="#FFFFFF" />
-                <Circle cx="225" cy="110.548" r="10" fill="#5AA4E4" />
-                <Path d={GENIE_LAMP_D} fill="url(#pwGenieGrad)" />
-              </Svg>
-            </View>
+          {/* Build 145 v5.13: top bar minimal — just spacer for X close button.
+              Logo pill removed per user. */}
+          <View style={styles.topBar}>
+            <View style={{ flex: 1 }} />
           </View>
 
-          <Text style={styles.subtitle}>Generate stunning room designs and shop curated furniture.</Text>
+          {/* Build 145: underline tabs (Wishes | Subscribe) replace the
+              old pill toggle. Active tab gets blue text + 2px blue
+              underline; inactive tab is muted gray. Sits directly under
+              the top bar per the mock. */}
+          {/* Build 145 v5.52: tab order swapped — Subscribe now sits on
+              the LEFT (default-focus position in LTR reading). High-value
+              recurring revenue option gets the first eye-tracking hit;
+              consumable wishes packs sit on the right as the secondary
+              option. activeTab default is still 'subscribe' so the
+              left-tab-active visual is consistent on open. */}
+          <View style={styles.tabsRow}>
+            <TouchableOpacity
+              activeOpacity={0.7}
+              onPress={() => setActiveTab('subscribe')}
+              style={styles.tabItem}
+            >
+              <Text style={[styles.tabLabel, activeTab === 'subscribe' && styles.tabLabelActive]}>
+                Subscribe
+              </Text>
+              {activeTab === 'subscribe' && <View style={styles.tabUnderline} />}
+            </TouchableOpacity>
+            <TouchableOpacity
+              activeOpacity={0.7}
+              onPress={() => setActiveTab('wishes')}
+              style={styles.tabItem}
+            >
+              <Text style={[styles.tabLabel, activeTab === 'wishes' && styles.tabLabelActive]}>
+                Wishes
+              </Text>
+              {activeTab === 'wishes' && <View style={styles.tabUnderline} />}
+            </TouchableOpacity>
+          </View>
+          <View style={styles.tabsDivider} />
 
-          {/* ── Free Wishes Usage bar ──────────────────────────────── */}
-          {/*
-              The count was previously rendered as "{remaining} of {totalFree}"
-              — e.g. "5 of 5" for a fresh account. That reads as EITHER "5
-              remaining of 5 total" OR "5 used of 5 total" depending on the
-              reader's mental model. TestFlight feedback (Apr 17 2026)
-              confirmed users were misreading a fresh account as "all 5
-              wishes already used" because the bar was visually full and the
-              label was ambiguous. Switched to the unambiguous
-              "{remaining} remaining" so fresh accounts display "5 remaining"
-              (clearly: you have 5 left), depleted accounts show "0 remaining"
-              (clearly: you have none left). The progress bar still fills
-              from 0% up to 100% representing remaining share — unchanged.
-          */}
-          {/* Build 84 follow-up — unified wishes counter. One card replaces
-              the prior dual-card setup (free + purchased). Adapts to all
-              four states (free-only, free + purchased, subscribed,
-              premium-unlimited) so the user sees ONE clear number that
-              reflects their total available wishes from whatever source
-              they paid for. Buying 4 wishes makes the count jump from
-              3 → 7, providing the transparent purchase feedback the user
-              asked for. */}
-          <View style={styles.progressCard}>
-            <View style={styles.progressLabelRow}>
-              <Text style={styles.progressLabel}>{cardLabel}</Text>
-              {/* Build 113: animated tick-up + scale punch on balance change.
-                  Falls back to plain text rendering when card-count is the
-                  non-numeric "Unlimited" string. The numeric value comes
-                  from the same render-time computation as before — the
-                  visible string is unchanged for all states except that
-                  the number now animates instead of jumping. */}
-              {isUnlimitedSub ? (
-                <Text style={styles.progressCount}>{cardCount}</Text>
-              ) : (
-                <AnimatedWishCounter
-                  value={isFree ? renewableRemaining + purchasedCount : renewableRemaining}
-                  suffix=" remaining"
-                  style={styles.progressCount}
-                />
-              )}
-            </View>
-            {showProgressBar && (
-              <View style={styles.progressTrack}>
-                <Animated.View style={[styles.progressFill, {
-                  width: progressAnim.interpolate({
-                    inputRange: [0, 1],
-                    outputRange: ['0%', '100%'],
-                  }),
-                }]} />
+          {/* Build 145 v5.52: emotional wish counter — "Only N wishes left
+              — get more below" with a tiny lamp icon. Reframes the
+              informational "Wishes Available / 6 Remaining" into an
+              urgency-flavored cue that primes the user for the cards
+              directly below. Unlimited subscribers still see the static
+              "Premium Plan / Unlimited" treatment. */}
+          {(() => {
+            const totalRemaining = isFree
+              ? renewableRemaining + purchasedCount
+              : renewableRemaining;
+            // Urgency tiers: <=10 wishes → "Only N left", >10 → "N
+            // wishes available" (neutral). Subscribers w/ unlimited
+            // skip both and render the static state.
+            const isUrgent = !isUnlimitedSub && totalRemaining <= 10;
+            return (
+              <View style={styles.wishCounter}>
+                <View style={styles.wishCounterRow}>
+                  <View style={styles.wishCounterLeft}>
+                    {/* Build 145 v5.60: urgent-state lamp color bluePrimary
+                        → blueLight per user. Lighter baby blue matches the
+                        scarcity number ("6") inside the label, keeping the
+                        urgent row visually unified. */}
+                    <SmallGenieLamp
+                      color={isUrgent ? colors.blueLight : C.textTertiary}
+                      size={12}
+                    />
+                    {/* Build 145 v5.53: urgent label rewritten as a span
+                        composition so the number itself can render in
+                        blueLight + medium weight while the surrounding
+                        words stay neutral. Visually highlights the
+                        scarcity number without bolding the whole line. */}
+                    {isUnlimitedSub ? (
+                      <Text style={styles.wishCounterLabel}>Premium Plan</Text>
+                    ) : isUrgent ? (
+                      <Text style={[styles.wishCounterLabel, styles.wishCounterLabelUrgent]}>
+                        Only{' '}
+                        <Text style={styles.wishCounterLabelNumber}>{totalRemaining}</Text>
+                        {' '}wish{totalRemaining === 1 ? '' : 'es'} left
+                      </Text>
+                    ) : (
+                      <Text style={styles.wishCounterLabel}>Wishes Available</Text>
+                    )}
+                  </View>
+                  {isUnlimitedSub ? (
+                    <Text style={styles.wishCounterValue}>{cardCount}</Text>
+                  ) : (
+                    <Text style={[
+                      styles.wishCounterValue,
+                      isUrgent && styles.wishCounterValueUrgent,
+                    ]}>
+                      {isUrgent ? 'Get more below' : `${totalRemaining} Remaining`}
+                    </Text>
+                  )}
+                </View>
+                <View style={styles.wishCounterDivider} />
+                {cardSubline && (
+                  <Text style={styles.wishCounterSubline}>{cardSubline}</Text>
+                )}
               </View>
-            )}
-            {cardSubline && (
-              <Text style={styles.progressSubline}>{cardSubline}</Text>
-            )}
+            );
+          })()}
+
+          {/* Build 145 v5.9: hero — paddingHorizontal wrapper pattern matching
+              EXACTLY how cardGrid renders. Same 20pt inset on both sides → hero
+              + cards align pixel-perfect. */}
+          <View style={styles.heroOuter}>
+            <View style={styles.heroImageInner}>
+              <Image
+                source={HERO_SOURCE}
+                style={styles.heroImage}
+                resizeMode="cover"
+                fadeDuration={0}
+              />
+            </View>
           </View>
 
-          {/* ── Toggle pill ───────────────────────────────────────── */}
-          <View style={styles.toggleWrapper}>
-            <TogglePill activeTab={activeTab} onTabChange={setActiveTab} />
-          </View>
-
-          {/* ── Card grid ─────────────────────────────────────────── */}
+          {/* Build 145: Wishes tab = horizontal scroll row (3-4 visible).
+              Subscribe tab = 2-card row (no scroll, full width). */}
           {activeTab === 'wishes' ? (
-            <View style={styles.cardGrid}>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.cardScrollContent}
+              style={styles.cardScrollWishes}
+            >
               {orderedWishes.map(pkg => (
                 <WishCard
                   key={pkg.id}
@@ -766,90 +1099,138 @@ export default function PaywallScreen({ navigation }) {
                   registerRef={(node) => { tileRefs.current[pkg.id] = node; }}
                 />
               ))}
+            </ScrollView>
+          ) : null}
+          {/* Build 145 v5.62: cross-tab promo strip — only shown on the
+              Wishes tab, fills the previously dead vertical space between
+              the wish cards and the feature bullets. Tapping it switches
+              to the Subscribe tab — cross-tab conversion lever for users
+              who came in looking at one-time packs but might prefer
+              recurring economics. The "$0.71/day" anchor makes the cost
+              comparison concrete (vs. $0.25/wish where you only get N
+              wishes total). */}
+          {activeTab === 'wishes' && (
+            <TouchableOpacity
+              activeOpacity={0.7}
+              onPress={() => setActiveTab('subscribe')}
+              style={styles.crossTabPromo}
+            >
+              <SmallGenieLamp color={colors.blueLight} size={13} />
+              <Text style={styles.crossTabPromoText}>
+                Want <Text style={styles.crossTabPromoHighlight}>unlimited wishes</Text>? Subscribe from <Text style={styles.crossTabPromoHighlight}>$0.71/day</Text>
+              </Text>
+              <Text style={styles.crossTabPromoArrow}>→</Text>
+            </TouchableOpacity>
+          )}
+          {activeTab === 'subscribe' && (
+            <View style={styles.cardGrid}>
+              {orderedTiers.map(tier => (
+                <TierCard
+                  key={tier.id}
+                  tier={tier}
+                  selected={selectedTier === tier.id}
+                  onSelect={setSelectedTier}
+                  isPurchasing={purchasing}
+                  registerRef={(node) => { tileRefs.current[tier.productId] = node; }}
+                />
+              ))}
             </View>
-          ) : (
-            <>
-              <View style={styles.cardGrid}>
-                {orderedTiers.map(tier => (
-                  <TierCard
-                    key={tier.id}
-                    tier={tier}
-                    selected={selectedTier === tier.id}
-                    onSelect={setSelectedTier}
-                    isPurchasing={purchasing}
-                    registerRef={(node) => { tileRefs.current[tier.productId] = node; }}
-                  />
-                ))}
-              </View>
-
-              {/* ── Feature checklist ──────────────────────────────── */}
-              <View style={styles.featuresSection}>
-                {features.map((feature, i) => (
-                  <View key={i} style={styles.featureRow}>
-                    <View style={styles.featureCheckCircle}>
-                      <CheckIcon size={11} color={colors.blueLight} />
-                    </View>
-                    <Text style={styles.featureText}>{feature}</Text>
-                  </View>
-                ))}
-              </View>
-            </>
           )}
 
-          {/* ── Legal section ─────────────────────────────────────── */}
-          <View style={styles.legalSection}>
-            <Text style={styles.finePrint}>
-              Payment will be charged to your Apple ID account at confirmation of purchase.
-              Subscription automatically renews unless cancelled at least 24 hours before the
-              end of the current period. You can manage or cancel your subscription in your
-              device's Settings {'>'} Apple ID {'>'} Subscriptions.
-            </Text>
-            <View style={styles.legalLinks}>
-              <TouchableOpacity onPress={() => navigation.navigate('TermsOfUse')} activeOpacity={0.7} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
-                <Text style={styles.legalLink}>Terms of Use</Text>
-              </TouchableOpacity>
-              <Text style={styles.legalDot}>{'\u00B7'}</Text>
-              <TouchableOpacity onPress={() => navigation.navigate('PrivacyPolicy')} activeOpacity={0.7} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
-                <Text style={styles.legalLink}>Privacy Policy</Text>
-              </TouchableOpacity>
-              <Text style={styles.legalDot}>{'\u00B7'}</Text>
-              <TouchableOpacity onPress={handleRestore} activeOpacity={0.7} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
-                <Text style={styles.legalLink}>{restoring ? 'Restoring...' : 'Restore Purchases'}</Text>
-              </TouchableOpacity>
-            </View>
+          {/* Build 145 v5.14: feature bullets with index-mapped icons.
+              0: lamp (wishes), 1: share, 2: cart, 3: sparkle (extras). */}
+          <View style={styles.featuresSection}>
+            {features.map((feature, i) => {
+              const Icon = FEATURE_ICONS[i] || FeatureSparkleIcon;
+              return (
+                <View key={i} style={styles.featureRow}>
+                  <View style={styles.featureCheckCircle}>
+                    <Icon color={colors.blueLight} size={12} />
+                  </View>
+                  <Text style={styles.featureText}>{renderFeatureText(feature)}</Text>
+                </View>
+              );
+            })}
+          </View>
+
+          {/* Build 145 v5.17: single "Continue" CTA — price + product
+              shown clearly on the selected card above, StoreKit confirms
+              the price before charging. */}
+          {/* Build 145 v5.52: Continue CTA gets a soft top→bottom gradient
+              for tactile depth.
+              Build 145 v5.54: shine-sweep overlay added — a clipped
+              diagonal white band translates across the button every
+              ~4.5 seconds for that premium-app polish feel. The
+              overlay is pointerEvents:none so it never blocks taps. */}
+          <View style={styles.ctaSection}>
+            <TouchableOpacity
+              onPress={handlePurchase}
+              disabled={purchasing}
+              activeOpacity={0.85}
+              style={purchasing && styles.ctaDisabled}
+              onLayout={(e) => setCtaWidth(e.nativeEvent.layout.width)}
+            >
+              <View style={styles.ctaClipWrap}>
+                <LinearGradient
+                  colors={['#7FB8ED', '#4F95D8']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 0, y: 1 }}
+                  style={styles.cta}
+                >
+                  <Text style={styles.ctaText}>{ctaLabel}</Text>
+                </LinearGradient>
+                {!purchasing && (
+                  <Animated.View
+                    pointerEvents="none"
+                    style={[
+                      styles.ctaShine,
+                      { transform: [{ translateX: ctaShineX }, { skewX: '-20deg' }] },
+                    ]}
+                  >
+                    <LinearGradient
+                      colors={[
+                        'rgba(255,255,255,0)',
+                        'rgba(255,255,255,0.45)',
+                        'rgba(255,255,255,0)',
+                      ]}
+                      start={{ x: 0, y: 0.5 }}
+                      end={{ x: 1, y: 0.5 }}
+                      style={StyleSheet.absoluteFill}
+                    />
+                  </Animated.View>
+                )}
+              </View>
+            </TouchableOpacity>
+          </View>
+
+          {/* Build 145: footer (Terms / Restore / Privacy) at very bottom */}
+          <View style={styles.footerRow}>
+            <TouchableOpacity
+              onPress={() => navigation.navigate('TermsOfUse')}
+              activeOpacity={0.7}
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            >
+              <Text style={styles.footerLink}>Terms of Use</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={handleRestore}
+              activeOpacity={0.7}
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            >
+              <Text style={styles.footerLink}>
+                {restoring ? 'Restoring...' : 'Restore Purchase'}
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => navigation.navigate('PrivacyPolicy')}
+              activeOpacity={0.7}
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            >
+              <Text style={styles.footerLink}>Privacy Policy</Text>
+            </TouchableOpacity>
           </View>
         </ScrollView>
 
-        {/* ── Sticky bottom section ─────────────────────────────────── */}
-        <View style={styles.stickyBar}>
-          {/* CTA button */}
-          <TouchableOpacity
-            onPress={handlePurchase}
-            disabled={purchasing}
-            activeOpacity={0.85}
-            style={[styles.cta, purchasing && styles.ctaDisabled]}
-          >
-            <View style={styles.ctaInner}>
-              <Text style={styles.ctaText}>{ctaLabel}</Text>
-              <View style={styles.ctaDivider} />
-              <Text style={styles.ctaPrice}>{ctaPrice}</Text>
-            </View>
-          </TouchableOpacity>
-
-          {/* Referral share button */}
-          <TouchableOpacity
-            activeOpacity={0.7}
-            onPress={handleShareReferral}
-            style={styles.referralBtn}
-          >
-            <Text style={styles.referralBtnText}>
-              Share to a friend and get free Wishes!
-            </Text>
-            <View style={styles.referralIconCircle}>
-              <ShareIcon />
-            </View>
-          </TouchableOpacity>
-        </View>
       </SafeAreaView>
 
       {/* Build 113: celebration overlay sits above all content, full-screen,
@@ -866,12 +1247,13 @@ export default function PaywallScreen({ navigation }) {
 
 // ── Styles ────────────────────────────────────────────────────────────────────
 
-const BLUE = colors.bluePrimary;
+// Build 145 v3 cleanup: unused `BLUE` constant removed; styles reference
+// `colors.bluePrimary` / `colors.blueLight` directly per the white-card mock.
 
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: '#000',
+    backgroundColor: C.bg,  // Build 145: white background (was #000)
   },
   safeArea: {
     flex: 1,
@@ -889,11 +1271,8 @@ const styles = StyleSheet.create({
   // ── Header
   header: {
     alignItems: 'center',
-    // Push the wordmark well below the close (X) button (which sits
-    // at safe-area-top + 32pt, 40pt tall → bottom edge at ~72pt).
-    // 80pt paddingTop gives the HomeGenie wordmark real breathing room.
     paddingHorizontal: layout.screenPaddingH,
-    paddingTop: 80,
+    paddingTop: 60,  // Build 145: tighter than 80pt — no hero behind it now
     paddingBottom: space.sm,
   },
   wordmarkRow: {
@@ -903,16 +1282,16 @@ const styles = StyleSheet.create({
   wordmark: {
     ...typeScale.hero,
     fontFamily: 'Geist_700Bold',
-    color: C.white,
+    color: C.textPrimary,  // Build 145: dark text on white bg
   },
   closeBtnCorner: {
-    // Fixed inside SafeAreaView so it clears the Dynamic Island and
-    // any iOS system chrome (e.g. the "◀ Safari" back-link pill that
-    // appears when the app is launched from another app). Plain white
-    // X on the hero background — no pill/circle backing.
+    // Build 145: dark X on white bg, moved to top-RIGHT per mock.
+    // Build 145 v5.46: top 18 → 30 — v5.45 was still too high (X visually
+    // touching the battery icon on iPhone 16e). 30pt clears the status
+    // bar comfortably on notched devices.
     position: 'absolute',
-    top: space['2xl'],          // 32pt below safe-area top = well clear of status-bar UI
-    left: space.lg,             // 20pt in from the left edge
+    top: 30,
+    right: space.lg,            // 20pt in from the right edge
     width: 40,
     height: 40,
     alignItems: 'center',
@@ -923,7 +1302,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: fontWeight.regular,
     fontFamily: 'Geist_400Regular',
-    color: 'rgba(255,255,255,0.75)',
+    color: C.textSecondary,  // Build 145: dark-on-white (was white-on-dark)
     textAlign: 'center',
     paddingHorizontal: layout.screenPaddingH + 16,
     marginBottom: space['2xl'],
@@ -980,7 +1359,7 @@ const styles = StyleSheet.create({
     marginTop: space.xs,
   },
 
-  // ── Toggle pill — matches mockup: blue filled active, transparent inactive
+  // Build 145: toggle pill on white bg — blue text active, gray text inactive
   toggleWrapper: {
     paddingHorizontal: layout.screenPaddingH + 56,
     marginBottom: space.xl,
@@ -988,8 +1367,10 @@ const styles = StyleSheet.create({
   toggleContainer: {
     flexDirection: 'row',
     borderRadius: radius.pill,
-    backgroundColor: C.white,
+    backgroundColor: C.surface,  // light gray pill background
     padding: 3,
+    borderWidth: 1,
+    borderColor: C.border,
   },
   toggleTab: {
     flex: 1,
@@ -999,21 +1380,21 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   toggleTabActive: {
-    backgroundColor: colors.blueLight,
+    backgroundColor: C.bg,  // active pill is white (raised) on the gray bg
   },
   toggleText: {
     fontSize: fontSize.sm,
     fontWeight: fontWeight.semibold,
     fontFamily: 'Geist_600SemiBold',
-    color: colors.blueLight,
+    color: C.textTertiary,  // inactive tab text = muted
   },
   toggleTextActive: {
-    color: C.white,
+    color: colors.bluePrimary,  // active tab text = brand blue
     fontWeight: fontWeight.semibold,
     fontFamily: 'Geist_600SemiBold',
   },
 
-  // ── Card grid (2 columns)
+  // Build 145 v3: tightened card layout per mock — less vertical padding
   cardGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -1021,19 +1402,45 @@ const styles = StyleSheet.create({
     gap: CARD_GAP,
     marginBottom: space.lg,
   },
+  // Build 145 v5.32: card background C.bg (#FFFFFF white) → very light grey
+  // (#F8FAFC, a hair below the screen's white). Gives the cards a subtle
+  // "panel" feel against the screen so they look like distinct tappable
+  // surfaces rather than flat white-on-white. Applied to both TierCard
+  // (Subscribe) and WishCard (Wishes) via the shared gridCard style.
   gridCard: {
     width: CARD_W,
-    backgroundColor: 'rgba(255,255,255,0.08)',
-    borderRadius: radius.lg,
-    paddingVertical: 18,
-    paddingHorizontal: 14,
-    borderWidth: 1.5,
-    borderColor: 'rgba(255,255,255,0.25)',
+    backgroundColor: '#FBFCFE',
+    borderRadius: 10,
+    paddingVertical: 10,            // Build 145 v5.20: tighter (was 12)
+    paddingHorizontal: 12,
+    borderWidth: 1,
+    borderColor: C.border,
+    position: 'relative',
   },
+  // Build 145 v5.49: narrower variant of gridCard for the 3-up Wishes carousel.
+  // Build 145 v5.59: tightened to 6/6 padding.
+  // Build 145 v5.61: justifyContent:'center' added so the stacked content
+  // (count → label → divider → price → per-wish → trust) vertically
+  // centers as a single block within the card. The inherited cardCountRow
+  // marginTop:14 was the previous cause of "content sits too low" — now
+  // overridden to 0 on cardCountRowWish, with the card's flex centering
+  // taking over.
+  gridCardWish: {
+    width: WISH_CARD_W,
+    paddingHorizontal: 6,
+    paddingVertical: 6,
+    justifyContent: 'center',
+  },
+  // Build 145 v5.39: selected-card border thinned 1.5 → 0.75 (half size).
+  // Build 145 v5.40: selected-card background gains a subtle blue tint.
+  // Build 145 v5.43: tint lightened #F0F6FF → #F7FAFF per user. The
+  // previous value read as "blue wash" and felt too bold; this one is
+  // closer to a "barely-blue almost-white" — selection still registers
+  // visually but doesn't overpower the other UI elements.
   gridCardSelected: {
     borderColor: colors.blueLight,
-    borderWidth: 2,
-    backgroundColor: 'rgba(103,172,233,0.12)',
+    borderWidth: 0.75,
+    backgroundColor: '#F7FAFF',
   },
 
   // ── Checkmark badge (split on top-right corner edge)
@@ -1052,28 +1459,104 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
 
-  // ── Card inner content
+  // Build 145 v3: Title Case "HomeGenie Designs" (not uppercase) per mock
   cardBrandLabel: {
-    fontSize: fontSize.xs,
+    fontSize: 10,
     fontWeight: fontWeight.semibold,
     fontFamily: 'Geist_600SemiBold',
-    color: 'rgba(255,255,255,0.6)',
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-    marginBottom: 6,
+    color: C.textTertiary,
+    letterSpacing: 0,
+    flexShrink: 1,
   },
   cardCountRow: {
     flexDirection: 'row',
-    alignItems: 'baseline',
-    marginBottom: 6,
+    // Build 145 v5.35: 'baseline' → 'flex-end'. Baseline alignment falls
+    // back to the View's TOP edge for non-text children (the SVG infinity
+    // wrap), which floated "Wishes" up and dropped the icon down on the
+    // UNLIMITED card. flex-end anchors all children to the row bottom so
+    // the infinity icon's bottom and the Wishes text bottom land on the
+    // same line — matching how "25" + "Wishes" looks on the PRO card.
+    // A small marginBottom on cardWishesLabel lifts its baseline up to
+    // sit next to the "25" digit on PRO (so flex-end doesn't push it
+    // below the digit's baseline).
+    alignItems: 'flex-end',
+    justifyContent: 'center',
+    marginTop: 14,
+    marginBottom: 2,
   },
   cardBigNumber: {
-    fontSize: 48,
-    fontWeight: fontWeight.bold,
-    fontFamily: 'Geist_700Bold',
-    color: C.white,
-    lineHeight: 52,
+    fontSize: 52,
+    // Build 145 v5.58: weight dropped semibold (600) → medium (500) per
+    // user. The semibold digit was reading too heavy against the rest
+    // of the card content — medium retains visual prominence (still the
+    // largest element on the card) while feeling more refined.
+    fontWeight: fontWeight.medium,
+    fontFamily: 'Geist_500Medium',
+    color: C.textPrimary,
+    lineHeight: 54,
     letterSpacing: -1,
+    // Build 145 v5.41: nudge "25" down 8pt so its visible baseline lines
+    // up with the "Wishes" label's baseline.
+    transform: [{ translateY: 8 }],
+  },
+  // Build 145 v5.49: smaller variant for 3-up wish carousel cards.
+  // Build 145 v5.59: 34 → 28 + lineHeight 36 → 30 — proportional to the
+  // newly tightened card padding. Still medium weight.
+  cardBigNumberWish: {
+    fontSize: 28,
+    lineHeight: 30,
+    fontWeight: fontWeight.medium,
+    fontFamily: 'Geist_500Medium',
+  },
+  cardWishesLabelWish: {
+    fontSize: 11,
+    marginLeft: 4,
+  },
+  // Build 145 v5.57/v5.59: stacked label sits directly under the number
+  // with no top margin — fully tight to the count.
+  cardWishesLabelWishStacked: {
+    marginLeft: 0,
+    marginTop: 0,
+  },
+  // Build 145 v5.57: column layout — number on top, label centered below.
+  // Build 145 v5.61: marginTop overridden to 0 — the inherited 14pt was
+  // pushing the entire content block down off-center. Now the card's
+  // own justifyContent:'center' handles vertical positioning naturally.
+  cardCountRowWish: {
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 0,
+  },
+  cardPriceWish: {
+    fontSize: 13,
+  },
+  // Build 145 v5.59: wish-specific compressions for the bottom content
+  // band so the divider/per-wish/trust-line area is as tight as the
+  // count area above it.
+  cardPriceDividerWish: {
+    marginVertical: 3,
+    alignSelf: 'center',
+    width: '70%',
+  },
+  cardPerDayWish: {
+    fontSize: 9,
+    marginTop: 0,
+  },
+  cardTrustLineWish: {
+    fontSize: 8,
+    marginTop: 0,
+  },
+  // Build 145 v5.37: wrap height pinned to 54 (matches the "25" digit's
+  // lineHeight on the PRO card) so both tier cards have IDENTICAL count-
+  // row heights — no more "UNLIMITED card looks slightly taller / shorter
+  // than PRO" drift. justifyContent:'flex-end' docks the icon at the
+  // bottom of the 54pt box so the icon's bottom lands on the row's
+  // bottom edge, right next to the Wishes label.
+  cardInfinityWrap: {
+    marginRight: 6,
+    height: 54,
+    justifyContent: 'flex-end',
   },
   cardWishesRow: {
     flexDirection: 'row',
@@ -1084,49 +1567,68 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: fontWeight.regular,
     fontFamily: 'Geist_400Regular',
-    color: 'rgba(255,255,255,0.6)',
+    color: C.textSecondary,
     marginLeft: 6,
   },
   cardPriceRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',    // Build 145 v5.18: center the price under the centered number
     gap: 6,
   },
   cardPrice: {
     fontSize: 16,
     fontWeight: fontWeight.semibold,
     fontFamily: 'Geist_600SemiBold',
-    color: C.white,
+    color: C.textPrimary,
   },
 
-  // ── Feature checklist (subscribe tab)
+  // Build 145 v3: feature checklist (tightened spacing)
+  // Build 145 v5.29: gap 14 → 11 to fit 6 bullets (up from 4) without
+  // pushing the CTA off the visible area on smaller iPhones.
   featuresSection: {
     paddingHorizontal: layout.screenPaddingH,
-    marginBottom: space.lg,
-    gap: space.md,
+    marginBottom: space.md,
+    gap: 11,
   },
   featureRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
+    gap: 12,
   },
+  // Build 145 v5.29: circle 20 → 18 to match the slightly smaller font.
   featureCheckCircle: {
-    width: 22,
-    height: 22,
-    borderRadius: 11,
-    backgroundColor: C.white,
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    backgroundColor: 'transparent',
+    borderWidth: 1,
+    borderColor: C.border,
     alignItems: 'center',
     justifyContent: 'center',
   },
+  // Build 145 v5.29: 13 → 12, with explicit lineHeight 16 for readability
+  // at the smaller size (default RN lineHeight for 12pt is too tight).
   featureText: {
-    fontSize: 14,
+    fontSize: 12,
+    lineHeight: 16,
     fontWeight: fontWeight.regular,
     fontFamily: 'Geist_400Regular',
-    color: 'rgba(255,255,255,0.85)',
+    color: C.textSecondary,
     flex: 1,
   },
+  // Build 145 v5.31: highlight span inside featureText.
+  // Build 145 v5.42: weight thinned from semibold (600) → medium (500)
+  // per user — the bold-highlight phrases were reading too heavy against
+  // the surrounding regular (400) text. Medium still draws the eye to
+  // the keyword but feels closer to elegant emphasis than aggressive bold.
+  featureTextHighlight: {
+    color: colors.blueLight,
+    fontWeight: fontWeight.medium,
+    fontFamily: 'Geist_500Medium',
+  },
 
-  // ── Legal section
+  // Build 145: legal section on white bg
   legalSection: {
     marginTop: space.lg,
     marginHorizontal: layout.screenPaddingH,
@@ -1137,7 +1639,7 @@ const styles = StyleSheet.create({
     fontSize: fontSize.xs,
     fontWeight: fontWeight.regular,
     fontFamily: 'Geist_400Regular',
-    color: 'rgba(255,255,255,0.4)',
+    color: C.textTertiary,
     textAlign: 'center',
     lineHeight: 16,
   },
@@ -1152,25 +1654,42 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: fontWeight.medium,
     fontFamily: 'Geist_500Medium',
-    color: 'rgba(255,255,255,0.55)',
+    color: C.textSecondary,
   },
   legalDot: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.3)',
+    color: C.textTertiary,
   },
 
-  // ── Sticky CTA bar
+  // Build 145: sticky CTA bar — blue primary CTA, white-with-border share
   stickyBar: {
     paddingHorizontal: layout.screenPaddingH,
     paddingTop: space.md,
     paddingBottom: space.xs,
   },
   cta: {
-    backgroundColor: C.white,
-    borderRadius: radius.pill,
-    height: 54,
+    backgroundColor: colors.blueLight,
+    borderRadius: 10,                 // Build 145 v5.12: unified 10pt corners across CTA + cards + hero
+    height: 48,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  // Build 145 v5.54: clip wrapper so the shine band stays inside the
+  // button's rounded edge. Matches the CTA's borderRadius exactly.
+  ctaClipWrap: {
+    borderRadius: 10,
+    overflow: 'hidden',
+    position: 'relative',
+  },
+  // The shine band itself — wider + taller than the button so the
+  // diagonal skew never reveals an empty edge at the corners. The inner
+  // LinearGradient (transparent → white → transparent) creates the
+  // soft-edge "glint" effect rather than a hard white rectangle.
+  ctaShine: {
+    position: 'absolute',
+    top: -10,
+    bottom: -10,
+    width: 90,
   },
   ctaDisabled: {
     opacity: 0.6,
@@ -1183,30 +1702,32 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: fontWeight.bold,
     fontFamily: 'Geist_700Bold',
-    color: colors.blueLight,
+    color: C.white,  // Build 145: white text on blue pill
     letterSpacing: -0.2,
   },
   ctaDivider: {
     width: 1,
     height: 20,
-    backgroundColor: 'rgba(103,172,233,0.3)',
+    backgroundColor: 'rgba(255,255,255,0.4)',  // white divider on blue
     marginHorizontal: space.md,
   },
   ctaPrice: {
     fontSize: 16,
     fontWeight: fontWeight.bold,
     fontFamily: 'Geist_700Bold',
-    color: colors.blueLight,
+    color: C.white,  // Build 145: white price on blue pill
   },
 
-  // ── Referral share button
+  // Build 145: share = white pill with blue border + blue text (was blue pill)
   referralBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     height: 50,
     borderRadius: radius.pill,
-    backgroundColor: colors.blueLight,
+    backgroundColor: C.bg,
+    borderWidth: 1.5,
+    borderColor: colors.bluePrimary,
     marginTop: space.sm,
     paddingLeft: space.xl,
     paddingRight: 6,
@@ -1214,15 +1735,364 @@ const styles = StyleSheet.create({
   referralBtnText: {
     ...typeScale.button,
     fontFamily: 'Geist_600SemiBold',
-    color: C.white,
+    color: colors.bluePrimary,
     flex: 1,
   },
   referralIconCircle: {
     width: 38,
     height: 38,
     borderRadius: 19,
-    backgroundColor: C.white,
+    backgroundColor: colors.bluePrimary,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+
+  // ─── Build 145 new styles (white-card mock layout) ────────────────────────
+
+  // Build 145 v5.46: bumped down a few more pt (minHeight 44 → 60,
+  // paddingTop 18 → 30) so the tabs sit slightly lower on the page,
+  // matching the new close-X top of 30pt. Now there's a clean 30pt gap
+  // below the safe-area top before any content begins.
+  topBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: layout.screenPaddingH,
+    paddingTop: 30,
+    paddingBottom: 0,
+    minHeight: 60,
+  },
+  logoPill: {
+    width: 110,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: '#000',
+    alignSelf: 'center',
+    position: 'absolute',
+    left: '50%',
+    marginLeft: -55,
+    top: space.md + 6,
+  },
+
+  // Underline tabs (Wishes | Subscribe)
+  // Build 145 v5.3: removed paddingHorizontal so tab underline reaches true
+  // 50%-of-screen width per mock. Tab text labels are still centered inside
+  // each tabItem (flex:1 + alignItems:center).
+  tabsRow: {
+    flexDirection: 'row',
+    paddingHorizontal: 0,
+    marginTop: 4,
+  },
+  tabItem: {
+    flex: 1,
+    paddingVertical: 10,
+    alignItems: 'center',
+    position: 'relative',
+  },
+  tabLabel: {
+    fontSize: 16,
+    fontWeight: fontWeight.semibold,
+    fontFamily: 'Geist_600SemiBold',
+    color: C.textTertiary,
+  },
+  tabLabelActive: {
+    color: colors.blueLight,    // Build 145 v5: light baby blue per mock (was bluePrimary navy)
+  },
+  tabUnderline: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: 1.5,                // Build 145 v5.4: barely thinner per user (was 2)
+    backgroundColor: colors.blueLight,
+  },
+  tabsDivider: {
+    height: 1,
+    backgroundColor: C.border,
+    marginBottom: space.md,  // tighter (was space.base)
+  },
+
+  // Minimal wish counter (no card border, no progress bar)
+  wishCounter: {
+    paddingHorizontal: layout.screenPaddingH,
+    marginBottom: space.md,  // tighter (was space.lg)
+  },
+  wishCounterRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingBottom: 4,
+  },
+  // Build 145 v5.52: left side groups the lamp icon + label so they
+  // scroll/align as one unit. Gap pulls the lamp away from the text.
+  wishCounterLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  wishCounterLabel: {
+    fontSize: 12,
+    fontFamily: 'Geist_400Regular',
+    color: C.textTertiary,
+  },
+  // Build 145 v5.52: urgent state ("Only N left").
+  // Build 145 v5.53: weight thinned semibold → regular (font feels
+  // less heavy on the line); only the number itself gets the
+  // weight + color pop via wishCounterLabelNumber.
+  wishCounterLabelUrgent: {
+    fontWeight: fontWeight.regular,
+    fontFamily: 'Geist_400Regular',
+    color: C.textPrimary,
+  },
+  // Build 145 v5.53: the scarcity number ("6") inside the urgent label
+  // — blueLight + medium weight pulls the eye to the number without
+  // bolding the entire line.
+  wishCounterLabelNumber: {
+    color: colors.blueLight,
+    fontWeight: fontWeight.medium,
+    fontFamily: 'Geist_500Medium',
+  },
+  wishCounterValue: {
+    fontSize: 12,
+    fontWeight: fontWeight.semibold,
+    fontFamily: 'Geist_600SemiBold',
+    color: colors.blueLight,
+  },
+  // Build 145 v5.53: urgent right-side text recolored bluePrimary →
+  // textTertiary (light grey) per user — softer cue, less aggressive
+  // than a saturated brand color competing with the cards below.
+  wishCounterValueUrgent: {
+    color: C.textTertiary,
+    fontWeight: fontWeight.regular,
+    fontFamily: 'Geist_400Regular',
+  },
+  wishCounterDivider: {
+    height: 1,
+    backgroundColor: C.border,
+    marginBottom: 4,
+  },
+  wishCounterSubline: {
+    fontSize: 11,
+    fontFamily: 'Geist_400Regular',
+    color: C.textTertiary,
+  },
+
+  // Build 145 v5.9: hero — paddingHorizontal wrapper pattern matching
+  // EXACTLY how cardGrid renders (paddingHorizontal: layout.screenPaddingH).
+  // The OUTER View takes the padding, the INNER View takes the borderRadius +
+  // aspectRatio. This is the same structural pattern as the cards.
+  heroOuter: {
+    paddingHorizontal: layout.screenPaddingH,
+    marginBottom: space.md,
+  },
+  heroImageInner: {
+    borderRadius: 10,                // Build 145 v5.12: unified 10pt corners
+    overflow: 'hidden',
+    aspectRatio: 410 / 206,
+    backgroundColor: C.surface,
+  },
+  heroImage: {
+    width: '100%',
+    height: '100%',
+  },
+
+  // Tier/Wish card content (mock layout)
+  cardHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 6,
+  },
+  // Build 145 v5.24: card "selected" accents back to baby blue (blueLight).
+  // Only the MOST POPULAR badge uses bluePrimary (navy) for badge contrast.
+  cardBrandLabelSelected: {
+    color: colors.blueLight,
+  },
+  cardHeaderDash: {
+    flex: 1,
+    height: 1,
+    backgroundColor: C.border,
+    marginHorizontal: 6,
+  },
+  cardHeaderDashSelected: {
+    backgroundColor: colors.blueLight,
+  },
+  cardTierLabel: {
+    fontSize: 10,
+    fontWeight: fontWeight.bold,
+    fontFamily: 'Geist_700Bold',
+    color: C.textTertiary,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  cardTierLabelSelected: {
+    color: colors.blueLight,
+  },
+  cardBigNumberSelected: {
+    color: colors.blueLight,
+  },
+  cardWishesLabelSelected: {
+    color: colors.blueLight,
+  },
+  cardPriceDivider: {
+    height: 1,
+    backgroundColor: C.border,
+    marginVertical: 5,
+  },
+  cardPriceDividerSelected: {
+    backgroundColor: colors.blueLight,
+  },
+  // Build 145 v5.30: price text on selected card uses bluePrimary (deeper
+  // navy) instead of blueLight — adds a darker, more commanding accent on
+  // the most important number on the card. Other accents (big number,
+  // divider, badge) stay blueLight for hierarchy.
+  cardPriceSelected: {
+    color: colors.bluePrimary,
+  },
+
+  // Build 145 v5.19: conversion-focused additions
+  popularBadge: {
+    position: 'absolute',
+    top: -8,
+    alignSelf: 'center',
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+  },
+  // Build 145 v5.25: badge is now a pill container with text + star
+  popularBadgePill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    backgroundColor: colors.bluePrimary,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 8,
+  },
+  popularBadgeText: {
+    color: C.white,
+    fontSize: 8,                          // Build 145 v5.25: smaller (was 9) per user
+    fontWeight: fontWeight.bold,
+    fontFamily: 'Geist_700Bold',
+    letterSpacing: 0.8,
+  },
+  popularBadgeStar: {
+    // Inline 4-point sparkle to the right of the text
+  },
+  // Build 145 v5.33: badge background swap when the PRO card is not the
+  // currently-selected tier — softens the badge so it stops competing for
+  // attention with the selected card's accent. Returns to bluePrimary
+  // (the styles.popularBadgePill default) the moment the user taps PRO.
+  popularBadgePillUnselected: {
+    backgroundColor: colors.blueLight,
+  },
+  cardPerDay: {
+    fontSize: 10,
+    fontWeight: fontWeight.regular,
+    fontFamily: 'Geist_400Regular',
+    color: C.textTertiary,
+    textAlign: 'center',
+    marginTop: 2,
+  },
+  cardPerDaySelected: {
+    color: colors.blueLight,
+  },
+  cardTrustLine: {
+    fontSize: 9,
+    fontWeight: fontWeight.regular,
+    fontFamily: 'Geist_400Regular',
+    color: C.textTertiary,
+    textAlign: 'center',
+    marginTop: 2,
+  },
+
+  // Build 145 v3: inline CTAs (tightened)
+  ctaSection: {
+    paddingHorizontal: layout.screenPaddingH,
+    marginTop: space.md,           // tighter (was space.lg)
+    gap: 8,
+  },
+
+  // Build 145 v3: share button (matches CTA height, lighter outline)
+  shareBtn: {
+    height: 44,                      // tighter (was 50)
+    borderRadius: radius.pill,
+    backgroundColor: C.bg,
+    borderWidth: 1,                  // thinner (was 1.5)
+    borderColor: colors.blueLight,   // light blue (was bluePrimary)
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: space.lg,
+  },
+  shareBtnText: {
+    fontSize: 13,
+    fontWeight: fontWeight.semibold,
+    fontFamily: 'Geist_600SemiBold',
+    color: colors.blueLight,         // light blue (was bluePrimary)
+    textAlign: 'center',
+  },
+
+  // Build 145 v3: footer (wider spacing per mock)
+  footerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',  // even spacing (was space-between)
+    alignItems: 'center',
+    paddingHorizontal: layout.screenPaddingH,
+    marginTop: space.lg,
+    marginBottom: space.md,
+  },
+  footerLink: {
+    fontSize: 11,                    // smaller (was 12) per mock
+    fontWeight: fontWeight.regular,  // regular (was medium)
+    fontFamily: 'Geist_400Regular',
+    color: C.textTertiary,
+  },
+
+  // Wishes tab horizontal scroll
+  // Build 145 v5.50/v5.51/v5.55: tuning history above.
+  // Build 145 v5.62: marginBottom dropped space.sm → 6 so the cross-tab
+  // promo strip below sits close to the carousel — the strip itself
+  // adds the rhythmic gap; we don't need extra space here too.
+  cardScrollWishes: {
+    marginBottom: 6,
+  },
+  // Build 145 v5.62: cross-tab promo strip — tappable hint row that
+  // pitches Subscribe to users browsing the Wishes carousel. Fills the
+  // previously-dead vertical space between cards and features. Subtle
+  // blue-tinted bg + thin border so it reads as "info/link" rather than
+  // "another CTA competing with Continue".
+  crossTabPromo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginHorizontal: layout.screenPaddingH,
+    marginBottom: space.md,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderRadius: 10,
+    backgroundColor: '#F7FAFF',
+    borderWidth: 1,
+    borderColor: colors.blueLight + '40', // ~25% opacity blueLight
+  },
+  crossTabPromoText: {
+    flex: 1,
+    fontSize: 12,
+    fontFamily: 'Geist_400Regular',
+    color: C.textSecondary,
+    lineHeight: 16,
+  },
+  crossTabPromoHighlight: {
+    color: colors.bluePrimary,
+    fontFamily: 'Geist_600SemiBold',
+    fontWeight: fontWeight.semibold,
+  },
+  crossTabPromoArrow: {
+    fontSize: 16,
+    color: colors.bluePrimary,
+    fontFamily: 'Geist_600SemiBold',
+    fontWeight: fontWeight.semibold,
+  },
+  cardScrollContent: {
+    paddingHorizontal: layout.screenPaddingH,
+    paddingTop: 10,
+    gap: CARD_GAP,
   },
 });

@@ -1,5 +1,5 @@
 import React, { useRef, useCallback, useEffect } from 'react';
-import { View, Text, StyleSheet, Animated, Pressable, LogBox, AppState } from 'react-native';
+import { View, Text, StyleSheet, Animated, Pressable, LogBox, AppState, Image } from 'react-native';
 import { lockPortrait } from './src/utils/orientation';
 import { supabase } from './src/services/supabase';
 import { hapticTap, hapticSelect } from './src/utils/haptics';
@@ -752,6 +752,17 @@ export default function App() {
                         SubscriptionContext flips shouldShowRatingPrompt
                         true (RoomResultScreen schedules that on blur). */}
                     <RatingPromptHost />
+                    {/* Build 145 v5: pre-mount the paywall hero image at app
+                        root so iOS decodes + caches the bitmap on first launch.
+                        When user opens the paywall, RN's Image picks up the
+                        cached UIImage by source key — synchronous render, no
+                        decode delay (vs the 8-15s "phase 2" load the user
+                        was seeing). Invisible (opacity 0, 1x1) but rendered. */}
+                    <Image
+                      source={require('./assets/paywall-hero.jpg')}
+                      style={{ position: 'absolute', width: 1, height: 1, opacity: 0, top: -10, left: -10 }}
+                      pointerEvents="none"
+                    />
                   </NavigationContainer>
                 </ErrorBoundary>
               </OnboardingProvider>
