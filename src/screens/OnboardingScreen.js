@@ -356,15 +356,17 @@ const styles = StyleSheet.create({
 
   // Top hero — video fills horizontally edge-to-edge.
   // Build 147 v2: flex 0.55 → 0.6 (bigger video per user direction).
-  // Build 147 v7: backgroundColor #FAFAFA → #F8F8F8 per user spec.
-  // Build 147 v16: flex 0.6 → 0.65. User: 'the black line, can you
-  // lower it? It's a little bit too close to the bottom of the video.'
-  // Bigger videoBlock pushes the divider lower on the screen and gives
-  // the video more vertical breathing room before the section break.
+  // Build 147 v16: flex 0.6 → 0.65.
+  // Build 147 v19: bg #F8F8F8 → #FFFFFF. With v18's 0.9× scale, the
+  // video shows ~5% margin of the videoBlock bg around its edges.
+  // The Higgsfield videos themselves were rendered with near-white
+  // backgrounds, so the previous #F8F8F8 was visible as a "weird gray
+  // border" around the video composition. Matching to #FFFFFF blends
+  // the margin into the video's own background invisibly.
   videoBlock: {
     flex: 0.65,
     width: '100%',
-    backgroundColor: '#F8F8F8',
+    backgroundColor: '#FFFFFF',
   },
 
   // 1pt black divider between video block and content block.

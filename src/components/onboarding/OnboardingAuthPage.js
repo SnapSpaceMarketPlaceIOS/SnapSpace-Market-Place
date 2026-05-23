@@ -279,10 +279,13 @@ const styles = StyleSheet.create({
 
   // Bottom half — the bigger Higgsfield video. flex:1 fills all space
   // between the topSection above and the dotsWrap below.
+  // Build 147 v19: bg #F8F8F8 → #FFFFFF. With 0.9× scale on the video
+  // the bg shows around the composition; matching to white blends with
+  // the video's own near-white render so no visible edge remains.
   videoBlock: {
     flex: 1,
     width: '100%',
-    backgroundColor: '#F8F8F8',
+    backgroundColor: '#FFFFFF',
   },
 
   // Progress bars row at the very bottom of the screen.
