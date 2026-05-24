@@ -202,7 +202,16 @@ export function getThumbnailUrl(url, width = 400) {
   // width/quality params to win (URLSearchParams would dedupe, but for
   // simplicity we just append — Supabase reads the LAST occurrence).
   const sep = tailQuery ? '&' : '';
-  return `${head}/storage/v1/render/image/public/${tailPath}?width=${width}&quality=75&resize=cover${sep}${tailQuery || ''}`;
+  // Build 148.9 — added &height=${width} so Supabase Image Transform
+  // returns a SQUARE center-cropped thumbnail (e.g. 400×400) instead of
+  // a width-constrained portrait/landscape proportional to the source.
+  // Without an explicit height, `resize=cover` preserves the source
+  // aspect → portrait sources came back as 400×711, which then got
+  // re-cropped by the 1:1 grid tile (CardImage cover) into a narrow
+  // center slice (sofa visible, ceiling+floor cropped). Forcing a
+  // square thumbnail server-side makes the tile fill cleanly with
+  // the full room visible, matching the App Store build's grid look.
+  return `${head}/storage/v1/render/image/public/${tailPath}?width=${width}&height=${width}&quality=75&resize=cover${sep}${tailQuery || ''}`;
 }
 
 export function warmupEdgeFunctions() {
