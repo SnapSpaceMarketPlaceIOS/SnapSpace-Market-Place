@@ -435,7 +435,14 @@ export default function OnboardingAuthPage({
         <View style={styles.backBtnSpacer} />
       </View>
 
+      {/* Build 148.1 — vertically center the form block in the available
+          space. flexGrow:1 + justifyContent:'center' on the contentContainer
+          floats the entire "Welcome back → Sign up" group to the visual
+          middle of the page when the keyboard is dismissed. When the
+          keyboard opens, the ScrollView still scrolls naturally so the
+          focused input stays visible. */}
       <ScrollView
+        style={styles.formScrollFlex}
         contentContainerStyle={styles.formScrollContent}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
@@ -591,12 +598,13 @@ export default function OnboardingAuthPage({
         )}
       </ScrollView>
 
-      {/* Small video at bottom — keeps the lamp loop visible while the
-          user is typing credentials. ~140pt fixed height (not flex) so it
-          stays put when KeyboardAvoidingView pushes the form up. */}
-      <View style={styles.videoBlockSmall}>
-        <OnboardingArt step={5} fullBleed contentFit="cover" isActive={isActive} />
-      </View>
+      {/* Build 148.1 — bottom video removed per user feedback. Centering
+          the form on the page was visually fighting with the 140pt video
+          strip below it; the strip made the page feel cluttered. Form
+          mode is now a clean, focused credentials screen with the
+          form group vertically centered. The looping lamp video is still
+          available on the choice screen (mode='choice') where it has
+          room to breathe. */}
     </KeyboardAvoidingView>
   );
 
@@ -689,10 +697,23 @@ const styles = StyleSheet.create({
     color: '#000000',
     letterSpacing: -0.3,
   },
+  // Build 148.1 — formScrollFlex gives the ScrollView the available
+  // vertical space (between the formHeader at top and the progress bars
+  // at the bottom). flex:1 lets contentContainer's flexGrow center the
+  // child block.
+  formScrollFlex: {
+    flex: 1,
+  },
   formScrollContent: {
     paddingHorizontal: 28,
     paddingTop: 18,
     paddingBottom: 16,
+    // Build 148.1: flexGrow + justifyContent center the form group
+    // vertically when content is shorter than viewport. When the
+    // keyboard opens (or the user is on signup with more fields than
+    // fit), normal scroll-from-top behavior kicks in.
+    flexGrow: 1,
+    justifyContent: 'center',
   },
   formTitle: {
     fontSize: 26,
@@ -708,11 +729,8 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 18,
   },
-  videoBlockSmall: {
-    height: 140,
-    width: '100%',
-    backgroundColor: '#FFFFFF',
-  },
+  // Build 148.1 — videoBlockSmall removed; the small bottom video is no
+  // longer rendered in form mode (see render method above).
 
   // ── Buttons / shared ────────────────────────────────────────────────────
   primaryButton: {

@@ -550,12 +550,33 @@ const FEATURE_ICONS = [
 
 // ── Screen ────────────────────────────────────────────────────────────────────
 
-export default function PaywallScreen({ navigation }) {
+export default function PaywallScreen({
+  navigation,
+  // Build 148.1 — optional onboarding-context overrides. When the
+  // OnboardingPaywallPage wrapper mounts PaywallScreen as slide 6 of
+  // the intro flow, the X close button and post-purchase Alerts can't
+  // call navigation.goBack() (there's no Paywall route in the stack
+  // to pop). Instead they call these callbacks, which advance the
+  // FlatList to slide 7 (reward). When PaywallScreen is mounted
+  // normally as a modal (in-app paywall, post-onboarding), these
+  // props are undefined and we fall back to navigation.goBack().
+  onClose,
+  onPurchaseComplete,
+  // Renders a "Maybe later" link below the Continue CTA. Used only
+  // by the onboarding wrapper to give users a clean skip path.
+  showSkipLink = false,
+}) {
   const { user } = useAuth();
   const {
     subscription, purchaseSubscription, restorePurchases,
     tokenBalance, purchaseTokens, refreshTokenBalance,
   } = useSubscription();
+
+  // Build 148.1 — unified close/complete handlers. Default to the
+  // navigation-back behavior when the props are undefined (normal
+  // modal mount) so existing in-app paywall usage stays untouched.
+  const handleClose = onClose || (() => navigation.goBack());
+  const handlePurchaseComplete = onPurchaseComplete || (() => navigation.goBack());
 
   // Build 145: default to Subscribe tab with the PRO tier highlighted.
   // Mock spec: paywall opens on Subscribe (was Wishes), PRO recommended.
@@ -781,7 +802,11 @@ export default function PaywallScreen({ navigation }) {
               wishCount > 0
                 ? `${wishCount} wish${wishCount === 1 ? '' : 'es'} added to your account. Tap a style on Home to start designing.`
                 : 'Your purchase was successful. Tap a style on Home to start designing.',
-              [{ text: 'Start Designing', onPress: () => navigation.goBack() }],
+              // Build 148.1: handlePurchaseComplete routes to the
+              // onboarding wrapper's onContinue when mounted as slide 6,
+              // otherwise falls back to navigation.goBack() for the
+              // normal in-app paywall modal.
+              [{ text: 'Start Designing', onPress: handlePurchaseComplete }],
             );
           }, 1500);
         }
@@ -797,7 +822,9 @@ export default function PaywallScreen({ navigation }) {
             Alert.alert(
               '🎉 Subscription active',
               `Welcome to ${selectedSubTier.name}! ${selectedSubTier.gens === -1 ? 'Unlimited' : selectedSubTier.gens} wishes per week. Renews automatically — manage anytime in your Apple ID settings.`,
-              [{ text: 'Start Designing', onPress: () => navigation.goBack() }],
+              // Build 148.1: see comment on the wishes-purchase Alert
+              // above — same handler swap for the subscription path.
+              [{ text: 'Start Designing', onPress: handlePurchaseComplete }],
             );
           }, 1500);
         }
@@ -834,7 +861,10 @@ export default function PaywallScreen({ navigation }) {
       const result = await restorePurchases();
       if (result?.restored > 0) {
         Alert.alert('Restored', 'Your purchases have been restored.');
-        navigation.goBack();
+        // Build 148.1: route through handlePurchaseComplete so the
+        // onboarding wrapper can advance to the reward slide on a
+        // successful restore instead of trying to pop the stack.
+        handlePurchaseComplete();
       } else {
         Alert.alert('Nothing to Restore', 'No previous purchases were found.');
       }
@@ -966,9 +996,12 @@ export default function PaywallScreen({ navigation }) {
       <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
         {/* Close (X) button — OUTSIDE the ScrollView so it stays fixed at
             the top of the safe area and doesn't scroll away. Positioned
-            below the status bar / Dynamic Island on iPhone 14/16 Pro. */}
+            below the status bar / Dynamic Island on iPhone 14/16 Pro.
+            Build 148.1: onPress routes through handleClose so the
+            onboarding wrapper can intercept and advance the FlatList
+            instead of popping a non-existent stack frame. */}
         <TouchableOpacity
-          onPress={() => navigation.goBack()}
+          onPress={handleClose}
           style={styles.closeBtnCorner}
           hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
         >
@@ -1243,6 +1276,26 @@ export default function PaywallScreen({ navigation }) {
                 )}
               </View>
             </TouchableOpacity>
+
+            {/* Build 148.1 — onboarding-only "Maybe later" skip link.
+                Only rendered when PaywallScreen is mounted as slide 6
+                via OnboardingPaywallPage (showSkipLink=true). In the
+                normal in-app paywall modal showSkipLink is false and
+                this link doesn't appear — users dismiss via the X
+                close button at the top-right instead. */}
+            {showSkipLink && (
+              <TouchableOpacity
+                onPress={handleClose}
+                disabled={purchasing || restoring}
+                activeOpacity={0.7}
+                hitSlop={{ top: 10, bottom: 10, left: 20, right: 20 }}
+                style={styles.skipLinkWrap}
+                accessibilityRole="button"
+                accessibilityLabel="Maybe later"
+              >
+                <Text style={styles.skipLinkText}>Maybe later</Text>
+              </TouchableOpacity>
+            )}
           </View>
 
           {/* Build 145: footer (Terms / Restore / Privacy) at very bottom */}
@@ -2077,6 +2130,22 @@ const styles = StyleSheet.create({
     paddingHorizontal: layout.screenPaddingH,
     marginTop: space.md,           // tighter (was space.lg)
     gap: 8,
+  },
+
+  // Build 148.1 — "Maybe later" link (onboarding-only, shown when
+  // showSkipLink prop is true). Sits below the Continue CTA, before
+  // the footer row. Subdued styling so it reads as a secondary path
+  // and doesn't compete with the Subscribe CTA.
+  skipLinkWrap: {
+    alignSelf: 'center',
+    marginTop: 12,
+    paddingVertical: 6,
+  },
+  skipLinkText: {
+    color: colors.bluePrimary,
+    fontSize: 14,
+    fontFamily: 'Geist_500Medium',
+    fontWeight: fontWeight.medium,
   },
 
   // Build 145 v3: share button (matches CTA height, lighter outline)

@@ -201,34 +201,25 @@ export default function OnboardingScreen({ navigation, route }) {
     if (idx >= AUTH_INDEX) reachedAuthPageRef.current = true;
   }, [pageIndex]);
 
-  // ── Swipe gate (Build 148) ─────────────────────────────────────────────
-  // Forward-swipe past the auth slide is blocked until the user signs in.
-  // FlatList's `scrollEnabled` is binary (blocks BOTH directions), so we
-  // can't use it for a directional lock. Instead we let the user drag
-  // freely and snap them back on momentum end if they over-shot the
-  // allowed range. The snap-back gives a clean "wall" feel that signals
-  // "auth required" without throwing an error or alert.
-  const onMomentumScrollEnd = useCallback((e) => {
-    const idx = Math.round(e.nativeEvent.contentOffset.x / SCREEN_W);
-    if (!user && idx > AUTH_INDEX) {
-      // Bounce back to the auth slide.
-      listRef.current?.scrollToOffset({
-        offset: AUTH_INDEX * SCREEN_W,
-        animated: true,
-      });
-      setPageIndex(AUTH_INDEX);
-      return;
-    }
-    if (idx !== pageIndex) setPageIndex(idx);
-    if (idx >= AUTH_INDEX) reachedAuthPageRef.current = true;
-  }, [user, pageIndex]);
-
-  // Once the user reaches the LAST page (post-paywall reward), prevent
-  // backward swipe so they can't accidentally land back on the paywall.
-  // Subscribers especially shouldn't see the paywall again after passing
-  // it. (The paywall has its own auto-skip-if-subscribed check, so this
-  // is belt-and-suspenders.)
-  const scrollEnabled = pageIndex < LAST_INDEX;
+  // ── Swipe lock (Build 148.1 — physical-device feedback) ───────────────
+  // Build 148.0 used a snap-back on momentum-end pattern to gate forward
+  // swipe past the auth slide. Problem on physical device: if the user
+  // flicked fast enough, the FlatList briefly displayed the paywall /
+  // reward content during the rubber-band travel — long enough to
+  // glimpse, and on a hard flick they could overshoot the snap-back and
+  // land on a later page entirely, bypassing auth.
+  //
+  // Fix: kill swipe entirely. `scrollEnabled={false}` on the FlatList
+  // blocks ALL user gestures (both directions). The only way forward is
+  // via the explicit Continue / Log In / Sign Up / Subscribe / Maybe
+  // later / Continue For FREE buttons on each slide. Programmatic
+  // scrolling (scrollToOffset, used by goToPage) is unaffected by
+  // scrollEnabled — pageviews still advance when buttons fire.
+  //
+  // The onMomentumScrollEnd handler is removed (no momentum events fire
+  // when the user can't drag). The auth-success useEffect still drives
+  // the slide-5 → slide-6 advance once `useAuth().user` flips truthy.
+  const scrollEnabled = false;
 
   // ── Paywall → reward advance (Build 148) ──────────────────────────────
   // OnboardingPaywallPage calls this when the user finishes the paywall
@@ -385,8 +376,10 @@ export default function OnboardingScreen({ navigation, route }) {
         horizontal
         pagingEnabled
         showsHorizontalScrollIndicator={false}
+        // Build 148.1: onScroll kept ONLY so programmatic scrollToOffset
+        // calls (from button-driven goToPage) update pageIndex. User
+        // gestures can't trigger scroll because scrollEnabled is false.
         onScroll={onScroll}
-        onMomentumScrollEnd={onMomentumScrollEnd}
         scrollEventThrottle={16}
         scrollEnabled={scrollEnabled}
         bounces={false}
