@@ -772,14 +772,13 @@ export default function ProfileScreen({ navigation }) {
                           variant; the full-res imageUrl is still on the
                           design object and gets passed to ShopTheLook on
                           tap.
-                          Build 148.6 — framed mode replaces the 148.5
-                          cover-only behavior. The full room photo is
-                          visible inside the square tile (no aggressive
-                          edge crop) and the letterbox area is filled by
-                          a blurred copy of the same image — no harsh
-                          white bands. See CardImage.js for the
-                          implementation. */}
-                      <CardImage uri={design.thumbnailUrl || design.imageUrl} style={styles.cardImgPhoto} framed />
+                          Build 148.7 — back to plain contain mode per
+                          user direction: no blur, no cover-crop. The
+                          tile's backgroundColor (see cardImg style)
+                          provides a soft neutral padding around the
+                          contained image so the small bands read as
+                          intentional, not glitchy. */}
+                      <CardImage uri={design.thumbnailUrl || design.imageUrl} style={styles.cardImgPhoto} resizeMode="cover" />
                     </View>
                   </PressableCard>
                 </View>

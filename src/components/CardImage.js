@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Image, StyleSheet } from 'react-native';
+import { View, Image } from 'react-native';
 
 /**
  * Renders a URI image with a graceful fallback for broken/missing URLs.
@@ -13,25 +13,18 @@ import { View, Image, StyleSheet } from 'react-native';
  *   compact          boolean      — when true, downscale Amazon URLs to _SL400_
  *                                   for grid/thumbnail use. PDP and other full-bleed
  *                                   contexts should leave this false (default).
- *   framed           boolean      — Build 148.6. When true, renders TWO image
- *                                   layers: a cover-mode blurred copy as the
- *                                   background fill, and a contain-mode clean
- *                                   copy in the foreground. The full image is
- *                                   visible (no aggressive crop) and the
- *                                   container has no harsh letterbox bands —
- *                                   the blurred fill provides aesthetic
- *                                   continuity behind the contained image.
- *                                   Used for AI-rendered room tiles (Explore
- *                                   Wishes grid, Profile My Wishes grid) where
- *                                   cover was cropping too aggressively and
- *                                   plain contain left visible white bands.
- *                                   `resizeMode` is ignored when framed=true.
  *
  * Build 144 — placeholder default returned to a brand-aligned cool gray
  * (#F3F4F6, matches uiColors.surface2). The Build-142 warm cream #F0EDE6
  * read as off-brand against the rest of the cool-blue UI; this restores
  * visual continuity while still being visible enough to communicate
  * "loading" rather than "blank".
+ *
+ * Build 148.7 — framed mode (blurred bg + contain fg) removed.
+ * User feedback explicitly: no blur, no overlays. The shared component
+ * stays a single-image renderer; call sites that want padding around a
+ * contained image should put a backgroundColor on the parent tile,
+ * not nest layers here.
  */
 
 // React Native's iOS Image loader runs URIs through NSURLComponents, which
@@ -71,7 +64,6 @@ export default function CardImage({
   placeholderColor = '#F3F4F6',
   resizeMode = 'cover',
   compact = false,
-  framed = false,
 }) {
   const [err, setErr] = useState(false);
   // Tracks how many times we've already retried this URI. Bounded retry so
@@ -105,36 +97,6 @@ export default function CardImage({
   };
 
   if (safeUri && !err) {
-    // Build 148.6 — framed mode (Spotify / Instagram style).
-    // Layer 1: cover-mode copy with blurRadius — fills the container,
-    //          may crop aggressively, but it's blurred so the crop is
-    //          invisible. Provides aesthetic background fill.
-    // Layer 2: contain-mode copy on top — the FULL image is visible,
-    //          no crop. Letterbox area (where there would normally be
-    //          white bands) sits over the blurred copy instead.
-    // Result: the user sees the entire room photo, framed by a soft
-    // out-of-focus echo of the same image instead of harsh white bands.
-    if (framed) {
-      return (
-        <View style={[style, framedStyles.wrap]}>
-          <Image
-            key={`bg-${retryKey}`}
-            source={{ uri: safeUri }}
-            style={StyleSheet.absoluteFillObject}
-            resizeMode="cover"
-            blurRadius={24}
-            onError={handleError}
-          />
-          <Image
-            key={`fg-${retryKey}`}
-            source={{ uri: safeUri }}
-            style={StyleSheet.absoluteFillObject}
-            resizeMode="contain"
-          />
-        </View>
-      );
-    }
-
     return (
       <Image
         key={retryKey}
@@ -147,12 +109,3 @@ export default function CardImage({
   }
   return <View style={[style, { backgroundColor: placeholderColor }]} />;
 }
-
-// Build 148.6 — framed-mode wrapper styles. overflow:hidden ensures the
-// blurred background doesn't bleed past the container's borderRadius.
-const framedStyles = StyleSheet.create({
-  wrap: {
-    overflow: 'hidden',
-    backgroundColor: '#F3F4F6', // fallback while images load
-  },
-});

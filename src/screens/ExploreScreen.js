@@ -570,18 +570,12 @@ const GridCard = React.memo(function GridCard({ design, onPress, cardRadius, isL
         onPress={onPress}
         activeOpacity={0.95}
       >
-        {/* Build 148.6 — switched to CardImage's `framed` mode after
-            user feedback that 148.5's cover-only crop was "too zoomed
-            in." Framed mode renders TWO layers inside the square tile:
-            a blurred cover-fill background + a contain-fitted clean
-            foreground. The full room photo is visible (no crop) and
-            the would-be white letterbox area is filled with a soft
-            out-of-focus echo of the same image. Square format preserved.
-            Product cards still use plain contain (see products grid
-            below) because Amazon white-BG catalog shots don't benefit
-            from the blurred-bg pattern. */}
+        {/* Build 148.8 — resizeMode "contain" → "cover" to match the
+            App Store build and the ProfileScreen My Wishes grid.
+            Image fills the square tile via center-crop. No bands, no
+            blur, no extra wrappers. Single-line change per user spec. */}
         <View style={[styles.cardImg, { borderRadius: r }]}>
-          <CardImage uri={design.thumbnailUrl || design.imageUrl} style={styles.cardImgPhoto} framed />
+          <CardImage uri={design.thumbnailUrl || design.imageUrl} style={styles.cardImgPhoto} resizeMode="cover" />
         </View>
       </PressableCard>
     );
@@ -598,11 +592,10 @@ const GridCard = React.memo(function GridCard({ design, onPress, cardRadius, isL
         onPress={onPress}
         activeOpacity={0.95}
       >
-        {/* Build 148.6 — framed mode (see multi-col branch above for
-            the full rationale). Same dual-layer rendering for the
-            1-col feed card. */}
+        {/* Build 148.8 — same cover swap as the multi-col branch
+            above for the 1-col feed card. */}
         <View style={[styles.cardImg, { borderTopLeftRadius: r, borderTopRightRadius: r, borderBottomLeftRadius: 0, borderBottomRightRadius: 0 }]}>
-          <CardImage uri={design.thumbnailUrl || design.imageUrl} style={styles.cardImgPhoto} framed />
+          <CardImage uri={design.thumbnailUrl || design.imageUrl} style={styles.cardImgPhoto} resizeMode="cover" />
         </View>
       </PressableCard>
       <View style={styles.feedUserRow}>
