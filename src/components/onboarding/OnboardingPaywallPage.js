@@ -90,13 +90,16 @@ export default function OnboardingPaywallPage({
     }
   }, [subscription?.tier, onContinue]);
 
+  // Build 148.4 — onboarding paywall is now X-only exit (no Maybe later
+  // link) and locked against scroll so the page reads as a single
+  // framed surface, matching the user's spec.
   return (
     <View style={[styles.page, { width: screenWidth }]}>
       <PaywallScreen
         navigation={navigation}
         onClose={onContinue}
         onPurchaseComplete={onContinue}
-        showSkipLink
+        lockScroll
       />
     </View>
   );

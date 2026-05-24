@@ -90,6 +90,23 @@ function ChevronLeftIcon({ color = BLUE_PRIMARY }) {
   );
 }
 
+// Build 148.2 — bottom-left back arrow, matches OnboardingScreen's
+// BackChevronIcon visually so the back-arrow surface reads identical
+// across all slides 2-5.
+function BackChevronIcon({ color = BLUE_PRIMARY, size = 18 }) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <Path
+        d="M15 18l-6-6 6-6"
+        stroke={color}
+        strokeWidth={1.8}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </Svg>
+  );
+}
+
 // ── Form input ─────────────────────────────────────────────────────────────
 
 function FormInput({
@@ -145,6 +162,14 @@ export default function OnboardingAuthPage({
   screenWidth,
   progressDots,
   isActive = true,
+  // Build 148.2 — slide-2 first name pre-fills the Full name input on
+  // the sign-up form so the user doesn't have to re-type it. Empty
+  // string is fine — input just renders its placeholder.
+  initialFirstName = '',
+  // Build 148.2 — back-arrow callback (choice mode → previous slide).
+  // Form mode handles its own back internally by toggling the mode
+  // state, so it doesn't call onBack directly.
+  onBack,
 }) {
   const insets = useSafeAreaInsets();
   const { signInWithApple, signIn, signUp, resetPassword } = useAuth();
@@ -159,7 +184,9 @@ export default function OnboardingAuthPage({
 
   // Inline credentials state — lifted from the previous SignInSheet
   // verbatim. Same validators, same Alerts, same promo redemption.
-  const [name, setName] = useState('');
+  // Build 148.2: name seeded from initialFirstName prop so the slide-2
+  // intake carries forward to the slide-5 signup form.
+  const [name, setName] = useState(initialFirstName || '');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -417,22 +444,15 @@ export default function OnboardingAuthPage({
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       keyboardVerticalOffset={0}
     >
-      {/* Back arrow + small title row */}
+      {/* Build 148.2 — formHeader is now just the centered brand label.
+          The previous top-left "← Options" button was removed in favor
+          of a single back-arrow surface at the bottom-left of the slide
+          (rendered below the progress bars, consistent with the rest of
+          the onboarding flow). The form-mode bottom-arrow tap toggles
+          mode back to 'choice'; the choice-mode bottom-arrow tap fires
+          the parent onBack prop to advance back to slide 4. */}
       <View style={[styles.formHeader, { paddingTop: insets.top + 12 }]}>
-        <TouchableOpacity
-          onPress={backToChoice}
-          disabled={loading}
-          activeOpacity={0.7}
-          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-          style={styles.backBtn}
-          accessibilityRole="button"
-          accessibilityLabel="Back to sign-in options"
-        >
-          <ChevronLeftIcon color={BLUE_PRIMARY} />
-          <Text style={styles.backLabel}>Options</Text>
-        </TouchableOpacity>
         <Text style={styles.formBrand}>HomeGenie</Text>
-        <View style={styles.backBtnSpacer} />
       </View>
 
       {/* Build 148.1 — vertically center the form block in the available
@@ -608,14 +628,42 @@ export default function OnboardingAuthPage({
     </KeyboardAvoidingView>
   );
 
+  // Build 148.2 — back arrow handler. In choice mode tap returns to
+  // slide 4 via the parent's onBack callback; in form mode tap
+  // collapses the form back to the choice card without leaving slide 5.
+  const handleBackArrowPress = () => {
+    if (mode === 'form') {
+      backToChoice();
+    } else {
+      onBack?.();
+    }
+  };
+
   // ── Render ──────────────────────────────────────────────────────────────
   return (
     <View style={[styles.page, { width: screenWidth }]}>
       {mode === 'choice' ? renderChoiceMode() : renderFormMode()}
 
-      {/* Progress bars pinned to bottom safe area in both modes */}
-      <View style={[styles.progressWrap, { paddingBottom: insets.bottom + 12 }]}>
+      {/* Progress bars + back arrow pinned to the bottom safe area.
+          Build 148.2 — back arrow row added below the progress bars
+          for consistency with slides 2-4. Same icon, same position,
+          same hit area. Tap behavior differs by mode (see
+          handleBackArrowPress above). */}
+      <View style={[styles.progressWrap, { paddingBottom: insets.bottom + 8 }]}>
         {progressDots}
+        <View style={styles.backArrowRow}>
+          <TouchableOpacity
+            style={styles.backArrowBtn}
+            onPress={handleBackArrowPress}
+            disabled={loading}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            activeOpacity={0.6}
+            accessibilityRole="button"
+            accessibilityLabel={mode === 'form' ? 'Back to sign-in options' : 'Back'}
+          >
+            <BackChevronIcon />
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
   );
@@ -669,27 +717,16 @@ const styles = StyleSheet.create({
   formRoot: {
     flex: 1,
   },
+  // Build 148.2 — formHeader simplified: just a centered brand label.
+  // The previous "← Options" link + spacer were removed in favor of a
+  // single back-arrow surface at the bottom-left of the slide (rendered
+  // alongside the progress bars below).
   formHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     paddingHorizontal: 20,
     paddingBottom: 4,
-  },
-  backBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 2,
-    paddingVertical: 8,
-    paddingRight: 8,
-  },
-  backBtnSpacer: {
-    width: 80, // mirrors backBtn so the brand label centers
-  },
-  backLabel: {
-    color: BLUE_PRIMARY,
-    fontSize: 15,
-    fontWeight: '500',
   },
   formBrand: {
     fontSize: 18,
@@ -816,11 +853,30 @@ const styles = StyleSheet.create({
   },
   legalLink: { color: BLUE_PRIMARY, fontWeight: '500' },
 
-  // ── Progress bars ──────────────────────────────────────────────────────
+  // ── Progress bars + back arrow row ──────────────────────────────────────
   progressWrap: {
     paddingHorizontal: 28,
     paddingTop: 8,
     backgroundColor: '#F8F8F8',
+  },
+  // Build 148.2 — bottom-left back arrow under the progress bars,
+  // matches the row used on slides 2-4 (see OnboardingScreen).
+  // paddingTop 14 + minHeight 32 keep the same visual gap from the
+  // progress bars as on slides 2-4 — consistent spacing across all
+  // five slides that expose a back arrow.
+  backArrowRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingTop: 14,
+    paddingHorizontal: 4,
+    minHeight: 32,
+    // Override the parent progressWrap horizontal padding so the back
+    // arrow lines up with the slide's true left edge (-24 reverses
+    // the 28pt padding to put the arrow at 4pt from the screen edge).
+    marginLeft: -24,
+  },
+  backArrowBtn: {
+    padding: 6,
   },
 });
 

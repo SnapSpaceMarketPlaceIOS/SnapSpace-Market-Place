@@ -564,7 +564,16 @@ export default function PaywallScreen({
   onPurchaseComplete,
   // Renders a "Maybe later" link below the Continue CTA. Used only
   // by the onboarding wrapper to give users a clean skip path.
+  // Build 148.4: defaulted to false everywhere; user prefers X-only
+  // exit on the onboarding paywall too.
   showSkipLink = false,
+  // Build 148.4 — when true, disables vertical scroll on the paywall's
+  // ScrollView so the page reads as a single framed surface (no
+  // accidental drag, no over-scroll wobble). Used by the onboarding
+  // wrapper since slide 6 should feel like a static page; left false
+  // for the in-app modal where scrolling is still useful on smaller
+  // devices.
+  lockScroll = false,
 }) {
   const { user } = useAuth();
   const {
@@ -1008,7 +1017,11 @@ export default function PaywallScreen({
           <CloseIcon />
         </TouchableOpacity>
 
-        {/* ── Scrollable content ────────────────────────────────────── */}
+        {/* ── Scrollable content ──────────────────────────────────────
+            Build 148.4 — scrollEnabled gated on lockScroll prop. The
+            onboarding wrapper passes true to give slide 6 a static-
+            page feel (no drag, no wobble). In-app modal mount uses
+            the default false → standard ScrollView behavior. */}
         <ScrollView
           style={styles.scroll}
           contentContainerStyle={styles.scrollContent}
@@ -1017,6 +1030,7 @@ export default function PaywallScreen({
           bounces={false}
           alwaysBounceVertical={false}
           overScrollMode="never"
+          scrollEnabled={!lockScroll}
         >
           {/* Build 145 v5.13: top bar minimal — just spacer for X close button.
               Logo pill removed per user. */}
@@ -1385,10 +1399,13 @@ const styles = StyleSheet.create({
     // touching the battery icon on iPhone 16e). 30pt clears the status
     // bar comfortably on notched devices.
     // Build 147: top 30 → 38 — physical-device feedback that X felt
-    // too cramped against the Dynamic Island. Extra 8pt gives a clearer
-    // visual exit affordance without dropping into the content area.
+    // too cramped against the Dynamic Island.
+    // Build 148.4: top 38 → 52 per user — X still felt a touch high
+    // against the Dynamic Island on physical iPhone 14 Pro. 52pt
+    // drops it clearly into the safe zone for a no-hesitation exit
+    // tap on both onboarding slide 6 and in-app modal contexts.
     position: 'absolute',
-    top: 38,
+    top: 52,
     right: space.lg,            // 20pt in from the right edge
     width: 40,
     height: 40,

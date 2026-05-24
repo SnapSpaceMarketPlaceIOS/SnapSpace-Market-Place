@@ -50,12 +50,16 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
+  TextInput,
   StyleSheet,
   TouchableOpacity,
   FlatList,
   Dimensions,
   StatusBar,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
 import OnboardingArt from '../components/onboarding/OnboardingArt';
@@ -65,6 +69,12 @@ import { useAuth } from '../context/AuthContext';
 import { markIntroCompleted } from '../utils/intro';
 import { colors } from '../constants/colors';
 
+// Build 148.2 — onboarding intake answers persisted to AsyncStorage on
+// completion. Read by Profile / analytics later; non-blocking if the
+// write fails (the funnel still completes either way). Keys live in
+// one constant so the consumer doesn't have to guess.
+const ONBOARDING_INTAKE_KEY = 'onboarding_intake_v1';
+
 const { width: SCREEN_W } = Dimensions.get('window');
 
 // ── Page copy ─────────────────────────────────────────────────────────────
@@ -72,6 +82,12 @@ const { width: SCREEN_W } = Dimensions.get('window');
 // the source mockups exactly. cta:null = slide has custom buttons handled
 // inline in renderPage (slide 1 dual-button, slide 5 auth page, slide 6
 // paywall page).
+// Build 148.2 — optional intake fields on slides 2, 3, 4. Each accepts
+// free-form text via a single-line pill above the Continue button.
+// User can submit empty (no validation). Values land in
+// `intakeAnswers` state and persist to AsyncStorage on flow completion.
+// The first name on slide 2 also seeds the OnboardingAuthPage Full name
+// input so signup feels continuous.
 const PAGES = [
   {
     step: 1,
@@ -84,18 +100,31 @@ const PAGES = [
     title: 'Wish it.\nSee it.',
     body: 'Describe your dream room. Our\ngenie designs it in seconds.',
     cta: 'Continue',
+    intakeKey: 'firstName',
+    intakePlaceholder: 'First name…',
+    intakeAutoCapitalize: 'words',
   },
   {
     step: 3,
     title: 'Shop every\npiece',
     body: 'Every item in your room is real,\navailable, and one tap away.',
     cta: 'Continue',
+    intakeKey: 'shoppingPref',
+    intakePlaceholder: 'Where do you shop right now for home design…',
+    intakeAutoCapitalize: 'sentences',
   },
   {
     step: 4,
-    title: 'Just what\nyou need',
+    // Build 148.3 — title on ONE line per user feedback. "Just what you
+    // need" at fontSize 28 (vs the default 38 used by other slides) fits
+    // the 224pt usable width without wrapping. styleSlide4 applies the
+    // smaller font + extra body padding.
+    title: 'Just what you need',
     body: 'Want a chair for that corner? A rug\nfor the bedroom? Snap the space\nand shop one piece at a time.',
     cta: 'Continue',
+    intakeKey: 'referralSource',
+    intakePlaceholder: 'How did you hear about us?',
+    intakeAutoCapitalize: 'sentences',
   },
   {
     step: 5,
@@ -147,6 +176,20 @@ export default function OnboardingScreen({ navigation, route }) {
   const listRef = useRef(null);
   const [pageIndex, setPageIndex] = useState(initialPage);
 
+  // Build 148.2 — optional intake answers from slides 2-4. None of these
+  // are required (the user can press Continue with empty values), and
+  // we never block flow advancement on them. The first name is the only
+  // one with a downstream consumer — it pre-fills the Full name input
+  // on the slide-5 signup form so the user doesn't have to retype it.
+  const [intakeAnswers, setIntakeAnswers] = useState({
+    firstName: '',
+    shoppingPref: '',
+    referralSource: '',
+  });
+  const updateIntake = useCallback((key, value) => {
+    setIntakeAnswers((prev) => ({ ...prev, [key]: value }));
+  }, []);
+
   // Track whether the user has reached page 5 yet. The auth completion
   // listener (below) advances them to page 6 once they sign in — but we
   // only want to do that if they explicitly reached page 5, not if they
@@ -165,7 +208,15 @@ export default function OnboardingScreen({ navigation, route }) {
       // Slides 1-4 → next slide
       goToPage(pageIndex + 1);
     } else if (pageIndex === LAST_INDEX) {
-      // Reward CTA — mark completed + drop into the app.
+      // Reward CTA — persist intake answers, mark completed + drop into
+      // the app. The intake write is fire-and-forget; we don't block on
+      // it because the user expects an immediate transition.
+      AsyncStorage.setItem(
+        ONBOARDING_INTAKE_KEY,
+        JSON.stringify(intakeAnswers),
+      ).catch((err) => {
+        console.warn('[Onboarding] intake persistence failed:', err?.message);
+      });
       markIntroCompleted().finally(() => {
         // Reset the stack so the user can't back-swipe into the intro again.
         // Replace with Main means Onboarding gets unmounted.
@@ -176,7 +227,17 @@ export default function OnboardingScreen({ navigation, route }) {
     // components themselves (auth → useAuth observer; paywall → onContinue
     // callback). Reaching this function from those slides would be a bug
     // — but no-op rather than crash.
-  }, [pageIndex, goToPage, navigation]);
+  }, [pageIndex, goToPage, navigation, intakeAnswers]);
+
+  // Build 148.2 — back arrow handler used by slides 2-5. Slides 6+ don't
+  // expose a back arrow at all (paywall + reward are terminal). For
+  // slide 5 the OnboardingAuthPage component owns this routing — choice
+  // mode taps onBack which we wire here; form mode handles its own
+  // "back to choice" internally.
+  const handleBack = useCallback(() => {
+    if (pageIndex <= 0) return;
+    goToPage(pageIndex - 1);
+  }, [pageIndex, goToPage]);
 
   // Watch for auth completion. The instant user becomes truthy AND the
   // user has scrolled to page 5 (the auth gate), advance to page 6 (the
@@ -254,6 +315,14 @@ export default function OnboardingScreen({ navigation, route }) {
           // page. Without this, slide 5's video auto-played on mount along
           // with all other slides on initial FlatList render.
           isActive={index === pageIndex}
+          // Build 148.2 — seed the slide-5 sign-up Full name input with
+          // whatever the user typed on slide 2 (if anything). Empty
+          // string is fine — TextInput just renders as placeholder.
+          initialFirstName={intakeAnswers.firstName}
+          // Build 148.2 — back arrow on slide 5 routes here for the
+          // choice-mode case (form-mode back is handled inside
+          // OnboardingAuthPage by toggling its own mode state).
+          onBack={handleBack}
         />
       );
     }
@@ -273,97 +342,186 @@ export default function OnboardingScreen({ navigation, route }) {
       );
     }
 
+    // Build 148.2 — intake-aware layout. Slides 2-4 carry an optional
+    // text input above the Continue button; slides 1 + 7 don't. The
+    // page wrapper switches to KeyboardAvoidingView ONLY for intake
+    // slides so the input stays visible above the iOS keyboard.
+    const hasIntake = !!item.intakeKey;
+    // Build 148.3 — slide 4 gets a smaller title + extra body padding
+    // so the heading fits on one line AND there's clear breathing room
+    // before the intake pill below. Other slides keep the default
+    // title styling.
+    const isSlide4 = item.step === 4;
+    // Build 148.4 — slide 7 (reward) uses center alignment instead of
+    // space-between so the title + body + Continue button group sits
+    // visually centered in the content block (the "bottom half of the
+    // phone screen where it doesn't display the video"), rather than
+    // anchored to the top of the content area with a yawning gap
+    // before the CTA. No intake on this slide, so center alignment
+    // doesn't compete with anything.
+    const isSlide7 = item.step === 7;
+    const PageWrapper = hasIntake ? KeyboardAvoidingView : View;
+    const wrapperProps = hasIntake
+      ? {
+          style: styles.pageInner,
+          behavior: Platform.OS === 'ios' ? 'padding' : undefined,
+          keyboardVerticalOffset: 0,
+        }
+      : { style: styles.pageInner };
+
+    // Back arrow visible on slides 2-5 only. Slide 5 (auth) gets its
+    // own back-arrow rendering inside OnboardingAuthPage; this branch
+    // only fires for slides 1, 2, 3, 4, 7 (the default visual layout).
+    // We expose the arrow when index >= 1 && index <= AUTH_INDEX-1
+    // here — slide 5's arrow is rendered in OnboardingAuthPage.
+    const showBackArrow = index >= 1 && index < AUTH_INDEX;
+
     return (
       <View style={[styles.page, { width: SCREEN_W }]}>
-        {/* ── Video block — edge-to-edge top ─────────────────────────────
-            Build 147 v2: backgroundColor #FFFFFF → #F5F7FA to blend
-            with the Higgsfield-rendered videos' off-white bg.
-            Build 147 v4: paddingTop:insets.top removed — video now
-            extends ALL the way to the top of the screen (under the
-            status bar / Dynamic Island). True corner-to-corner means
-            no separate safe-area band exists to create a seam.
-            ─────────────────────────────────────────────────────────────── */}
-        <View style={styles.videoBlock}>
-          {/* Build 147 v12: isActive only true for the currently-visible
-              slide so non-visible slides' videos stay paused (was: all
-              6 videos auto-playing simultaneously since FlatList mounts
-              every page on render). */}
-          <OnboardingArt
-            step={item.step}
-            fullBleed
-            contentFit="cover"
-            isActive={index === pageIndex}
-          />
-        </View>
-
-        {/* ── 1pt black divider between video and content ─────────────
-            Build 147 v6: divider restored. v5 removed it based on a
-            misread of feedback — the user wanted the SOFT color step
-            killed and the HARD line kept. Hard 1pt black line is the
-            clean defined section separator. */}
-        <View style={styles.divider} />
-
-        {/* ── Content block — title, body, CTA, progress bars ───────────
-            Build 147 v5: contentMiddle now centers title + body + buttons
-            VERTICALLY in the available space (flex:1 + justify-center).
-            Previously they were pinned to the top via space-between which
-            stacked everything at the top of contentBlock with the
-            ProgressBars at the bottom. Now the group floats centered;
-            ProgressBars stays at the bottom.
-            ─────────────────────────────────────────────────────────────── */}
-        <View style={[styles.contentBlock, { paddingBottom: insets.bottom + 16 }]}>
-          <View style={styles.contentMiddle}>
-            <View style={styles.titleBlock}>
-              <Text style={styles.title}>{item.title}</Text>
-              <Text style={styles.body}>{item.body}</Text>
-            </View>
-
-            {isSlide1 ? (
-              // Build 147: dual-button row on slide 1 only. Both Log In
-              // and Sign Up just advance to slide 2 — actual auth lives
-              // on slide 5. Visual differentiation only at this stage.
-              <View style={styles.dualButtonRow}>
-                <TouchableOpacity
-                  style={[styles.btnHalf, styles.btnFilled]}
-                  onPress={handleContinue}
-                  activeOpacity={0.85}
-                  accessibilityRole="button"
-                  accessibilityLabel="Log In"
-                >
-                  <Text style={styles.btnFilledText}>Log In</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[styles.btnHalf, styles.btnOutline]}
-                  onPress={handleContinue}
-                  activeOpacity={0.85}
-                  accessibilityRole="button"
-                  accessibilityLabel="Sign Up"
-                >
-                  <Text style={styles.btnOutlineText}>Sign Up</Text>
-                </TouchableOpacity>
-              </View>
-            ) : (
-              // Build 147 v22: removed ArrowRightIcon. User: 'remove the
-              // arrow, center the Continue text.' Text now sits naturally
-              // centered without the arrow offset throwing visual balance.
-              <TouchableOpacity
-                style={styles.primaryButton}
-                onPress={handleContinue}
-                activeOpacity={0.85}
-                accessibilityRole="button"
-                accessibilityLabel={item.cta}
-              >
-                <Text style={styles.primaryButtonText}>{item.cta}</Text>
-              </TouchableOpacity>
-            )}
+        <PageWrapper {...wrapperProps}>
+          {/* ── Video block — edge-to-edge top ─────────────────────────────
+              Build 147 v2: backgroundColor #FFFFFF → #F5F7FA to blend
+              with the Higgsfield-rendered videos' off-white bg.
+              Build 147 v4: paddingTop:insets.top removed — video now
+              extends ALL the way to the top of the screen (under the
+              status bar / Dynamic Island). True corner-to-corner means
+              no separate safe-area band exists to create a seam.
+              ─────────────────────────────────────────────────────────────── */}
+          <View style={styles.videoBlock}>
+            {/* Build 147 v12: isActive only true for the currently-visible
+                slide so non-visible slides' videos stay paused (was: all
+                6 videos auto-playing simultaneously since FlatList mounts
+                every page on render). */}
+            <OnboardingArt
+              step={item.step}
+              fullBleed
+              contentFit="cover"
+              isActive={index === pageIndex}
+            />
           </View>
 
-          {/* Progress bars pinned to bottom via parent space-between */}
-          <ProgressBars count={TOTAL_PAGES} active={index} />
-        </View>
+          {/* ── 1pt black divider between video and content ─────────────
+              Build 147 v6: divider restored. v5 removed it based on a
+              misread of feedback — the user wanted the SOFT color step
+              killed and the HARD line kept. Hard 1pt black line is the
+              clean defined section separator. */}
+          <View style={styles.divider} />
+
+          {/* ── Content block — title, body, CTA, progress bars, back arrow ──
+              Build 148.2: tightened paddingBottom (insets.bottom + 16 →
+              insets.bottom + 8) to leave room for the back-arrow row
+              below the progress bars without pushing content out.
+              ─────────────────────────────────────────────────────────────── */}
+          <View style={[styles.contentBlock, { paddingBottom: insets.bottom + 8 }]}>
+            <View
+              style={[
+                styles.contentMiddle,
+                isSlide7 && styles.contentMiddleSlide7,
+              ]}
+            >
+              <View
+                style={[
+                  styles.titleBlock,
+                  isSlide1 && styles.titleBlockSlide1,
+                  isSlide4 && styles.titleBlockSlide4,
+                  isSlide7 && styles.titleBlockSlide7,
+                ]}
+              >
+                <Text style={[styles.title, isSlide4 && styles.titleSlide4]}>
+                  {item.title}
+                </Text>
+                <Text style={styles.body}>{item.body}</Text>
+              </View>
+
+              {/* Build 148.2 — intake + CTA grouped together as the
+                  bottom child of contentMiddle. Title floats at top
+                  (via contentMiddle's space-between), this group pins
+                  to the bottom. Adding the intake doesn't disturb the
+                  CTA's relative position. */}
+              <View style={styles.bottomGroup}>
+                {hasIntake && (
+                  <TextInput
+                    style={styles.intakeInput}
+                    placeholder={item.intakePlaceholder}
+                    placeholderTextColor="#9CA3AF"
+                    value={intakeAnswers[item.intakeKey] || ''}
+                    onChangeText={(t) => updateIntake(item.intakeKey, t)}
+                    autoCapitalize={item.intakeAutoCapitalize || 'sentences'}
+                    autoCorrect={false}
+                    returnKeyType="done"
+                    onSubmitEditing={handleContinue}
+                    blurOnSubmit
+                    accessibilityLabel={item.intakePlaceholder}
+                  />
+                )}
+
+                {isSlide1 ? (
+                  // Build 147: dual-button row on slide 1 only. Both Log In
+                  // and Sign Up just advance to slide 2 — actual auth lives
+                  // on slide 5. Visual differentiation only at this stage.
+                  <View style={styles.dualButtonRow}>
+                    <TouchableOpacity
+                      style={[styles.btnHalf, styles.btnFilled]}
+                      onPress={handleContinue}
+                      activeOpacity={0.85}
+                      accessibilityRole="button"
+                      accessibilityLabel="Log In"
+                    >
+                      <Text style={styles.btnFilledText}>Log In</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={[styles.btnHalf, styles.btnOutline]}
+                      onPress={handleContinue}
+                      activeOpacity={0.85}
+                      accessibilityRole="button"
+                      accessibilityLabel="Sign Up"
+                    >
+                      <Text style={styles.btnOutlineText}>Sign Up</Text>
+                    </TouchableOpacity>
+                  </View>
+                ) : (
+                  // Build 147 v22: removed ArrowRightIcon. User: 'remove the
+                  // arrow, center the Continue text.' Text now sits naturally
+                  // centered without the arrow offset throwing visual balance.
+                  <TouchableOpacity
+                    style={styles.primaryButton}
+                    onPress={handleContinue}
+                    activeOpacity={0.85}
+                    accessibilityRole="button"
+                    accessibilityLabel={item.cta}
+                  >
+                    <Text style={styles.primaryButtonText}>{item.cta}</Text>
+                  </TouchableOpacity>
+                )}
+              </View>
+            </View>
+
+            {/* Progress bars pinned to bottom via parent space-between */}
+            <ProgressBars count={TOTAL_PAGES} active={index} />
+
+            {/* Build 148.2 — thin back arrow at the bottom-left, under
+                the progress bars. Slides 2-4 only (slide 1 has no
+                previous slide; slide 5+ render their back via their own
+                components). Tap → goToPage(pageIndex - 1). */}
+            {showBackArrow && (
+              <View style={styles.backArrowRow}>
+                <TouchableOpacity
+                  style={styles.backArrowBtn}
+                  onPress={handleBack}
+                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                  activeOpacity={0.6}
+                  accessibilityRole="button"
+                  accessibilityLabel="Back"
+                >
+                  <BackChevronIcon />
+                </TouchableOpacity>
+              </View>
+            )}
+          </View>
+        </PageWrapper>
       </View>
     );
-  }, [insets, handleContinue, navigation, pageIndex, advanceFromPaywall]);
+  }, [insets, handleContinue, handleBack, navigation, pageIndex, advanceFromPaywall, intakeAnswers, updateIntake]);
 
   return (
     <View style={styles.root}>
@@ -428,6 +586,23 @@ function ArrowRightIcon({ style }) {
   );
 }
 
+// Build 148.2 — thin left-chevron used for the bottom-left back arrow
+// on slides 2-5. Stroke weight is intentionally on the thinner side
+// (1.8 vs the more typical 2.2) per user spec: "It should be thin."
+function BackChevronIcon({ color = BLUE_PRIMARY, size = 18 }) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <Path
+        d="M15 18l-6-6 6-6"
+        stroke={color}
+        strokeWidth={1.8}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </Svg>
+  );
+}
+
 // ─── Styles ──────────────────────────────────────────────────────────────
 
 const styles = StyleSheet.create({
@@ -438,18 +613,25 @@ const styles = StyleSheet.create({
   page: {
     flex: 1,
   },
+  // Build 148.2 — inner wrapper used by both <View> and
+  // <KeyboardAvoidingView>. flex:1 lets the page content fill the slide.
+  pageInner: {
+    flex: 1,
+  },
 
   // Top hero — video fills horizontally edge-to-edge.
   // Build 147 v2: flex 0.55 → 0.6 (bigger video per user direction).
   // Build 147 v16: flex 0.6 → 0.65.
-  // Build 147 v19: bg #F8F8F8 → #FFFFFF. With v18's 0.9× scale, the
-  // video shows ~5% margin of the videoBlock bg around its edges.
-  // The Higgsfield videos themselves were rendered with near-white
-  // backgrounds, so the previous #F8F8F8 was visible as a "weird gray
-  // border" around the video composition. Matching to #FFFFFF blends
-  // the margin into the video's own background invisibly.
+  // Build 147 v19: bg #F8F8F8 → #FFFFFF.
+  // Build 148.2: 0.65 → 0.55 to reclaim ~75pt of vertical room for the
+  // new intake pill + the back-arrow row at the bottom.
+  // Build 148.3: 0.55 → 0.58 per user feedback that the page boundary
+  // felt pushed too high — the video felt cropped at the bottom. 0.58
+  // gives the video back ~23pt while still leaving the content area
+  // wide enough to host the intake + button + bars + back arrow
+  // without overlap.
   videoBlock: {
-    flex: 0.65,
+    flex: 0.58,
     width: '100%',
     backgroundColor: '#FFFFFF',
   },
@@ -462,15 +644,12 @@ const styles = StyleSheet.create({
     width: '100%',
   },
 
-  // Bottom content — title, body, CTA, progress.
-  // contentMiddle takes flex:1 with justifyContent:center — visually
-  // centers title + body + buttons in the available vertical space.
-  // ProgressBars hangs off the bottom as the last child.
-  // Build 147 v16: flex 0.4 → 0.35 to match the videoBlock bump above
-  // (videoBlock 0.6 → 0.65). Net: divider line sits lower on the
-  // screen, content area is slightly more compact.
+  // Bottom content — title, body, intake pill, CTA, progress, back arrow.
+  // Build 148.2: flex 0.35 → 0.45 (mirrors videoBlock 0.65 → 0.55).
+  // Build 148.3: 0.45 → 0.42 (mirrors videoBlock 0.55 → 0.58). Still
+  // enough headroom for intake + button + bars + arrow.
   contentBlock: {
-    flex: 0.35,
+    flex: 0.42,
     paddingHorizontal: 28,
     paddingTop: 8,
     backgroundColor: '#FFFFFF',
@@ -479,27 +658,56 @@ const styles = StyleSheet.create({
   // Build 147 v5: wrapper for the title/body/buttons group.
   // Build 147 v10: justifyContent space-between. Title+body float at
   // the TOP of the content area, buttons stay anchored at the BOTTOM
-  // just above the progress bars. v9 had everything stuck at the
-  // bottom — user wanted title+body higher (centered in upper half)
-  // while buttons stayed near progress bars.
+  // just above the progress bars.
+  // Build 148.2: paddingBottom 8 → 18 to keep clearer separation
+  // between the Continue button and the progress-bar row below.
   contentMiddle: {
     flex: 1,
     justifyContent: 'space-between',
-    paddingBottom: 8,
+    paddingBottom: 18,
   },
 
   // Title block — sits in the upper-middle of the content area.
-  // Build 147 v11: paddingTop 40 floats title into the upper third.
-  // Build 147 v22: paddingTop 40 → 24. v11's 40 was fine for slides
-  // with short body copy but slide 4's longer body ('Want a chair for
-  // that corner? A rug for the bedroom? Snap the space and shop one
-  // piece at a time.') wraps to 3 lines and overflowed contentBlock,
-  // pushing the Continue button down into the progress bars. 24pt
-  // gives the title enough breathing room without starving the body
-  // and CTA of vertical space.
+  // Build 148.2: paddingTop 24 → 8 per user feedback ("heading and
+  // subheading need to be pushed up a little bit higher"). Used by
+  // intake slides 2-4 where space is at a premium.
   titleBlock: {
     alignItems: 'center',
-    paddingTop: 24,
+    paddingTop: 8,
+  },
+  // Build 148.3 — slide-1 specific override. Without an intake pill,
+  // the contentMiddle's space-between layout floats the dual-button
+  // row at the bottom and leaves a large empty middle on slide 1.
+  // Pushing the title down ~52pt visually centers the "Picture the
+  // possibilities" group in the content area, eliminating the
+  // "title too high" feel the user reported.
+  titleBlockSlide1: {
+    paddingTop: 60,
+  },
+  // Build 148.3 — slide-4 specific override. The original 38pt title
+  // forced "Just what you need" onto two stacked lines, which the
+  // user wanted on one line. The smaller font + extra paddingBottom
+  // achieves two things at once: title fits on one line AND there's
+  // visible breathing room before the intake pill below the body.
+  titleBlockSlide4: {
+    paddingBottom: 18,
+  },
+  titleSlide4: {
+    fontSize: 28,
+    lineHeight: 34,
+  },
+  // Build 148.4 — slide-7 (reward) overrides. Without an intake field
+  // and with a single Continue button, the default space-between
+  // layout left a yawning empty middle. Switching contentMiddle to
+  // justifyContent:'center' + adding a slight gap between title block
+  // and the bottom group visually anchors the title + Continue pair
+  // in the bottom half of the screen, per user spec.
+  contentMiddleSlide7: {
+    justifyContent: 'center',
+    gap: 24,
+  },
+  titleBlockSlide7: {
+    paddingTop: 0, // override the default 8pt — center owns the layout now
   },
   // Build 147 v9: fontSize 34 → 38 + lineHeight 40 → 44 (heading larger
   // per user spec).
@@ -522,22 +730,31 @@ const styles = StyleSheet.create({
     lineHeight: 24,
   },
 
+  // Build 148.2 — bottomGroup hosts intake (when present) + the CTA
+  // row inside contentMiddle. contentMiddle's justifyContent:'space-
+  // between' pushes titleBlock to top and bottomGroup to bottom; the
+  // internal gap separates the intake from the buttons.
+  bottomGroup: {
+    gap: 12,
+  },
+
   // Slide 1 dual-button row (Log In + Sign Up).
   // flex:1 on each button + gap:12 between them gives equal-width
   // buttons spanning the content padding box.
-  // Build 147 v2: marginTop:24 pulls the buttons close to the body
-  // text above (was previously floating with huge gap from the
-  // justify-content:space-between layout).
+  // Build 148.2: marginTop removed — spacing now handled by
+  // bottomGroup's gap + contentMiddle's space-between.
   dualButtonRow: {
     flexDirection: 'row',
     gap: 12,
-    marginTop: 24,
   },
-  // Build 147 v10: height 56 → 50 (shorter buttons per user spec).
+  // Build 148.2 — height 50 → 44, borderRadius 30 → 26 to match the
+  // Continue button on slides 2-4. Visual rhythm across the funnel is
+  // now consistent: every primary CTA is 44pt tall with a 26pt radius,
+  // including the intake pill above it.
   btnHalf: {
     flex: 1,
-    height: 50,
-    borderRadius: 30,
+    height: 44,
+    borderRadius: 26,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 16,
@@ -572,12 +789,12 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
 
-  // Continue button — single CTA on slides 2-4 + 6.
+  // Continue button — single CTA on slides 2-4 + 7.
   // Build 147 v22: height 50 → 44 (thinner per user), borderRadius
-  // 30 → 26 to keep the pill curve proportional. marginTop 24 → 18
-  // reclaims another 6pt to help slide 4's longer body fit cleanly.
-  // No more arrow icon, so the row flex-direction is unused but kept
-  // for backward compatibility (single Text child still centers).
+  // 30 → 26 to keep the pill curve proportional.
+  // Build 148.2: marginTop 18 → 0 (the bottomGroup wrapper now handles
+  // separation from the intake via its gap; vertical positioning relative
+  // to the title is handled by contentMiddle's space-between).
   primaryButton: {
     backgroundColor: BLUE_LIGHT,
     borderRadius: 26,
@@ -586,7 +803,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 24,
-    marginTop: 18,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.08,
@@ -599,19 +815,52 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
 
+  // Build 148.2 — optional intake pill above the Continue button on
+  // slides 2-4. Thin border, light fill, generous internal padding,
+  // 44pt tall so the pill height matches the buttons below it.
+  // borderRadius 22 (half of height) gives a pure pill shape.
+  // Build 148.3: fontSize 15 → 13 per user — the 15pt text felt too
+  // large for an optional intake field; the smaller size keeps the
+  // pill subordinate to the Continue CTA visually.
+  intakeInput: {
+    height: 44,
+    borderRadius: 22,
+    borderWidth: 1,
+    borderColor: 'rgba(0,0,0,0.08)',
+    backgroundColor: '#FFFFFF',
+    paddingHorizontal: 18,
+    fontSize: 13,
+    color: '#111827',
+  },
+
+  // Build 148.2 — back-arrow row below the progress bars. Slides 2-5
+  // only. Aligned left so the tap target sits in the bottom-left
+  // corner of the slide.
+  // paddingTop:14 (was 6) per user feedback — explicit gap below the
+  // progress bars before the back arrow so the touch target reads as
+  // its own zone rather than appearing flush against the bars.
+  backArrowRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingTop: 14,
+    paddingHorizontal: 4,
+    minHeight: 32,
+  },
+  backArrowBtn: {
+    padding: 6,
+  },
+
   // Build 147 — segmented bars at the bottom of each slide.
-  // Build 147 v2: thinner + tighter per mockup feedback.
-  //   height 4 → 3 (thinner)
-  //   borderRadius 2 → 1.5 (matches thinner bar)
-  //   gap 6 → 4 (closer together)
-  //   marginTop:18 removed — bars are now pinned to bottom via parent
-  //   contentBlock's justify-content:space-between, so they sit at the
-  //   bottom edge of the content area naturally.
-  // Build 147 v11: gap 4 → 2. Tighter spacing between segments.
+  // Build 148.2: marginTop:8 reintroduced to put explicit space above
+  // the bar row. Combined with contentMiddle's paddingBottom:18 this
+  // gives ~26pt of clear separation between the Continue button and
+  // the progress bars — fixes the previous overlap where Continue
+  // collided with the bars under the new intake-pill layout.
   progressBarsRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 2,
+    marginTop: 8,
   },
   // Build 147 v9: height 3 → 2 + borderRadius 1.5 → 1. Thinner bars
   // per user — same length, smaller height so they read as delicate
