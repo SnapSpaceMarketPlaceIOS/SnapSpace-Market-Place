@@ -773,8 +773,14 @@ export default function ProfileScreen({ navigation }) {
                           variant; the full-res imageUrl is still on the
                           design object and gets passed to ShopTheLook on
                           tap. Falls back to imageUrl for any design whose
-                          source isn't a Supabase URL. */}
-                      <CardImage uri={design.thumbnailUrl || design.imageUrl} style={styles.cardImgPhoto} resizeMode="contain" />
+                          source isn't a Supabase URL.
+                          Build 148.5 — resizeMode "contain" → "cover"
+                          on the My Wishes grid so AI-generated room
+                          photos fill their square tiles instead of
+                          letterboxing into thin strips. The Liked tab
+                          above (product photos with white BG) stays
+                          on "contain" — see comment there. */}
+                      <CardImage uri={design.thumbnailUrl || design.imageUrl} style={styles.cardImgPhoto} resizeMode="cover" />
                     </View>
                   </PressableCard>
                 </View>

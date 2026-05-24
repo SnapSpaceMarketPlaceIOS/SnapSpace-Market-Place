@@ -207,6 +207,18 @@ function normalizeProduct(product) {
     compareAtPrice: product.compareAtPrice ?? null,
     compareAtPriceDisplay: product.compareAtPriceDisplay ?? null,
     bestSellerBadge: product.bestSellerBadge ?? null,
+
+    // Build 148.5 — preserve the two-track studio shot + matcher metadata.
+    // productMatcher rewrites imageUrl/asin/affiliateUrl/price to the
+    // matched variant's values AND attaches _matchedVariant as metadata
+    // for downstream consumers (RoomResultScreen ProductCard's effectiveImage
+    // chain, ProductDetailScreen's selectedVar default, CartContext override).
+    // Prior to this build normalizeProduct omitted both fields, so the
+    // ProductCard would fall through to imageUrl and the PDP would default
+    // to the first variant instead of the matched one. Including them
+    // here keeps the matched-variant story intact end-to-end.
+    panelImageUrl: product.panelImageUrl || null,
+    _matchedVariant: product._matchedVariant || null,
   };
 }
 

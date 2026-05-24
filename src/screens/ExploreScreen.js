@@ -570,9 +570,19 @@ const GridCard = React.memo(function GridCard({ design, onPress, cardRadius, isL
         onPress={onPress}
         activeOpacity={0.95}
       >
+        {/* Build 148.5 — design (wish) images now render with cover
+            instead of contain. The 1:1 cardImg container was forcing
+            landscape AI-renders to letterbox inside the square, leaving
+            white bands top + bottom and making the photo look like a
+            narrow strip. Cover fills the tile by cropping the image's
+            longer axis — for landscape rooms that means the left/right
+            edges crop slightly (centered furniture stays visible).
+            Product cards still use contain (see line below for the
+            products grid) because Amazon-style white-BG product shots
+            crop poorly under cover. */}
         <View style={[styles.cardImg, { borderRadius: r }]}>
           <View style={styles.cardImgBg} />
-          <CardImage uri={design.thumbnailUrl || design.imageUrl} style={styles.cardImgPhoto} resizeMode="contain" />
+          <CardImage uri={design.thumbnailUrl || design.imageUrl} style={styles.cardImgPhoto} resizeMode="cover" />
         </View>
       </PressableCard>
     );
@@ -589,9 +599,12 @@ const GridCard = React.memo(function GridCard({ design, onPress, cardRadius, isL
         onPress={onPress}
         activeOpacity={0.95}
       >
+        {/* Build 148.5 — same cover swap as the multi-col branch above.
+            Design (wish) images fill the tile naturally rather than
+            letterboxing into the square aspect ratio. */}
         <View style={[styles.cardImg, { borderTopLeftRadius: r, borderTopRightRadius: r, borderBottomLeftRadius: 0, borderBottomRightRadius: 0 }]}>
           <View style={styles.cardImgBg} />
-          <CardImage uri={design.thumbnailUrl || design.imageUrl} style={styles.cardImgPhoto} resizeMode="contain" />
+          <CardImage uri={design.thumbnailUrl || design.imageUrl} style={styles.cardImgPhoto} resizeMode="cover" />
         </View>
       </PressableCard>
       <View style={styles.feedUserRow}>
