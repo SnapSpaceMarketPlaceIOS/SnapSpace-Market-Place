@@ -43,6 +43,7 @@ import Svg, { Path } from 'react-native-svg';
 import * as AppleAuthentication from 'expo-apple-authentication';
 
 import OnboardingArt from './OnboardingArt';
+import SignInSheet from './SignInSheet';
 import { useAuth } from '../../context/AuthContext';
 import { colors } from '../../constants/colors';
 
@@ -70,6 +71,10 @@ export default function OnboardingAuthPage({ navigation, screenWidth, progressDo
 
   const [loading, setLoading] = useState(false);
   const [appleAvailable, setAppleAvailable] = useState(false);
+  // Build 147 v23: sheet visibility state. "Sign in" tap opens the sheet
+  // inline; sheet handles its own dismissal. AuthScreen (the previous
+  // full-screen modal navigation target) is no longer reached from here.
+  const [signInSheetVisible, setSignInSheetVisible] = useState(false);
 
   // Probe Apple Auth availability on mount. iOS-only; non-iOS returns false.
   useEffect(() => {
@@ -87,12 +92,14 @@ export default function OnboardingAuthPage({ navigation, screenWidth, progressDo
 
   // ── Handlers ────────────────────────────────────────────────────────────
 
-  // Build 147 v14: "Sign in" no longer does inline auth. Navigates to
-  // the standalone AuthScreen which has the full email/password +
-  // signup + forgot-password + promo-code + legal UX. Cleaner separation
-  // of concerns and keeps this slide reading minimal.
+  // Build 147 v14: navigated to standalone AuthScreen.
+  // Build 147 v23: replaced with inline bottom-sheet. SignInSheet hosts
+  // the full email/password + signup + forgot + promo UX so users never
+  // leave slide 5 to authenticate. AuthScreen stays mounted in App.js
+  // for backward compat (deep links, signout flow) but onboarding no
+  // longer routes there.
   const handleSignInPress = () => {
-    if (navigation?.navigate) navigation.navigate('Auth');
+    setSignInSheetVisible(true);
   };
 
   const handleApple = async () => {
@@ -179,6 +186,14 @@ export default function OnboardingAuthPage({ navigation, screenWidth, progressDo
       <View style={[styles.dotsWrap, { paddingBottom: insets.bottom + 12 }]}>
         {progressDots}
       </View>
+
+      {/* Build 147 v23: inline email/password sheet, replaces the old
+          full-screen AuthScreen modal navigation. */}
+      <SignInSheet
+        visible={signInSheetVisible}
+        onClose={() => setSignInSheetVisible(false)}
+        navigation={navigation}
+      />
     </View>
   );
 }
