@@ -570,19 +570,18 @@ const GridCard = React.memo(function GridCard({ design, onPress, cardRadius, isL
         onPress={onPress}
         activeOpacity={0.95}
       >
-        {/* Build 148.5 — design (wish) images now render with cover
-            instead of contain. The 1:1 cardImg container was forcing
-            landscape AI-renders to letterbox inside the square, leaving
-            white bands top + bottom and making the photo look like a
-            narrow strip. Cover fills the tile by cropping the image's
-            longer axis — for landscape rooms that means the left/right
-            edges crop slightly (centered furniture stays visible).
-            Product cards still use contain (see line below for the
-            products grid) because Amazon-style white-BG product shots
-            crop poorly under cover. */}
+        {/* Build 148.6 — switched to CardImage's `framed` mode after
+            user feedback that 148.5's cover-only crop was "too zoomed
+            in." Framed mode renders TWO layers inside the square tile:
+            a blurred cover-fill background + a contain-fitted clean
+            foreground. The full room photo is visible (no crop) and
+            the would-be white letterbox area is filled with a soft
+            out-of-focus echo of the same image. Square format preserved.
+            Product cards still use plain contain (see products grid
+            below) because Amazon white-BG catalog shots don't benefit
+            from the blurred-bg pattern. */}
         <View style={[styles.cardImg, { borderRadius: r }]}>
-          <View style={styles.cardImgBg} />
-          <CardImage uri={design.thumbnailUrl || design.imageUrl} style={styles.cardImgPhoto} resizeMode="cover" />
+          <CardImage uri={design.thumbnailUrl || design.imageUrl} style={styles.cardImgPhoto} framed />
         </View>
       </PressableCard>
     );
@@ -599,12 +598,11 @@ const GridCard = React.memo(function GridCard({ design, onPress, cardRadius, isL
         onPress={onPress}
         activeOpacity={0.95}
       >
-        {/* Build 148.5 — same cover swap as the multi-col branch above.
-            Design (wish) images fill the tile naturally rather than
-            letterboxing into the square aspect ratio. */}
+        {/* Build 148.6 — framed mode (see multi-col branch above for
+            the full rationale). Same dual-layer rendering for the
+            1-col feed card. */}
         <View style={[styles.cardImg, { borderTopLeftRadius: r, borderTopRightRadius: r, borderBottomLeftRadius: 0, borderBottomRightRadius: 0 }]}>
-          <View style={styles.cardImgBg} />
-          <CardImage uri={design.thumbnailUrl || design.imageUrl} style={styles.cardImgPhoto} resizeMode="cover" />
+          <CardImage uri={design.thumbnailUrl || design.imageUrl} style={styles.cardImgPhoto} framed />
         </View>
       </PressableCard>
       <View style={styles.feedUserRow}>

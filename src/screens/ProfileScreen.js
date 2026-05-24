@@ -768,19 +768,18 @@ export default function ProfileScreen({ navigation }) {
                     onPress={() => navigation.navigate('ShopTheLook', { design })}
                   >
                     <View style={[styles.cardImg, { borderRadius: cardRadius }]}>
-                      <View style={styles.cardImgBg} />
                       {/* Build 144 — grid renders the 400px thumbnail
                           variant; the full-res imageUrl is still on the
                           design object and gets passed to ShopTheLook on
-                          tap. Falls back to imageUrl for any design whose
-                          source isn't a Supabase URL.
-                          Build 148.5 — resizeMode "contain" → "cover"
-                          on the My Wishes grid so AI-generated room
-                          photos fill their square tiles instead of
-                          letterboxing into thin strips. The Liked tab
-                          above (product photos with white BG) stays
-                          on "contain" — see comment there. */}
-                      <CardImage uri={design.thumbnailUrl || design.imageUrl} style={styles.cardImgPhoto} resizeMode="cover" />
+                          tap.
+                          Build 148.6 — framed mode replaces the 148.5
+                          cover-only behavior. The full room photo is
+                          visible inside the square tile (no aggressive
+                          edge crop) and the letterbox area is filled by
+                          a blurred copy of the same image — no harsh
+                          white bands. See CardImage.js for the
+                          implementation. */}
+                      <CardImage uri={design.thumbnailUrl || design.imageUrl} style={styles.cardImgPhoto} framed />
                     </View>
                   </PressableCard>
                 </View>
