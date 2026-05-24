@@ -189,6 +189,11 @@ export default function OnboardingScreen({ navigation, route }) {
           navigation={navigation}
           screenWidth={SCREEN_W}
           progressDots={<ProgressBars count={TOTAL_PAGES} active={index} />}
+          // Build 147 v22: pass isActive so OnboardingAuthPage's internal
+          // OnboardingArt only plays the video when slide 5 is the current
+          // page. Without this, slide 5's video auto-played on mount along
+          // with all other slides on initial FlatList render.
+          isActive={index === pageIndex}
         />
       );
     }
@@ -263,6 +268,9 @@ export default function OnboardingScreen({ navigation, route }) {
                 </TouchableOpacity>
               </View>
             ) : (
+              // Build 147 v22: removed ArrowRightIcon. User: 'remove the
+              // arrow, center the Continue text.' Text now sits naturally
+              // centered without the arrow offset throwing visual balance.
               <TouchableOpacity
                 style={styles.primaryButton}
                 onPress={handleContinue}
@@ -271,7 +279,6 @@ export default function OnboardingScreen({ navigation, route }) {
                 accessibilityLabel={item.cta}
               >
                 <Text style={styles.primaryButtonText}>{item.cta}</Text>
-                <ArrowRightIcon style={{ marginLeft: 10 }} />
               </TouchableOpacity>
             )}
           </View>
@@ -404,15 +411,17 @@ const styles = StyleSheet.create({
   },
 
   // Title block — sits in the upper-middle of the content area.
-  // Build 147 v11: added paddingTop:40. v10 had title pinned at the
-  // very top (felt too high), v9 had it pinned at the bottom near
-  // buttons (felt too low). v11 splits the difference by giving the
-  // title a top breathing margin so it floats into the upper third
-  // of the content area while buttons stay at the bottom via the
-  // contentMiddle's justify-content:space-between.
+  // Build 147 v11: paddingTop 40 floats title into the upper third.
+  // Build 147 v22: paddingTop 40 → 24. v11's 40 was fine for slides
+  // with short body copy but slide 4's longer body ('Want a chair for
+  // that corner? A rug for the bedroom? Snap the space and shop one
+  // piece at a time.') wraps to 3 lines and overflowed contentBlock,
+  // pushing the Continue button down into the progress bars. 24pt
+  // gives the title enough breathing room without starving the body
+  // and CTA of vertical space.
   titleBlock: {
     alignItems: 'center',
-    paddingTop: 40,
+    paddingTop: 24,
   },
   // Build 147 v9: fontSize 34 → 38 + lineHeight 40 → 44 (heading larger
   // per user spec).
@@ -486,17 +495,20 @@ const styles = StyleSheet.create({
   },
 
   // Continue button — single CTA on slides 2-4 + 6.
-  // Build 147 v10: height 56 → 50, borderRadius 34 → 30 (shorter
-  // buttons per user spec, matching btnHalf).
+  // Build 147 v22: height 50 → 44 (thinner per user), borderRadius
+  // 30 → 26 to keep the pill curve proportional. marginTop 24 → 18
+  // reclaims another 6pt to help slide 4's longer body fit cleanly.
+  // No more arrow icon, so the row flex-direction is unused but kept
+  // for backward compatibility (single Text child still centers).
   primaryButton: {
     backgroundColor: BLUE_LIGHT,
-    borderRadius: 30,
-    height: 50,
+    borderRadius: 26,
+    height: 44,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 24,
-    marginTop: 24,
+    marginTop: 18,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.08,

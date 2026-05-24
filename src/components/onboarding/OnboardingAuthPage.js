@@ -64,7 +64,7 @@ function AppleLogoIcon() {
   );
 }
 
-export default function OnboardingAuthPage({ navigation, screenWidth, progressDots }) {
+export default function OnboardingAuthPage({ navigation, screenWidth, progressDots, isActive = true }) {
   const insets = useSafeAreaInsets();
   const { signInWithApple } = useAuth();
 
@@ -168,7 +168,11 @@ export default function OnboardingAuthPage({ navigation, screenWidth, progressDo
           OnboardingArt default prop) so the video plays whenever this
           page renders. */}
       <View style={styles.videoBlock}>
-        <OnboardingArt step={5} fullBleed contentFit="cover" />
+        {/* Build 147 v22: pass isActive so the slide-5 video only plays
+            when this page is the visible one. Was previously auto-
+            playing from app launch like the rest of the slides before
+            v12 fixed that for slides 1-4 + 6. */}
+        <OnboardingArt step={5} fullBleed contentFit="cover" isActive={isActive} />
       </View>
 
       {/* Progress bars at very bottom — pinned with safe-area inset. */}
