@@ -24,7 +24,14 @@
  *   step 3 → slide-3.mp4 (Shop every piece)
  *   step 4 → slide-4.mp4 (Just what you need)
  *   step 5 → slide-5.mp4 (HomeGenie auth wall)
- *   step 6 → slide-7.mp4 (A gift to get you started)
+ *   step 6 → (no video — paywall slide owns its own UI)
+ *   step 7 → slide-7.mp4 (A gift to get you started — reward)
+ *
+ * Build 148: 7-slide flow restructure. Paywall inserted at step 6;
+ * reward shifted to step 7. Step 6 intentionally has no video source
+ * because OnboardingPaywallPage renders its own static UI (tier cards
+ * + CTA), not a Higgsfield animation. If a parent ever asks for step
+ * 6 via OnboardingArt by mistake, we fall back to slide-1 (default).
  */
 
 import React, { useEffect } from 'react';
@@ -37,7 +44,8 @@ const VIDEO_SOURCES = {
   3: require('../../assets/onboarding/videos/slide-3.mp4'),
   4: require('../../assets/onboarding/videos/slide-4.mp4'),
   5: require('../../assets/onboarding/videos/slide-5.mp4'),
-  6: require('../../assets/onboarding/videos/slide-7.mp4'),
+  // step 6 = paywall (no video — page draws static tier cards)
+  7: require('../../assets/onboarding/videos/slide-7.mp4'),
 };
 
 // Build 147 v17: per-step scale transform.
@@ -74,7 +82,8 @@ const VIDEO_SCALE_BY_STEP = {
   3: 1.05,
   4: 1.05,
   5: 1.05,
-  6: 1.05,
+  // step 6 = paywall (no video)
+  7: 1.05,
 };
 
 export default function OnboardingArt({ step, style, fullBleed = false, contentFit = 'contain', isActive = true }) {

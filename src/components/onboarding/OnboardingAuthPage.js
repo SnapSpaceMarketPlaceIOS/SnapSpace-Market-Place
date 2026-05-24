@@ -1,54 +1,65 @@
 /**
- * OnboardingAuthPage — slide 5 of the 6-page onboarding flow.
+ * OnboardingAuthPage — slide 5 of the 7-page onboarding flow.
  *
- * Build 147 v14 restructure:
- *   Previous version had inline email/password fields, signup toggle,
- *   "Forgot password?" link, promo code redemption, and legal disclosure
- *   all stuffed onto one scroll-heavy page. User feedback: too busy,
- *   not matching mockup.
+ * Build 148 restructure (was Build 147 v23):
+ *   The previous version routed "Sign in" → SignInSheet (a bottom-sheet
+ *   Modal sliding up over slide 5). User feedback: that pop-up feels
+ *   disconnected from the onboarding flow — the page underneath becomes
+ *   inert and the sheet height jumps when toggling sign-in / sign-up.
  *
- *   New layout per mockup:
- *     • Title + subtitle at top (HomeGenie / Shop and Design your room with AI)
- *     • Card with two buttons:
- *         - "Sign in"        → navigates to AuthScreen (the email/password
- *                              form lives there now, separate screen)
- *         - "Sign in with Apple" → inline Apple SSO (existing handler)
- *     • Video at bottom (BIGGER than previous shrunkArt) — same Higgsfield
- *       slide-5 mp4, now occupying the lower half of the screen
- *     • Progress bars at very bottom (passed in via progressDots prop)
+ *   New behavior: the page itself morphs in-place between two modes.
+ *     • 'choice' (default) — HomeGenie title + button card (Sign in /
+ *                            Sign in with Apple) + big looping slide-5
+ *                            video filling the lower half.
+ *     • 'form'             — Back arrow + shrunk title + inline email/
+ *                            password form (sign-in or sign-up variant)
+ *                            + smaller video at the bottom (still looping).
  *
- *   Auth happens via two paths:
- *     • Tap "Sign in" → navigates to AuthScreen (existing screen with full
- *       email/password + signup + forgot password + promo code + legal)
- *     • Tap "Sign in with Apple" → inline signInWithApple from AuthContext.
- *       OnboardingScreen's useEffect detects useAuth().user becoming truthy
- *       and auto-advances to slide 6.
+ *   The user never leaves slide 5 to enter credentials. Same component,
+ *   same FlatList page, same progress bars at the bottom — only the
+ *   middle content swaps.
  *
- *   This separation lets the onboarding flow read clean (just two buttons)
- *   while keeping the heavy email-auth UX on its own screen for users who
- *   prefer that path.
+ * Auth completion behavior (unchanged):
+ *   • Email/password sign-in OR sign-up → useAuth().user becomes truthy
+ *     → OnboardingScreen's useEffect detects the change and advances
+ *     the FlatList to slide 6 (paywall).
+ *   • Apple SSO → same observer-driven advance.
+ *   • Sign-up that needs email verification → navigate to VerifyEmailSent
+ *     (existing flow, unchanged).
+ *
+ * Build 148 — paywall insertion:
+ *   This component doesn't care about the slide 5 → slide 6 advance
+ *   target (that lives in OnboardingScreen's useEffect). The change
+ *   from "slide 5 → slide 6 reward" to "slide 5 → slide 6 paywall → slide
+ *   7 reward" is invisible from this file's perspective.
  */
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   View,
   Text,
+  TextInput,
   StyleSheet,
   TouchableOpacity,
   ActivityIndicator,
   Alert,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
 import * as AppleAuthentication from 'expo-apple-authentication';
 
 import OnboardingArt from './OnboardingArt';
-import SignInSheet from './SignInSheet';
 import { useAuth } from '../../context/AuthContext';
+import { redeemSignupCode } from '../../services/subscriptionService';
 import { colors } from '../../constants/colors';
 
 const BLUE_LIGHT = colors.blueLight;     // #67ACE9
 const BLUE_PRIMARY = colors.bluePrimary; // #0B6DC3
+
+// ── Icons ──────────────────────────────────────────────────────────────────
 
 function AppleLogoIcon() {
   return (
@@ -65,18 +76,100 @@ function AppleLogoIcon() {
   );
 }
 
-export default function OnboardingAuthPage({ navigation, screenWidth, progressDots, isActive = true }) {
+function ChevronLeftIcon({ color = BLUE_PRIMARY }) {
+  return (
+    <Svg width={20} height={20} viewBox="0 0 24 24" fill="none">
+      <Path
+        d="M15 18l-6-6 6-6"
+        stroke={color}
+        strokeWidth={2.2}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </Svg>
+  );
+}
+
+// ── Form input ─────────────────────────────────────────────────────────────
+
+function FormInput({
+  placeholder,
+  value,
+  onChangeText,
+  error,
+  secureTextEntry,
+  showToggle,
+  showPassword,
+  onToggle,
+  ...rest
+}) {
+  const [focused, setFocused] = useState(false);
+  return (
+    <View>
+      <View
+        style={[
+          inputStyles.wrap,
+          focused && inputStyles.wrapFocused,
+          error && inputStyles.wrapError,
+        ]}
+      >
+        <TextInput
+          style={inputStyles.input}
+          placeholder={placeholder}
+          placeholderTextColor="#9CA3AF"
+          value={value}
+          onChangeText={onChangeText}
+          secureTextEntry={secureTextEntry && !showPassword}
+          onFocus={() => setFocused(true)}
+          onBlur={() => setFocused(false)}
+          {...rest}
+        />
+        {showToggle && (
+          <TouchableOpacity
+            onPress={onToggle}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          >
+            <Text style={inputStyles.toggleText}>{showPassword ? 'Hide' : 'Show'}</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+      {!!error && <Text style={inputStyles.errorText}>{error}</Text>}
+    </View>
+  );
+}
+
+// ── Main component ─────────────────────────────────────────────────────────
+
+export default function OnboardingAuthPage({
+  navigation,
+  screenWidth,
+  progressDots,
+  isActive = true,
+}) {
   const insets = useSafeAreaInsets();
-  const { signInWithApple } = useAuth();
+  const { signInWithApple, signIn, signUp, resetPassword } = useAuth();
 
-  const [loading, setLoading] = useState(false);
+  // Top-level UI mode: choice screen vs. inline credentials form.
+  const [mode, setMode] = useState('choice');
+  // Within form mode: sign-in vs. sign-up variant.
+  const [isSignUp, setIsSignUp] = useState(false);
+
+  // Apple Auth availability — probed once on mount.
   const [appleAvailable, setAppleAvailable] = useState(false);
-  // Build 147 v23: sheet visibility state. "Sign in" tap opens the sheet
-  // inline; sheet handles its own dismissal. AuthScreen (the previous
-  // full-screen modal navigation target) is no longer reached from here.
-  const [signInSheetVisible, setSignInSheetVisible] = useState(false);
 
-  // Probe Apple Auth availability on mount. iOS-only; non-iOS returns false.
+  // Inline credentials state — lifted from the previous SignInSheet
+  // verbatim. Same validators, same Alerts, same promo redemption.
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [referralCode, setReferralCode] = useState('');
+  const [showPromoField, setShowPromoField] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState({});
+
+  // Probe Apple Auth availability on mount.
   useEffect(() => {
     let cancelled = false;
     (async () => {
@@ -87,52 +180,179 @@ export default function OnboardingAuthPage({ navigation, screenWidth, progressDo
         if (!cancelled) setAppleAvailable(false);
       }
     })();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
-  // ── Handlers ────────────────────────────────────────────────────────────
+  // Reset form state whenever the user backs out to choice mode.
+  // Prevents stale values from showing when they re-enter the form.
+  useEffect(() => {
+    if (mode === 'choice') {
+      setName('');
+      setPassword('');
+      setConfirmPassword('');
+      setErrors({});
+      setShowPassword(false);
+      setShowPromoField(false);
+      setReferralCode('');
+    }
+  }, [mode]);
 
-  // Build 147 v14: navigated to standalone AuthScreen.
-  // Build 147 v23: replaced with inline bottom-sheet. SignInSheet hosts
-  // the full email/password + signup + forgot + promo UX so users never
-  // leave slide 5 to authenticate. AuthScreen stays mounted in App.js
-  // for backward compat (deep links, signout flow) but onboarding no
-  // longer routes there.
-  const handleSignInPress = () => {
-    setSignInSheetVisible(true);
+  // 16s safety timer so a stuck network never freezes the spinner on.
+  const loadingTimerRef = useRef(null);
+  const safeSetLoading = (val) => {
+    if (val) {
+      loadingTimerRef.current = setTimeout(() => setLoading(false), 16000);
+    } else {
+      clearTimeout(loadingTimerRef.current);
+    }
+    setLoading(val);
+  };
+
+  // ── Validators ──────────────────────────────────────────────────────────
+  const validate = () => {
+    const e = {};
+    if (isSignUp && !name.trim()) e.name = 'Full name is required.';
+    if (!email.trim() || !/\S+@\S+\.\S+/.test(email)) {
+      e.email = 'Enter a valid email address.';
+    }
+    if (password.length < 6) e.password = 'Password must be at least 6 characters.';
+    if (isSignUp && password !== confirmPassword) {
+      e.confirmPassword = 'Passwords do not match.';
+    }
+    setErrors(e);
+    return Object.keys(e).length === 0;
+  };
+
+  // ── Handlers ────────────────────────────────────────────────────────────
+  const handleAuth = async () => {
+    if (!validate()) return;
+    safeSetLoading(true);
+    try {
+      if (isSignUp) {
+        const result = await signUp(name, email, password);
+
+        // Promo / referral code redemption (non-blocking — failure is logged
+        // but doesn't abort the sign-up).
+        let redeemResult = null;
+        if (referralCode.trim()) {
+          try {
+            const userId = result.userId || result.user?.id;
+            if (userId) {
+              redeemResult = await redeemSignupCode(userId, referralCode.trim());
+            }
+          } catch (err) {
+            console.warn('[OnboardingAuthPage] signup code redeem failed:', err.message);
+          }
+        }
+
+        if (redeemResult?.matched === 'promo' && redeemResult.status === 'PENDING_VERIFY') {
+          Alert.alert(
+            `${redeemResult.wishesPending} Wishes Reserved`,
+            `Verify your email to unlock your ${redeemResult.wishesPending} bonus wishes — they'll be in your account the moment you confirm.`,
+          );
+        } else if (redeemResult?.status === 'ALREADY_REDEEMED') {
+          Alert.alert(
+            'Code Already Used',
+            'This code has already been redeemed on this account. Your account is set up and ready to go.',
+          );
+        } else if (redeemResult?.status === 'CODE_EXHAUSTED') {
+          Alert.alert(
+            'Code No Longer Available',
+            "That code has hit its redemption limit. Don't worry — your account is set up and you'll get your standard free wishes after verifying.",
+          );
+        } else if (redeemResult?.matched === 'none' && redeemResult?.status === 'INVALID_CODE') {
+          Alert.alert(
+            'Code Not Recognized',
+            "We couldn't find that code. Your account was created — verify your email to continue.",
+          );
+        }
+
+        if (result.needsEmailVerification) {
+          navigation?.navigate?.('VerifyEmailSent', { email });
+        }
+        // If no verification needed: useAuth().user flips, OnboardingScreen's
+        // useEffect advances to slide 6.
+      } else {
+        await signIn(email, password);
+        // Same — useAuth().user flips, OnboardingScreen advances.
+      }
+    } catch (err) {
+      Alert.alert(
+        isSignUp ? 'Sign Up Failed' : 'Sign In Failed',
+        err.message || 'Something went wrong. Please try again.',
+      );
+    } finally {
+      safeSetLoading(false);
+    }
+  };
+
+  const handleForgotPassword = async () => {
+    if (!email.trim() || !/\S+@\S+\.\S+/.test(email)) {
+      Alert.alert(
+        'Enter your email',
+        'Type your email address above and tap "Forgot password?" again.',
+      );
+      return;
+    }
+    safeSetLoading(true);
+    try {
+      await resetPassword(email);
+      Alert.alert('Check your inbox', `A password reset link has been sent to ${email}.`);
+    } catch (err) {
+      Alert.alert('Error', err.message);
+    } finally {
+      safeSetLoading(false);
+    }
   };
 
   const handleApple = async () => {
     try {
-      setLoading(true);
+      safeSetLoading(true);
       await signInWithApple();
-      // useAuth().user changes → OnboardingScreen's useEffect advances to page 6.
+      // useAuth().user changes → OnboardingScreen's useEffect advances.
     } catch (err) {
-      const cancelled = err?.code === 'ERR_REQUEST_CANCELED' || /cancel/i.test(err?.message || '');
+      const cancelled =
+        err?.code === 'ERR_REQUEST_CANCELED' || /cancel/i.test(err?.message || '');
       if (!cancelled) {
         Alert.alert('Sign in with Apple Failed', err.message || 'Please try again.');
       }
     } finally {
-      setLoading(false);
+      safeSetLoading(false);
     }
   };
 
-  // ── Render ─────────────────────────────────────────────────────────────
-  return (
-    <View style={[styles.page, { width: screenWidth }]}>
-      {/* Top section — title + subtitle + button card */}
-      <View style={[styles.topSection, { paddingTop: insets.top + 24 }]}>
+  const enterForm = (signup = false) => {
+    setIsSignUp(signup);
+    setErrors({});
+    setMode('form');
+  };
+
+  const backToChoice = () => {
+    setMode('choice');
+  };
+
+  const switchMode = () => {
+    setIsSignUp((v) => !v);
+    setErrors({});
+    setPassword('');
+    setConfirmPassword('');
+  };
+
+  // ── Render: choice mode ────────────────────────────────────────────────
+  const renderChoiceMode = () => (
+    <>
+      <View style={[styles.choiceTop, { paddingTop: insets.top + 24 }]}>
         <View style={styles.titleBlock}>
           <Text style={styles.title}>HomeGenie</Text>
-          <Text style={styles.body}>Shop and Design your room with AI</Text>
+          <Text style={styles.subtitle}>Shop and Design your room with AI</Text>
         </View>
 
-        {/* Button card — Sign in + Sign in with Apple inside a subtle
-            light-gray rounded container. Matches mockup spec. */}
         <View style={styles.buttonCard}>
           <TouchableOpacity
-            style={[styles.primaryButton, loading && styles.primaryButtonDisabled]}
-            onPress={handleSignInPress}
+            style={[styles.primaryButton, loading && styles.btnDisabled]}
+            onPress={() => enterForm(false)}
             activeOpacity={0.85}
             disabled={loading}
             accessibilityRole="button"
@@ -149,7 +369,7 @@ export default function OnboardingAuthPage({ navigation, screenWidth, progressDo
 
           {appleAvailable && (
             <TouchableOpacity
-              style={[styles.appleButton, loading && styles.primaryButtonDisabled]}
+              style={[styles.appleButton, loading && styles.btnDisabled]}
               onPress={handleApple}
               activeOpacity={0.85}
               disabled={loading}
@@ -166,34 +386,229 @@ export default function OnboardingAuthPage({ navigation, screenWidth, progressDo
               )}
             </TouchableOpacity>
           )}
+
+          {/* Sign-up CTA under the button card — discoverable but secondary. */}
+          <TouchableOpacity
+            onPress={() => enterForm(true)}
+            disabled={loading}
+            activeOpacity={0.7}
+            hitSlop={{ top: 10, bottom: 10, left: 20, right: 20 }}
+            style={styles.signupHintWrap}
+            accessibilityRole="button"
+            accessibilityLabel="Create an account"
+          >
+            <Text style={styles.signupHintText}>
+              New here? <Text style={styles.signupHintLink}>Create an account</Text>
+            </Text>
+          </TouchableOpacity>
         </View>
       </View>
 
-      {/* Video at bottom — bigger than the previous shrunkArt version.
-          Uses fullBleed + cover so the slide-5 mp4 fills the available
-          space edge-to-edge. isActive defaults true (handled by
-          OnboardingArt default prop) so the video plays whenever this
-          page renders. */}
-      <View style={styles.videoBlock}>
-        {/* Build 147 v22: pass isActive so the slide-5 video only plays
-            when this page is the visible one. Was previously auto-
-            playing from app launch like the rest of the slides before
-            v12 fixed that for slides 1-4 + 6. */}
+      <View style={styles.videoBlockBig}>
         <OnboardingArt step={5} fullBleed contentFit="cover" isActive={isActive} />
       </View>
+    </>
+  );
 
-      {/* Progress bars at very bottom — pinned with safe-area inset. */}
-      <View style={[styles.dotsWrap, { paddingBottom: insets.bottom + 12 }]}>
-        {progressDots}
+  // ── Render: inline form mode ───────────────────────────────────────────
+  const renderFormMode = () => (
+    <KeyboardAvoidingView
+      style={styles.formRoot}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      keyboardVerticalOffset={0}
+    >
+      {/* Back arrow + small title row */}
+      <View style={[styles.formHeader, { paddingTop: insets.top + 12 }]}>
+        <TouchableOpacity
+          onPress={backToChoice}
+          disabled={loading}
+          activeOpacity={0.7}
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          style={styles.backBtn}
+          accessibilityRole="button"
+          accessibilityLabel="Back to sign-in options"
+        >
+          <ChevronLeftIcon color={BLUE_PRIMARY} />
+          <Text style={styles.backLabel}>Options</Text>
+        </TouchableOpacity>
+        <Text style={styles.formBrand}>HomeGenie</Text>
+        <View style={styles.backBtnSpacer} />
       </View>
 
-      {/* Build 147 v23: inline email/password sheet, replaces the old
-          full-screen AuthScreen modal navigation. */}
-      <SignInSheet
-        visible={signInSheetVisible}
-        onClose={() => setSignInSheetVisible(false)}
-        navigation={navigation}
-      />
+      <ScrollView
+        contentContainerStyle={styles.formScrollContent}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+      >
+        <Text style={styles.formTitle}>
+          {isSignUp ? 'Create your account' : 'Welcome back'}
+        </Text>
+        <Text style={styles.formSubtitle}>
+          {isSignUp
+            ? 'Start designing rooms with HomeGenie.'
+            : 'Sign in to continue designing your space.'}
+        </Text>
+
+        {/* Form fields */}
+        {isSignUp && (
+          <FormInput
+            placeholder="Full name"
+            value={name}
+            onChangeText={setName}
+            textContentType="name"
+            autoComplete="name"
+            autoCapitalize="words"
+            error={errors.name}
+          />
+        )}
+        <FormInput
+          placeholder="Email"
+          value={email}
+          onChangeText={setEmail}
+          keyboardType="email-address"
+          textContentType="emailAddress"
+          autoComplete="email"
+          autoCapitalize="none"
+          error={errors.email}
+        />
+        <FormInput
+          placeholder="Password"
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry
+          showToggle
+          showPassword={showPassword}
+          onToggle={() => setShowPassword((v) => !v)}
+          textContentType={isSignUp ? 'newPassword' : 'password'}
+          autoComplete={isSignUp ? 'password-new' : 'password'}
+          error={errors.password}
+        />
+        {isSignUp && (
+          <FormInput
+            placeholder="Confirm password"
+            value={confirmPassword}
+            onChangeText={setConfirmPassword}
+            secureTextEntry={!showPassword}
+            textContentType="newPassword"
+            error={errors.confirmPassword}
+          />
+        )}
+
+        {/* Promo code (sign-up only) */}
+        {isSignUp && (
+          <>
+            {!showPromoField ? (
+              <TouchableOpacity
+                onPress={() => setShowPromoField(true)}
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                style={styles.havecodeWrap}
+              >
+                <Text style={styles.havecodeText}>Have a code?</Text>
+              </TouchableOpacity>
+            ) : (
+              <FormInput
+                placeholder="Promo or referral code"
+                value={referralCode}
+                onChangeText={setReferralCode}
+                autoCapitalize="characters"
+              />
+            )}
+          </>
+        )}
+
+        {/* Forgot password (sign-in only) */}
+        {!isSignUp && (
+          <TouchableOpacity
+            onPress={handleForgotPassword}
+            style={styles.forgotWrap}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+          >
+            <Text style={styles.forgotText}>Forgot password?</Text>
+          </TouchableOpacity>
+        )}
+
+        {/* Submit */}
+        <TouchableOpacity
+          style={[styles.primaryButton, loading && styles.btnDisabled]}
+          onPress={handleAuth}
+          activeOpacity={0.85}
+          disabled={loading}
+          accessibilityRole="button"
+          accessibilityLabel={isSignUp ? 'Create account' : 'Sign in'}
+        >
+          {loading ? (
+            <ActivityIndicator color="#FFFFFF" />
+          ) : (
+            <Text style={styles.primaryButtonText}>
+              {isSignUp ? 'Create account' : 'Sign in'}
+            </Text>
+          )}
+        </TouchableOpacity>
+
+        {/* Switch mode */}
+        <TouchableOpacity
+          onPress={switchMode}
+          disabled={loading}
+          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+          style={styles.switchModeWrap}
+        >
+          <Text style={styles.switchModeText}>
+            {isSignUp ? (
+              <>
+                Already have an account?{' '}
+                <Text style={styles.switchModeLink}>Sign in</Text>
+              </>
+            ) : (
+              <>
+                Don't have an account?{' '}
+                <Text style={styles.switchModeLink}>Sign up</Text>
+              </>
+            )}
+          </Text>
+        </TouchableOpacity>
+
+        {/* Apple §5.1.1 — Terms + Privacy disclosure on signup */}
+        {isSignUp && navigation?.navigate && (
+          <View style={styles.legalWrap}>
+            <Text style={styles.legalText}>
+              By creating an account, you agree to our{' '}
+              <Text
+                style={styles.legalLink}
+                onPress={() => navigation.navigate('TermsOfUse')}
+              >
+                Terms of Use
+              </Text>{' '}
+              and{' '}
+              <Text
+                style={styles.legalLink}
+                onPress={() => navigation.navigate('PrivacyPolicy')}
+              >
+                Privacy Policy
+              </Text>
+              .
+            </Text>
+          </View>
+        )}
+      </ScrollView>
+
+      {/* Small video at bottom — keeps the lamp loop visible while the
+          user is typing credentials. ~140pt fixed height (not flex) so it
+          stays put when KeyboardAvoidingView pushes the form up. */}
+      <View style={styles.videoBlockSmall}>
+        <OnboardingArt step={5} fullBleed contentFit="cover" isActive={isActive} />
+      </View>
+    </KeyboardAvoidingView>
+  );
+
+  // ── Render ──────────────────────────────────────────────────────────────
+  return (
+    <View style={[styles.page, { width: screenWidth }]}>
+      {mode === 'choice' ? renderChoiceMode() : renderFormMode()}
+
+      {/* Progress bars pinned to bottom safe area in both modes */}
+      <View style={[styles.progressWrap, { paddingBottom: insets.bottom + 12 }]}>
+        {progressDots}
+      </View>
     </View>
   );
 }
@@ -201,20 +616,16 @@ export default function OnboardingAuthPage({ navigation, screenWidth, progressDo
 // ── Styles ────────────────────────────────────────────────────────────────
 
 const styles = StyleSheet.create({
-  // Build 147 v15: page bg #FFFFFF → #F8F8F8 (super-light gray).
-  // The button card flips to #FFFFFF below — gives the buttons a
-  // clean "elevated" feel against the slightly darker page surface.
   page: {
     flex: 1,
     backgroundColor: '#F8F8F8',
   },
 
-  // Upper portion: title + subtitle + button card.
-  topSection: {
+  // ── Choice mode ─────────────────────────────────────────────────────────
+  choiceTop: {
     paddingHorizontal: 28,
     paddingBottom: 16,
   },
-
   titleBlock: {
     alignItems: 'center',
     marginBottom: 24,
@@ -226,26 +637,84 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     letterSpacing: -0.5,
   },
-  body: {
+  subtitle: {
     marginTop: 10,
     fontSize: 18,
     color: BLUE_LIGHT,
     textAlign: 'center',
     lineHeight: 24,
   },
-
-  // Card wrapping the two sign-in CTAs.
-  // Build 147 v15: bg #F8F8F8 → #FFFFFF. Swapped with the page bg so
-  // the card now reads as a brighter elevated surface against the
-  // soft-gray page background.
   buttonCard: {
     backgroundColor: '#FFFFFF',
     borderRadius: 20,
     paddingHorizontal: 16,
     paddingTop: 16,
-    paddingBottom: 16,
+    paddingBottom: 12,
+  },
+  videoBlockBig: {
+    flex: 1,
+    width: '100%',
+    backgroundColor: '#FFFFFF',
   },
 
+  // ── Form mode ───────────────────────────────────────────────────────────
+  formRoot: {
+    flex: 1,
+  },
+  formHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingBottom: 4,
+  },
+  backBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 2,
+    paddingVertical: 8,
+    paddingRight: 8,
+  },
+  backBtnSpacer: {
+    width: 80, // mirrors backBtn so the brand label centers
+  },
+  backLabel: {
+    color: BLUE_PRIMARY,
+    fontSize: 15,
+    fontWeight: '500',
+  },
+  formBrand: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#000000',
+    letterSpacing: -0.3,
+  },
+  formScrollContent: {
+    paddingHorizontal: 28,
+    paddingTop: 18,
+    paddingBottom: 16,
+  },
+  formTitle: {
+    fontSize: 26,
+    fontWeight: '700',
+    color: '#000000',
+    textAlign: 'center',
+    marginBottom: 6,
+    letterSpacing: -0.3,
+  },
+  formSubtitle: {
+    fontSize: 14,
+    color: BLUE_LIGHT,
+    textAlign: 'center',
+    marginBottom: 18,
+  },
+  videoBlockSmall: {
+    height: 140,
+    width: '100%',
+    backgroundColor: '#FFFFFF',
+  },
+
+  // ── Buttons / shared ────────────────────────────────────────────────────
   primaryButton: {
     backgroundColor: BLUE_LIGHT,
     borderRadius: 30,
@@ -260,14 +729,14 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.08,
     shadowRadius: 6,
     elevation: 2,
+    marginTop: 8,
   },
-  primaryButtonDisabled: { opacity: 0.6 },
+  btnDisabled: { opacity: 0.6 },
   primaryButtonText: {
     color: '#FFFFFF',
     fontSize: 17,
     fontWeight: '700',
   },
-
   dividerRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -280,7 +749,6 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '500',
   },
-
   appleButton: {
     backgroundColor: '#000000',
     borderRadius: 30,
@@ -296,23 +764,78 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
 
-  // Bottom half — the bigger Higgsfield video. flex:1 fills all space
-  // between the topSection above and the dotsWrap below.
-  // Build 147 v19: bg #F8F8F8 → #FFFFFF. With 0.9× scale on the video
-  // the bg shows around the composition; matching to white blends with
-  // the video's own near-white render so no visible edge remains.
-  videoBlock: {
-    flex: 1,
-    width: '100%',
-    backgroundColor: '#FFFFFF',
+  signupHintWrap: {
+    alignSelf: 'center',
+    marginTop: 12,
+    paddingVertical: 6,
+  },
+  signupHintText: {
+    color: '#6B7280',
+    fontSize: 14,
+  },
+  signupHintLink: {
+    color: BLUE_PRIMARY,
+    fontWeight: '600',
   },
 
-  // Progress bars row at the very bottom of the screen.
-  // Build 147 v15: bg #FFFFFF → #F8F8F8 to match the new page bg so
-  // there's no visible seam between the video bottom and the dots row.
-  dotsWrap: {
+  // ── Form-only ──────────────────────────────────────────────────────────
+  forgotWrap: { alignSelf: 'flex-end', marginTop: 4, marginBottom: 8 },
+  forgotText: { fontSize: 13, color: BLUE_PRIMARY, fontWeight: '600' },
+
+  havecodeWrap: { alignSelf: 'flex-start', marginTop: 4, marginBottom: 12 },
+  havecodeText: { fontSize: 13, color: BLUE_PRIMARY, fontWeight: '600' },
+
+  switchModeWrap: { alignSelf: 'center', marginTop: 18 },
+  switchModeText: { color: '#6B7280', fontSize: 14 },
+  switchModeLink: { color: BLUE_PRIMARY, fontWeight: '600' },
+
+  legalWrap: { marginTop: 14 },
+  legalText: {
+    color: '#9CA3AF',
+    fontSize: 12,
+    textAlign: 'center',
+    lineHeight: 17,
+  },
+  legalLink: { color: BLUE_PRIMARY, fontWeight: '500' },
+
+  // ── Progress bars ──────────────────────────────────────────────────────
+  progressWrap: {
     paddingHorizontal: 28,
     paddingTop: 8,
     backgroundColor: '#F8F8F8',
+  },
+});
+
+const inputStyles = StyleSheet.create({
+  wrap: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    height: 50,
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+  },
+  wrapFocused: { borderColor: BLUE_LIGHT },
+  wrapError: { borderColor: '#EF4444' },
+  input: {
+    flex: 1,
+    fontSize: 15,
+    color: '#111827',
+  },
+  toggleText: {
+    fontSize: 13,
+    color: '#6B7280',
+    fontWeight: '500',
+    marginLeft: 8,
+  },
+  errorText: {
+    color: '#EF4444',
+    fontSize: 12,
+    marginBottom: 8,
+    marginTop: -4,
+    marginLeft: 4,
   },
 });

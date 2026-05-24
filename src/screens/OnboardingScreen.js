@@ -1,19 +1,31 @@
 /**
- * OnboardingScreen — 6-page intro shown to brand-new installs before they
+ * OnboardingScreen — 7-page intro shown to brand-new installs before they
  * can access the app. Replaces the pre-Build-145 "auth wall on launch"
- * behavior. Once completed (auth on page 5 → click through page 6) the
- * intro flag is set in AsyncStorage and the user will never see this
- * screen again on this device.
+ * behavior. Once completed (auth on page 5 → paywall on page 6 → reward
+ * on page 7) the intro flag is set in AsyncStorage and the user will
+ * never see this screen again on this device.
  *
- * Page order:
+ * Page order (Build 148 — paywall insertion):
  *   1. Picture the possibilities     — Log In + Sign Up (both → page 2)
  *   2. Wish it. See it.              — Continue → page 3
  *   3. Shop every piece              — Continue → page 4
  *   4. Just what you need            — Continue → page 5
  *   5. HomeGenie (AUTH)              — Sign in / Sign in with Apple
- *                                       (handled by OnboardingAuthPage,
- *                                        existing layout untouched)
- *   6. A gift to get you started     — Continue For FREE → completes
+ *                                       (handled by OnboardingAuthPage —
+ *                                        inline form mode now, no popup)
+ *                                       Swipe-forward is BLOCKED here
+ *                                       until useAuth().user becomes
+ *                                       truthy (see swipe-gate notes
+ *                                       on onMomentumScrollEnd below).
+ *   6. Paywall                        — OnboardingPaywallPage: 2 tier
+ *                                       cards, Subscribe CTA, "Maybe
+ *                                       later" link. Subscribe OR Maybe
+ *                                       later → advances to page 7.
+ *                                       If user already has paid sub
+ *                                       (returning user via initialPage:5
+ *                                       re-auth flow) the page auto-
+ *                                       skips itself on mount.
+ *   7. A gift to get you started     — Continue For FREE → completes
  *                                       onboarding, drops into Main
  *
  * Build 147 layout restructure:
@@ -48,6 +60,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
 import OnboardingArt from '../components/onboarding/OnboardingArt';
 import OnboardingAuthPage from '../components/onboarding/OnboardingAuthPage';
+import OnboardingPaywallPage from '../components/onboarding/OnboardingPaywallPage';
 import { useAuth } from '../context/AuthContext';
 import { markIntroCompleted } from '../utils/intro';
 import { colors } from '../constants/colors';
@@ -57,7 +70,8 @@ const { width: SCREEN_W } = Dimensions.get('window');
 // ── Page copy ─────────────────────────────────────────────────────────────
 // Centralized so the screen body stays compact. Titles and subtitles match
 // the source mockups exactly. cta:null = slide has custom buttons handled
-// inline in renderPage (slide 1 dual-button, slide 5 auth page).
+// inline in renderPage (slide 1 dual-button, slide 5 auth page, slide 6
+// paywall page).
 const PAGES = [
   {
     step: 1,
@@ -91,6 +105,12 @@ const PAGES = [
   },
   {
     step: 6,
+    title: 'Unlock the\nfull experience',
+    body: 'Choose a plan to unlock unlimited designs.',
+    cta: null, // handled by OnboardingPaywallPage
+  },
+  {
+    step: 7,
     title: 'A gift to get\nyou started',
     body: '5 free wishes are yours. Snap a\nroom, make a wish, watch it\ncome to life, Shop it!',
     cta: 'Continue For FREE',
@@ -98,8 +118,14 @@ const PAGES = [
 ];
 
 const TOTAL_PAGES = PAGES.length;
-const PAGE_5_INDEX = 4; // 0-indexed
-const PAGE_6_INDEX = 5;
+// 0-indexed slide pointers. Slide 5 (auth) at index 4, slide 6 (paywall)
+// at index 5, slide 7 (reward) at index 6. AUTH_INDEX is the swipe-gate
+// pivot — forward swiping past this index requires useAuth().user to be
+// truthy. LAST_INDEX (= TOTAL_PAGES - 1) is the reward slide; its CTA
+// finishes onboarding.
+const AUTH_INDEX = 4;
+const PAYWALL_INDEX = 5;
+const LAST_INDEX = TOTAL_PAGES - 1; // reward slide
 
 const BLUE_LIGHT = colors.blueLight;    // #67ACE9 — matches mockup CTA gradient base
 const BLUE_PRIMARY = colors.bluePrimary; // #0B6DC3
@@ -126,7 +152,7 @@ export default function OnboardingScreen({ navigation, route }) {
   // only want to do that if they explicitly reached page 5, not if they
   // happen to be on some other page when their auth state flips.
   // Pre-seed to true if we entered at page 5 (returning-user re-auth flow).
-  const reachedAuthPageRef = useRef(initialPage >= 4);
+  const reachedAuthPageRef = useRef(initialPage >= AUTH_INDEX);
 
   // ─── Page advance ─────────────────────────────────────────────────────
   const goToPage = useCallback((idx) => {
@@ -135,26 +161,33 @@ export default function OnboardingScreen({ navigation, route }) {
   }, []);
 
   const handleContinue = useCallback(() => {
-    if (pageIndex < PAGE_5_INDEX) {
+    if (pageIndex < AUTH_INDEX) {
+      // Slides 1-4 → next slide
       goToPage(pageIndex + 1);
-    } else if (pageIndex === PAGE_6_INDEX) {
-      // Last page CTA — mark completed + drop into the app.
+    } else if (pageIndex === LAST_INDEX) {
+      // Reward CTA — mark completed + drop into the app.
       markIntroCompleted().finally(() => {
         // Reset the stack so the user can't back-swipe into the intro again.
         // Replace with Main means Onboarding gets unmounted.
         navigation.reset({ index: 0, routes: [{ name: 'Main' }] });
       });
     }
+    // Slides 5 + 6 have their own custom CTAs handled by the page
+    // components themselves (auth → useAuth observer; paywall → onContinue
+    // callback). Reaching this function from those slides would be a bug
+    // — but no-op rather than crash.
   }, [pageIndex, goToPage, navigation]);
 
   // Watch for auth completion. The instant user becomes truthy AND the
-  // user has scrolled to page 5 (the auth gate), advance to page 6.
-  // Build 145: page 5 is now the inline auth page (OnboardingAuthPage),
-  // so the keyboard may still be up when auth completes. The setTimeout
-  // gives the keyboard time to dismiss before the page-6 slide-in.
+  // user has scrolled to page 5 (the auth gate), advance to page 6 (the
+  // paywall). Build 148: target is now PAYWALL_INDEX (was the reward at
+  // index 5). The paywall page itself handles advance-to-reward via its
+  // onContinue callback.
+  // The setTimeout gives the keyboard (form mode on auth page) time to
+  // dismiss before the next slide animates in.
   useEffect(() => {
-    if (user && reachedAuthPageRef.current && pageIndex === PAGE_5_INDEX) {
-      const t = setTimeout(() => goToPage(PAGE_6_INDEX), 350);
+    if (user && reachedAuthPageRef.current && pageIndex === AUTH_INDEX) {
+      const t = setTimeout(() => goToPage(PAYWALL_INDEX), 350);
       return () => clearTimeout(t);
     }
   }, [user, pageIndex, goToPage]);
@@ -165,17 +198,51 @@ export default function OnboardingScreen({ navigation, route }) {
   const onScroll = useCallback((e) => {
     const idx = Math.round(e.nativeEvent.contentOffset.x / SCREEN_W);
     if (idx !== pageIndex) setPageIndex(idx);
-    if (idx >= PAGE_5_INDEX) reachedAuthPageRef.current = true;
+    if (idx >= AUTH_INDEX) reachedAuthPageRef.current = true;
   }, [pageIndex]);
 
-  // Once the user reaches page 6 (post-auth), prevent backward swipe so
-  // they can't accidentally land back on page 5 in a "signed-in but on
-  // auth page" weird state. FlatList scrollEnabled toggles this.
-  const scrollEnabled = pageIndex < PAGE_6_INDEX;
+  // ── Swipe gate (Build 148) ─────────────────────────────────────────────
+  // Forward-swipe past the auth slide is blocked until the user signs in.
+  // FlatList's `scrollEnabled` is binary (blocks BOTH directions), so we
+  // can't use it for a directional lock. Instead we let the user drag
+  // freely and snap them back on momentum end if they over-shot the
+  // allowed range. The snap-back gives a clean "wall" feel that signals
+  // "auth required" without throwing an error or alert.
+  const onMomentumScrollEnd = useCallback((e) => {
+    const idx = Math.round(e.nativeEvent.contentOffset.x / SCREEN_W);
+    if (!user && idx > AUTH_INDEX) {
+      // Bounce back to the auth slide.
+      listRef.current?.scrollToOffset({
+        offset: AUTH_INDEX * SCREEN_W,
+        animated: true,
+      });
+      setPageIndex(AUTH_INDEX);
+      return;
+    }
+    if (idx !== pageIndex) setPageIndex(idx);
+    if (idx >= AUTH_INDEX) reachedAuthPageRef.current = true;
+  }, [user, pageIndex]);
+
+  // Once the user reaches the LAST page (post-paywall reward), prevent
+  // backward swipe so they can't accidentally land back on the paywall.
+  // Subscribers especially shouldn't see the paywall again after passing
+  // it. (The paywall has its own auto-skip-if-subscribed check, so this
+  // is belt-and-suspenders.)
+  const scrollEnabled = pageIndex < LAST_INDEX;
+
+  // ── Paywall → reward advance (Build 148) ──────────────────────────────
+  // OnboardingPaywallPage calls this when the user finishes the paywall
+  // (either via successful Subscribe OR Maybe later). Always advances to
+  // the reward slide. Wrapped in useCallback so the paywall's auto-skip
+  // useEffect doesn't re-fire on every parent render.
+  const advanceFromPaywall = useCallback(() => {
+    goToPage(LAST_INDEX);
+  }, [goToPage]);
 
   // ─── Render ───────────────────────────────────────────────────────────
   const renderPage = useCallback(({ item, index }) => {
-    const isAuthPage = index === PAGE_5_INDEX;
+    const isAuthPage = index === AUTH_INDEX;
+    const isPaywallPage = index === PAYWALL_INDEX;
     const isSlide1 = index === 0;
 
     // Build 145 — page 5 is its own self-contained component that owns the
@@ -183,6 +250,8 @@ export default function OnboardingScreen({ navigation, route }) {
     // password, promo codes, ToS/Privacy disclosure). Build 147: progress
     // indicator changes to bars but the existing prop name 'progressDots'
     // is kept for back-compat — content is now bars.
+    // Build 148: form mode is now inline (no Modal); component morphs
+    // between 'choice' and 'form' internally.
     if (isAuthPage) {
       return (
         <OnboardingAuthPage
@@ -193,6 +262,21 @@ export default function OnboardingScreen({ navigation, route }) {
           // OnboardingArt only plays the video when slide 5 is the current
           // page. Without this, slide 5's video auto-played on mount along
           // with all other slides on initial FlatList render.
+          isActive={index === pageIndex}
+        />
+      );
+    }
+
+    // Build 148 — page 6 is the paywall. Self-contained component that
+    // renders 2 tier cards + Subscribe/Maybe-later. Calls advanceFromPaywall
+    // when the user is done (success OR skip).
+    if (isPaywallPage) {
+      return (
+        <OnboardingPaywallPage
+          navigation={navigation}
+          screenWidth={SCREEN_W}
+          progressDots={<ProgressBars count={TOTAL_PAGES} active={index} />}
+          onContinue={advanceFromPaywall}
           isActive={index === pageIndex}
         />
       );
@@ -288,7 +372,7 @@ export default function OnboardingScreen({ navigation, route }) {
         </View>
       </View>
     );
-  }, [insets, handleContinue, navigation, pageIndex]);
+  }, [insets, handleContinue, navigation, pageIndex, advanceFromPaywall]);
 
   return (
     <View style={styles.root}>
@@ -302,6 +386,7 @@ export default function OnboardingScreen({ navigation, route }) {
         pagingEnabled
         showsHorizontalScrollIndicator={false}
         onScroll={onScroll}
+        onMomentumScrollEnd={onMomentumScrollEnd}
         scrollEventThrottle={16}
         scrollEnabled={scrollEnabled}
         bounces={false}
