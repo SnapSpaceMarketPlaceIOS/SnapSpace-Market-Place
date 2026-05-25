@@ -651,8 +651,10 @@ export default function SnapScreen({ navigation, route }) {
               // Auto-navigate: Explore → first product → PDP for step 3
               navigation.navigate('Main', { screen: 'Explore' });
               setTimeout(() => {
-                // Navigate to first product in catalog for the genie lamp tutorial
-                const CATALOG = require('../data/productCatalog').PRODUCT_CATALOG;
+                // Navigate to first product in catalog for the genie lamp tutorial.
+                // Build 147 (C1): productCatalog.js is now a lazy facade.
+                // Use getCatalog() — the old `PRODUCT_CATALOG` export is gone.
+                const CATALOG = require('../data/productCatalog').getCatalog();
                 const firstProduct = CATALOG[0];
                 if (firstProduct) {
                   const navProduct = { ...firstProduct, price: firstProduct.priceDisplay || `$${firstProduct.price}`, priceValue: firstProduct.price, source: firstProduct.source };

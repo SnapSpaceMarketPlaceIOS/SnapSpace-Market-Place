@@ -29,7 +29,9 @@ import * as AppleAuthentication from 'expo-apple-authentication';
 import { useAuth } from '../context/AuthContext';
 import LensLoader from './LensLoader';
 import CardImage from './CardImage';
-import { PRODUCT_CATALOG } from '../data/productCatalog';
+// Build 147 (C1): lazy facade — defers 2.87 MB catalog parse. AuthGate
+// is in the cold-start import graph (wraps Main when signed out).
+import { getCatalog } from '../data/productCatalog';
 
 const { width: SCREEN_W } = Dimensions.get('window');
 const BLUE = '#67ACE9';
@@ -342,7 +344,7 @@ export default function AuthGate({ title, subtitle, navigation, onSuccess }) {
   // float to the top.
   const marqueeProducts = useMemo(() => {
     const allowedCats = new Set(['sofa', 'bed', 'rug']);
-    return PRODUCT_CATALOG
+    return getCatalog()
       .filter(p => allowedCats.has(p.category) && (p.rating || 0) >= 4.0)
       .map(p => ({ ...p, _qualityScore: (p.rating || 0) * Math.log((p.reviewCount || 1) + 1) }))
       .sort((a, b) => b._qualityScore - a._qualityScore)

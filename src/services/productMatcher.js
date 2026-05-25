@@ -1,4 +1,9 @@
-import { PRODUCT_CATALOG } from '../data/productCatalog';
+// Build 147 (C1): catalog import switched to the lazy facade so module
+// load of productMatcher.js no longer wakes the 2.87 MB data file.
+// `getCatalog()` is the canonical accessor; we use it as the default
+// argument value below so consumers that pass an explicit catalog
+// (tests, screen-specific subsets) still work unchanged.
+import { getCatalog } from '../data/productCatalog';
 import { STYLE_AFFINITY, ROOM_FURNITURE } from '../data/styleMap';
 import {
   productHasColorFamily,
@@ -193,7 +198,7 @@ const MATERIAL_AFFINITY = {
  *
  * @param {object} parsedPrompt - Output from promptParser.parseDesignPrompt()
  * @param {number} limit        - Max products to return (default 6)
- * @param {object[]} catalog    - Product catalog to search (default PRODUCT_CATALOG)
+ * @param {object[]} catalog    - Product catalog to search. Default: full catalog via lazy getCatalog().
  * @param {object|null} userPrefs - User preference data from getUserPreferences() (default null — no bonus)
  * @param {Set<string>|null} recentlyShownIds - Build 83 soft exclusion: product
  *   IDs the user just saw in the last few generations. The diversifier will
@@ -222,7 +227,9 @@ const MATERIAL_AFFINITY = {
 export function matchProducts(
   parsedPrompt,
   limit = 6,
-  catalog = PRODUCT_CATALOG,
+  // Build 147 (C1): default evaluated at call time, not import time, so the
+  // 2.87 MB data module isn't loaded until matchProducts actually runs.
+  catalog = getCatalog(),
   userPrefs = null,
   recentlyShownIds = null,
   productHistory = null,
@@ -1347,7 +1354,7 @@ function diversify(
  * Convenience: match products from raw design tags (used by Explore designs).
  * Converts design.styles and design.roomType into the parsedPrompt shape.
  */
-export function matchProductsForDesign(design, limit = 4, catalog = PRODUCT_CATALOG) {
+export function matchProductsForDesign(design, limit = 4, catalog = getCatalog()) {
   const parsedPrompt = {
     roomType: design.roomType || 'living-room',
     styles: design.styles || [],

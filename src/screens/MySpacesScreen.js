@@ -77,15 +77,20 @@ const StarIconSmall = ({ filled = true, size = 10 }) => (
 );
 
 // ── Horizontal Product Card ────────────────────────────────────────────────────
+//
+// Build 147 (H10): wrapped in React.memo + onPress expects product as
+// arg so the parent passes a useCallback-stable handler. Mounted
+// inside a horizontal FlatList rather than ScrollView+map.
 
-function ProductCard({ product, onPress }) {
+function ProductCardImpl({ product, onPress }) {
   const priceVal = product.priceValue ?? product.price;
   const priceStr = typeof priceVal === 'number'
     ? `$${priceVal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
     : product.priceLabel || String(priceVal).replace(/^\$+/, '$');
+  const handlePress = useCallback(() => onPress(product), [onPress, product]);
 
   return (
-    <TouchableOpacity style={s.hCard} activeOpacity={0.7} onPress={onPress}>
+    <TouchableOpacity style={s.hCard} activeOpacity={0.7} onPress={handlePress}>
       {/* Build 139 — resizeMode unified to "contain" (was "cover") so saved
           designs render product photos with the same uncropped framing as
           the live RoomResultScreen Shop Room. */}
@@ -116,12 +121,22 @@ function ProductCard({ product, onPress }) {
   );
 }
 
+const ProductCard = React.memo(ProductCardImpl);
+
 // ── Detail Modal (same layout as AI result page) ───────────────────────────────
 
 function SpaceDetailModal({ design, visible, onClose, onDelete, navigation }) {
   const insets = useSafeAreaInsets();
   const products = design?.products || [];
   const [deleting, setDeleting] = useState(false);
+  // Build 147 (H10): useCallback-stable handler so the memoized
+  // ProductCard children in the horizontal FlatList below short-circuit
+  // on shallow-prop comparison. Closes over onClose + navigation +
+  // the dynamic per-card product (passed by ProductCard via onPress).
+  const handleProductPress = useCallback((p) => {
+    onClose();
+    navigation?.navigate('ProductDetail', { product: p });
+  }, [onClose, navigation]);
 
   const handleShare = async () => {
     // Build 122 — share the actual design image with a branded caption.
@@ -219,23 +234,26 @@ function SpaceDetailModal({ design, visible, onClose, onDelete, navigation }) {
                 </View>
               </View>
 
-              {/* Horizontal cards */}
-              <ScrollView
+              {/* Horizontal cards.
+                  Build 147 (H10): ScrollView+map → FlatList with
+                  virtualization + memoized ProductCard + stable
+                  onPress. Modal opens onto an in-memory product list
+                  that can be 4-8 items; FlatList means only the
+                  first 3 mount immediately, the rest as the user
+                  scrolls. */}
+              <FlatList
+                data={products}
+                keyExtractor={(item, idx) => item.id || `det-${idx}`}
                 horizontal
                 showsHorizontalScrollIndicator={false}
+                initialNumToRender={3}
+                windowSize={5}
+                removeClippedSubviews
                 contentContainerStyle={{ gap: 10, paddingRight: 20, paddingTop: 12 }}
-              >
-                {products.map((p, i) => (
-                  <ProductCard
-                    key={p.id || i}
-                    product={p}
-                    onPress={() => {
-                      onClose();
-                      navigation?.navigate('ProductDetail', { product: p });
-                    }}
-                  />
-                ))}
-              </ScrollView>
+                renderItem={({ item }) => (
+                  <ProductCard product={item} onPress={handleProductPress} />
+                )}
+              />
 
             </View>
           )}

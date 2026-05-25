@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
+import { AppState } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useAuth } from './AuthContext';
 import { toggleLike as toggleLikeRPC, getUserLikedIds } from '../services/supabase';
@@ -37,10 +38,38 @@ export function LikedProvider({ children }) {
       .finally(() => setProductsHydrated(true));
   }, []);
 
-  // Persist liked products
+  // Persist liked products.
+  //
+  // Build 147 (H11): debounce writes 300 ms + force-flush on background
+  // — every product like used to JSON.stringify + AsyncStorage write
+  // immediately. With a typical browse session toggling 5-10 likes,
+  // that's 10× the disk thrash for no UX benefit. Same safety pattern
+  // as CartContext.
+  const productsWriteTimerRef = useRef(null);
+  const pendingProductsRef = useRef(likedProducts);
+  useEffect(() => { pendingProductsRef.current = likedProducts; }, [likedProducts]);
+
+  const flushProductsWrite = () => {
+    if (productsWriteTimerRef.current) {
+      clearTimeout(productsWriteTimerRef.current);
+      productsWriteTimerRef.current = null;
+    }
+    AsyncStorage.setItem(STORAGE_KEY_PRODUCTS, JSON.stringify(pendingProductsRef.current)).catch(() => {});
+  };
+
   useEffect(() => {
     if (!productsHydrated) return;
-    AsyncStorage.setItem(STORAGE_KEY_PRODUCTS, JSON.stringify(likedProducts)).catch(() => {});
+    if (productsWriteTimerRef.current) clearTimeout(productsWriteTimerRef.current);
+    productsWriteTimerRef.current = setTimeout(() => {
+      productsWriteTimerRef.current = null;
+      AsyncStorage.setItem(STORAGE_KEY_PRODUCTS, JSON.stringify(likedProducts)).catch(() => {});
+    }, 300);
+    return () => {
+      if (productsWriteTimerRef.current) {
+        clearTimeout(productsWriteTimerRef.current);
+        productsWriteTimerRef.current = null;
+      }
+    };
   }, [likedProducts, productsHydrated]);
 
   // Toggle a product like — stores full product object for display in Liked tab
@@ -96,11 +125,48 @@ export function LikedProvider({ children }) {
     return () => { cancelled = true; };
   }, [user?.id]);
 
-  // Persist to AsyncStorage whenever liked changes (after hydration)
+  // Persist to AsyncStorage whenever liked changes (after hydration).
+  // Build 147 (H11): debounce 300 ms + AppState force-flush. Same pattern
+  // as likedProducts above.
+  const likedWriteTimerRef = useRef(null);
+  const pendingLikedRef = useRef(liked);
+  useEffect(() => { pendingLikedRef.current = liked; }, [liked]);
+
+  const flushLikedWrite = () => {
+    if (likedWriteTimerRef.current) {
+      clearTimeout(likedWriteTimerRef.current);
+      likedWriteTimerRef.current = null;
+    }
+    AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(pendingLikedRef.current)).catch(() => {});
+  };
+
   useEffect(() => {
     if (!hydrated) return;
-    AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(liked)).catch(() => {});
+    if (likedWriteTimerRef.current) clearTimeout(likedWriteTimerRef.current);
+    likedWriteTimerRef.current = setTimeout(() => {
+      likedWriteTimerRef.current = null;
+      AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(liked)).catch(() => {});
+    }, 300);
+    return () => {
+      if (likedWriteTimerRef.current) {
+        clearTimeout(likedWriteTimerRef.current);
+        likedWriteTimerRef.current = null;
+      }
+    };
   }, [liked, hydrated]);
+
+  // Force-flush both maps on background — see CartContext H11 fix
+  // comment for the suspension-race rationale.
+  useEffect(() => {
+    if (!hydrated && !productsHydrated) return;
+    const sub = AppState.addEventListener('change', (next) => {
+      if (next === 'background' || next === 'inactive') {
+        flushLikedWrite();
+        flushProductsWrite();
+      }
+    });
+    return () => sub.remove();
+  }, [hydrated, productsHydrated]);
 
   // Toggle like — optimistic UI + server sync
   const toggleLiked = useCallback(async (designId) => {

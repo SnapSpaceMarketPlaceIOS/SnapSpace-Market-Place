@@ -55,3 +55,11 @@ keys/
 *.ipa
 build-*.ipa
 build-local-*.ipa
+
+# Build 147 (Gap-cleanup): catalog rollback backups. Each major catalog
+# audit/edit creates a .bak-buildN snapshot in src/data/. They're useful
+# during the build for fast revert, but they're ~2.8 MB each — Metro
+# globs *.js into the bundle and would ship them inside the IPA.
+# Always gitignored; clean up locally with `rm src/data/*.bak-*` when
+# you're confident the change has stuck.
+*.bak-*

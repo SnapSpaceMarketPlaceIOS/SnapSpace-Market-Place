@@ -28,7 +28,10 @@ import { useLiked } from '../context/LikedContext';
 import { useAuth } from '../context/AuthContext';
 import { useOnboarding, ONBOARDING_STEPS } from '../context/OnboardingContext';
 import OnboardingOverlay from '../components/OnboardingOverlay';
-import { PRODUCT_CATALOG } from '../data/productCatalog';
+// Build 147 (C1): lazy facade — defers 2.87 MB catalog parse. Explore
+// is not a first-paint tab, but its module is in the import graph from
+// the Stack navigator — the import alone used to wake the data.
+import { getCatalog } from '../data/productCatalog';
 import { getPublicDesigns, getThumbnailUrl } from '../services/supabase';
 import { DESIGNS as LOCAL_DESIGNS } from '../data/designs';
 import PressableCard from '../components/PressableCard';
@@ -648,6 +651,86 @@ const ROOM_LABEL_MAP = {
   nursery: 'Nursery', dorm: 'Dorms',
 };
 
+// ── ProductGridCell (Build 147 C3) ─────────────────────────────────────
+//
+// Memoized cell for the Products grid. Used to live inline as a giant
+// .map() arrow that re-rendered 24+ TouchableOpacity nodes with 5
+// inline <StarIconSmall> per card EVERY time the parent re-rendered
+// (which happened on every scroll-pagination bump, every cart change,
+// every filter sheet open/close, etc.).
+//
+// React.memo here means a parent re-render walks the visibleProducts
+// array but skips each cell's interior render unless its specific
+// props changed — which is essentially never for product data that's
+// stable until filter/pagination state changes. Combined with a
+// useCallback-stable onPress in the parent, the highest-traffic surface
+// in the app no longer re-walks 24+ subtrees on every scroll tick.
+//
+// Note on virtualization: this cell is rendered inside an outer
+// ScrollView+map structure (the screen's main scroll surface), so
+// FlatList numColumns is NOT used here. Memoization alone gives us
+// the bulk of the win without disrupting the existing scroll
+// orchestration / sticky header layout. Full virtualization can be
+// pursued later when the surrounding scroll surface is refactored.
+const ProductGridCell = React.memo(function ProductGridCell({
+  product,
+  gridCols,
+  cardRadius,
+  onPress,
+}) {
+  const ratingVal = typeof product.rating === 'number'
+    ? product.rating
+    : parseFloat(product.rating) || 0;
+  const ratingRounded = Math.round(ratingVal);
+  const isOnCol = gridCols === 1;
+  const handlePress = useCallback(() => onPress(product), [onPress, product]);
+  return (
+    <View style={{ width: colWidthPct(gridCols), padding: isOnCol ? 5 : 1 }}>
+      <TouchableOpacity
+        style={[styles.card, { borderRadius: cardRadius }, isOnCol && styles.cardSingle]}
+        activeOpacity={0.88}
+        onPress={handlePress}
+      >
+        <View style={[styles.cardImg, {
+          borderTopLeftRadius: cardRadius,
+          borderTopRightRadius: cardRadius,
+          borderBottomLeftRadius: gridCols === 3 ? cardRadius : 0,
+          borderBottomRightRadius: gridCols === 3 ? cardRadius : 0,
+          aspectRatio: 1,
+        }]}>
+          <View style={styles.cardImgBg} />
+          <CardImage uri={product.imageUrl} style={styles.cardImgPhoto} resizeMode="contain" compact />
+        </View>
+        {gridCols !== 3 && (
+          <View style={[styles.prodCardBody, isOnCol && styles.prodCardBodySingle]}>
+            <Text style={[styles.prodCardName, isOnCol && styles.prodCardNameSingle]} numberOfLines={2}>{product.name}</Text>
+            <Text style={styles.prodCardBrand}>{product.brand}</Text>
+            {ratingVal > 0 && (
+              <View style={styles.prodCardRating}>
+                {[1,2,3,4,5].map(i => (
+                  <StarIconSmall key={i} size={isOnCol ? 12 : 10} filled={i <= ratingRounded} />
+                ))}
+                <Text style={styles.prodCardRatingText}>{ratingVal.toFixed(1)}</Text>
+                {!!product.reviewCount && (
+                  <Text style={styles.prodCardReviews}>({product.reviewCount.toLocaleString()})</Text>
+                )}
+              </View>
+            )}
+            <Text style={[styles.prodCardPrice, isOnCol && styles.prodCardPriceSingle]}>{product.priceDisplay}</Text>
+          </View>
+        )}
+      </TouchableOpacity>
+    </View>
+  );
+});
+
+// Note on `styles` references inside ProductGridCell above: `styles`
+// is declared via StyleSheet.create() at the bottom of this file.
+// JavaScript closures resolve identifiers at call time, not at
+// function-definition time, so by the time ProductGridCell renders
+// (post first paint), `styles` is fully initialized. No need for a
+// proxy or shim.
+
 // ── Main Component ─────────────────────────────────────────────────────────────
 
 export default function ExploreScreen({ navigation, route }) {
@@ -1009,14 +1092,17 @@ export default function ExploreScreen({ navigation, route }) {
   }, [activeTab, activeCategory, activeRoomFilter, activeStyleFilter, search, wishSort, wishFilterStyles, wishFilterRoomTypes]);
 
   const filteredProducts = useMemo(() => {
+    // Build 147 (C1): lazy resolve once per useMemo recompute. getCatalog()
+    // returns a memoized reference so this is O(1) after first call.
+    const catalog = getCatalog();
     let pool;
     if (overrideProducts) {
       const idSet = new Set(overrideProducts);
-      pool = PRODUCT_CATALOG.filter(p => idSet.has(p.id));
+      pool = catalog.filter(p => idSet.has(p.id));
     } else {
       const catLabel = PRODUCT_CATEGORIES[activeProdCat];
       const cats = PRODUCT_CAT_MAP[catLabel];
-      pool = cats ? PRODUCT_CATALOG.filter((p) => cats.includes(p.category)) : PRODUCT_CATALOG;
+      pool = cats ? catalog.filter((p) => cats.includes(p.category)) : catalog;
     }
     if (search.trim()) {
       const q = search.trim().toLowerCase();
@@ -1127,6 +1213,21 @@ export default function ExploreScreen({ navigation, route }) {
     () => filteredProducts.slice(0, productsVisibleCount),
     [filteredProducts, productsVisibleCount],
   );
+
+  // Build 147 (C3): useCallback-stable handler passed into each
+  // memoized ProductGridCell. The cell's local handlePress closes over
+  // its product, so this parent handler stays stable across renders
+  // and ProductGridCell.memo can skip re-renders when nothing else
+  // about a card changed.
+  const handleProductCellPress = useCallback((product) => {
+    const navProduct = {
+      ...product,
+      price: product.priceDisplay,
+      priceValue: product.price,
+      source: product.source,
+    };
+    navigation?.navigate('ProductDetail', { product: navProduct });
+  }, [navigation]);
 
   // ── Auth wall — show full Auth screen inline if not signed in ──────────────
   // Suppress flash during AuthContext bootstrap so signed-in users don't see
@@ -1352,56 +1453,22 @@ export default function ExploreScreen({ navigation, route }) {
                 <Text style={styles.emptyStateSub}>Try a different category or search</Text>
               </View>
             ) : (
+              {/* Build 147 (C3): inline 50-line product card replaced with
+                  the memoized ProductGridCell (declared above main). Each
+                  card now skips re-render when its product/onPress/
+                  gridCols/cardRadius don't change — eliminates the
+                  24+ subtree rebuild that happened on every scroll
+                  pagination bump or filter sheet open. */}
               <View style={[styles.grid, gridCols === 1 && { paddingHorizontal: 10 }]}>
-                {visibleProducts.map((product) => {
-                  const ratingVal = typeof product.rating === 'number' ? product.rating : parseFloat(product.rating) || 0;
-                  const navProduct = { ...product, price: product.priceDisplay, priceValue: product.price, source: product.source };
-                  const isOnCol = gridCols === 1;
-                  return (
-                    <View key={product.id} style={{ width: colWidthPct(gridCols), padding: isOnCol ? 5 : 1 }}>
-                      <TouchableOpacity
-                        style={[styles.card, { borderRadius: cardRadius }, isOnCol && styles.cardSingle]}
-                        activeOpacity={0.88}
-                        onPress={() => navigation?.navigate('ProductDetail', { product: navProduct })}
-                      >
-                        <View style={[styles.cardImg, {
-                          borderTopLeftRadius: cardRadius,
-                          borderTopRightRadius: cardRadius,
-                          // No bottom radius when card body sits below — prevents background gap
-                          borderBottomLeftRadius: gridCols === 3 ? cardRadius : 0,
-                          borderBottomRightRadius: gridCols === 3 ? cardRadius : 0,
-                          aspectRatio: 1,
-                        }]}>
-                          <View style={styles.cardImgBg} />
-                          {/* compact=true rewrites Amazon `_SL1500_` → `_SL400_` so the grid
-                              fetches a 400px asset instead of 1500px (~85% less data per card).
-                              Eliminates the concurrent-fetch throttling that was leaving
-                              products as gray placeholders on physical iPhones. PDP keeps full-res. */}
-                          <CardImage uri={product.imageUrl} style={styles.cardImgPhoto} resizeMode="contain" compact />
-                        </View>
-                        {/* 2-col: white info card; 3-col: image only; 1-col: generous info card */}
-                        {gridCols !== 3 && (
-                          <View style={[styles.prodCardBody, isOnCol && styles.prodCardBodySingle]}>
-                            <Text style={[styles.prodCardName, isOnCol && styles.prodCardNameSingle]} numberOfLines={2}>{product.name}</Text>
-                            <Text style={styles.prodCardBrand}>{product.brand}</Text>
-                            {ratingVal > 0 && (
-                              <View style={styles.prodCardRating}>
-                                {[1,2,3,4,5].map(i => (
-                                  <StarIconSmall key={i} size={isOnCol ? 12 : 10} filled={i <= Math.round(ratingVal)} />
-                                ))}
-                                <Text style={styles.prodCardRatingText}>{ratingVal.toFixed(1)}</Text>
-                                {!!product.reviewCount && (
-                                  <Text style={styles.prodCardReviews}>({product.reviewCount.toLocaleString()})</Text>
-                                )}
-                              </View>
-                            )}
-                            <Text style={[styles.prodCardPrice, isOnCol && styles.prodCardPriceSingle]}>{product.priceDisplay}</Text>
-                          </View>
-                        )}
-                      </TouchableOpacity>
-                    </View>
-                  );
-                })}
+                {visibleProducts.map((product) => (
+                  <ProductGridCell
+                    key={product.id}
+                    product={product}
+                    gridCols={gridCols}
+                    cardRadius={cardRadius}
+                    onPress={handleProductCellPress}
+                  />
+                ))}
               </View>
             )
           ) : communityLoading && filteredDesigns.length === 0 ? (

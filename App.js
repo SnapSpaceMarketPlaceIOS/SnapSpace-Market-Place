@@ -1,10 +1,14 @@
-import React, { useRef, useCallback, useEffect } from 'react';
-import { View, Text, StyleSheet, Animated, Pressable, LogBox, AppState, Image } from 'react-native';
+import React, { useRef, useCallback, useEffect, useState } from 'react';
+import { View, Text, StyleSheet, Animated, Pressable, LogBox, AppState, Image, InteractionManager } from 'react-native';
 import { lockPortrait } from './src/utils/orientation';
 import { supabase } from './src/services/supabase';
 import { hapticTap, hapticSelect } from './src/utils/haptics';
 import ErrorBoundary from './src/components/ErrorBoundary';
-import { useFonts } from 'expo-font';
+// Build 147 (H1): switched from useFonts() to Font.loadAsync() inside
+// an InteractionManager-deferred effect so font registration doesn't
+// run on the cold-start critical path. System font renders first paint;
+// Geist loads ~one frame later. Inferred ~150–400 ms saved on iPhone 14 Pro.
+import * as Font from 'expo-font';
 
 // Silence known-harmless dev-mode warnings that LogBox promotes to red
 // error boxes. The orientation entry hides the 'Cannot find native
@@ -421,12 +425,28 @@ function RootNavigator() {
   // page 5) rather than re-running this check, because Stack.Navigator's
   // initialRouteName only applies on first mount.
   const [introStatus, setIntroStatus] = React.useState('checking');
+
+  // Build 147 (H5): parallelize isIntroCompleted() with the auth
+  // bootstrap. isIntroCompleted() reads a single AsyncStorage flag and
+  // has zero dependency on user state — there's no reason to wait for
+  // authLoading before kicking it. By starting the promise on mount,
+  // by the time auth bootstrap resolves the AsyncStorage read is
+  // already (likely) in hand, eliminating a serial 30–120 ms link in
+  // the splash → first-frame chain.
+  const introCompletedPromiseRef = React.useRef(null);
+  React.useEffect(() => {
+    introCompletedPromiseRef.current = isIntroCompleted().catch(() => false);
+  }, []);
+
   React.useEffect(() => {
     if (authLoading) return;
     let cancelled = false;
     (async () => {
+      // ensureIntroFlagForExistingUser depends on user — still must wait
+      // for auth. Then await the already-in-flight intro-completed check
+      // (no extra round-trip if it resolved during the auth bootstrap).
       await ensureIntroFlagForExistingUser(!!user);
-      const completed = await isIntroCompleted();
+      const completed = await (introCompletedPromiseRef.current || isIntroCompleted());
       if (cancelled) return;
       if (user) setIntroStatus('signed-in');
       else if (completed) setIntroStatus('returning');
@@ -644,12 +664,24 @@ function RootNavigator() {
 }
 
 export default function App() {
-  const [fontsLoaded] = useFonts({
-    Geist_400Regular,
-    Geist_500Medium,
-    Geist_600SemiBold,
-    Geist_700Bold,
-  });
+  // Build 147 (H1): deferred font load. useFonts() ran on every mount and
+  // triggered CoreText registration on the cold-start path. Now Font.loadAsync
+  // runs after the first interactive frame via InteractionManager.
+  // The app renders first paint with the system font; Geist swaps in
+  // ~1 frame later. Already-documented tradeoff from Build 89 (the splash
+  // wasn't gated on fontsLoaded), but useFonts itself still added init
+  // cost — that's what this fix removes.
+  useEffect(() => {
+    const handle = InteractionManager.runAfterInteractions(() => {
+      Font.loadAsync({
+        Geist_400Regular,
+        Geist_500Medium,
+        Geist_600SemiBold,
+        Geist_700Bold,
+      }).catch(() => { /* fall back to system font on failure */ });
+    });
+    return () => handle && handle.cancel && handle.cancel();
+  }, []);
 
   // app.json sets orientation to "default" (allows rotation natively) so the
   // camera screen can unlock to landscape. Every other screen in the app
@@ -716,14 +748,10 @@ export default function App() {
     };
   }, []);
 
-  // Build 89 / 🚩1: dropped the `if (!fontsLoaded) return loading-screen`
-  // gate. Geist fonts are bundled (no network) but still parsed by iOS
-  // CoreText which adds 150-400ms to cold path. Rendering the tree
-  // immediately produces a brief (~50-200ms) flash where text uses iOS
-  // system font, then reflows to Geist when ready. Premium apps do
-  // this (Instagram, Airbnb). The trade is documented + accepted.
-  // fontsLoaded is intentionally read but its truthiness is not gated on.
-  void fontsLoaded;
+  // Build 89 / 🚩1 (refined Build 147 H1): fonts are loaded via
+  // InteractionManager-deferred Font.loadAsync above — no first-paint
+  // gating. Premium-app pattern (Instagram, Airbnb): brief flash of
+  // system font, reflow to Geist when ready. Trade documented + accepted.
 
   // PostHog gets a render-only branch: if the API key isn't set (dev build,
   // env var missing), render the app WITHOUT the provider. The analytics
@@ -779,12 +807,14 @@ export default function App() {
                         When user opens the paywall, RN's Image picks up the
                         cached UIImage by source key — synchronous render, no
                         decode delay (vs the 8-15s "phase 2" load the user
-                        was seeing). Invisible (opacity 0, 1x1) but rendered. */}
-                    <Image
-                      source={require('./assets/paywall-hero.jpg')}
-                      style={{ position: 'absolute', width: 1, height: 1, opacity: 0, top: -10, left: -10 }}
-                      pointerEvents="none"
-                    />
+                        was seeing). Invisible (opacity 0, 1x1) but rendered.
+
+                        Build 147 (H2): deferred mount via InteractionManager.
+                        The bitmap-decode side-effect of mounting an <Image>
+                        used to run on cold-start critical path; now it runs
+                        one frame after the app is interactive. Same cache
+                        benefit, off the boot budget. */}
+                    <DeferredPaywallHeroPrewarm />
                   </NavigationContainer>
                 </ErrorBoundary>
               </OnboardingProvider>
@@ -865,6 +895,34 @@ function PostHogClientRegistrar() {
     }
   }, [client]);
   return null;
+}
+
+/**
+ * Build 147 (H2) — defers the paywall hero <Image> mount one frame past
+ * first interactive paint. Same warm-cache benefit (iOS keeps the
+ * decoded UIImage by source key, so the paywall later renders
+ * synchronously) without the boot-time decode cost.
+ *
+ * Lives inside NavigationContainer so it inherits the same StyleSheet
+ * scope as the original inline <Image>. Pointer-events disabled +
+ * positioned off-screen + opacity 0; visually identical to before.
+ */
+function DeferredPaywallHeroPrewarm() {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    const handle = InteractionManager.runAfterInteractions(() => {
+      setMounted(true);
+    });
+    return () => handle && handle.cancel && handle.cancel();
+  }, []);
+  if (!mounted) return null;
+  return (
+    <Image
+      source={require('./assets/paywall-hero.jpg')}
+      style={{ position: 'absolute', width: 1, height: 1, opacity: 0, top: -10, left: -10 }}
+      pointerEvents="none"
+    />
+  );
 }
 
 // ─── Styles ──────────────────────────────────────────────────────

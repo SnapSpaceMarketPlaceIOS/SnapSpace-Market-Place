@@ -1,6 +1,8 @@
 import { parseDesignPrompt } from '../utils/promptParser';
 import { matchProducts, matchProductsForDesign } from './productMatcher';
-import { PRODUCT_CATALOG, getProductsByIds } from '../data/productCatalog';
+// Build 147 (C1): catalog access via lazy facade. `getCatalog()` defers
+// the 2.87 MB data-module load until first call.
+import { getCatalog, getProductsByIds } from '../data/productCatalog';
 import curatedProducts from '../data/curatedProducts';
 import { uiColors } from '../constants/tokens';
 
@@ -63,17 +65,22 @@ function normalizeCuratedProduct(p) {
 }
 
 // Lazy-built combined catalog: PRODUCT_CATALOG + curatedProducts (PA-API fallback)
-// Set to null to force rebuild on next call (e.g. after style map changes)
+// Set to null to force rebuild on next call (e.g. after style map changes).
+// Build 147 (C1): getCatalog() here is the lazy-facade getter — invoking
+// it inside getCombinedCatalog() means the heavy data module is only
+// touched when the matcher actually runs (first generation), not at
+// app boot.
 let _combinedCatalog = null;
 export function resetCatalogCache() { _combinedCatalog = null; }
 function getCombinedCatalog() {
   if (!_combinedCatalog) {
+    const baseCatalog = getCatalog();
     const curatedNormalized = curatedProducts.map(normalizeCuratedProduct);
     // Merge: curated items first (higher priority in ties), then base catalog
     // Deduplicate by id so future PA-API items won't collide
-    const baseIds = new Set(PRODUCT_CATALOG.map((p) => p.id));
+    const baseIds = new Set(baseCatalog.map((p) => p.id));
     const uniqueCurated = curatedNormalized.filter((p) => !baseIds.has(p.id));
-    _combinedCatalog = [...uniqueCurated, ...PRODUCT_CATALOG];
+    _combinedCatalog = [...uniqueCurated, ...baseCatalog];
   }
   return _combinedCatalog;
 }

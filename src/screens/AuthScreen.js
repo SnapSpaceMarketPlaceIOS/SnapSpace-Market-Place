@@ -20,7 +20,10 @@ import { useOnboarding } from '../context/OnboardingContext';
 import LensLoader from '../components/LensLoader';
 import CardImage from '../components/CardImage';
 import { redeemSignupCode } from '../services/subscriptionService';
-import { PRODUCT_CATALOG } from '../data/productCatalog';
+// Build 147 (C1): lazy facade — defers the 2.87 MB catalog parse off
+// the cold-start path. AuthScreen is only reached when user is signed
+// out, but its module is still in the import graph from RootNavigator.
+import { getCatalog } from '../data/productCatalog';
 
 const { width: SCREEN_W } = Dimensions.get('window');
 const BLUE = '#67ACE9';
@@ -332,7 +335,7 @@ export default function AuthScreen({ navigation, route }) {
   // best-reviewed items float to the top. Stable per mount via useMemo.
   const marqueeProducts = useMemo(() => {
     const allowedCats = new Set(['sofa', 'bed', 'rug']);
-    return PRODUCT_CATALOG
+    return getCatalog()
       .filter(p => allowedCats.has(p.category) && (p.rating || 0) >= 4.0)
       .map(p => ({ ...p, _qualityScore: (p.rating || 0) * Math.log((p.reviewCount || 1) + 1) }))
       .sort((a, b) => b._qualityScore - a._qualityScore)

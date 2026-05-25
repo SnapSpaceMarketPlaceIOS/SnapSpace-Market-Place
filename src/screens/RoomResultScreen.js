@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback, useEffect } from 'react';
+import React, { useState, useRef, useCallback, useEffect, useMemo } from 'react';
 import {
   View,
   Text,
@@ -267,16 +267,34 @@ function RevealImage({ before, after, borderRadius = 9 }) {
   const [afterFailed, setAfterFailed] = useState(false);
   const [afterRetryKey, setAfterRetryKey] = useState(0);
   const afterRetryCountRef = useRef(0);
+  // Build 147 (H14): retry timer leak fix. The retry setTimeout used to
+  // run untracked — if the user backed out of RoomResult mid-retry, the
+  // timer still fired setState on an unmounted component (yellow box +
+  // closure held the screen tree in memory until it resolved). Now we
+  // store the timer id in a ref, clear it on unmount, on manual retry,
+  // and on AFTER URL change.
+  const retryTimerRef = useRef(null);
+  const clearRetryTimer = () => {
+    if (retryTimerRef.current) {
+      clearTimeout(retryTimerRef.current);
+      retryTimerRef.current = null;
+    }
+  };
   const handleAfterError = () => {
     if (afterRetryCountRef.current < 3) {
       const delayMs = 1000 * (afterRetryCountRef.current + 1);
       afterRetryCountRef.current += 1;
-      setTimeout(() => setAfterRetryKey((k) => k + 1), delayMs);
+      clearRetryTimer();
+      retryTimerRef.current = setTimeout(() => {
+        retryTimerRef.current = null;
+        setAfterRetryKey((k) => k + 1);
+      }, delayMs);
       return;
     }
     setAfterFailed(true);
   };
   const handleManualRetry = () => {
+    clearRetryTimer();
     afterRetryCountRef.current = 0;
     setAfterFailed(false);
     setAfterLoaded(false);
@@ -284,6 +302,7 @@ function RevealImage({ before, after, borderRadius = 9 }) {
   };
   // Reset load state when AFTER URL changes (new generation, deep-link, etc.)
   useEffect(() => {
+    clearRetryTimer();
     setAfterLoaded(false);
     setAfterFailed(false);
     afterRetryCountRef.current = 0;
@@ -291,6 +310,8 @@ function RevealImage({ before, after, borderRadius = 9 }) {
     // Pre-warm the CDN so the first <Image> mount usually hits warm cache.
     if (after) Image.prefetch(after).catch(() => {});
   }, [after]);
+  // Final unmount cleanup — guarantees no orphan timer survives a back nav.
+  useEffect(() => clearRetryTimer, []);
 
   // Re-encode BEFORE through ImageManipulator to bake EXIF rotation into pixels.
   // Build 126 — Item 4 fix: explicit rotate(0) action instead of empty array.
@@ -1069,10 +1090,19 @@ export default function RoomResultScreen({ route, navigation }) {
   // isInCart and handleAddToCart need stable refs (when their deps don't
   // change) so the memoized ProductCard can short-circuit on shallow
   // comparison instead of re-rendering on every parent re-render.
+  // Build 147 (H9): pre-derive a key Set once per (addedKeys, items)
+  // change so isInCart is O(1) per call instead of items.some() per
+  // card per render.
+  const inCartKeySet = useMemo(
+    () => new Set([
+      ...Object.keys(addedKeys).filter(k => addedKeys[k]),
+      ...items.map(i => i.key),
+    ]),
+    [addedKeys, items]
+  );
   const isInCart = useCallback((product) => {
-    const key = `${product.name}__${product.brand}`;
-    return addedKeys[key] || items.some(item => item.key === key);
-  }, [addedKeys, items]);
+    return inCartKeySet.has(`${product.name}__${product.brand}`);
+  }, [inCartKeySet]);
 
   const allInCart = products.length > 0 && products.every(p => isInCart(p));
 
@@ -1112,6 +1142,29 @@ export default function RoomResultScreen({ route, navigation }) {
   const handleProductPress = useCallback((product) => {
     navigation.navigate('ProductDetail', { product });
   }, [navigation]);
+
+  // Build 147 (H9): stable renderItem callbacks for the SHOP ROOM and
+  // YOU MIGHT ALSO LIKE FlatLists. Identical render shape (same memoized
+  // ProductCard) but distinct keys so React's reconciler doesn't try
+  // to confuse cards across strips. Both close over inCartKeySet for
+  // O(1) cart lookup, handleAddToCart, and handleProductPress — all
+  // useCallback-stable.
+  const renderShopRoomCard = useCallback(({ item }) => (
+    <ProductCard
+      product={item}
+      inCart={inCartKeySet.has(`${item.name}__${item.brand}`)}
+      onAddToCart={handleAddToCart}
+      onPress={handleProductPress}
+    />
+  ), [inCartKeySet, handleAddToCart, handleProductPress]);
+  const renderRecommendedCard = useCallback(({ item }) => (
+    <ProductCard
+      product={item}
+      inCart={inCartKeySet.has(`${item.name}__${item.brand}`)}
+      onAddToCart={handleAddToCart}
+      onPress={handleProductPress}
+    />
+  ), [inCartKeySet, handleAddToCart, handleProductPress]);
 
   const handleAddAll = () => {
     let added = 0;
@@ -1454,25 +1507,27 @@ export default function RoomResultScreen({ route, navigation }) {
         {/* ── Divider ──────────────────────────────────────────────── */}
         <View style={s.divider} />
 
-        {/* ── SHOP ROOM ────────────────────────────────────────────── */}
+        {/* ── SHOP ROOM ──────────────────────────────────────────────
+            Build 147 (H9): ScrollView+map → horizontal FlatList.
+            ProductCard was already memoized (Build 136); the parent
+            ScrollView still mounted ALL 4-6 cards immediately. FlatList
+            with initialNumToRender + windowSize lets iOS skip mounting
+            off-screen cards — meaningful when 4+ cards live next to
+            the RECOMMENDED strip below (12+ cards combined). */}
         {products.length > 0 && (
           <View style={s.productsSection}>
             <Text style={s.sectionLabel}>SHOP ROOM</Text>
-            <ScrollView
+            <FlatList
+              data={products}
+              keyExtractor={(item, idx) => item.id || `shop-${idx}`}
               horizontal
               showsHorizontalScrollIndicator={false}
+              initialNumToRender={3}
+              windowSize={5}
+              removeClippedSubviews
               contentContainerStyle={s.hList}
-            >
-              {products.map((product, index) => (
-                <ProductCard
-                  key={product.id || index}
-                  product={product}
-                  inCart={isInCart(product)}
-                  onAddToCart={handleAddToCart}
-                  onPress={handleProductPress}
-                />
-              ))}
-            </ScrollView>
+              renderItem={renderShopRoomCard}
+            />
             {/* Build 132 — reframed copy. The previous wording ("AI-generated
                 for inspiration") seeded doubt about whether the render was
                 "real." New wording shifts framing toward the curated shopping
@@ -1487,26 +1542,24 @@ export default function RoomResultScreen({ route, navigation }) {
           </View>
         )}
 
-        {/* ── YOU MIGHT ALSO LIKE ──────────────────────────────────── */}
+        {/* ── YOU MIGHT ALSO LIKE ────────────────────────────────────
+            Build 147 (H9): same ScrollView→FlatList conversion as SHOP
+            ROOM above. */}
         {recommended.length > 0 && (
           <View style={s.productsSection}>
             <View style={[s.divider, { marginTop: space.xl, marginLeft: 0 }]} />
             <Text style={s.sectionLabel}>YOU MIGHT ALSO LIKE</Text>
-            <ScrollView
+            <FlatList
+              data={recommended}
+              keyExtractor={(item, idx) => item.id || `rec-${idx}`}
               horizontal
               showsHorizontalScrollIndicator={false}
+              initialNumToRender={3}
+              windowSize={5}
+              removeClippedSubviews
               contentContainerStyle={s.hList}
-            >
-              {recommended.map((product, index) => (
-                <ProductCard
-                  key={product.id || `rec-${index}`}
-                  product={product}
-                  inCart={isInCart(product)}
-                  onAddToCart={handleAddToCart}
-                  onPress={handleProductPress}
-                />
-              ))}
-            </ScrollView>
+              renderItem={renderRecommendedCard}
+            />
           </View>
         )}
 

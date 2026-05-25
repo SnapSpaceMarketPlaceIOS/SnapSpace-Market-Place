@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import {
   View,
   Text,
@@ -46,15 +46,37 @@ function EmptyHeartIcon() {
   );
 }
 
+// Build 147 (H12): TTL cache for the server-side liked-designs fetch.
+// Without it, every focus of the Liked tab refetched from Supabase —
+// users toggling tabs in a typical session hit the DB constantly for
+// data that changes only when they like/unlike a design. Mirrors the
+// pattern used in ProfileScreen.js. 5 min is generous; the user's own
+// toggle flows update `liked` from LikedContext immediately so cache
+// staleness is bounded to the difference between local state and the
+// server's view (which is identical except across devices).
+const LIKED_CACHE_TTL_MS = 5 * 60 * 1000;
+
 export default function LikedScreen({ navigation }) {
   const { liked, toggleLiked } = useLiked();
   const { user } = useAuth();
   const [serverLiked, setServerLiked] = useState([]);
+  const lastFetchRef = useRef(0);
+  const lastFetchedUserIdRef = useRef(null);
 
-  // Fetch liked designs from Supabase on screen focus
+  // Fetch liked designs from Supabase on screen focus, with 5-min TTL.
   useFocusEffect(
     useCallback(() => {
       if (!user?.id) return;
+      // Skip when we have a fresh result for this user.
+      const now = Date.now();
+      if (
+        lastFetchedUserIdRef.current === user.id &&
+        now - lastFetchRef.current < LIKED_CACHE_TTL_MS
+      ) {
+        return;
+      }
+      lastFetchedUserIdRef.current = user.id;
+      lastFetchRef.current = now;
       getUserLikedDesigns(user.id)
         .then(rows => {
           const normalized = (rows || []).map(d => ({
@@ -73,7 +95,12 @@ export default function LikedScreen({ navigation }) {
           }));
           setServerLiked(normalized);
         })
-        .catch(err => console.warn('[Liked] server fetch failed:', err.message));
+        .catch(err => {
+          // Reset the timestamp so the next focus attempts a re-fetch
+          // instead of being silently blocked by the TTL.
+          lastFetchRef.current = 0;
+          console.warn('[Liked] server fetch failed:', err.message);
+        });
     }, [user?.id])
   );
 

@@ -34,11 +34,34 @@
  * 6 via OnboardingArt by mistake, we fall back to slide-1 (default).
  */
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { VideoView, useVideoPlayer } from 'expo-video';
 
-const VIDEO_SOURCES = {
+// Build 147 (C4): onboarding videos can be served from a remote CDN
+// (Supabase storage) instead of the IPA bundle. Set
+// EXPO_PUBLIC_ONBOARDING_VIDEO_BASE_URL to the public-bucket prefix
+// (no trailing slash) and the bundled require()s below become the
+// fallback path only. Once you've uploaded the 7 MP4s + verified
+// remote playback on TestFlight, delete `src/assets/onboarding/videos/`
+// to land the ~44 MB IPA reduction (or ~28-31 MB if you re-encoded
+// to HEVC 720p first per H17).
+//
+// Upload script: scripts/upload-onboarding-videos.mjs
+// Bucket layout expected: <BASE_URL>/slide-N.mp4
+//
+// expo-video's HTTP source mode uses AVPlayer's native streaming on
+// iOS — it caches the asset to the on-device URL cache after first
+// play, so subsequent launches play instantly without a re-download
+// (provided the user has any meaningful network connectivity).
+const ONBOARDING_VIDEO_BASE_URL =
+  process.env.EXPO_PUBLIC_ONBOARDING_VIDEO_BASE_URL || null;
+
+// Bundled fallbacks — kept in the build until you flip the env var.
+// When ONBOARDING_VIDEO_BASE_URL is set, these are unreferenced and
+// Metro tree-shakes them out of the bundle (as long as the videos
+// folder is deleted at the same time).
+const BUNDLED_VIDEO_SOURCES = {
   1: require('../../assets/onboarding/videos/slide-1.mp4'),
   2: require('../../assets/onboarding/videos/slide-2.mp4'),
   3: require('../../assets/onboarding/videos/slide-3.mp4'),
@@ -47,6 +70,13 @@ const VIDEO_SOURCES = {
   // step 6 = paywall (no video — page draws static tier cards)
   7: require('../../assets/onboarding/videos/slide-7.mp4'),
 };
+
+function resolveVideoSource(step) {
+  if (ONBOARDING_VIDEO_BASE_URL) {
+    return { uri: `${ONBOARDING_VIDEO_BASE_URL}/slide-${step}.mp4` };
+  }
+  return BUNDLED_VIDEO_SOURCES[step] || BUNDLED_VIDEO_SOURCES[1];
+}
 
 // Build 147 v17: per-step scale transform.
 //
@@ -87,7 +117,11 @@ const VIDEO_SCALE_BY_STEP = {
 };
 
 export default function OnboardingArt({ step, style, fullBleed = false, contentFit = 'contain', isActive = true }) {
-  const source = VIDEO_SOURCES[step] || VIDEO_SOURCES[1];
+  // Build 147 (C4): useMemo so the source object isn't re-allocated
+  // each render. For bundled require() refs this doesn't matter much,
+  // but for remote { uri } objects a fresh ref each render could
+  // trigger expo-video's player to reload.
+  const source = useMemo(() => resolveVideoSource(step), [step]);
 
   // Build 147 v12: player no longer auto-plays in the init callback.
   // The useEffect below drives play/pause based on the isActive prop

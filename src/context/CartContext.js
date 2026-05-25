@@ -1,6 +1,12 @@
 import React, { createContext, useContext, useState, useMemo, useEffect, useRef } from 'react';
+import { AppState } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { PRODUCT_CATALOG } from '../data/productCatalog';
+// Build 147 (C1): lazy facade. CartContext mounts at app boot via
+// CartProvider; importing PRODUCT_CATALOG here used to wake the 2.87 MB
+// data module on cold start. getCatalog() defers that load until the
+// rehydration callback actually runs (already async via AsyncStorage),
+// keeping it off the first-paint critical path entirely.
+import { getCatalog } from '../data/productCatalog';
 import { useAuth } from './AuthContext';
 import { hapticMedium } from '../utils/haptics';
 // Build 143 — analytics instrumentation. Safe no-op when PostHog isn't
@@ -48,10 +54,14 @@ export function CartProvider({ children }) {
       .then((data) => {
         if (data) {
           const loaded = JSON.parse(data);
+          // Build 147 (C1): resolve catalog INSIDE the rehydration callback
+          // so the heavy data module isn't touched if the user has no
+          // cart to rehydrate. Also defers off the first-paint window.
+          const catalog = getCatalog();
           const enriched = loaded.map((item) => {
             // Always try to enrich — an item may have imageUrl but be missing asin/affiliateUrl
             if (item.imageUrl && item.asin && item.affiliateUrl && item.source) return item;
-            const match = PRODUCT_CATALOG.find(
+            const match = catalog.find(
               (p) => p.name === item.name && p.brand === item.brand
             );
             if (!match) return item;
@@ -76,11 +86,59 @@ export function CartProvider({ children }) {
       .finally(() => setHydrated(true));
   }, []);
 
-  // Persist cart whenever items change (skip initial empty state before hydration)
+  // Persist cart whenever items change (skip initial empty state before hydration).
+  //
+  // Build 147 (H11): debounce the write 300 ms. Every quantity bump,
+  // add/remove, and rehydration write used to JSON.stringify + hit
+  // AsyncStorage immediately — during a browse session with rapid
+  // cart edits this thrashes disk for no benefit. The debounce
+  // coalesces bursts.
+  //
+  // Safety: we hold the latest items in a ref AND flush immediately on
+  // background/inactive AppState transitions. iOS may suspend the JS
+  // thread shortly after backgrounding, so a pending debounced timer
+  // is not guaranteed to fire — without the AppState flush, a user who
+  // adds an item and immediately home-buttons could lose the edit.
+  const cartWriteTimerRef = useRef(null);
+  const pendingItemsRef = useRef(items);
+  useEffect(() => { pendingItemsRef.current = items; }, [items]);
+
+  const flushCartWrite = () => {
+    if (cartWriteTimerRef.current) {
+      clearTimeout(cartWriteTimerRef.current);
+      cartWriteTimerRef.current = null;
+    }
+    // Direct sync-attempt write of the latest known state. AsyncStorage is
+    // still async, but we kick the promise BEFORE JS yields to the
+    // background suspension.
+    AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(pendingItemsRef.current)).catch(() => {});
+  };
+
   useEffect(() => {
     if (!hydrated) return;
-    AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(items)).catch(() => {});
+    if (cartWriteTimerRef.current) clearTimeout(cartWriteTimerRef.current);
+    cartWriteTimerRef.current = setTimeout(() => {
+      cartWriteTimerRef.current = null;
+      AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(items)).catch(() => {});
+    }, 300);
+    return () => {
+      if (cartWriteTimerRef.current) {
+        clearTimeout(cartWriteTimerRef.current);
+        cartWriteTimerRef.current = null;
+      }
+    };
   }, [items, hydrated]);
+
+  // Force-flush on background — see comment above.
+  useEffect(() => {
+    if (!hydrated) return;
+    const sub = AppState.addEventListener('change', (next) => {
+      if (next === 'background' || next === 'inactive') {
+        flushCartWrite();
+      }
+    });
+    return () => sub.remove();
+  }, [hydrated]);
 
   const addToCart = (product) => {
     // Guard against stale/missing product. Callers (e.g. ProductVisualizeModal)

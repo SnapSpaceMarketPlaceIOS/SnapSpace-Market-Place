@@ -25,7 +25,8 @@ import * as WebBrowser from 'expo-web-browser';
 // registered.
 import { trackEvent, EVENTS } from '../services/analytics';
 import { hapticTap, hapticMedium } from '../utils/haptics';
-import { PRODUCT_CATALOG } from '../data/productCatalog';
+// Build 147 (C1): lazy facade — defers 2.87 MB catalog parse.
+import { getCatalog } from '../data/productCatalog';
 import TabScreenFade from '../components/TabScreenFade';
 
 const C  = theme.colors;
@@ -505,9 +506,11 @@ export default function CartScreen({ navigation }) {
         {/* ── Section 2B: Cart Item Rows ─────────────────────────────── */}
         {items.map((item) => {
           const category = getCategoryInfo(item.name);
-          // Fall back to catalog for rating/reviewCount on items added before the fix
-          const catalogMatch = (!item.rating && PRODUCT_CATALOG)
-            ? PRODUCT_CATALOG.find(p => p.name === item.name && p.brand === item.brand)
+          // Fall back to catalog for rating/reviewCount on items added before the fix.
+          // Build 147 (C1): getCatalog() returns the lazy-loaded array; the
+          // truthiness check via `&&` short-circuits when item.rating is set.
+          const catalogMatch = !item.rating
+            ? getCatalog().find(p => p.name === item.name && p.brand === item.brand)
             : null;
           const displayRating = item.rating ?? catalogMatch?.rating ?? null;
           const displayReviewCount = item.reviewCount ?? catalogMatch?.reviewCount ?? null;

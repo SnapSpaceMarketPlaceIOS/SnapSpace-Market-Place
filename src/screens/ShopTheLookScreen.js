@@ -6,7 +6,7 @@
  *   → divider → SHOP ROOM horizontal cards → FTC → Tags
  *   → sticky Add All to Cart bottom bar
  */
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import {
   View,
   Text,
@@ -18,6 +18,7 @@ import {
   Share,
   Animated,
   Pressable,
+  FlatList,
 } from 'react-native';
 import * as FileSystem from 'expo-file-system/legacy';
 import CardImage from '../components/CardImage';
@@ -170,16 +171,32 @@ function StarIconSmall({ filled = true, size = 10 }) {
 }
 
 // ── Horizontal Product Card ────────────────────────────────────────────────────
+//
+// Build 147 (H10): wrapped in React.memo. Used to re-render every time
+// the parent re-rendered (which happened on every add-to-cart toggle,
+// scroll, etc.). With memoization + a useCallback-stable onPress in the
+// parent + Set-based inCart lookup, only the cards whose inCart status
+// actually changed re-render. For the typical 6-product SHOP ROOM strip
+// plus 6+ recommended, this drops re-render count from ~12 → ~0 per
+// cart toggle.
 
-function ProductCard({ product, inCart, onAddToCart, onPress }) {
+function ProductCardImpl({ product, inCart, onAddToCart, onPress }) {
   const priceVal = product.priceValue ?? product.price;
   const priceStr = typeof priceVal === 'number'
     ? `$${priceVal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
     : product.priceLabel || String(priceVal).replace(/^\$+/, '$');
   const ratingVal = typeof product.rating === 'number' ? product.rating : parseFloat(product.rating) || 0;
+  // Build 147 (H10): onPress is now expected to take the product as an
+  // argument (parent passes a useCallback-stable handler). Wrap in a
+  // local useCallback so the TouchableOpacity onPress prop is stable
+  // for the lifetime of this card's mount.
+  const handlePress = useCallback(() => onPress(product), [onPress, product]);
+  const handleAdd = useCallback(() => {
+    if (!inCart) onAddToCart(product);
+  }, [inCart, onAddToCart, product]);
 
   return (
-    <TouchableOpacity style={s.hCard} activeOpacity={0.7} onPress={onPress}>
+    <TouchableOpacity style={s.hCard} activeOpacity={0.7} onPress={handlePress}>
       {/* Build 139 — resizeMode flipped from "cover" to "contain" for
           consistency with RoomResultScreen. cover was zooming wide product
           images (e.g. couch shots at 2.26:1 aspect) into the middle of the
@@ -208,7 +225,7 @@ function ProductCard({ product, inCart, onAddToCart, onPress }) {
       <TouchableOpacity
         style={[s.hCardAddBtn, inCart && s.hCardAddBtnDone]}
         activeOpacity={0.8}
-        onPress={() => !inCart && onAddToCart(product)}
+        onPress={handleAdd}
         hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
       >
         {inCart
@@ -221,6 +238,8 @@ function ProductCard({ product, inCart, onAddToCart, onPress }) {
     </TouchableOpacity>
   );
 }
+
+const ProductCard = React.memo(ProductCardImpl);
 
 // ── Main Screen ────────────────────────────────────────────────────────────────
 
@@ -325,16 +344,51 @@ export default function ShopTheLookScreen({ route, navigation }) {
   // Past all hooks — safe to short-circuit render if design is missing
   if (!design) return null;
 
-  const isInCart = (product) => {
-    const key = `${product.name}__${product.brand}`;
-    return addedKeys[key] || items.some((item) => item.key === key);
-  };
+  // Build 147 (H10): pre-derive in-cart Set + useCallback handlers so
+  // the memoized ProductCard children can short-circuit shallow-prop
+  // comparison.
+  const inCartKeySet = useMemo(
+    () => new Set([
+      ...Object.keys(addedKeys).filter(k => addedKeys[k]),
+      ...items.map(i => i.key),
+    ]),
+    [addedKeys, items]
+  );
+  const isInCart = useCallback((product) => {
+    return inCartKeySet.has(`${product.name}__${product.brand}`);
+  }, [inCartKeySet]);
 
-  const handleAddToCart = (product) => {
+  const handleAddToCart = useCallback((product) => {
     const key = `${product.name}__${product.brand}`;
     addToCart({ ...product, price: product.priceValue ?? product.price });
     setAddedKeys((prev) => ({ ...prev, [key]: true }));
-  };
+  }, [addToCart]);
+
+  const handleProductPress = useCallback((product) => {
+    navigation.navigate('ProductDetail', { product, design });
+  }, [navigation, design]);
+
+  // Build 147 (H10): onPress passes the stable parent handler — the
+  // child's local handlePress useCallback closes over `product` so the
+  // navigation receives the correct item without an inline arrow at
+  // the call site (which would break React.memo).
+  const renderShopCard = useCallback(({ item }) => (
+    <ProductCard
+      product={item}
+      inCart={inCartKeySet.has(`${item.name}__${item.brand}`)}
+      onAddToCart={handleAddToCart}
+      onPress={handleProductPress}
+    />
+  ), [inCartKeySet, handleAddToCart, handleProductPress]);
+
+  const renderRecommendedCard = useCallback(({ item }) => (
+    <ProductCard
+      product={item}
+      inCart={inCartKeySet.has(`${item.name}__${item.brand}`)}
+      onAddToCart={handleAddToCart}
+      onPress={handleProductPress}
+    />
+  ), [inCartKeySet, handleAddToCart, handleProductPress]);
 
   const handleAddAll = () => {
     let added = 0;
@@ -455,50 +509,47 @@ export default function ShopTheLookScreen({ route, navigation }) {
         {/* ── Divider before SHOP ROOM ─────────────────────────────── */}
         <View style={s.divider} />
 
-        {/* ── SHOP ROOM — horizontal cards ─────────────────────────── */}
+        {/* ── SHOP ROOM — horizontal cards ───────────────────────────
+            Build 147 (H10): ScrollView+map → FlatList with virtualization
+            (initialNumToRender=3, windowSize=5). Memoized ProductCard +
+            stable handlers means cart toggles re-render only the affected
+            card, not the full strip. */}
         {products.length > 0 && (
           <View style={s.productsSection}>
             <Text style={s.sectionLabel}>SHOP ROOM</Text>
 
-            <ScrollView
+            <FlatList
+              data={products}
+              keyExtractor={(item, idx) => item.id || `shop-${idx}`}
               horizontal
               showsHorizontalScrollIndicator={false}
+              initialNumToRender={3}
+              windowSize={5}
+              removeClippedSubviews
               contentContainerStyle={s.hList}
-            >
-              {products.map((product, index) => (
-                <ProductCard
-                  key={product.id || index}
-                  product={product}
-                  inCart={isInCart(product)}
-                  onAddToCart={handleAddToCart}
-                  onPress={() => navigation.navigate('ProductDetail', { product, design })}
-                />
-              ))}
-            </ScrollView>
+              renderItem={renderShopCard}
+            />
 
           </View>
         )}
 
-        {/* ── YOU MIGHT ALSO LIKE ──────────────────────────────────── */}
+        {/* ── YOU MIGHT ALSO LIKE ────────────────────────────────────
+            Build 147 (H10): same retrofit as SHOP ROOM above. */}
         {recommended.length > 0 && (
           <View style={s.productsSection}>
             <View style={[s.divider, { marginTop: space.xl, marginLeft: 0 }]} />
             <Text style={s.sectionLabel}>YOU MIGHT ALSO LIKE</Text>
-            <ScrollView
+            <FlatList
+              data={recommended}
+              keyExtractor={(item, idx) => item.id || `rec-${idx}`}
               horizontal
               showsHorizontalScrollIndicator={false}
+              initialNumToRender={3}
+              windowSize={5}
+              removeClippedSubviews
               contentContainerStyle={s.hList}
-            >
-              {recommended.map((product, index) => (
-                <ProductCard
-                  key={product.id || `rec-${index}`}
-                  product={product}
-                  inCart={isInCart(product)}
-                  onAddToCart={handleAddToCart}
-                  onPress={() => navigation.navigate('ProductDetail', { product, design })}
-                />
-              ))}
-            </ScrollView>
+              renderItem={renderRecommendedCard}
+            />
           </View>
         )}
 

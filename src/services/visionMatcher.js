@@ -1,4 +1,7 @@
-import { PRODUCT_CATALOG } from '../data/productCatalog';
+// Build 147 (C1): lazy facade — getCatalog() defers the 2.87 MB data
+// module load until rematchFromVision actually runs (post-generation
+// vision verification pass).
+import { getCatalog } from '../data/productCatalog';
 import { STYLE_AFFINITY } from '../data/styleMap';
 import { proxyFetch } from './apiProxy';
 import { detectColorFamilies, findMatchingColorVariant } from '../utils/colorMap';
@@ -521,7 +524,7 @@ function categoriesAreRelated(productCat, visionCat) {
  * @param {number}   limit        - Max products to return (default 6)
  * @returns {object[]} Re-matched products ordered by visual dominance
  */
-export function rematchFromVision(visionItems, roomType, fallbackProducts = [], limit = 6, catalog = PRODUCT_CATALOG) {
+export function rematchFromVision(visionItems, roomType, fallbackProducts = [], limit = 6, catalog = getCatalog()) {
   if (!visionItems || visionItems.length === 0) {
     console.log('[Vision] No items identified, using fallback products');
     return fallbackProducts.slice(0, limit);

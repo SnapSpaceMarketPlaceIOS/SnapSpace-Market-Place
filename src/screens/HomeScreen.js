@@ -1,4 +1,9 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+// Build 147 (H13 + M5): pause-on-blur for the hero slideshow + greeting
+// interval. HomeScreen never unmounts under bottom tabs, so without
+// useFocusEffect the animation/timer keep running while the user is on
+// Cart/Profile/Snap — wasted CPU + battery.
+import { useFocusEffect } from '@react-navigation/native';
 import {
   View,
   Text,
@@ -54,7 +59,11 @@ import { verifyGeneratedProducts } from '../services/visionMatcher';
 // Build 143 — analytics for wish_generated / wish_failed. Safe no-op when
 // PostHog client isn't registered (e.g. dev build with missing .env).
 import { trackEvent, EVENTS } from '../services/analytics';
-import { PRODUCT_CATALOG } from '../data/productCatalog';
+// Build 147 (C1): lazy facade — defers the 2.87 MB catalog parse off the
+// HomeScreen first-paint path. The two module-top usages below
+// (NEW_ARRIVAL_PRODUCTS dead-code, HIGHLIGHT_POOL) have been wrapped in
+// lazy getters that wake the data only when the component renders.
+import { getCatalog } from '../data/productCatalog';
 import { saveUserDesign, updateDesignVisibility, uploadRoomPhoto, recordGenerationError } from '../services/supabase';
 import { safeOpenURL } from '../utils/safeOpenURL';
 import Constants from 'expo-constants';
@@ -417,8 +426,26 @@ const STYLE_PRODUCT_COUNTS = Object.fromEntries(
   ])
 );
 
-// ── New Arrivals — first 4 products from catalog ───────────────────────────────
-const NEW_ARRIVAL_PRODUCTS = PRODUCT_CATALOG.slice(0, 4);
+// Build 147 (C1): NEW_ARRIVAL_PRODUCTS was declared but never read anywhere
+// in the file. Removed as part of the lazy-catalog migration so the
+// productCatalog data module isn't woken at module load just to compute
+// a dead constant.
+
+// Build 147 (H7): room chips hoisted to module scope. Used to be a
+// literal `[{key:'living room', ...}, ...]` array inside JSX —
+// reallocated on every HomeScreen render (every keystroke into the
+// prompt). Now stable across renders so the memoized RoomChip
+// children can skip re-renders when only `selectedRoom` toggles.
+const ROOM_CHIPS = [
+  { key: 'living room', label: 'Living Room' },
+  { key: 'kitchen',     label: 'Kitchen'    },
+  { key: 'bedroom',     label: 'Bedroom'    },
+  { key: 'dining room', label: 'Dining'     },
+  { key: 'office',      label: 'Office'     },
+  { key: 'bathroom',    label: 'Bathroom'   },
+  { key: 'outdoor',     label: 'Outdoor'    },
+  { key: 'dorm room',   label: 'Dorms'      },
+];
 
 // ── Style label display map ────────────────────────────────────────────────────
 const STYLE_LABEL_MAP = {
@@ -464,9 +491,172 @@ const HIGHLIGHT_IDS = [
   'B0FB99BP2J', // Christopher Knight Modular Boucle Sofa — $724
   'B0G7BT3HRC', // CHITA Curved Cloud Chenille Sofa — $600
 ];
-const HIGHLIGHT_POOL = HIGHLIGHT_IDS
-  .map(id => PRODUCT_CATALOG.find(p => p.id === id))
-  .filter(Boolean);
+// Build 147 (C1): lazy resolution. Used to be a module-top constant
+// (`HIGHLIGHT_POOL = HIGHLIGHT_IDS.map(id => PRODUCT_CATALOG.find(...))`)
+// which forced the catalog parse during HomeScreen module load. Now
+// memoized inside a getter so the first call (from `dealProduct`'s
+// useMemo on first render) is what wakes the data — at least one
+// frame after splash hides.
+let _highlightPool = null;
+function getHighlightPool() {
+  if (!_highlightPool) {
+    const catalog = getCatalog();
+    _highlightPool = HIGHLIGHT_IDS
+      .map(id => catalog.find(p => p.id === id))
+      .filter(Boolean);
+  }
+  return _highlightPool;
+}
+
+// ── RoomChip (Build 147 H7) ────────────────────────────────────────────
+//
+// Memoized chip used by the room-context strip above the prompt input.
+// Used to be 8 inline TouchableOpacity nodes with inline onPress arrows
+// inside HomeScreen's JSX — each parent render (every keystroke!)
+// rebuilt all 8. React.memo here means a parent render only re-renders
+// the chips whose active state changed (typically 0 chips on keystroke,
+// 2 chips on a room swap). Defaults to shallow prop comparison.
+//
+// Props are intentionally minimal: chip (stable module-scope object),
+// active (cheap boolean), onSelect (parent useCallback-stable).
+//
+// Note: `styles` is declared at the bottom of this file via
+// StyleSheet.create. Referencing `styles.roomChipAbove` from inside
+// RoomChip's body is safe because the body executes at render time
+// (after the module finishes evaluating), not at module-load time.
+const RoomChip = React.memo(function RoomChip({ chip, active, onSelect }) {
+  const handlePress = useCallback(() => onSelect(chip), [chip, onSelect]);
+  return (
+    <TouchableOpacity
+      onPress={handlePress}
+      style={styles.roomChipAbove}
+      activeOpacity={0.6}
+      hitSlop={{ top: 8, bottom: 8, left: 4, right: 4 }}
+    >
+      <Text style={[styles.roomChipAboveLabel, active && styles.roomChipAboveLabelActive]}>
+        {chip.label}
+      </Text>
+    </TouchableOpacity>
+  );
+});
+
+// ── HeroSlideshow (Build 147 H6) ───────────────────────────────────────
+//
+// Memoized wrapper around the 7-image crossfading hero. Used to live
+// inline in HomeScreen's JSX as `{HERO_IMAGES.map((src, i) => <Animated.View ...>)}`
+// — each parent re-render (every keystroke into the prompt!) allocated
+// 7 fresh Animated.View nodes + 7 inline style arrays. React.memo here
+// means HeroSlideshow's render is skipped whenever its props are
+// shallow-equal: heroOpacities is a ref (stable forever), and the
+// other two props change only on actual slideshow advances or the
+// onLoad fire — i.e. not at all during a typing storm.
+//
+// Note: HERO_IMAGES is closed over from module scope. The slideshow
+// effect that drives the crossfade still lives in HomeScreen so it
+// owns the heroCurrentIdx/heroTimerRef state — clean separation
+// (state in parent, render in memoized child).
+const HeroSlideshow = React.memo(function HeroSlideshow({
+  heroOpacities,
+  mountedHeroSet,
+  hero0Loaded,
+  onHero0Load,
+}) {
+  return (
+    <>
+      <View style={styles.bgImage}>
+        {HERO_IMAGES.map((src, i) => (
+          <Animated.View key={i} style={[StyleSheet.absoluteFill, { opacity: heroOpacities[i], justifyContent: 'center' }]}>
+            {mountedHeroSet.has(i) && (
+              <Image
+                source={src}
+                style={{ width: '100%', height: '100%' }}
+                resizeMode="cover"
+                onLoad={i === 0 ? onHero0Load : undefined}
+              />
+            )}
+          </Animated.View>
+        ))}
+      </View>
+      {hero0Loaded && <View style={styles.heroTint} pointerEvents="none" />}
+    </>
+  );
+});
+
+// ── ResultProductCard (Build 147 H8) ───────────────────────────────────
+//
+// Memoized card rendered inside the result-modal SHOP YOUR ROOM
+// FlatList. Used to live inline as a multi-hundred-line renderItem
+// arrow that re-allocated 5 inline `[1..5].map(<Svg .../>)` star nodes
+// per card per parent render + ran `cartItems.some(i => i.key === ...)`
+// inside an IIFE per card.
+//
+// Now: stars rendered inside the memoized child (re-rendered only when
+// THIS card's product changes). cartItems → inCart boolean derived
+// ONCE at the parent via useMemo'd Map and passed as a prop. Press
+// handlers are useCallback-stable in the parent.
+//
+// Renders inside a horizontal FlatList — wrapping in React.memo
+// converts cart changes from "rebuild all 6 cards" → "rebuild zero
+// cards" (since none of these products' inCart status changes when an
+// unrelated product is toggled).
+const ResultProductCard = React.memo(function ResultProductCard({
+  product,
+  inCart,
+  onPress,
+  onAddToCart,
+}) {
+  const handleCardPress = useCallback(() => onPress(product), [onPress, product]);
+  const handleAdd = useCallback(() => {
+    if (!inCart) onAddToCart(product);
+  }, [inCart, onAddToCart, product]);
+  const priceText =
+    typeof product.priceValue === 'number'
+      ? `$${product.priceValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+      : typeof product.price === 'number'
+        ? `$${product.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+        : product.priceLabel || String(product.price).replace(/^\$+/, '$');
+  const ratingRounded = product.rating ? Math.round(product.rating) : 0;
+  return (
+    <TouchableOpacity style={resultStyles.hCard} activeOpacity={0.7} onPress={handleCardPress}>
+      <CardImage uri={product.imageUrl} style={resultStyles.hCardImg} resizeMode="cover" compact />
+      <View style={resultStyles.hCardBody}>
+        <Text style={resultStyles.hCardName} numberOfLines={2}>{product.name}</Text>
+        <Text style={resultStyles.hCardBrand}>{product.brand}</Text>
+        {!!product.rating && (
+          <View style={resultStyles.hCardRating}>
+            {[1,2,3,4,5].map(i => (
+              <Svg key={i} width={10} height={10} viewBox="0 0 24 24" fill={i <= ratingRounded ? '#67ACE9' : '#E5E7EB'} stroke="none">
+                <Path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+              </Svg>
+            ))}
+            <Text style={resultStyles.hCardRatingText}>{product.rating.toFixed(1)}</Text>
+            {!!product.reviewCount && (
+              <Text style={resultStyles.hCardReviews}>({product.reviewCount.toLocaleString()})</Text>
+            )}
+          </View>
+        )}
+        <Text style={resultStyles.hCardPrice}>{priceText}</Text>
+      </View>
+      <TouchableOpacity
+        style={[resultStyles.hCardAdd, inCart && resultStyles.hCardAddDone]}
+        activeOpacity={0.7}
+        hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+        onPress={handleAdd}
+      >
+        {inCart ? (
+          <Svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
+            <Polyline points="20 6 9 17 4 12" />
+          </Svg>
+        ) : (
+          <Svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="#0B6DC3" strokeWidth={1.2}>
+            <Line x1={12} y1={5} x2={12} y2={19} />
+            <Line x1={5} y1={12} x2={19} y2={12} />
+          </Svg>
+        )}
+      </TouchableOpacity>
+    </TouchableOpacity>
+  );
+});
 
 // ─── Icons ────────────────────────────────────────────────────────────────────
 
@@ -1005,6 +1195,63 @@ export default function HomeScreen({ navigation, route }) {
       setSelectedStyle(null);
     }
   }, [prompt, selectedStyle]);
+
+  // Build 147 (H6): useCallback-stable handler for HeroSlideshow's
+  // first-image onLoad. Single setState; stable forever.
+  const handleHero0Load = useCallback(() => setHero0Loaded(true), []);
+
+  // Build 147 (H8): result-modal product strip handlers + memoized
+  // in-cart lookup. Pre-derive a Set once per cartItems change so each
+  // card's `inCart` lookup is O(1) without rebuilding cartItems.some
+  // per card per render. The two press handlers below are stable
+  // refs that take the product as an argument — passed into the
+  // memoized ResultProductCard so its memo can short-circuit.
+  const resultInCartKeySet = useMemo(
+    () => new Set(cartItems.map(i => i.key)),
+    [cartItems]
+  );
+  const handleResultCardPress = useCallback((product) => {
+    setShowResult(false);
+    navigation?.navigate('ProductDetail', { product });
+  }, [navigation]);
+  const handleResultAddToCart = useCallback((product) => {
+    addToCart({ ...product, price: product.priceValue ?? product.price });
+  }, [addToCart]);
+  const renderResultProduct = useCallback(({ item }) => {
+    const cartKey = `${item.name}__${item.brand}`;
+    return (
+      <ResultProductCard
+        product={item}
+        inCart={resultInCartKeySet.has(cartKey)}
+        onPress={handleResultCardPress}
+        onAddToCart={handleResultAddToCart}
+      />
+    );
+  }, [resultInCartKeySet, handleResultCardPress, handleResultAddToCart]);
+
+  // Build 147 (H7): useCallback-stable handler for the RoomChip strip.
+  // Used to be an inline arrow allocated per chip per parent render
+  // (8 closures every render). With this handler stable across renders,
+  // the memoized RoomChip can skip work when only `selectedRoom`
+  // changes — only the two affected chips re-render instead of all 8.
+  const handleRoomPick = useCallback((chip) => {
+    setSelectedRoom(chip.key);
+    // If a style is currently selected, re-fire its prompt swap with
+    // the new room so the input updates immediately (don't make user
+    // re-tap the style card). Skip if no style is selected.
+    if (selectedStyle) {
+      const orig = selectedStyle.prompt || '';
+      const swapped = orig.replace(
+        /(living room|bedroom|kitchen|dining room|office|bathroom|outdoor|nursery|dorm room)/i,
+        chip.key
+      );
+      if (swapped !== orig) {
+        setSelectedStyle({ ...selectedStyle, prompt: swapped });
+        setPrompt(swapped);
+        bumpInputKey();
+      }
+    }
+  }, [selectedStyle]);
   // The input bar's height is now driven entirely by the multiline
   // TextInput's intrinsic content size (capped by maxHeight on styles.inputBar).
   // We no longer track expansion in React state — the previous approach used
@@ -1239,48 +1486,59 @@ export default function HomeScreen({ navigation, route }) {
   // tint is the reliable signal that the hero has actually drawn pixels.
   const [hero0Loaded, setHero0Loaded] = useState(false);
 
-  useEffect(() => {
-    let cancelled = false;
+  // Build 147 (H13): pause hero slideshow on tab blur. HomeScreen sits
+  // under bottom tabs and never unmounts — without useFocusEffect, the
+  // setTimeout + crossfade Animated.timing kept ticking while user was
+  // on Cart/Profile/Snap. Even though the crossfade is native-driven
+  // (cheap), the setMountedHeroSet update + JPEG-decode side effects
+  // were running indefinitely off-screen, burning CPU + battery. Now:
+  // animation runs only while Home is focused; on blur the cleanup
+  // clears the pending timer; on next focus it resumes from the
+  // current heroCurrentIdx.
+  useFocusEffect(
+    useCallback(() => {
+      let cancelled = false;
 
-    const scheduleNext = () => {
-      heroTimerRef.current = setTimeout(() => {
-        if (cancelled) return;
-        const currentIdx = heroCurrentIdx.current;
-        const nextIdx = (currentIdx + 1) % HERO_IMAGES.length;
-
-        // Mount nextIdx if not yet mounted. iOS will start decoding as soon
-        // as <Image> mounts; opacity ramps up over HERO_FADE_MS (1200ms),
-        // which is well above bundled-JPEG decode time (~50-100ms).
-        setMountedHeroSet(prev => {
-          if (prev.has(nextIdx)) return prev;
-          const next = new Set(prev);
-          next.add(nextIdx);
-          return next;
-        });
-
-        // Crossfade: fade out current + fade in next simultaneously
-        Animated.parallel([
-          Animated.timing(heroOpacities[nextIdx], {
-            toValue: 1,
-            duration: HERO_FADE_MS,
-            useNativeDriver: true,
-          }),
-          Animated.timing(heroOpacities[currentIdx], {
-            toValue: 0,
-            duration: HERO_FADE_MS,
-            useNativeDriver: true,
-          }),
-        ]).start(() => {
+      const scheduleNext = () => {
+        heroTimerRef.current = setTimeout(() => {
           if (cancelled) return;
-          heroCurrentIdx.current = nextIdx;
-          scheduleNext();
-        });
-      }, HERO_INTERVAL);
-    };
+          const currentIdx = heroCurrentIdx.current;
+          const nextIdx = (currentIdx + 1) % HERO_IMAGES.length;
 
-    scheduleNext();
-    return () => { cancelled = true; clearTimeout(heroTimerRef.current); };
-  }, []);
+          // Mount nextIdx if not yet mounted. iOS will start decoding as soon
+          // as <Image> mounts; opacity ramps up over HERO_FADE_MS (1200ms),
+          // which is well above bundled-JPEG decode time (~50-100ms).
+          setMountedHeroSet(prev => {
+            if (prev.has(nextIdx)) return prev;
+            const next = new Set(prev);
+            next.add(nextIdx);
+            return next;
+          });
+
+          // Crossfade: fade out current + fade in next simultaneously
+          Animated.parallel([
+            Animated.timing(heroOpacities[nextIdx], {
+              toValue: 1,
+              duration: HERO_FADE_MS,
+              useNativeDriver: true,
+            }),
+            Animated.timing(heroOpacities[currentIdx], {
+              toValue: 0,
+              duration: HERO_FADE_MS,
+              useNativeDriver: true,
+            }),
+          ]).start(() => {
+            if (cancelled) return;
+            heroCurrentIdx.current = nextIdx;
+            scheduleNext();
+          });
+        }, HERO_INTERVAL);
+      };
+
+      scheduleNext();
+      return () => { cancelled = true; clearTimeout(heroTimerRef.current); };
+    }, [])
+  );
 
   // Build 89: removed `scrollY` Animated.Value. It was being written by a
   // 60Hz onScroll handler on the home ScrollView but read by NOTHING — pure
@@ -1322,18 +1580,34 @@ export default function HomeScreen({ navigation, route }) {
   // slotIndex increments once per 3-hour window, cycling through HIGHLIGHT_POOL.
   // useMemo with [] so it's computed once on mount (same slot for the whole session).
   const dealProduct = useMemo(() => {
-    if (HIGHLIGHT_POOL.length > 0) {
+    const pool = getHighlightPool();
+    if (pool.length > 0) {
       const slotIndex = Math.floor(Date.now() / (3 * 60 * 60 * 1000));
-      return HIGHLIGHT_POOL[slotIndex % HIGHLIGHT_POOL.length];
+      return pool[slotIndex % pool.length];
     }
     return FEATURED_PRODUCTS[0] || null;
   }, []);
 
   // ── Effects ─────────────────────────────────────────────────────────────────
 
+  // Build 147 (M5): greeting refresh moved from a 60s setInterval (which
+  // ran forever, including while Home was blurred) to event-driven:
+  //   - recompute once on every Home focus (covers tab return)
+  //   - recompute on AppState 'active' (covers foreground after long
+  //     background, the only time staleness is user-visible across the
+  //     morning/afternoon/evening boundaries)
+  // Removes one always-on JS-thread timer; greeting accuracy is unchanged
+  // for any user-visible interaction pattern.
+  useFocusEffect(
+    useCallback(() => {
+      setGreeting(getGreeting());
+    }, [])
+  );
   useEffect(() => {
-    const timer = setInterval(() => setGreeting(getGreeting()), 60_000);
-    return () => clearInterval(timer);
+    const sub = AppState.addEventListener('change', (next) => {
+      if (next === 'active') setGreeting(getGreeting());
+    });
+    return () => sub.remove();
   }, []);
 
   // (Build 89: snapspace_recently_viewed read folded into the multiGet above.)
@@ -3387,27 +3661,20 @@ export default function HomeScreen({ navigation, route }) {
     <TabScreenFade style={styles.container}>
       {/* Hero background — crossfading slideshow.
           Build 89: <Image> mounts gated on `mountedHeroSet.has(i)` so iOS
-          only decodes images we've actually displayed. See lazy-mount
-          comment on the heroOpacities useEffect above. */}
-      <View style={styles.bgImage}>
-        {HERO_IMAGES.map((src, i) => (
-          <Animated.View key={i} style={[StyleSheet.absoluteFill, { opacity: heroOpacities[i], justifyContent: 'center' }]}>
-            {mountedHeroSet.has(i) && (
-              <Image
-                source={src}
-                style={{ width: '100%', height: '100%' }}
-                resizeMode="cover"
-                // Build 127: hero[0] gates the tint mount. See hero0Loaded
-                // comment above. Other indices don't need this — by the
-                // time the slideshow advances to them, hero[0] is already
-                // loaded and the tint is in place.
-                onLoad={i === 0 ? () => setHero0Loaded(true) : undefined}
-              />
-            )}
-          </Animated.View>
-        ))}
-      </View>
-      {hero0Loaded && <View style={styles.heroTint} pointerEvents="none" />}
+          only decodes images we've actually displayed.
+          Build 127: hero[0] gates the tint mount via hero0Loaded.
+          Build 147 (H6): JSX extracted to memoized <HeroSlideshow>.
+          Props are ref-stable (heroOpacities) or change only on real
+          slideshow events (mountedHeroSet, hero0Loaded, onHero0Load).
+          Prompt-input keystrokes no longer re-walk 7 Animated.View
+          nodes + 7 inline style-array allocations. */}
+      <HeroSlideshow
+        heroOpacities={heroOpacities}
+        mountedHeroSet={mountedHeroSet}
+        hero0Loaded={hero0Loaded}
+        onHero0Load={handleHero0Load}
+      />
+      {/* hero0Loaded tint is rendered inside HeroSlideshow — see component above. */}
 
       <ScrollView
         style={StyleSheet.absoluteFill}
@@ -3586,50 +3853,20 @@ export default function HomeScreen({ navigation, route }) {
                       matcher (a dorm is architecturally a bedroom — bed,
                       nightstand, dresser, rug all fit). styleMap.js's
                       ROOM_KEYWORDS.bedroom includes 'dorm' / 'dorm room'
-                      so prompt parsing recognizes it. */}
-                  {[
-                    { key: 'living room', label: 'Living Room' },
-                    { key: 'kitchen',     label: 'Kitchen'    },
-                    { key: 'bedroom',     label: 'Bedroom'    },
-                    { key: 'dining room', label: 'Dining'     },
-                    { key: 'office',      label: 'Office'     },
-                    { key: 'bathroom',    label: 'Bathroom'   },
-                    { key: 'outdoor',     label: 'Outdoor'    },
-                    { key: 'dorm room',   label: 'Dorms'      },
-                  ].map((r) => {
-                    const active = selectedRoom === r.key;
-                    return (
-                      <TouchableOpacity
-                        key={r.key}
-                        onPress={() => {
-                          setSelectedRoom(r.key);
-                          // If a style is currently selected, re-fire its
-                          // prompt swap with the new room so the input
-                          // updates immediately (don't make user re-tap
-                          // the style card). Skip if no style is selected.
-                          if (selectedStyle) {
-                            const orig = selectedStyle.prompt || '';
-                            const swapped = orig.replace(
-                              /(living room|bedroom|kitchen|dining room|office|bathroom|outdoor|nursery|dorm room)/i,
-                              r.key
-                            );
-                            if (swapped !== orig) {
-                              setSelectedStyle({ ...selectedStyle, prompt: swapped });
-                              setPrompt(swapped);
-                              bumpInputKey();
-                            }
-                          }
-                        }}
-                        style={styles.roomChipAbove}
-                        activeOpacity={0.6}
-                        hitSlop={{ top: 8, bottom: 8, left: 4, right: 4 }}
-                      >
-                        <Text style={[styles.roomChipAboveLabel, active && styles.roomChipAboveLabelActive]}>
-                          {r.label}
-                        </Text>
-                      </TouchableOpacity>
-                    );
-                  })}
+                      so prompt parsing recognizes it.
+                      Build 147 (H7) — chip array hoisted to module scope
+                      as ROOM_CHIPS; memoized RoomChip child reads
+                      `active` per chip and a useCallback-stable
+                      handleRoomPick handler. Per-keystroke re-renders
+                      of these 8 nodes are eliminated. */}
+                  {ROOM_CHIPS.map((chip) => (
+                    <RoomChip
+                      key={chip.key}
+                      chip={chip}
+                      active={selectedRoom === chip.key}
+                      onSelect={handleRoomPick}
+                    />
+                  ))}
                 </ScrollView>
               </View>
             )}
@@ -4212,74 +4449,7 @@ export default function HomeScreen({ navigation, route }) {
                   windowSize={5}
                   removeClippedSubviews
                   contentContainerStyle={{ paddingRight: 20, gap: 10 }}
-                  renderItem={({ item: product }) => (
-                    <TouchableOpacity
-                      style={resultStyles.hCard}
-                      activeOpacity={0.7}
-                      onPress={() => {
-                        setShowResult(false);
-                        navigation?.navigate('ProductDetail', { product });
-                      }}
-                    >
-                      <CardImage
-                        uri={product.imageUrl}
-                        style={resultStyles.hCardImg}
-                        resizeMode="cover"
-                        compact
-                      />
-                      <View style={resultStyles.hCardBody}>
-                        <Text style={resultStyles.hCardName} numberOfLines={2}>{product.name}</Text>
-                        <Text style={resultStyles.hCardBrand}>{product.brand}</Text>
-                        {!!product.rating && (
-                          <View style={resultStyles.hCardRating}>
-                            {[1,2,3,4,5].map(i => (
-                              <Svg key={i} width={10} height={10} viewBox="0 0 24 24" fill={i <= Math.round(product.rating) ? '#67ACE9' : '#E5E7EB'} stroke="none">
-                                <Path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                              </Svg>
-                            ))}
-                            <Text style={resultStyles.hCardRatingText}>{product.rating.toFixed(1)}</Text>
-                            {!!product.reviewCount && (
-                              <Text style={resultStyles.hCardReviews}>({product.reviewCount.toLocaleString()})</Text>
-                            )}
-                          </View>
-                        )}
-                        <Text style={resultStyles.hCardPrice}>
-                          {typeof product.priceValue === 'number'
-                            ? `$${product.priceValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
-                            : typeof product.price === 'number'
-                              ? `$${product.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
-                              : product.priceLabel || String(product.price).replace(/^\$+/, '$')}
-                        </Text>
-                      </View>
-                      {(() => {
-                        const cartKey = `${product.name}__${product.brand}`;
-                        const inCart = cartItems.some(i => i.key === cartKey);
-                        return (
-                          <TouchableOpacity
-                            style={[resultStyles.hCardAdd, inCart && resultStyles.hCardAddDone]}
-                            activeOpacity={0.7}
-                            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-                            onPress={() => {
-                              if (!inCart) {
-                                addToCart({ ...product, price: product.priceValue ?? product.price });
-                              }
-                            }}
-                          >
-                            {inCart ? (
-                              <Svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
-                                <Polyline points="20 6 9 17 4 12" />
-                              </Svg>
-                            ) : (
-                              <Svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="#0B6DC3" strokeWidth={1.2}>
-                                <Line x1={12} y1={5} x2={12} y2={19} />
-                                <Line x1={5} y1={12} x2={19} y2={12} />
-                              </Svg>
-                            )}
-                          </TouchableOpacity>
-                        );
-                      })()}
-                    </TouchableOpacity>
-                  )}
+                  renderItem={renderResultProduct}
                 />
               </View>
             )}
