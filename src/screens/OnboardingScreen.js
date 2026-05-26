@@ -57,6 +57,7 @@ import {
   Dimensions,
   StatusBar,
   KeyboardAvoidingView,
+  Keyboard,
   Platform,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -188,6 +189,23 @@ export default function OnboardingScreen({ navigation, route }) {
   });
   const updateIntake = useCallback((key, value) => {
     setIntakeAnswers((prev) => ({ ...prev, [key]: value }));
+  }, []);
+
+  // Build 149.1 — keyboard visibility tracker. When the user taps an
+  // intake field (slides 2-4) iOS's keyboard pushes the page content
+  // up, and the progress-bar row + back-arrow row at the bottom of
+  // the slide end up sitting flush above the keyboard, overlapping
+  // the Continue button. Hiding them while the keyboard is up keeps
+  // the focused-input view clean; they reappear the moment the
+  // keyboard dismisses.
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
+  useEffect(() => {
+    const showSub = Keyboard.addListener('keyboardDidShow', () => setKeyboardVisible(true));
+    const hideSub = Keyboard.addListener('keyboardDidHide', () => setKeyboardVisible(false));
+    return () => {
+      showSub.remove();
+      hideSub.remove();
+    };
   }, []);
 
   // Track whether the user has reached page 5 yet. The auth completion
@@ -496,14 +514,19 @@ export default function OnboardingScreen({ navigation, route }) {
               </View>
             </View>
 
-            {/* Progress bars pinned to bottom via parent space-between */}
-            <ProgressBars count={TOTAL_PAGES} active={index} />
+            {/* Progress bars pinned to bottom via parent space-between.
+                Build 149.1 — hidden while the keyboard is up (intake
+                field focused) to avoid overlap with the Continue
+                button just above. */}
+            {!keyboardVisible && <ProgressBars count={TOTAL_PAGES} active={index} />}
 
             {/* Build 148.2 — thin back arrow at the bottom-left, under
                 the progress bars. Slides 2-4 only (slide 1 has no
                 previous slide; slide 5+ render their back via their own
-                components). Tap → goToPage(pageIndex - 1). */}
-            {showBackArrow && (
+                components). Tap → goToPage(pageIndex - 1).
+                Build 149.1 — same keyboard-hide treatment as the
+                progress bars above; reappears on dismiss. */}
+            {showBackArrow && !keyboardVisible && (
               <View style={styles.backArrowRow}>
                 <TouchableOpacity
                   style={styles.backArrowBtn}
@@ -521,7 +544,7 @@ export default function OnboardingScreen({ navigation, route }) {
         </PageWrapper>
       </View>
     );
-  }, [insets, handleContinue, handleBack, navigation, pageIndex, advanceFromPaywall, intakeAnswers, updateIntake]);
+  }, [insets, handleContinue, handleBack, navigation, pageIndex, advanceFromPaywall, intakeAnswers, updateIntake, keyboardVisible]);
 
   return (
     <View style={styles.root}>

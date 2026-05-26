@@ -44,6 +44,7 @@ import {
   ActivityIndicator,
   Alert,
   KeyboardAvoidingView,
+  Keyboard,
   Platform,
   ScrollView,
 } from 'react-native';
@@ -181,6 +182,21 @@ export default function OnboardingAuthPage({
 
   // Apple Auth availability — probed once on mount.
   const [appleAvailable, setAppleAvailable] = useState(false);
+
+  // Build 149.1 — keyboard visibility tracker. In form mode the user
+  // taps email/password fields and the iOS keyboard pushes the form
+  // up, parking the progress-bar row + back-arrow row right above
+  // the keyboard. Hiding both while the keyboard is up keeps the
+  // typing context clean; they reappear on keyboard dismiss.
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
+  useEffect(() => {
+    const showSub = Keyboard.addListener('keyboardDidShow', () => setKeyboardVisible(true));
+    const hideSub = Keyboard.addListener('keyboardDidHide', () => setKeyboardVisible(false));
+    return () => {
+      showSub.remove();
+      hideSub.remove();
+    };
+  }, []);
 
   // Inline credentials state — lifted from the previous SignInSheet
   // verbatim. Same validators, same Alerts, same promo redemption.
@@ -648,23 +664,28 @@ export default function OnboardingAuthPage({
           Build 148.2 — back arrow row added below the progress bars
           for consistency with slides 2-4. Same icon, same position,
           same hit area. Tap behavior differs by mode (see
-          handleBackArrowPress above). */}
-      <View style={[styles.progressWrap, { paddingBottom: insets.bottom + 8 }]}>
-        {progressDots}
-        <View style={styles.backArrowRow}>
-          <TouchableOpacity
-            style={styles.backArrowBtn}
-            onPress={handleBackArrowPress}
-            disabled={loading}
-            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-            activeOpacity={0.6}
-            accessibilityRole="button"
-            accessibilityLabel={mode === 'form' ? 'Back to sign-in options' : 'Back'}
-          >
-            <BackChevronIcon />
-          </TouchableOpacity>
+          handleBackArrowPress above).
+          Build 149.1 — entire bottom block hides while the keyboard
+          is up so it doesn't sit flush against the keyboard / overlap
+          the form submit button. Reappears on dismiss. */}
+      {!keyboardVisible && (
+        <View style={[styles.progressWrap, { paddingBottom: insets.bottom + 8 }]}>
+          {progressDots}
+          <View style={styles.backArrowRow}>
+            <TouchableOpacity
+              style={styles.backArrowBtn}
+              onPress={handleBackArrowPress}
+              disabled={loading}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+              activeOpacity={0.6}
+              accessibilityRole="button"
+              accessibilityLabel={mode === 'form' ? 'Back to sign-in options' : 'Back'}
+            >
+              <BackChevronIcon />
+            </TouchableOpacity>
+          </View>
         </View>
-      </View>
+      )}
     </View>
   );
 }
