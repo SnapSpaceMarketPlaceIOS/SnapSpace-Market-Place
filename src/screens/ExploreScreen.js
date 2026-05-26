@@ -1453,12 +1453,16 @@ export default function ExploreScreen({ navigation, route }) {
                 <Text style={styles.emptyStateSub}>Try a different category or search</Text>
               </View>
             ) : (
-              {/* Build 147 (C3): inline 50-line product card replaced with
-                  the memoized ProductGridCell (declared above main). Each
-                  card now skips re-render when its product/onPress/
-                  gridCols/cardRadius don't change — eliminates the
-                  24+ subtree rebuild that happened on every scroll
-                  pagination bump or filter sheet open. */}
+              // Build 147 (C3): inline 50-line product card replaced with
+              // the memoized ProductGridCell (declared above main). Each
+              // card now skips re-render when its product/onPress/
+              // gridCols/cardRadius don't change — eliminates the
+              // 24+ subtree rebuild that happened on every scroll
+              // pagination bump or filter sheet open.
+              // Build 150 syntax-fix: a JSX-style comment here was an
+              // error — a ternary branch's parens can hold only ONE
+              // expression, not a comment + a sibling View. Converted
+              // to line comments so the parser only sees the View.
               <View style={[styles.grid, gridCols === 1 && { paddingHorizontal: 10 }]}>
                 {visibleProducts.map((product) => (
                   <ProductGridCell
