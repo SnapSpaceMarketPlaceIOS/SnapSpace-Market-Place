@@ -1,16 +1,22 @@
 /**
- * aiProvider.js — Single-provider AI generation router (FAL only).
+ * aiProvider.js — Single-provider AI generation router.
+ *   Gateway: fal.ai     Model: openai/gpt-image-2/edit
  *
- * ── Build 63 (Gate A): retired the replicate/fal feature flag ──────────────
+ * ── Model swap: flux-2-pro/edit → GPT Image 2 edit ─────────────────────────
+ * The fal.ai GATEWAY is unchanged (same proxyFetch('fal', …), same
+ * FAL_API_KEY, same queue.fal.run host). Only the MODEL changed: the three
+ * generation fns now route to `./openai` (GPT Image 2 edit) instead of
+ * `./fal` (flux-2-pro/edit). All call-site signatures and return shapes are
+ * preserved, so screens need no changes.
+ *
+ * fal.js stays in the repo as orphaned code — the rollback path. Re-point the
+ * import below back to './fal' to revert to flux instantly. (This mirrors how
+ * replicate.js was kept after Build 63's Replicate→FAL swap.)
+ *
+ * ── Build 63 (Gate A) history: retired the replicate/fal feature flag ──────
  * Previously this module routed between `replicateService` and `falService`
- * based on `EXPO_PUBLIC_AI_PROVIDER`. With FAL validated in production and
- * cost-proven (~$0.06/gen vs Replicate's ~$0.13/gen), the flag became a
- * liability — any accidental flip in .env or EAS secrets silently doubled
- * generation cost. The flag is now a no-op; FAL is the only code path.
- *
- * replicate.js remains in the repo as orphaned code for reference, but is
- * no longer imported by any live module. It can be deleted in a future
- * cleanup pass once the team has confidence in Build 63+.
+ * based on `EXPO_PUBLIC_AI_PROVIDER`. That flag is now a no-op. replicate.js
+ * is doubly-orphaned and can be deleted in a future cleanup pass.
  *
  * ── Public surface ─────────────────────────────────────────────────────────
  *   generateWithProductPanel(roomURL, prompt, products, panelURL, aspect)
@@ -24,7 +30,10 @@
  * file if we ever need to bring in a third backend.
  */
 
-import * as falService from './fal';
+// Active model: GPT Image 2 edit (via the fal.ai gateway). To roll back to
+// flux-2-pro/edit, change this single import to `from './fal'` — both modules
+// export the identical three-fn surface.
+import * as genService from './openai';
 import { pickAspectRatio as pickAspectRatioImpl, buildFinalPrompt as buildFinalPromptImpl } from './promptBuilders';
 
 // ── Legacy feature-flag compatibility ────────────────────────────────────────
@@ -38,9 +47,9 @@ if (LEGACY_FLAG && LEGACY_FLAG !== 'fal') {
     ' is ignored — FAL is the only supported provider as of Build 63.'
   );
 }
-console.log('[aiProvider] Active provider: fal (locked)');
+console.log('[aiProvider] Active: fal gateway · model openai/gpt-image-2/edit');
 
-// ── Generation functions — always FAL ────────────────────────────────────────
+// ── Generation functions — fal gateway, GPT Image 2 edit model ───────────────
 
 /**
  * Full-room redesign with 2×2 product panel. Primary generation path.
@@ -50,24 +59,24 @@ console.log('[aiProvider] Active provider: fal (locked)');
  * @param {Array}  products      Matched affiliate products (up to 4)
  * @param {string} panelUrl      Supabase storage URL of the 2×2 product grid
  * @param {string} aspectRatio   e.g. '16:9', '3:2', '1:1'
- * @returns {Promise<{ url: string, predictionId: string, seed: number }>}
+ * @returns {Promise<{ url: string, predictionId: string, seed: null }>} (GPT Image 2 has no seed)
  */
 export function generateWithProductPanel(roomPhotoUrl, userPrompt, products, panelUrl, aspectRatio) {
-  return falService.generateWithProductPanel(roomPhotoUrl, userPrompt, products, panelUrl, aspectRatio);
+  return genService.generateWithProductPanel(roomPhotoUrl, userPrompt, products, panelUrl, aspectRatio);
 }
 
 /**
  * Full-room redesign using individual product images (fallback when panel fails).
  */
 export function generateWithProductRefs(roomPhotoUrl, userPrompt, products, aspectRatio) {
-  return falService.generateWithProductRefs(roomPhotoUrl, userPrompt, products, aspectRatio);
+  return genService.generateWithProductRefs(roomPhotoUrl, userPrompt, products, aspectRatio);
 }
 
 /**
  * Visualize a single product in the user's room ("Visualize in your space").
  */
 export function generateSingleProductInRoom(roomPhotoUrl, product, aspectRatio) {
-  return falService.generateSingleProductInRoom(roomPhotoUrl, product, aspectRatio);
+  return genService.generateSingleProductInRoom(roomPhotoUrl, product, aspectRatio);
 }
 
 // ── Model-agnostic utilities — source of truth in promptBuilders.js ──────────

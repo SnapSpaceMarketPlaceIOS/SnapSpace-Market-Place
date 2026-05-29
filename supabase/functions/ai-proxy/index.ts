@@ -123,10 +123,13 @@ const PROVIDERS: Record<string, ProviderConfig> = {
     envKey: "FAL_API_KEY",
     authHeader: (key) => ({ Authorization: `Key ${key}` }),
     // FAL queue submissions hit queue.fal.run; direct inference hits
-    // fal.run; the rest API uses rest.fal.run. All legitimate fal paths
-    // start with /fal-ai/ (the namespace prefix for every model).
+    // fal.run; the rest API uses rest.fal.run. fal namespaces models by
+    // owner: first-party models under /fal-ai/ (e.g. flux-2-pro/edit),
+    // partner models under their own namespace — OpenAI's GPT Image 2 edit
+    // lives at /openai/gpt-image-2/edit. Both are the same fal account/key,
+    // so this stays ONE provider; we just allow both path prefixes.
     allowedHosts: ["queue.fal.run", "fal.run", "rest.fal.run"],
-    allowedPathPrefixes: ["/fal-ai/"],
+    allowedPathPrefixes: ["/fal-ai/", "/openai/"],
   },
 };
 
@@ -194,8 +197,9 @@ function isPollingRead(method: string, url: string): boolean {
   const p = parsed.pathname;
   // Replicate: GET /v1/predictions/<id>
   if (/^\/v1\/predictions\/[A-Za-z0-9_-]+$/.test(p)) return true;
-  // FAL: GET /fal-ai/.../requests/<id>/status  or  .../requests/<id>
-  if (/^\/fal-ai\/.+\/requests\/[A-Za-z0-9_-]+(\/status)?$/.test(p)) return true;
+  // FAL: GET /<namespace>/.../requests/<id>/status  or  .../requests/<id>
+  // namespace is /fal-ai/ (flux) or /openai/ (GPT Image 2) — same fal queue.
+  if (/^\/(fal-ai|openai)\/.+\/requests\/[A-Za-z0-9_-]+(\/status)?$/.test(p)) return true;
   // BFL: GET /v1/get_result?id=<id>
   if (p === "/v1/get_result") return true;
   return false;
