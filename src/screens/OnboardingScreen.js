@@ -93,13 +93,13 @@ const PAGES = [
   {
     step: 1,
     title: 'Picture the\npossibilities',
-    body: 'Point your camera at any room,\nempty or fully lived-in.',
+    body: 'Point your camera at any room, empty or fully lived-in.',
     cta: null, // slide 1 = Log In + Sign Up dual buttons
   },
   {
     step: 2,
     title: 'Wish it.\nSee it.',
-    body: 'Describe your dream room. Our\ngenie designs it in seconds.',
+    body: 'Describe your dream room. Our genie designs it in seconds.',
     cta: 'Continue',
     intakeKey: 'firstName',
     intakePlaceholder: 'First name…',
@@ -108,7 +108,7 @@ const PAGES = [
   {
     step: 3,
     title: 'Shop every\npiece',
-    body: 'Every item in your room is real,\navailable, and one tap away.',
+    body: 'Every item in your room is real, available, and one tap away.',
     cta: 'Continue',
     intakeKey: 'shoppingPref',
     intakePlaceholder: 'Where do you shop right now for home design…',
@@ -121,7 +121,7 @@ const PAGES = [
     // the 224pt usable width without wrapping. styleSlide4 applies the
     // smaller font + extra body padding.
     title: 'Just what you need',
-    body: 'Want a chair for that corner? A rug\nfor the bedroom? Snap the space\nand shop one piece at a time.',
+    body: 'Want a chair for that corner? A rug for the bedroom? Snap the space and shop one piece at a time.',
     cta: 'Continue',
     intakeKey: 'referralSource',
     intakePlaceholder: 'How did you hear about us?',
@@ -142,7 +142,7 @@ const PAGES = [
   {
     step: 7,
     title: 'A gift to get\nyou started',
-    body: '5 free wishes are yours. Snap a\nroom, make a wish, watch it\ncome to life, Shop it!',
+    body: '5 free wishes are yours. Snap a room, make a wish, watch it come to life, Shop it!',
     cta: 'Continue For FREE',
   },
 ];
@@ -370,13 +370,10 @@ export default function OnboardingScreen({ navigation, route }) {
     // before the intake pill below. Other slides keep the default
     // title styling.
     const isSlide4 = item.step === 4;
-    // Build 148.4 — slide 7 (reward) uses center alignment instead of
-    // space-between so the title + body + Continue button group sits
-    // visually centered in the content block (the "bottom half of the
-    // phone screen where it doesn't display the video"), rather than
-    // anchored to the top of the content area with a yawning gap
-    // before the CTA. No intake on this slide, so center alignment
-    // doesn't compete with anything.
+    // Build 151 — slide 7 (reward) is the other no-intake slide, so it
+    // shares slide 1's title placement: title nudged down from the top
+    // (titleBlockSlide1) while the Continue button pins to the bottom via
+    // contentMiddle's space-between — matching the rest of the funnel.
     const isSlide7 = item.step === 7;
     const PageWrapper = hasIntake ? KeyboardAvoidingView : View;
     const wrapperProps = hasIntake
@@ -431,18 +428,12 @@ export default function OnboardingScreen({ navigation, route }) {
               below the progress bars without pushing content out.
               ─────────────────────────────────────────────────────────────── */}
           <View style={[styles.contentBlock, { paddingBottom: insets.bottom + 8 }]}>
-            <View
-              style={[
-                styles.contentMiddle,
-                isSlide7 && styles.contentMiddleSlide7,
-              ]}
-            >
+            <View style={[styles.contentMiddle, isSlide7 && styles.contentMiddleSlide7]}>
               <View
                 style={[
                   styles.titleBlock,
-                  isSlide1 && styles.titleBlockSlide1,
+                  (isSlide1 || isSlide7) && styles.titleBlockSlide1,
                   isSlide4 && styles.titleBlockSlide4,
-                  isSlide7 && styles.titleBlockSlide7,
                 ]}
               >
                 <Text style={[styles.title, isSlide4 && styles.titleSlide4]}>
@@ -517,8 +508,16 @@ export default function OnboardingScreen({ navigation, route }) {
             {/* Progress bars pinned to bottom via parent space-between.
                 Build 149.1 — hidden while the keyboard is up (intake
                 field focused) to avoid overlap with the Continue
-                button just above. */}
-            {!keyboardVisible && <ProgressBars count={TOTAL_PAGES} active={index} />}
+                button just above.
+                Build 151 — also hidden on slide 7 (the terminal reward
+                slide). The funnel is complete there (all 7 segments would
+                be filled anyway), and the bars were the element creating
+                the empty gap directly beneath the lone "Continue For FREE"
+                CTA — removing them lets that button anchor low instead of
+                floating. */}
+            {!keyboardVisible && !isSlide7 && (
+              <ProgressBars count={TOTAL_PAGES} active={index} />
+            )}
 
             {/* Build 148.2 — thin back arrow at the bottom-left, under
                 the progress bars. Slides 2-4 only (slide 1 has no
@@ -689,6 +688,16 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingBottom: 18,
   },
+  // Build 151 — slide 7 (terminal reward) override. Drops the 18pt bottom
+  // padding to 0 so the lone "Continue For FREE" CTA anchors just above the
+  // home-indicator safe area (the contentBlock still carries insets.bottom+8
+  // below) instead of floating ~70pt above the bottom edge. Paired with the
+  // hidden progress bars on this slide, this closes the empty gap under the
+  // button the user flagged as "too high." flex:1 + space-between are
+  // inherited from contentMiddle, so the title still floats at the top.
+  contentMiddleSlide7: {
+    paddingBottom: 0,
+  },
 
   // Title block — sits in the upper-middle of the content area.
   // Build 148.2: paddingTop 24 → 8 per user feedback ("heading and
@@ -698,7 +707,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingTop: 8,
   },
-  // Build 148.3 — slide-1 specific override. Without an intake pill,
+  // Build 148.3 — slide-1 override (Build 151: also applied to slide 7,
+  // the other no-intake slide). Without an intake pill,
   // the contentMiddle's space-between layout floats the dual-button
   // row at the bottom and leaves a large empty middle on slide 1.
   // Pushing the title down ~52pt visually centers the "Picture the
@@ -719,19 +729,6 @@ const styles = StyleSheet.create({
     fontSize: 28,
     lineHeight: 34,
   },
-  // Build 148.4 — slide-7 (reward) overrides. Without an intake field
-  // and with a single Continue button, the default space-between
-  // layout left a yawning empty middle. Switching contentMiddle to
-  // justifyContent:'center' + adding a slight gap between title block
-  // and the bottom group visually anchors the title + Continue pair
-  // in the bottom half of the screen, per user spec.
-  contentMiddleSlide7: {
-    justifyContent: 'center',
-    gap: 24,
-  },
-  titleBlockSlide7: {
-    paddingTop: 0, // override the default 8pt — center owns the layout now
-  },
   // Build 147 v9: fontSize 34 → 38 + lineHeight 40 → 44 (heading larger
   // per user spec).
   title: {
@@ -744,13 +741,23 @@ const styles = StyleSheet.create({
   },
   // Build 147 v9: fontSize 16 → 18 (subheading larger) + color
   // BLUE_PRIMARY → BLUE_LIGHT (lighter, friendlier blue per user).
+  // Build 151 — pre-publish polish: subheading enlarged (18 → 19) with
+  // more breathing room (lineHeight 24 → 26, marginTop 10 → 14,
+  // letterSpacing 0.2) so the copy under the video reads as deliberate
+  // rather than cramped. Color stays BLUE_LIGHT per user direction.
+  // maxWidth 320 + center caps the line measure so the body wraps to a
+  // tidy column on wide devices; the hard line breaks in PAGES were
+  // removed so every line wraps naturally instead of at fixed points.
   body: {
-    marginTop: 10,
-    fontSize: 18,
+    marginTop: 14,
+    fontSize: 19,
     fontWeight: '400',
     color: BLUE_LIGHT,
     textAlign: 'center',
-    lineHeight: 24,
+    lineHeight: 26,
+    letterSpacing: 0.2,
+    maxWidth: 320,
+    alignSelf: 'center',
   },
 
   // Build 148.2 — bottomGroup hosts intake (when present) + the CTA
