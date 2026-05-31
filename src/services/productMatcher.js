@@ -4,7 +4,7 @@
 // argument value below so consumers that pass an explicit catalog
 // (tests, screen-specific subsets) still work unchanged.
 import { getCatalog } from '../data/productCatalog';
-import { STYLE_AFFINITY, ROOM_FURNITURE } from '../data/styleMap';
+import { STYLE_AFFINITY, ROOM_FURNITURE, DESIGN_STYLES } from '../data/styleMap';
 import {
   productHasColorFamily,
   getColorOppositionPenalty,
@@ -51,6 +51,39 @@ const MAX_PER_CATEGORY = 1;
 // exact-style bonus (Workstream C3), the top scorer is now reliably the
 // best stylistic match instead of a near-tie that varies on noise.
 const RANDOM_POOL_SIZE = 4;
+
+// Phase 3 (Build 155) — over-claim specificity dampening.
+// A product that lists a handful of canonical design styles is a credible,
+// focused style signal. A product that lists 10–17 canonical styles (the
+// "universal matcher" — e.g. a coastal lamp ALSO claiming japandi, biophilic,
+// glam, dark-luxe…) matches nearly every style prompt at full strength and so
+// wins its category across unrelated styles. Audit 2026-05-31 (read-only):
+//   • 48 products (7.8%) claim >=10 canonical styles yet filled 26.5% of all
+//     selected slots; one floor lamp won 13 of 14 distinct style prompts, and
+//     the TOBUSA table lamp (14 claims) won 10/14. THIS is "blue lamp in every
+//     output" (Issue 1) and "coastal lamp in a Mediterranean room" (Issue 2).
+// We deliberately do NOT edit catalog data (617 records, hard to audit, risks
+// dropping legit styles). Instead we scale the STYLE-axis credit by claim
+// breadth so a focused competitor outranks the universal matcher wherever one
+// exists; the universal matcher still surfaces when it's the only option
+// (thin pools). Purely a score scaler — no product is filtered out, and the
+// whole effect reverts by deleting this block + its call site in scoreProduct.
+//   spec = canonClaims <= K ? 1 : max(FLOOR, K / canonClaims)
+// K=6 (median product claims 4 canonical styles; 6 leaves headroom for a
+// genuinely versatile neutral), FLOOR=0.55 (never fully erase the signal).
+const STYLE_SPECIFICITY_K = 6;
+const STYLE_SPECIFICITY_FLOOR = 0.55;
+const CANONICAL_STYLES = new Set(DESIGN_STYLES);
+const _canonClaimsCache = Object.create(null);
+function canonicalClaimCount(product) {
+  const id = product && product.id;
+  if (id != null && id in _canonClaimsCache) return _canonClaimsCache[id];
+  const styles = Array.isArray(product.styles) ? product.styles : [];
+  let n = 0;
+  for (const s of styles) if (CANONICAL_STYLES.has(s)) n++;
+  if (id != null) _canonClaimsCache[id] = n;
+  return n;
+}
 
 // Top-N pool for the optional wildcard slot. One non-essential result slot
 // gets swapped for a uniform-random pick from these top-N overall scorers
@@ -765,6 +798,18 @@ function scoreProduct(
         break;
       }
     }
+  }
+
+  // ── Over-claim specificity dampening (Build 155) ─────────────────────────
+  // Scale the combined style credit (affinity ×25 + tiered bonus) down for
+  // products that claim an implausible number of canonical styles, so a
+  // focused style match outranks a 14-style "universal matcher". See
+  // STYLE_SPECIFICITY_K / FLOOR above for the rationale + audit numbers.
+  // No-op for normal products (<=K canonical styles → spec = 1.0).
+  const _canonClaims = canonicalClaimCount(product);
+  if (_canonClaims > STYLE_SPECIFICITY_K && breakdown.style > 0) {
+    const spec = Math.max(STYLE_SPECIFICITY_FLOOR, STYLE_SPECIFICITY_K / _canonClaims);
+    breakdown.style *= spec;
   }
 
   // ── Color match (25 points — NEW in Phase 3) ─────────────────────────────
