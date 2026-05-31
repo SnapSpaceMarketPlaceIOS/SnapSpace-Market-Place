@@ -110,12 +110,19 @@ export function getProductsForPrompt(
   productHistory = null,
   likedIds = null,
   cartIds = null,
+  allowedCategories = null,
 ) {
   const parsed = parseDesignPrompt(promptText);
+  // When a category allow-list is supplied (e.g. ANCHOR_CATEGORIES for the
+  // dual-panel anchor grid), pre-filter the catalog so the scorer only ever
+  // sees those categories. Default null = full catalog (unchanged behavior).
+  const catalog = allowedCategories
+    ? getCombinedCatalog().filter((p) => allowedCategories.has(p.category))
+    : getCombinedCatalog();
   const products = matchProducts(
     parsed,
     limit,
-    getCombinedCatalog(),
+    catalog,
     null,
     recentlyShownIds,
     productHistory,
@@ -315,6 +322,40 @@ const ACCENT_CATEGORIES = new Set([
   'table-lamp', 'pendant-light', 'accent-chair', 'side-table',
 ]);
 
+// ── Dual-panel category framing (Workstream B polish) ──────────────────────
+// Panel 1 ("anchor" 2×2) carries the structural centerpieces + the grounding
+// rug; Panel 2 ("decor" 2×2) fills the gaps with lighting, soft goods, and
+// wall/surface decor. ANCHOR_CATEGORIES and DECOR_CATEGORIES are DISJOINT and
+// together EXHAUSTIVE over the catalog's categories, so the assembled
+// 8-product Shop Room strip can never repeat a category across the two panels
+// (this is what kills the "two rugs / both grids are centerpieces" drift) —
+// no separate cross-panel dedup pass is needed.
+const ANCHOR_CATEGORIES = new Set([
+  'sofa', 'sectional', 'loveseat', 'lounge-chair', 'accent-chair',
+  'coffee-table', 'dining-table', 'dining-chair', 'bar-stool', 'kitchen-island',
+  'bed', 'nightstand', 'dresser', 'desk', 'desk-chair', 'office-chair',
+  'bookshelf', 'tv-stand', 'media-console', 'furniture-set', 'fire-pit',
+  'storage', 'rug',
+]);
+
+// Panel 2 — decor / gap-fillers only. Distinct from ACCENT_CATEGORIES (which
+// still powers getRecommendedProducts' "You Might Also Like"): this set
+// deliberately drops rug + accent-chair (now anchors) so Panel 2 never renders
+// a second centerpiece.
+const DECOR_CATEGORIES = new Set([
+  'table-lamp', 'floor-lamp', 'lamp', 'pendant-light', 'chandelier',
+  'wall-art', 'vase', 'planter', 'mirror', 'throw-pillow', 'throw-blanket',
+  'side-table', 'curtains',
+]);
+
+// Primary seating is a single design "group": a room gets ONE of these, never
+// two (a sofa + sectional, or a sofa + a multi-piece furniture-set, reads as
+// "too many centerpieces"). accent-chair / lounge-chair are intentionally NOT
+// in this group — a secondary side chair alongside the main seating is correct.
+const PRIMARY_SEATING = new Set([
+  'sofa', 'sectional', 'loveseat', 'furniture-set',
+]);
+
 /**
  * Get "You Might Also Like" accent recommendations for a design.
  *
@@ -366,4 +407,89 @@ export function getRecommendedProducts(design, excludeIds = [], likedDesignIds =
   // Layer 3: same scoring engine → naturally diverse across accent categories
   const products = matchProducts(parsedPrompt, fetchLimit, accentCatalog);
   return products.slice(0, limit).map(normalizeProduct);
+}
+
+/**
+ * Get accent/decor products matched to a free-text AI design prompt — the
+ * SECOND product panel for Workstream B's dual-panel generation.
+ *
+ * Sibling to getProductsForPrompt: same parse → matchProducts → normalize
+ * pipeline, but the catalog is restricted to DECOR_CATEGORIES (lighting,
+ * textiles, wall/surface decor, etc.) and the center pieces already chosen
+ * for panel 1 are excluded, so the two panels never share a product. Because
+ * DECOR_CATEGORIES is disjoint from ANCHOR_CATEGORIES, the panels also never
+ * share a CATEGORY (no second rug / sofa). The same scoring engine ranks the
+ * decor-filtered catalog, so the accents track the user's style + room
+ * exactly like the center set does.
+ *
+ * @param {string}   promptText - The user's AI generation prompt
+ * @param {string[]} excludeIds - Product IDs already in panel 1 (center pieces)
+ * @param {number}   limit      - Number of accents to return (default 4)
+ * @returns {object[]}          - Normalized, diversified decor products
+ */
+export function getAccentProductsForPrompt(promptText, excludeIds = [], limit = 4) {
+  const excludeSet = new Set(excludeIds);
+  const accentCatalog = getCombinedCatalog().filter(
+    (p) => DECOR_CATEGORIES.has(p.category) && !excludeSet.has(p.id)
+  );
+  if (accentCatalog.length === 0) return [];
+
+  const parsed = parseDesignPrompt(promptText);
+  const products = matchProducts(parsed, limit, accentCatalog);
+  return products.slice(0, limit).map(normalizeProduct);
+}
+
+/**
+ * Get anchor/centerpiece products matched to a free-text AI design prompt —
+ * the FIRST product panel for the dual-panel generation.
+ *
+ * Sibling to getAccentProductsForPrompt: same pipeline, but restricted to
+ * ANCHOR_CATEGORIES (structural furniture + the grounding rug) via
+ * getProductsForPrompt's allow-list. After scoring, primary seating is
+ * collapsed to a SINGLE group member (one sofa OR sectional OR furniture-set,
+ * never two) so the centerpiece grid never doubles up on big seating. The
+ * recent/history/liked weighting is threaded through unchanged so anchors
+ * still rotate across generations.
+ *
+ * Requests `limit + 2` raw candidates so the seating collapse can drop a
+ * duplicate seat and still return a full `limit`.
+ *
+ * @param {string}        promptText       - The user's AI generation prompt
+ * @param {number}        limit            - Number of anchors to return (default 6)
+ * @param {Set|null}      recentlyShownIds - rotation exclusion (see getProductsForPrompt)
+ * @param {object|null}   productHistory   - cross-gen history snapshot
+ * @param {Set|null}      likedIds         - liked-product weight bonus
+ * @param {Set|null}      cartIds          - in-cart hard exclusion
+ * @returns {object[]}                     - Normalized anchor products, ≤1 primary seat
+ */
+export function getAnchorProductsForPrompt(
+  promptText,
+  limit = 6,
+  recentlyShownIds = null,
+  productHistory = null,
+  likedIds = null,
+  cartIds = null,
+) {
+  const raw = getProductsForPrompt(
+    promptText,
+    limit + 2,
+    recentlyShownIds,
+    productHistory,
+    likedIds,
+    cartIds,
+    ANCHOR_CATEGORIES,
+  );
+  // Collapse primary seating to one group member. `raw` is score-ordered, so
+  // the first seat encountered is the highest-scored — keep it, skip the rest.
+  const out = [];
+  let seatingUsed = false;
+  for (const p of raw) {
+    if (PRIMARY_SEATING.has(p.category)) {
+      if (seatingUsed) continue;
+      seatingUsed = true;
+    }
+    out.push(p);
+    if (out.length >= limit) break;
+  }
+  return out;
 }

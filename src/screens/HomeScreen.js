@@ -46,13 +46,13 @@ import { useLiked } from '../context/LikedContext';
 import { useCart } from '../context/CartContext';
 import { DESIGNS } from '../data/designs';
 import { SELLERS } from '../data/sellers';
-import { searchProducts, getSourceColor, getProductsForPrompt, getNormalizedProductsByIds } from '../services/affiliateProducts';
+import { searchProducts, getSourceColor, getProductsForPrompt, getAnchorProductsForPrompt, getAccentProductsForPrompt, getNormalizedProductsByIds } from '../services/affiliateProducts';
 import { loadProductHistory, appendPicksToHistory } from '../services/productHistory';
 import { parseDesignPrompt } from '../utils/promptParser';
-import { buildFinalPrompt, generateWithProductPanel, generateWithProductRefs, generateSingleProductInRoom, pickAspectRatio } from '../services/aiProvider';
+import { buildFinalPrompt, generateWithProductPanel, generateWithDualPanel, generateWithProductRefs, generateSingleProductInRoom, pickAspectRatio } from '../services/aiProvider';
 import { expandPrompt } from '../services/promptExpander';
 import { hapticMedium, hapticSuccess, hapticError } from '../utils/haptics';
-import { createProductPanel } from '../utils/createProductPanel';
+import { createProductPanel, resolvePanelCellImage } from '../utils/createProductPanel';
 import { withTimeout } from '../utils/withTimeout';
 import { readFileExifOrientation, readFileExif, getLastFileExifError } from '../utils/imageOptimizer';
 import { verifyGeneratedProducts } from '../services/visionMatcher';
@@ -2417,7 +2417,7 @@ export default function HomeScreen({ navigation, route }) {
         const likedIdsSet = new Set(
           Object.keys(liked || {}).filter((id) => liked[id])
         );
-        matchedProducts = getProductsForPrompt(
+        matchedProducts = getAnchorProductsForPrompt(
           designPrompt,
           // Build 140 — RESTORED to 6 (was 4 in Build 130). The Build 130
           // reduction "to match 2×2 panel cell count" silently regressed
@@ -2970,6 +2970,11 @@ export default function HomeScreen({ navigation, route }) {
             // it into the panel — "Shop Your Room" must show the same 4.
             let usedPanel = false;
             let panelCompositedIndices = null;
+            // Build 153 — dual-panel (8-product) path. Holds the accent
+            // products that rendered into panel 2 when the dual path runs;
+            // stays null on the single-panel path so the reconciliation block
+            // below appends nothing (and finalProducts stays at 4).
+            let accentProductsUsed = null;
             if (reachableProducts.length >= 2) {
               try {
                 setGenStatus('Preparing product panel…');
@@ -3028,19 +3033,115 @@ export default function HomeScreen({ navigation, route }) {
                       : reachableProducts;
                   log('prompt-panel alignment | composited=[' + (panelCompositedIndices?.join(',') ?? '?') + '] | productsForPrompt=' + productsForPrompt.length);
 
-                  const panelResult = await generateWithProductPanel(
-                    roomPhotoUrl,
-                    enrichedDesignPrompt,
-                    productsForPrompt,
-                    panelResponse.url,
-                    aspectRatio,
-                  );
-                  resultUrl = panelResult.url;
-                  genMeta.predictionId = panelResult.predictionId;
-                  genMeta.seed = panelResult.seed;
-                  genMeta.pipeline = 'panel';
-                  usedPanel = true;
-                  log('panel gen complete | prediction=' + panelResult.predictionId + ' seed=' + panelResult.seed + ' | composited=[' + (panelCompositedIndices?.join(',') ?? '?') + ']');
+                  // ── Build 153: dual-panel (8-product) attempt ─────────────
+                  // The anchor panel (panelResponse) is ready. Try to build a
+                  // SECOND 2×2 grid of accent decor and render all 8 in one
+                  // generation via generateWithDualPanel. This is the new
+                  // default, but it is wrapped so that ANY failure (no accent
+                  // matches, all accent URLs unreachable, accent-panel build
+                  // fails, dual gen throws) falls through to the proven
+                  // single-panel call below — identical to Build 152 behavior.
+                  // Net AI cost delta = one extra ~1 MP input image; the
+                  // generation count is unchanged (still one AI POST), so the
+                  // ai-proxy per-user cooldown is not a factor here.
+                  let dualPanelDone = false;
+                  // True once the dual path has actually POSTed an AI gen. The
+                  // non-gen degradation branches (accent match/preflight/panel
+                  // build) never set this, so the single-panel fallback can
+                  // fire instantly; only a failure AFTER the AI POST needs the
+                  // ai-proxy cooldown sleep before retrying.
+                  let dualSubmittedGen = false;
+                  try {
+                    // Exclude the FULL anchor candidate pool (not just the
+                    // rendered 4) so accents can never duplicate a center
+                    // candidate. Accent matching parses the RAW designPrompt
+                    // for parity with the center matcher (enriched prompt is
+                    // for image-gen text only, never for product matching).
+                    const anchorIds = reachableProducts.map((p) => p.id).filter(Boolean);
+                    const accentMatches = getAccentProductsForPrompt(designPrompt, anchorIds, 4);
+                    if (accentMatches.length >= 2) {
+                      const accentReachable = await filterReachableProducts(accentMatches);
+                      if (accentReachable.length >= 2) {
+                        setGenStatus('Adding accent details…');
+                        const accentPanel = await createProductPanel(accentReachable, user.id);
+                        if (accentPanel?.url) {
+                          const accentIdxs = accentPanel.compositedIndices;
+                          const accentForPrompt =
+                            Array.isArray(accentIdxs) && accentIdxs.length > 0
+                              ? accentIdxs.map((i) => accentReachable[i]).filter(Boolean)
+                              : accentReachable.slice(0, 4);
+                          log('dual-panel: accent panel ready | accents=' + accentForPrompt.length +
+                            ' | composited=[' + (accentIdxs?.join(',') ?? '?') + '] | url=' + String(accentPanel.url).substring(0, 80));
+                          // Build 153: warm the accent images into iOS' cache
+                          // during the dual-gen wait window — same Build 131
+                          // fix the center pool got at line ~2483 (accents are
+                          // matched here, after that earlier prefetch, so they
+                          // need their own pass to avoid the gray-placeholder
+                          // window on RoomResult's Shop Room strip).
+                          try {
+                            for (const ap of accentForPrompt) {
+                              if (typeof ap?.imageUrl === 'string' && ap.imageUrl.startsWith('http')) {
+                                Image.prefetch(ap.imageUrl).catch(() => { /* best-effort */ });
+                              }
+                            }
+                          } catch { /* swallow — prefetch is never load-bearing */ }
+                          setGenStatus('Analyzing your room…');
+                          dualSubmittedGen = true; // an AI POST is about to happen
+                          const dualResult = await generateWithDualPanel(
+                            roomPhotoUrl,
+                            enrichedDesignPrompt,
+                            productsForPrompt,
+                            accentForPrompt,
+                            panelResponse.url,
+                            accentPanel.url,
+                            aspectRatio,
+                          );
+                          resultUrl = dualResult.url;
+                          genMeta.predictionId = dualResult.predictionId;
+                          genMeta.seed = dualResult.seed;
+                          genMeta.pipeline = 'dual-panel';
+                          usedPanel = true;
+                          dualPanelDone = true;
+                          accentProductsUsed = accentForPrompt;
+                          log('dual-panel gen complete | prediction=' + dualResult.predictionId +
+                            ' seed=' + dualResult.seed + ' | center=' + productsForPrompt.length +
+                            ' accent=' + accentForPrompt.length);
+                        } else {
+                          warn('dual-panel: accent createProductPanel returned no URL — single panel');
+                        }
+                      } else {
+                        warn('dual-panel: <2 reachable accents after preflight (' + accentReachable.length + ') — single panel');
+                      }
+                    } else {
+                      warn('dual-panel: <2 accent matches (' + accentMatches.length + ') — single panel');
+                    }
+                  } catch (dualErr) {
+                    warn('dual-panel attempt threw (' + String(dualErr?.message || dualErr).substring(0, 160) + ') — falling back to single panel');
+                  }
+
+                  if (!dualPanelDone) {
+                    // If the dual path already POSTed an AI gen that failed,
+                    // honor the ai-proxy 2s per-user cooldown (014_rate_limits)
+                    // before this retry POST — otherwise it 429s. Skipped when
+                    // dual degraded pre-POST (no AI call was made yet).
+                    if (dualSubmittedGen) {
+                      log('dual-panel gen failed post-submit — 2.2s cooldown before single-panel retry');
+                      await new Promise((r) => setTimeout(r, 2200));
+                    }
+                    const panelResult = await generateWithProductPanel(
+                      roomPhotoUrl,
+                      enrichedDesignPrompt,
+                      productsForPrompt,
+                      panelResponse.url,
+                      aspectRatio,
+                    );
+                    resultUrl = panelResult.url;
+                    genMeta.predictionId = panelResult.predictionId;
+                    genMeta.seed = panelResult.seed;
+                    genMeta.pipeline = 'panel';
+                    usedPanel = true;
+                    log('panel gen complete | prediction=' + panelResult.predictionId + ' seed=' + panelResult.seed + ' | composited=[' + (panelCompositedIndices?.join(',') ?? '?') + ']');
+                  }
                 } else {
                   warn('createProductPanel returned no URL');
                 }
@@ -3200,6 +3301,13 @@ export default function HomeScreen({ navigation, route }) {
                   .filter(Boolean);
               } else {
                 finalProducts = reachableProducts.slice(0, 4);
+              }
+              // Build 153: dual-panel appends the accent products that
+              // rendered into panel 2 so "Shop Your Room" lists all 8.
+              // accentProductsUsed is null on the single-panel path, leaving
+              // finalProducts at the original 4.
+              if (Array.isArray(accentProductsUsed) && accentProductsUsed.length > 0) {
+                finalProducts = [...finalProducts, ...accentProductsUsed];
               }
               replicateSucceeded = true;
               // Structured telemetry: exactly which pipeline ran. Grep prod
@@ -3457,6 +3565,21 @@ export default function HomeScreen({ navigation, route }) {
       // never actually saw because this step blocked indefinitely). 20s is
       // 10x the typical Haiku latency (~1-3s) — if we miss it, something is
       // wrong upstream and falling back to unverified is the right call.
+      // ── input = output ───────────────────────────────────────────────────
+      // Stamp each product with the EXACT image the AI saw in its 2×2 grid cell
+      // (resolvePanelCellImage runs the SAME selection createProductPanel used).
+      // The buy card reads _panelCellImage first, so the variant the AI was told
+      // to reproduce is the variant the shopper is shown — and sold. Pure +
+      // deterministic; null for products with no usable panel image (the card
+      // then falls back to its own chain). Computed here from the panel-time
+      // state, BEFORE verification — vision is now a confidence signal only and
+      // no longer reassigns the displayed variant out from under the panel.
+      if (Array.isArray(finalProducts)) {
+        finalProducts = finalProducts.map((p) => ({
+          ...p,
+          _panelCellImage: resolvePanelCellImage(p),
+        }));
+      }
       let finalMatchedProducts = finalProducts;
       let verifyMeta = { verifiedCount: 0, roomType: null, visionItems: [] };
       let verifyTimedOut = false;

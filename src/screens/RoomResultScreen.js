@@ -29,7 +29,9 @@ import { useLiked } from '../context/LikedContext';
 import { useSubscription } from '../context/SubscriptionContext';
 import { getProductsForPrompt, getRecommendedProducts } from '../services/affiliateProducts';
 import { parseDesignPrompt } from '../utils/promptParser';
-import { getVariantSwatchHex } from '../utils/colorMap';
+// Build 154 — variant colorway is now named with a text label on the card
+// (see hCardVariantChip), replacing the Build 131 color dot that could
+// contradict the variant photo. getVariantSwatchHex is no longer imported here.
 import { saveUserDesign, updateDesignVisibility, updateDesignProducts } from '../services/supabase';
 import { buildShareMessage } from '../services/shareService';
 import * as FileSystem from 'expo-file-system/legacy';
@@ -38,6 +40,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { STYLE_PRESETS, pickPromptVariation } from '../data/stylePresets';
 import { pickRemixStyle, appendStyleHistory } from '../utils/pickRemixStyle';
 import { hapticMedium } from '../utils/haptics';
+import { resolveVariantColor } from '../utils/variantColor';
 
 const { width } = Dimensions.get('window');
 const IMG_RADIUS = Math.round((width - space.lg * 2) * 0.025);
@@ -820,7 +823,29 @@ function ProductCardImpl({ product, inCart, onAddToCart, onPress }) {
   // variant's mainImage and the price swaps to the variant's price.
   // Falls through cleanly when no variant is matched.
   const variant = product._matchedVariant;
-  const effectiveImage = variant?.mainImage || product.panelImageUrl || product.imageUrl;
+  // Build 153 polish — input = output. _panelCellImage is the EXACT image the
+  // AI saw for this product in the 2×2 grid (stamped in HomeScreen via the
+  // shared resolvePanelCellImage — the SAME selection the panel compositor
+  // used). Lead with it so the card photo == the grid cell == the buy
+  // recommendation: hard goods show their clean studio cutout, while lifestyle
+  // categories (rug/mirror/pendant/…) keep the in-context shot the AI was fed.
+  // This also kills the "black sphere" mirror case, where a bad variant hero
+  // (mainImage) used to win over the lifestyle photo the AI actually saw.
+  //
+  // Fall back to the prior chain for non-panel rings or products with no usable
+  // panel image. Build 154 — swatchImage sits BEFORE the default product photo
+  // so a variant whose hero (mainImage) is missing still shows ITS colorway.
+  // Build 154 — color-trust (utils/variantColor.js). _panelCellImage still leads
+  // (it IS the AI's input, already color-resolved by resolvePanelCellImage). When
+  // it's absent (non-panel rings) the fallback must NOT reach for the variant's
+  // shared, wrong-colorway hero: 'swatch' → the per-color swatch, 'hero' → the
+  // variant mainImage (today's path), 'none' → product default only.
+  const colorVerdict = resolveVariantColor(product);
+  const variantColorImage =
+    colorVerdict.trust === 'swatch' ? variant?.swatchImage
+      : colorVerdict.trust === 'hero' ? variant?.mainImage
+        : null;
+  const effectiveImage = product._panelCellImage || variantColorImage || product.panelImageUrl || product.imageUrl;
   const effectivePrice = variant?.price ?? product.priceValue ?? product.price;
 
   const priceVal = effectivePrice;
@@ -833,19 +858,22 @@ function ProductCardImpl({ product, inCart, onAddToCart, onPress }) {
   // legal disclosure in the SHOP ROOM footer covers the whole section.
   const showSimilarBadge = product.confidence && product.confidence !== 'verified';
 
-  // Build 131 — variant swatch dot. When the matcher picked a specific
-  // variant (e.g. "Sage Green" of a chair), show a small color dot in the
-  // image's bottom-right corner so the user can tell at a glance which
-  // color this card represents. Closes the gap where the user couldn't
-  // tell why a "purple" chair appeared in their glam-prompt set without
-  // tapping into PDP and scrolling variants.
-  // Build 147 #7 — kept the swatch dot even though the card image now
-  // swaps to the variant. The dot remains a useful at-a-glance signal
-  // for "this is a variant pick" (e.g. when the variant image is very
-  // similar to the default at thumbnail size, the dot disambiguates).
-  const variantSwatchHex = variant
-    ? getVariantSwatchHex(variant.label)
-    : null;
+  // Build 154 — variant colorway LABEL (replaces the Build 131 color dot).
+  // The card image already swaps to the matched variant's photo; the dot's
+  // job was to name the colorway, but it derived a single midpoint hex from
+  // the FIRST color word in the label (getVariantSwatchHex), so a multi-tone
+  // colorway ("Cream/Walnut", "Pearl Gray") could show a dot that contradicts
+  // the photo — which the user reads as "the recommendation doesn't match."
+  // A short text label names the EXACT colorway the AI rendered with zero
+  // ambiguity, so the photo + label together ARE the buy recommendation and
+  // the user never has to drill into the PDP to hunt for the right color.
+  //
+  // Gated on colorVerdict.showColorLabel: when trust==='none' (no per-color
+  // hero AND no per-color swatch — the hero is a colorway-shared photo) we have
+  // NO image proven to be this color, so we DROP the pill rather than stamp a
+  // colorway name onto a photo that may show a different color. Showing "White"
+  // over a black-looking shared photo is exactly the "doesn't match" complaint.
+  const variantLabel = (variant && colorVerdict.showColorLabel) ? variant.label : null;
 
   // Build 136 — call onPress with the product as arg. Lets the parent
   // pass a single useCallback'd handler to all cards instead of an
@@ -871,13 +899,19 @@ function ProductCardImpl({ product, inCart, onAddToCart, onPress }) {
             (still ~18% of the catalog as of Build 146 backfill).
             Build 147 #7 — effectiveImage further prefers the matched
             variant's mainImage when one was selected by the matcher.
-            Chain: variant.mainImage → product.panelImageUrl → imageUrl. */}
+            Build 154 — chain: variant.mainImage → variant.swatchImage →
+            product.panelImageUrl → imageUrl. */}
         <CardImage uri={effectiveImage} style={s.hCardImg} resizeMode="contain" placeholderColor="#D0D7E3" compact />
-        {variantSwatchHex && (
-          <View
-            style={[s.hCardSwatchDot, { backgroundColor: variantSwatchHex }]}
-            accessibilityLabel={`Variant: ${variant.label}`}
-          />
+        {variantLabel && (
+          <View style={s.hCardVariantChip} pointerEvents="none">
+            <Text
+              style={s.hCardVariantChipText}
+              numberOfLines={1}
+              accessibilityLabel={`Color: ${variantLabel}`}
+            >
+              {variantLabel}
+            </Text>
+          </View>
         )}
       </View>
       <View style={s.hCardBody}>
@@ -1118,16 +1152,19 @@ export default function RoomResultScreen({ route, navigation }) {
     // and stores variant label/id metadata when _matchedVariant is
     // present, so price/image were the only missing pieces from the
     // user-facing cart row.
+    // Build 153 polish — input = output. The cart thumbnail must match the card
+    // the shopper tapped, so lead with _panelCellImage (the exact grid-cell
+    // image the AI saw) just like effectiveImage does, then the variant chain.
     const variant = product._matchedVariant;
     const cartPayload = variant
       ? {
           ...product,
           price:        variant.price ?? product.priceValue ?? product.price,
-          imageUrl:     variant.mainImage || product.imageUrl,
+          imageUrl:     product._panelCellImage || variant.mainImage || variant.swatchImage || product.imageUrl,
           asin:         variant.asin     || product.asin,
           affiliateUrl: variant.affiliateUrl || product.affiliateUrl,
         }
-      : { ...product, price: product.priceValue ?? product.price };
+      : { ...product, price: product.priceValue ?? product.price, imageUrl: product._panelCellImage || product.imageUrl };
     addToCart(cartPayload);
     setAddedKeys(prev => ({ ...prev, [key]: true }));
   }, [addToCart]);
@@ -1872,24 +1909,29 @@ const s = StyleSheet.create({
     // rest of the cool-blue UI.
     backgroundColor: '#F3F4F6',
   },
-  // Build 131 — variant swatch dot, anchored to bottom-right of the
-  // card image. Small white border keeps the dot visible against any
-  // background color (including dark variants like black/charcoal that
-  // would otherwise blend into shadowed product photos).
-  hCardSwatchDot: {
+  // Build 154 — variant colorway chip, anchored bottom-LEFT of the card
+  // image (bottom-right would tangent the body's absolute Add button just
+  // below). Replaces the Build 131 color dot: a text label names the exact
+  // colorway the AI rendered (e.g. "Pearl Gray") with zero ambiguity, so the
+  // photo + label together ARE the buy recommendation. Dark translucent pill
+  // + white text reads on any product photo; maxWidth + numberOfLines keep
+  // long labels ("Transparent/Walnut") from overrunning the card.
+  hCardVariantChip: {
     position: 'absolute',
     bottom: 8,
-    right: 8,
-    width: 16,
-    height: 16,
-    borderRadius: 8,
-    borderWidth: 2,
-    borderColor: '#FFFFFF',
-    shadowColor: '#000',
-    shadowOpacity: 0.18,
-    shadowRadius: 3,
-    shadowOffset: { width: 0, height: 1 },
-    elevation: 3,
+    left: 8,
+    maxWidth: 140,
+    backgroundColor: 'rgba(17, 24, 39, 0.88)',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 6,
+  },
+  hCardVariantChipText: {
+    fontSize: 10,
+    fontWeight: '700',
+    fontFamily: 'Geist_700Bold',
+    letterSpacing: 0.3,
+    color: '#FFFFFF',
   },
   similarBadge: {
     position: 'absolute',

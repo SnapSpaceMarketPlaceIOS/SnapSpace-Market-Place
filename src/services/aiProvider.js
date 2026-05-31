@@ -20,6 +20,8 @@
  *
  * ── Public surface ─────────────────────────────────────────────────────────
  *   generateWithProductPanel(roomURL, prompt, products, panelURL, aspect)
+ *   generateWithDualPanel(roomURL, prompt, centerProducts, accentProducts,
+ *                         panel1URL, panel2URL, aspect)
  *   generateWithProductRefs(roomURL, prompt, products, aspect)
  *   generateSingleProductInRoom(roomURL, product, aspect)
  *   pickAspectRatio(w, h)
@@ -63,6 +65,26 @@ console.log('[aiProvider] Active: fal gateway · model openai/gpt-image-2/edit')
  */
 export function generateWithProductPanel(roomPhotoUrl, userPrompt, products, panelUrl, aspectRatio) {
   return genService.generateWithProductPanel(roomPhotoUrl, userPrompt, products, panelUrl, aspectRatio);
+}
+
+/**
+ * Build 153 — full-room redesign with TWO 2×2 product panels (8 products).
+ * The 8-product default path: anchor furniture (panel 1) + accent decor
+ * (panel 2) composited into the room in one generation. HomeScreen degrades
+ * to generateWithProductPanel (single panel, 4 products) if accent matching
+ * or the second panel build fails.
+ *
+ * @param {string} roomPhotoUrl   Supabase storage URL of the uploaded room photo
+ * @param {string} userPrompt     Raw style prompt from the user
+ * @param {Array}  centerProducts Up to 4 anchor furniture products (panel 1)
+ * @param {Array}  accentProducts Up to 4 accent decor products (panel 2)
+ * @param {string} panel1Url      Supabase storage URL of the anchor 2×2 grid
+ * @param {string} panel2Url      Supabase storage URL of the accent 2×2 grid
+ * @param {string} aspectRatio    e.g. '16:9', '3:2', '1:1'
+ * @returns {Promise<{ url: string, predictionId: string, seed: null }>} (GPT Image 2 has no seed)
+ */
+export function generateWithDualPanel(roomPhotoUrl, userPrompt, centerProducts, accentProducts, panel1Url, panel2Url, aspectRatio) {
+  return genService.generateWithDualPanel(roomPhotoUrl, userPrompt, centerProducts, accentProducts, panel1Url, panel2Url, aspectRatio);
 }
 
 /**

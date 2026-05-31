@@ -39,7 +39,7 @@ import { proxyFetch } from './apiProxy';
 // fal.js has zero runtime dependency on replicate.js. replicate.js is now
 // orphaned (no import graph edge into it) and can be deleted in a future
 // cleanup. Keeping it around for the moment in case a rollback is needed.
-import { buildPanelPrompt, buildFlux2MaxPrompt, getQualityPrefix, FIDELITY_DIRECTIVES_SINGLE, ARCHITECTURE_LOCK_SINGLE } from './promptBuilders';
+import { buildPanelPrompt, buildDualPanelPrompt, buildFlux2MaxPrompt, getQualityPrefix, FIDELITY_DIRECTIVES_SINGLE, ARCHITECTURE_LOCK_SINGLE } from './promptBuilders';
 
 const FAL_QUEUE_URL = 'https://queue.fal.run/fal-ai/flux-2-pro/edit';
 const POLL_INTERVAL_MS = 3000;
@@ -366,6 +366,60 @@ export async function generateWithProductPanel(roomPhotoUrl, userPrompt, product
     // (FAL default ~0.85). If 0.4 over-preserves and products don't render,
     // bump to 0.5; if it under-preserves, drop to 0.3. One-line tuning.
     strength:         0.4,
+  });
+}
+
+/**
+ * Build 153 — DUAL-panel path (rollback parity with openai.js). Sends a
+ * 3-image input [roomPhotoUrl, panel1Url, panel2Url]:
+ *   image 1 = room photo (architecture to preserve)
+ *   image 2 = 2×2 grid of ANCHOR furniture (4 center pieces)
+ *   image 3 = 2×2 grid of ACCENT decor (4 complementary pieces)
+ *
+ * Mirrors generateWithProductPanel's machinery with one extra input image and
+ * the dual-grid prompt. Cost note: the 3rd ~1 MP input adds ~$0.015 over the
+ * single-panel path (4 billable MP → ~$0.075/gen). Only reachable if the live
+ * provider is repointed to fal — GPT Image 2 (openai.js) is the live default.
+ *
+ * @param {string}   roomPhotoUrl   Public URL of user's (optimized) room photo
+ * @param {string}   userPrompt     Enriched design prompt
+ * @param {object[]} centerProducts Up to 4 anchor furniture products (panel 1)
+ * @param {object[]} accentProducts Up to 4 accent decor products (panel 2)
+ * @param {string}   panel1Url      Public URL of the anchor 2×2 panel
+ * @param {string}   panel2Url      Public URL of the accent 2×2 panel
+ * @param {string}   [aspectRatio]  Bucket from pickAspectRatio() — defaults to 1:1
+ * @returns {Promise<{ url: string, predictionId: string, seed: number }>}
+ */
+export async function generateWithDualPanel(
+  roomPhotoUrl, userPrompt, centerProducts, accentProducts, panel1Url, panel2Url, aspectRatio,
+) {
+  if (!roomPhotoUrl) throw new Error('generateWithDualPanel requires a public room photo URL.');
+  if (!panel1Url)    throw new Error('generateWithDualPanel requires an anchor product panel URL.');
+  if (!panel2Url)    throw new Error('generateWithDualPanel requires an accent product panel URL.');
+
+  const imageUrls        = [roomPhotoUrl, panel1Url, panel2Url];
+  const generationPrompt = buildDualPanelPrompt(
+    userPrompt || 'Modern minimalist interior design.',
+    centerProducts || [],
+    accentProducts || [],
+  );
+  const imageSize        = resolveImageSize(aspectRatio);
+
+  if (__DEV__) {
+    console.log('[flux-2-pro/edit dual] Prompt:', generationPrompt.substring(0, 200) + '...');
+    console.log('[flux-2-pro/edit dual] image_urls: 3 (room + anchor 2×2 + accent 2×2)');
+    console.log('[flux-2-pro/edit dual] image_size:', `${imageSize.width}×${imageSize.height}`, '(from aspect:', aspectRatio || 'default', ')');
+    console.log('[flux-2-pro/edit dual] Anchor panel:', panel1Url.substring(0, 80));
+    console.log('[flux-2-pro/edit dual] Accent panel:', panel2Url.substring(0, 80));
+  }
+
+  return await submitFalWithRetry({
+    prompt:           generationPrompt,
+    image_urls:       imageUrls,
+    image_size:       imageSize,
+    output_format:    'jpeg',     // FAL flux-2-pro/edit only accepts jpeg|png (no webp)
+    safety_tolerance: 1,          // Build 69: see generateWithProductPanel for rationale
+    strength:         0.4,        // Build 141: same room-preservation lever as panel path
   });
 }
 

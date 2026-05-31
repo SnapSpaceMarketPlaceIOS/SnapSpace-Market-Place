@@ -17,6 +17,7 @@ import {
   getVariantStyleBoost,
   findBestStyleAffinityVariant,
 } from '../utils/colorStyleAffinity';
+import { resolveVariantColor } from '../utils/variantColor';
 
 // Phase 3: flip to true to see [match] diagnostic logs in Metro for each
 // generation. Leave false in production to keep logs tidy.
@@ -489,22 +490,32 @@ export function matchProducts(
       colors: derivedColors,
       _matchedVariant: matched,
     };
-    if (matched.mainImage || matched.swatchImage) {
-      next.imageUrl = matched.mainImage || matched.swatchImage;
-    }
-    // Build 130 — variant-aware panelImageUrl. When a variant's mainImage
-    // exists (which it always does for catalog-imported variants), use it
-    // for the FAL panel cell so what the model sees == what the user sees
-    // == what the cart adds. The product-level panelImageUrl was the
-    // studio shot of the DEFAULT variant only — when matcher picks a
-    // different variant, that studio shot is the wrong color.
-    //
-    // Trade-off: a variant's mainImage may be lifestyle-styled rather than
-    // a clean studio cutout. We accept that here because cart-render
-    // consistency outweighs marginal panel cleanliness. Move 5 (panel
-    // re-audit) will refine variant-level panel quality later.
-    if (matched.mainImage) {
-      next.panelImageUrl = matched.mainImage;
+    // Build 154 — color-trust (see utils/variantColor.js). A catalog audit
+    // found ~38% of multi-color products reuse ONE gallery photo across several
+    // colorways, so the matched variant's hero is reliable ONLY when it is
+    // UNIQUE to this colorway. resolveVariantColor decides, and we rewrite the
+    // inherited product imageUrl/panelImageUrl so every downstream surface (PDP,
+    // Explore, cart, the AI panel, the buy card) shows a color it can back up:
+    //   hero   → the variant's own studio + lifestyle shots (today's good path;
+    //            panelImage is the A1 clean cutout fed to FAL, imageUrl the
+    //            lifestyle photo the shopper sees).
+    //   swatch → the per-color swatch — Amazon keys it to the colorway, so it's
+    //            the color-truth when the hero is shared across colors.
+    //   none   → KEEP the product defaults (do NOT propagate the shared,
+    //            wrong-colorway hero); the buy card then drops the colorway
+    //            label because the verdict's showColorLabel is false.
+    const colorTrust = resolveVariantColor(next).trust;
+    next._variantColorTrust = colorTrust;
+    if (colorTrust === 'hero') {
+      if (matched.mainImage || matched.swatchImage) {
+        next.imageUrl = matched.mainImage || matched.swatchImage;
+      }
+      if (matched.panelImage) next.panelImageUrl = matched.panelImage;
+    } else if (colorTrust === 'swatch') {
+      if (matched.swatchImage) {
+        next.imageUrl = matched.swatchImage;
+        next.panelImageUrl = matched.swatchImage;
+      }
     }
     if (matched.affiliateUrl) next.affiliateUrl = matched.affiliateUrl;
     if (matched.asin) next.asin = matched.asin;

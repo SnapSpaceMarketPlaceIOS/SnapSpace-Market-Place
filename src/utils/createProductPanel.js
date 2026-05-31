@@ -31,6 +31,7 @@
  */
 
 import { supabase } from '../services/supabase';
+import { resolveVariantColor } from './variantColor';
 
 const SUPABASE_URL  = process.env.EXPO_PUBLIC_SUPABASE_URL || '';
 const ANON_KEY      = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || '';
@@ -89,6 +90,102 @@ function toRenderUrl(url) { // eslint-disable-line no-unused-vars
   return `${head}/storage/v1/render/image/public/${tailPath}?format=origin${sep}${tailQuery || ''}`;
 }
 
+// ── Panel-cell image selection — SINGLE SOURCE OF TRUTH ──────────────────────
+// The exact image the AI sees for a product in the 2×2 reference grid. Exposed
+// (via resolvePanelCellImage) so the shopper-facing buy card can render the
+// IDENTICAL photo — the "input = output" contract: the variant the AI was told
+// to reproduce is the variant the user is told to buy. Keep this the only place
+// the selection logic lives so the panel input and the card output can't drift.
+//
+// Source-image precedence for the panel composite:
+//
+//   1. Variant swap. When productMatcher.js swaps the product to a specific
+//      colorway it attaches _matchedVariant and routes that variant's clean
+//      studio cutout (variant.panelImage — backfilled by the Workstream A1
+//      panel audit, A2-wired into p.panelImageUrl) into the panel. For hard
+//      goods we feed that CUTOUT to FAL — NOT the variant's lifestyle mainImage
+//      (the Build 125 mistake, which leaked styled rooms into 3/4 cells).
+//
+//   2. Build 125 — Lever A: lifestyle preference for context-dependent
+//      categories. Studio shots work great for hard goods (sofa, table, chair)
+//      — clean silhouette, isolated from environment. But they hurt FAL
+//      fidelity for items that only "make sense" in context (rugs need a floor,
+//      lighting needs a mount, wall art/mirrors need framing context, soft
+//      goods need to sit ON something). For those categories prefer the
+//      lifestyle imageUrl. The FIDELITY_DIRECTIVES "ignore other furniture …
+//      photography artifacts" clause guards against context-bleed.
+//
+//   3. Catalog override. An optional `panelImageUrl` overrides a busy/cropped
+//      default `imageUrl` for the panel.
+//
+//   4. Default → `imageUrl`.
+//
+// Build 126 — Item 1: never let a variant swap leak a lifestyle photo into the
+// panel, and never let a tiny variant swatch crop stand in as a "lifestyle"
+// shot for a LIFESTYLE_PREFERRED category (fall back to the clean panelImageUrl
+// in that case).
+const LIFESTYLE_PREFERRED = new Set([
+  'rug',
+  'throw-pillow', 'throw-blanket', 'curtains',
+  'pendant-light', 'chandelier',
+  'wall-art', 'mirror',
+]);
+const isHttpUrl = (u) => typeof u === 'string' && u.startsWith('http');
+function pickPanelCellSource(p) {
+  const mv = p._matchedVariant;
+  if (p.category && LIFESTYLE_PREFERRED.has(p.category)) {
+    const lifestyle = p.imageUrl || p.panelImageUrl;
+    // imageUrl fell back to the variant's swatch (no variant mainImage)? A
+    // swatch is a texture crop, useless as a panel cell — use the clean
+    // panelImageUrl instead.
+    if (mv && lifestyle === mv.swatchImage && isHttpUrl(p.panelImageUrl)) {
+      return p.panelImageUrl;
+    }
+    return lifestyle;
+  }
+  if (mv) {
+    // Build 154 — color-trust (utils/variantColor.js). The matched variant's
+    // hero feeds the FAL cell ONLY when it is UNIQUE to this colorway. When
+    // Amazon shares one hero across colors, send the per-color swatch instead so
+    // the model renders THIS colorway (input == output). trust==='none' means no
+    // per-color asset exists, so fall through to the product default — right
+    // shape, default color, and the buy card drops the colorway claim.
+    const trust = resolveVariantColor(p).trust;
+    if (trust === 'swatch' && isHttpUrl(mv.swatchImage)) return mv.swatchImage;
+    if (trust === 'hero' && isHttpUrl(mv.panelImage)) return mv.panelImage;
+  }
+  if (isHttpUrl(p.panelImageUrl)) return p.panelImageUrl;
+  return p.imageUrl;
+}
+// Bump Amazon sources to 1500px so the panel's 620×620 cells stay sharp after
+// Lanczos downsampling. Non-Amazon URLs pass through unchanged.
+function normalizeAmazonHiRes(url) {
+  return url
+    .replace(/_AC_SL\d+_/g,  '_AC_SL1500_')
+    .replace(/_AC_UL\d+_/g,  '_AC_SL1500_')
+    .replace(/_SX\d+_/g,     '_AC_SL1500_')
+    .replace(/_SR\d+,\d+_/g, '_AC_SL1500_');
+}
+
+/**
+ * resolvePanelCellImage — the EXACT, normalized http(s) image the panel
+ * compositor would place in this product's 2×2 cell, or null if none usable.
+ *
+ * Pure (no I/O) — safe on the render path. Display surfaces (the Shop-Your-Room
+ * buy card) call this so the shopper sees precisely the photo FAL saw for this
+ * product. Returns null when the product has no valid panel image, so callers
+ * can fall back to their own display chain.
+ *
+ * @param {object} product  matched product (may carry _matchedVariant, panelImageUrl, imageUrl)
+ * @returns {string|null}
+ */
+export function resolvePanelCellImage(product) {
+  if (!product || typeof product !== 'object') return null;
+  const raw = pickPanelCellSource(product);
+  if (!isHttpUrl(raw)) return null;
+  return normalizeAmazonHiRes(raw);
+}
+
 export async function createProductPanel(products, userId) {
   // ── Guard: requires products with image URLs ──────────────────────────────
   if (!products || products.length === 0) {
@@ -113,88 +210,15 @@ export async function createProductPanel(products, userId) {
   // so per-input billing is unchanged. Quality win: sharper product detail
   // in flux's attention map → 4/4 fidelity in the render.
   //
-  // Source-image precedence for the panel composite:
-  //
-  //   1. Variant swap wins. If productMatcher.js (Build 71 Fix #2) swapped
-  //      the product to a specific variant, p.imageUrl already points at
-  //      that variant's mainImage — typically a clean studio shot of the
-  //      exact color the user asked for. We must NOT override that with
-  //      a catalog-level panelImageUrl, because the variant photo is the
-  //      whole point of the swap (it's both the most accurate panel
-  //      source AND what the user will actually see in their cart).
-  //
-  //   2. Build 125 — Lever A: lifestyle preference for context-dependent
-  //      categories. Studio shots work great for hard goods (sofa, table,
-  //      chair) — clean silhouette, isolated from environment. But they
-  //      hurt FAL fidelity for items that only "make sense" in context:
-  //        - Rugs: a flat top-down studio shot doesn't tell FAL how the
-  //          rug should drape on a real floor.
-  //        - Lighting fixtures: a fixture floating in a void doesn't tell
-  //          FAL how it mounts (ceiling/wall) or its scale.
-  //        - Wall art / mirrors: framing context informs how they hang.
-  //        - Soft goods (pillows/throws): need to be ON something.
-  //      For these categories, prefer the lifestyle imageUrl over
-  //      panelImageUrl. The FIDELITY_DIRECTIVES clause in promptBuilders
-  //      ("ignore any other furniture, walls, or decor visible in the
-  //      cell, those are photography artifacts") already protects against
-  //      lifestyle context-bleed for these cells.
-  //
-  //   3. Catalog override. If the product carries an optional
-  //      `panelImageUrl` field, prefer that for the AI panel composite
-  //      ONLY. Used to override a default `imageUrl` that's a busy
-  //      lifestyle shot, a tightly-cropped detail, or otherwise gives
-  //      flux a poor silhouette to work with. The catalog UI keeps
-  //      showing `imageUrl` so the shopper-facing surface stays rich.
-  //
-  //   4. Default. Fall back to `imageUrl`.
-  const LIFESTYLE_PREFERRED = new Set([
-    'rug',
-    'throw-pillow', 'throw-blanket', 'curtains',
-    'pendant-light', 'chandelier',
-    'wall-art', 'mirror',
-  ]);
-  // Build 126 — Item 1: don't let variant-swap leak lifestyle photos into
-  // the panel.
-  //
-  // Build 125 had a bug: when productMatcher swapped a product to a color
-  // variant (e.g. "sage green sofa" → variant id 3), it set p.imageUrl to
-  // that variant's mainImage. The pre-existing pickPanelSource then
-  // checked `_matchedVariant` first and returned p.imageUrl unconditionally
-  // — bypassing panelImageUrl entirely. Result: the 2×2 panel sent to FAL
-  // ended up with lifestyle scenes in 3 of 4 cells (verified in Build 125
-  // TestFlight: a sectional in a styled room, sofa with autumn window,
-  // chairs in a styled space). FAL inherited those scenes' architecture,
-  // bleeding into the rendered room despite our per-cell isolation
-  // directive.
-  //
-  // The two-track image model (Build 121) is unambiguous about who sees
-  // what: panelImageUrl = AI panel input (clean studio), imageUrl = user-
-  // facing display (lifestyle, color-correct for the chosen variant). For
-  // the variant case, we want FAL to see the studio shape reference; the
-  // variant's color is conveyed via the prompt descriptor + user style
-  // intent, and post-render variant re-rank reconciles any color drift.
-  //
-  // For LIFESTYLE_PREFERRED categories the lifestyle shot is intentional
-  // (rugs need a floor, pendants need a ceiling) and we keep that path.
-  const pickPanelSource = (p) => {
-    if (p.category && LIFESTYLE_PREFERRED.has(p.category)) {
-      return p.imageUrl || p.panelImageUrl;
-    }
-    if (typeof p.panelImageUrl === 'string' && p.panelImageUrl.startsWith('http')) {
-      return p.panelImageUrl;
-    }
-    return p.imageUrl;
-  };
+  // Source selection + 1500px normalization live in the module-level
+  // pickPanelCellSource / normalizeAmazonHiRes (documented above, and exposed
+  // as resolvePanelCellImage) so the panel input here and the buy-card output
+  // in RoomResultScreen draw from the exact same logic and can never drift.
   const productUrls = products
-    .map(pickPanelSource)
-    .filter((url) => typeof url === 'string' && url.startsWith('http'))
+    .map(pickPanelCellSource)
+    .filter(isHttpUrl)
     .slice(0, SEND_LIMIT)
-    .map((url) => url
-      .replace(/_AC_SL\d+_/g,  '_AC_SL1500_')
-      .replace(/_AC_UL\d+_/g,  '_AC_SL1500_')
-      .replace(/_SX\d+_/g,     '_AC_SL1500_')
-      .replace(/_SR\d+,\d+_/g, '_AC_SL1500_')
-    );
+    .map(normalizeAmazonHiRes);
 
   if (productUrls.length < MIN_PRODUCTS) {
     console.warn(`[Panel] Only ${productUrls.length} valid image URL(s) — need at least ${MIN_PRODUCTS} to build a panel`);

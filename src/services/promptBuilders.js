@@ -391,6 +391,130 @@ export function buildPanelPrompt(userPrompt, products) {
 }
 
 /**
+ * Build the edit prompt for the DUAL-panel path (Build 153 — 8 products).
+ *
+ * Sibling to buildPanelPrompt, but for TWO 2×2 reference grids instead of
+ * one. The model receives three images:
+ *   image 1 = the room photo (architecture to preserve)
+ *   image 2 = a 2×2 grid of ANCHOR furniture (the 4 center pieces)
+ *   image 3 = a 2×2 grid of ACCENT decor (4 complementary pieces)
+ *
+ * Why a dedicated builder rather than calling buildPanelPrompt twice: the
+ * model needs to understand the SEMANTIC difference between the two grids —
+ * anchors are the primary furniture that defines the room, accents are
+ * styling layered on top. Collapsing both into one "render these 8" line
+ * loses that hierarchy and the model tends to over-weight whichever grid is
+ * described last. We name the grids explicitly (anchor vs accent) and keep a
+ * single combined render directive so the all-N count constraint still lands.
+ *
+ * Structure mirrors buildPanelPrompt's proven 5-section ordering, extended
+ * to two grids:
+ *   1. Quality framing (opening attention)
+ *   2. Anchor grid (image 2) cell descriptors
+ *   3. Accent grid (image 3) cell descriptors
+ *   4. Combined render directive + fidelity anchor (all-N, per-cell isolation)
+ *   5. Style mood (scoped to fabric + lighting)
+ *   6. Architecture lock (closing attention — overrides any surface bleed)
+ *
+ * The fidelity clause is built INLINE with the live product count rather than
+ * reusing the shared FIDELITY_DIRECTIVES constant (which hardcodes "4") —
+ * the single-panel path still depends on that constant, so we must not mutate
+ * it. Word count at 8 products is ~280; well within GPT Image 2's instruction-
+ * following window (it is an instruction-tuned model, not a pure diffusion
+ * model, so the higher count is acceptable here where it would not be on flux).
+ *
+ * Degrades gracefully: if accentProducts is empty this produces a prompt
+ * equivalent in spirit to the single-panel path (anchor grid only), so the
+ * caller can still use it as a fallback shape.
+ *
+ * @param {string}   userPrompt     - User's raw design prompt
+ * @param {object[]} centerProducts - Up to 4 anchor furniture products (image 2)
+ * @param {object[]} accentProducts - Up to 4 accent decor products (image 3)
+ * @returns {string} Structured prompt for dual-panel edit input
+ */
+export function buildDualPanelPrompt(userPrompt, centerProducts, accentProducts) {
+  const posLabels = ['top-left', 'top-right', 'bottom-left', 'bottom-right'];
+
+  // Shared per-cell descriptor builder. imageNo is the 1-based input-image
+  // index the cell lives in (2 = anchor grid, 3 = accent grid) so the
+  // panel-anchored fallback can point flux/GPT at the right reference.
+  const describeCell = (p, imageNo) => {
+    const desc = describeProductForPrompt(p);
+    if (!desc) {
+      console.warn(
+        `[promptBuilder/dual] Missing descriptor for product ${p?.id || '(no id)'} ` +
+        `category=${p?.category || '(none)'} — using panel-anchored fallback`,
+      );
+    }
+    const safeDesc = desc || `the exact product shown in this cell of reference grid ${imageNo}`;
+    const hint = fidelityHintForCategory(p?.category);
+    return { safeDesc, hint };
+  };
+
+  const center = (centerProducts || []).slice(0, 4);
+  const accent = (accentProducts || []).slice(0, 4);
+
+  const centerEntries = center.map((p, i) => {
+    const { safeDesc, hint } = describeCell(p, 2);
+    return `Product ${i + 1} (image 2, ${posLabels[i]}): ${safeDesc} — ${hint}`;
+  });
+  const accentEntries = accent.map((p, i) => {
+    const { safeDesc, hint } = describeCell(p, 3);
+    // Global product number continues from the anchor grid so the model
+    // tracks N distinct items, not two separate "Product 1..4" lists.
+    return `Product ${center.length + i + 1} (image 3, ${posLabels[i]}): ${safeDesc} — ${hint}`;
+  });
+
+  const total = center.length + accent.length;
+
+  const centerLine = centerEntries.length > 0
+    ? `Image 2 is a 2×2 grid of anchor furniture: ${centerEntries.join('; ')}.`
+    : '';
+  const accentLine = accentEntries.length > 0
+    ? `Image 3 is a 2×2 grid of accent decor: ${accentEntries.join('; ')}.`
+    : '';
+
+  // Single combined render directive — anchors as primary pieces, accents
+  // layered in as complementary styling. Per-cell hints already carry
+  // placement (rug → floor, pendant → ceiling), so this line stays about
+  // hierarchy + fidelity rather than re-stating placement.
+  //
+  // Degradation: when accents are empty (documented fallback shape — not the
+  // live path, which gates on >=2 reachable accents), drop the image-3 clause
+  // so we never instruct the model to use an accent grid that wasn't sent.
+  // The accent-present branch is byte-identical to the production prompt.
+  const renderLine =
+    accent.length > 0
+      ? `Render all ${total} products in the room: the anchor furniture (image 2) as the primary pieces and the accent decor (image 3) layered in naturally as complementary styling. Match each product's color, material, silhouette, and proportions to its reference cell.`
+      : center.length > 0
+        ? `Render all ${total} products in the room, matching each one's color, material, silhouette, and proportions to its reference cell.`
+        : 'Replace furniture with pieces that complement the room style.';
+
+  // Inline fidelity anchor with the live count (do NOT reuse the hardcoded-"4"
+  // FIDELITY_DIRECTIVES constant — the single-panel path still depends on it).
+  const fidelityLine =
+    `All ${total} products must appear, matching their reference cells exactly. ` +
+    'Each cell shows only its named product — ignore any other furniture, walls, or decor ' +
+    'visible in the cell, those are photography artifacts of the source listing, not directives ' +
+    'for the room. No substitutions, no omissions, no new decor.';
+
+  const cleanedPrompt = (userPrompt || '').replace(/[.\s]+$/, '');
+  const styleIntent = cleanedPrompt
+    ? `Atmosphere applies to lighting tone and upholstery only: ${cleanedPrompt}.`
+    : '';
+
+  return [
+    getQualityPrefix(cleanedPrompt),
+    centerLine,
+    accentLine,
+    renderLine,
+    fidelityLine,
+    styleIntent,
+    'Architectural words in the user style (concrete, raw, brutal, monolithic, dramatic, deep void, weathered, rustic, polished, etc.) describe upholstery and decor materials only — never walls, floors, ceilings, or trim. Architecture lock: image 1\'s walls, floor, ceiling, windows, doors, trim, and camera angle remain identical to the room photo. The atmosphere applies to fabric, lighting, and soft furnishings, never to surfaces.',
+  ].filter(Boolean).join(' ');
+}
+
+/**
  * Build the flux prompt when each product is passed as a separate input
  * image (Ring 2 fallback — fires when the 2×2 panel is unavailable).
  *

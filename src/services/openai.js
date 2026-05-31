@@ -34,6 +34,9 @@
  * ── Architectural contract (identical to fal.js / replicate.js) ────────────
  *   - generateWithProductPanel(roomURL, prompt, products, panelURL, aspect)
  *       → { url, predictionId, seed }   (seed always null for GPT Image 2)
+ *   - generateWithDualPanel(roomURL, prompt, centerProducts, accentProducts,
+ *                           panel1URL, panel2URL, aspect)
+ *       → { url, predictionId, seed }   (Build 153 — 8-product / two-panel path)
  *   - generateWithProductRefs(roomURL, prompt, products, aspect)
  *       → string (the URL)
  *   - generateSingleProductInRoom(roomURL, product, aspect)
@@ -45,7 +48,7 @@
 
 import { describeProductForPrompt } from '../utils/productDescriptor';
 import { proxyFetch } from './apiProxy';
-import { buildPanelPrompt, buildFlux2MaxPrompt, getQualityPrefix, FIDELITY_DIRECTIVES_SINGLE } from './promptBuilders';
+import { buildPanelPrompt, buildDualPanelPrompt, buildFlux2MaxPrompt, getQualityPrefix, FIDELITY_DIRECTIVES_SINGLE } from './promptBuilders';
 
 const GPT_QUEUE_URL = 'https://queue.fal.run/openai/gpt-image-2/edit';
 const POLL_INTERVAL_MS = 3000;
@@ -319,6 +322,62 @@ export async function generateWithProductPanel(roomPhotoUrl, userPrompt, product
     console.log('[gpt-image-2/edit panel] image_urls: 2 (room + 2×2 product panel)');
     console.log('[gpt-image-2/edit panel] image_size:', imageSize, '(from aspect:', aspectRatio || 'default', ') quality:', GPT_IMAGE_QUALITY);
     console.log('[gpt-image-2/edit panel] Panel URL:', panelUrl.substring(0, 80));
+  }
+
+  return await submitGptWithRetry({
+    prompt:        generationPrompt,
+    image_urls:    imageUrls,
+    image_size:    imageSize,
+    quality:       GPT_IMAGE_QUALITY,
+    output_format: 'jpeg',
+  });
+}
+
+/**
+ * Build 153 — DUAL-panel path. Generate a product-aware room redesign from a
+ * 3-image input [roomPhotoUrl, panel1Url, panel2Url]:
+ *   image 1 = room photo (architecture to preserve)
+ *   image 2 = 2×2 grid of ANCHOR furniture (4 center pieces)
+ *   image 3 = 2×2 grid of ACCENT decor (4 complementary pieces)
+ *
+ * This is the 8-product default. It is a SUPERSET of generateWithProductPanel:
+ * same submission/poll/retry machinery, one extra input image, and the
+ * dual-grid prompt from buildDualPanelPrompt. HomeScreen degrades to
+ * generateWithProductPanel (single grid, 4 products) if the accent match or
+ * the second panel build fails, so this path never has to handle the
+ * missing-accent case itself — but buildDualPanelPrompt does tolerate an empty
+ * accent list defensively.
+ *
+ * @param {string}   roomPhotoUrl   Public URL of user's (optimized) room photo
+ * @param {string}   userPrompt     Enriched design prompt
+ * @param {object[]} centerProducts Up to 4 anchor furniture products (panel 1)
+ * @param {object[]} accentProducts Up to 4 accent decor products (panel 2)
+ * @param {string}   panel1Url      Public URL of the anchor 2×2 panel
+ * @param {string}   panel2Url      Public URL of the accent 2×2 panel
+ * @param {string}   [aspectRatio]  Bucket from pickAspectRatio() — defaults to auto
+ * @returns {Promise<{ url: string, predictionId: string, seed: null }>}
+ */
+export async function generateWithDualPanel(
+  roomPhotoUrl, userPrompt, centerProducts, accentProducts, panel1Url, panel2Url, aspectRatio,
+) {
+  if (!roomPhotoUrl) throw new Error('generateWithDualPanel requires a public room photo URL.');
+  if (!panel1Url)    throw new Error('generateWithDualPanel requires an anchor product panel URL.');
+  if (!panel2Url)    throw new Error('generateWithDualPanel requires an accent product panel URL.');
+
+  const imageUrls        = [roomPhotoUrl, panel1Url, panel2Url];
+  const generationPrompt = buildDualPanelPrompt(
+    userPrompt || 'Modern minimalist interior design.',
+    centerProducts || [],
+    accentProducts || [],
+  );
+  const imageSize        = resolveImageSize(aspectRatio);
+
+  if (__DEV__) {
+    console.log('[gpt-image-2/edit dual] Prompt:', generationPrompt.substring(0, 200) + '...');
+    console.log('[gpt-image-2/edit dual] image_urls: 3 (room + anchor 2×2 + accent 2×2)');
+    console.log('[gpt-image-2/edit dual] image_size:', imageSize, '(from aspect:', aspectRatio || 'default', ') quality:', GPT_IMAGE_QUALITY);
+    console.log('[gpt-image-2/edit dual] Anchor panel:', panel1Url.substring(0, 80));
+    console.log('[gpt-image-2/edit dual] Accent panel:', panel2Url.substring(0, 80));
   }
 
   return await submitGptWithRetry({

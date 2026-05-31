@@ -48,7 +48,7 @@ roomType must be exactly one of: living-room, bedroom, kitchen, dining-room, off
 
 dominance: "high" for largest/most prominent pieces, "medium" for secondary furniture, "low" for small accents.
 
-Only include clearly visible items. List 4-6 items, most dominant first.`;
+Only include clearly visible items. List up to 10 items, most dominant first — and be sure to include smaller accent pieces (rugs, throw pillows, throw blankets, vases, planters, wall art, mirrors, lamps), not just the large furniture.`;
 
 // ── Color word matching ───────────────────────────────────────────────────────
 // Maps vision color descriptions to words that appear in product names/descriptions
@@ -319,7 +319,7 @@ function verifyThresholdFor(category) {
  * users understand those products are close matches, not exact replicas.
  *
  * @param {string}   imageUrl          - URL of the generated room image
- * @param {object[]} referenceProducts - Products committed before generation (max 6)
+ * @param {object[]} referenceProducts - Products committed before generation (up to 8)
  * @returns {Promise<{products: object[], roomType: string|null, visionItems: object[]}>}
  */
 export async function verifyGeneratedProducts(imageUrl, referenceProducts) {
@@ -396,47 +396,48 @@ export async function verifyGeneratedProducts(imageUrl, referenceProducts) {
     return (b._visionScore || 0) - (a._visionScore || 0);
   });
 
-  // Build 125 — post-render variant re-rank.
+  // Build 153 polish — input = output: vision is a CONFIDENCE SIGNAL ONLY.
   //
-  // The vision pass tells us the actual color FAL rendered for each item
-  // (via _visionMatch.color). If the catalog product has a variant whose
-  // label matches that color, swap to it — same imageUrl/affiliateUrl/asin
-  // rewrite as productMatcher's pre-render variant swap (Build 71 Fix #2),
-  // but driven by what FAL ACTUALLY drew rather than the prompt's intent.
+  // The vision pass tells us the actual color FAL rendered for each item (via
+  // _visionMatch.color). HISTORICALLY (Build 125) we used that to SWAP the
+  // displayed variant post-render — rewriting _matchedVariant/imageUrl/asin/
+  // price to whatever color FAL happened to draw. That broke the new
+  // "input = output" contract: the buy card must show the EXACT variant the AI
+  // was fed in the 2×2 grid (pinned upstream via _panelCellImage + the
+  // panel-time _matchedVariant), NOT a different variant inferred from the
+  // render. Vision reads pixels, not the catalog, so it can disagree with the
+  // grid — and letting it overwrite what's sold is precisely the divergence
+  // we're killing here.
   //
-  // Why this matters: a "japandi living room" prompt might pull a CAJCA
-  // coffee table with default Brown/Walnut variant. FAL renders the room
-  // with a Black/Transparent table. Without re-rank, the strip shows the
-  // brown table photo next to a black-table room — visually mismatched.
-  // With re-rank, the strip swaps to the Black/Transparent variant photo
-  // before the user sees it.
-  //
-  // Conservative: only swaps if a clean color-family match exists. Falls
-  // back to whatever variant productMatcher already chose (or no variant)
-  // when vision color is ambiguous or no matching variant is in stock.
-  const reranked = verified.map(p => applyVisionColorVariantSwap(p));
+  // So we no longer swap. annotateVisionColor only RECORDS what vision saw (a
+  // non-applied _visionColorSuggestion, for telemetry/QA); the confidence tier
+  // still comes from the score above. _matchedVariant, imageUrl, asin,
+  // affiliateUrl and price are left exactly as the panel committed them.
+  const reranked = verified.map(p => annotateVisionColor(p));
 
   const verifiedCount = reranked.filter(p => p.confidence === 'verified').length;
-  const swappedCount = reranked.filter(p => p._visionVariantSwap).length;
-  console.log(`[Verify] ${verifiedCount}/${reranked.length} verified | ${swappedCount} variants swapped from vision color`);
+  const driftCount = reranked.filter(p => p._visionColorSuggestion).length;
+  console.log(`[Verify] ${verifiedCount}/${reranked.length} verified | ${driftCount} vision-color note(s) recorded (variant pinned to grid — no swap)`);
 
   return { products: reranked, roomType, visionItems };
 }
 
 /**
- * Build 125 — post-render variant swap helper.
+ * Build 153 polish — vision color annotation (CONFIDENCE-ONLY).
  *
- * If the product has a `_visionMatch.color`, map it to a canonical color
- * family and look for a matching variant. If found, rewrite imageUrl,
- * affiliateUrl, asin, and price to that variant — same shape as the
- * pre-render swap in productMatcher.js so downstream UI renders the
- * matched variant photo + correct ASIN/price in the strip.
+ * REPLACES the Build 125 post-render variant swap. Under the input = output
+ * contract the displayed/sold variant is pinned to what the AI saw in the 2×2
+ * grid (HomeScreen stamps _panelCellImage and the panel-time _matchedVariant is
+ * left intact), so this helper must NOT reassign it. Instead it records — for
+ * telemetry/QA only — whether FAL's rendered color diverged from the committed
+ * variant, WITHOUT touching _matchedVariant, imageUrl, asin, affiliateUrl, or
+ * price.
  *
- * Idempotent: if a pre-render swap already chose a variant in the right
- * color family, this is a no-op (the existing variant satisfies the
- * vision color and we don't need to re-swap).
+ * Stamps `_visionColorSuggestion = { from, to, family }` when a different
+ * in-stock color-family variant matches what vision saw; otherwise returns the
+ * product unchanged. Pure — never mutates the input object.
  */
-function applyVisionColorVariantSwap(product) {
+function annotateVisionColor(product) {
   const visionColor = product?._visionMatch?.color;
   if (!visionColor) return product;
   if (!Array.isArray(product.variants) || product.variants.length === 0) return product;
@@ -444,8 +445,7 @@ function applyVisionColorVariantSwap(product) {
   const families = detectColorFamilies(visionColor);
   if (families.length === 0) return product;
 
-  // If the current variant already matches one of the vision color families,
-  // no swap needed — the pre-render matcher got it right.
+  // Current (pinned) variant already in a vision color family? Nothing to note.
   if (product._matchedVariant) {
     const currentLabel = String(product._matchedVariant.label || '').toLowerCase();
     if (families.some(f => detectColorFamilies(currentLabel).includes(f))) {
@@ -453,7 +453,7 @@ function applyVisionColorVariantSwap(product) {
     }
   }
 
-  // Walk each detected family in priority order; first matching variant wins.
+  // Find the variant vision WOULD point to — recorded, never applied.
   let matched = null;
   let matchedFamily = null;
   for (const family of families) {
@@ -465,25 +465,21 @@ function applyVisionColorVariantSwap(product) {
   }
   if (!matched) return product;
 
-  const next = {
-    ...product,
-    _matchedVariant: matched,
-    _visionVariantSwap: { from: product._matchedVariant?.label || null, to: matched.label, family: matchedFamily },
-  };
-  if (matched.mainImage || matched.swatchImage) {
-    next.imageUrl = matched.mainImage || matched.swatchImage;
-  }
-  if (matched.affiliateUrl) next.affiliateUrl = matched.affiliateUrl;
-  if (matched.asin) next.asin = matched.asin;
-  if (typeof matched.price === 'number' && matched.price > 0) {
-    next.price = matched.price;
-    next.priceDisplay = `$${matched.price.toFixed(2)}`;
-  }
+  // Record-only: the buy card stays pinned to the grid variant. This note lets
+  // us measure render/catalog color drift without changing what's sold.
   console.log(
-    `[Verify] vision-color variant swap: "${(product.name || '').slice(0, 40)}" ` +
-    `→ "${matched.label}" (vision=${visionColor}, family=${matchedFamily})`
+    `[Verify] vision-color note (not applied): "${(product.name || '').slice(0, 40)}" ` +
+    `grid="${product._matchedVariant?.label || '(none)'}" vs vision="${visionColor}" ` +
+    `→ would suggest "${matched.label}" (family=${matchedFamily})`
   );
-  return next;
+  return {
+    ...product,
+    _visionColorSuggestion: {
+      from: product._matchedVariant?.label || null,
+      to: matched.label,
+      family: matchedFamily,
+    },
+  };
 }
 
 // Category relatedness for cross-checking vision items against products.
@@ -582,7 +578,7 @@ export function rematchFromVision(visionItems, roomType, fallbackProducts = [], 
 
 // ── Call Claude Vision to analyze a generated room image ─────────────────────
 /**
- * Sends the generated room image URL to Claude Sonnet for visual analysis.
+ * Sends the generated room image URL to Claude Haiku for visual analysis.
  * Returns structured furniture descriptions for re-matching against the catalog.
  *
  * @param {string} imageUrl  - URL of the AI-generated room image (from Replicate)
@@ -596,14 +592,14 @@ export async function analyzeRoomImage(imageUrl) {
     return null;
   }
 
-  console.log('[Vision] Analyzing generated room with Claude Sonnet 4.6...');
+  console.log('[Vision] Analyzing generated room with Claude Haiku...');
 
   try {
     const res = await proxyFetch('anthropic', ANTHROPIC_API_URL, {
       method: 'POST',
       body: {
         model: VISION_MODEL,
-        max_tokens: 1024,
+        max_tokens: 2048,
         messages: [
           {
             role: 'user',
