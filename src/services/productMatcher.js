@@ -105,6 +105,36 @@ const CATEGORY_ROOM_LOCK = {
   'desk-chair':     ['office'],
 };
 
+// ── Build 154 (Phase 2): Room-agnostic categories ───────────────────────────
+// Genuinely room-neutral accessories — decor, lighting, soft goods, rugs,
+// storage. These legitimately appear in ANY room (a rug in a kitchen, a wall
+// mirror in a bathroom, a table lamp in an office), so the full-catalog
+// expansion below is allowed to cross-room them when a room pool is thin.
+//
+// Everything NOT in this set and NOT in CATEGORY_ROOM_LOCK is treated as
+// room-bound FURNITURE: the expansion requires it to be tagged for the
+// requested room (same as the main pool's HARD FILTER 1). This closes the
+// leak where sofas, coffee tables, accent chairs, bookshelves and tv-stands
+// were pulled into wrong rooms (a sofa + coffee table in a bathroom render)
+// purely to fill slots. chandelier is intentionally absent — it's already
+// room-locked above. See Phase 0/2 baselines: locked categories already show
+// 0% off-room; this brings unlocked furniture in line while universal
+// accessories keep thin rooms (bathroom/outdoor/nursery) filled.
+const ROOM_AGNOSTIC_CATEGORIES = new Set([
+  // Lighting (chandelier excluded — room-locked above)
+  'lamp', 'table-lamp', 'floor-lamp', 'pendant-light', 'wall-light',
+  // Wall decor
+  'mirror', 'wall-art', 'wall-shelf',
+  // Surface decor
+  'vase', 'planter', 'sculpture',
+  // Soft goods
+  'throw-pillow', 'throw-blanket', 'curtains',
+  // Floor covering — appropriate in any room
+  'rug',
+  // Generic storage baskets / bins
+  'storage',
+]);
+
 // ── Build 131: Category pairing ────────────────────────────────────────────
 // When the matcher picks an "anchor" furniture piece (a dining-table or a
 // kitchen-island), the diversifier guarantees its functional pair (chair or
@@ -415,8 +445,19 @@ export function matchProducts(
       .filter(p => !usedIds.has(p.id))
       .filter(p => (usedCats[p.category] || 0) < MAX_PER_CATEGORY)
       .filter(p => {
+        // CATEGORY_ROOM_LOCK still applies (bed only in bedroom, etc.).
         const lock = CATEGORY_ROOM_LOCK[p.category];
-        return !lock || lock.includes(roomType);
+        if (lock && !lock.includes(roomType)) return false;
+        // Build 154 (Phase 2): close the off-room furniture leak. The main
+        // pool enforces HARD FILTER 1 (room inclusion) but this expansion
+        // historically only checked the lock, so room-bound furniture (sofas,
+        // coffee tables, accent chairs, bookshelves, tv-stands) leaked into
+        // wrong rooms purely to fill slots. Now: universal accessories may
+        // still cross rooms to keep thin pools full; everything else must be
+        // tagged for the requested room, same as the main pool.
+        if (ROOM_AGNOSTIC_CATEGORIES.has(p.category)) return true;
+        const productRooms = Array.isArray(p.roomType) ? p.roomType : [p.roomType];
+        return productRooms.includes(roomType);
       })
       .map(p => {
         const b = scoreProduct(

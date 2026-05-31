@@ -46,7 +46,7 @@ import { useLiked } from '../context/LikedContext';
 import { useCart } from '../context/CartContext';
 import { DESIGNS } from '../data/designs';
 import { SELLERS } from '../data/sellers';
-import { searchProducts, getSourceColor, getProductsForPrompt, getAnchorProductsForPrompt, getAccentProductsForPrompt, getNormalizedProductsByIds } from '../services/affiliateProducts';
+import { getSourceColor, getProductsForPrompt, getAnchorProductsForPrompt, getAccentProductsForPrompt, getNormalizedProductsByIds } from '../services/affiliateProducts';
 import { loadProductHistory, appendPicksToHistory } from '../services/productHistory';
 import { parseDesignPrompt } from '../utils/promptParser';
 import { buildFinalPrompt, generateWithProductPanel, generateWithDualPanel, generateWithProductRefs, generateSingleProductInRoom, pickAspectRatio } from '../services/aiProvider';
@@ -373,58 +373,18 @@ const HERO_IMAGES = [
 const HERO_INTERVAL = 5500;  // 5.5 seconds between transitions
 const HERO_FADE_MS  = 1200;  // 1.2 second smooth crossfade
 
-// ── Style category chips with preview image ────────────────────────────────────
-// Local assets for curated styles (permanent, no CDN expiry)
-const STYLE_IMG_JAPANDI       = require('../assets/styles/Japandi.jpg');
-const STYLE_IMG_SCANDI        = require('../assets/styles/Scandanavian.jpg');
-const STYLE_IMG_MINIMALIST    = require('../assets/styles/Minimalist.jpg');
-const STYLE_IMG_GLAM          = require('../assets/styles/glam.jpg');
-const STYLE_IMG_MODERN        = require('../assets/styles/Modern.jpg');
-const STYLE_IMG_CONTEMPORARY  = require('../assets/styles/Contemporary.jpg');
-
-const STYLE_CATEGORIES = [
-  { key: 'contemporary', label: 'Contemporary', sub: 'Now & Refined',
-    bg: '#FAFAFA', text: '#1F2937', accent: '#4B5563',
-    localImage: STYLE_IMG_CONTEMPORARY, nativeW: 1000, nativeH: 1250 },
-  { key: 'japandi',     label: 'Japandi',     sub: 'Refined Calm',
-    bg: '#F0FDF4', text: '#166534', accent: '#16A34A',
-    localImage: STYLE_IMG_JAPANDI,    nativeW: 600,  nativeH: 750 },
-  { key: 'scandi',      label: 'Scandi',      sub: 'Pure & Airy',
-    bg: '#EFF6FF', text: '#1E40AF', accent: '#3B82F6',
-    localImage: STYLE_IMG_SCANDI,     nativeW: 600,  nativeH: 750 },
-  { key: 'minimalist',  label: 'Minimalist',  sub: 'Less Is More',
-    bg: '#F3F4F6', text: '#111827', accent: '#374151',
-    localImage: STYLE_IMG_MINIMALIST, nativeW: 600,  nativeH: 750 },
-  { key: 'luxury',      label: 'Glam',        sub: 'Opulent Edge',
-    bg: '#F5F3FF', text: '#5B21B6', accent: '#7C3AED',
-    localImage: STYLE_IMG_GLAM,       nativeW: 736,  nativeH: 1031 },
-  { key: 'modern',      label: 'Modern',      sub: 'Clean & Current',
-    bg: '#F8FAFC', text: '#0F172A', accent: '#334155',
-    localImage: STYLE_IMG_MODERN,     nativeW: 900,  nativeH: 1124 },
-  { key: 'mid-century', label: 'Mid-Century', sub: 'Bold Heritage',
-    bg: '#FFF7ED', text: '#9A3412', accent: '#EA580C',
-    imageUrl: 'https://images.unsplash.com/photo-1541085929911-dea736e9287b?w=600&q=85' },
-  { key: 'dark-luxe',   label: 'Dark Luxe',   sub: 'Moody & Rich',
-    bg: '#1E1B4B', text: '#C7D2FE', accent: '#818CF8',
-    imageUrl: 'https://images.unsplash.com/photo-1668089677938-b52086753f77?w=600&q=85' },
-  { key: 'bohemian',    label: 'Boho',        sub: 'Free Spirit',
-    bg: '#FEF3C7', text: '#92400E', accent: '#D97706',
-    imageUrl: 'https://images.unsplash.com/photo-1632119580908-ae947d4c7691?w=600&q=85' },
-  { key: 'farmhouse',   label: 'Farmhouse',   sub: 'Warm & Rooted',
-    bg: '#FAF6F0', text: '#713F12', accent: '#A16207',
-    imageUrl: 'https://images.unsplash.com/photo-1764076327046-fe35f955cba1?w=600&q=85' },
-  { key: 'coastal',     label: 'Coastal',     sub: 'Breezy & Light',
-    bg: '#F0F9FF', text: '#0C4A6E', accent: '#0EA5E9',
-    imageUrl: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=600&q=85' },
-];
-
-// Product counts per style (computed once at module load)
-const STYLE_PRODUCT_COUNTS = Object.fromEntries(
-  STYLE_CATEGORIES.map(cat => [
-    cat.key,
-    searchProducts({ style: cat.key, limit: 999 }).length,
-  ])
-);
+// Build 154 (Phase 1): STYLE_CATEGORIES + STYLE_PRODUCT_COUNTS removed.
+// Both were dead code. STYLE_CATEGORIES was never rendered — the live
+// style picker is the StyleCarousel, driven by STYLE_PRESETS in
+// src/data/stylePresets.js — and STYLE_PRODUCT_COUNTS was never read.
+// Worse, STYLE_PRODUCT_COUNTS ran searchProducts() 11× at module load,
+// and searchProducts() calls getCatalog(), waking the full product catalog
+// at HomeScreen import time and defeating the Build 147 (C1) lazy-catalog
+// migration (same anti-pattern noted for NEW_ARRIVAL_PRODUCTS below).
+// Removing this block keeps the catalog lazy until the first real
+// search/match. The block also held a stale `key:'luxury'/label:'Glam'`
+// entry that never existed in the live STYLE_PRESETS path (`id:'glam'`),
+// so its removal also erases a misleading non-bug.
 
 // Build 147 (C1): NEW_ARRIVAL_PRODUCTS was declared but never read anywhere
 // in the file. Removed as part of the lazy-catalog migration so the
